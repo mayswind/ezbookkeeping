@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }" v-if="mode !== TransactionEditPageMode.View || transaction.type !== TransactionType.ModifyBalance">
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': inputIsEmpty || submitting }" @click="save" v-if="mode !== TransactionEditPageMode.View"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': inputIsEmpty || submitting }" @click="save(AfterSaveAction.GoBack)" v-if="mode !== TransactionEditPageMode.View"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -470,11 +470,26 @@
         </f7-actions>
 
         <template #fixed>
-            <f7-fab position="right-bottom" :class="{ 'disabled': inputIsEmpty || submitting }"
-                    :text="tt(saveButtonTitle)"
-                    @click="save" v-if="mode !== TransactionEditPageMode.View">
+            <f7-fab id="quick-save-fab" position="right-bottom" :class="{ 'disabled': inputIsEmpty || submitting }"
+                    :text="tt(quickSaveButtonTitle)"
+                    @click="quickSave" v-if="mode !== TransactionEditPageMode.View">
             </f7-fab>
         </template>
+
+        <f7-popover class="quick-save-popover" target-el="#quick-save-fab"
+                    v-model:opened="showQuickSavePopover">
+            <f7-list>
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt(TransactionQuickAddButtonActionType.SaveAndGoBack.name)"
+                              @click="save(AfterSaveAction.GoBack)"></f7-list-item>
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt(TransactionQuickAddButtonActionType.SaveAndAddNewTransaction.name)"
+                              @click="save(AfterSaveAction.StayWithNewTransaction)"></f7-list-item>
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt(TransactionQuickAddButtonActionType.SaveAndKeepCurrentData.name)"
+                              @click="save(AfterSaveAction.StayWithCurrentTransaction)"></f7-list-item>
+            </f7-list>
+        </f7-popover>
 
         <f7-photo-browser ref="pictureBrowser" type="popup" navbar-of-text="/"
                           :navbar-show-count="true" :exposition="false"
@@ -493,6 +508,7 @@ import {
     TransactionEditPageMode,
     TransactionEditPageType,
     GeoLocationStatus,
+    AfterSaveAction,
     useTransactionEditPageBase
 } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
@@ -505,7 +521,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import { CategoryType } from '@/core/category.ts';
-import { TransactionEditScopeType, TransactionType } from '@/core/transaction.ts';
+import { TransactionType, TransactionEditScopeType, TransactionQuickAddButtonActionType } from '@/core/transaction.ts';
 import { ScheduledTemplateFrequencyType, TemplateType } from '@/core/template.ts';
 import { TRANSACTION_MAX_AMOUNT, TRANSACTION_MIN_AMOUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
@@ -523,6 +539,7 @@ import {
 import { formatCoordinate } from '@/lib/coordinate.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { getTransactionPrimaryCategoryName, getTransactionSecondaryCategoryName } from '@/lib/category.ts';
+import { type SetTransactionOptions } from '@/lib/transaction.ts';
 import { getMapProvider, isTransactionPicturesEnabled } from '@/lib/server_settings.ts';
 import logger from '@/lib/logger.ts';
 
@@ -554,6 +571,7 @@ const {
     clientSessionId,
     loading,
     submitting,
+    submitted,
     uploadingPicture,
     geoLocationStatus,
     setGeoLocationByClickMap,
@@ -574,7 +592,7 @@ const {
     hasVisibleTransferCategories,
     canAddTransactionPicture,
     title,
-    saveButtonTitle,
+    quickSaveButtonTitle,
     sourceAmountTitle,
     sourceAccountTitle,
     transferInAmountTitle,
@@ -588,6 +606,7 @@ const {
     inputEmptyProblemMessage,
     inputIsEmpty,
     setTransactionModel,
+    updateTransactionModelByAfterSaveAction,
     updateTransactionTime,
     updateTransactionTimezone,
     swapTransactionData,
@@ -609,10 +628,10 @@ const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
 const isSupportClipboard = !!navigator.clipboard;
 
 const loadingError = ref<unknown | null>(null);
-const submitted = ref<boolean>(false);
 const removingPictureId = ref<string | null>(null);
 const transactionDateTimeSheetMode = ref<string>('time');
 const showTimeInDefaultTimezone = ref<boolean>(false);
+const showQuickSavePopover = ref<boolean>(false);
 const showTimezonePopup = ref<boolean>(false);
 const showGeoLocationActionSheet = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
@@ -825,6 +844,20 @@ function getFontClassByAmount(amount: number): string {
     }
 }
 
+function getQueryTransactionOptions(): SetTransactionOptions {
+    return {
+        time: query['time'] ? parseInt(query['time']) : undefined,
+        type: query['type'] ? parseInt(query['type']) : 0,
+        categoryId: query['categoryId'],
+        accountId: query['accountId'],
+        destinationAccountId: query['destinationAccountId'],
+        amount: query['amount'] ? parseInt(query['amount']) : undefined,
+        destinationAmount: query['destinationAmount'] ? parseInt(query['destinationAmount']) : undefined,
+        tagIds: query['tagIds'],
+        comment: query['comment']
+    };
+}
+
 function init(): void {
     if (!pageTypeAndMode) {
         showToast('Parameter Invalid');
@@ -875,16 +908,16 @@ function init(): void {
         }
     }
 
-    const queryType = query['type'] ? parseInt(query['type']) : 0;
+    const initOptions = getQueryTransactionOptions();
 
-    if (queryType &&
-        queryType >= TransactionType.Income &&
-        queryType <= TransactionType.Transfer) {
-        transaction.value.type = queryType;
-    } else if (queryType === TransactionType.ModifyBalance &&
+    if (initOptions.type &&
+        initOptions.type >= TransactionType.Income &&
+        initOptions.type <= TransactionType.Transfer) {
+        transaction.value.type = initOptions.type;
+    } else if (initOptions.type === TransactionType.ModifyBalance &&
         pageTypeAndMode.type === TransactionEditPageType.Transaction &&
         mode.value === TransactionEditPageMode.View) {
-        transaction.value.type = queryType;
+        transaction.value.type = initOptions.type;
     }
 
     if (mode.value === TransactionEditPageMode.Add) {
@@ -926,17 +959,7 @@ function init(): void {
 
         setTransactionModel(
             fromTransaction,
-            {
-                time: query['time'] ? parseInt(query['time']) : undefined,
-                type: queryType,
-                categoryId: query['categoryId'],
-                accountId: query['accountId'],
-                destinationAccountId: query['destinationAccountId'],
-                amount: query['amount'] ? parseInt(query['amount']) : undefined,
-                destinationAmount: query['destinationAmount'] ? parseInt(query['destinationAmount']) : undefined,
-                tagIds: query['tagIds'],
-                comment: query['comment']
-            },
+            initOptions,
             pageTypeAndMode.type === TransactionEditPageType.Transaction && (mode.value === TransactionEditPageMode.Edit || mode.value === TransactionEditPageMode.View)
         );
 
@@ -974,7 +997,7 @@ function init(): void {
     });
 }
 
-function save(): void {
+function save(afterAction: AfterSaveAction): void {
     const router = props.f7router;
 
     if (mode.value === TransactionEditPageMode.View) {
@@ -1000,20 +1023,26 @@ function save(): void {
                 clientSessionId: clientSessionId.value
             }).then(() => {
                 submitting.value = false;
+                submitted.value = true;
                 hideLoading();
-
-                if (mode.value === TransactionEditPageMode.Add) {
-                    showToast('You have added a new transaction');
-                } else if (mode.value === TransactionEditPageMode.Edit) {
-                    showToast('You have saved this transaction');
-                }
 
                 if (mode.value === TransactionEditPageMode.Add && query['noTransactionDraft'] !== 'true' && !addByTemplateId.value && !duplicateFromId.value) {
                     transactionsStore.clearTransactionDraft();
                 }
 
-                submitted.value = true;
-                router.back();
+                if (mode.value === TransactionEditPageMode.Add && (afterAction === AfterSaveAction.StayWithNewTransaction || afterAction === AfterSaveAction.StayWithCurrentTransaction)) {
+                    showToast('You have added a new transaction');
+                    updateTransactionModelByAfterSaveAction(afterAction, getQueryTransactionOptions());
+                    clientSessionId.value = generateRandomUUID();
+                } else {
+                    if (mode.value === TransactionEditPageMode.Add) {
+                        showToast('You have added a new transaction');
+                    } else if (mode.value === TransactionEditPageMode.Edit) {
+                        showToast('You have saved this transaction');
+                    }
+
+                    router.back();
+                }
             }).catch(error => {
                 submitting.value = false;
                 hideLoading();
@@ -1062,6 +1091,7 @@ function save(): void {
             clientSessionId: clientSessionId.value
         }).then(() => {
             submitting.value = false;
+            submitted.value = true;
             hideLoading();
 
             if (mode.value === TransactionEditPageMode.Add) {
@@ -1070,7 +1100,6 @@ function save(): void {
                 showToast('You have saved this template');
             }
 
-            submitted.value = true;
             router.back();
         }).catch(error => {
             submitting.value = false;
@@ -1081,6 +1110,29 @@ function save(): void {
             }
         });
     }
+}
+
+function quickSave(): void {
+    if (mode.value === TransactionEditPageMode.View) {
+        return;
+    }
+
+    if (pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode.value === TransactionEditPageMode.Add) {
+        const quickAddActionType = settingsStore.appSettings.quickAddButtonActionInMobileTransactionEditPage;
+
+        if (quickAddActionType === TransactionQuickAddButtonActionType.OpenMenu.type) {
+            showQuickSavePopover.value = true;
+            return;
+        } else if (quickAddActionType === TransactionQuickAddButtonActionType.SaveAndAddNewTransaction.type) {
+            save(AfterSaveAction.StayWithNewTransaction);
+            return;
+        } else if (quickAddActionType === TransactionQuickAddButtonActionType.SaveAndKeepCurrentData.type) {
+            save(AfterSaveAction.StayWithCurrentTransaction);
+            return;
+        }
+    }
+
+    save(AfterSaveAction.GoBack);
 }
 
 function pasteAmount(type: 'sourceAmount' | 'destinationAmount'): void {

@@ -66,3 +66,34 @@ export class TransactionTagFilterType implements TypeAndName {
         return TransactionTagFilterType.allInstancesByType[type];
     }
 }
+
+export class TransactionQuickAddButtonActionType implements TypeAndName {
+    private static readonly allInstances: TransactionQuickAddButtonActionType[] = [];
+    private static readonly allInstancesByType: Record<number, TransactionQuickAddButtonActionType> = {};
+
+    public static readonly SaveAndGoBack = new TransactionQuickAddButtonActionType(0, 'Save');
+    public static readonly OpenMenu = new TransactionQuickAddButtonActionType(1, 'Open Menu');
+    public static readonly SaveAndAddNewTransaction = new TransactionQuickAddButtonActionType(2, 'Save & New');
+    public static readonly SaveAndKeepCurrentData = new TransactionQuickAddButtonActionType(3, 'Save & Duplicate');
+
+    public static readonly Default = TransactionQuickAddButtonActionType.SaveAndGoBack;
+
+    public readonly type: number;
+    public readonly name: string;
+
+    private constructor(type: number, name: string) {
+        this.type = type;
+        this.name = name;
+
+        TransactionQuickAddButtonActionType.allInstances.push(this);
+        TransactionQuickAddButtonActionType.allInstancesByType[type] = this;
+    }
+
+    public static values(): TransactionQuickAddButtonActionType[] {
+        return TransactionQuickAddButtonActionType.allInstances;
+    }
+
+    public static valueOf(type: number): TransactionQuickAddButtonActionType | undefined {
+        return TransactionQuickAddButtonActionType.allInstancesByType[type];
+    }
+}

@@ -414,11 +414,25 @@
                     <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
                         <template v-slot:activator="{ props }">
                             <div v-bind="props" class="d-inline-block">
-                                <v-btn :disabled="inputIsEmpty || loading || submitting"
-                                       v-if="mode !== TransactionEditPageMode.View" @click="save">
-                                    {{ tt(saveButtonTitle) }}
-                                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                                </v-btn>
+                                <v-btn-group density="comfortable" v-if="mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit">
+                                    <v-btn color="primary" :disabled="inputIsEmpty || loading || submitting" @click="save(AfterSaveAction.GoBack)">
+                                        {{ tt(saveButtonTitle) }}
+                                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                                    </v-btn>
+                                    <v-btn color="primary" density="compact"
+                                           :disabled="inputIsEmpty || loading || submitting" :icon="true"
+                                           v-if="type === TransactionEditPageType.Transaction && mode === TransactionEditPageMode.Add">
+                                        <v-icon :icon="mdiMenuDown" size="24" />
+                                        <v-menu activator="parent">
+                                            <v-list>
+                                                <v-list-item :title="tt(TransactionQuickAddButtonActionType.SaveAndAddNewTransaction.name)"
+                                                             @click="save(AfterSaveAction.StayWithNewTransaction)"></v-list-item>
+                                                <v-list-item :title="tt(TransactionQuickAddButtonActionType.SaveAndKeepCurrentData.name)"
+                                                             @click="save(AfterSaveAction.StayWithCurrentTransaction)"></v-list-item>
+                                            </v-list>
+                                        </v-menu>
+                                    </v-btn>
+                                </v-btn-group>
                             </div>
                         </template>
                     </v-tooltip>
@@ -474,6 +488,7 @@ import {
     TransactionEditPageMode,
     TransactionEditPageType,
     GeoLocationStatus,
+    AfterSaveAction,
     useTransactionEditPageBase
 } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
@@ -487,7 +502,7 @@ import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import type { Coordinate } from '@/core/coordinate.ts';
 import { CategoryType } from '@/core/category.ts';
-import { TransactionType, TransactionEditScopeType } from '@/core/transaction.ts';
+import { TransactionType, TransactionEditScopeType, TransactionQuickAddButtonActionType } from '@/core/transaction.ts';
 import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
@@ -563,6 +578,7 @@ const {
     clientSessionId,
     loading,
     submitting,
+    submitted,
     uploadingPicture,
     geoLocationStatus,
     setGeoLocationByClickMap,
@@ -596,6 +612,7 @@ const {
     inputIsEmpty,
     createNewTransactionModel,
     setTransactionModel,
+    updateTransactionModelByAfterSaveAction,
     updateTransactionTime,
     updateTransactionTimezone,
     swapTransactionData,
@@ -656,6 +673,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     activeTab.value = 'basicInfo';
     loading.value = true;
     submitting.value = false;
+    submitted.value = false;
     geoLocationStatus.value = null;
     setGeoLocationByClickMap.value = false;
     originalTransactionEditable.value = false;
@@ -791,7 +809,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
     });
 }
 
-function save(): void {
+function save(afterAction: AfterSaveAction): void {
     const problemMessage = inputEmptyProblemMessage.value;
 
     if (problemMessage) {
@@ -810,24 +828,31 @@ function save(): void {
                 clientSessionId: clientSessionId.value
             }).then(() => {
                 submitting.value = false;
-
-                if (resolveFunc) {
-                    if (mode.value === TransactionEditPageMode.Add) {
-                        resolveFunc({
-                            message: 'You have added a new transaction'
-                        });
-                    } else if (mode.value === TransactionEditPageMode.Edit) {
-                        resolveFunc({
-                            message: 'You have saved this transaction'
-                        });
-                    }
-                }
+                submitted.value = true;
 
                 if (mode.value === TransactionEditPageMode.Add && !noTransactionDraft.value && !addByTemplateId.value && !duplicateFromId.value) {
                     transactionsStore.clearTransactionDraft();
                 }
 
-                showState.value = false;
+                if (mode.value === TransactionEditPageMode.Add && (afterAction === AfterSaveAction.StayWithNewTransaction || afterAction === AfterSaveAction.StayWithCurrentTransaction)) {
+                    snackbar.value?.showMessage('You have added a new transaction');
+                    updateTransactionModelByAfterSaveAction(afterAction, initOptions.value);
+                    clientSessionId.value = generateRandomUUID();
+                } else {
+                    if (resolveFunc) {
+                        if (mode.value === TransactionEditPageMode.Add) {
+                            resolveFunc({
+                                message: 'You have added a new transaction'
+                            });
+                        } else if (mode.value === TransactionEditPageMode.Edit) {
+                            resolveFunc({
+                                message: 'You have saved this transaction'
+                            });
+                        }
+                    }
+
+                    showState.value = false;
+                }
             }).catch(error => {
                 submitting.value = false;
 
@@ -903,6 +928,7 @@ function duplicate(withTime?: boolean, withGeoLocation?: boolean): void {
     editId.value = null;
     duplicateFromId.value = transaction.value.id;
     clientSessionId.value = generateRandomUUID();
+    submitted.value = false;
     activeTab.value = 'basicInfo';
     transaction.value.id = '';
 
@@ -958,7 +984,11 @@ function remove(): void {
 
 function cancel(): void {
     const doClose = function () {
-        if (rejectFunc) {
+        if (props.type === TransactionEditPageType.Transaction && mode.value === TransactionEditPageMode.Add && submitted.value && resolveFunc) {
+            resolveFunc({
+                message: 'You have added a new transaction'
+            });
+        } else if (rejectFunc) {
             rejectFunc();
         }
 

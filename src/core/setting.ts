@@ -1,6 +1,7 @@
 import { type WeekDayValue, WeekDay } from './datetime.ts';
 import { TimezoneTypeForStatistics } from './timezone.ts';
 import { CurrencySortingType } from './currency.ts';
+import { TransactionQuickAddButtonActionType } from './transaction.ts';
 import {
     CategoricalChartType,
     TrendChartType,
@@ -43,6 +44,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     overviewAccountFilterInHomePage: Record<string, boolean>;
     overviewTransactionCategoryFilterInHomePage: Record<string, boolean>;
     // Transaction List Page
+    quickAddButtonActionInMobileTransactionEditPage: number;
     itemsCountInTransactionListPage: number;
     showTotalAmountInTransactionListPage: boolean;
     showTagInTransactionListPage: boolean;
@@ -123,6 +125,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'showTotalAmountInTransactionListPage': UserApplicationCloudSettingType.Boolean,
     'showTagInTransactionListPage': UserApplicationCloudSettingType.Boolean,
     // Transaction Edit Page
+    'quickAddButtonActionInMobileTransactionEditPage': UserApplicationCloudSettingType.Number,
     'autoSaveTransactionDraft': UserApplicationCloudSettingType.String,
     'autoGetCurrentGeoLocation': UserApplicationCloudSettingType.Boolean,
     'alwaysShowTransactionPicturesInMobileTransactionEditPage': UserApplicationCloudSettingType.Boolean,
@@ -181,6 +184,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     showTotalAmountInTransactionListPage: true,
     showTagInTransactionListPage: true,
     // Transaction Edit Page
+    quickAddButtonActionInMobileTransactionEditPage: TransactionQuickAddButtonActionType.Default.type,
     autoSaveTransactionDraft: 'disabled',
     autoGetCurrentGeoLocation: false,
     alwaysShowTransactionPicturesInMobileTransactionEditPage: false,

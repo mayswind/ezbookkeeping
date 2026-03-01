@@ -13,7 +13,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
-import { TransactionType } from '@/core/transaction.ts';
+import { TransactionType, TransactionQuickAddButtonActionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
@@ -64,6 +64,12 @@ export enum GeoLocationStatus {
     Error = 'error'
 }
 
+export enum AfterSaveAction {
+    GoBack = 'goBack',
+    StayWithNewTransaction = 'stayWithNewTransaction',
+    StayWithCurrentTransaction = 'stayWithCurrentTransaction'
+}
+
 export function useTransactionEditPageBase(type: TransactionEditPageType, initMode?: TransactionEditPageMode, transactionDefaultType?: number) {
     const {
         tt,
@@ -93,6 +99,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const clientSessionId = ref<string>('');
     const loading = ref<boolean>(true);
     const submitting = ref<boolean>(false);
+    const submitted = ref<boolean>(false);
     const uploadingPicture = ref<boolean>(false);
     const geoLocationStatus = ref<GeoLocationStatus | null>(null);
     const setGeoLocationByClickMap = ref<boolean>(false);
@@ -165,6 +172,20 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const saveButtonTitle = computed<string>(() => {
         if (mode.value === TransactionEditPageMode.Add) {
             return 'Add';
+        } else {
+            return 'Save';
+        }
+    });
+
+    const quickSaveButtonTitle = computed<string>(() => {
+        if (mode.value === TransactionEditPageMode.Add) {
+            const quickAddActionType = TransactionQuickAddButtonActionType.valueOf(settingsStore.appSettings.quickAddButtonActionInMobileTransactionEditPage);
+
+            if (quickAddActionType && quickAddActionType.type !== TransactionQuickAddButtonActionType.OpenMenu.type) {
+                return quickAddActionType.name;
+            } else {
+                return 'Add';
+            }
         } else {
             return 'Save';
         }
@@ -395,6 +416,16 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         );
     }
 
+    function updateTransactionModelByAfterSaveAction(afterSaveAction: AfterSaveAction, initOptions?: SetTransactionOptions): void {
+        if (afterSaveAction === AfterSaveAction.StayWithNewTransaction) {
+            transaction.value = createNewTransactionModel(transactionDefaultType);
+            setTransactionModel(null, initOptions, true);
+            geoLocationStatus.value = null;
+        } else if (afterSaveAction === AfterSaveAction.StayWithCurrentTransaction) {
+            transaction.value.clearPictures();
+        }
+    }
+
     function updateTransactionTime(newTime: number): void {
         transaction.value.time = newTime;
         updateTransactionTimezone(transaction.value.timeZone ?? '');
@@ -489,6 +520,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         clientSessionId,
         loading,
         submitting,
+        submitted,
         uploadingPicture,
         geoLocationStatus,
         setGeoLocationByClickMap,
@@ -516,6 +548,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         canAddTransactionPicture,
         title,
         saveButtonTitle,
+        quickSaveButtonTitle,
         cancelButtonTitle,
         sourceAmountName,
         sourceAmountTitle,
@@ -533,6 +566,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         // functions
         createNewTransactionModel,
         setTransactionModel,
+        updateTransactionModelByAfterSaveAction,
         updateTransactionTime,
         updateTransactionTimezone,
         swapTransactionData,

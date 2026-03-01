@@ -1355,6 +1355,8 @@
         "utf-8": "UTF-8",
         "utf-16le": "UTF-16 Little Endian",
         "utf-16be": "UTF-16 Big Endian",
+        "utf-32le": "UTF-32 Little Endian",
+        "utf-32be": "UTF-32 Big Endian",
         "cp437": "OEM 米国 (CP-437)",
         "cp863": "OEM カナダ系フランス語 (CP-863)",
         "cp037": "IBM EBCDIC 米国/カナダ (CP-037)",

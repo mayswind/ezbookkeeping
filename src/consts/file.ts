@@ -15,6 +15,8 @@ export const SUPPORTED_FILE_ENCODINGS: string[] = [
     UTF_8, // UTF-8
     'utf-16le', // UTF-16 Little Endian
     'utf-16be', // UTF-16 Big Endian
+    'utf-32le', // UTF-32 Little Endian
+    'utf-32be', // UTF-32 Big Endian
     'cp437', // OEM United States (CP-437)
     'cp863', // OEM Canadian French (CP-863)
     'cp037', // IBM EBCDIC US/Canada (CP-037)
@@ -67,8 +69,8 @@ export const CHARDET_ENCODING_NAME_MAPPING: Record<string, string> = {
     'UTF-8': UTF_8,
     'UTF-16LE': 'utf-16le',
     'UTF-16BE': 'utf-16be',
-    // 'UTF-32 LE': '', // not supported
-    // 'UTF-32 BE': '', // not supported
+    'UTF-32LE': 'utf-32le',
+    'UTF-32BE': 'utf-32be',
     'ISO-2022-JP': 'iso-2022-jp',
     // 'ISO-2022-KR': '', // not supported
     // 'ISO-2022-CN': '', // not supported

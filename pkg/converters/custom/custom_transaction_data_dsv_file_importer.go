@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/encoding/traditionalchinese"
 	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/encoding/unicode/utf32"
 	"golang.org/x/text/transform"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
@@ -36,6 +37,8 @@ var supportedFileEncodings = map[string]encoding.Encoding{
 	"utf-8":        unicode.UTF8BOM,                                     // UTF-8
 	"utf-16le":     unicode.UTF16(unicode.LittleEndian, unicode.UseBOM), // UTF-16 Little Endian
 	"utf-16be":     unicode.UTF16(unicode.BigEndian, unicode.UseBOM),    // UTF-16 Big Endian
+	"utf-32le":     utf32.UTF32(utf32.LittleEndian, utf32.UseBOM),       // UTF-32 Little Endian
+	"utf-32be":     utf32.UTF32(utf32.BigEndian, utf32.UseBOM),          // UTF-32 Big Endian
 	"cp437":        charmap.CodePage437,                                 // OEM United States (CP-437)
 	"cp863":        charmap.CodePage863,                                 // OEM Canadian French (CP-863)
 	"cp037":        charmap.CodePage037,                                 // IBM EBCDIC US/Canada (CP-037)

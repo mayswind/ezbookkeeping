@@ -1355,6 +1355,8 @@
         "utf-8": "UTF-8",
         "utf-16le": "UTF-16 Endian เล็ก",
         "utf-16be": "UTF-16 Endian ใหญ่",
+        "utf-32le": "UTF-32 Endian เล็ก",
+        "utf-32be": "UTF-32 Endian ใหญ่",
         "cp437": "OEM สหรัฐอเมริกา (CP-437)",
         "cp863": "OEM ฝรั่งเศสแคนาดา (CP-863)",
         "cp037": "IBM EBCDIC สหรัฐอเมริกา/แคนาดา (CP-037)",

@@ -11,6 +11,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { isWebAuthnSupported } from '@/lib/webauthn.ts';
 import { hasWebAuthnConfig } from '@/lib/userstate.ts';
+import { updateMapCacheExpiration } from '@/lib/cache.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
@@ -48,14 +49,14 @@ export function useUnlockPageBase() {
                 setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
             }
 
+            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+            exchangeRatesStore.removeExpiredExchangeRates(true);
+            exchangeRatesStore.autoUpdateExchangeRatesData();
+
             if (response.notificationContent) {
                 rootStore.setNotificationContent(response.notificationContent);
             }
         });
-
-        if (settingsStore.appSettings.autoUpdateExchangeRatesData) {
-            exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-        }
     }
 
     function doRelogin(): void {

@@ -169,6 +169,12 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         clearExchangeRatesFromLocalStorage();
     }
 
+    function autoUpdateExchangeRatesData(): void {
+        if (settingsStore.appSettings.autoUpdateExchangeRatesData) {
+            getLatestExchangeRates({ silent: true, force: false });
+        }
+    }
+
     function getLatestExchangeRates({ silent, force }: { silent: boolean, force: boolean }): Promise<LatestExchangeRateResponse> {
         const currentExchangeRateData = latestExchangeRates.value;
         const now = getCurrentUnixTime();
@@ -331,6 +337,7 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         getExchangeRatesCacheSize,
         removeExpiredExchangeRates,
         resetLatestExchangeRates,
+        autoUpdateExchangeRatesData,
         getLatestExchangeRates,
         updateUserCustomExchangeRate,
         deleteUserCustomExchangeRate,

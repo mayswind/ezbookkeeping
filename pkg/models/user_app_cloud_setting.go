@@ -15,7 +15,10 @@ const (
 
 var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationCloudSettingType{
 	// Basic Settings
-	"showAccountBalance": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"showAccountBalance":          USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"autoUpdateExchangeRatesData": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	// Navigation Bar
+	"showAddTransactionButtonInDesktopNavbar": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Overview Page
 	"showAmountInHomePage":                        USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"timezoneUsedForStatisticsInHomePage":         USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
@@ -41,6 +44,9 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"hideCategoriesWithoutAccounts": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Exchange Rates Data Page
 	"currencySortByInExchangeRatesPage": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
+	// Browser Cache Management
+	"mapCacheExpiration":               USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
+	"exchangeRatesDataCacheExpiration": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// Statistics Settings
 	"statistics.defaultChartDataType":                 USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"statistics.defaultTimezoneType":                  USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,

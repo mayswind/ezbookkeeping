@@ -62,7 +62,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     hideCategoriesWithoutAccounts: boolean;
     // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: number;
-    // Browser Cache Settings
+    // Browser Cache Management
     mapCacheExpiration: number,
     exchangeRatesDataCacheExpiration: number,
     // Statistics Settings
@@ -110,6 +110,9 @@ export interface WebAuthnConfig {
 export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserApplicationCloudSettingType> = {
     // Basic Settings
     'showAccountBalance': UserApplicationCloudSettingType.Boolean,
+    'autoUpdateExchangeRatesData': UserApplicationCloudSettingType.Boolean,
+    // Navigation Bar
+    'showAddTransactionButtonInDesktopNavbar': UserApplicationCloudSettingType.Boolean,
     // Overview Page
     'showAmountInHomePage': UserApplicationCloudSettingType.Boolean,
     'timezoneUsedForStatisticsInHomePage': UserApplicationCloudSettingType.Number,
@@ -135,6 +138,9 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'hideCategoriesWithoutAccounts': UserApplicationCloudSettingType.Boolean,
     // Exchange Rates Data Page
     'currencySortByInExchangeRatesPage': UserApplicationCloudSettingType.Number,
+    // Browser Cache Management
+    'mapCacheExpiration': UserApplicationCloudSettingType.Number,
+    'exchangeRatesDataCacheExpiration': UserApplicationCloudSettingType.Number,
     // Statistics Settings
     'statistics.defaultChartDataType': UserApplicationCloudSettingType.Number,
     'statistics.defaultTimezoneType': UserApplicationCloudSettingType.Number,
@@ -190,7 +196,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     hideCategoriesWithoutAccounts: false,
     // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: CurrencySortingType.Default.type,
-    // Browser Cache Settings
+    // Browser Cache Management
     mapCacheExpiration: -1,
     exchangeRatesDataCacheExpiration: 0,
     // Statistics Settings

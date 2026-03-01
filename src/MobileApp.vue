@@ -181,16 +181,6 @@ onMounted(() => {
         const languageInfo = getCurrentLanguageInfo();
         initMapProvider(languageInfo?.alternativeLanguageTag);
     });
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
-        });
-
-        if (navigator.serviceWorker.controller) {
-            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
-        }
-    }
 });
 
 watch(currentNotificationContent, (newValue) => {
@@ -221,7 +211,6 @@ watch(currentNotificationContent, (newValue) => {
 
 let localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
 settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-exchangeRatesStore.removeExpiredExchangeRates(true);
 
 setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
 
@@ -239,12 +228,11 @@ if (isUserLogined()) {
                     rootStore.setNotificationContent(response.notificationContent);
                 }
             }
-        });
 
-        // auto refresh exchange rates data
-        if (settingsStore.appSettings.autoUpdateExchangeRatesData) {
-            exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false });
-        }
+            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+            exchangeRatesStore.removeExpiredExchangeRates(true);
+            exchangeRatesStore.autoUpdateExchangeRatesData();
+        });
     }
 }
 </script>

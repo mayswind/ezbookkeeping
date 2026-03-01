@@ -152,6 +152,7 @@ export const useSettingsStore = defineStore('settings', () => {
     function setAutoUpdateExchangeRatesData(value: boolean): void {
         updateApplicationSettingsValue('autoUpdateExchangeRatesData', value);
         appSettings.value.autoUpdateExchangeRatesData = value;
+        updateUserApplicationCloudSettingValue('autoUpdateExchangeRatesData', value);
     }
 
     function setShowAccountBalance(value: boolean): void {
@@ -185,6 +186,7 @@ export const useSettingsStore = defineStore('settings', () => {
     function setShowAddTransactionButtonInDesktopNavbar(value: boolean): void {
         updateApplicationSettingsValue('showAddTransactionButtonInDesktopNavbar', value);
         appSettings.value.showAddTransactionButtonInDesktopNavbar = value;
+        updateUserApplicationCloudSettingValue('showAddTransactionButtonInDesktopNavbar', value);
     }
 
     // Overview Page
@@ -310,15 +312,17 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('currencySortByInExchangeRatesPage', value);
     }
 
-    // Browser Cache Settings
+    // Browser Cache Management
     function setMapCacheExpiration(value: number): void {
         updateApplicationSettingsValue('mapCacheExpiration', value);
         appSettings.value.mapCacheExpiration = value;
+        updateUserApplicationCloudSettingValue('mapCacheExpiration', value);
     }
 
     function setExchangeRatesDataCacheExpiration(value: number): void {
         updateApplicationSettingsValue('exchangeRatesDataCacheExpiration', value);
         appSettings.value.exchangeRatesDataCacheExpiration = value;
+        updateUserApplicationCloudSettingValue('exchangeRatesDataCacheExpiration', value);
     }
 
     // Statistics Settings
@@ -542,7 +546,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setHideCategoriesWithoutAccounts,
         // -- Exchange Rates Data Page
         setCurrencySortByInExchangeRatesPage,
-        // -- Browser Cache Settings
+        // -- Browser Cache Management
         setMapCacheExpiration,
         setExchangeRatesDataCacheExpiration,
         // -- Statistics Settings

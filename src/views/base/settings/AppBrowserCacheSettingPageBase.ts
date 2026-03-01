@@ -70,17 +70,26 @@ export function useAppBrowserCacheSettingPageBase() {
         }
     });
 
-    function loadCacheStatistics(): Promise<void> {
+    function loadCacheStatistics(updateLoadingState: boolean): Promise<void> {
         return new Promise((resolve, reject) => {
-            loading.value = true;
+            if (updateLoadingState) {
+                loading.value = true;
+            }
 
             loadBrowserCacheStatistics().then(statistics => {
                 fileCacheStatistics.value = statistics;
                 exchangeRatesCacheSize.value = exchangeRatesStore.getExchangeRatesCacheSize();
-                loading.value = false;
+
+                if (updateLoadingState) {
+                    loading.value = false;
+                }
+
                 resolve();
             }).catch(error => {
-                loading.value = false;
+                if (updateLoadingState) {
+                    loading.value = false;
+                }
+
                 reject(error);
             });
         });

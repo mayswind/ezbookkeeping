@@ -6,7 +6,7 @@
                     <div class="d-flex align-center">
                         <span>{{ tt('File Cache') }}</span>
                         <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ms-2" :icon="true" :loading="loading" @click="loadCacheStatistics()">
+                               class="ms-2" :icon="true" :loading="loading" @click="loadCacheStatistics(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -88,9 +88,10 @@
                     </div>
                 </template>
 
-                <v-card-text>
+                <v-card-text class="d-flex align-end" style="height: 3rem">
                     <span class="text-body-1">{{ tt('Used storage') }}</span>
-                    <span class="text-xl ms-1">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
+                    <v-skeleton-loader class="d-inline-block skeleton-no-margin ms-1 pt-1 pb-1" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
+                    <span class="text-xl ms-1" v-if="!loading">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
                 </v-card-text>
 
                 <v-card-text class="mt-2">
@@ -188,7 +189,7 @@ const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 function clearMapCache(): void {
     confirmDialog.value?.open('Are you sure you want to clear map data cache?').then(() => {
         clearMapDataCache().then(() => {
-            loadCacheStatistics();
+            loadCacheStatistics(true);
         });
     });
 }
@@ -207,5 +208,5 @@ function clearExchangeRatesCache(): void {
     });
 }
 
-loadCacheStatistics();
+loadCacheStatistics(true);
 </script>

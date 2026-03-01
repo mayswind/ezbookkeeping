@@ -150,21 +150,17 @@ const showExchangeRatesDataCacheExpirationPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 
 function reloadCacheStatistics(done?: () => void): void {
-    loadCacheStatistics().then(() => {
-        if (done) {
-            done();
-        }
+    loadCacheStatistics(false).then(() => {
+        done?.();
     }).catch(() => {
-        if (done) {
-            done();
-        }
+        done?.();
     });
 }
 
 function clearMapCache(): void {
     showConfirm('Are you sure you want to clear map data cache?', () => {
         clearMapDataCache().then(() => {
-            loadCacheStatistics();
+            loadCacheStatistics(true);
         });
     });
 }
@@ -183,5 +179,5 @@ function clearExchangeRatesCache(): void {
     });
 }
 
-loadCacheStatistics();
+loadCacheStatistics(true);
 </script>

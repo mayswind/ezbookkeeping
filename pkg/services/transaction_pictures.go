@@ -132,6 +132,23 @@ func (s *TransactionPictureService) GetPictureInfosByTransactionIds(c core.Conte
 	return pictureInfoMap, err
 }
 
+// GetAllPictureInfosOfAllTransactions returns all transaction picture info models
+func (s *TransactionPictureService) GetAllPictureInfosOfAllTransactions(c core.Context, uid int64) (map[int64][]*models.TransactionPictureInfo, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	var pictureInfos []*models.TransactionPictureInfo
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).OrderBy("picture_id asc").Find(&pictureInfos)
+
+	if err != nil {
+		return nil, err
+	}
+
+	pictureInfoMap := s.GetPictureInfoListMapByList(pictureInfos)
+	return pictureInfoMap, err
+}
+
 // GetPictureByPictureId returns the transaction picture data according to transaction picture id
 func (s *TransactionPictureService) GetPictureByPictureId(c core.Context, uid int64, pictureId int64, fileExtension string) ([]byte, error) {
 	if uid <= 0 {

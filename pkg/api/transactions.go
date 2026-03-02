@@ -192,7 +192,15 @@ func (a *TransactionsApi) TransactionListHandler(c *core.WebContext) (any, *errs
 		transactions = transactions[:transactionListReq.Count]
 	}
 
-	transactionResult, err := a.getTransactionResponseListResult(c, user, transactions, clientTimezone, transactionListReq.WithPictures, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
+	accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, err := a.getTransactionEssentialDataByTransactionIds(c, user, transactions, transactionListReq.WithPictures, transactionListReq.TrimCategory, transactionListReq.TrimTag)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionListHandler] failed to get essential data for assembling transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	transactions = a.filterTransactions(c, uid, transactions, accountMap)
+	transactionResult, err := a.getTransactionResponseListResult(c, user, transactions, accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, clientTimezone, transactionListReq.WithPictures, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
@@ -275,7 +283,15 @@ func (a *TransactionsApi) TransactionMonthListHandler(c *core.WebContext) (any, 
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	transactionResult, err := a.getTransactionResponseListResult(c, user, transactions, clientTimezone, transactionListReq.WithPictures, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
+	accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, err := a.getTransactionEssentialDataByTransactionIds(c, user, transactions, transactionListReq.WithPictures, transactionListReq.TrimCategory, transactionListReq.TrimTag)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionMonthListHandler] failed to get essential data for assembling transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	transactions = a.filterTransactions(c, uid, transactions, accountMap)
+	transactionResult, err := a.getTransactionResponseListResult(c, user, transactions, accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, clientTimezone, transactionListReq.WithPictures, transactionListReq.TrimAccount, transactionListReq.TrimCategory, transactionListReq.TrimTag)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionMonthListHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
@@ -362,7 +378,25 @@ func (a *TransactionsApi) TransactionListAllHandler(c *core.WebContext) (any, *e
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	transactionResult, err := a.getTransactionResponseListResult(c, user, allTransactions, clientTimezone, transactionAllListReq.WithPictures, transactionAllListReq.TrimAccount, transactionAllListReq.TrimCategory, transactionAllListReq.TrimTag)
+	var accountMap map[int64]*models.Account
+	var categoryMap map[int64]*models.TransactionCategory
+	var tagMap map[int64]*models.TransactionTag
+	var allTransactionTagIds map[int64][]int64
+	var pictureInfoMap map[int64][]*models.TransactionPictureInfo
+
+	if minTransactionTime == 0 && maxTransactionTime == math.MaxInt64 && len(allCategoryIds) < 1 && len(allAccountIds) < 1 && len(tagFilters) < 1 && transactionAllListReq.AmountFilter == "" && transactionAllListReq.Keyword == "" {
+		accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, err = a.getTransactionAllEssentialData(c, user, transactionAllListReq.WithPictures, transactionAllListReq.TrimCategory, transactionAllListReq.TrimTag)
+	} else {
+		accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, err = a.getTransactionEssentialDataByTransactionIds(c, user, allTransactions, transactionAllListReq.WithPictures, transactionAllListReq.TrimCategory, transactionAllListReq.TrimTag)
+	}
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionListAllHandler] failed to get essential data for assembling transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	allTransactions = a.filterTransactions(c, uid, allTransactions, accountMap)
+	transactionResult, err := a.getTransactionResponseListResult(c, user, allTransactions, accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, clientTimezone, transactionAllListReq.WithPictures, transactionAllListReq.TrimAccount, transactionAllListReq.TrimCategory, transactionAllListReq.TrimTag)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionListAllHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
@@ -441,7 +475,24 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 		transactionAccountBalanceMap[transactionWithBalance.RelatedId] = transactionWithBalance
 	}
 
-	transactionResult, err := a.getTransactionResponseListResult(c, user, transactions, clientTimezone, false, true, true, true)
+	allAccountIds := make([]int64, 0, len(transactions)*2)
+
+	for i := 0; i < len(transactions); i++ {
+		allAccountIds = append(allAccountIds, transactions[i].AccountId)
+
+		if transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN || transactions[i].Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			allAccountIds = append(allAccountIds, transactions[i].RelatedAccountId)
+		}
+	}
+
+	allAccounts, err := a.accounts.GetAccountsByAccountIds(c, uid, utils.ToUniqueInt64Slice(allAccountIds))
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to get essential data for assembling transaction result for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	transactionResult, err := a.getTransactionResponseListResult(c, user, transactions, allAccounts, nil, nil, nil, nil, clientTimezone, false, true, true, true)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionReconciliationStatementHandler] failed to assemble transaction result for user \"uid:%d\", because %s", uid, err.Error())
@@ -1927,7 +1978,61 @@ func (a *TransactionsApi) getTransactionTagInfoResponses(tagIds []int64, allTran
 	return allTags
 }
 
-func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, user *models.User, transactions []*models.Transaction, clientTimezone *time.Location, withPictures bool, trimAccount bool, trimCategory bool, trimTag bool) (models.TransactionInfoResponseSlice, error) {
+func (a *TransactionsApi) getTransactionAllEssentialData(c *core.WebContext, user *models.User, withPictures bool, trimCategory bool, trimTag bool) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTransactionTagIds map[int64][]int64, pictureInfoMap map[int64][]*models.TransactionPictureInfo, err error) {
+	uid := user.Uid
+	allAccounts, err := a.accounts.GetAllAccountsByUid(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.getTransactionAllEssentialData] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, nil, err
+	}
+
+	accountMap = a.accounts.GetAccountMapByList(allAccounts)
+
+	allTagIndexes, err := a.transactionTags.GetAllTagIdsOfAllTransactions(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.getTransactionAllEssentialData] failed to get all transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, nil, err
+	}
+
+	allTransactionTagIds = a.transactionTags.GetGroupedTransactionTagIds(allTagIndexes)
+
+	if !trimCategory {
+		allCategories, err := a.transactionCategories.GetAllCategoriesByUid(c, uid, 0, -1)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.getTransactionAllEssentialData] failed to get all transactions categories for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, nil, nil, nil, nil, err
+		}
+
+		categoryMap = a.transactionCategories.GetCategoryMapByList(allCategories)
+	}
+
+	if !trimTag {
+		allTags, err := a.transactionTags.GetAllTagsByUid(c, uid)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.getTransactionAllEssentialData] failed to get all transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, nil, nil, nil, nil, err
+		}
+
+		tagMap = a.transactionTags.GetTagMapByList(allTags)
+	}
+
+	if withPictures && a.CurrentConfig().EnableTransactionPictures {
+		pictureInfoMap, err = a.transactionPictures.GetAllPictureInfosOfAllTransactions(c, uid)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.getTransactionAllEssentialData] failed to get all transactions pictures for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, nil, nil, nil, nil, err
+		}
+	}
+
+	return accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, nil
+}
+
+func (a *TransactionsApi) getTransactionEssentialDataByTransactionIds(c *core.WebContext, user *models.User, transactions []*models.Transaction, withPictures bool, trimCategory bool, trimTag bool) (accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTransactionTagIds map[int64][]int64, pictureInfoMap map[int64][]*models.TransactionPictureInfo, err error) {
 	uid := user.Uid
 	transactionIds := make([]int64, len(transactions))
 	accountIds := make([]int64, 0, len(transactions)*2)
@@ -1950,32 +2055,26 @@ func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, u
 		categoryIds = append(categoryIds, transactions[i].CategoryId)
 	}
 
-	allAccounts, err := a.accounts.GetAccountsByAccountIds(c, uid, utils.ToUniqueInt64Slice(accountIds))
+	accountMap, err = a.accounts.GetAccountsByAccountIds(c, uid, utils.ToUniqueInt64Slice(accountIds))
 
 	if err != nil {
-		log.Errorf(c, "[transactions.getTransactionResponseListResult] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, err
+		log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, nil, err
 	}
 
-	transactions = a.filterTransactions(c, uid, transactions, allAccounts)
-
-	allTransactionTagIds, err := a.transactionTags.GetAllTagIdsOfTransactions(c, uid, transactionIds)
+	allTransactionTagIds, err = a.transactionTags.GetAllTagIdsOfTransactions(c, uid, transactionIds)
 
 	if err != nil {
-		log.Errorf(c, "[transactions.getTransactionResponseListResult] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
-		return nil, err
+		log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get transactions tag ids for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, nil, nil, nil, nil, err
 	}
-
-	var categoryMap map[int64]*models.TransactionCategory
-	var tagMap map[int64]*models.TransactionTag
-	var pictureInfoMap map[int64][]*models.TransactionPictureInfo
 
 	if !trimCategory {
 		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(c, uid, utils.ToUniqueInt64Slice(categoryIds))
 
 		if err != nil {
-			log.Errorf(c, "[transactions.getTransactionResponseListResult] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, err
+			log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, nil, nil, nil, nil, err
 		}
 	}
 
@@ -1983,8 +2082,8 @@ func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, u
 		tagMap, err = a.transactionTags.GetTagsByTagIds(c, uid, utils.ToUniqueInt64Slice(a.transactionTags.GetTransactionTagIds(allTransactionTagIds)))
 
 		if err != nil {
-			log.Errorf(c, "[transactions.getTransactionResponseListResult] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, err
+			log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get transactions tags for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, nil, nil, nil, nil, err
 		}
 	}
 
@@ -1992,11 +2091,15 @@ func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, u
 		pictureInfoMap, err = a.transactionPictures.GetPictureInfosByTransactionIds(c, uid, utils.ToUniqueInt64Slice(a.transactions.GetTransactionIds(transactions)))
 
 		if err != nil {
-			log.Errorf(c, "[transactions.getTransactionResponseListResult] failed to get transactions pictures for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, err
+			log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get transactions pictures for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, nil, nil, nil, nil, err
 		}
 	}
 
+	return accountMap, categoryMap, tagMap, allTransactionTagIds, pictureInfoMap, nil
+}
+
+func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, user *models.User, transactions []*models.Transaction, allAccounts map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTransactionTagIds map[int64][]int64, pictureInfoMap map[int64][]*models.TransactionPictureInfo, clientTimezone *time.Location, withPictures bool, trimAccount bool, trimCategory bool, trimTag bool) (models.TransactionInfoResponseSlice, error) {
 	result := make(models.TransactionInfoResponseSlice, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
@@ -2020,17 +2123,17 @@ func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, u
 			}
 		}
 
-		if !trimCategory {
+		if !trimCategory && categoryMap != nil {
 			if category := categoryMap[transaction.CategoryId]; category != nil {
 				result[i].Category = category.ToTransactionCategoryInfoResponse()
 			}
 		}
 
-		if !trimTag {
+		if !trimTag && tagMap != nil && transactionTagIds != nil {
 			result[i].Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
 		}
 
-		if withPictures && a.CurrentConfig().EnableTransactionPictures {
+		if withPictures && a.CurrentConfig().EnableTransactionPictures && pictureInfoMap != nil {
 			pictureInfos, exists := pictureInfoMap[transaction.TransactionId]
 
 			if exists {

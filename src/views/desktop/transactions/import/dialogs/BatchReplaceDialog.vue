@@ -8,6 +8,7 @@
                     <h4 class="text-h4 text-wrap" v-if="mode === 'batchReplace' && type === 'transferCategory'">{{ tt('Batch Replace Selected Transfer Categories') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="mode === 'batchReplace' && type === 'account'">{{ tt('Batch Replace Selected Accounts') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="mode === 'batchReplace' && type === 'destinationAccount'">{{ tt('Batch Replace Selected Destination Accounts') }}</h4>
+                    <h4 class="text-h4 text-wrap" v-if="mode === 'batchReplace' && type === 'timezone'">{{ tt('Batch Replace Selected Transaction Timezones') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="mode === 'batchReplace' && type === 'tag'">{{ tt('Batch Replace Selected Transaction Tags') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="mode === 'batchAdd' && type === 'tag'">{{ tt('Batch Add Transaction Tags') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="mode === 'replaceInvalidItems' && type === 'expenseCategory'">{{ tt('Replace Invalid Expense Categories') }}</h4>
@@ -15,9 +16,11 @@
                     <h4 class="text-h4 text-wrap" v-if="mode === 'replaceInvalidItems' && type === 'transferCategory'">{{ tt('Replace Invalid Transfer Categories') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="mode === 'replaceInvalidItems' && type === 'account'">{{ tt('Replace Invalid Accounts') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="mode === 'replaceInvalidItems' && type === 'tag'">{{ tt('Replace Invalid Transaction Tags') }}</h4>
-                    <v-btn density="compact" color="default" variant="text" size="24"
-                           class="ms-2" :icon="true" :disabled="loading"
-                           :loading="loading" @click="reload">
+                    <v-btn class="ms-2" density="compact" color="default" variant="text" size="24"
+                           :icon="true" :disabled="loading" :loading="loading"
+                           @click="reload"
+                           v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory' || type === 'account' || type === 'destinationAccount' || type === 'tag'"
+                    >
                         <template #loader>
                             <v-progress-circular indeterminate size="20"/>
                         </template>
@@ -131,6 +134,24 @@
                     </v-col>
                 </v-row>
             </v-card-text>
+            <v-card-text class="w-100 d-flex justify-center" v-if="type === 'timezone'">
+                <v-row>
+                    <v-col cols="12">
+                        <v-autocomplete
+                            item-title="displayNameWithUtcOffset"
+                            item-value="name"
+                            persistent-placeholder
+                            auto-select-first
+                            :disabled="loading"
+                            :label="tt('Target Timezone')"
+                            :placeholder="tt('Target Timezone')"
+                            :items="allTimezones"
+                            v-model="targetItem"
+                        >
+                        </v-autocomplete>
+                    </v-col>
+                </v-row>
+            </v-card-text>
             <v-card-text class="w-100 d-flex justify-center" v-if="type === 'tag'">
                 <v-row>
                     <v-col cols="12" v-if="mode === 'batchReplace'">
@@ -227,10 +248,13 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import type { NameValue } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
+import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
+
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
 
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import {
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName
@@ -242,7 +266,7 @@ import {
 } from '@mdi/js';
 
 export type BatchReplaceDialogMode = 'batchReplace' | 'batchAdd' | 'replaceInvalidItems';
-export type BatchReplaceDialogDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'account' | 'destinationAccount' | 'tag';
+export type BatchReplaceDialogDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'account' | 'destinationAccount' | 'timezone' | 'tag';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
@@ -251,7 +275,11 @@ interface BatchReplaceDialogResponse {
     targetItem?: string;
 }
 
-const { tt, getCategorizedAccountsWithDisplayBalance } = useI18n();
+const {
+    tt,
+    getAllTimezones,
+    getCategorizedAccountsWithDisplayBalance
+} = useI18n();
 
 const { allTagsWithGroupHeader } = useTransactionTagSelectionBase({ modelValue: [] }, false);
 
@@ -281,6 +309,7 @@ const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
 const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);
 const allVisibleCategorizedAccounts = computed<CategorizedAccountWithDisplayBalance[]>(() => getCategorizedAccountsWithDisplayBalance(allVisibleAccounts.value, showAccountBalance.value, customAccountCategoryOrder.value));
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
+const allTimezones = computed<LocalizedTimezoneInfo[]>(() => getAllTimezones(getCurrentUnixTime(), false));
 
 const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);
 const hasVisibleIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleIncomeCategories);

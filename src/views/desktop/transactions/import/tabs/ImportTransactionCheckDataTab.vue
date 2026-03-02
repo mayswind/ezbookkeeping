@@ -831,6 +831,12 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
     },
     {
         prependIcon: mdiTextBoxEditOutline,
+        title: tt('Batch Replace Selected Transaction Timezones'),
+        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
+        onClick: () => showBatchReplaceDialog('timezone')
+    },
+    {
+        prependIcon: mdiTextBoxEditOutline,
         title: tt('Batch Replace Selected Transaction Tags'),
         disabled: isEditing.value || selectedImportTransactionCount.value < 1,
         onClick: () => showBatchReplaceDialog('tag', allOriginalTransactionTagNames.value)
@@ -1736,6 +1742,9 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagIt
                         importTransaction.destinationAccountId = result.targetItem as string;
                         updated = true;
                     }
+                } else if (type === 'timezone') {
+                    importTransaction.utcOffset = getTimezoneOffsetMinutes(importTransaction.time, result.targetItem as string);
+                    updated = true;
                 } else if (type === 'tag') {
                     const removeIndex: number[] = [];
 

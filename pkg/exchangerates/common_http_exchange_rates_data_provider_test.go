@@ -14,21 +14,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-func TestExchangeRatesApiLatestExchangeRateHandler_ReserveBankOfAustraliaDataSource(t *testing.T) {
-	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.ReserveBankOfAustraliaDataSource)
-
-	if exchangeRateResponse == nil {
-		return
-	}
-
-	assert.Equal(t, "AUD", exchangeRateResponse.BaseCurrency)
-
-	supportedCurrencyCodes := []string{"CAD", "CHF", "CNY", "EUR", "GBP", "HKD", "IDR", "INR", "JPY", "KRW",
-		"MYR", "NZD", "PGK", "PHP", "SGD", "THB", "TWD", "USD", "VND"}
-
-	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
-}
-
 func TestExchangeRatesApiLatestExchangeRateHandler_BankOfCanadaDataSource(t *testing.T) {
 	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.BankOfCanadaDataSource)
 

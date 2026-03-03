@@ -27,7 +27,7 @@
                                 <v-list-item :key="columnType.type"
                                              :append-icon="parsedFileDataColumnMapping.dataColumnMapping[columnType.type] === parseInt(column.key) ? mdiCheck : undefined"
                                              v-for="columnType in allImportTransactionColumnTypes"
-                                             @click="parsedFileDataColumnMapping.toggleDataMappingColumn(parseInt(column.key), columnType.type)">
+                                             @click="toggleDataMappingColumn(parseInt(column.key), columnType.type)">
                                     <v-list-item-title class="cursor-pointer">
                                         {{ columnType.displayName }}
                                     </v-list-item-title>
@@ -228,7 +228,7 @@ import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, entries } from '@/core/base.ts';
+import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, keys, entries } from '@/core/base.ts';
 import { type NumeralSystem, KnownAmountFormat } from '@/core/numeral.ts';
 import { type DateFormatOrder, KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownDateTimezoneFormat } from '@/core/timezone.ts';
@@ -490,6 +490,26 @@ function getParseDataMappedColumnDisplayName(columnIndex: number): string {
     }
 
     return tt('Unspecified');
+}
+
+function toggleDataMappingColumn(columnIndex: number, columnType: number): void {
+    parsedFileDataColumnMapping.value.toggleDataMappingColumn(columnIndex, columnType);
+
+    if (columnType === ImportTransactionColumnType.TransactionType.type) {
+        if (!parsedFileDataColumnMapping.value.isColumnMappingSet(ImportTransactionColumnType.TransactionType)) {
+            parsedFileDataColumnMapping.value.transactionTypeMapping = {};
+        } else {
+            const allTransactionTypes = parsedFileAllTransactionTypes.value;
+
+            for (const transactionTypeName of keys(parsedFileDataColumnMapping.value.transactionTypeMapping)) {
+                if (!allTransactionTypes.includes(transactionTypeName)) {
+                    delete parsedFileDataColumnMapping.value.transactionTypeMapping[transactionTypeName];
+                }
+            }
+        }
+
+        autoSetTransactionTypeMapping();
+    }
 }
 
 function autoSetColumnMapping(): void {

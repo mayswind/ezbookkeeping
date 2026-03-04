@@ -7,7 +7,7 @@
 API_CONFIGS='[
     {
     "Name": "tokens-list",
-    "Description": "Get available sessions information",
+        "Description": "Retrieve all sessions for the current user",
     "Method": "GET",
     "Path": "tokens/list.json",
     "RequiresTimezone": false,
@@ -33,7 +33,7 @@ API_CONFIGS='[
   },
   {
     "Name": "tokens-revoke",
-    "Description": "Revoke token",
+    "Description": "Revoke a specified token",
     "Method": "POST",
     "Path": "tokens/revoke.json",
     "RequiresTimezone": false,
@@ -51,7 +51,7 @@ API_CONFIGS='[
   },
   {
     "Name": "accounts-list",
-    "Description": "Get all accounts list",
+    "Description": "Retrieve all account information",
     "Method": "GET",
     "Path": "accounts/list.json",
     "RequiresTimezone": false,
@@ -89,7 +89,7 @@ API_CONFIGS='[
   },
   {
     "Name": "accounts-add",
-    "Description": "Add account",
+    "Description": "Add a new account",
     "Method": "POST",
     "Path": "accounts/add.json",
     "RequiresTimezone": true,
@@ -142,7 +142,7 @@ API_CONFIGS='[
   },
   {
     "Name": "transaction-categories-list",
-    "Description": "Get all transaction categories",
+    "Description": "Retrieve all available transaction categories",
     "Method": "GET",
     "Path": "transaction/categories/list.json",
     "RequiresTimezone": false,
@@ -176,7 +176,7 @@ API_CONFIGS='[
   },
   {
     "Name": "transaction-categories-add",
-    "Description": "Add transaction category",
+    "Description": "Add a new transaction category",
     "Method": "POST",
     "Path": "transaction/categories/add.json",
     "RequiresTimezone": false,
@@ -215,7 +215,7 @@ API_CONFIGS='[
   },
   {
     "Name": "transaction-tags-list",
-    "Description": "Get all transaction tags list",
+    "Description": "Retrieve all available transaction tags",
     "Method": "GET",
     "Path": "transaction/tags/list.json",
     "RequiresTimezone": false,
@@ -241,7 +241,7 @@ API_CONFIGS='[
   },
   {
     "Name": "transaction-tags-add",
-    "Description": "Add transaction tag",
+    "Description": "Add a new transaction tag",
     "Method": "POST",
     "Path": "transaction/tags/add.json",
     "RequiresTimezone": false,
@@ -267,7 +267,7 @@ API_CONFIGS='[
   },
   {
     "Name": "transactions-list",
-    "Description": "Get transactions list with pagination",
+    "Description": "Retrieve transaction data based on specified query criteria (with pagination support)",
     "Method": "GET",
     "Path": "transactions/list.json",
     "RequiresTimezone": true,
@@ -349,7 +349,7 @@ API_CONFIGS='[
   },
   {
     "Name": "transactions-list-all",
-    "Description": "Get all transactions list",
+    "Description": "Retrieve all transaction data matching the specified query criteria",
     "Method": "GET",
     "Path": "transactions/list/all.json",
     "RequiresTimezone": true,
@@ -416,7 +416,7 @@ API_CONFIGS='[
   },
   {
     "Name": "transactions-add",
-    "Description": "Add transaction",
+    "Description": "Add a new transaction",
     "Method": "POST",
     "Path": "transactions/add.json",
     "RequiresTimezone": true,
@@ -479,7 +479,7 @@ API_CONFIGS='[
   },
   {
     "Name": "exchangerates-latest",
-    "Description": "Get latest exchange rates",
+    "Description": "Retrieve the latest exchange rate data",
     "Method": "GET",
     "Path": "exchange_rates/latest.json",
     "RequiresTimezone": false,
@@ -514,7 +514,7 @@ API_CONFIGS='[
   },
   {
     "Name": "server-version",
-    "Description": "Get ezBookkeeping server version information",
+    "Description": "Retrieve ezBookkeeping server version information",
     "Method": "GET",
     "Path": "systems/version.json",
     "RequiresTimezone": false,
@@ -817,7 +817,7 @@ Environment Variables (Required):
     EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)
     EBKTOOL_TOKEN               ezBookkeeping API token
 
-    You can also set the above environment variables in a .env file located in the current directory, parent directory or home directory.
+    You can also set the above environment variables in a '.env' file located in the current directory, parent directory or home directory.
 
 Global Options:
     --tz-name <name>            The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'.
@@ -860,7 +860,7 @@ list_commands() {
     done
 
     echo ""
-    echo "Use 'ebktools.sh help <api-command>' to see detailed information about a API command."
+    echo "Use 'ebktools.sh help <api-command>' to see detailed information about an API command."
 }
 
 show_command_help() {
@@ -1000,7 +1000,7 @@ call_api() {
         case "$param_type" in
             integer)
                 if ! echo "$param_value" | grep -Eq '^-?[0-9]+$'; then
-                    echo_red "Error: Parameter '--${param_name}' must be a integer value"
+                    echo_red "Error: Parameter '--${param_name}' must be an integer value"
                     exit 1
                 fi
                 ;;

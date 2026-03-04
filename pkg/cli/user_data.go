@@ -150,7 +150,7 @@ func (l *UserDataCli) ModifyUserPassword(c *core.CliContext, username string, pa
 		Password: password,
 	}
 
-	_, _, err = l.users.UpdateUser(c, userNew, false)
+	err = l.users.UpdateUserPassword(c, userNew)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.ModifyUserPassword] failed to update user \"%s\" password, because %s", user.Username, err.Error())

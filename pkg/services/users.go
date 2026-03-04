@@ -379,6 +379,32 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 	return keyProfileUpdated, emailSetToUnverified, nil
 }
 
+// UpdateUserPassword updates the password of specified user
+func (s *UserService) UpdateUserPassword(c core.Context, user *models.User) error {
+	if user.Uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	if user.Password == "" {
+		return errs.ErrPasswordIsEmpty
+	}
+
+	user.Password = utils.EncodePassword(user.Password, user.Salt)
+	user.UpdatedUnixTime = time.Now().Unix()
+
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+		updatedRows, err := sess.ID(user.Uid).Cols("password", "updated_unix_time").Where("deleted=?", false).Update(user)
+
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
+			return errs.ErrUserNotFound
+		}
+
+		return nil
+	})
+}
+
 // UpdateUserAvatar updates the custom avatar type of specified user
 func (s *UserService) UpdateUserAvatar(c core.Context, uid int64, avatarFile multipart.File, fileExtension string, oldFileExtension string) error {
 	if uid <= 0 {

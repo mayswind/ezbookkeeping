@@ -316,6 +316,7 @@ func startWebServer(c *core.CliContext) error {
 
 		apiV1Route := apiRoute.Group("/v1")
 		apiV1Route.Use(bindMiddleware(middlewares.JWTAuthorization(config)))
+		apiV1Route.Use(bindMiddleware(middlewares.APITokenIpLimit(config)))
 		{
 			// Tokens
 			apiV1Route.GET("/tokens/list.json", bindApi(api.Tokens.TokenListHandler))

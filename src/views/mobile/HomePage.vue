@@ -172,7 +172,8 @@
                 <f7-icon f7="creditcard"></f7-icon>
                 <span class="tabbar-label">{{ tt('Accounts') }}</span>
             </f7-link>
-            <f7-link id="homepage-add-button" class="link" href="/transaction/add" @taphold="openTransactionTemplatePopover">
+            <f7-link id="homepage-add-button" class="link dragenabled"
+                     href="/transaction/add" @taphold="openTransactionTemplatePopover">
                 <f7-icon f7="plus_square" class="ebk-tarbar-big-icon"></f7-icon>
             </f7-link>
             <f7-link class="link" href="/statistic/transaction">

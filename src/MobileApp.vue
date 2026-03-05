@@ -22,6 +22,8 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
+
+import { isFunction } from '@/lib/common.ts';
 import { isProduction } from '@/lib/version.ts';
 import { getTheme, isEnableSwipeBack, isEnableAnimate } from '@/lib/settings.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
@@ -161,7 +163,7 @@ onMounted(() => {
         f7.on('sheetOpen', (sheet: Sheet.Sheet) => onBackdropChanged(sheet));
         f7.on('sheetClose', (sheet: Sheet.Sheet) => onBackdropChanged(sheet));
 
-        f7.on('pageBeforeOut',  () => {
+        f7.on('pageBeforeOut', () => {
             if (isModalShowing()) {
                 f7.actions.close('.actions-modal.modal-in', false);
                 f7.dialog.close('.dialog.modal-in', false);
@@ -183,7 +185,9 @@ onMounted(() => {
     });
 
     document.addEventListener('dragstart', (e) => {
-        e.preventDefault();
+        if (!e.target || !('closest' in e.target) || !isFunction(e.target.closest) || !e.target.closest('.dragenabled')) {
+            e.preventDefault();
+        }
     }, true);
 });
 

@@ -181,6 +181,10 @@ onMounted(() => {
         const languageInfo = getCurrentLanguageInfo();
         initMapProvider(languageInfo?.alternativeLanguageTag);
     });
+
+    document.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+    }, true);
 });
 
 watch(currentNotificationContent, (newValue) => {

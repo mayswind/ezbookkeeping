@@ -25,6 +25,49 @@
                         :items="allPageCounts"
                         v-model="currentExplorer.countPerPage"
                     />
+                    <v-spacer/>
+                    <div class="d-flex align-center">
+                        <span class="text-subtitle-1">{{ tt('Total Transactions') }}</span>
+                        <span v-if="loading">
+                            <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 50px" :loading="true"></v-skeleton-loader>
+                        </span>
+                        <span class="text-subtitle-1 ms-2" v-else-if="!loading">
+                            {{ formatNumberToLocalizedNumerals(filteredTransactions.length) }}
+                        </span>
+                        <span class="text-subtitle-1 ms-3" v-if="loading || filteredTransactionsStatistic">{{ tt('Total Amount') }}</span>
+                        <span v-if="loading">
+                            <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        </span>
+                        <span class="text-subtitle-1 ms-2" v-else-if="!loading && filteredTransactionsStatistic">
+                            {{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalAmount) }}
+                        </span>
+                        <v-tooltip interactive class="table-tooltip" activator="parent" v-if="!loading && filteredTransactionsStatistic">
+                            <v-table density="compact">
+                                <tbody>
+                                <tr>
+                                    <td>{{ tt('Total Amount') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalAmount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Average Amount') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.averageAmount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Median Amount') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.medianAmount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Minimum Amount') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.minimumAmount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Maximum Amount') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.maximumAmount) }}</td>
+                                </tr>
+                                </tbody>
+                            </v-table>
+                        </v-tooltip>
+                    </div>
                 </div>
             </v-col>
         </v-row>
@@ -126,7 +169,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
-import { useExplorersStore } from '@/stores/explorer.ts';
+import { type InsightsExplorerTransactionStatisticData, useExplorersStore } from '@/stores/explorer.ts';
 
 import { type NameValue, type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
@@ -166,7 +209,8 @@ const {
     formatDateTimeToLongDateTime,
     formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
-    formatAmountToLocalizedNumeralsWithCurrency
+    formatAmountToLocalizedNumeralsWithCurrency,
+    formatNumberToLocalizedNumerals
 } = useI18n();
 
 const settingsStore = useSettingsStore();
@@ -181,6 +225,7 @@ const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurre
 const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
 
 const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactionsInDataTable);
+const filteredTransactionsStatistic = computed<InsightsExplorerTransactionStatisticData | undefined>(() => explorersStore.filteredTransactionsInDataTableStatistic);
 
 const allDataTableQuerySources = computed<NameValue[]>(() => {
     const sources: NameValue[] = [];

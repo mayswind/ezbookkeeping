@@ -407,6 +407,16 @@ html[dir="rtl"] .v-img.img-with-direction > img {
     }
 }
 
+.table-tooltip {
+    &.v-tooltip > .v-overlay__content {
+        background-color: initial;
+
+        .v-table {
+            box-shadow: 0 6px 16px 0 rgba(var(--v-shadow-key-umbra-color), var(--v-shadow-lg-opacity)), 0 0 transparent, 0 0 transparent;
+        }
+    }
+}
+
 .v-snackbar {
     .v-snackbar__content {
         color: rgb(var(--v-tooltip-color));

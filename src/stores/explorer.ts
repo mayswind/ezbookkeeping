@@ -111,6 +111,15 @@ export interface CategoriedTransactionExplorerDataItem extends SeriesInfo {
     value: number;
 }
 
+export interface InsightsExplorerTransactionStatisticData {
+    totalCount: number;
+    totalAmount: number;
+    averageAmount: number;
+    medianAmount: number;
+    minimumAmount: number;
+    maximumAmount: number;
+}
+
 export const useExplorersStore = defineStore('explorers', () => {
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
@@ -576,6 +585,53 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
 
         return result;
+    });
+
+    const filteredTransactionsInDataTableStatistic = computed<InsightsExplorerTransactionStatisticData>(() => {
+        const statisticData: InsightsExplorerTransactionStatisticData = {
+            totalCount: 0,
+            totalAmount: 0,
+            averageAmount: 0,
+            medianAmount: 0,
+            minimumAmount: Number.MAX_SAFE_INTEGER,
+            maximumAmount: Number.MIN_SAFE_INTEGER
+        };
+
+        const sourceAmounts: number[] = [];
+
+        for (const transaction of filteredTransactionsInDataTable.value) {
+            statisticData.totalCount++;
+            statisticData.totalAmount += transaction.sourceAmount;
+
+            if (transaction.sourceAmount >= 0 && transaction.sourceAmount < statisticData.minimumAmount) {
+                statisticData.minimumAmount = transaction.sourceAmount;
+            }
+
+            if (transaction.sourceAmount > statisticData.maximumAmount) {
+                statisticData.maximumAmount = transaction.sourceAmount;
+            }
+
+            sourceAmounts.push(transaction.sourceAmount);
+        }
+
+        if (statisticData.totalCount > 0) {
+            statisticData.averageAmount = Math.trunc(statisticData.totalAmount / statisticData.totalCount);
+        }
+
+        if (sourceAmounts.length > 0) {
+            sourceAmounts.sort((a, b) => a - b);
+            statisticData.medianAmount = sourceAmounts[Math.floor(sourceAmounts.length / 2)] as number;
+        }
+
+        if (statisticData.minimumAmount === Number.MAX_SAFE_INTEGER) {
+            statisticData.minimumAmount = 0;
+        }
+
+        if (statisticData.maximumAmount === Number.MIN_SAFE_INTEGER) {
+            statisticData.maximumAmount = 0;
+        }
+
+        return statisticData;
     });
 
     const categoriedTransactions = computed<Record<string, CategoriedTransactions>>(() => {
@@ -1174,6 +1230,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         insightsExplorerListStateInvalid,
         // computed
         filteredTransactionsInDataTable,
+        filteredTransactionsInDataTableStatistic,
         categoriedTransactionExplorerData,
         // functions
         updateTransactionExplorerInvalidState,

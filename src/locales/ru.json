@@ -1776,6 +1776,7 @@
     "Transaction Day of Month": "День месяца транзакции",
     "Transaction Month of Year": "Месяц года транзакции",
     "Transaction Quarter of Year": "Квартал транзакции",
+    "Transaction Hour of Day": "Transaction Hour of Day",
     "Source Account Category": "Категория исходного счёта",
     "Source Account Currency": "Валюта исходного счёта",
     "Destination Account Category": "Категория целевого счёта",

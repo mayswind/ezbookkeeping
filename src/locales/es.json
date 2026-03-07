@@ -1776,6 +1776,7 @@
     "Transaction Day of Month": "Día del mes de la transacción",
     "Transaction Month of Year": "Mes del año de la transacción",
     "Transaction Quarter of Year": "Trimestre de la transacción",
+    "Transaction Hour of Day": "Transaction Hour of Day",
     "Source Account Category": "Categoría de la cuenta de origen",
     "Source Account Currency": "Moneda de la cuenta de origen",
     "Destination Account Category": "Categoría de la cuenta de destino",

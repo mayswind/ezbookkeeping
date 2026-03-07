@@ -191,6 +191,7 @@ export enum TransactionExplorerDataDimensionType {
     DateTimeByDayOfMonth = 'dateTimeByDayOfMonth',
     DateTimeByMonthOfYear = 'dateTimeByMonthOfYear',
     DateTimeByQuarterOfYear = 'dateTimeByQuarterOfYear',
+    DateTimeByHourOfDay = 'dateTimeByHourOfDay',
     TransactionType = 'transactionType',
     SourceAccount = 'sourceAccount',
     SourceAccountCategory = 'sourceAccountCategory',
@@ -220,6 +221,7 @@ export class TransactionExplorerDataDimension implements NameValue {
     public static readonly DateTimeByDayOfMonth = new TransactionExplorerDataDimension('Transaction Day of Month', TransactionExplorerDataDimensionType.DateTimeByDayOfMonth);
     public static readonly DateTimeByMonthOfYear = new TransactionExplorerDataDimension('Transaction Month of Year', TransactionExplorerDataDimensionType.DateTimeByMonthOfYear);
     public static readonly DateTimeByQuarterOfYear = new TransactionExplorerDataDimension('Transaction Quarter of Year', TransactionExplorerDataDimensionType.DateTimeByQuarterOfYear);
+    public static readonly DateTimeByHourOfDay = new TransactionExplorerDataDimension('Transaction Hour of Day', TransactionExplorerDataDimensionType.DateTimeByHourOfDay);
     public static readonly TransactionType = new TransactionExplorerDataDimension('Transaction Type', TransactionExplorerDataDimensionType.TransactionType);
     public static readonly SourceAccount = new TransactionExplorerDataDimension('Source Account', TransactionExplorerDataDimensionType.SourceAccount);
     public static readonly SourceAccountCategory = new TransactionExplorerDataDimension('Source Account Category', TransactionExplorerDataDimensionType.SourceAccountCategory);

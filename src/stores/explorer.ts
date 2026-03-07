@@ -279,6 +279,15 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryIdType: TransactionExplorerDimensionType.Other,
                 categoryDisplayOrders: [dateTime.getGregorianCalendarQuarter()]
             };
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByHourOfDay) {
+            const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+
+            return {
+                categoryName: dateTime.getHour().toString(10),
+                categoryId: dateTime.getHour().toString(10),
+                categoryIdType: TransactionExplorerDimensionType.Other,
+                categoryDisplayOrders: [dateTime.getHour()]
+            };
         } else if (dimension === TransactionExplorerDataDimension.TransactionType) {
             let transactionTypeName = 'Unknown';
 

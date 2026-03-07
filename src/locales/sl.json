@@ -1776,6 +1776,7 @@
     "Transaction Day of Month": "Dan v mesecu transakcije",
     "Transaction Month of Year": "Mesec v letu transakcije",
     "Transaction Quarter of Year": "Četrtletje v letu transakcije",
+    "Transaction Hour of Day": "Transaction Hour of Day",
     "Source Account Category": "Kategorija izvornega računa",
     "Source Account Currency": "Valuta izvornega računa",
     "Destination Account Category": "Kategorija ciljnega računa",

@@ -1776,6 +1776,7 @@
     "Transaction Day of Month": "거래 일자",
     "Transaction Month of Year": "거래 월",
     "Transaction Quarter of Year": "거래 분기",
+    "Transaction Hour of Day": "Transaction Hour of Day",
     "Source Account Category": "출처 계좌 분류",
     "Source Account Currency": "출처 계좌 통화",
     "Destination Account Category": "목적지 계좌 분류",

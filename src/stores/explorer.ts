@@ -8,7 +8,7 @@ import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useTransactionTagsStore } from './transactionTag.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
-import { type BeforeResolveFunction, itemAndIndex, keys, values } from '@/core/base.ts';
+import { type BeforeResolveFunction, itemAndIndex, reversed, keys, values } from '@/core/base.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
@@ -114,10 +114,20 @@ export interface CategoriedTransactionExplorerDataItem extends SeriesInfo {
 export interface InsightsExplorerTransactionStatisticData {
     totalCount: number;
     totalAmount: number;
+    totalIncome: number;
+    totalExpense: number;
+    netIncome: number;
     averageAmount: number;
     medianAmount: number;
+    p90Amount: number;
+    top5AmountShare: number;
+    transactionsFor80PercentAmount: number;
     minimumAmount: number;
     maximumAmount: number;
+    range: number;
+    interquartileRange: number;
+    variance: number;
+    standardDeviation: number;
 }
 
 export const useExplorersStore = defineStore('explorers', () => {
@@ -591,10 +601,20 @@ export const useExplorersStore = defineStore('explorers', () => {
         const statisticData: InsightsExplorerTransactionStatisticData = {
             totalCount: 0,
             totalAmount: 0,
+            totalIncome: 0,
+            totalExpense: 0,
+            netIncome: 0,
             averageAmount: 0,
             medianAmount: 0,
+            p90Amount: 0,
+            top5AmountShare: 0,
+            transactionsFor80PercentAmount: 0,
             minimumAmount: Number.MAX_SAFE_INTEGER,
-            maximumAmount: Number.MIN_SAFE_INTEGER
+            maximumAmount: Number.MIN_SAFE_INTEGER,
+            range: 0,
+            interquartileRange: 0,
+            variance: 0,
+            standardDeviation: 0
         };
 
         const sourceAmounts: number[] = [];
@@ -602,6 +622,12 @@ export const useExplorersStore = defineStore('explorers', () => {
         for (const transaction of filteredTransactionsInDataTable.value) {
             statisticData.totalCount++;
             statisticData.totalAmount += transaction.sourceAmount;
+
+            if (transaction.type === TransactionType.Income) {
+                statisticData.totalIncome += transaction.sourceAmount;
+            } else if (transaction.type === TransactionType.Expense) {
+                statisticData.totalExpense += transaction.sourceAmount;
+            }
 
             if (transaction.sourceAmount >= 0 && transaction.sourceAmount < statisticData.minimumAmount) {
                 statisticData.minimumAmount = transaction.sourceAmount;
@@ -614,14 +640,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             sourceAmounts.push(transaction.sourceAmount);
         }
 
-        if (statisticData.totalCount > 0) {
-            statisticData.averageAmount = Math.trunc(statisticData.totalAmount / statisticData.totalCount);
-        }
-
-        if (sourceAmounts.length > 0) {
-            sourceAmounts.sort((a, b) => a - b);
-            statisticData.medianAmount = sourceAmounts[Math.floor(sourceAmounts.length / 2)] as number;
-        }
+        statisticData.netIncome = statisticData.totalIncome - statisticData.totalExpense;
 
         if (statisticData.minimumAmount === Number.MAX_SAFE_INTEGER) {
             statisticData.minimumAmount = 0;
@@ -630,6 +649,47 @@ export const useExplorersStore = defineStore('explorers', () => {
         if (statisticData.maximumAmount === Number.MIN_SAFE_INTEGER) {
             statisticData.maximumAmount = 0;
         }
+
+        if (statisticData.totalCount > 0) {
+            statisticData.averageAmount = Math.trunc(statisticData.totalAmount / statisticData.totalCount);
+        }
+
+        statisticData.range = statisticData.maximumAmount - statisticData.minimumAmount;
+
+        if (sourceAmounts.length > 0) {
+            sourceAmounts.sort((a, b) => a - b);
+            statisticData.medianAmount = sourceAmounts[Math.floor(sourceAmounts.length / 2)] as number;
+            statisticData.p90Amount = sourceAmounts[Math.floor(sourceAmounts.length * 9 / 10)] as number;
+
+            const q1 = sourceAmounts[Math.floor(sourceAmounts.length / 4)] as number;
+            const q3 = sourceAmounts[Math.floor(sourceAmounts.length * 3 / 4)] as number;
+            statisticData.interquartileRange = q3 - q1;
+        }
+
+        if (sourceAmounts.length > 5) {
+            const top5Count = Math.ceil(sourceAmounts.length * 0.05);
+            const top5AmountSum = sourceAmounts.slice(-top5Count).reduce((sum, amount) => sum + amount, 0);
+            statisticData.top5AmountShare = statisticData.totalAmount > 0 ? 100.0 * top5AmountSum / statisticData.totalAmount : 0;
+        } else {
+            statisticData.top5AmountShare = 100.0;
+        }
+
+        const eightyPercentAmountThreshold: number = 0.8 * statisticData.totalAmount;
+        let cumulativeAmount: number = 0;
+        let cumulativeCount: number = 0;
+        for (const amount of reversed(sourceAmounts)) {
+            cumulativeAmount += amount;
+            cumulativeCount++;
+
+            if (cumulativeAmount >= eightyPercentAmountThreshold) {
+                statisticData.transactionsFor80PercentAmount = 100.0 * cumulativeCount / statisticData.totalCount;
+                break;
+            }
+        }
+
+        const sumOfSquaredDifferences: number = sourceAmounts.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - statisticData.averageAmount / 100.0, 2), 0);
+        statisticData.variance = sourceAmounts.length > 0 ? sumOfSquaredDifferences / sourceAmounts.length : 0;
+        statisticData.standardDeviation = Math.sqrt(statisticData.variance);
 
         return statisticData;
     });

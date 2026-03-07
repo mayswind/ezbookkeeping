@@ -49,6 +49,18 @@
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalAmount) }}</td>
                                 </tr>
                                 <tr>
+                                    <td>{{ tt('Total Income') }}</td>
+                                    <td class="text-end text-income">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalIncome) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Total Expense') }}</td>
+                                    <td class="text-end text-expense">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalExpense) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Net Income') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.netIncome) }}</td>
+                                </tr>
+                                <tr>
                                     <td>{{ tt('Average Amount') }}</td>
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.averageAmount) }}</td>
                                 </tr>
@@ -57,12 +69,40 @@
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.medianAmount) }}</td>
                                 </tr>
                                 <tr>
+                                    <td>{{ tt('90th Percentile Amount') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.p90Amount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Top 5 Amount Share') }}</td>
+                                    <td class="text-end">{{ formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare, 2, '<0.01') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Transactions for 80% of Amount') }}</td>
+                                    <td class="text-end">{{ formatPercentToLocalizedNumerals(filteredTransactionsStatistic.transactionsFor80PercentAmount, 2, '<0.01') }}</td>
+                                </tr>
+                                <tr>
                                     <td>{{ tt('Minimum Amount') }}</td>
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.minimumAmount) }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Maximum Amount') }}</td>
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.maximumAmount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Range (Max - Min)') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.range) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Interquartile Range (Q3 - Q1)') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.interquartileRange) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Variance') }}</td>
+                                    <td class="text-end">{{ formatNumberToLocalizedNumerals(filteredTransactionsStatistic.variance, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Standard Deviation') }}</td>
+                                    <td class="text-end">{{ formatNumberToLocalizedNumerals(filteredTransactionsStatistic.standardDeviation, 2) }}</td>
                                 </tr>
                                 </tbody>
                             </v-table>
@@ -210,7 +250,8 @@ const {
     formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency,
-    formatNumberToLocalizedNumerals
+    formatNumberToLocalizedNumerals,
+    formatPercentToLocalizedNumerals
 } = useI18n();
 
 const settingsStore = useSettingsStore();

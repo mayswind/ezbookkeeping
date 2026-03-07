@@ -9,7 +9,7 @@ import { useTransactionTagsStore } from './transactionTag.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, reversed, keys, values } from '@/core/base.ts';
-import { AmountFilterType } from '@/core/numeral.ts';
+import { NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountCategory } from '@/core/account.ts';
@@ -187,7 +187,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             }
         } else if (dimension === TransactionExplorerDataDimension.DateTime) {
             const dateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
-            const textualDateTime = `${dateTime.getGregorianCalendarYearDashMonthDashDay()} ${dateTime.getHour().toString(10).padStart(2, '0')}:${dateTime.getMinute().toString(10).padStart(2, '0')}:${dateTime.getSecond().toString(10).padStart(2, '0')}`;
+            const textualDateTime = `${dateTime.getGregorianCalendarYearDashMonthDashDay()} ${dateTime.getHour().toString(10).padStart(2, NumeralSystem.WesternArabicNumerals.digitZero)}:${dateTime.getMinute().toString(10).padStart(2, NumeralSystem.WesternArabicNumerals.digitZero)}:${dateTime.getSecond().toString(10).padStart(2, NumeralSystem.WesternArabicNumerals.digitZero)}`;
 
             return {
                 categoryName: textualDateTime,

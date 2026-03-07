@@ -818,10 +818,38 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        value = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length * 9 / 10)] as number;
+                    } else {
+                        value = 0;
+                    }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMinimum) {
                     value = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMaximum) {
                     value = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountRange) {
+                    const finalMinimumSourceAmountInDefaultCurrency = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
+                    const finalMaximumSourceAmountInDefaultCurrency = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
+                    value = finalMaximumSourceAmountInDefaultCurrency - finalMinimumSourceAmountInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountInterquartileRange) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        const q1 = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length / 4)] as number;
+                        const q3 = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length * 3 / 4)] as number;
+                        value = q3 - q1;
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance) {
+                    const averageSourceAmountInDefaultCurrency = allSourceAmountsInDefaultCurrency.length > 0 ? totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / 100.0 : 0;
+                    const sumOfSquaredDifferences = allSourceAmountsInDefaultCurrency.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageSourceAmountInDefaultCurrency, 2), 0);
+                    value = allSourceAmountsInDefaultCurrency.length > 0 ? sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length : 0;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation) {
+                    const averageSourceAmountInDefaultCurrency = allSourceAmountsInDefaultCurrency.length > 0 ? totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / 100.0 : 0;
+                    const sumOfSquaredDifferences = allSourceAmountsInDefaultCurrency.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageSourceAmountInDefaultCurrency, 2), 0);
+                    value = allSourceAmountsInDefaultCurrency.length > 0 ? Math.sqrt(sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length) : 0;
                 }
 
                 dataItems.push({

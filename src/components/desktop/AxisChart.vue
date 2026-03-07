@@ -405,7 +405,7 @@ function getDisplayValue(value: number): string {
         return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
     }
 
-    return formatNumberToLocalizedNumerals(value);
+    return formatNumberToLocalizedNumerals(value, 2);
 }
 
 function clickItem(e: ECElementEvent): void {

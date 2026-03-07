@@ -81,7 +81,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
 
                 accumulatedPaintPercent += finalItem.paintPercent;
                 finalItem.displayPercent = formatPercentToLocalizedNumerals(finalItem.percent, 2, '<0.01');
-                finalItem.displayValue = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency) : formatNumberToLocalizedNumerals(value);
+                finalItem.displayValue = props.amountValue ? formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency) : formatNumberToLocalizedNumerals(value, 2);
 
                 validItems.push(finalItem);
             }

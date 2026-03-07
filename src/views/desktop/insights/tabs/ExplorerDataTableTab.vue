@@ -41,7 +41,7 @@
                         <span class="text-subtitle-1 ms-2" v-else-if="!loading && filteredTransactionsStatistic">
                             {{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalAmount) }}
                         </span>
-                        <v-tooltip interactive class="table-tooltip" activator="parent" v-if="!loading && filteredTransactionsStatistic">
+                        <v-tooltip interactive class="table-tooltip" activator="parent" v-if="!loading && filteredTransactions.length > 0 && filteredTransactionsStatistic">
                             <v-table density="compact">
                                 <tbody>
                                 <tr>
@@ -74,11 +74,11 @@
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Top 5 Amount Share') }}</td>
-                                    <td class="text-end">{{ formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare, 2, '<0.01') }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.top5AmountShare) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare, 2, '<0.01') : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Transactions for 80% of Amount') }}</td>
-                                    <td class="text-end">{{ formatPercentToLocalizedNumerals(filteredTransactionsStatistic.transactionsFor80PercentAmount, 2, '<0.01') }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.transactionsFor80PercentAmount) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.transactionsFor80PercentAmount, 2, '<0.01') : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Minimum Amount') }}</td>
@@ -98,11 +98,11 @@
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Variance') }}</td>
-                                    <td class="text-end">{{ formatNumberToLocalizedNumerals(filteredTransactionsStatistic.variance, 2) }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.variance) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.variance, 2) : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Standard Deviation') }}</td>
-                                    <td class="text-end">{{ formatNumberToLocalizedNumerals(filteredTransactionsStatistic.standardDeviation, 2) }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.standardDeviation) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.standardDeviation, 2) : '-' }}</td>
                                 </tr>
                                 </tbody>
                             </v-table>
@@ -218,7 +218,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
 import type { InsightsExplorer} from '@/models/explorer.ts';
 
-import { replaceAll } from '@/lib/common.ts';
+import { isDefined, replaceAll } from '@/lib/common.ts';
 
 import {
     getUtcOffsetByUtcOffsetMinutes,

@@ -48,7 +48,7 @@ const localeData: ChineseCalendarLocaleData = {
 const ordinalSuffix = ['st', 'nd', 'rd'];
 
 describe('getChineseYearMonthAllDayInfos', () => {
-    const lines: string[] = fs.readFileSync(path.join(__dirname, 'chinese_calendar_all_data.txt'), 'utf8').split('\n');
+    const lines: string[] = fs.readFileSync(path.join(__dirname, 'chinese_calendar_all_data.txt'), 'utf8').replace(/\r/g, '').split('\n');
     const allMonthChineseDays: Record<string, string[]> = {};
     const allMonthSolarTermNames: Record<string, string[]> = {};
     let currentMonthChineseDays: string[] = [];
@@ -121,7 +121,7 @@ describe('getChineseYearMonthAllDayInfos', () => {
 });
 
 describe('getChineseYearMonthDayInfo', () => {
-    const lines: string[] = fs.readFileSync(path.join(__dirname, 'chinese_calendar_all_data.txt'), 'utf8').split('\n');
+    const lines: string[] = fs.readFileSync(path.join(__dirname, 'chinese_calendar_all_data.txt'), 'utf8').replace(/\r/g, '').split('\n');
 
     for (const line of lines) {
         if (!line.trim() || line.startsWith('#')) {

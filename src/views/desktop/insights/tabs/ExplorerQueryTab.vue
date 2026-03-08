@@ -236,10 +236,57 @@
                                                     />
                                                 </div>
 
-                                                <v-text-field disabled density="compact"
-                                                              :placeholder="tt('None')"
-                                                              v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.GeoLocation.value"
-                                                />
+                                                <div class="d-flex w-100 align-center gap-2"
+                                                     v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.GeoLocation.value">
+                                                    <v-text-field disabled density="compact"
+                                                                  :placeholder="tt('None')"
+                                                                  v-if="conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.LatitudeBetween.value &&
+                                                                        conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.LatitudeNotBetween.value &&
+                                                                        conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.LongitudeBetween.value &&
+                                                                        conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.LongitudeNotBetween.value"
+                                                    />
+                                                    <number-input density="compact"
+                                                                  :disabled="loading || disabled || !!editingQuery"
+                                                                  :min-value="TransactionExplorerGeoLocationCondition.MIN_LATITUDE"
+                                                                  :max-value="TransactionExplorerGeoLocationCondition.MAX_LATITUDE"
+                                                                  :max-decimal-count="6"
+                                                                  v-model="conditionWithRelation.condition.value[0]"
+                                                                  v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeBetween.value ||
+                                                                        conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeNotBetween.value"
+                                                    />
+                                                    <number-input density="compact"
+                                                                  :disabled="loading || disabled || !!editingQuery"
+                                                                  :min-value="TransactionExplorerGeoLocationCondition.MIN_LONGITUDE"
+                                                                  :max-value="TransactionExplorerGeoLocationCondition.MAX_LONGITUDE"
+                                                                  :max-decimal-count="6"
+                                                                  v-model="conditionWithRelation.condition.value[2]"
+                                                                  v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeBetween.value ||
+                                                                        conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeNotBetween.value"
+                                                    />
+                                                    <span class="ms-2 me-2"
+                                                          v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeBetween.value ||
+                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeNotBetween.value ||
+                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeBetween.value ||
+                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeNotBetween.value">~</span>
+                                                    <number-input density="compact"
+                                                                  :disabled="loading || disabled || !!editingQuery"
+                                                                  :min-value="TransactionExplorerGeoLocationCondition.MIN_LATITUDE"
+                                                                  :max-value="TransactionExplorerGeoLocationCondition.MAX_LATITUDE"
+                                                                  :max-decimal-count="6"
+                                                                  v-model="conditionWithRelation.condition.value[1]"
+                                                                  v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeBetween.value ||
+                                                                        conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeNotBetween.value"
+                                                    />
+                                                    <number-input density="compact"
+                                                                  :disabled="loading || disabled || !!editingQuery"
+                                                                  :min-value="TransactionExplorerGeoLocationCondition.MIN_LONGITUDE"
+                                                                  :max-value="TransactionExplorerGeoLocationCondition.MAX_LONGITUDE"
+                                                                  :max-decimal-count="6"
+                                                                  v-model="conditionWithRelation.condition.value[3]"
+                                                                  v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeBetween.value ||
+                                                                        conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeNotBetween.value"
+                                                    />
+                                                </div>
 
                                                 <div class="d-flex w-100" v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTag.value">
                                                     <v-text-field
@@ -359,7 +406,8 @@ import {
 
 import {
     type TransactionExplorerCondition,
-    TransactionExplorerQuery
+    TransactionExplorerQuery,
+    TransactionExplorerGeoLocationCondition
 } from '@/models/explorer.ts';
 
 import {

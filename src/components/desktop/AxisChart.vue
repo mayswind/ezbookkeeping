@@ -314,7 +314,7 @@ const chartOptions = computed<object>(() => {
                     if (displayItems.length === 1 || item.totalAmount !== 0) {
                         const value = getDisplayValue(item.totalAmount);
                         tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
-                        tooltip += `<span>${item.name}</span><span class="ms-5" style="float: inline-end">${value}</span><br/>`;
+                        tooltip += `<span>${item.name}</span><span class="ms-5" style="float: inline-end">${value}</span>`;
                         tooltip += '</div>';
                         actualDisplayItemCount++;
                     }
@@ -322,10 +322,11 @@ const chartOptions = computed<object>(() => {
 
                 if (props.showTotalAmountInTooltip && !props.oneHundredPercentStacked) {
                     const displayTotalAmount = getDisplayValue(totalAmount);
-                    tooltip = (actualDisplayItemCount > 0 ? '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px">' : '<div></div>')
-                        + '<span class="chart-pointer" style="background-color: ' + (isDarkMode.value ? '#eee' : '#333') + '"></span>'
-                        + `<span>${props.totalNameInTooltip}</span><span class="ms-5" style="float: inline-end">${displayTotalAmount}</span><br/>`
-                        + '</div>' + tooltip;
+                    tooltip = '<div><span class="chart-pointer" style="background-color: ' + (isDarkMode.value ? '#eee' : '#333') + '"></span>'
+                        + `<span>${props.totalNameInTooltip}</span><span class="ms-5" style="float: inline-end">${displayTotalAmount}</span>`
+                        + '</div>'
+                        + (actualDisplayItemCount > 0 ? '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px"></div>' : '')
+                        + tooltip;
                 }
 
                 if (params.length && params[0] && params[0].name) {

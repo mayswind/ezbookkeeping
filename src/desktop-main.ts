@@ -52,7 +52,7 @@ import 'vuetify/styles';
 
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { LineChart, BarChart, PieChart, ScatterChart, CandlestickChart, RadarChart, SankeyChart } from 'echarts/charts';
+import { LineChart, BarChart, PieChart, ScatterChart, BoxplotChart, CandlestickChart, RadarChart, SankeyChart } from 'echarts/charts';
 import {
     GridComponent,
     TooltipComponent,
@@ -503,6 +503,7 @@ echarts.use([
     BarChart,
     PieChart,
     ScatterChart,
+    BoxplotChart,
     CandlestickChart,
     RadarChart,
     SankeyChart,

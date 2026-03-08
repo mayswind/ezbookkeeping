@@ -44,6 +44,8 @@ export interface AccountBalanceTrendsChartItem {
     maximumBalance: number;
     medianBalance: number;
     averageBalance: number;
+    q1Balance: number;
+    q3Balance: number;
 }
 
 export interface CommonAccountBalanceTrendsChartProps {
@@ -162,6 +164,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         let lastMaximumBalance = lastClosingBalance;
         let lastMedianBalance = lastClosingBalance;
         let lastAverageBalance = lastClosingBalance;
+        let lastQ1Balance = lastClosingBalance;
+        let lastQ3Balance = lastClosingBalance;
 
         for (const dateRange of allDateRanges.value) {
             const minDateTime = parseDateTimeFromUnixTime(dateRange.minUnixTime);
@@ -205,6 +209,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                 const maximumBalance = Math.max(...dataItems.map(item => item.accountClosingBalance));
                 const medianBalance = allDataItemsSortedByClosingBalance[Math.floor(allDataItemsSortedByClosingBalance.length / 2)]!.accountClosingBalance;
                 const averageBalance = Math.trunc(sumAmounts(dataItems.map(item => item.accountClosingBalance)) / dataItems.length);
+                const q1Balance = allDataItemsSortedByClosingBalance[Math.floor(allDataItemsSortedByClosingBalance.length / 4)]!.accountClosingBalance;
+                const q3Balance = allDataItemsSortedByClosingBalance[Math.floor(allDataItemsSortedByClosingBalance.length * 3 / 4)]!.accountClosingBalance;
 
                 if (props.account.isAsset) {
                     lastOpeningBalance = openingBalance;
@@ -213,6 +219,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                     lastMaximumBalance = maximumBalance;
                     lastMedianBalance = medianBalance;
                     lastAverageBalance = averageBalance;
+                    lastQ1Balance = q1Balance;
+                    lastQ3Balance = q3Balance;
                 } else if (props.account.isLiability) {
                     lastOpeningBalance = -openingBalance;
                     lastClosingBalance = -closingBalance;
@@ -220,6 +228,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                     lastMaximumBalance = -maximumBalance;
                     lastMedianBalance = -medianBalance;
                     lastAverageBalance = -averageBalance;
+                    lastQ1Balance = -q1Balance;
+                    lastQ3Balance = -q3Balance;
                 } else {
                     lastOpeningBalance = openingBalance;
                     lastClosingBalance = closingBalance;
@@ -227,6 +237,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                     lastMaximumBalance = maximumBalance;
                     lastMedianBalance = medianBalance;
                     lastAverageBalance = averageBalance;
+                    lastQ1Balance = q1Balance;
+                    lastQ3Balance = q3Balance;
                 }
             }
 
@@ -237,7 +249,9 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                 minimumBalance: lastMinimumBalance,
                 maximumBalance: lastMaximumBalance,
                 medianBalance: lastMedianBalance,
-                averageBalance: lastAverageBalance
+                averageBalance: lastAverageBalance,
+                q1Balance: lastQ1Balance,
+                q3Balance: lastQ3Balance
             });
 
             lastOpeningBalance = lastClosingBalance;

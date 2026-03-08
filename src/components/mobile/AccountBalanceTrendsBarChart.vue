@@ -103,6 +103,8 @@ const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() =
             averageBalance: dataItem.averageBalance,
             minimumBalance: dataItem.minimumBalance,
             maximumBalance: dataItem.maximumBalance,
+            q1Balance: dataItem.q1Balance,
+            q3Balance: dataItem.q3Balance,
             color: `#${DEFAULT_CHART_COLORS[0] as string}`,
             percent: 0.0
         };

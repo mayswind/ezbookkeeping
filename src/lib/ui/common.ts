@@ -188,7 +188,7 @@ export function startDownloadFile(fileName: string, fileData: Blob): void {
     dataLink.click();
 }
 
-export function compressJpgImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
+export function compressJpgImage(blob: Blob, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -242,6 +242,6 @@ export function compressJpgImage(file: File, maxWidth: number, maxHeight: number
             reject(error);
         };
 
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(blob);
     });
 }

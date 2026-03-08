@@ -177,6 +177,9 @@ declare const self: ServiceWorkerGlobalScope;
 const SW_ASSETS_CACHE_NAME: string = 'ezbookkeeping-assets-cache';
 const SW_CODE_CACHE_NAME: string = 'ezbookkeeping-code-cache';
 const SW_MAP_CACHE_NAME: string = 'ezbookkeeping-map-cache';
+const SW_SHARE_CACHE_NAME: string = 'ezbookkeeping-share-cache';
+const SW_SHARE_IMAGE_URL_PATHNAME: string = '__share__image__';
+const SW_SHARE_IMAGE_PARAM_NAME: string = 'image';
 
 const SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG: string = 'UPDATE_MAP_CACHE_CONFIG';
 const SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG_RESPONSE: string = 'UPDATE_MAP_CACHE_CONFIG_RESPONSE';
@@ -274,6 +277,43 @@ registerRoute(
         ]
     })
 );
+
+self.addEventListener('fetch', (event: FetchEvent) => {
+    const request: Request = event.request;
+
+    if (request.method !== 'POST' || !request.url.endsWith(SW_SHARE_IMAGE_URL_PATHNAME)) {
+        return;
+    }
+
+    event.respondWith((async (): Promise<Response> => {
+        let redirectUrl = request.url;
+        let lastShareIndex = redirectUrl.lastIndexOf(SW_SHARE_IMAGE_URL_PATHNAME);
+        redirectUrl = redirectUrl.substring(0, lastShareIndex);
+
+        try {
+            const formData = await request.formData();
+            const image = formData.get(SW_SHARE_IMAGE_PARAM_NAME);
+
+            if (image instanceof Blob) {
+                const cache: Cache = await caches.open(SW_SHARE_CACHE_NAME);
+                const response = new Response(image, {
+                    headers: {
+                        'Content-Type': image.type
+                    }
+                });
+
+                const putPromise = cache.put(SW_SHARE_CACHE_NAME, response.clone());
+                event.waitUntil(putPromise);
+                await putPromise;
+            }
+
+            return Response.redirect(redirectUrl, 303);
+        } catch (ex) {
+            console.error('failed to handle share image upload in service worker', ex);
+            return Response.redirect(redirectUrl, 303);
+        }
+    })());
+});
 
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
     try {

@@ -70,12 +70,12 @@ const cancelRecognizingUuid = ref<string | undefined>(undefined);
 const imageFile = ref<File | null>(null);
 const imageSrc = ref<string | undefined>(undefined);
 
-function loadImage(file: File): void {
+function loadImage(image: Blob): void {
     loading.value = true;
     imageFile.value = null;
     imageSrc.value = undefined;
 
-    compressJpgImage(file, 1280, 1280, 0.8).then(blob => {
+    compressJpgImage(image, 1280, 1280, 0.8).then(blob => {
         imageFile.value = KnownFileType.JPG.createFileFromBlob(blob, "image");
         imageSrc.value = URL.createObjectURL(blob);
         loading.value = false;
@@ -184,6 +184,10 @@ function onSheetOpen(): void {
 function onSheetClosed(): void {
     close();
 }
+
+defineExpose({
+    loadImage
+});
 </script>
 
 <style>

@@ -139,7 +139,20 @@ export default defineConfig(() => {
                             sizes: '512x512',
                             type: 'image/png'
                         }
-                    ]
+                    ],
+                    share_target: {
+                        action: './__share__image__',
+                        method: 'POST',
+                        enctype: 'multipart/form-data',
+                        params: {
+                            files: [
+                                {
+                                    'name': 'image',
+                                    'accept': ['image/*']
+                                }
+                            ]
+                        }
+                    }
                 },
                 injectManifest: {
                     globDirectory: 'dist/',

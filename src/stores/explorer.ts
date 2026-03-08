@@ -128,6 +128,7 @@ export interface InsightsExplorerTransactionStatisticData {
     interquartileRange: number;
     variance?: number;
     standardDeviation?: number;
+    coefficientOfVariation?: number;
 }
 
 export const useExplorersStore = defineStore('explorers', () => {
@@ -623,7 +624,8 @@ export const useExplorersStore = defineStore('explorers', () => {
             range: 0,
             interquartileRange: 0,
             variance: undefined,
-            standardDeviation: undefined
+            standardDeviation: undefined,
+            coefficientOfVariation: undefined
         };
 
         const sourceAmounts: number[] = [];
@@ -701,6 +703,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             const sumOfSquaredDifferences: number = sourceAmounts.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageAmountForVarianceCalculation, 2), 0);
             statisticData.variance = sumOfSquaredDifferences / sourceAmounts.length;
             statisticData.standardDeviation = Math.sqrt(statisticData.variance);
+            statisticData.coefficientOfVariation = averageAmountForVarianceCalculation !== 0 ? statisticData.standardDeviation / averageAmountForVarianceCalculation : undefined;
         }
 
         return statisticData;
@@ -851,14 +854,21 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance) {
-                    const averageSourceAmountInDefaultCurrency = allSourceAmountsInDefaultCurrency.length > 0 ? totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / 100.0 : 0;
-                    const sumOfSquaredDifferences = allSourceAmountsInDefaultCurrency.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageSourceAmountInDefaultCurrency, 2), 0);
-                    value = allSourceAmountsInDefaultCurrency.length > 0 ? sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length : 0;
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation) {
-                    const averageSourceAmountInDefaultCurrency = allSourceAmountsInDefaultCurrency.length > 0 ? totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / 100.0 : 0;
-                    const sumOfSquaredDifferences = allSourceAmountsInDefaultCurrency.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageSourceAmountInDefaultCurrency, 2), 0);
-                    value = allSourceAmountsInDefaultCurrency.length > 0 ? Math.sqrt(sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length) : 0;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance || valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation || valueMetric === TransactionExplorerValueMetric.SourceAmountCoefficientOfVariation) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / 100.0;
+                        const sumOfSquaredDifferences = allSourceAmountsInDefaultCurrency.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageSourceAmountInDefaultCurrency, 2), 0);
+
+                        if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance) {
+                            value = sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation) {
+                            value = Math.sqrt(sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length);
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountCoefficientOfVariation) {
+                            value = averageSourceAmountInDefaultCurrency !== 0 ? Math.sqrt(sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length) / averageSourceAmountInDefaultCurrency : 0;
+                        }
+                    } else {
+                        value = 0;
+                    }
                 }
 
                 dataItems.push({

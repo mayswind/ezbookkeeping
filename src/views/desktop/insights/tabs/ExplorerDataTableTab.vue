@@ -104,6 +104,10 @@
                                     <td>{{ tt('Standard Deviation') }}</td>
                                     <td class="text-end">{{ isDefined(filteredTransactionsStatistic.standardDeviation) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.standardDeviation, 2) : '-' }}</td>
                                 </tr>
+                                <tr>
+                                    <td>{{ tt('Coefficient of Variation') }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.coefficientOfVariation) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.coefficientOfVariation, 2) : '-' }}</td>
+                                </tr>
                                 </tbody>
                             </v-table>
                         </v-tooltip>

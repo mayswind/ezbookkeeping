@@ -608,6 +608,7 @@ export const useExplorersStore = defineStore('explorers', () => {
     });
 
     const filteredTransactionsInDataTableStatistic = computed<InsightsExplorerTransactionStatisticData>(() => {
+        const defaultCurrency = userStore.currentUserDefaultCurrency;
         const statisticData: InsightsExplorerTransactionStatisticData = {
             totalCount: 0,
             totalAmount: 0,
@@ -632,23 +633,35 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         for (const transaction of filteredTransactionsInDataTable.value) {
             statisticData.totalCount++;
-            statisticData.totalAmount += transaction.sourceAmount;
+
+            let amountInDefaultCurrency: number = transaction.sourceAmount;
+
+            if (transaction.sourceAccount.currency !== defaultCurrency) {
+                const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency);
+
+                if (isNumber(amount)) {
+                    amountInDefaultCurrency = Math.trunc(amount);
+                } else {
+                    continue;
+                }
+            }
+
+            statisticData.totalAmount += amountInDefaultCurrency;
+            sourceAmounts.push(amountInDefaultCurrency);
 
             if (transaction.type === TransactionType.Income) {
-                statisticData.totalIncome += transaction.sourceAmount;
+                statisticData.totalIncome += amountInDefaultCurrency;
             } else if (transaction.type === TransactionType.Expense) {
-                statisticData.totalExpense += transaction.sourceAmount;
+                statisticData.totalExpense += amountInDefaultCurrency;
             }
 
-            if (transaction.sourceAmount >= 0 && transaction.sourceAmount < statisticData.minimumAmount) {
-                statisticData.minimumAmount = transaction.sourceAmount;
+            if (amountInDefaultCurrency >= 0 && amountInDefaultCurrency < statisticData.minimumAmount) {
+                statisticData.minimumAmount = amountInDefaultCurrency;
             }
 
-            if (transaction.sourceAmount > statisticData.maximumAmount) {
-                statisticData.maximumAmount = transaction.sourceAmount;
+            if (amountInDefaultCurrency > statisticData.maximumAmount) {
+                statisticData.maximumAmount = amountInDefaultCurrency;
             }
-
-            sourceAmounts.push(transaction.sourceAmount);
         }
 
         statisticData.netIncome = statisticData.totalIncome - statisticData.totalExpense;
@@ -661,8 +674,8 @@ export const useExplorersStore = defineStore('explorers', () => {
             statisticData.maximumAmount = 0;
         }
 
-        if (statisticData.totalCount > 0) {
-            statisticData.averageAmount = Math.trunc(statisticData.totalAmount / statisticData.totalCount);
+        if (sourceAmounts.length > 0) {
+            statisticData.averageAmount = Math.trunc(statisticData.totalAmount / sourceAmounts.length);
         }
 
         statisticData.range = statisticData.maximumAmount - statisticData.minimumAmount;
@@ -692,14 +705,14 @@ export const useExplorersStore = defineStore('explorers', () => {
                 cumulativeCount++;
 
                 if (cumulativeAmount >= eightyPercentAmountThreshold) {
-                    statisticData.transactionsFor80PercentAmount = 100.0 * cumulativeCount / statisticData.totalCount;
+                    statisticData.transactionsFor80PercentAmount = 100.0 * cumulativeCount / sourceAmounts.length;
                     break;
                 }
             }
         }
 
-        if (statisticData.totalCount > 0 && sourceAmounts.length > 0) {
-            const averageAmountForVarianceCalculation: number = statisticData.totalAmount / statisticData.totalCount / 100.0;
+        if (sourceAmounts.length > 0) {
+            const averageAmountForVarianceCalculation: number = statisticData.totalAmount / sourceAmounts.length / 100.0;
             const sumOfSquaredDifferences: number = sourceAmounts.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageAmountForVarianceCalculation, 2), 0);
             statisticData.variance = sumOfSquaredDifferences / sourceAmounts.length;
             statisticData.standardDeviation = Math.sqrt(statisticData.variance);

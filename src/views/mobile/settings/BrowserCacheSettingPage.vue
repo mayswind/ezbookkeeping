@@ -102,6 +102,8 @@
                 <f7-actions-button :class="{ 'disabled': loading || !isSupportedFileCache || !fileCacheStatistics }"
                                    @click="clearMapCache">{{ tt('Clear Map Data Cache') }}</f7-actions-button>
                 <f7-actions-button :class="{ 'disabled': loading || !isSupportedFileCache || !fileCacheStatistics }"
+                                   @click="clearApplicationCodeFileCache">{{ tt('Clear Application Code Cache') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': loading || !isSupportedFileCache || !fileCacheStatistics }"
                                    @click="clearAllFileCache">{{ tt('Clear All File Cache') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -141,6 +143,7 @@ const {
     exchangeRatesDataCacheExpiration,
     loadCacheStatistics,
     clearMapDataCache,
+    clearApplicationCodeCache,
     clearAllBrowserCaches,
     clearExchangeRatesDataCache
 } = useAppBrowserCacheSettingPageBase();
@@ -160,6 +163,14 @@ function reloadCacheStatistics(done?: () => void): void {
 function clearMapCache(): void {
     showConfirm('Are you sure you want to clear map data cache?', () => {
         clearMapDataCache().then(() => {
+            loadCacheStatistics(true);
+        });
+    });
+}
+
+function clearApplicationCodeFileCache(): void {
+    showConfirm('Are you sure you want to clear application code cache?', () => {
+        clearApplicationCodeCache().then(() => {
             loadCacheStatistics(true);
         });
     });

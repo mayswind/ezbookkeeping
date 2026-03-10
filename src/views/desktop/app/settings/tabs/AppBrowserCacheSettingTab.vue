@@ -69,12 +69,12 @@
 
                 <v-card-text class="mt-2">
                     <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearMapCache()">
-                        {{ tt('Clear Map Data Cache') }}
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal"
                            :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearApplicationCodeFileCache()">
                         {{ tt('Clear Application Code Cache') }}
+                    </v-btn>
+                    <v-btn class="ms-2" color="secondary" variant="tonal"
+                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearMapCache()">
+                        {{ tt('Clear Map Data Cache') }}
                     </v-btn>
                     <v-btn class="ms-2" color="secondary" variant="tonal"
                            :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearAllFileCache()">
@@ -183,25 +183,25 @@ const {
     mapCacheExpiration,
     exchangeRatesDataCacheExpiration,
     loadCacheStatistics,
-    clearMapDataCache,
     clearApplicationCodeCache,
+    clearMapDataCache,
     clearAllBrowserCaches,
     clearExchangeRatesDataCache
 } = useAppBrowserCacheSettingPageBase();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 
-function clearMapCache(): void {
-    confirmDialog.value?.open('Are you sure you want to clear map data cache?').then(() => {
-        clearMapDataCache().then(() => {
+function clearApplicationCodeFileCache(): void {
+    confirmDialog.value?.open('Are you sure you want to clear application code cache?').then(() => {
+        clearApplicationCodeCache().then(() => {
             loadCacheStatistics(true);
         });
     });
 }
 
-function clearApplicationCodeFileCache(): void {
-    confirmDialog.value?.open('Are you sure you want to clear application code cache?').then(() => {
-        clearApplicationCodeCache().then(() => {
+function clearMapCache(): void {
+    confirmDialog.value?.open('Are you sure you want to clear map data cache?').then(() => {
+        clearMapDataCache().then(() => {
             loadCacheStatistics(true);
         });
     });

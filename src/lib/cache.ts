@@ -212,23 +212,6 @@ export function updateMapCacheExpiration(expireSeconds: number): void {
     }
 }
 
-export function clearMapDataCache(): Promise<void> {
-    if (!window.caches) {
-        logger.error('caches API is not supported in this browser');
-        return Promise.reject();
-    }
-
-    return window.caches.delete(SW_MAP_CACHE_NAME).then(success => {
-        if (success) {
-            logger.info(`cache "${SW_MAP_CACHE_NAME}" cleared successfully`);
-        } else {
-            logger.warn(`failed to clear cache "${SW_MAP_CACHE_NAME}"`);
-        }
-    }).catch(error => {
-        logger.error(`failed to clear cache "${SW_MAP_CACHE_NAME}"`, error);
-    });
-}
-
 export function clearApplicationCodeCache(): Promise<void> {
     if (!window.caches) {
         logger.error('caches API is not supported in this browser');
@@ -243,6 +226,23 @@ export function clearApplicationCodeCache(): Promise<void> {
         }
     }).catch(error => {
         logger.error(`failed to clear cache "${SW_CODE_CACHE_NAME}"`, error);
+    });
+}
+
+export function clearMapDataCache(): Promise<void> {
+    if (!window.caches) {
+        logger.error('caches API is not supported in this browser');
+        return Promise.reject();
+    }
+
+    return window.caches.delete(SW_MAP_CACHE_NAME).then(success => {
+        if (success) {
+            logger.info(`cache "${SW_MAP_CACHE_NAME}" cleared successfully`);
+        } else {
+            logger.warn(`failed to clear cache "${SW_MAP_CACHE_NAME}"`);
+        }
+    }).catch(error => {
+        logger.error(`failed to clear cache "${SW_MAP_CACHE_NAME}"`, error);
     });
 }
 

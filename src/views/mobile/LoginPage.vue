@@ -13,6 +13,10 @@
             <f7-list-input
                 type="text"
                 autocomplete="username"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+                inputmode="email"
                 clear-button
                 :disabled="loggingInByPassword || loggingInByOAuth2"
                 :label="tt('Username')"

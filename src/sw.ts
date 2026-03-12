@@ -287,7 +287,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 
     event.respondWith((async (): Promise<Response> => {
         let redirectUrl = request.url;
-        let lastShareIndex = redirectUrl.lastIndexOf(SW_SHARE_IMAGE_URL_PATHNAME);
+        const lastShareIndex = redirectUrl.lastIndexOf(SW_SHARE_IMAGE_URL_PATHNAME);
         redirectUrl = redirectUrl.substring(0, lastShareIndex);
 
         try {

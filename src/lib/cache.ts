@@ -212,38 +212,60 @@ export function updateMapCacheExpiration(expireSeconds: number): void {
     }
 }
 
-export function clearApplicationCodeCache(): Promise<void> {
+export function clearCaches(cacheNames: string[], cacheNamePrefixes?: string[]): Promise<void> {
     if (!window.caches) {
         logger.error('caches API is not supported in this browser');
         return Promise.reject();
     }
 
-    return window.caches.delete(SW_CODE_CACHE_NAME).then(success => {
-        if (success) {
-            logger.info(`cache "${SW_CODE_CACHE_NAME}" cleared successfully`);
-        } else {
-            logger.warn(`failed to clear cache "${SW_CODE_CACHE_NAME}"`);
+    return new Promise((resolve, reject) => {
+        const promises = [];
+
+        for (const cacheName of cacheNames) {
+            promises.push(window.caches.delete(cacheName).then(success => {
+                if (success) {
+                    logger.info(`cache "${cacheName}" cleared successfully`);
+                    return Promise.resolve(cacheName);
+                } else {
+                    logger.warn(`failed to clear cache "${cacheName}"`);
+                    return Promise.reject(cacheName);
+                }
+            }));
         }
-    }).catch(error => {
-        logger.error(`failed to clear cache "${SW_CODE_CACHE_NAME}"`, error);
+
+        if (cacheNamePrefixes) {
+            for (const prefix of cacheNamePrefixes) {
+                promises.push(findFirstCacheName(prefix).then(cacheName => {
+                    return window.caches.delete(cacheName).then(success => {
+                        if (success) {
+                            logger.info(`cache "${cacheName}" cleared successfully`);
+                            return Promise.resolve(cacheName);
+                        } else {
+                            logger.warn(`failed to clear cache "${cacheName}"`);
+                            return Promise.reject(cacheName);
+                        }
+                    });
+                }).catch(error => {
+                    logger.warn(`cache with prefix "${prefix}" not found`, error);
+                    return Promise.resolve();
+                }));
+            }
+        }
+
+        Promise.all(promises).then(() => {
+            resolve();
+        }).catch(() => {
+            resolve();
+        });
     });
 }
 
-export function clearMapDataCache(): Promise<void> {
-    if (!window.caches) {
-        logger.error('caches API is not supported in this browser');
-        return Promise.reject();
-    }
+export function clearApplicationCodeCache(): Promise<void> {
+    return clearCaches([SW_CODE_CACHE_NAME], [SW_RUNTIME_CACHE_NAME_PREFIX]);
+}
 
-    return window.caches.delete(SW_MAP_CACHE_NAME).then(success => {
-        if (success) {
-            logger.info(`cache "${SW_MAP_CACHE_NAME}" cleared successfully`);
-        } else {
-            logger.warn(`failed to clear cache "${SW_MAP_CACHE_NAME}"`);
-        }
-    }).catch(error => {
-        logger.error(`failed to clear cache "${SW_MAP_CACHE_NAME}"`, error);
-    });
+export function clearMapDataCache(): Promise<void> {
+    return clearCaches([SW_MAP_CACHE_NAME]);
 }
 
 export function clearAllBrowserCaches(): Promise<void> {

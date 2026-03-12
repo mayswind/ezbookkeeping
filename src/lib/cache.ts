@@ -218,7 +218,7 @@ export function clearCaches(cacheNames: string[], cacheNamePrefixes?: string[]):
         return Promise.reject();
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const promises = [];
 
         for (const cacheName of cacheNames) {

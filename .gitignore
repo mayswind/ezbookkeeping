@@ -150,6 +150,7 @@ dist/
 
 # Binary and build files
 ezbookkeeping
+!**/ezbookkeeping/
 package/
 
 # Environment variable files

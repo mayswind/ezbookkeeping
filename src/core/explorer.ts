@@ -4,17 +4,27 @@ import { DateRange } from '@/core/datetime.ts';
 export enum TransactionExplorerConditionRelation {
     First = 'first',
     And = 'and',
-    Or = 'or'
+    Or = 'or',
+    AndSub = 'and(',
+    OrSub = 'or(',
+    SubEnd = ')'
 }
+
+export type TransactionExplorerSubConditionStartRelation = '(';
+export const TransactionExplorerSubConditionStartRelationPlaceholder: TransactionExplorerSubConditionStartRelation = '(';
 
 export const TransactionExplorerConditionRelationPriority: Record<TransactionExplorerConditionRelation, number> = {
     [TransactionExplorerConditionRelation.First]: 0,
     [TransactionExplorerConditionRelation.Or]: 1,
-    [TransactionExplorerConditionRelation.And]: 2
+    [TransactionExplorerConditionRelation.And]: 2,
+    [TransactionExplorerConditionRelation.AndSub]: 0,
+    [TransactionExplorerConditionRelation.OrSub]: 0,
+    [TransactionExplorerConditionRelation.SubEnd]: 0
 };
 
 
 export enum TransactionExplorerConditionFieldType {
+    Undefined = 'undefined',
     TransactionType = 'transactionType',
     TransactionCategory = 'transactionCategory',
     SourceAccount = 'sourceAccount',

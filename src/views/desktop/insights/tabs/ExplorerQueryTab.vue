@@ -98,11 +98,13 @@
 
                                 <div v-else-if="element.conditions && element.conditions.length > 0 && !showExpression[element.id]">
                                     <div :key="conditionIndex" v-for="(conditionWithRelation, conditionIndex) in element.conditions">
-                                        <div class="d-flex overflow-x-auto align-center gap-2 mb-4">
+                                        <div class="d-flex overflow-x-auto align-center gap-2 mb-4"
+                                             :style="getConditionStyle(element, conditionIndex)"
+                                             v-if="conditionWithRelation.relation !== TransactionExplorerConditionRelation.SubEnd">
                                             <v-select
                                                 disabled
                                                 class="flex-0-0"
-                                                width="120px"
+                                                width="140px"
                                                 density="compact"
                                                 item-title="displayName"
                                                 item-value="value"
@@ -113,16 +115,19 @@
 
                                             <v-select
                                                 class="flex-0-0"
-                                                width="120px"
+                                                width="140px"
                                                 density="compact"
                                                 item-title="displayName"
                                                 item-value="value"
                                                 :disabled="loading || disabled || !!editingQuery"
                                                 :items="[
                                                     { value: TransactionExplorerConditionRelation.And, displayName: tt('AND') },
-                                                    { value: TransactionExplorerConditionRelation.Or, displayName: tt('OR') }
+                                                    { value: TransactionExplorerConditionRelation.Or, displayName: tt('OR') },
+                                                    { value: TransactionExplorerConditionRelation.AndSub, displayName: tt('AND SUB') },
+                                                    { value: TransactionExplorerConditionRelation.OrSub, displayName: tt('OR SUB') }
                                                 ]"
-                                                v-model="conditionWithRelation.relation"
+                                                :model-value="conditionWithRelation.relation"
+                                                @update:model-value="updateItemRelation(element, conditionIndex, $event)"
                                                 v-else-if="conditionIndex >= 1"
                                             />
 
@@ -335,6 +340,16 @@
                                                 <v-tooltip activator="parent">{{ tt('Remove Condition') }}</v-tooltip>
                                             </v-btn>
                                         </div>
+                                        <div class="d-flex overflow-x-auto align-center gap-2 mb-4"
+                                             :style="getConditionStyle(element, conditionIndex)"
+                                             v-if="conditionWithRelation.relation === TransactionExplorerConditionRelation.SubEnd">
+                                            <v-btn class="px-2" density="comfortable" color="primary" variant="text" size="small"
+                                                   :prepend-icon="mdiPlus"
+                                                   :disabled="loading || disabled || !!editingQuery"
+                                                   @click="addSubCondition(element, conditionIndex)">
+                                                {{ tt('Add Sub Condition') }}
+                                            </v-btn>
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-else-if="element.conditions && element.conditions.length > 0 && showExpression[element.id]">
@@ -541,6 +556,25 @@ function getFilteredTransactionCategoriesDisplayContent(filterTransactionCategor
     return joinMultiText(selectedCategoryNames);
 }
 
+function getConditionStyle(query: TransactionExplorerQuery, conditionIndex: number): Record<string, string> {
+    const style: Record<string, string> = {};
+    const depths = query.getConditionNestingDepths();
+    const item = query.conditions[conditionIndex];
+    let depth = 0;
+
+    if (item && item.relation === TransactionExplorerConditionRelation.SubEnd) {
+        depth = depths[conditionIndex - 1] ?? 0;
+    } else {
+        depth = depths[conditionIndex] ?? 0;
+    }
+
+    if (depth > 0) {
+        style['margin-inline-start'] = (depth * 1.5) + 'rem';
+    }
+
+    return style;
+}
+
 function addQuery(): void {
     queries.value.push(TransactionExplorerQuery.create(generateRandomUUID()));
 }
@@ -584,15 +618,87 @@ function addCondition(query: TransactionExplorerQuery): void {
     query.conditions.push(newCondition);
 }
 
+function addSubCondition(query: TransactionExplorerQuery, subEndIndex: number): void {
+    const newCondition = query.addNewCondition(TransactionExplorerConditionField.TransactionType, false);
+    query.conditions.splice(subEndIndex, 0, newCondition);
+}
+
 function removeCondition(query: TransactionExplorerQuery, conditionIndex: number): void {
+    const item = query.conditions[conditionIndex];
+
+    if (!item || item.relation === TransactionExplorerConditionRelation.SubEnd) {
+        return;
+    }
+
     query.conditions.splice(conditionIndex, 1);
 
     if (conditionIndex === 0 && query.conditions.length > 0) {
         const newFirstCondition = query.conditions[0];
 
         if (newFirstCondition) {
+            if (newFirstCondition.relation === TransactionExplorerConditionRelation.AndSub || newFirstCondition.relation === TransactionExplorerConditionRelation.OrSub) {
+                removeSubCondition(query, conditionIndex + 1);
+            }
+
             newFirstCondition.relation = TransactionExplorerConditionRelation.First;
         }
+    }
+
+    const oldStartSubCondition = item.relation === TransactionExplorerConditionRelation.AndSub || item.relation === TransactionExplorerConditionRelation.OrSub;
+
+    if (oldStartSubCondition && conditionIndex < query.conditions.length && query.conditions[conditionIndex]) {
+        const nextItem = query.conditions[conditionIndex];
+
+        if (nextItem.relation === TransactionExplorerConditionRelation.SubEnd) {
+            query.conditions.splice(conditionIndex, 1);
+        } else if (nextItem.relation === TransactionExplorerConditionRelation.AndSub || nextItem.relation === TransactionExplorerConditionRelation.OrSub) {
+            nextItem.relation = item.relation;
+            removeSubCondition(query, conditionIndex);
+        } else {
+            nextItem.relation = item.relation;
+        }
+    }
+}
+
+function removeSubCondition(query: TransactionExplorerQuery, conditionIndex: number): void {
+    let depth = 1;
+
+    for (let i = conditionIndex + 1; i < query.conditions.length; i++) {
+        const currentCondition = query.conditions[i];
+
+        if (!currentCondition) {
+            continue;
+        }
+
+        if (currentCondition.relation === TransactionExplorerConditionRelation.AndSub || currentCondition.relation === TransactionExplorerConditionRelation.OrSub) {
+            depth++;
+        } else if (currentCondition.relation === TransactionExplorerConditionRelation.SubEnd) {
+            depth--;
+
+            if (depth === 0) {
+                query.conditions.splice(i, 1);
+                break;
+            }
+        }
+    }
+}
+
+function updateItemRelation(query: TransactionExplorerQuery, conditionIndex: number, value: TransactionExplorerConditionRelation): void {
+    const item = query.conditions[conditionIndex];
+
+    if (!item || item.relation === TransactionExplorerConditionRelation.SubEnd) {
+        return;
+    }
+
+    const oldStartSubCondition = item.relation === TransactionExplorerConditionRelation.AndSub || item.relation === TransactionExplorerConditionRelation.OrSub;
+    const newStartSubCondition = value === TransactionExplorerConditionRelation.AndSub || value === TransactionExplorerConditionRelation.OrSub;
+
+    item.relation = value;
+
+    if (!oldStartSubCondition && newStartSubCondition) {
+        query.conditions.splice(conditionIndex + 1, 0, query.addSubConditionEnd());
+    } else if (oldStartSubCondition && !newStartSubCondition) {
+        removeSubCondition(query, conditionIndex);
     }
 }
 

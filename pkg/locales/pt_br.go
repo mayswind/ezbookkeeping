@@ -14,7 +14,7 @@ var ptBR = &LocaleTextItems{
 	},
 	DataConverterTextItems: &DataConverterTextItems{
 		Alipay:       "Alipay",
-		WeChatWallet: "WeChat Pay",
+		WeChatWallet: "Wallet",
 	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
 		Title:                     "Verifique seu e-mail",

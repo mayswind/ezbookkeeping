@@ -53,6 +53,7 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
     {
         categoryName: 'Transaction Edit Page',
         items: [
+            { settingKey: 'quickSaveButtonStyleInMobileTransactionListPage', settingName: 'Quick Save Button Style', mobile: true, desktop: false },
             { settingKey: 'quickAddButtonActionInMobileTransactionEditPage', settingName: 'Quick Add Button Action', mobile: true, desktop: false },
             { settingKey: 'autoSaveTransactionDraft', settingName: 'Automatically Save Draft', mobile: true, desktop: true },
             { settingKey: 'autoGetCurrentGeoLocation', settingName: 'Automatically Add Geolocation', mobile: true, desktop: true },

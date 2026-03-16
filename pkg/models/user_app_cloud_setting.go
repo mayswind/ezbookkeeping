@@ -29,6 +29,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"showTotalAmountInTransactionListPage": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"showTagInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Transaction Edit Page
+	"quickSaveButtonStyleInMobileTransactionListPage":          USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"quickAddButtonActionInMobileTransactionEditPage":          USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"autoSaveTransactionDraft":                                 USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	"autoGetCurrentGeoLocation":                                USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,

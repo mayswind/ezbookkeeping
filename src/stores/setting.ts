@@ -234,6 +234,12 @@ export const useSettingsStore = defineStore('settings', () => {
     }
 
     // Transaction Edit Page
+    function setQuickSaveButtonStyleInMobileTransactionListPage(value: number): void {
+        updateApplicationSettingsValue('quickSaveButtonStyleInMobileTransactionListPage', value);
+        appSettings.value.quickSaveButtonStyleInMobileTransactionListPage = value;
+        updateUserApplicationCloudSettingValue('quickSaveButtonStyleInMobileTransactionListPage', value);
+    }
+
     function setQuickAddButtonActionInMobileTransactionEditPage(value: number): void {
         updateApplicationSettingsValue('quickAddButtonActionInMobileTransactionEditPage', value);
         appSettings.value.quickAddButtonActionInMobileTransactionEditPage = value;
@@ -537,6 +543,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setShowTotalAmountInTransactionListPage,
         setShowTagInTransactionListPage,
         // -- Transaction Edit Page
+        setQuickSaveButtonStyleInMobileTransactionListPage,
         setQuickAddButtonActionInMobileTransactionEditPage,
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,

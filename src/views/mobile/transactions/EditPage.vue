@@ -469,14 +469,20 @@
             </f7-actions-group>
         </f7-actions>
 
-        <template #fixed>
-            <f7-fab id="quick-save-fab" position="right-bottom" :class="{ 'disabled': inputIsEmpty || submitting }"
+        <template #fixed v-if="quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomLeftFloating.type || quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomCenterFloating.type || quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomRightFloating.type">
+            <f7-fab id="quick-save-button" :class="{ 'disabled': inputIsEmpty || submitting }" :position="quickSaveButtonFloatingPosition"
                     :text="tt(quickSaveButtonTitle)"
                     @click="quickSave" v-if="mode !== TransactionEditPageMode.View">
             </f7-fab>
         </template>
 
-        <f7-popover class="quick-save-popover" target-el="#quick-save-fab"
+        <f7-toolbar id="quick-save-button" tabbar bottom v-if="quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomFixed.type && mode !== TransactionEditPageMode.View">
+            <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" @click="quickSave">
+                <span class="tabbar-primary-link">{{ tt(quickSaveButtonTitle) }}</span>
+            </f7-link>
+        </f7-toolbar>
+
+        <f7-popover class="quick-save-popover" target-el="#quick-save-button"
                     v-model:opened="showQuickSavePopover">
             <f7-list>
                 <f7-list-item link="#" no-chevron popover-close
@@ -521,8 +527,14 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import { CategoryType } from '@/core/category.ts';
-import { TransactionType, TransactionEditScopeType, TransactionQuickAddButtonActionType } from '@/core/transaction.ts';
+import {
+    TransactionType,
+    TransactionEditScopeType,
+    TransactionQuickSaveButtonStyle,
+    TransactionQuickAddButtonActionType
+} from '@/core/transaction.ts';
 import { ScheduledTemplateFrequencyType, TemplateType } from '@/core/template.ts';
+
 import { TRANSACTION_MAX_AMOUNT, TRANSACTION_MIN_AMOUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
@@ -649,6 +661,20 @@ const showTransactionTagSheet = ref<boolean>(false);
 const showTransactionPictures = ref<boolean>(pageTypeAndMode?.type === TransactionEditPageType.Transaction
     && (pageTypeAndMode?.mode === TransactionEditPageMode.Add || pageTypeAndMode?.mode === TransactionEditPageMode.Edit)
     && settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage);
+
+const quickSaveButtonStyleType = computed<number>(() => settingsStore.appSettings.quickSaveButtonStyleInMobileTransactionListPage);
+const quickSaveButtonFloatingPosition = computed<string>(() => {
+    switch (settingsStore.appSettings.quickSaveButtonStyleInMobileTransactionListPage) {
+        case TransactionQuickSaveButtonStyle.BottomLeftFloating.type:
+            return 'left-bottom';
+        case TransactionQuickSaveButtonStyle.BottomCenterFloating.type:
+            return 'center-bottom';
+        case TransactionQuickSaveButtonStyle.BottomRightFloating.type:
+            return 'right-bottom';
+        default:
+            return 'right-bottom';
+    }
+});
 
 const sourceAmountClass = computed<Record<string, boolean>>(() => {
     const classes: Record<string, boolean> = {

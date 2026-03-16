@@ -35,6 +35,10 @@
                                         <v-text-field
                                             type="text"
                                             autocomplete="username"
+                                            autocapitalize="none"
+                                            autocorrect="off"
+                                            spellcheck="false"
+                                            inputmode="email"
                                             :autofocus="true"
                                             :disabled="show2faInput || loggingInByPassword || loggingInByOAuth2 || verifying"
                                             :label="tt('Username')"

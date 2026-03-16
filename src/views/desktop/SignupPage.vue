@@ -36,6 +36,10 @@
                                         <v-text-field
                                             type="text"
                                             autocomplete="username"
+                                            autocapitalize="none"
+                                            autocorrect="off"
+                                            spellcheck="false"
+                                            inputmode="email"
                                             :disabled="submitting || navigateToHomePage"
                                             :label="tt('Username')"
                                             :placeholder="tt('Your username')"

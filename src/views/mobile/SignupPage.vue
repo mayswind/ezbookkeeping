@@ -12,6 +12,10 @@
             <f7-list-input
                 type="text"
                 autocomplete="username"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+                inputmode="email"
                 clear-button
                 :label="tt('Username')"
                 :placeholder="tt('Your username')"

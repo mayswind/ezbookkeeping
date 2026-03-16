@@ -10,24 +10,24 @@ var ptBR = &LocaleTextItems{
 	},
 	DefaultTypes: &DefaultTypes{
 		DecimalSeparator:    core.DECIMAL_SEPARATOR_COMMA,
-		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_SPACE,
+		DigitGroupingSymbol: core.DIGIT_GROUPING_SYMBOL_DOT,
 	},
 	DataConverterTextItems: &DataConverterTextItems{
 		Alipay:       "Alipay",
 		WeChatWallet: "Wallet",
 	},
 	VerifyEmailTextItems: &VerifyEmailTextItems{
-		Title:                     "Verificar Email",
+		Title:                     "Verifique seu e-mail",
 		SalutationFormat:          "Olá %s,",
-		DescriptionAboveBtn:       "Por favor, clique no link abaixo para confirmar o seu endereço de e-mail.",
-		VerifyEmail:               "Verificar Email",
-		DescriptionBelowBtnFormat: "Se você não se registrou para uma conta %s, basta ignorar este e-mail. Se não conseguir clicar no link acima, copie a URL acima e cole no seu navegador. O link para verificação de e-mail expirará após %v minutos.",
+		DescriptionAboveBtn:       "Clique no link abaixo para confirmar seu endereço de e-mail.",
+		VerifyEmail:               "Verificar e-mail",
+		DescriptionBelowBtnFormat: "Se você não criou uma conta no %s, ignore este e-mail. Se não conseguir clicar no link acima, copie a URL e cole no navegador. O link de verificação de e-mail expira em %v minutos.",
 	},
 	ForgetPasswordMailTextItems: &ForgetPasswordMailTextItems{
-		Title:                     "Redefinir Sua Senha",
+		Title:                     "Redefina sua senha",
 		SalutationFormat:          "Olá %s,",
-		DescriptionAboveBtn:       "Recebemos recentemente uma solicitação para redefinir a sua senha. Você pode clicar no link abaixo para redefinir sua senha.",
-		ResetPassword:             "Redefinir Senha",
-		DescriptionBelowBtnFormat: "Se você não solicitou a redefinição de senha, basta ignorar este e-mail. Se não conseguir clicar no link acima, copie a URL acima e cole no seu navegador. O link de redefinição de senha expirará após %v minutos.",
+		DescriptionAboveBtn:       "Recebemos recentemente uma solicitação para redefinir sua senha. Clique no link abaixo para redefini-la.",
+		ResetPassword:             "Redefinir senha",
+		DescriptionBelowBtnFormat: "Se você não solicitou a redefinição da senha, ignore este e-mail. Se não conseguir clicar no link acima, copie a URL e cole no navegador. O link de redefinição de senha expira em %v minutos.",
 	},
 }

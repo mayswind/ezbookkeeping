@@ -245,6 +245,7 @@ const {
     getMonthdayShortName,
     getWeekdayLongName,
     getQuarterName,
+    getCurrencyName,
     formatDateTimeToShortDateTime,
     formatDateTimeToShortDate,
     formatDateTimeToGregorianLikeShortYear,
@@ -487,6 +488,10 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
         displayName = month ? getMonthLongName(month.name) : tt('Unknown');
     } else if (dimession === TransactionExplorerDataDimension.DateTimeByQuarterOfYear.value) {
         displayName = getQuarterName(parseInt(name));
+    } else if (dimession === TransactionExplorerDataDimension.SourceAccountCurrency.value || dimession === TransactionExplorerDataDimension.DestinationAccountCurrency.value) {
+        if (!needI18n) {
+            displayName = getCurrencyName(name);
+        }
     }
 
     if (dimession === TransactionExplorerDataDimension.SourceAmount.value

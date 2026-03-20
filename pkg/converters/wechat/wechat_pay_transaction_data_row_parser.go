@@ -71,7 +71,7 @@ func (p *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 	}
 
 	if p.hasOriginalColumn(wechatPayTransactionAmountColumnName) {
-		amount, success := utils.ParseFirstConsecutiveNumber(dataRow.GetData(wechatPayTransactionAmountColumnName))
+		amount, success := utils.ParseFirstConsecutiveNumber(strings.ReplaceAll(dataRow.GetData(wechatPayTransactionAmountColumnName), ",", ""))
 
 		if !success {
 			log.Errorf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] cannot parse amount \"%s\" of transaction in row \"%s\"", dataRow.GetData(wechatPayTransactionAmountColumnName), rowId)

@@ -42,6 +42,7 @@ interface AxisChartDataItem {
 }
 
 interface AxisChartTooltipItem extends SortableTransactionStatisticDataItem {
+    readonly id: string;
     readonly name: string;
     readonly color: unknown;
     readonly displayOrders: number[];
@@ -71,6 +72,9 @@ const props = defineProps<{
     amountValue?: boolean;
     defaultCurrency?: string;
     enableClickItem?: boolean;
+    tooltipExtraColumnNames?: string[];
+    tooltipExtraColumnTotalValues?: (categoryIndex: number, totalValue: number, visibleSeriesIds: string[]) => string[];
+    tooltipExtraColumnValues?: (seriesId: string, categoryIndex: number, currentValue: number) => string[];
 }>();
 
 const emit = defineEmits<{
@@ -290,6 +294,8 @@ const chartOptions = computed<object>(() => {
                 let totalAmount = 0;
                 let actualDisplayItemCount = 0;
                 const displayItems: AxisChartTooltipItem[] = [];
+                const categoryIndex = params.length > 0 && params[0] ? (params[0].dataIndex ?? 0) : 0;
+                const visibleSeriesIds: string[] = [];
 
                 for (const param of params) {
                     const id = param.seriesId as string;
@@ -299,38 +305,111 @@ const chartOptions = computed<object>(() => {
                     const amount = param.data as number;
 
                     displayItems.push({
+                        id: id,
                         name: name,
                         color: color,
                         displayOrders: displayOrders,
                         totalAmount: amount
                     });
 
+                    visibleSeriesIds.push(id);
                     totalAmount += amount;
                 }
 
                 sortStatisticsItems(displayItems, props.sortingType);
 
-                for (const item of displayItems) {
+                const extraColumnValuesMap: Record<number, string[]> = {};
+                const extraColumnTotalValues: string[] = [];
+                const hasExtraColumnIndexes: Record<number, boolean> = {};
+
+                if (props.tooltipExtraColumnNames) {
+                    if (props.tooltipExtraColumnValues) {
+                        for (const [item, index] of itemAndIndex(displayItems)) {
+                            const values = props.tooltipExtraColumnValues(item.id, categoryIndex, item.totalAmount);
+                            extraColumnValuesMap[index] = values;
+
+                            for (const [value, columnIndex] of itemAndIndex(values)) {
+                                if (value && value !== '-') {
+                                    hasExtraColumnIndexes[columnIndex] = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (props.tooltipExtraColumnTotalValues) {
+                        const values = props.tooltipExtraColumnTotalValues(categoryIndex, totalAmount, visibleSeriesIds);
+                        extraColumnTotalValues.push(...values);
+
+                        for (const [value, columnIndex] of itemAndIndex(values)) {
+                            if (value && value !== '-') {
+                                hasExtraColumnIndexes[columnIndex] = true;
+                            }
+                        }
+                    }
+                }
+
+                for (const [item, index] of itemAndIndex(displayItems)) {
                     if (displayItems.length === 1 || item.totalAmount !== 0) {
                         const value = getDisplayValue(item.totalAmount);
-                        tooltip += '<div><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
-                        tooltip += `<span>${item.name}</span><span class="ms-5" style="float: inline-end">${value}</span>`;
-                        tooltip += '</div>';
+                        tooltip += '<tr><td><span class="chart-pointer" style="background-color: ' + item.color + '"></span>';
+                        tooltip += `<span>${item.name}</span></td><td><span class="ms-5" style="float: inline-end">${value}</span></td>`;
+
+                        if (props.tooltipExtraColumnNames) {
+                            const values = extraColumnValuesMap[index] ?? [];
+
+                            for (let i = 0; i < props.tooltipExtraColumnNames.length; i++) {
+                                if (!hasExtraColumnIndexes[i]) {
+                                    continue;
+                                }
+
+                                const value = values[i] ?? '-';
+                                tooltip += `<td><span class="ms-5" style="float: inline-end">${value}</span></td>`;
+                            }
+                        }
+
+                        tooltip += '</tr>';
                         actualDisplayItemCount++;
                     }
                 }
 
                 if (props.showTotalAmountInTooltip && !props.oneHundredPercentStacked) {
                     const displayTotalAmount = getDisplayValue(totalAmount);
-                    tooltip = '<div><span class="chart-pointer" style="background-color: ' + (isDarkMode.value ? '#eee' : '#333') + '"></span>'
-                        + `<span>${props.totalNameInTooltip}</span><span class="ms-5" style="float: inline-end">${displayTotalAmount}</span>`
-                        + '</div>'
-                        + (actualDisplayItemCount > 0 ? '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px"></div>' : '')
-                        + tooltip;
+                    let totalColumnCount = 2;
+
+                    let totalTooltip = `<tr><td><span class="chart-pointer" style="background-color: ${isDarkMode.value ? '#eee' : '#333'}"></span>`
+                        + `<span>${props.totalNameInTooltip}</span></td><td><span class="ms-5" style="float: inline-end">${displayTotalAmount}</span></td>`;
+
+                    if (props.tooltipExtraColumnNames) {
+                        for (let i = 0; i < props.tooltipExtraColumnNames.length; i++) {
+                            if (!hasExtraColumnIndexes[i]) {
+                                continue;
+                            }
+
+                            const value = extraColumnTotalValues[i] ?? '-';
+                            totalTooltip += `<td><span class="ms-5" style="float: inline-end">${value}</span></td>`;
+                            totalColumnCount++;
+                        }
+                    }
+
+                    totalTooltip += '</tr>';
+                    totalTooltip += `<tr><td colspan="${totalColumnCount}" ${actualDisplayItemCount > 0 ? 'style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px"' : ''}></td></tr>`;
+                    tooltip = totalTooltip + tooltip;
                 }
 
                 if (params.length && params[0] && params[0].name) {
-                    tooltip = `${params[0].name}<br/>` + tooltip;
+                    let tooltipHeader = `<td>${params[0].name}</td><td></td>`;
+
+                    if (props.tooltipExtraColumnNames) {
+                        for (const [columnName, columnIndex] of itemAndIndex(props.tooltipExtraColumnNames)) {
+                            if (!hasExtraColumnIndexes[columnIndex]) {
+                                continue;
+                            }
+
+                            tooltipHeader += `<td><span class="ms-5" style="float: inline-end">${columnName}</span></td>`;
+                        }
+                    }
+
+                    tooltip = `<table class="chart-tooltip-table"><tbody><tr>${tooltipHeader}</tr>${tooltip}</tbody></table>`
                 }
 
                 return tooltip;

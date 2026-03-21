@@ -2210,6 +2210,8 @@
     "Aggregate by Quarter": "รวมตามไตรมาส",
     "Aggregate by Year": "รวมตามปี",
     "Aggregate by Fiscal Year": "รวมตามปีงบประมาณ",
+    "Year-over-Year": "Year-over-Year",
+    "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "กรองบัญชี",
     "Filter Transaction Categories": "กรองหมวดรายการ",
     "Filter Transaction Tags": "กรองแท็กรายการ",

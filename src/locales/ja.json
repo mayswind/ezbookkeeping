@@ -2210,6 +2210,8 @@
     "Aggregate by Quarter": "四半期ごとに集計",
     "Aggregate by Year": "年ごとに集計",
     "Aggregate by Fiscal Year": "Aggregate by Fiscal Year",
+    "Year-over-Year": "Year-over-Year",
+    "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "口座で絞り込み",
     "Filter Transaction Categories": "取引カテゴリで絞り込み",
     "Filter Transaction Tags": "取引タグで絞り込み",

@@ -2210,6 +2210,8 @@
     "Aggregate by Quarter": "Nach Quartal aggregieren",
     "Aggregate by Year": "Nach Jahr aggregieren",
     "Aggregate by Fiscal Year": "Aggregate by Fiscal Year",
+    "Year-over-Year": "Year-over-Year",
+    "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "Konten filtern",
     "Filter Transaction Categories": "Transaktionskategorien filtern",
     "Filter Transaction Tags": "Transaktions-Tags filtern",

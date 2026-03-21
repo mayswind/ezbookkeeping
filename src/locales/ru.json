@@ -2210,6 +2210,8 @@
     "Aggregate by Quarter": "Агрегировать по кварталам",
     "Aggregate by Year": "Агрегировать по годам",
     "Aggregate by Fiscal Year": "Агрегировать по фискальным годам",
+    "Year-over-Year": "Year-over-Year",
+    "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "Фильтровать счета",
     "Filter Transaction Categories": "Фильтровать категории транзакций",
     "Filter Transaction Tags": "Фильтровать теги транзакций",

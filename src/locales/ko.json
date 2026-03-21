@@ -2210,6 +2210,8 @@
     "Aggregate by Quarter": "분기별 집계",
     "Aggregate by Year": "연도별 집계",
     "Aggregate by Fiscal Year": "회계 연도별 집계",
+    "Year-over-Year": "Year-over-Year",
+    "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "계좌 필터",
     "Filter Transaction Categories": "거래 범주 필터",
     "Filter Transaction Tags": "거래 태그 필터",

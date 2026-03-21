@@ -2210,6 +2210,8 @@
     "Aggregate by Quarter": "依季度彙整",
     "Aggregate by Year": "依年份彙整",
     "Aggregate by Fiscal Year": "依財年彙整",
+    "Year-over-Year": "同比",
+    "Period-over-Period": "環比",
     "Filter Accounts": "篩選帳戶",
     "Filter Transaction Categories": "篩選交易分類",
     "Filter Transaction Tags": "篩選交易標籤",

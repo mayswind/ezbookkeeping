@@ -43,6 +43,7 @@ import {
     isEquals,
 } from '@/lib/common.ts';
 import {
+    getUtcOffsetByUtcOffsetMinutes,
     parseDateTimeFromUnixTime,
     parseDateTimeFromUnixTimeWithTimezoneOffset,
     getDateRangeByDateType,
@@ -288,6 +289,13 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryId: dateTime.getHour().toString(10),
                 categoryIdType: TransactionExplorerDimensionType.Other,
                 categoryDisplayOrders: [dateTime.getHour()]
+            };
+        } else if (dimension === TransactionExplorerDataDimension.TimezoneOffset) {
+            return {
+                categoryName: getUtcOffsetByUtcOffsetMinutes(transaction.utcOffset),
+                categoryId: transaction.utcOffset.toString(10),
+                categoryIdType: TransactionExplorerDimensionType.Other,
+                categoryDisplayOrders: [transaction.utcOffset]
             };
         } else if (dimension === TransactionExplorerDataDimension.TransactionType) {
             let transactionTypeName = 'Unknown';

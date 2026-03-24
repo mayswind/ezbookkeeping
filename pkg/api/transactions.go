@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -1252,6 +1253,17 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		newTransaction.GeoLatitude = transactionModifyReq.GeoLocation.Latitude
 	}
 
+	if transactionModifyReq.EncryptionId != "" {
+		newTransaction.EncryptionId = transactionModifyReq.EncryptionId
+	}
+
+	if transactionModifyReq.EncryptedData != "" {
+		encryptedData, decodeErr := base64.StdEncoding.DecodeString(transactionModifyReq.EncryptedData)
+		if decodeErr == nil {
+			newTransaction.EncryptedData = encryptedData
+		}
+	}
+
 	if newTransaction.CategoryId == transaction.CategoryId &&
 		utils.GetUnixTimeFromTransactionTime(newTransaction.TransactionTime) == utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) &&
 		newTransaction.TimezoneUtcOffset == transaction.TimezoneUtcOffset &&
@@ -1263,6 +1275,8 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		newTransaction.Comment == transaction.Comment &&
 		newTransaction.GeoLongitude == transaction.GeoLongitude &&
 		newTransaction.GeoLatitude == transaction.GeoLatitude &&
+		newTransaction.EncryptionId == transaction.EncryptionId &&
+		string(newTransaction.EncryptedData) == string(transaction.EncryptedData) &&
 		utils.Int64SliceEquals(tagIds, transactionTagIds) &&
 		utils.Int64SliceEquals(pictureIds, transactionPictureIds) {
 		return nil, errs.ErrNothingWillBeUpdated
@@ -2181,6 +2195,17 @@ func (a *TransactionsApi) createNewTransactionModel(uid int64, transactionCreate
 	if transactionCreateReq.GeoLocation != nil {
 		transaction.GeoLongitude = transactionCreateReq.GeoLocation.Longitude
 		transaction.GeoLatitude = transactionCreateReq.GeoLocation.Latitude
+	}
+
+	if transactionCreateReq.EncryptionId != "" {
+		transaction.EncryptionId = transactionCreateReq.EncryptionId
+	}
+
+	if transactionCreateReq.EncryptedData != "" {
+		encryptedData, err := base64.StdEncoding.DecodeString(transactionCreateReq.EncryptedData)
+		if err == nil {
+			transaction.EncryptedData = encryptedData
+		}
 	}
 
 	return transaction

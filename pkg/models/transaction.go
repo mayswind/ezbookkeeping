@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -139,6 +140,8 @@ type Transaction struct {
 	GeoLatitude          float64           `xorm:"INDEX(IDX_transaction_uid_deleted_time_longitude_latitude)"`
 	CreatedIp            string            `xorm:"VARCHAR(39)"`
 	ScheduledCreated     bool
+	EncryptionId         string `xorm:"VARCHAR(36)"`
+	EncryptedData        []byte `xorm:"BLOB"`
 	CreatedUnixTime      int64
 	UpdatedUnixTime      int64
 	DeletedUnixTime      int64
@@ -173,6 +176,8 @@ type TransactionCreateRequest struct {
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
 	ClientSessionId      string                         `json:"clientSessionId"`
+	EncryptionId         string                         `json:"encryptionId" binding:"omitempty,max=36"`
+	EncryptedData        string                         `json:"encryptedData" binding:"omitempty"`
 }
 
 // TransactionModifyRequest represents all parameters of transaction modification request
@@ -190,6 +195,8 @@ type TransactionModifyRequest struct {
 	PictureIds           []string                       `json:"pictureIds"`
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
+	EncryptionId         string                         `json:"encryptionId" binding:"omitempty,max=36"`
+	EncryptedData        string                         `json:"encryptedData" binding:"omitempty"`
 }
 
 // TransactionImportRequest represents all parameters of transaction import request
@@ -370,6 +377,8 @@ type TransactionInfoResponse struct {
 	Comment              string                                   `json:"comment"`
 	GeoLocation          *TransactionGeoLocationResponse          `json:"geoLocation,omitempty"`
 	Editable             bool                                     `json:"editable"`
+	EncryptionId         string                                   `json:"encryptionId,omitempty"`
+	EncryptedData        string                                   `json:"encryptedData,omitempty"`
 }
 
 // TransactionCountResponse represents transaction count response
@@ -564,6 +573,11 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		geoLocation = nil
 	}
 
+	var encryptedDataStr string
+	if len(t.EncryptedData) > 0 {
+		encryptedDataStr = base64.StdEncoding.EncodeToString(t.EncryptedData)
+	}
+
 	return &TransactionInfoResponse{
 		Id:                   t.TransactionId,
 		TimeSequenceId:       t.TransactionTime,
@@ -580,6 +594,8 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 		Comment:              t.Comment,
 		GeoLocation:          geoLocation,
 		Editable:             editable,
+		EncryptionId:         t.EncryptionId,
+		EncryptedData:        encryptedDataStr,
 	}
 }
 

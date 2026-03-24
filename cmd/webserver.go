@@ -326,6 +326,15 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.POST("/tokens/revoke_all.json", bindApi(api.Tokens.TokenRevokeAllHandler))
 			apiV1Route.POST("/tokens/refresh.json", bindApiWithTokenUpdate(api.Tokens.TokenRefreshHandler, config))
 
+			// Vault
+			apiV1Route.POST("/vault/init.json", bindApi(api.Vault.VaultInitHandler))
+			apiV1Route.GET("/vault/params.json", bindApi(api.Vault.VaultGetParamsHandler))
+			apiV1Route.PUT("/vault/params.json", bindApi(api.Vault.VaultUpdateParamsHandler))
+			apiV1Route.DELETE("/vault/shred.json", bindApi(api.Vault.VaultShredHandler))
+
+			// API Key
+			apiV1Route.POST("/account/link-apikey.json", bindApi(api.Vault.LinkApiKeyHandler))
+
 			// Users
 			apiV1Route.GET("/users/profile/get.json", bindApi(api.Users.UserProfileHandler))
 			apiV1Route.POST("/users/profile/update.json", bindApiWithTokenUpdate(api.Users.UserUpdateProfileHandler, config))

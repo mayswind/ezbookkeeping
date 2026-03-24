@@ -1,11 +1,14 @@
 import type { Router } from 'framework7/types';
 
-import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
+import { isUserLogined, isUserUnlocked, getStoredHasVault } from '@/lib/userstate.ts';
+import { isVaultUnlocked } from '@/lib/vault-service.ts';
 
 import HomePage from '@/views/mobile/HomePage.vue';
 import LoginPage from '@/views/mobile/LoginPage.vue';
 import SignUpPage from '@/views/mobile/SignupPage.vue';
 import UnlockPage from '@/views/mobile/UnlockPage.vue';
+import VaultSetupPage from '@/views/mobile/VaultSetupPage.vue';
+import VaultUnlockPage from '@/views/mobile/VaultUnlockPage.vue';
 
 import TransactionListPage from '@/views/mobile/transactions/ListPage.vue';
 import TransactionEditPage from '@/views/mobile/transactions/EditPage.vue';
@@ -70,6 +73,24 @@ function checkLogin({ router, resolve, reject }: { router: Router.Router, resolv
     if (!isUserUnlocked()) {
         reject();
         router.navigate('/unlock', {
+            clearPreviousHistory: true,
+            browserHistory: false
+        });
+        return;
+    }
+
+    if (!getStoredHasVault()) {
+        reject();
+        router.navigate('/vault/setup', {
+            clearPreviousHistory: true,
+            browserHistory: false
+        });
+        return;
+    }
+
+    if (!isVaultUnlocked()) {
+        reject();
+        router.navigate('/vault/unlock', {
             clearPreviousHistory: true,
             browserHistory: false
         });
@@ -152,6 +173,20 @@ const routes: Router.RouteParameters[] = [
         path: '/unlock',
         async: asyncResolve(UnlockPage),
         beforeEnter: [checkLocked],
+        options: {
+            animate: false,
+        }
+    },
+    {
+        path: '/vault/setup',
+        async: asyncResolve(VaultSetupPage),
+        options: {
+            animate: false,
+        }
+    },
+    {
+        path: '/vault/unlock',
+        async: asyncResolve(VaultUnlockPage),
         options: {
             animate: false,
         }

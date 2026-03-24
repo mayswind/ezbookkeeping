@@ -4,6 +4,8 @@ package models
 type AuthResponse struct {
 	Token                    string                        `json:"token"`
 	Need2FA                  bool                          `json:"need2FA"`
+	HasVault                 bool                          `json:"hasVault"`
+	Tier                     string                        `json:"tier"`
 	User                     *UserBasicInfo                `json:"user"`
 	ApplicationCloudSettings *ApplicationCloudSettingSlice `json:"applicationCloudSettings,omitempty"`
 	NotificationContent      string                        `json:"notificationContent,omitempty"`

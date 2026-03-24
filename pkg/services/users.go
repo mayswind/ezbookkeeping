@@ -405,6 +405,50 @@ func (s *UserService) UpdateUserPassword(c core.Context, user *models.User) erro
 	})
 }
 
+// UpdateUserVault updates vault fields for the specified user
+func (s *UserService) UpdateUserVault(c core.Context, user *models.User) error {
+	if user.Uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+		updatedRows, err := sess.ID(user.Uid).Cols(
+			"vault_version", "vault_salt", "vault_argon2_params",
+			"vault_encrypted_dek", "vault_encrypted_x25519", "vault_x25519_public",
+			"updated_unix_time",
+		).Where("deleted=?", false).Update(user)
+
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
+			return errs.ErrUserNotFound
+		}
+
+		return nil
+	})
+}
+
+// UpdateUserApiKey updates nicodAImus API key hash and tier for the specified user
+func (s *UserService) UpdateUserApiKey(c core.Context, user *models.User) error {
+	if user.Uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+		updatedRows, err := sess.ID(user.Uid).Cols(
+			"nicodaimus_key_hash", "nicodaimus_tier", "updated_unix_time",
+		).Where("deleted=?", false).Update(user)
+
+		if err != nil {
+			return err
+		} else if updatedRows < 1 {
+			return errs.ErrUserNotFound
+		}
+
+		return nil
+	})
+}
+
 // UpdateUserAvatar updates the custom avatar type of specified user
 func (s *UserService) UpdateUserAvatar(c core.Context, uid int64, avatarFile multipart.File, fileExtension string, oldFileExtension string) error {
 	if uid <= 0 {

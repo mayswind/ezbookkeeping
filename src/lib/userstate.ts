@@ -15,6 +15,9 @@ const webauthnConfigLocalStorageKey: string = 'ebk_user_webauthn_config';
 const userInfoLocalStorageKey: string = 'ebk_user_info';
 const transactionDraftLocalStorageKey: string = 'ebk_user_draft_transaction';
 
+const vaultHasVaultLocalStorageKey: string = 'oscar_has_vault';
+const vaultTierLocalStorageKey: string = 'oscar_tier';
+
 const tokenSessionStorageKey: string = 'ebk_user_session_token';
 const encryptedTokenSessionStorageKey: string = 'ebk_user_session_encrypted_token';
 const appLockStateSessionStorageKey: string = 'ebk_user_app_lock_state'; // { 'username': '', secret: '' }
@@ -316,6 +319,24 @@ export function clearCurrentTokenAndUserInfo(clearAppLockState: boolean): void {
     sessionStorage.removeItem(tokenSessionStorageKey);
     sessionStorage.removeItem(encryptedTokenSessionStorageKey);
     localStorage.removeItem(tokenLocalStorageKey);
+    localStorage.removeItem(vaultHasVaultLocalStorageKey);
+    localStorage.removeItem(vaultTierLocalStorageKey);
     clearUserTransactionDraft();
     clearCurrentUserInfo();
+}
+
+export function getStoredHasVault(): boolean {
+    return localStorage.getItem(vaultHasVaultLocalStorageKey) === 'true';
+}
+
+export function setStoredHasVault(hasVault: boolean): void {
+    localStorage.setItem(vaultHasVaultLocalStorageKey, hasVault ? 'true' : 'false');
+}
+
+export function getStoredTier(): string {
+    return localStorage.getItem(vaultTierLocalStorageKey) || 'free';
+}
+
+export function setStoredTier(tier: string): void {
+    localStorage.setItem(vaultTierLocalStorageKey, tier);
 }

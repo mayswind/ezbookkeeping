@@ -537,9 +537,16 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 }
 
 func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, need2FA bool, user *models.User, applicationCloudSettings *models.ApplicationCloudSettingSlice) *models.AuthResponse {
+	tier := user.NicodaimusTier
+	if tier == "" {
+		tier = "free"
+	}
+
 	return &models.AuthResponse{
 		Token:                    token,
 		Need2FA:                  need2FA,
+		HasVault:                 user.VaultVersion > 0,
+		Tier:                     tier,
 		User:                     a.GetUserBasicInfo(user),
 		ApplicationCloudSettings: applicationCloudSettings,
 		NotificationContent:      a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),

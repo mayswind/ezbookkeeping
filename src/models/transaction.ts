@@ -8,6 +8,19 @@ import { TransactionCategory, type TransactionCategoryInfoResponse } from './tra
 import { TransactionTag, type TransactionTagInfoResponse } from './transaction_tag.ts';
 import { TransactionPicture, type TransactionPictureInfoBasicResponse } from './transaction_picture_info.ts';
 
+import { decryptTransactionResponse } from '@/lib/transaction-crypto.ts';
+
+function decryptIfNeeded(resp: TransactionInfoResponse): TransactionInfoResponse {
+    if (resp.encryptionId && resp.encryptedData) {
+        try {
+            return decryptTransactionResponse(resp);
+        } catch {
+            // Decryption unavailable or failed - use raw response
+        }
+    }
+    return resp;
+}
+
 export class Transaction implements TransactionInfoResponse {
     public id: string;
     public timeSequenceId: string;
@@ -311,52 +324,55 @@ export class Transaction implements TransactionInfoResponse {
     }
 
     public static of(transactionResponse: TransactionInfoResponse): Transaction {
+        // Decrypt sensitive fields if encrypted data is present
+        const resp = decryptIfNeeded(transactionResponse);
+
         const transaction: Transaction = new Transaction(
-            transactionResponse.id,
-            transactionResponse.timeSequenceId,
-            transactionResponse.type,
-            transactionResponse.categoryId,
-            transactionResponse.time,
+            resp.id,
+            resp.timeSequenceId,
+            resp.type,
+            resp.categoryId,
+            resp.time,
             undefined, // only in new transaction
-            transactionResponse.utcOffset,
-            transactionResponse.sourceAccountId,
-            transactionResponse.destinationAccountId,
-            transactionResponse.sourceAmount,
-            transactionResponse.destinationAmount,
-            transactionResponse.hideAmount,
-            transactionResponse.tagIds,
-            transactionResponse.comment,
-            transactionResponse.editable
+            resp.utcOffset,
+            resp.sourceAccountId,
+            resp.destinationAccountId,
+            resp.sourceAmount,
+            resp.destinationAmount,
+            resp.hideAmount,
+            resp.tagIds,
+            resp.comment,
+            resp.editable
         );
 
-        if (transactionResponse.category) {
-            transaction.setCategory(TransactionCategory.of(transactionResponse.category));
+        if (resp.category) {
+            transaction.setCategory(TransactionCategory.of(resp.category));
         }
 
-        if (transactionResponse.sourceAccount) {
-            transaction.setSourceAccount(Account.of(transactionResponse.sourceAccount));
+        if (resp.sourceAccount) {
+            transaction.setSourceAccount(Account.of(resp.sourceAccount));
         }
 
-        if (transactionResponse.destinationAccount) {
-            transaction.setDestinationAccount(Account.of(transactionResponse.destinationAccount));
+        if (resp.destinationAccount) {
+            transaction.setDestinationAccount(Account.of(resp.destinationAccount));
         }
 
-        if (transactionResponse.tags) {
-            transaction.setTags(TransactionTag.ofMulti(transactionResponse.tags));
+        if (resp.tags) {
+            transaction.setTags(TransactionTag.ofMulti(resp.tags));
         }
 
-        if (transactionResponse.pictures) {
+        if (resp.pictures) {
             const pictures: TransactionPicture[] = [];
 
-            for (const picture of transactionResponse.pictures) {
+            for (const picture of resp.pictures) {
                 pictures.push(TransactionPicture.of(picture));
             }
 
             transaction.setPictures(pictures);
         }
 
-        if (transactionResponse.geoLocation) {
-            transaction.setLatitudeAndLongitude(transactionResponse.geoLocation.latitude, transactionResponse.geoLocation.longitude);
+        if (resp.geoLocation) {
+            transaction.setLatitudeAndLongitude(resp.geoLocation.latitude, resp.geoLocation.longitude);
         }
 
         return transaction;
@@ -540,6 +556,8 @@ export interface TransactionCreateRequest {
     readonly comment: string;
     readonly geoLocation?: TransactionGeoLocationRequest;
     readonly clientSessionId: string;
+    readonly encryptionId?: string;
+    readonly encryptedData?: string;
 }
 
 export interface TransactionModifyRequest {
@@ -556,6 +574,8 @@ export interface TransactionModifyRequest {
     readonly pictureIds: string[];
     readonly comment: string;
     readonly geoLocation?: TransactionGeoLocationRequest;
+    readonly encryptionId?: string;
+    readonly encryptedData?: string;
 }
 
 export interface TransactionMoveBetweenAccountsRequest {
@@ -632,6 +652,8 @@ export interface TransactionInfoResponse {
     readonly comment: string;
     readonly geoLocation?: TransactionGeoLocationResponse;
     readonly editable: boolean;
+    readonly encryptionId?: string;
+    readonly encryptedData?: string;
 }
 
 export interface TransactionStatisticRequest {

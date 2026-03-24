@@ -987,6 +987,14 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			updateCols = append(updateCols, "geo_latitude")
 		}
 
+		if transaction.EncryptionId != oldTransaction.EncryptionId {
+			updateCols = append(updateCols, "encryption_id")
+		}
+
+		if string(transaction.EncryptedData) != string(oldTransaction.EncryptedData) {
+			updateCols = append(updateCols, "encrypted_data")
+		}
+
 		// Get and verify tags
 		err = s.isTagsValid(sess, transaction, transactionTagIndexes, addTagIds)
 

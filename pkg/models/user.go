@@ -114,6 +114,14 @@ type User struct {
 	Disabled              bool
 	Deleted               bool `xorm:"NOT NULL"`
 	EmailVerified         bool `xorm:"NOT NULL"`
+	VaultVersion          int    `xorm:"TINYINT NOT NULL DEFAULT 0"`
+	VaultSalt             []byte `xorm:"BLOB"`
+	VaultArgon2Params     string `xorm:"VARCHAR(100)"`
+	VaultEncryptedDek     []byte `xorm:"BLOB"`
+	VaultEncryptedX25519  []byte `xorm:"BLOB"`
+	VaultX25519Public     []byte `xorm:"BLOB"`
+	NicodaimusKeyHash     string `xorm:"VARCHAR(64)"`
+	NicodaimusTier        string `xorm:"VARCHAR(20) NOT NULL DEFAULT 'free'"`
 	CreatedUnixTime       int64
 	UpdatedUnixTime       int64
 	DeletedUnixTime       int64

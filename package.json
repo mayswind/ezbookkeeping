@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
+    "@nicodaimus/crypto": "file:../nicodaimus-crypto",
     "@vuepic/vue-datepicker": "^12.1.0",
     "axios": "^1.13.4",
     "cbor-js": "^0.1.0",
@@ -47,7 +48,8 @@
     "vue-router": "^5.0.2",
     "vue3-perfect-scrollbar": "^2.0.0",
     "vuedraggable": "^4.1.0",
-    "vuetify": "^3.11.8"
+    "vuetify": "^3.11.8",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@jest/globals": "^30.2.0",
@@ -59,6 +61,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
     "@types/ua-parser-js": "^0.7.39",
+    "@types/zxcvbn": "^4.4.5",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/tsconfig": "^0.8.1",

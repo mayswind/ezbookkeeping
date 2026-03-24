@@ -197,6 +197,7 @@ import {
     getCurrentUnixTime
 } from './datetime.ts';
 import { generateRandomUUID } from './misc.ts';
+import { encryptCreateRequest, encryptModifyRequest } from './transaction-crypto.ts';
 import { getBasePath } from './web.ts';
 import logger from './logger.ts';
 
@@ -606,10 +607,10 @@ export default {
         return axios.get<ApiResponse<TransactionInfoResponse>>(`v1/transactions/get.json?id=${id}&with_pictures=${withPictures}&trim_account=true&trim_category=true&trim_tag=true`);
     },
     addTransaction: (req: TransactionCreateRequest): ApiResponsePromise<TransactionInfoResponse> => {
-        return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/add.json', req);
+        return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/add.json', encryptCreateRequest(req));
     },
     modifyTransaction: (req: TransactionModifyRequest): ApiResponsePromise<TransactionInfoResponse> => {
-        return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/modify.json', req);
+        return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/modify.json', encryptModifyRequest(req));
     },
     moveAllTransactionsBetweenAccounts: (req: TransactionMoveBetweenAccountsRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/move/all.json', req);
@@ -896,6 +897,21 @@ export default {
         } else {
             return avatarUrl + '?' + params.join('&');
         }
+    },
+    vaultInit: (data: { vaultSalt: string; argon2Params: string; encryptedDek: string; encryptedX25519: string; x25519Public: string }): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/vault/init.json', data);
+    },
+    vaultGetParams: (): ApiResponsePromise<{ vaultVersion: number; vaultSalt: string; argon2Params: string; encryptedDek: string; encryptedX25519: string; x25519Public: string }> => {
+        return axios.get('v1/vault/params.json');
+    },
+    vaultUpdateParams: (data: { vaultSalt: string; argon2Params: string; encryptedDek: string; encryptedX25519: string; x25519Public: string }): ApiResponsePromise<boolean> => {
+        return axios.put<ApiResponse<boolean>>('v1/vault/params.json', data);
+    },
+    vaultShred: (): ApiResponsePromise<boolean> => {
+        return axios.delete<ApiResponse<boolean>>('v1/vault/shred.json');
+    },
+    linkApiKey: (data: { apiKey: string }): ApiResponsePromise<{ tier: string }> => {
+        return axios.post<ApiResponse<{ tier: string }>>('v1/account/link-apikey.json', data);
     },
     getTransactionPictureUrlWithToken(pictureUrl: string, disableBrowserCache?: boolean | string): string {
         if (!pictureUrl) {

@@ -35,7 +35,9 @@ import {
     updateCurrentToken,
     clearWebAuthnConfig,
     clearCurrentSessionToken,
-    clearCurrentTokenAndUserInfo
+    clearCurrentTokenAndUserInfo,
+    setStoredHasVault,
+    setStoredTier
 } from '@/lib/userstate.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
@@ -118,6 +120,13 @@ export const useRootStore = defineStore('root', () => {
 
                 updateCurrentToken(data.result.token);
 
+                if (data.result.hasVault !== undefined) {
+                    setStoredHasVault(data.result.hasVault);
+                }
+                if (data.result.tier) {
+                    setStoredTier(data.result.tier);
+                }
+
                 if (data.result.user && isObject(data.result.user)) {
                     userStore.storeUserBasicInfo(data.result.user);
                 }
@@ -179,6 +188,13 @@ export const useRootStore = defineStore('root', () => {
 
                 updateCurrentToken(data.result.token);
 
+                if (data.result.hasVault !== undefined) {
+                    setStoredHasVault(data.result.hasVault);
+                }
+                if (data.result.tier) {
+                    setStoredTier(data.result.tier);
+                }
+
                 if (data.result.user && isObject(data.result.user)) {
                     userStore.storeUserBasicInfo(data.result.user);
                 }
@@ -226,6 +242,13 @@ export const useRootStore = defineStore('root', () => {
                 settingsStore.setApplicationSettingsFromCloudSettings(data.result.applicationCloudSettings);
 
                 updateCurrentToken(data.result.token);
+
+                if (data.result.hasVault !== undefined) {
+                    setStoredHasVault(data.result.hasVault);
+                }
+                if (data.result.tier) {
+                    setStoredTier(data.result.tier);
+                }
 
                 if (data.result.user && isObject(data.result.user)) {
                     userStore.storeUserBasicInfo(data.result.user);

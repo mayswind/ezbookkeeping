@@ -105,6 +105,8 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 	authResp := &models.RegisterResponse{
 		AuthResponse: models.AuthResponse{
 			Need2FA:             false,
+			HasVault:            false,
+			Tier:                "free",
 			User:                a.GetUserBasicInfo(user),
 			NotificationContent: a.GetAfterRegisterNotificationContent(user.Language, c.GetClientLocale()),
 		},

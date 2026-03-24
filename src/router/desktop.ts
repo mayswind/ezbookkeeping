@@ -1,7 +1,8 @@
 import { type NavigationGuardReturn, createRouter, createWebHashHistory } from 'vue-router';
 
 import { TemplateType } from '@/core/template.ts';
-import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
+import { isUserLogined, isUserUnlocked, getStoredHasVault } from '@/lib/userstate.ts';
+import { isVaultUnlocked } from '@/lib/vault-service.ts';
 
 import MainLayout from '@/views/desktop/MainLayout.vue';
 import LoginPage from '@/views/desktop/LoginPage.vue';
@@ -11,6 +12,8 @@ import ForgetPasswordPage from '@/views/desktop/ForgetPasswordPage.vue';
 import ResetPasswordPage from '@/views/desktop/ResetPasswordPage.vue';
 import OAuth2CallbackPage from '@/views/desktop/OAuth2CallbackPage.vue';
 import UnlockPage from '@/views/desktop/UnlockPage.vue';
+import VaultSetupPage from '@/views/desktop/VaultSetupPage.vue';
+import VaultUnlockPage from '@/views/desktop/VaultUnlockPage.vue';
 
 import HomePage from '@/views/desktop/HomePage.vue';
 
@@ -47,6 +50,56 @@ function checkLogin(): NavigationGuardReturn {
             path: '/unlock',
             replace: true
         };
+    }
+
+    if (!getStoredHasVault()) {
+        return {
+            path: '/vault/setup',
+            replace: true
+        };
+    }
+
+    if (!isVaultUnlocked()) {
+        return {
+            path: '/vault/unlock',
+            replace: true
+        };
+    }
+
+    return true;
+}
+
+function checkVaultSetup(): NavigationGuardReturn {
+    if (!isUserLogined()) {
+        return { path: '/login', replace: true };
+    }
+
+    if (!isUserUnlocked()) {
+        return { path: '/unlock', replace: true };
+    }
+
+    if (getStoredHasVault()) {
+        return { path: '/vault/unlock', replace: true };
+    }
+
+    return true;
+}
+
+function checkVaultUnlock(): NavigationGuardReturn {
+    if (!isUserLogined()) {
+        return { path: '/login', replace: true };
+    }
+
+    if (!isUserUnlocked()) {
+        return { path: '/unlock', replace: true };
+    }
+
+    if (!getStoredHasVault()) {
+        return { path: '/vault/setup', replace: true };
+    }
+
+    if (isVaultUnlocked()) {
+        return { path: '/', replace: true };
     }
 
     return true;
@@ -256,6 +309,16 @@ const router = createRouter({
             path: '/unlock',
             component: UnlockPage,
             beforeEnter: checkLocked
+        },
+        {
+            path: '/vault/setup',
+            component: VaultSetupPage,
+            beforeEnter: checkVaultSetup
+        },
+        {
+            path: '/vault/unlock',
+            component: VaultUnlockPage,
+            beforeEnter: checkVaultUnlock
         }
     ],
 })

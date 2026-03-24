@@ -1,7 +1,7 @@
 {
     "global": {
         "app": {
-            "title": "ezBookkeeping"
+            "title": "oscar"
         }
     },
     "language": {
@@ -137,20 +137,20 @@
             "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Ein Aktivierungslink wurde an Ihre E-Mail-Adresse gesendet: {email}. Wenn Sie die E-Mail nicht erhalten haben, geben Sie bitte das Passwort erneut ein und klicken Sie auf die Schaltfläche unten, um die Bestätigungs-E-Mail erneut zu senden.",
             "resendValidationEmailTip": "Wenn Sie die E-Mail nicht erhalten haben, geben Sie bitte das Passwort erneut ein und klicken Sie auf die Schaltfläche unten, um die Bestätigungs-E-Mail an: {email} erneut zu senden.",
-            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your ezBookkeeping password to verify."
+            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your oscar password to verify."
         }
     },
     "dataExport": {
-        "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data",
-        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
-        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_reconciliation_statements",
-        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
-        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
-        "defaultImportHandlingScript": "ezBookkeeping_handling_script",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule",
-        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
+        "defaultExportFilename": "oscar_export_data",
+        "exportFilename": "oscar_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "oscar_statistics_data",
+        "exportStatisticsFileName": "oscar_{nickname}_statistics_data",
+        "defaultExportReconciliationStatementsFileName": "oscar_reconciliation_statements",
+        "exportReconciliationStatementsFileName": "oscar_{nickname}_reconciliation_statements",
+        "defaultImportDataMappingFileName": "oscar_import_data_mapping",
+        "defaultImportHandlingScript": "oscar_handling_script",
+        "defaultImportReplaceRuleFileName": "oscar_import_replace_rule",
+        "defaultImportCheckResultFileName": "oscar_import_check_result"
     },
     "calendar": {
         "Gregorian": "Gregorian",
@@ -1627,8 +1627,8 @@
     "Change Language": "Sprache ändern",
     "Date is too early": "Datum ist zu früh",
     "User Canceled": "User Canceled",
-    "Welcome to ezBookkeeping": "Willkommen bei ezBookkeeping",
-    "Please log in with your ezBookkeeping account": "Bitte melden Sie sich mit Ihrem ezBookkeeping-Konto an",
+    "Welcome to oscar": "Willkommen bei oscar",
+    "Please log in with your oscar account": "Bitte melden Sie sich mit Ihrem oscar-Konto an",
     "Unlock Application": "Anwendung entsperren",
     "Please enter your PIN code or use WebAuthn to unlock application": "Bitte geben Sie Ihren PIN-Code ein oder verwenden Sie WebAuthn, um die Anwendung zu entsperren",
     "Please enter your PIN code to unlock application": "Bitte geben Sie Ihren PIN-Code ein, um die Anwendung zu entsperren",
@@ -1987,13 +1987,13 @@
     "Filter Description": "Filterbeschreibung",
     "How to import this file?": "How to import this file?",
     "How to export this file?": "Wie exportiere ich diese Datei?",
-    "ezBookkeeping File Format": "ezBookkeeping File Format",
+    "oscar File Format": "oscar File Format",
     "Custom File Format": "Custom File Format",
     "General Data Exchange Format": "General Data Exchange Format",
     "General Bank Statement Format": "General Bank Statement Format",
     "Other Bank/Payment App Statement File": "Other Bank/Payment App Statement File",
     "Other Finance App File Format": "Other Finance App File Format",
-    "ezbookkeeping Data Export File": "ezBookkeeping-Datenexportdatei",
+    "oscar Data Export File": "oscar-Datenexportdatei",
     "Excel Workbook File": "Excel Workbook File",
     "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
     "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",

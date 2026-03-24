@@ -1,7 +1,7 @@
 {
     "global": {
         "app": {
-            "title": "ezBookkeeping"
+            "title": "oscar"
         }
     },
     "language": {
@@ -137,20 +137,20 @@
             "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "Liên kết kích hoạt tài khoản đã được gửi tới email của bạn: {email}. Nếu bạn không nhận được email, vui lòng nhập lại mật khẩu và nhấp nút bên dưới để gửi lại email xác nhận.",
             "resendValidationEmailTip": "Nếu bạn không nhận được email, vui lòng nhập lại mật khẩu và nhấp nút bên dưới để gửi lại email xác nhận tới: {email}",
-            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your ezBookkeeping password to verify."
+            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your oscar password to verify."
         }
     },
     "dataExport": {
-        "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data",
-        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
-        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_reconciliation_statements",
-        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
-        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
-        "defaultImportHandlingScript": "ezBookkeeping_handling_script",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule",
-        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
+        "defaultExportFilename": "oscar_export_data",
+        "exportFilename": "oscar_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "oscar_statistics_data",
+        "exportStatisticsFileName": "oscar_{nickname}_statistics_data",
+        "defaultExportReconciliationStatementsFileName": "oscar_reconciliation_statements",
+        "exportReconciliationStatementsFileName": "oscar_{nickname}_reconciliation_statements",
+        "defaultImportDataMappingFileName": "oscar_import_data_mapping",
+        "defaultImportHandlingScript": "oscar_handling_script",
+        "defaultImportReplaceRuleFileName": "oscar_import_replace_rule",
+        "defaultImportCheckResultFileName": "oscar_import_check_result"
     },
     "calendar": {
         "Gregorian": "Gregorian",
@@ -1627,8 +1627,8 @@
     "Change Language": "Thay đổi ngôn ngữ",
     "Date is too early": "Ngày quá sớm",
     "User Canceled": "User Canceled",
-    "Welcome to ezBookkeeping": "Chào mừng đến với ezBookkeeping",
-    "Please log in with your ezBookkeeping account": "Vui lòng đăng nhập bằng tài khoản ezBookkeeping của bạn",
+    "Welcome to oscar": "Chào mừng đến với oscar",
+    "Please log in with your oscar account": "Vui lòng đăng nhập bằng tài khoản oscar của bạn",
     "Unlock Application": "Mở khóa ứng dụng",
     "Please enter your PIN code or use WebAuthn to unlock application": "Vui lòng nhập mã PIN hoặc sử dụng WebAuthn để mở khóa ứng dụng",
     "Please enter your PIN code to unlock application": "Vui lòng nhập mã PIN để mở khóa ứng dụng",
@@ -1987,13 +1987,13 @@
     "Filter Description": "Mô tả bộ lọc",
     "How to import this file?": "How to import this file?",
     "How to export this file?": "Làm thế nào để xuất tệp này?",
-    "ezBookkeeping File Format": "ezBookkeeping File Format",
+    "oscar File Format": "oscar File Format",
     "Custom File Format": "Custom File Format",
     "General Data Exchange Format": "General Data Exchange Format",
     "General Bank Statement Format": "General Bank Statement Format",
     "Other Bank/Payment App Statement File": "Other Bank/Payment App Statement File",
     "Other Finance App File Format": "Other Finance App File Format",
-    "ezbookkeeping Data Export File": "Tệp xuất dữ liệu ezbookkeeping",
+    "oscar Data Export File": "Tệp xuất dữ liệu oscar",
     "Excel Workbook File": "Excel Workbook File",
     "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
     "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",

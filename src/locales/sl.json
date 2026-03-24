@@ -1,7 +1,7 @@
 {
     "global": {
         "app": {
-            "title": "ezBookkeeping"
+            "title": "oscar"
         }
     },
     "language": {
@@ -137,20 +137,20 @@
             "clearTransactionsInAccountTip": "Tega dejanja NE MORETE razveljaviti. S tem boste izbrisali podatke o transakcijah v računu {account}. Za potrditev vnesite trenutno geslo.",
             "accountActivationAndResendValidationEmailTip": "Povezava za aktivacijo računa je bila poslana na vaš e-poštni naslov: {email}. Če e-pošte ne prejmete, ponovno vnesite geslo in kliknite spodnji gumb, da ponovno pošljete potrditveno e-pošto.",
             "resendValidationEmailTip": "Če ne prejmete e-pošte, ponovno vnesite geslo in kliknite spodnji gumb, da ponovno pošljete potrditveno e-pošto na: {email}",
-            "oauth2bindTip": "Prijavljate se v uporabniški račun {userName} z uporabo računa {providerName}. Za potrditev vnesite svoje geslo za ezBookkeeping."
+            "oauth2bindTip": "Prijavljate se v uporabniški račun {userName} z uporabo računa {providerName}. Za potrditev vnesite svoje geslo za oscar."
         }
     },
     "dataExport": {
-        "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data",
-        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
-        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_reconciliation_statements",
-        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
-        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
-        "defaultImportHandlingScript": "ezBookkeeping_handling_script",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule",
-        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
+        "defaultExportFilename": "oscar_export_data",
+        "exportFilename": "oscar_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "oscar_statistics_data",
+        "exportStatisticsFileName": "oscar_{nickname}_statistics_data",
+        "defaultExportReconciliationStatementsFileName": "oscar_reconciliation_statements",
+        "exportReconciliationStatementsFileName": "oscar_{nickname}_reconciliation_statements",
+        "defaultImportDataMappingFileName": "oscar_import_data_mapping",
+        "defaultImportHandlingScript": "oscar_handling_script",
+        "defaultImportReplaceRuleFileName": "oscar_import_replace_rule",
+        "defaultImportCheckResultFileName": "oscar_import_check_result"
     },
     "calendar": {
         "Gregorian": "Gregorijanski",
@@ -1627,8 +1627,8 @@
     "Change Language": "Spremeni jezik",
     "Date is too early": "Datum je prezgoden",
     "User Canceled": "Uporabnik je preklical",
-    "Welcome to ezBookkeeping": "Dobrodošli v ezBookkeeping",
-    "Please log in with your ezBookkeeping account": "Prosimo, prijavite se s svojim računom ezBookkeeping",
+    "Welcome to oscar": "Dobrodošli v oscar",
+    "Please log in with your oscar account": "Prosimo, prijavite se s svojim računom oscar",
     "Unlock Application": "Odkleni aplikacijo",
     "Please enter your PIN code or use WebAuthn to unlock application": "Prosimo, vnesite svojo kodo PIN ali uporabite WebAuthn za odklepanje aplikacije",
     "Please enter your PIN code to unlock application": "Prosimo, vnesite svojo kodo PIN za odklepanje aplikacije",
@@ -1987,13 +1987,13 @@
     "Filter Description": "Opis filtra",
     "How to import this file?": "Kako uvoziti to datoteko?",
     "How to export this file?": "Kako izvoziti to datoteko?",
-    "ezBookkeeping File Format": "ezBookkeeping format datoteke",
+    "oscar File Format": "oscar format datoteke",
     "Custom File Format": "Format datoteke po meri",
     "General Data Exchange Format": "Splošni format za izmenjavo podatkov",
     "General Bank Statement Format": "Splošni format bančnega izpiska",
     "Other Bank/Payment App Statement File": "Izpisek druge banke ali plačilne aplikacije",
     "Other Finance App File Format": "Format datoteke druge finančne aplikacije",
-    "ezbookkeeping Data Export File": "ezbookkeeping datoteka za izvoz podatkov",
+    "oscar Data Export File": "oscar datoteka za izvoz podatkov",
     "Excel Workbook File": "Excelova delovni zvezek",
     "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
     "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",

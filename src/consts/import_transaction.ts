@@ -19,7 +19,7 @@ export const KNOWN_COLUMN_NAME_MAPPING: Record<string, ImportTransactionColumnTy
 
     return result;
 })([
-    // Columns of ezbookkeeping Data Export File
+    // Columns of oscar Data Export File
     {
         ['Time']: ImportTransactionColumnType.TransactionTime,
         ['Timezone']: ImportTransactionColumnType.TransactionTimezone,
@@ -155,7 +155,7 @@ export const KNOWN_TRANSACTION_TYPE_NAME_MAPPING: Record<string, TransactionType
 
     return result;
 })([
-    // Transaction types of ezbookkeeping Data Export File
+    // Transaction types of oscar Data Export File
     {
         ['Balance Modification']: TransactionType.ModifyBalance,
         ['Income']: TransactionType.Income,

@@ -35,7 +35,7 @@ export interface LanguageOption {
 
 export const DEFAULT_LANGUAGE: string = 'en';
 
-// To add new languages, please refer to https://ezbookkeeping.mayswind.net/translating
+// To add new languages, please refer to the oscar documentation
 export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
     'de': {
         name: 'German',

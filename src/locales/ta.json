@@ -1,7 +1,7 @@
 {
     "global": {
         "app": {
-            "title": "ezBookkeeping"
+            "title": "oscar"
         }
     },
     "language": {
@@ -137,20 +137,20 @@
             "clearTransactionsInAccountTip": "இந்த செயலை மீட்டெடுக்க முடியாது. இது {account} இல் உள்ள உங்கள் அனைத்து பரிவர்த்தனைகளையும் நீக்கும். உறுதிப்படுத்த உங்கள் தற்போதைய கடவுச்சொல்லை உள்ளிடவும்.",
             "accountActivationAndResendValidationEmailTip": "கணக்கு செயல்படுத்தும் இணைப்பு உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்டது: {email}. நீங்கள் மின்னஞ்சலைப் பெறவில்லை என்றால், கடவுச்சொல்லை மீண்டும் உள்ளிட்டு கீழே உள்ள பொத்தானை அழுத்தி சரிபார்ப்பு மின்னஞ்சலை மீண்டும் அனுப்பவும்.",
             "resendValidationEmailTip": "நீங்கள் மின்னஞ்சலைப் பெறவில்லை என்றால், கடவுச்சொல்லை மீண்டும் உள்ளிட்டு கீழே உள்ள பொத்தானை அழுத்தவும், சரிபார்ப்பு மின்னஞ்சல் அனுப்பப்படும்: {email}",
-            "oauth2bindTip": "நீங்கள் {providerName} பயன்படுத்தி {userName} பயனராக உள்நுழைகிறீர்கள். உறுதிப்படுத்த உங்கள் ezBookkeeping கடவுச்சொல்லை உள்ளிடவும்."
+            "oauth2bindTip": "நீங்கள் {providerName} பயன்படுத்தி {userName} பயனராக உள்நுழைகிறீர்கள். உறுதிப்படுத்த உங்கள் oscar கடவுச்சொல்லை உள்ளிடவும்."
         }
     },
     "dataExport": {
-        "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data",
-        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
-        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_reconciliation_statements",
-        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
-        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
-        "defaultImportHandlingScript": "ezBookkeeping_handling_script",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule",
-        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
+        "defaultExportFilename": "oscar_export_data",
+        "exportFilename": "oscar_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "oscar_statistics_data",
+        "exportStatisticsFileName": "oscar_{nickname}_statistics_data",
+        "defaultExportReconciliationStatementsFileName": "oscar_reconciliation_statements",
+        "exportReconciliationStatementsFileName": "oscar_{nickname}_reconciliation_statements",
+        "defaultImportDataMappingFileName": "oscar_import_data_mapping",
+        "defaultImportHandlingScript": "oscar_handling_script",
+        "defaultImportReplaceRuleFileName": "oscar_import_replace_rule",
+        "defaultImportCheckResultFileName": "oscar_import_check_result"
     },
     "calendar": {
         "Gregorian": "கிரிகோரியன்",
@@ -1627,8 +1627,8 @@
     "Change Language": "மொழியை மாற்று",
     "Date is too early": "தேதி மிக முன்னதாக உள்ளது",
     "User Canceled": "பயனர் ரத்துப்படுத்தியுள்ளார்",
-    "Welcome to ezBookkeeping": "ezBookkeeping க்கு வரவேற்கிறோம்",
-    "Please log in with your ezBookkeeping account": "உங்கள் ezBookkeeping கணக்குடன் உள்நுழையவும்",
+    "Welcome to oscar": "oscar க்கு வரவேற்கிறோம்",
+    "Please log in with your oscar account": "உங்கள் oscar கணக்குடன் உள்நுழையவும்",
     "Unlock Application": "பயன்பாடுவை அன்‌பூட்டு செய்",
     "Please enter your PIN code or use WebAuthn to unlock application": "PIN உள்ளிடவும் அல்லது WebAuthn பயன்படுத்தி பயன்பாடுவை அன்‌பூட்டு செய்",
     "Please enter your PIN code to unlock application": "பயன்பாடுவை அன்‌பூட்டு செய்ய PIN உள்ளிடவும்",
@@ -1987,13 +1987,13 @@
     "Filter Description": "வடிகட்டி விளக்கம்",
     "How to import this file?": "இந்த கோப்பு ஐ எப்படி இறக்குமதி செய்வது?",
     "How to export this file?": "இந்த கோப்பு ஐ எப்படி ஏற்றுமதி செய்வது?",
-    "ezBookkeeping File Format": "ezBookkeeping கோப்பு வடிவம்",
+    "oscar File Format": "oscar கோப்பு வடிவம்",
     "Custom File Format": "தனிப்பயன் கோப்பு வடிவம்",
     "General Data Exchange Format": "பொதுவான தரவு மாற்று வடிவம்",
     "General Bank Statement Format": "பொதுவான வங்கி அறிக்கை வடிவம்",
     "Other Bank/Payment App Statement File": "இதர வங்கி/கட்டண ஆப் அறிக்கை கோப்பு",
     "Other Finance App File Format": "இதர நிதி ஆப் கோப்பு வடிவம்",
-    "ezbookkeeping Data Export File": "ezBookkeeping தரவு ஏற்றுமதி கோப்பு",
+    "oscar Data Export File": "oscar தரவு ஏற்றுமதி கோப்பு",
     "Excel Workbook File": "Excel வேலை‌புத்தகம் கோப்பு",
     "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
     "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",

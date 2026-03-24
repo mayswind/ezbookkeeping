@@ -1,7 +1,7 @@
 {
     "global": {
         "app": {
-            "title": "ezBookkeeping"
+            "title": "oscar"
         }
     },
     "language": {
@@ -137,20 +137,20 @@
             "clearTransactionsInAccountTip": "You CANNOT undo this action. This will clear your transactions data in {account}. Please enter your current password to confirm.",
             "accountActivationAndResendValidationEmailTip": "アカウントの有効化リンクがメールアドレスに送信されました:{email}、メールが届かない場合はパスワードをもう一度入力して下のボタンをクリックして認証メールを再送信してください。",
             "resendValidationEmailTip": "メールが届かない場合は、パスワードをもう一度入力の上、以下のボタンをクリックして検証メールを再送信してください: {email}",
-            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your ezBookkeeping password to verify."
+            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your oscar password to verify."
         }
     },
     "dataExport": {
-        "defaultExportFilename": "ezBookkeeping_エクスポートデータ",
-        "exportFilename": "ezBookkeeping_{nickname}_エクスポートデータ",
-        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
-        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_reconciliation_statements",
-        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
-        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
-        "defaultImportHandlingScript": "ezBookkeeping_handling_script",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule",
-        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
+        "defaultExportFilename": "oscar_エクスポートデータ",
+        "exportFilename": "oscar_{nickname}_エクスポートデータ",
+        "defaultExportStatisticsFileName": "oscar_statistics_data",
+        "exportStatisticsFileName": "oscar_{nickname}_statistics_data",
+        "defaultExportReconciliationStatementsFileName": "oscar_reconciliation_statements",
+        "exportReconciliationStatementsFileName": "oscar_{nickname}_reconciliation_statements",
+        "defaultImportDataMappingFileName": "oscar_import_data_mapping",
+        "defaultImportHandlingScript": "oscar_handling_script",
+        "defaultImportReplaceRuleFileName": "oscar_import_replace_rule",
+        "defaultImportCheckResultFileName": "oscar_import_check_result"
     },
     "calendar": {
         "Gregorian": "Gregorian",
@@ -1627,8 +1627,8 @@
     "Change Language": "言語の変更",
     "Date is too early": "日付が早すぎます",
     "User Canceled": "User Canceled",
-    "Welcome to ezBookkeeping": "ezBookkeepingへようこそ",
-    "Please log in with your ezBookkeeping account": "ezBookkeepingアカウントにログインしてください",
+    "Welcome to oscar": "oscarへようこそ",
+    "Please log in with your oscar account": "oscarアカウントにログインしてください",
     "Unlock Application": "アプリのロックを解除",
     "Please enter your PIN code or use WebAuthn to unlock application": "PINコードを入力するか、ebAuthnを使用してアプリのロックを解除してください",
     "Please enter your PIN code to unlock application": "アプリのロックを解除するにはPINコードを入力してください",
@@ -1987,13 +1987,13 @@
     "Filter Description": "フィルターの説明",
     "How to import this file?": "How to import this file?",
     "How to export this file?": "このファイルをエクスポートする方法",
-    "ezBookkeeping File Format": "ezBookkeeping File Format",
+    "oscar File Format": "oscar File Format",
     "Custom File Format": "Custom File Format",
     "General Data Exchange Format": "General Data Exchange Format",
     "General Bank Statement Format": "General Bank Statement Format",
     "Other Bank/Payment App Statement File": "Other Bank/Payment App Statement File",
     "Other Finance App File Format": "Other Finance App File Format",
-    "ezbookkeeping Data Export File": "ezbookkeepingデータエクスポートファイル",
+    "oscar Data Export File": "oscarデータエクスポートファイル",
     "Excel Workbook File": "Excel Workbook File",
     "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
     "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",

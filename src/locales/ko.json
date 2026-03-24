@@ -1,7 +1,7 @@
 {
     "global": {
         "app": {
-            "title": "ezBookkeeping"
+            "title": "oscar"
         }
     },
     "language": {
@@ -137,20 +137,20 @@
             "clearTransactionsInAccountTip": "이 작업은 되돌릴 수 없습니다. {account}의 거래 데이터를 지웁니다. 계속하시려면 현재 비밀번호를 입력하세요.",
             "accountActivationAndResendValidationEmailTip": "계정 활성화 링크가 귀하의 이메일 주소({email})로 전송되었습니다. 메일을 받지 못하신 경우, 비밀번호를 다시 입력하고 아래 버튼을 클릭하여 확인 메일을 재전송하십시오.",
             "resendValidationEmailTip": "메일을 받지 못하신 경우, 비밀번호를 다시 입력하고 아래 버튼을 클릭하여 확인 메일을 {email}로 재전송하십시오.",
-            "oauth2bindTip": "{providerName}를 사용하여 {userName} 사용자로 로그인하고 있습니다. 확인을 위해 ezBookkeeping 비밀번호를 입력하세요."
+            "oauth2bindTip": "{providerName}를 사용하여 {userName} 사용자로 로그인하고 있습니다. 확인을 위해 oscar 비밀번호를 입력하세요."
         }
     },
     "dataExport": {
-        "defaultExportFilename": "ezBookkeeping_export_data",
-        "exportFilename": "ezBookkeeping_{nickname}_export_data",
-        "defaultExportStatisticsFileName": "ezBookkeeping_statistics_data",
-        "exportStatisticsFileName": "ezBookkeeping_{nickname}_statistics_data",
-        "defaultExportReconciliationStatementsFileName": "ezBookkeeping_reconciliation_statements",
-        "exportReconciliationStatementsFileName": "ezBookkeeping_{nickname}_reconciliation_statements",
-        "defaultImportDataMappingFileName": "ezBookkeeping_import_data_mapping",
-        "defaultImportHandlingScript": "ezBookkeeping_handling_script",
-        "defaultImportReplaceRuleFileName": "ezBookkeeping_import_replace_rule",
-        "defaultImportCheckResultFileName": "ezBookkeeping_import_check_result"
+        "defaultExportFilename": "oscar_export_data",
+        "exportFilename": "oscar_{nickname}_export_data",
+        "defaultExportStatisticsFileName": "oscar_statistics_data",
+        "exportStatisticsFileName": "oscar_{nickname}_statistics_data",
+        "defaultExportReconciliationStatementsFileName": "oscar_reconciliation_statements",
+        "exportReconciliationStatementsFileName": "oscar_{nickname}_reconciliation_statements",
+        "defaultImportDataMappingFileName": "oscar_import_data_mapping",
+        "defaultImportHandlingScript": "oscar_handling_script",
+        "defaultImportReplaceRuleFileName": "oscar_import_replace_rule",
+        "defaultImportCheckResultFileName": "oscar_import_check_result"
     },
     "calendar": {
         "Gregorian": "그레고리력",
@@ -1627,8 +1627,8 @@
     "Change Language": "언어 변경",
     "Date is too early": "날짜가 너무 이름니다",
     "User Canceled": "사용자가 취소했습니다",
-    "Welcome to ezBookkeeping": "ezBookkeeping에 오신 것을 환영합니다",
-    "Please log in with your ezBookkeeping account": "ezBookkeeping 계정으로 로그인해 주세요",
+    "Welcome to oscar": "oscar에 오신 것을 환영합니다",
+    "Please log in with your oscar account": "oscar 계정으로 로그인해 주세요",
     "Unlock Application": "애플리케이션 잠금 해제",
     "Please enter your PIN code or use WebAuthn to unlock application": "PIN 코드를 입력하거나 WebAuthn을 사용하여 애플리케이션 잠금을 해제해 주세요",
     "Please enter your PIN code to unlock application": "PIN 코드를 입력하여 애플리케이션 잠금을 해제해 주세요",
@@ -1987,13 +1987,13 @@
     "Filter Description": "필터 설명",
     "How to import this file?": "이 파일을 가져오는 방법은?",
     "How to export this file?": "이 파일을 내보내는 방법은?",
-    "ezBookkeeping File Format": "ezBookkeeping 파일 형식",
+    "oscar File Format": "oscar 파일 형식",
     "Custom File Format": "사용자 정의 파일 형식",
     "General Data Exchange Format": "일반 데이터 교환 형식",
     "General Bank Statement Format": "일반 은행 명세서 형식",
     "Other Bank/Payment App Statement File": "기타 은행/결제 앱 명세서 파일",
     "Other Finance App File Format": "기타 금융 앱 파일 형식",
-    "ezbookkeeping Data Export File": "ezbookkeeping 데이터 내보내기 파일",
+    "oscar Data Export File": "oscar 데이터 내보내기 파일",
     "Excel Workbook File": "Excel 통합 문서 파일",
     "Excel Workbook File (.xlsx)": "Excel Workbook File (.xlsx)",
     "Excel 97-2003 Workbook File (.xls)": "Excel 97-2003 Workbook File (.xls)",

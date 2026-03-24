@@ -12,7 +12,7 @@ ENV BUILD_UNIXTIME=$BUILD_UNIXTIME
 ENV BUILD_DATE=$BUILD_DATE
 ENV CHECK_3RD_API=$CHECK_3RD_API
 ENV SKIP_TESTS=$SKIP_TESTS
-WORKDIR /go/src/github.com/mayswind/ezbookkeeping
+WORKDIR /go/src/github.com/Paxtiny/oscar
 COPY . .
 RUN docker/backend-build-pre-setup.sh
 RUN apk add git gcc g++ libc-dev
@@ -28,7 +28,7 @@ ENV RELEASE_BUILD=$RELEASE_BUILD
 ENV BUILD_PIPELINE=$BUILD_PIPELINE
 ENV BUILD_UNIXTIME=$BUILD_UNIXTIME
 ENV BUILD_DATE=$BUILD_DATE
-WORKDIR /go/src/github.com/mayswind/ezbookkeeping
+WORKDIR /go/src/github.com/Paxtiny/oscar
 COPY . .
 RUN docker/frontend-build-pre-setup.sh
 RUN apk add git
@@ -36,21 +36,21 @@ RUN ./build.sh frontend
 
 # Package docker image
 FROM alpine:3.23.3
-LABEL maintainer="MaysWind <i@mayswind.net>"
-RUN addgroup -S -g 1000 ezbookkeeping && adduser -S -G ezbookkeeping -u 1000 ezbookkeeping
+LABEL maintainer="nicodAImus <dev@nicodaimus.com>"
+RUN addgroup -S -g 1000 oscar && adduser -S -G oscar -u 1000 oscar
 RUN apk --no-cache add tzdata
 COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
-RUN mkdir -p /ezbookkeeping && chown 1000:1000 /ezbookkeeping \
-  && mkdir -p /ezbookkeeping/data && chown 1000:1000 /ezbookkeeping/data \
-  && mkdir -p /ezbookkeeping/log && chown 1000:1000 /ezbookkeeping/log \
-  && mkdir -p /ezbookkeeping/storage && chown 1000:1000 /ezbookkeeping/storage
-WORKDIR /ezbookkeeping
-COPY --from=be-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/ezbookkeeping /ezbookkeeping/ezbookkeeping
-COPY --from=fe-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/dist /ezbookkeeping/public
-COPY --chown=1000:1000 conf /ezbookkeeping/conf
-COPY --chown=1000:1000 templates /ezbookkeeping/templates
-COPY --chown=1000:1000 LICENSE /ezbookkeeping/LICENSE
+RUN mkdir -p /oscar && chown 1000:1000 /oscar \
+  && mkdir -p /oscar/data && chown 1000:1000 /oscar/data \
+  && mkdir -p /oscar/log && chown 1000:1000 /oscar/log \
+  && mkdir -p /oscar/storage && chown 1000:1000 /oscar/storage
+WORKDIR /oscar
+COPY --from=be-builder --chown=1000:1000 /go/src/github.com/Paxtiny/oscar/oscar /oscar/oscar
+COPY --from=fe-builder --chown=1000:1000 /go/src/github.com/Paxtiny/oscar/dist /oscar/public
+COPY --chown=1000:1000 conf /oscar/conf
+COPY --chown=1000:1000 templates /oscar/templates
+COPY --chown=1000:1000 LICENSE /oscar/LICENSE
 USER 1000:1000
 EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]

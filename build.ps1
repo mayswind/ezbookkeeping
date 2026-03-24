@@ -195,7 +195,7 @@ function Build-Package {
     New-Item -ItemType Directory -Path "package\storage"
     New-Item -ItemType Directory -Path "package\log"
 
-    Copy-Item ezbookkeeping.exe package\
+    Copy-Item oscar.exe package\
     Copy-Item dist package\public -Recurse
     Copy-Item conf package\conf -Recurse
     Copy-Item templates package\templates -Recurse

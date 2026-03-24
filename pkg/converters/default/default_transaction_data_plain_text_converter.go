@@ -9,17 +9,17 @@ import (
 	"github.com/Paxtiny/oscar/pkg/models"
 )
 
-// defaultTransactionDataPlainTextConverter defines the structure of ezbookkeeping default plain text converter for transaction data
+// defaultTransactionDataPlainTextConverter defines the structure of oscar default plain text converter for transaction data
 type defaultTransactionDataPlainTextConverter struct {
 	columnSeparator string
 }
 
-const ezbookkeepingLineSeparator = "\n"
-const ezbookkeepingGeoLocationSeparator = " "
-const ezbookkeepingGeoLocationOrder = converter.TRANSACTION_GEO_LOCATION_ORDER_LONGITUDE_LATITUDE
-const ezbookkeepingTagSeparator = ";"
+const oscarLineSeparator = "\n"
+const oscarGeoLocationSeparator = " "
+const oscarGeoLocationOrder = converter.TRANSACTION_GEO_LOCATION_ORDER_LONGITUDE_LATITUDE
+const oscarTagSeparator = ";"
 
-var ezbookkeepingDataColumnNameMapping = map[datatable.TransactionDataTableColumn]string{
+var oscarDataColumnNameMapping = map[datatable.TransactionDataTableColumn]string{
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME:         "Time",
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE:     "Timezone",
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE:         "Type",
@@ -36,14 +36,14 @@ var ezbookkeepingDataColumnNameMapping = map[datatable.TransactionDataTableColum
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION:              "Description",
 }
 
-var ezbookkeepingTransactionTypeNameMapping = map[models.TransactionType]string{
+var oscarTransactionTypeNameMapping = map[models.TransactionType]string{
 	models.TRANSACTION_TYPE_MODIFY_BALANCE: "Balance Modification",
 	models.TRANSACTION_TYPE_INCOME:         "Income",
 	models.TRANSACTION_TYPE_EXPENSE:        "Expense",
 	models.TRANSACTION_TYPE_TRANSFER:       "Transfer",
 }
 
-var ezbookkeepingDataColumns = []datatable.TransactionDataTableColumn{
+var oscarDataColumns = []datatable.TransactionDataTableColumn{
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME,
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE,
 	datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE,
@@ -64,16 +64,16 @@ var ezbookkeepingDataColumns = []datatable.TransactionDataTableColumn{
 func (c *defaultTransactionDataPlainTextConverter) ToExportedContent(ctx core.Context, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) ([]byte, error) {
 	dataTableBuilder := createNewDefaultTransactionPlainTextDataTableBuilder(
 		len(transactions),
-		ezbookkeepingDataColumns,
-		ezbookkeepingDataColumnNameMapping,
+		oscarDataColumns,
+		oscarDataColumnNameMapping,
 		c.columnSeparator,
-		ezbookkeepingLineSeparator,
+		oscarLineSeparator,
 	)
 
 	dataTableExporter := converter.CreateNewExporter(
-		ezbookkeepingTransactionTypeNameMapping,
-		ezbookkeepingGeoLocationSeparator,
-		ezbookkeepingTagSeparator,
+		oscarTransactionTypeNameMapping,
+		oscarGeoLocationSeparator,
+		oscarTagSeparator,
 	)
 
 	err := dataTableExporter.BuildExportedContent(ctx, dataTableBuilder, uid, transactions, accountMap, categoryMap, tagMap, allTagIndexes)
@@ -90,20 +90,20 @@ func (c *defaultTransactionDataPlainTextConverter) ParseImportedData(ctx core.Co
 	dataTable, err := createNewDefaultPlainTextDataTable(
 		string(data),
 		c.columnSeparator,
-		ezbookkeepingLineSeparator,
+		oscarLineSeparator,
 	)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	transactionDataTable := datatable.CreateNewTransactionDataTableFromBasicDataTable(dataTable, ezbookkeepingDataColumnNameMapping)
+	transactionDataTable := datatable.CreateNewTransactionDataTableFromBasicDataTable(dataTable, oscarDataColumnNameMapping)
 
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(
-		ezbookkeepingTransactionTypeNameMapping,
-		ezbookkeepingGeoLocationSeparator,
-		ezbookkeepingGeoLocationOrder,
-		ezbookkeepingTagSeparator,
+		oscarTransactionTypeNameMapping,
+		oscarGeoLocationSeparator,
+		oscarGeoLocationOrder,
+		oscarTagSeparator,
 	)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezone, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)

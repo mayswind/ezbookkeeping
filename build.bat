@@ -254,7 +254,7 @@ goto :pre_parse_args
     mkdir package\data
     mkdir package\storage
     mkdir package\log
-    xcopy ezbookkeeping.exe package\
+    xcopy oscar.exe package\
     xcopy dist package\public /e /i
     xcopy conf package\conf /e /i
     xcopy templates package\templates /e /i

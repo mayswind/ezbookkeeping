@@ -26,10 +26,10 @@ var allJsonDataSupportedColumns = []datatable.TransactionDataTableColumn{
 	datatable.TRANSACTION_DATA_TABLE_DESCRIPTION,
 }
 
-// defaultTransactionDataJsonImporter defines the structure of ezbookkeeping default json importer for transaction data
+// defaultTransactionDataJsonImporter defines the structure of oscar default json importer for transaction data
 type defaultTransactionDataJsonImporter struct{}
 
-// Initialize an ezbookkeeping default transaction data json file importer singleton instance
+// Initialize an oscar default transaction data json file importer singleton instance
 var (
 	DefaultTransactionDataJsonFileImporter = &defaultTransactionDataJsonImporter{}
 )
@@ -49,10 +49,10 @@ func (c *defaultTransactionDataJsonImporter) ParseImportedData(ctx core.Context,
 	}
 
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(
-		ezbookkeepingTransactionTypeNameMapping,
-		ezbookkeepingGeoLocationSeparator,
-		ezbookkeepingGeoLocationOrder,
-		ezbookkeepingTagSeparator,
+		oscarTransactionTypeNameMapping,
+		oscarGeoLocationSeparator,
+		oscarGeoLocationOrder,
+		oscarTagSeparator,
 	)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezone, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)

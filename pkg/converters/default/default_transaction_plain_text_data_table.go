@@ -8,7 +8,7 @@ import (
 	"github.com/Paxtiny/oscar/pkg/errs"
 )
 
-// defaultPlainTextDataTable defines the structure of ezbookkeeping default plain text data table
+// defaultPlainTextDataTable defines the structure of oscar default plain text data table
 type defaultPlainTextDataTable struct {
 	columnSeparator       string
 	lineSeparator         string
@@ -16,18 +16,18 @@ type defaultPlainTextDataTable struct {
 	headerLineColumnNames []string
 }
 
-// defaultPlainTextDataRow defines the structure of ezbookkeeping default plain text data row
+// defaultPlainTextDataRow defines the structure of oscar default plain text data row
 type defaultPlainTextDataRow struct {
 	allItems []string
 }
 
-// defaultPlainTextDataRowIterator defines the structure of ezbookkeeping default plain text data row iterator
+// defaultPlainTextDataRowIterator defines the structure of oscar default plain text data row iterator
 type defaultPlainTextDataRowIterator struct {
 	dataTable    *defaultPlainTextDataTable
 	currentIndex int
 }
 
-// defaultTransactionPlainTextDataTableBuilder defines the structure of ezbookkeeping default transaction plain text data table builder
+// defaultTransactionPlainTextDataTableBuilder defines the structure of oscar default transaction plain text data table builder
 type defaultTransactionPlainTextDataTableBuilder struct {
 	columnSeparator       string
 	lineSeparator         string

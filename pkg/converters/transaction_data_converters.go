@@ -34,11 +34,11 @@ func GetTransactionDataExporter(fileType string) converter.TransactionDataExport
 
 // GetTransactionDataImporter returns the transaction data importer according to the file type
 func GetTransactionDataImporter(fileType string) (converter.TransactionDataImporter, error) {
-	if fileType == "ezbookkeeping_csv" {
+	if fileType == "oscar_csv" {
 		return _default.DefaultTransactionDataCSVFileConverter, nil
-	} else if fileType == "ezbookkeeping_tsv" {
+	} else if fileType == "oscar_tsv" {
 		return _default.DefaultTransactionDataTSVFileConverter, nil
-	} else if fileType == "ezbookkeeping_json" {
+	} else if fileType == "oscar_json" {
 		return _default.DefaultTransactionDataJsonFileImporter, nil
 	} else if fileType == "ofx" {
 		return ofx.OFXTransactionDataImporter, nil

@@ -72,13 +72,13 @@ export default defineConfig(() => {
         publicDir: PUBLIC_DIR,
         base: './',
         define: {
-            __EZBOOKKEEPING_IS_PRODUCTION__: process.env['NODE_ENV'] === 'production',
-            __EZBOOKKEEPING_VERSION__: JSON.stringify(packageFile.version),
-            __EZBOOKKEEPING_BUILD_UNIX_TIME__: JSON.stringify(buildUnixTime),
-            __EZBOOKKEEPING_BUILD_COMMIT_HASH__: JSON.stringify(git.short()),
-            __EZBOOKKEEPING_CONTRIBUTORS__: JSON.stringify(contributorsFile),
-            __EZBOOKKEEPING_LICENSE__: JSON.stringify(licenseContent),
-            __EZBOOKKEEPING_THIRD_PARTY_LICENSES__: JSON.stringify(thirdPartyLicenseFile)
+            __OSCAR_IS_PRODUCTION__: process.env['NODE_ENV'] === 'production',
+            __OSCAR_VERSION__: JSON.stringify(packageFile.version),
+            __OSCAR_BUILD_UNIX_TIME__: JSON.stringify(buildUnixTime),
+            __OSCAR_BUILD_COMMIT_HASH__: JSON.stringify(git.short()),
+            __OSCAR_CONTRIBUTORS__: JSON.stringify(contributorsFile),
+            __OSCAR_LICENSE__: JSON.stringify(licenseContent),
+            __OSCAR_THIRD_PARTY_LICENSES__: JSON.stringify(thirdPartyLicenseFile)
         },
         plugins: [
             vue({
@@ -118,10 +118,10 @@ export default defineConfig(() => {
                 injectRegister: false,
                 manifestFilename: 'manifest.json',
                 manifest: {
-                    name: 'ezBookkeeping',
-                    short_name: 'ezBookkeeping',
-                    description: 'A lightweight, self-hosted personal finance app with a user-friendly interface and powerful bookkeeping features.',
-                    theme_color: '#C67E48',
+                    name: 'nicodAImus oscar',
+                    short_name: 'oscar',
+                    description: 'Privacy-first AI expense tracker by nicodAImus',
+                    theme_color: '#1a1a2e',
                     background_color: '#F6F7F8',
                     start_url: './',
                     scope: './',
@@ -130,12 +130,12 @@ export default defineConfig(() => {
                     prefer_related_applications: false,
                     icons: [
                         {
-                            src: 'img/ezbookkeeping-192.png',
+                            src: 'img/oscar-192.png',
                             sizes: '192x192',
                             type: 'image/png'
                         },
                         {
-                            src: 'img/ezbookkeeping-512.png',
+                            src: 'img/oscar-512.png',
                             sizes: '512x512',
                             type: 'image/png'
                         }

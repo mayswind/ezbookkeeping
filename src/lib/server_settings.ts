@@ -1,5 +1,5 @@
 function getServerSetting(key: string): string | number | boolean | Record<string, string> | undefined | null {
-    const settings = window.EZBOOKKEEPING_SERVER_SETTINGS || {};
+    const settings = window.OSCAR_SERVER_SETTINGS || {};
     return settings[key];
 }
 

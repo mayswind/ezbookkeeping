@@ -1,10 +1,10 @@
-declare const __EZBOOKKEEPING_IS_PRODUCTION__: boolean;
-declare const __EZBOOKKEEPING_VERSION__: string;
-declare const __EZBOOKKEEPING_BUILD_UNIX_TIME__: string;
-declare const __EZBOOKKEEPING_BUILD_COMMIT_HASH__: string;
-declare const __EZBOOKKEEPING_LICENSE__: string;
-declare const __EZBOOKKEEPING_CONTRIBUTORS__: ContributorInfo;
-declare const __EZBOOKKEEPING_THIRD_PARTY_LICENSES__: LicenseInfo[];
+declare const __OSCAR_IS_PRODUCTION__: boolean;
+declare const __OSCAR_VERSION__: string;
+declare const __OSCAR_BUILD_UNIX_TIME__: string;
+declare const __OSCAR_BUILD_COMMIT_HASH__: string;
+declare const __OSCAR_LICENSE__: string;
+declare const __OSCAR_CONTRIBUTORS__: ContributorInfo;
+declare const __OSCAR_THIRD_PARTY_LICENSES__: LicenseInfo[];
 
 declare interface ContributorInfo {
     code: string[];
@@ -20,7 +20,7 @@ declare interface LicenseInfo {
 }
 
 interface Window {
-    EZBOOKKEEPING_SERVER_SETTINGS?: {
+    OSCAR_SERVER_SETTINGS?: {
         [key: string]: string | number | boolean | undefined | null;
     };
 }

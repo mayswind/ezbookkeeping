@@ -1,15 +1,15 @@
 {
-  "name": "ezbookkeeping",
-  "version": "1.5.0",
+  "name": "oscar",
+  "version": "0.1.0",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mayswind/ezbookkeeping.git"
+    "url": "git+https://github.com/Paxtiny/oscar.git"
   },
-  "author": "MaysWind <i@mayswind.net>",
+  "author": "nicodAImus",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mayswind/ezbookkeeping/issues"
+    "url": "https://github.com/Paxtiny/oscar/issues"
   },
   "scripts": {
     "serve": "cross-env NODE_ENV=development vite",

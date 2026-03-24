@@ -36,8 +36,8 @@
                             <span class="text-body-1">{{ tt('Official Website') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping" target="_blank">
-                                https://github.com/mayswind/ezbookkeeping
+                            <a class="text-body-1" href="https://github.com/Paxtiny/oscar" target="_blank">
+                                https://github.com/Paxtiny/oscar
                             </a>
                         </v-col>
                     </v-row>
@@ -46,8 +46,8 @@
                             <span class="text-body-1">{{ tt('Report Issue') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping/issues" target="_blank">
-                                https://github.com/mayswind/ezbookkeeping/issues
+                            <a class="text-body-1" href="https://github.com/Paxtiny/oscar/issues" target="_blank">
+                                https://github.com/Paxtiny/oscar/issues
                             </a>
                         </v-col>
                     </v-row>
@@ -113,7 +113,7 @@
                             <v-divider/>
                             <br/>
                             <p>
-                                <span>ezBookkeeping's codebase and localization translation rely on contributions from the community. The following people have contributed to ezBookkeeping:</span>
+                                <span>oscar's codebase and localization translation rely on contributions from the community. The following people have contributed to oscar:</span>
                             </p>
                             <div>
                                 <strong>Project Maintainer</strong>
@@ -169,7 +169,7 @@
                                 </tbody>
                             </table>
                             <p class="mt-4 mb-4">
-                                <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
+                                <span>oscar also contains additional third party software and illustration.</span><br/>
                                 <span>All the third party software / illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
                             </p>
                             <p :key="licenseInfo.name" v-for="licenseInfo in thirdPartyLicenses">

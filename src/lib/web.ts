@@ -10,7 +10,7 @@ export function getBasePath(): string {
 }
 
 export function navigateToHomePage(type: 'desktop' | 'mobile'): void {
-    if (__EZBOOKKEEPING_IS_PRODUCTION__) {
+    if (__OSCAR_IS_PRODUCTION__) {
         window.location.replace(`${type}#/`);
     } else {
         window.location.replace(`${type}.html#/`);

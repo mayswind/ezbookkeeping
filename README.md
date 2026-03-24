@@ -1,159 +1,94 @@
-# ezBookkeeping
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/mayswind/ezbookkeeping/blob/master/LICENSE)
-[![Go Report](https://goreportcard.com/badge/github.com/mayswind/ezbookkeeping)](https://goreportcard.com/report/github.com/mayswind/ezbookkeeping)
-[![Latest Release](https://img.shields.io/github/release/mayswind/ezbookkeeping.svg?style=flat)](https://github.com/mayswind/ezbookkeeping/releases)
-[![Latest Build](https://img.shields.io/github/actions/workflow/status/mayswind/ezbookkeeping/build-snapshot.yml?branch=main)](https://github.com/mayswind/ezbookkeeping/actions)
-[![Latest Docker Image Size](https://img.shields.io/docker/image-size/mayswind/ezbookkeeping.svg?style=flat)](https://hub.docker.com/r/mayswind/ezbookkeeping)
-[![Docker Pulls](https://img.shields.io/docker/pulls/mayswind/ezbookkeeping)](https://hub.docker.com/r/mayswind/ezbookkeeping)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mayswind/ezbookkeeping)
+# nicodAImus oscar
 
-[![Recommend By HelloGitHub](https://api.hellogithub.com/v1/widgets/recommend.svg?rid=ded5af09da574ec1811ddb154f1b2093&claim_uid=LT7EZxeBukCnh0K)](https://hellogithub.com/en/repository/mayswind/ezbookkeeping)
-[![Trending](https://trendshift.io/api/badge/repositories/12917)](https://trendshift.io/repositories/12917)
+Privacy-first AI expense tracker. Fork of [ezBookkeeping](https://github.com/mayswind/ezbookkeeping) with client-side encryption, multi-user groups, and budgeting.
 
-## Introduction
-ezBookkeeping is a lightweight, self-hosted personal finance app with a user-friendly interface and powerful bookkeeping features. It helps you record daily transactions, import data from various sources, and quickly search and filter your bills. You can analyze historical data using built-in charts or perform custom queries with your own chart dimensions to better understand spending patterns and financial trends. ezBookkeeping is easy to deploy, and you can start it with just one single Docker command. Designed to be resource-efficient, it runs smoothly on devices such as Raspberry Pi, NAS, and MicroServers.
+## What it does
 
-ezBookkeeping offers tailored interfaces for both mobile and desktop devices. With support for PWA (Progressive Web Apps), you can even [add it to your mobile home screen](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/mobile/add_to_home_screen.gif) and use it like a native app.
+- **Scan invoices** with AI (8 LLM providers) or on-device OCR (Tesseract)
+- **Import bank data** from CSV (52 encodings), OFX, QFX, QIF, Beancount, and more
+- **Track expenses** with two-level categories, tags, multi-currency, and analytics
+- **Encrypt everything** client-side (AES-256-GCM) - the server never sees your data
+- **Bring your own storage** - local, S3/MinIO, or WebDAV per user
 
-Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.mayswind.net)
+## Privacy by design
 
-## Features
-- **Open Source & Self-Hosted**
-    - Built for privacy and control
-- **Lightweight & Fast**
-    - Minimal resource usage, runs smoothly even on low-resource devices
-- **Easy Installation**
-    - Docker support
-    - Supports SQLite, MySQL, PostgreSQL
-    - Cross-platform (Windows, macOS, Linux)
-    - Works on x86, amd64, ARM architectures
-- **User-Friendly Interface**
-    - UI optimized for both mobile and desktop
-    - PWA support for native-like mobile experience
-    - Dark mode
-- **AI-Powered Features**
-    - Receipt image recognition
-    - MCP (Model Context Protocol) support for AI integration
-    - API command-line script tools for AI integration
-- **Powerful Bookkeeping**
-    - Two-level accounts and categories
-    - Image attachments for transactions
-    - Location tracking with maps
-    - Scheduled transactions
-    - Advanced filtering, search, visualization and analysis
-- **Localization & Internationalization**
-    - Multi-language and multi-currency support
-    - Multiple exchange rate sources with automatic updates
-    - Multi-timezone support
-    - Custom formats for dates, numbers and currencies
-- **Security**
-    - Two-factor authentication (2FA)
-    - OIDC external authentication
-    - Login rate limiting
-    - Application lock (PIN code / WebAuthn)
-- **Data Import & Export**
-    - Supports CSV, OFX, QFX, QIF, IIF, Camt.052, Camt.053, MT940, GnuCash, Firefly III, Beancount and more
+oscar uses user-passphrase-derived encryption. Your passphrase never leaves your device. The server stores only encrypted blobs. Lost passphrase = lost data (by design, no recovery).
 
-For a full list of features, visit the [Full Feature List](https://ezbookkeeping.mayswind.net/comparison/).
+Not even the operator can read your data.
 
-## Screenshots
-### Desktop Version
-[![ezBookkeeping](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/desktop/en.png)](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/desktop/en.png)
+## Quick start (Docker)
 
-### Mobile Version
-[![ezBookkeeping](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/mobile/en.png)](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/mobile/en.png)
+```bash
+docker run -d --name oscar \
+  -p 8080:8080 \
+  -v oscar-data:/oscar/data \
+  oscar:latest
+```
 
-## Installation
-### Run with Docker
-Visit [Docker Hub](https://hub.docker.com/r/mayswind/ezbookkeeping) to see all images and tags.
+## Configuration
 
-**Latest Release:**
+oscar supports SQLite, MySQL, and PostgreSQL. Configure in `conf/oscar.ini`.
 
-    $ docker run -p8080:8080 mayswind/ezbookkeeping
+### nicodAImus AI integration
 
-**Latest Daily Build:**
+```ini
+[llm_image_recognition]
+llm_provider = openai_compatible
+openai_compatible_base_url = https://chat.nicodaimus.com/v1
+openai_compatible_api_key = <your API key>
+openai_compatible_model_id = auto
+```
 
-    $ docker run -p8080:8080 mayswind/ezbookkeeping:latest-snapshot
+## Development
 
-### Install from Binary
-Download the latest release: [https://github.com/mayswind/ezbookkeeping/releases](https://github.com/mayswind/ezbookkeeping/releases)
+### Prerequisites
 
-**Linux / macOS**
+- Go 1.25+
+- Node.js 24+
+- PostgreSQL 17+ (or Docker)
 
-    $ ./ezbookkeeping server run
+### Build from source
 
-**Windows**
+```bash
+# Backend
+go build -o oscar oscar.go
 
-    > .\ezbookkeeping.exe server run
+# Frontend
+npm install && npm run build
 
-By default, ezBookkeeping listens on port 8080. You can then visit `http://{YOUR_HOST_ADDRESS}:8080/` .
+# Docker
+docker build . -t oscar:local
+```
 
-### Build from Source
-Make sure you have [Golang](https://golang.org/), [GCC](https://gcc.gnu.org/), [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) installed. Then download the source code, and follow these steps:
+### Run tests
 
-**Linux / macOS**
+```bash
+go test ./... -v   # Backend
+npm test           # Frontend
+```
 
-    $ ./build.sh package -o ezbookkeeping.tar.gz
+## Project structure
 
-All the files will be packaged in `ezbookkeeping.tar.gz`.
+```
+oscar.go            # Main entry point
+cmd/                # CLI commands (server, database, user-data)
+pkg/
+  api/              # REST API endpoints
+  services/         # Business logic
+  models/           # Database models (xorm)
+  storage/          # Object storage abstraction (local/S3/WebDAV)
+  llm/              # LLM integration (receipt scanning)
+  mcp/              # MCP server (7 tools)
+src/                # Vue.js frontend (PWA)
+conf/oscar.ini      # Configuration
+```
 
-**Windows**
+## Upstream
 
-    > .\build.bat package -o ezbookkeeping.zip
-
-or
-
-    PS > .\build.ps1 package -Output ezbookkeeping.zip
-
-All the files will be packaged in `ezbookkeeping.zip`.
-
-You can also build a Docker image. Make sure you have [Docker](https://www.docker.com/) installed, then follow these steps:
-
-**Linux**
-
-    $ ./build.sh docker
-
-## Contributing
-We welcome contributions of all kinds.
-
-If you find a bug, please [submit an issue](https://github.com/mayswind/ezbookkeeping/issues) on GitHub.
-
-If you would like to contribute code, you can fork the repository and open a pull request.
-
-Improvements to documentation, feature suggestions, and other forms of feedback are also appreciated.
-
-You can view existing contributors on the [Contributor Graph](https://github.com/mayswind/ezbookkeeping/graphs/contributors).
-
-## Translating
-Help make ezBookkeeping accessible to users around the world. We welcome help to improve existing translations or add new ones. If you would like to contribute a translation, please refer to the [translation guide](https://ezbookkeeping.mayswind.net/translating).
-
-Currently available translations:
-
-| Tag | Language | Contributors |
-| --- | --- | --- |
-| de | Deutsch | [@chrgm](https://github.com/chrgm) |
-| en | English | / |
-| es | Español | [@Miguelonlonlon](https://github.com/Miguelonlonlon), [@abrugues](https://github.com/abrugues), [@AndresTeller](https://github.com/AndresTeller), [@diegofercri](https://github.com/diegofercri) |
-| fr | Français | [@brieucdlf](https://github.com/brieucdlf) |
-| it | Italiano | [@waron97](https://github.com/waron97) |
-| ja | 日本語 | [@tkymmm](https://github.com/tkymmm) |
-| kn | ಕನ್ನಡ | [@Darshanbm05](https://github.com/Darshanbm05) |
-| ko | 한국어 | [@overworks](https://github.com/overworks) |
-| nl | Nederlands | [@automagics](https://github.com/automagics) |
-| pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus), [@balaios](https://github.com/balaios) |
-| ru | Русский | [@artegoser](https://github.com/artegoser), [@dshemin](https://github.com/dshemin) |
-| sl | Slovenščina | [@thehijacker](https://github.com/thehijacker) |
-| ta | தமிழ் | [@hhharsha36](https://github.com/hhharsha36) |
-| th | ไทย | [@natthavat28](https://github.com/natthavat28) |
-| tr | Türkçe | [@aydnykn](https://github.com/aydnykn) |
-| uk | Українська | [@nktlitvinenko](https://github.com/nktlitvinenko) |
-| vi | Tiếng Việt | [@f97](https://github.com/f97) |
-| zh-Hans | 中文 (简体) | / |
-| zh-Hant | 中文 (繁體) | / |
-
-## Documentation
-1. [English](https://ezbookkeeping.mayswind.net)
-1. [中文 (简体)](https://ezbookkeeping.mayswind.net/zh_Hans)
+oscar is a fork of [ezBookkeeping](https://github.com/mayswind/ezbookkeeping) v1.4.0 by MaysWind. We inherit its excellent transaction management, multi-currency support, import/export, analytics, i18n (19 languages), and MCP server. See the [ezBookkeeping documentation](https://ezbookkeeping.mayswind.net/) for inherited features.
 
 ## License
-[MIT](https://github.com/mayswind/ezbookkeeping/blob/master/LICENSE)
+
+MIT - see [LICENSE](LICENSE)
+
+Built by [nicodAImus](https://nicodaimus.com)

@@ -34,7 +34,7 @@ func (h *mcpQueryAllAccountsToolHandler) Name() string {
 
 // Description returns the description of the MCP tool
 func (h *mcpQueryAllAccountsToolHandler) Description() string {
-	return "Query all accounts for the current user in ezBookkeeping."
+	return "Query all accounts for the current user in oscar."
 }
 
 // InputType returns the input type for the MCP tool request

@@ -43,7 +43,7 @@ goto :pre_parse_args
     goto :check_dependency
 
 :show_help
-    echo ezBookkeeping build script for Windows
+    echo oscar build script for Windows
     echo.
     echo Usage:
     echo     build.cmd type [options]

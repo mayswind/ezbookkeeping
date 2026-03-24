@@ -44,7 +44,7 @@ func (h *mcpQueryAllAccountsBalanceToolHandler) Name() string {
 
 // Description returns the description of the MCP tool
 func (h *mcpQueryAllAccountsBalanceToolHandler) Description() string {
-	return "Query all accounts balance for the current user in ezBookkeeping."
+	return "Query all accounts balance for the current user in oscar."
 }
 
 // InputType returns the input type for the MCP tool request

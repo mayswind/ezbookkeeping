@@ -29,7 +29,7 @@ function Check-Dependency {
 }
 
 function Show-Help {
-    Write-Host "ezBookkeeping build script for Windows PowerShell"
+    Write-Host "oscar build script for Windows PowerShell"
     Write-Host ""
     Write-Host "Usage:"
     Write-Host "    build.ps1 type [options]"

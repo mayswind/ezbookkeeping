@@ -1,9 +1,9 @@
 ---
-name: ezbookkeeping
-description: Use ezBookkeeping API Tools script to record new transactions, query transactions, retrieve account information, retrieve categories, retrieve tags, and retrieve exchange rate data in the self hosted personal finance application ezBookkeeping.
+name: oscar
+description: Use oscar API Tools script to record new transactions, query transactions, retrieve account information, retrieve categories, retrieve tags, and retrieve exchange rate data in the self hosted personal finance application oscar.
 ---
 
-# ezBookkeeping API Tools
+# oscar API Tools
 
 ## Usage
 
@@ -57,9 +57,9 @@ The meanings of these environment variables are as follows:
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `EBKTOOL_SERVER_BASEURL` | Required | ezBookkeeping server base URL (e.g., `http://localhost:8080`) |
-| `EBKTOOL_TOKEN` | Required | ezBookkeeping API token |
+| `EBKTOOL_SERVER_BASEURL` | Required | oscar server base URL (e.g., `http://localhost:8080`) |
+| `EBKTOOL_TOKEN` | Required | oscar API token |
 
 ## Reference
 
-ezBookkeeping: [https://ezbookkeeping.mayswind.net](https://ezbookkeeping.mayswind.net)
+oscar: [https://oscar.mayswind.net](https://oscar.mayswind.net)

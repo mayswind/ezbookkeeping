@@ -11,17 +11,17 @@ import (
 
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
-	"github.com/mayswind/ezbookkeeping/pkg/converters"
-	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
-	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/services"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/Paxtiny/oscar/pkg/converters"
+	"github.com/Paxtiny/oscar/pkg/converters/converter"
+	"github.com/Paxtiny/oscar/pkg/converters/datatable"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/duplicatechecker"
+	"github.com/Paxtiny/oscar/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/log"
+	"github.com/Paxtiny/oscar/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/services"
+	"github.com/Paxtiny/oscar/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
 const pageCountForAccountStatement = 1000

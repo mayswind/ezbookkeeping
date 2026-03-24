@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/Paxtiny/oscar/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
 // Reference: https://en.gravatar.com/site/implement/hash/

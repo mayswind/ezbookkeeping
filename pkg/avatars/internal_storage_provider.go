@@ -3,8 +3,8 @@ package avatars
 import (
 	"fmt"
 
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 const internalAvatarUrlFormat = "%savatar/%d.%s"

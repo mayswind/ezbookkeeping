@@ -7,7 +7,7 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/core"
 )
 
 func TestCronJobNextRunTimeWithIntervalPeriod(t *testing.T) {

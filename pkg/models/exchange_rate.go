@@ -3,7 +3,7 @@ package models
 import (
 	"strings"
 
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
 const UserCustomExchangeRateFactorInDatabase = int64(100000000)

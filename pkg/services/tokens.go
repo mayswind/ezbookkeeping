@@ -11,13 +11,13 @@ import (
 	"github.com/golang-jwt/jwt/v5/request"
 	"xorm.io/xorm"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/datastore"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/datastore"
+	"github.com/Paxtiny/oscar/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/log"
+	"github.com/Paxtiny/oscar/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
 const tokenMaxExpiredAtUnixTime = int64(253402300799) // 9999-12-31 23:59:59 UTC

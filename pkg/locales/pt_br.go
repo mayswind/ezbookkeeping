@@ -1,7 +1,7 @@
 package locales
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/core"
 )
 
 var ptBR = &LocaleTextItems{

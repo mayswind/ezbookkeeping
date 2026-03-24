@@ -1,8 +1,8 @@
 package datatable
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/models"
 )
 
 // TransactionDataTable defines the structure of transaction data table

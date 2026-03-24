@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
 // TransactionTemplateType represents transaction template type in database

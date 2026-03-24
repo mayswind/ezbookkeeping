@@ -3,9 +3,9 @@ package anthropic
 import (
 	"net/http"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/llm/provider"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 const anthropicCompatibleMessagesPath = "messages"

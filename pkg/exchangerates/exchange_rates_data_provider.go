@@ -1,9 +1,9 @@
 package exchangerates
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 // ExchangeRatesDataProvider defines the structure of exchange rates data provider

@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/errs"
 )
 
 const sgmlTagName = "sgml"

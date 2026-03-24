@@ -3,7 +3,7 @@ package validators
 import (
 	"github.com/go-playground/validator/v10"
 
-	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/models"
 )
 
 // ValidTagFilter returns whether the given tag filter is valid

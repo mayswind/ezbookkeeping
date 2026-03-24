@@ -1,8 +1,8 @@
 package uuid
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 // UuidContainer contains the current uuid generator

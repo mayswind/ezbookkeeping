@@ -7,8 +7,8 @@ import (
 
 	"golang.org/x/net/html/charset"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/errs"
 )
 
 // gnucashDatabaseReader defines the structure of gnucash database reader

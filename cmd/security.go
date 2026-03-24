@@ -5,8 +5,8 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
 // SecurityUtils represents the security command

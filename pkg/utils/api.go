@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/errs"
 )
 
 // GetDisplayErrorMessage returns the display error message for given error

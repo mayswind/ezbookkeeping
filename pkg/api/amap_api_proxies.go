@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 const amapCustomMapStylesUrl = "https://webapi.amap.com/v4/map/styles"

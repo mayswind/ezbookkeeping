@@ -7,13 +7,13 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
-	"github.com/mayswind/ezbookkeeping/pkg/llm/provider"
-	"github.com/mayswind/ezbookkeeping/pkg/llm/provider/common"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/llm/data"
+	"github.com/Paxtiny/oscar/pkg/llm/provider"
+	"github.com/Paxtiny/oscar/pkg/llm/provider/common"
+	"github.com/Paxtiny/oscar/pkg/log"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 // AnthropicMessagesAPIProvider defines the structure of Anthropic messages API provider

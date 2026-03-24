@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/mayswind/ezbookkeeping/pkg/core"
+import "github.com/Paxtiny/oscar/pkg/core"
 
 // ObjectStorage represents an object storage to store file object
 type ObjectStorage interface {

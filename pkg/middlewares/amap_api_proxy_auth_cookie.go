@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 // AmapApiProxyAuthCookie adds amap api proxy auth cookie to cookies in response

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/errs"
 )
 
 // IPPattern represents a pattern for matching IP addresses, either IPv4 or IPv6

@@ -3,10 +3,10 @@ package _default
 import (
 	"time"
 
-	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
-	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/converters/converter"
+	"github.com/Paxtiny/oscar/pkg/converters/datatable"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/models"
 )
 
 // defaultTransactionDataPlainTextConverter defines the structure of ezbookkeeping default plain text converter for transaction data

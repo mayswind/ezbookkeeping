@@ -1,7 +1,7 @@
 package avatars
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/models"
 )
 
 // NullAvatarProvider represents the null avatar provider

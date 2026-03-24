@@ -6,8 +6,8 @@ import (
 
 	"github.com/extrame/xls"
 
-	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/converters/datatable"
+	"github.com/Paxtiny/oscar/pkg/errs"
 )
 
 // ExcelMSCFBFileBasicDataTable defines the structure of excel (microsoft compound file binary) file data table

@@ -3,8 +3,8 @@ package provider
 import (
 	"golang.org/x/oauth2"
 
-	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/data"
-	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/auth/oauth2/data"
+	"github.com/Paxtiny/oscar/pkg/core"
 )
 
 // OAuth2Provider defines the structure of OAuth 2.0 provider

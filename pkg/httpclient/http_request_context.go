@@ -1,7 +1,7 @@
 package httpclient
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/core"
 )
 
 const (

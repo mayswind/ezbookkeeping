@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/utils"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
 // TransactionEditScope represents the scope which transaction can be edited

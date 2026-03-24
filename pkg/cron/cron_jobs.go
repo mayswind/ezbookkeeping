@@ -3,8 +3,8 @@ package cron
 import (
 	"time"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/services"
 )
 
 // RemoveExpiredTokensJob represents the cron job which periodically remove expired user tokens from the database

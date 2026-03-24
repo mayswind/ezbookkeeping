@@ -1,9 +1,9 @@
 package datatable
 
 import (
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/log"
+	"github.com/Paxtiny/oscar/pkg/models"
 )
 
 // WritableTransactionDataTable defines the structure of writable transaction data table

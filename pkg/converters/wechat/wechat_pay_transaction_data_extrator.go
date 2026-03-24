@@ -3,11 +3,11 @@ package wechat
 import (
 	"strings"
 
-	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
-	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/Paxtiny/oscar/pkg/converters/csv"
+	"github.com/Paxtiny/oscar/pkg/converters/datatable"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/log"
 )
 
 func createNewWeChatPayTransactionBasicDataTable(ctx core.Context, originalDataTable datatable.BasicDataTable) (datatable.BasicDataTable, error) {

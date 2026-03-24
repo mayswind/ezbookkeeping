@@ -1,6 +1,6 @@
 package models
 
-import "github.com/mayswind/ezbookkeeping/pkg/core"
+import "github.com/Paxtiny/oscar/pkg/core"
 
 // UserExternalAuth represents user external auth data stored in database
 type UserExternalAuth struct {

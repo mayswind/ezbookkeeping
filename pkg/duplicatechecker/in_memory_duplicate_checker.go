@@ -7,7 +7,7 @@ import (
 
 	"github.com/patrickmn/go-cache"
 
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 // InMemoryDuplicateChecker represents in-memory duplicate checker

@@ -5,9 +5,9 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/cron"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/cron"
+	"github.com/Paxtiny/oscar/pkg/log"
 )
 
 // CronJobs represents the cron command

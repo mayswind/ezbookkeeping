@@ -1,4 +1,4 @@
-module github.com/mayswind/ezbookkeeping
+module github.com/Paxtiny/oscar
 
 go 1.25
 

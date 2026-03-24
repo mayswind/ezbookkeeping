@@ -1,6 +1,6 @@
 package cli
 
-import "github.com/mayswind/ezbookkeeping/pkg/settings"
+import "github.com/Paxtiny/oscar/pkg/settings"
 
 // CliUsingConfig represents a cli that need to use config
 type CliUsingConfig struct {

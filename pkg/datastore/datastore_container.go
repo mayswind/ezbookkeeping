@@ -13,8 +13,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"xorm.io/xorm"
 
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 // DataStoreContainer contains all data storages

@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/mayswind/ezbookkeeping/pkg/core"
+import "github.com/Paxtiny/oscar/pkg/core"
 
 // CustomTransactionDataParser represents the parser for custom transaction data files
 type CustomTransactionDataParser interface {

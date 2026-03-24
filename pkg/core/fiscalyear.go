@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/Paxtiny/oscar/pkg/errs"
 )
 
 // FiscalYearStart represents the fiscal year start date as a uint16 (month: high byte, day: low byte)

@@ -3,8 +3,8 @@ package converter
 import (
 	"time"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/models"
 )
 
 // TransactionDataExporter defines the structure of transaction data exporter

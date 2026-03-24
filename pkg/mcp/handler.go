@@ -3,10 +3,10 @@ package mcp
 import (
 	"reflect"
 
-	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/services"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/Paxtiny/oscar/pkg/core"
+	"github.com/Paxtiny/oscar/pkg/models"
+	"github.com/Paxtiny/oscar/pkg/services"
+	"github.com/Paxtiny/oscar/pkg/settings"
 )
 
 // MCPAvailableServices holds the services available for MCP tools

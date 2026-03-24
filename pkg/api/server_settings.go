@@ -10,10 +10,10 @@ import (
 	"github.com/Paxtiny/oscar/pkg/utils"
 )
 
-const ezbookkeepingServerSettingsGlobalVariableName = "EZBOOKKEEPING_SERVER_SETTINGS"
-const ezbookkeepingServerSettingsGlobalVariableFullName = "window." + ezbookkeepingServerSettingsGlobalVariableName
-const ezbookkeepingServerSettingsJavascriptFileHeader = ezbookkeepingServerSettingsGlobalVariableFullName +
-	"=" + ezbookkeepingServerSettingsGlobalVariableFullName + "||{};\n"
+const oscarServerSettingsGlobalVariableName = "OSCAR_SERVER_SETTINGS"
+const oscarServerSettingsGlobalVariableFullName = "window." + oscarServerSettingsGlobalVariableName
+const oscarServerSettingsJavascriptFileHeader = oscarServerSettingsGlobalVariableFullName +
+	"=" + oscarServerSettingsGlobalVariableFullName + "||{};\n"
 
 // ServerSettingsApi represents server settings api
 type ServerSettingsApi struct {
@@ -33,7 +33,7 @@ var (
 func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) ([]byte, string, *errs.Error) {
 	config := a.CurrentConfig()
 	builder := &strings.Builder{}
-	builder.WriteString(ezbookkeepingServerSettingsJavascriptFileHeader)
+	builder.WriteString(oscarServerSettingsJavascriptFileHeader)
 
 	a.appendBooleanSetting(builder, "a", config.EnableInternalAuth)
 	a.appendBooleanSetting(builder, "o", config.EnableOAuth2Login)
@@ -137,7 +137,7 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 }
 
 func (a *ServerSettingsApi) appendStringSetting(builder *strings.Builder, key string, value string) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(oscarServerSettingsGlobalVariableFullName)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]=")
@@ -148,7 +148,7 @@ func (a *ServerSettingsApi) appendStringSetting(builder *strings.Builder, key st
 }
 
 func (a *ServerSettingsApi) appendMultiLanguageTipSetting(builder *strings.Builder, key string, value settings.MultiLanguageContentConfig) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(oscarServerSettingsGlobalVariableFullName)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]={\n")
@@ -168,7 +168,7 @@ func (a *ServerSettingsApi) appendMultiLanguageTipSetting(builder *strings.Build
 }
 
 func (a *ServerSettingsApi) appendBooleanSetting(builder *strings.Builder, key string, value bool) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(oscarServerSettingsGlobalVariableFullName)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]=")
@@ -183,7 +183,7 @@ func (a *ServerSettingsApi) appendBooleanSetting(builder *strings.Builder, key s
 }
 
 func (a *ServerSettingsApi) appendIntegerSetting(builder *strings.Builder, key string, value int) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(oscarServerSettingsGlobalVariableFullName)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]=")

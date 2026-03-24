@@ -174,7 +174,7 @@ goto :pre_parse_args
 
     echo Building backend binary file (%RELEASE_TYPE%)...
 
-    call go build -a -v -trimpath -tags timetzdata -ldflags "-w -s -linkmode external -extldflags '-static' %backend_build_extra_arguments%" -o ezbookkeeping.exe ezbookkeeping.go
+    call go build -a -v -trimpath -tags timetzdata -ldflags "-w -s -linkmode external -extldflags '-static' %backend_build_extra_arguments%" -o oscar.exe oscar.go
     endlocal
 
     set "CGO_ENABLED="
@@ -231,7 +231,7 @@ goto :pre_parse_args
         set "package_file_name=%package_file_name%-%build_date%"
     )
 
-    set "package_file_name=ezbookkeeping-%package_file_name%-windows.zip"
+    set "package_file_name=oscar-%package_file_name%-windows.zip"
 
     if defined PACKAGE_FILENAME set "package_file_name=%PACKAGE_FILENAME%"
 

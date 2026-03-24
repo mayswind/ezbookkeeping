@@ -3,7 +3,7 @@ package core
 import "fmt"
 
 // ApplicationName represents the application name
-const ApplicationName = "ezBookkeeping"
+const ApplicationName = "oscar"
 
 // Version, CommitHash and BuildTime are set at build
 var (

@@ -26,7 +26,7 @@ func (p *OpenRouterChatCompletionsAPIProvider) BuildChatCompletionsHttpRequest(c
 	}
 
 	req.Header.Set("Authorization", "Bearer "+p.OpenRouterAPIKey)
-	req.Header.Set("HTTP-Referer", "https://ezbookkeeping.mayswind.net/")
+	req.Header.Set("HTTP-Referer", "https://github.com/Paxtiny/oscar")
 	req.Header.Set("X-Title", core.ApplicationName)
 
 	return req, nil

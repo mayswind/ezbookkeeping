@@ -360,7 +360,7 @@ var UserData = &cli.Command{
 					Name:     "type",
 					Aliases:  []string{"t"},
 					Required: true,
-					Usage:    "Import file type (supports \"ezbookkeeping_csv\", \"ezbookkeeping_tsv\")",
+					Usage:    "Import file type (supports \"ezbookkeeping_csv\", \"ezbookkeeping_tsv\" and other formats)",
 				},
 			},
 		},

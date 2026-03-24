@@ -130,7 +130,7 @@ function Build-Backend {
     Write-Host "Building backend binary file ($ReleaseType)..."
 
     $env:CGO_ENABLED = 1
-    go build -a -v -trimpath -tags timetzdata -ldflags "-w -s -linkmode external -extldflags '-static' $backend_build_extra_arguments" -o ezbookkeeping.exe ezbookkeeping.go
+    go build -a -v -trimpath -tags timetzdata -ldflags "-w -s -linkmode external -extldflags '-static' $backend_build_extra_arguments" -o oscar.exe oscar.go
 
     Remove-Item Env:\CGO_ENABLED -ErrorAction SilentlyContinue
 }
@@ -172,7 +172,7 @@ function Build-Frontend {
 }
 
 function Build-Package {
-    $packageFileName = "ezbookkeeping-$Version"
+    $packageFileName = "oscar-$Version"
 
     if (-not $Release) {
         $packageFileName = "$packageFileName-$BuildDate"

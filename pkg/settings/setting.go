@@ -17,9 +17,9 @@ import (
 
 const (
 	ebkWorkDirEnvName                  = "EBK_WORK_DIR"
-	ebkConfigItemValueEnvNamePrefix    = "EBK"
-	ebkConfigItemFilePathEnvNamePrefix = "EBKCFP"
-	defaultConfigPath                  = "/conf/ezbookkeeping.ini"
+	ebkConfigItemValueEnvNamePrefix    = "OSCAR"
+	ebkConfigItemFilePathEnvNamePrefix = "OSCARCFP"
+	defaultConfigPath                  = "/conf/oscar.ini"
 	defaultRootUrl                     = "%(protocol)s://%(domain)s:%(http_port)s/"
 	defaultStaticRootPath              = "public"
 )
@@ -152,7 +152,7 @@ const (
 	defaultDomain   string = "localhost"
 
 	defaultDatabaseHost            string = "127.0.0.1:3306"
-	defaultDatabaseName            string = "ezbookkeeping"
+	defaultDatabaseName            string = "oscar"
 	defaultDatabaseMaxIdleConn     uint16 = 2
 	defaultDatabaseMaxOpenConn     uint16 = 0
 	defaultDatabaseConnMaxLifetime uint32 = 14400
@@ -170,7 +170,7 @@ const (
 	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
 	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
 
-	defaultSecretKey                     string = "ezbookkeeping"
+	defaultSecretKey                     string = "oscar"
 	defaultTokenExpiredTime              uint32 = 2592000 // 30 days
 	defaultTokenMinRefreshInterval       uint32 = 86400   // 1 day
 	defaultTemporaryTokenExpiredTime     uint32 = 300     // 5 minutes

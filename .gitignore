@@ -149,8 +149,8 @@ dist/
 .roo/
 
 # Binary and build files
-ezbookkeeping
-!**/ezbookkeeping/
+oscar
+!**/oscar/
 package/
 
 # Environment variable files

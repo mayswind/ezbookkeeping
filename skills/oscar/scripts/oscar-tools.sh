@@ -531,8 +531,8 @@ API_CONFIGS='[
   }
 ]'
 
-EBKTOOL_SERVER_BASEURL="${EBKTOOL_SERVER_BASEURL}"
-EBKTOOL_TOKEN="${EBKTOOL_TOKEN}"
+OSCAR_SERVER_BASEURL="${OSCAR_SERVER_BASEURL}"
+OSCAR_TOKEN="${OSCAR_TOKEN}"
 TIMEZONE_NAME=""
 TIMEZONE_OFFSET=""
 RAW_RESPONSE="false"
@@ -578,7 +578,7 @@ load_env_file() {
         value="$(echo "$value" | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
 
         case "$key" in
-            EBKTOOL_SERVER_BASEURL|EBKTOOL_TOKEN)
+            OSCAR_SERVER_BASEURL|OSCAR_TOKEN)
                 eval "$key=\"\$value\""
                 ;;
         esac
@@ -588,7 +588,7 @@ load_env_file() {
 }
 
 load_env_from_paths() {
-    if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+    if [ -n "$OSCAR_SERVER_BASEURL" ] && [ -n "$OSCAR_TOKEN" ]; then
         return 0
     fi
 
@@ -596,25 +596,25 @@ load_env_from_paths() {
     parent_dir="$(dirname "$current_dir")"
     home_dir="$HOME"
 
-    if [ -z "$EBKTOOL_SERVER_BASEURL" ] || [ -z "$EBKTOOL_TOKEN" ]; then
+    if [ -z "$OSCAR_SERVER_BASEURL" ] || [ -z "$OSCAR_TOKEN" ]; then
         if load_env_file "$current_dir/.env"; then
-            if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+            if [ -n "$OSCAR_SERVER_BASEURL" ] && [ -n "$OSCAR_TOKEN" ]; then
                 return 0
             fi
         fi
     fi
 
-    if [ -z "$EBKTOOL_SERVER_BASEURL" ] || [ -z "$EBKTOOL_TOKEN" ]; then
+    if [ -z "$OSCAR_SERVER_BASEURL" ] || [ -z "$OSCAR_TOKEN" ]; then
         if load_env_file "$parent_dir/.env"; then
-            if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+            if [ -n "$OSCAR_SERVER_BASEURL" ] && [ -n "$OSCAR_TOKEN" ]; then
                 return 0
             fi
         fi
     fi
 
-    if [ -z "$EBKTOOL_SERVER_BASEURL" ] || [ -z "$EBKTOOL_TOKEN" ]; then
+    if [ -z "$OSCAR_SERVER_BASEURL" ] || [ -z "$OSCAR_TOKEN" ]; then
         if load_env_file "$home_dir/.env"; then
-            if [ -n "$EBKTOOL_SERVER_BASEURL" ] && [ -n "$EBKTOOL_TOKEN" ]; then
+            if [ -n "$OSCAR_SERVER_BASEURL" ] && [ -n "$OSCAR_TOKEN" ]; then
                 return 0
             fi
         fi
@@ -811,11 +811,11 @@ oscar API Tools
 A command-line tool for calling oscar APIs
 
 Usage:
-    ebktools.sh [--tz-name <name>] [--tz-offset <offset>] [--raw-response] <command> [command-options]
+    oscar-tools.sh [--tz-name <name>] [--tz-offset <offset>] [--raw-response] <command> [command-options]
 
 Environment Variables (Required):
-    EBKTOOL_SERVER_BASEURL      oscar server base URL (e.g., http://localhost:8080)
-    EBKTOOL_TOKEN               oscar API token
+    OSCAR_SERVER_BASEURL      oscar server base URL (e.g., http://localhost:8080)
+    OSCAR_TOKEN               oscar API token
 
     You can also set the above environment variables in a '.env' file located in the current directory, parent directory or home directory.
 
@@ -831,23 +831,23 @@ Commands:
 
 Examples:
     # Set environment variables
-    export EBKTOOL_SERVER_BASEURL="http://localhost:8080"
-    export EBKTOOL_TOKEN="YOUR_TOKEN"
+    export OSCAR_SERVER_BASEURL="http://localhost:8080"
+    export OSCAR_TOKEN="YOUR_TOKEN"
 
     # List all available commands
-    ebktools.sh list
+    oscar-tools.sh list
 
     # Show help for a specific command
-    ebktools.sh help server-version
+    oscar-tools.sh help server-version
 
     # Call server-version API
-    ebktools.sh server-version
+    oscar-tools.sh server-version
 
     # Call API with timezone name
-    ebktools.sh --tz-name ${example_timezone_name} transactions-list --count 10
+    oscar-tools.sh --tz-name ${example_timezone_name} transactions-list --count 10
 
     # Call API with timezone offset
-    ebktools.sh --tz-offset ${example_timezone_offset} transactions-list --count 10
+    oscar-tools.sh --tz-offset ${example_timezone_offset} transactions-list --count 10
 EOF
 }
 
@@ -860,7 +860,7 @@ list_commands() {
     done
 
     echo ""
-    echo "Use 'ebktools.sh help <api-command>' to see detailed information about an API command."
+    echo "Use 'oscar-tools.sh help <api-command>' to see detailed information about an API command."
 }
 
 show_command_help() {
@@ -870,7 +870,7 @@ show_command_help() {
     if [ -z "$config" ]; then
         echo_red "Error: Unknown command '$command_name'"
         echo ""
-        echo "Use 'ebktools.sh list' to see all available commands."
+        echo "Use 'oscar-tools.sh list' to see all available commands."
         exit 1
     fi
 
@@ -922,13 +922,13 @@ show_command_help() {
     current_tz_name="$(get_system_timezone_name)"
     current_tz_offset="$(get_system_timezone_offset)"
     if [ "$requires_timezone" = "true" ] && [ -n "$current_tz_name" ]; then
-        echo "  ebktools.sh --tz-name ${current_tz_name} $name"
+        echo "  oscar-tools.sh --tz-name ${current_tz_name} $name"
     elif [ "$requires_timezone" = "true" ] && [ -n "$current_tz_offset" ]; then
-        echo "  ebktools.sh --tz-offset ${current_tz_offset} $name"
+        echo "  oscar-tools.sh --tz-offset ${current_tz_offset} $name"
     elif [ "$requires_timezone" = "true" ]; then
-        echo "  ebktools.sh --tz-name <name> $name"
+        echo "  oscar-tools.sh --tz-name <name> $name"
     else
-        echo "  ebktools.sh $name"
+        echo "  oscar-tools.sh $name"
     fi
 }
 
@@ -941,21 +941,21 @@ call_api() {
     if [ -z "$config" ]; then
         echo_red "Error: Unknown command '$command_name'"
         echo ""
-        echo "Use 'ebktools.sh list' to see all available commands."
+        echo "Use 'oscar-tools.sh list' to see all available commands."
         exit 1
     fi
 
-    serverBaseUrl="$EBKTOOL_SERVER_BASEURL"
-    authToken="$EBKTOOL_TOKEN"
+    serverBaseUrl="$OSCAR_SERVER_BASEURL"
+    authToken="$OSCAR_TOKEN"
 
     if [ -z "$serverBaseUrl" ]; then
-        echo_red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
+        echo_red "Error: Environment variable 'OSCAR_SERVER_BASEURL' is not set."
         echo "Please set it to your oscar server base URL (e.g., http://localhost:8080)"
         exit 1
     fi
 
     if [ -z "$authToken" ]; then
-        echo_red "Error: Environment variable 'EBKTOOL_TOKEN' is not set."
+        echo_red "Error: Environment variable 'OSCAR_TOKEN' is not set."
         echo "Please set it to your API token."
         exit 1
     fi
@@ -978,8 +978,8 @@ call_api() {
         echo "Please provide either '--tz-name' or '--tz-offset' parameter."
         echo ""
         echo "Examples:"
-        echo "  ebktools.sh --tz-name <name> $command_name ..."
-        echo "  ebktools.sh --tz-offset <offset> $command_name ..."
+        echo "  oscar-tools.sh --tz-name <name> $command_name ..."
+        echo "  oscar-tools.sh --tz-offset <offset> $command_name ..."
         exit 1
     fi
 
@@ -1124,7 +1124,7 @@ call_api() {
         if [ "$json_params" != "{}" ]; then
             if [ -n "$timezone_headers" ]; then
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $OSCAR_TOKEN" \
                     -H "Content-Type: application/json" \
                     -H "$timezone_headers" \
                     -d "$json_params" \
@@ -1132,7 +1132,7 @@ call_api() {
                 curl_exit_code=$?
             else
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $OSCAR_TOKEN" \
                     -H "Content-Type: application/json" \
                     -d "$json_params" \
                     "$url")"
@@ -1141,13 +1141,13 @@ call_api() {
         else
             if [ -n "$timezone_headers" ]; then
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $OSCAR_TOKEN" \
                     -H "$timezone_headers" \
                     "$url")"
                 curl_exit_code=$?
             else
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $OSCAR_TOKEN" \
                     "$url")"
                 curl_exit_code=$?
             fi
@@ -1162,12 +1162,12 @@ call_api() {
 
         if [ -n "$timezone_headers" ]; then
             response="$(curl -s -X "$method" \
-                -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                -H "Authorization: Bearer $OSCAR_TOKEN" \
                 -H "$timezone_headers" \
                 "$url")"
         else
             response="$(curl -s -X "$method" \
-                -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                -H "Authorization: Bearer $OSCAR_TOKEN" \
                 "$url")"
         fi
         curl_exit_code=$?

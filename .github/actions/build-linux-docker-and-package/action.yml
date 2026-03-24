@@ -106,7 +106,7 @@ runs:
     - name: Build package file for ${{ inputs.platform-name }}
       shell: bash
       run: |
-        cd ${{ runner.temp }}/package/ezbookkeeping
+        cd ${{ runner.temp }}/package/oscar
         tar -czf ${{ runner.temp }}/${{ inputs.package-file-name-prefix }}-${{ inputs.platform-name }}.tar.gz *
 
     - name: Upload ${{ inputs.platform-name }} digests artifact

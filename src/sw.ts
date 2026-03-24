@@ -16,7 +16,7 @@ interface CacheTimestampEntry {
 }
 
 class DynamicExpirationPlugin implements WorkboxPlugin {
-    private static readonly SW_CACHE_TIME_HEADER: string = 'ezbookkeeping-sw-cache-time';
+    private static readonly SW_CACHE_TIME_HEADER: string = 'oscar-sw-cache-time';
     private maxEntries: number;
     private maxAgeMilliseconds: number;
     private cleaningCache: boolean = false;
@@ -174,10 +174,10 @@ interface MapCacheConfig {
 
 declare const self: ServiceWorkerGlobalScope;
 
-const SW_ASSETS_CACHE_NAME: string = 'ezbookkeeping-assets-cache';
-const SW_CODE_CACHE_NAME: string = 'ezbookkeeping-code-cache';
-const SW_MAP_CACHE_NAME: string = 'ezbookkeeping-map-cache';
-const SW_SHARE_CACHE_NAME: string = 'ezbookkeeping-share-cache';
+const SW_ASSETS_CACHE_NAME: string = 'oscar-assets-cache';
+const SW_CODE_CACHE_NAME: string = 'oscar-code-cache';
+const SW_MAP_CACHE_NAME: string = 'oscar-map-cache';
+const SW_SHARE_CACHE_NAME: string = 'oscar-share-cache';
 const SW_SHARE_IMAGE_URL_PATHNAME: string = '__share__image__';
 const SW_SHARE_IMAGE_PARAM_NAME: string = 'image';
 

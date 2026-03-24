@@ -9,57 +9,33 @@ description: Use oscar API Tools script to record new transactions, query transa
 
 ### List all supported commands
 
-Linux / macOS
-
 ```bash
-sh scripts/ebktools.sh list
-```
-
-Windows
-
-```powershell
-scripts\ebktools.ps1 list
+sh scripts/oscar-tools.sh list
 ```
 
 ### Show help for a specific command
 
-Linux / macOS
-
 ```bash
-sh scripts/ebktools.sh help <command>
-```
-
-Windows
-
-```powershell
-scripts\ebktools.ps1 help <command>
+sh scripts/oscar-tools.sh help <command>
 ```
 
 ### Call API
 
-Linux / macOS
-
 ```bash
-sh scripts/ebktools.sh [global-options] <command> [command-options]
-```
-
-Windows
-
-```powershell
-scripts\ebktools.ps1 [global-options] <command> [command-options]
+sh scripts/oscar-tools.sh [global-options] <command> [command-options]
 ```
 
 ## Troubleshooting
 
-If the script reports that the environment variable `EBKTOOL_SERVER_BASEURL` or `EBKTOOL_TOKEN` is not set, user can define them as system environment variables, or create a `.env` file in the user home directory that contains these two variables and place it there.
+If the script reports that the environment variable `OSCAR_SERVER_BASEURL` or `OSCAR_TOKEN` is not set, user can define them as system environment variables, or create a `.env` file in the user home directory that contains these two variables and place it there.
 
 The meanings of these environment variables are as follows:
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `EBKTOOL_SERVER_BASEURL` | Required | oscar server base URL (e.g., `http://localhost:8080`) |
-| `EBKTOOL_TOKEN` | Required | oscar API token |
+| `OSCAR_SERVER_BASEURL` | Required | oscar server base URL (e.g., `http://localhost:8080`) |
+| `OSCAR_TOKEN` | Required | oscar API token |
 
 ## Reference
 
-oscar: [https://oscar.mayswind.net](https://oscar.mayswind.net)
+oscar by nicodAImus: [https://github.com/Paxtiny/oscar](https://github.com/Paxtiny/oscar)

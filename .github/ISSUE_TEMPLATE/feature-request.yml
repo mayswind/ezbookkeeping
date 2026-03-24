@@ -1,5 +1,5 @@
 name: Feature Request
-description: Request a feature or enhancement for ezBookkeeping
+description: Request a feature or enhancement for oscar
 body:
   - type: checkboxes
     id: checkboxes
@@ -7,7 +7,7 @@ body:
       label: Before You Submit
       description: Please check whether the following items have been completed.
       options:
-        - label: I've already checked this request hasn't been raised in [issues](https://github.com/mayswind/ezbookkeeping/issues)
+        - label: I've already checked this request hasn't been raised in [issues](https://github.com/Paxtiny/oscar/issues)
           required: true
 
   - type: textarea

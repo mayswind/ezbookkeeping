@@ -1,0 +1,16 @@
+[Unit]
+Description=oscar, a privacy-first AI expense manager by nicodAImus.
+After=syslog.target
+After=network.target
+After=postgresql.service
+
+[Service]
+Type=simple
+User=oscar
+Group=oscar
+WorkingDirectory=/usr/local/bin/oscar
+ExecStart=/usr/local/bin/oscar/oscar server run
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

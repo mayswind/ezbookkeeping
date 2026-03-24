@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in ezBookkeeping
+description: Report a bug in oscar
 body:
   - type: checkboxes
     id: checkboxes
@@ -7,7 +7,7 @@ body:
       label: Before You Submit
       description: Please check whether the following items have been completed.
       options:
-        - label: I've already checked this bug hasn't been raised in [issues](https://github.com/mayswind/ezbookkeeping/issues)
+        - label: I've already checked this bug hasn't been raised in [issues](https://github.com/Paxtiny/oscar/issues)
           required: true
 
   - type: textarea
@@ -31,10 +31,10 @@ body:
       required: true
 
   - type: input
-    id: ezbookkeeping-version
+    id: oscar-version
     attributes:
-      label: ezBookkeeping Version
-      description: ezBookkeeping version and commit hash of your instance, e.g. "v1.0.0 (20e2444)"
+      label: oscar Version
+      description: oscar version and commit hash of your instance, e.g. "v0.1.0 (abc1234)"
     validations:
       required: true
 
@@ -42,25 +42,13 @@ body:
     id: server-os
     attributes:
       label: Server Operating System
-      description: The operating system information you are using to deploy ezBookkeeping, e.g "Debian GNU/Linux 11 amd64"
+      description: The operating system information you are using to deploy oscar, e.g "Debian GNU/Linux 12 amd64"
 
   - type: input
     id: server-database
     attributes:
       label: Database
-      description: The database system you are using, e.g. "MariaDB v11.7.2"
-
-  - type: dropdown
-    id: reproduce-on-demo-site
-    attributes:
-      label: Can you reproduce this bug on the ezBookkeeping demo site?
-      description: |
-        ezBookkeeping demo site: https://ezbookkeeping-demo.mayswind.net/
-      options:
-        - "No"
-        - "Yes"
-    validations:
-      required: true
+      description: The database system you are using, e.g. "PostgreSQL 17.2"
 
   - type: textarea
     id: additional-context

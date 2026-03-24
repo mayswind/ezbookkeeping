@@ -154,7 +154,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
-const { tt, getCurrentLanguageTag, getAllLanguageOptions } = useI18n();
+const { tt, getAllLanguageOptions } = useI18n();
 const { showAlert, openExternalUrl } = useI18nUIComponents();
 const {
     clientVersion,
@@ -182,11 +182,7 @@ const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(fals
 const forceShowRefreshBrowserCacheMenu = computed<boolean>(() => versionClickCount.value >= 5);
 
 const documentUrl = computed<string>(() => {
-    if (getCurrentLanguageTag() === 'zh-Hans' || getCurrentLanguageTag() === 'zh-Hant') {
-        return 'https://ezbookkeeping.mayswind.net/zh_Hans/faq/';
-    } else {
-        return 'https://ezbookkeeping.mayswind.net/faq/';
-    }
+    return 'https://github.com/Paxtiny/oscar';
 });
 
 function showVersion(): void {

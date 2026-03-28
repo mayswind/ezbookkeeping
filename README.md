@@ -131,7 +131,7 @@ Currently available translations:
 
 | Tag | Language | Contributors |
 | --- | --- | --- |
-| de | Deutsch | [@chrgm](https://github.com/chrgm) |
+| de | Deutsch | [@chrgm](https://github.com/chrgm), [@1270o1](https://github.com/1270o1) |
 | en | English | / |
 | es | Español | [@Miguelonlonlon](https://github.com/Miguelonlonlon), [@abrugues](https://github.com/abrugues), [@AndresTeller](https://github.com/AndresTeller), [@diegofercri](https://github.com/diegofercri) |
 | fr | Français | [@brieucdlf](https://github.com/brieucdlf) |

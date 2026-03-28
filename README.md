@@ -34,7 +34,7 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
 - **AI-Powered Features**
     - Receipt image recognition
     - MCP (Model Context Protocol) support for AI integration
-    - API command-line script tools for AI integration
+    - Agent Skill and API command-line script tools support for AI integration
 - **Powerful Bookkeeping**
     - Two-level accounts and categories
     - Image attachments for transactions

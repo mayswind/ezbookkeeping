@@ -1,0 +1,73 @@
+name: Update i18n Translation Progress Badges
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/locales/**'
+      - 'pkg/locales/**'
+  workflow_dispatch:
+
+jobs:
+  update-i18n-progress:
+    if: vars.UPDATE_I18N_BADGE_REPO == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Update translation progress data
+        run: |
+          node .github/scripts/update-i18n-progress.js ${{ runner.temp }}/i18n-badge
+
+      - name: Checkout badge repository
+        uses: actions/checkout@v5
+        with:
+          repository: mayswind/ezbookkeeping-i18n-badge
+          token: ${{ secrets.I18N_BADGE_REPO_TOKEN }}
+          path: ezbookkeeping-i18n-badge
+
+      - name: Update badge data
+        run: |
+          cp ${{ runner.temp }}/i18n-badge/i18n-progress.json ezbookkeeping-i18n-badge/
+          mkdir -p ezbookkeeping-i18n-badge/badges
+          cp ${{ runner.temp }}/i18n-badge/badges/*.json ezbookkeeping-i18n-badge/badges/
+          mkdir -p ezbookkeeping-i18n-badge/untranslated
+          cp ${{ runner.temp }}/i18n-badge/untranslated/*.json ezbookkeeping-i18n-badge/untranslated/
+
+      - name: Commit and push
+        run: |
+          cd ezbookkeeping-i18n-badge
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update i18n progress data (${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})"
+            git push
+          fi
+
+      - name: Purge GitHub camo image cache
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CAMO_URLS=$(curl -s -H "Accept: application/vnd.github.html+json" -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/readme" | grep -oP 'https://camo\.githubusercontent\.com/[^"]+' | sort -u)
+
+          if [ -z "$CAMO_URLS" ]; then
+            echo "No camo URLs found, skipping cache purge"
+            exit 0
+          fi
+
+          for url in $CAMO_URLS; do
+            echo "Purging: $url"
+            curl -s -X PURGE "$url" > /dev/null
+          done
+
+          echo "Purged $(echo "$CAMO_URLS" | wc -l) camo URLs"

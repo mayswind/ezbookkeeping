@@ -129,27 +129,27 @@ Help make ezBookkeeping accessible to users around the world. We welcome help to
 
 Currently available translations:
 
-| Tag | Language | Contributors |
-| --- | --- | --- |
-| de | Deutsch | [@chrgm](https://github.com/chrgm), [@1270o1](https://github.com/1270o1) |
-| en | English | / |
-| es | Español | [@Miguelonlonlon](https://github.com/Miguelonlonlon), [@abrugues](https://github.com/abrugues), [@AndresTeller](https://github.com/AndresTeller), [@diegofercri](https://github.com/diegofercri) |
-| fr | Français | [@brieucdlf](https://github.com/brieucdlf) |
-| it | Italiano | [@waron97](https://github.com/waron97) |
-| ja | 日本語 | [@tkymmm](https://github.com/tkymmm) |
-| kn | ಕನ್ನಡ | [@Darshanbm05](https://github.com/Darshanbm05) |
-| ko | 한국어 | [@overworks](https://github.com/overworks) |
-| nl | Nederlands | [@automagics](https://github.com/automagics) |
-| pt-BR | Português (Brasil) | [@thecodergus](https://github.com/thecodergus), [@balaios](https://github.com/balaios) |
-| ru | Русский | [@artegoser](https://github.com/artegoser), [@dshemin](https://github.com/dshemin) |
-| sl | Slovenščina | [@thehijacker](https://github.com/thehijacker) |
-| ta | தமிழ் | [@hhharsha36](https://github.com/hhharsha36) |
-| th | ไทย | [@natthavat28](https://github.com/natthavat28) |
-| tr | Türkçe | [@aydnykn](https://github.com/aydnykn) |
-| uk | Українська | [@nktlitvinenko](https://github.com/nktlitvinenko) |
-| vi | Tiếng Việt | [@f97](https://github.com/f97) |
-| zh-Hans | 中文 (简体) | / |
-| zh-Hant | 中文 (繁體) | / |
+| Tag | Language | Progress | Contributors |
+| --- | --- | --- | --- |
+| de | Deutsch | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fde.json) | [@chrgm](https://github.com/chrgm), [@1270o1](https://github.com/1270o1) |
+| en | English | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fen.json) | / |
+| es | Español | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fes.json) | [@Miguelonlonlon](https://github.com/Miguelonlonlon), [@abrugues](https://github.com/abrugues), [@AndresTeller](https://github.com/AndresTeller), [@diegofercri](https://github.com/diegofercri) |
+| fr | Français | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Ffr.json) | [@brieucdlf](https://github.com/brieucdlf) |
+| it | Italiano | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fit.json) | [@waron97](https://github.com/waron97) |
+| ja | 日本語 | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fja.json) | [@tkymmm](https://github.com/tkymmm) |
+| kn | ಕನ್ನಡ | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fkn.json) | [@Darshanbm05](https://github.com/Darshanbm05) |
+| ko | 한국어 | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fko.json) | [@overworks](https://github.com/overworks) |
+| nl | Nederlands | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fnl.json) | [@automagics](https://github.com/automagics) |
+| pt-BR | Português (Brasil) | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fpt-BR.json) | [@thecodergus](https://github.com/thecodergus), [@balaios](https://github.com/balaios) |
+| ru | Русский | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fru.json) | [@artegoser](https://github.com/artegoser), [@dshemin](https://github.com/dshemin) |
+| sl | Slovenščina | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fsl.json) | [@thehijacker](https://github.com/thehijacker) |
+| ta | தமிழ் | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fta.json) | [@hhharsha36](https://github.com/hhharsha36) |
+| th | ไทย | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fth.json) | [@natthavat28](https://github.com/natthavat28) |
+| tr | Türkçe | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Ftr.json) | [@aydnykn](https://github.com/aydnykn) |
+| uk | Українська | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fuk.json) | [@nktlitvinenko](https://github.com/nktlitvinenko) |
+| vi | Tiếng Việt | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fvi.json) | [@f97](https://github.com/f97) |
+| zh-Hans | 中文 (简体) | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fzh-Hans.json) | / |
+| zh-Hant | 中文 (繁體) | ![Translation Progress](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmayswind%2FezBookkeeping-i18n-badge%2Fmain%2Fbadges%2Fzh-Hant.json) | / |
 
 ## Documentation
 1. [English](https://ezbookkeeping.mayswind.net)

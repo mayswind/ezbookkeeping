@@ -35,10 +35,13 @@ jobs:
 
       - name: Update badge data
         run: |
+          rm -rf ezbookkeeping-i18n-badge/i18n-progress.json
           cp ${{ runner.temp }}/i18n-badge/i18n-progress.json ezbookkeeping-i18n-badge/
           mkdir -p ezbookkeeping-i18n-badge/badges
+          rm -rf ezbookkeeping-i18n-badge/badges/*
           cp ${{ runner.temp }}/i18n-badge/badges/*.json ezbookkeeping-i18n-badge/badges/
           mkdir -p ezbookkeeping-i18n-badge/untranslated
+          rm -rf ezbookkeeping-i18n-badge/untranslated/*
           cp ${{ runner.temp }}/i18n-badge/untranslated/*.json ezbookkeeping-i18n-badge/untranslated/
 
       - name: Commit and push

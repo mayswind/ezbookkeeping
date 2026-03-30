@@ -82,6 +82,30 @@ function shouldSkipFrontendKey(key) {
         return true;
     } else if (key.startsWith('default.')) {
         return true;
+    } else if (key.startsWith('currency.')) {
+        if (key.startsWith('currency.unit.')) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (key.startsWith('mapprovider.')) {
+        return true;
+    } else if (key.startsWith('encoding.')) {
+        return true;
+    } else if (key.startsWith('document.')) {
+        if (key.startsWith('document.anchor.')) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+function isFrontendAlwaysTranslatedKey(key) {
+    if (key.startsWith('language.')) {
+        return true;
     } else if (key.startsWith('format.')) {
         if (key.startsWith('format.misc.')) {
             if (key === 'format.misc.multiTextJoinSeparator') {
@@ -99,17 +123,23 @@ function shouldSkipFrontendKey(key) {
     } else if (key.startsWith('timezone.')) {
         return true;
     } else if (key.startsWith('currency.')) {
-        return true;
-    } else if (key.startsWith('mapprovider.')) {
-        return true;
-    } else if (key.startsWith('parameter.id')) {
-        return true;
-    } else if (key.startsWith('encoding.')) {
-        return true;
-    } else if (key.startsWith('document.anchor.')) {
-        return true;
+        if (key === 'currency.name.EUR') {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (key.startsWith('parameter.')) {
+        if (key === 'parameter.id') {
+            return true;
+        } else {
+            return false;
+        }
     } else {
-        return false;
+        if (key === 'OK') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
@@ -211,10 +241,10 @@ function main() {
         let translated = 0;
 
         for (const key of frontendTranslatableKeys) {
-            if (kv[key] !== undefined && kv[key] !== '' && kv[key] !== defaultFrontendItemsMap[key]) {
+            if (kv[key] !== undefined && kv[key] !== '' && (kv[key] !== defaultFrontendItemsMap[key] || isFrontendAlwaysTranslatedKey(key))) {
                 translated++;
             } else {
-                untranslatedKeys[tag].push({ source: 'frontend', key: key, defaultValue: defaultFrontendItemsMap[key], value: kv[key] });
+                untranslatedKeys[tag].push({ source: path.join('src', 'locales', file), key: key, defaultValue: defaultFrontendItemsMap[key], value: kv[key] });
             }
         }
 
@@ -244,7 +274,7 @@ function main() {
             if (i < fields.length && fields[i].value !== defaultBackendTranslatableItems[i].value) {
                 translated++;
             } else {
-                untranslatedKeys[tag].push({ source: 'backend', key: defaultBackendTranslatableItems[i].struct + '.' + defaultBackendTranslatableItems[i].name, defaultValue: defaultBackendTranslatableItems[i].value, value: (i < fields.length) ? fields[i].value : null });
+                untranslatedKeys[tag].push({ source: path.join('pkg', 'locales', file), key: defaultBackendTranslatableItems[i].struct + '.' + defaultBackendTranslatableItems[i].name, defaultValue: defaultBackendTranslatableItems[i].value, value: (i < fields.length) ? fields[i].value : null });
             }
         }
 

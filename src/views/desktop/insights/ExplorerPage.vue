@@ -20,11 +20,11 @@
                             </v-tab>
                             <v-tab class="tab-text-truncate" :key="explorer.id" :value="explorer.id"
                                    :disabled="loading || updating"
-                                   v-for="explorer in allExplorers"
+                                   v-for="explorer in allVisibleExplorers"
                                    @click="loadExplorer(explorer.id)">
                                 <span class="text-truncate">{{ explorer.name || tt('Untitled Explorer') }}</span>
                             </v-tab>
-                            <template v-if="loading && (!allExplorers || allExplorers.length < 1)">
+                            <template v-if="loading && (!allVisibleExplorers || allVisibleExplorers.length < 1)">
                                 <v-skeleton-loader class="skeleton-no-margin mx-5 mt-4 mb-3" type="text"
                                                    :key="itemIdx" :loading="true" v-for="itemIdx in [ 1, 2, 3, 4, 5 ]"></v-skeleton-loader>
                             </template>
@@ -306,7 +306,8 @@ const showCustomDateRangeDialog = ref<boolean>(false);
 const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
 
-const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
+const allExplorers = computed<InsightsExplorerBasicInfo[]>(() => explorersStore.allInsightsExplorerBasicInfos);
+const allVisibleExplorers = computed<InsightsExplorerBasicInfo[]>(() => {
     const ret: InsightsExplorerBasicInfo[] = [];
     let hasCurrentExplorer = false;
 

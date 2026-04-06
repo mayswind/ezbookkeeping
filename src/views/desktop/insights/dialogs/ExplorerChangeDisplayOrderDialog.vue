@@ -59,7 +59,8 @@
                                     v-model="allExplorers"
                                     @change="onMove">
                         <template #item="{ element }">
-                            <tr class="explorers-table-row text-sm" v-if="showHidden || !element.hidden">
+                            <tr class="explorers-table-row text-sm" v-if="showHidden || !element.hidden"
+                                @mouseenter="hoveredExplorerId = element.id" @mouseleave="hoveredExplorerId = ''">
                                 <td>
                                     <div class="d-flex align-center">
                                         <div class="d-flex align-center">
@@ -68,22 +69,24 @@
 
                                         <v-spacer/>
 
-                                        <v-btn class="px-2 ms-2" color="default"
-                                               density="compact" variant="text"
-                                               :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                               :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
-                                               :loading="explorerHiding[element.id]"
-                                               :disabled="loading || updating"
-                                               @click="hide(element, !element.hidden)">
-                                            <template #loader>
-                                                <v-progress-circular indeterminate size="20" width="2"/>
-                                            </template>
-                                            {{ element.hidden ? tt('Show') : tt('Hide') }}
-                                        </v-btn>
+                                        <template v-if="hoveredExplorerId === element.id && !loading">
+                                            <v-btn class="px-2 ms-2" color="default"
+                                                   density="compact" variant="text"
+                                                   :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
+                                                   :loading="explorerHiding[element.id]"
+                                                   :disabled="loading || updating"
+                                                   @click="hide(element, !element.hidden)">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20" width="2"/>
+                                                </template>
+                                                {{ element.hidden ? tt('Show') : tt('Hide') }}
+                                            </v-btn>
+                                        </template>
+
                                         <span class="ms-2">
                                             <v-icon :class="!loading && !updating && !noAvailableExplorer ? 'drag-handle' : 'disabled'"
                                                     :icon="mdiDrag"/>
-                                            <v-tooltip activator="parent" v-if="!loading && !updating && !noAvailableExplorer">{{ tt('Drag to Reorder') }}</v-tooltip>
+                                            <v-tooltip activator="parent" v-if="!loading && !updating && !noAvailableExplorer && hoveredExplorerId === element.id">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                     </div>
                                 </td>
@@ -137,6 +140,7 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(true);
 const updating = ref<boolean>(false);
+const hoveredExplorerId = ref<string>('');
 const explorerHiding = ref<Record<string, boolean>>({});
 const displayOrderModified = ref<boolean>(false);
 const showHidden = ref<boolean>(false);
@@ -274,13 +278,3 @@ defineExpose({
     open
 });
 </script>
-
-<style>
-.explorers-table tr.explorers-table-row .hover-display {
-    display: none;
-}
-
-.explorers-table tr.explorers-table-row:hover .hover-display {
-    display: inline-grid;
-}
-</style>

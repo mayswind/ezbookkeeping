@@ -115,7 +115,8 @@
                                                         v-model="categories"
                                                         @change="onMove">
                                             <template #item="{ element }">
-                                                <tr class="transaction-category-table-row text-sm" v-if="showHidden || !element.hidden">
+                                                <tr class="transaction-category-table-row text-sm" v-if="showHidden || !element.hidden"
+                                                    @mouseenter="hoveredCategoryId = element.id" @mouseleave="hoveredCategoryId = ''">
                                                     <td>
                                                         <div class="d-flex align-center">
                                                             <div class="d-flex align-center" :class="{ 'cursor-pointer': isCategorySupportSwitch(element) }"
@@ -131,42 +132,42 @@
 
                                                             <v-spacer/>
 
-                                                            <v-btn class="px-2 ms-2" color="default"
-                                                                   density="comfortable" variant="text"
-                                                                   :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                   :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
-                                                                   :loading="categoryHiding[element.id]"
-                                                                   :disabled="loading || updating"
-                                                                   @click="hide(element, !element.hidden)">
-                                                                <template #loader>
-                                                                    <v-progress-circular indeterminate size="20" width="2"/>
-                                                                </template>
-                                                                {{ element.hidden ? tt('Show') : tt('Hide') }}
-                                                            </v-btn>
-                                                            <v-btn class="px-2" color="default"
-                                                                   density="comfortable" variant="text"
-                                                                   :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                   :prepend-icon="mdiPencilOutline"
-                                                                   :disabled="loading || updating"
-                                                                   @click="edit(element)">
-                                                                {{ tt('Edit') }}
-                                                            </v-btn>
-                                                            <v-btn class="px-2" color="default"
-                                                                   density="comfortable" variant="text"
-                                                                   :class="{ 'd-none': loading, 'hover-display': !loading }"
-                                                                   :prepend-icon="mdiDeleteOutline"
-                                                                   :loading="categoryRemoving[element.id]"
-                                                                   :disabled="loading || updating"
-                                                                   @click="remove(element)">
-                                                                <template #loader>
-                                                                    <v-progress-circular indeterminate size="20" width="2"/>
-                                                                </template>
-                                                                {{ tt('Delete') }}
-                                                            </v-btn>
+                                                            <template v-if="hoveredCategoryId === element.id && !loading">
+                                                                <v-btn class="px-2 ms-2" color="default"
+                                                                       density="comfortable" variant="text"
+                                                                       :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
+                                                                       :loading="categoryHiding[element.id]"
+                                                                       :disabled="loading || updating"
+                                                                       @click="hide(element, !element.hidden)">
+                                                                    <template #loader>
+                                                                        <v-progress-circular indeterminate size="20" width="2"/>
+                                                                    </template>
+                                                                    {{ element.hidden ? tt('Show') : tt('Hide') }}
+                                                                </v-btn>
+                                                                <v-btn class="px-2" color="default"
+                                                                       density="comfortable" variant="text"
+                                                                       :prepend-icon="mdiPencilOutline"
+                                                                       :disabled="loading || updating"
+                                                                       @click="edit(element)">
+                                                                    {{ tt('Edit') }}
+                                                                </v-btn>
+                                                                <v-btn class="px-2" color="default"
+                                                                       density="comfortable" variant="text"
+                                                                       :prepend-icon="mdiDeleteOutline"
+                                                                       :loading="categoryRemoving[element.id]"
+                                                                       :disabled="loading || updating"
+                                                                       @click="remove(element)">
+                                                                    <template #loader>
+                                                                        <v-progress-circular indeterminate size="20" width="2"/>
+                                                                    </template>
+                                                                    {{ tt('Delete') }}
+                                                                </v-btn>
+                                                            </template>
+
                                                             <span class="ms-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
                                                                         :icon="mdiDrag"/>
-                                                                <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
+                                                                <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1 && hoveredCategoryId === element.id">{{ tt('Drag to Reorder') }}</v-tooltip>
                                                             </span>
                                                         </div>
                                                     </td>
@@ -245,6 +246,7 @@ const editDialog = useTemplateRef<EditDialogType>('editDialog');
 const activeCategoryType = ref<CategoryType>(CategoryType.Expense);
 const activeTab = ref<string>('categoryPage');
 const updating = ref<boolean>(false);
+const hoveredCategoryId = ref<string>('');
 const categoryHiding = ref<Record<string, boolean>>({});
 const categoryRemoving = ref<Record<string, boolean>>({});
 const displayOrderModified = ref<boolean>(false);
@@ -496,14 +498,6 @@ reload(false);
 </script>
 
 <style>
-.transaction-category-table tr.transaction-category-table-row .hover-display {
-    display: none;
-}
-
-.transaction-category-table tr.transaction-category-table-row:hover .hover-display {
-    display: grid;
-}
-
 .transaction-category-table .transaction-category-comment {
     font-size: 0.8rem;
     color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important;

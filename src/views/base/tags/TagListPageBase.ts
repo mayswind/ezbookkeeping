@@ -52,7 +52,7 @@ export function useTagListPageBase() {
         }
     }
 
-    function add(): void {
+    function createNewTag(): void {
         newTag.value = TransactionTag.createNewTag('', activeTagGroupId.value);
     }
 
@@ -78,7 +78,7 @@ export function useTagListPageBase() {
         // functions
         isTagModified,
         switchTagGroup,
-        add,
+        createNewTag,
         edit
     };
 }

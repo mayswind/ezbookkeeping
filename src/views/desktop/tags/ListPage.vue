@@ -258,7 +258,7 @@
                                             </template>
                                         </draggable-list>
 
-                                        <tbody v-if="newTag">
+                                        <tbody ref="newTagRow" v-if="newTag">
                                         <tr class="text-sm" :class="{ 'even-row': (availableTagCount & 1) === 1}">
                                             <td>
                                                 <div class="d-flex align-center">
@@ -348,7 +348,7 @@ import RenameDialog from '@/components/desktop/RenameDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -406,12 +406,13 @@ const {
     hasEditingTag,
     isTagModified,
     switchTagGroup,
-    add,
+    createNewTag,
     edit
 } = useTagListPageBase();
 
 const transactionTagsStore = useTransactionTagsStore();
 
+const newTagRow = useTemplateRef<HTMLElement>('newTagRow');
 const tagGroupChangeDisplayOrderDialog = useTemplateRef<TagGroupChangeDisplayOrderDialogType>('tagGroupChangeDisplayOrderDialog');
 const renameDialog = useTemplateRef<RenameDialogType>('renameDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
@@ -458,6 +459,14 @@ function reload(): void {
         if (!error.processed) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function add(): void {
+    createNewTag();
+
+    nextTick(() => {
+        newTagRow.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 }
 

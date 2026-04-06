@@ -118,7 +118,7 @@
                 </f7-swipeout-actions>
             </f7-list-item>
 
-            <f7-list-item class="editing-list-item" v-if="newTag">
+            <f7-list-item ref="newTagItem" class="editing-list-item" v-if="newTag">
                 <template #media>
                     <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
                 </template>
@@ -219,7 +219,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, useTemplateRef, nextTick } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -257,11 +257,13 @@ const {
     hasEditingTag,
     isTagModified,
     switchTagGroup,
-    add,
+    createNewTag,
     edit
 } = useTagListPageBase();
 
 const transactionTagsStore = useTransactionTagsStore();
+
+const newTagItem = useTemplateRef<{ $el: HTMLElement }>('newTagItem');
 
 const loadingError = ref<unknown | null>(null);
 const sortable = ref<boolean>(false);
@@ -332,6 +334,18 @@ function reload(done?: () => void): void {
 
         if (!error.processed) {
             showToast(error.message || error);
+        }
+    });
+}
+
+function add(): void {
+    createNewTag();
+
+    nextTick(() => {
+        const el = newTagItem.value?.$el as HTMLElement | undefined;
+
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     });
 }

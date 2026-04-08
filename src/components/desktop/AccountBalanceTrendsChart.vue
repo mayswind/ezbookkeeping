@@ -16,7 +16,7 @@ import {
 
 import { useUserStore } from '@/stores/user.ts';
 
-import { type NameValue, itemAndIndex } from '@/core/base.ts';
+import { type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
@@ -52,8 +52,19 @@ interface AccountBalanceTrendsChartDataItem {
 const props = defineProps<DesktopAccountBalanceTrendsChartProps>();
 
 const theme = useTheme();
-const { tt, getCurrentLanguageTextDirection, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
-const { allDataItems, allDisplayDateRanges } = useAccountBalanceTrendsChartBase(props);
+const {
+    tt,
+    getCurrentLanguageTextDirection,
+    formatAmountToLocalizedNumeralsWithCurrency,
+    formatPercentToLocalizedNumerals
+} = useI18n();
+const {
+    showYearOverYearOnTooltip,
+    showPeriodOverPeriodOnTooltip,
+    allDataItems,
+    allDataItemsMap,
+    allDisplayDateRanges
+} = useAccountBalanceTrendsChartBase(props);
 
 const userStore = useUserStore();
 
@@ -189,105 +200,74 @@ const chartOptions = computed<object>(() => {
                 color: isDarkMode.value ? '#eee' : '#333'
             },
             formatter: (params: CallbackDataParams[]) => {
+                const dataIndex = params[0]!.dataIndex;
+                const dataItem: AccountBalanceTrendsChartItem = allDataItems.value[dataIndex] as AccountBalanceTrendsChartItem;
+                const yearOverYearDataItem: AccountBalanceTrendsChartItem | undefined = showYearOverYearOnTooltip.value ? allDataItemsMap.value[dataItem.lastYearDateRangeKey] : undefined;
+                const periodOverPeriodDataItem: AccountBalanceTrendsChartItem | undefined = showPeriodOverPeriodOnTooltip.value ? allDataItems.value[dataIndex - 1] : undefined;
+
+                let header: string = params[0]!.name;
+                let displayItems: NameNumeralValue[] = [];
+                let yearOverYearDataItemDisplayItems: NameNumeralValue[] | undefined = undefined;
+                let periodOverPeriodDataItemDisplayItems: NameNumeralValue[] | undefined = undefined;
+                let separatorLineIndex: number | undefined = undefined;
+
                 if (props.type === AccountBalanceTrendChartType.Boxplot.type) {
-                    const dataIndex = params[0]!.dataIndex;
-                    const dataItem = allDataItems.value[dataIndex] as AccountBalanceTrendsChartItem;
-                    const displayItems: NameValue[] = [
-                        {
-                            name: tt('Minimum Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.minimumBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Q1 Balance (First Quartile)'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.q1Balance, props.account.currency)
-                        },
-                        {
-                            name: tt('Median Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.medianBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Q3 Balance (Third Quartile)'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.q3Balance, props.account.currency)
-                        },
-                        {
-                            name: tt('Maximum Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.maximumBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Opening Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.openingBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Closing Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.closingBalance, props.account.currency)
-                        }
-                    ];
-
-                    let tooltip = `${params[0]!.name} ${props.legendName}<br/>`;
-
-                    for (const [displayItem, index] of itemAndIndex(displayItems)) {
-                        if (index === 5) {
-                            tooltip += '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px"></div>';
-                        }
-
-                        tooltip += `<div><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[index]}"></span>`
-                            + `<span>${displayItem.name}</span><span class="ms-5" style="float: inline-end">${displayItem.value}</span>`
-                            + `</div>`;
-                    }
-
-                    return tooltip;
+                    header += ` ${props.legendName}`;
+                    displayItems = getBoxplotChartTooltip(dataItem);
+                    yearOverYearDataItemDisplayItems = yearOverYearDataItem ? getBoxplotChartTooltip(yearOverYearDataItem) : undefined;
+                    periodOverPeriodDataItemDisplayItems = periodOverPeriodDataItem ? getBoxplotChartTooltip(periodOverPeriodDataItem) : undefined;
+                    separatorLineIndex = 5;
                 } else if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
-                    const dataIndex = params[0]!.dataIndex;
-                    const dataItem = allDataItems.value[dataIndex] as AccountBalanceTrendsChartItem;
-                    const displayItems: NameValue[] = [
-                        {
-                            name: tt('Opening Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.openingBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Closing Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.closingBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Minimum Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.minimumBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Maximum Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.maximumBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Median Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.medianBalance, props.account.currency)
-                        },
-                        {
-                            name: tt('Average Balance'),
-                            value: formatAmountToLocalizedNumeralsWithCurrency(dataItem.averageBalance, props.account.currency)
-                        }
-                    ];
+                    header += ` ${props.legendName}`;
+                    displayItems = getCandlestickChartTooltip(dataItem);
+                    yearOverYearDataItemDisplayItems = yearOverYearDataItem ? getCandlestickChartTooltip(yearOverYearDataItem) : undefined;
+                    periodOverPeriodDataItemDisplayItems = periodOverPeriodDataItem ? getCandlestickChartTooltip(periodOverPeriodDataItem) : undefined;
+                    separatorLineIndex = 4;
+                } else {
+                    displayItems = getDefaultChartTooltip(dataItem);
+                    yearOverYearDataItemDisplayItems = yearOverYearDataItem ? getDefaultChartTooltip(yearOverYearDataItem) : undefined;
+                    periodOverPeriodDataItemDisplayItems = periodOverPeriodDataItem ? getDefaultChartTooltip(periodOverPeriodDataItem) : undefined;
+                }
 
-                    let tooltip = `${params[0]!.name} ${props.legendName}<br/>`;
+                const totalColumnCount = 2 + (yearOverYearDataItemDisplayItems && yearOverYearDataItemDisplayItems.length ? 1 : 0) + (periodOverPeriodDataItemDisplayItems && periodOverPeriodDataItemDisplayItems.length ? 1 : 0);
+                let tooltip = `<table class="chart-tooltip-table"><tbody><tr><td colspan="2">${header}</td>`;
 
-                    for (const [displayItem, index] of itemAndIndex(displayItems)) {
-                        if (index === 4) {
-                            tooltip += '<div style="border-bottom: ' + (isDarkMode.value ? '#eee' : '#333') + ' dashed 1px"></div>';
-                        }
+                if (yearOverYearDataItemDisplayItems && yearOverYearDataItemDisplayItems.length) {
+                    tooltip += `<td><span class="ms-5" style="float: inline-end">${tt('Year-over-Year')}</span></td>`;
+                }
 
-                        tooltip += `<div><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[index]}"></span>`
-                            + `<span>${displayItem.name}</span><span class="ms-5" style="float: inline-end">${displayItem.value}</span>`
-                            + `</div>`;
+                if (periodOverPeriodDataItemDisplayItems && periodOverPeriodDataItemDisplayItems.length) {
+                    tooltip += `<td><span class="ms-5" style="float: inline-end">${tt('Period-over-Period')}</span></td>`;
+                }
+
+                tooltip += '</tr>';
+
+                for (const [displayItem, index] of itemAndIndex(displayItems)) {
+                    const displayValue = formatAmountToLocalizedNumeralsWithCurrency(displayItem.value, props.account.currency);
+                    tooltip += `<tr><td><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[index]}"></span>`
+                        + `<span>${displayItem.name}</span></td><td><span class="ms-5" style="float: inline-end">${displayValue}</span></td>`;
+
+                    if (yearOverYearDataItemDisplayItems && yearOverYearDataItemDisplayItems.length && yearOverYearDataItemDisplayItems[index]) {
+                        const yearOverYearDisplayItem = yearOverYearDataItemDisplayItems[index];
+                        const displayGrowthRate = formatDisplayChangeRate(displayItem.value, yearOverYearDisplayItem.value);
+                        tooltip += `<td><span class="ms-5" style="float: inline-end">${displayGrowthRate}</span></td>`;
                     }
 
-                    return tooltip;
-                } else {
-                    const amount = params[0]!.data as number;
-                    const value = formatAmountToLocalizedNumeralsWithCurrency(amount, props.account.currency);
+                    if (periodOverPeriodDataItemDisplayItems && periodOverPeriodDataItemDisplayItems.length && periodOverPeriodDataItemDisplayItems[index]) {
+                        const periodOverPeriodDisplayItem = periodOverPeriodDataItemDisplayItems[index];
+                        const displayGrowthRate = formatDisplayChangeRate(displayItem.value, periodOverPeriodDisplayItem.value);
+                        tooltip += `<td><span class="ms-5" style="float: inline-end">${displayGrowthRate}</span></td>`;
+                    }
 
-                    return `${params[0]!.name}<br/>`
-                        + '<div><span class="chart-pointer" style="background-color: #' + DEFAULT_CHART_COLORS[0] + '"></span>'
-                        + `<span>${props.legendName}</span><span class="ms-5" style="float: inline-end">${value}</span>`
-                        + '</div>';
+                    tooltip += '</tr>';
+
+                    if (separatorLineIndex !== undefined && index === separatorLineIndex - 1) {
+                        tooltip += `<tr><td colspan="${totalColumnCount}" style="border-bottom: ${(isDarkMode.value ? '#eee' : '#333')} dashed 1px"></td></tr>`;
+                    }
                 }
+
+                tooltip += `</tbody></table>`;
+                return tooltip;
             }
         },
         grid: {
@@ -332,6 +312,91 @@ const chartOptions = computed<object>(() => {
         series: allSeries.value
     };
 });
+
+function getBoxplotChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNumeralValue[] {
+    return [
+        {
+            name: tt('Minimum Balance'),
+            value: dataItem.minimumBalance
+        },
+        {
+            name: tt('Q1 Balance (First Quartile)'),
+            value: dataItem.q1Balance
+        },
+        {
+            name: tt('Median Balance'),
+            value: dataItem.medianBalance
+        },
+        {
+            name: tt('Q3 Balance (Third Quartile)'),
+            value: dataItem.q3Balance
+        },
+        {
+            name: tt('Maximum Balance'),
+            value: dataItem.maximumBalance
+        },
+        {
+            name: tt('Opening Balance'),
+            value: dataItem.openingBalance
+        },
+        {
+            name: tt('Closing Balance'),
+            value: dataItem.closingBalance
+        }
+    ];
+}
+
+function getCandlestickChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNumeralValue[] {
+    return [
+        {
+            name: tt('Opening Balance'),
+            value: dataItem.openingBalance
+        },
+        {
+            name: tt('Closing Balance'),
+            value: dataItem.closingBalance
+        },
+        {
+            name: tt('Minimum Balance'),
+            value: dataItem.minimumBalance
+        },
+        {
+            name: tt('Maximum Balance'),
+            value: dataItem.maximumBalance
+        },
+        {
+            name: tt('Median Balance'),
+            value: dataItem.medianBalance
+        },
+        {
+            name: tt('Average Balance'),
+            value: dataItem.averageBalance
+        }
+    ];
+}
+
+function getDefaultChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNumeralValue[] {
+    return [
+        {
+            name: props.legendName,
+            value: dataItem.closingBalance
+        }
+    ];
+}
+
+
+function formatDisplayChangeRate(current: number, reference: number): string {
+    if (reference === 0 && current === 0) {
+        return formatPercentToLocalizedNumerals(0, 2, '<0.01');
+    }
+
+    if (reference === 0) {
+        return '-';
+    }
+
+    const rate = (current - reference) / reference * 100;
+    return formatPercentToLocalizedNumerals(rate, 2, '<0.01');
+}
 </script>
 
 <style scoped>

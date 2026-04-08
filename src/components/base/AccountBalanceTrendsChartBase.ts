@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -28,7 +28,10 @@ import {
     getFiscalYearStartDateTime
 } from '@/lib/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
-import { getAllDateRangesByYearMonthRange } from '@/lib/statistics.ts';
+import {
+    getAllDateRangesByYearMonthRange,
+    getDateRangeKeyWithYearOffset
+} from '@/lib/statistics.ts';
 
 export interface AccountBalanceUnixTimeAndBalanceRange extends UnixTimeRange {
     minUnixTimeOpeningBalance: number;
@@ -37,6 +40,8 @@ export interface AccountBalanceUnixTimeAndBalanceRange extends UnixTimeRange {
 }
 
 export interface AccountBalanceTrendsChartItem {
+    dateRangeKey: string;
+    lastYearDateRangeKey: string;
     displayDate: string;
     openingBalance: number;
     closingBalance: number;
@@ -64,6 +69,9 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         formatDateTimeToGregorianLikeYearQuarter,
         formatDateTimeToGregorianLikeFiscalYear
     } = useI18n();
+
+    const showYearOverYearOnTooltip = ref<boolean>(true);
+    const showPeriodOverPeriodOnTooltip = computed<boolean>(() => props.dateAggregationType === ChartDateAggregationType.Day.type || props.dateAggregationType === ChartDateAggregationType.Month.type || props.dateAggregationType === ChartDateAggregationType.Quarter.type);
 
     const dataDateRange = computed<AccountBalanceUnixTimeAndBalanceRange | null>(() => {
         if (!props.items || props.items.length < 1) {
@@ -187,6 +195,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             }
 
             const dataItems = dayDataItemsMap[displayDate];
+            const dateRangeKey = getDateRangeKeyWithYearOffset(dateRange, props.dateAggregationType) ?? '';
+            const lastYearDateRangeKey = getDateRangeKeyWithYearOffset(dateRange, props.dateAggregationType, -1) ?? '';
 
             if (isArray(dataItems)) {
                 if (dataItems.length < 1) {
@@ -243,6 +253,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             }
 
             ret.push({
+                dateRangeKey: dateRangeKey,
+                lastYearDateRangeKey: lastYearDateRangeKey,
                 displayDate: displayDate,
                 openingBalance: lastOpeningBalance,
                 closingBalance: lastClosingBalance,
@@ -260,6 +272,18 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         return ret;
     });
 
+    const allDataItemsMap = computed<Record<string, AccountBalanceTrendsChartItem>>(() => {
+        const ret: Record<string, AccountBalanceTrendsChartItem> = {};
+
+        for (const item of allDataItems.value) {
+            if (item.dateRangeKey) {
+                ret[item.dateRangeKey] = item;
+            }
+        }
+
+        return ret;
+    });
+
     const allDisplayDateRanges = computed<string[]>(() => {
         if (!allDataItems.value || allDataItems.value.length < 1) {
             return [];
@@ -269,9 +293,13 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
     });
 
     return {
+        // states
+        showYearOverYearOnTooltip,
+        showPeriodOverPeriodOnTooltip,
         // computed states
         allDateRanges,
         allDataItems,
+        allDataItemsMap,
         allDisplayDateRanges
     };
 }

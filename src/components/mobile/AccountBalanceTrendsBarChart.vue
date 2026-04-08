@@ -96,6 +96,8 @@ const allVirtualListItems = computed<MobileAccountBalanceTrendsChartItem[]>(() =
 
         const finalDataItem: MobileAccountBalanceTrendsChartItem = {
             index: index,
+            dateRangeKey: dataItem.dateRangeKey,
+            lastYearDateRangeKey: dataItem.lastYearDateRangeKey,
             displayDate: dataItem.displayDate,
             openingBalance: dataItem.openingBalance,
             closingBalance: dataItem.closingBalance,

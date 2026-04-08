@@ -1,6 +1,19 @@
-import type { TextualYearMonth, Year1BasedMonth, YearUnixTime, YearQuarterUnixTime, YearMonthUnixTime } from '@/core/datetime.ts';
-import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
-import { ChartSortingType, ChartDateAggregationType } from '@/core/statistics.ts';
+import {
+    type TextualYearMonth,
+    type Year1BasedMonth,
+    type YearUnixTime,
+    type YearQuarterUnixTime,
+    type YearMonthUnixTime,
+    YearMonthDayUnixTime
+} from '@/core/datetime.ts';
+import {
+    type FiscalYearUnixTime
+} from '@/core/fiscalyear.ts';
+import {
+    ChartSortingType,
+    ChartDateAggregationType
+} from '@/core/statistics.ts';
+
 import type {
     YearMonthItems,
     SortableTransactionStatisticDataItem
@@ -86,5 +99,21 @@ export function getAllDateRangesByYearMonthRange(startYearMonth: Year1BasedMonth
         return getAllQuartersStartAndEndUnixTimes(startYearMonth, endYearMonth);
     } else { // if (dateAggregationType === ChartDateAggregationType.Month.type) {
         return getAllMonthsStartAndEndUnixTimes(startYearMonth, endYearMonth);
+    }
+}
+
+export function getDateRangeKeyWithYearOffset(dateRange: YearUnixTime | FiscalYearUnixTime | YearQuarterUnixTime | YearMonthUnixTime | YearMonthDayUnixTime, dateAggregationType: number, yearOffset?: number): string | undefined {
+    if (dateAggregationType === ChartDateAggregationType.Year.type) {
+        return (dateRange.year + (yearOffset ?? 0)).toString();
+    } else if (dateAggregationType === ChartDateAggregationType.FiscalYear.type && 'year' in dateRange) {
+        return (dateRange.year + (yearOffset ?? 0)).toString();
+    } else if (dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
+        return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.quarter}`;
+    } else if (dateAggregationType === ChartDateAggregationType.Month.type && 'month0base' in dateRange) {
+        return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.month0base + 1}`;
+    } else if (dateAggregationType === ChartDateAggregationType.Day.type && 'day' in dateRange) {
+        return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.month}-${dateRange.day}`;
+    } else {
+        return undefined;
     }
 }

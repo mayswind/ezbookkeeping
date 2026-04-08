@@ -64,6 +64,9 @@ import {
     getDateTypeByDateRange,
     getFiscalYearFromUnixTime
 } from '@/lib/datetime.ts';
+import {
+    getDateRangeKeyWithYearOffset
+} from '@/lib/statistics.ts';
 
 type AxisChartType = InstanceType<typeof AxisChart>;
 
@@ -297,19 +300,11 @@ function getSeriesId(item: Record<string, unknown>): string {
 }
 
 function getDateRangeKey(dateRange: YearUnixTime | FiscalYearUnixTime | YearQuarterUnixTime | YearMonthUnixTime | YearMonthDayUnixTime, yearOffset?: number): string | undefined {
-    if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
-        return (dateRange.year + (yearOffset ?? 0)).toString();
-    } else if (props.dateAggregationType === ChartDateAggregationType.FiscalYear.type && 'year' in dateRange) {
-        return (dateRange.year + (yearOffset ?? 0)).toString();
-    } else if (props.dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
-        return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.quarter}`;
-    } else if (props.dateAggregationType === ChartDateAggregationType.Month.type && 'month0base' in dateRange) {
-        return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.month0base + 1}`;
-    } else if (props.dateAggregationType === ChartDateAggregationType.Day.type && 'day' in dateRange && props.chartMode === 'daily') {
-        return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.month}-${dateRange.day}`;
-    } else {
+    if (props.dateAggregationType === ChartDateAggregationType.Day.type && props.chartMode !== 'daily') {
         return undefined;
     }
+
+    return getDateRangeKeyWithYearOffset(dateRange, props.dateAggregationType, yearOffset);
 }
 
 function formatDisplayChangeRate(current: number, reference: number): string {

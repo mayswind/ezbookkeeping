@@ -294,7 +294,8 @@
         "Yearly": "依年份",
         "Quarterly": "依季度",
         "Monthly": "依月份",
-        "Daily": "依日期"
+        "Daily": "依日期",
+        "BillingCycle": "依帳單週期"
     },
     "numeral": {
         "Western Arabic Numerals": "阿拉伯數字",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "依季度彙整",
     "Aggregate by Year": "依年份彙整",
     "Aggregate by Fiscal Year": "依財年彙整",
+    "Aggregate by Billing Cycle": "依帳單週期彙整",
     "Year-over-Year": "同比",
     "Period-over-Period": "環比",
     "Filter Accounts": "篩選帳戶",

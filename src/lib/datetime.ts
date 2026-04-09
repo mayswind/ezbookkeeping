@@ -890,6 +890,26 @@ export function getDayLastDateTimeBySpecifiedUnixTime(unixTime: number, utcOffse
     return getDayFirstDateTimeBySpecifiedUnixTime(unixTime, utcOffset).add(1, 'days').subtract(1, 'seconds');
 }
 
+export function getBillingCycleFirstUnixTimeBySpecifiedUnixTime(unixTime: number, statementDate: number, utcOffset?: number): DateTime {
+    let date = moment.unix(unixTime);
+
+    if (isNumber(utcOffset)) {
+        date = date.tz(getFixedTimezoneName(utcOffset));
+    }
+
+    if (date.date() > statementDate) {
+        date = date.set({ date: statementDate + 1, hour: 0, minute: 0, second: 0, millisecond: 0 });
+    } else {
+        date = date.set({ date: statementDate, hour: 0, minute: 0, second: 0, millisecond: 0 }).add(-1, 'months').add(1, 'days');
+    }
+
+    return MomentDateTime.of(date);
+}
+
+export function getBillingCycleLastUnixTimeBySpecifiedUnixTime(unixTime: number, statementDate: number, utcOffset?: number): DateTime {
+    return getBillingCycleFirstUnixTimeBySpecifiedUnixTime(unixTime, statementDate, utcOffset).add(1, 'months').subtract(1, 'seconds');
+}
+
 export function getYearFirstUnixTime(year: number): number {
     return moment().set({ year: year, month: 0, date: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }).unix();
 }
@@ -1101,6 +1121,41 @@ export function getAllMonthsStartAndEndUnixTimes(startYearMonth: Year0BasedMonth
         } else {
             month0base++;
         }
+    }
+
+    return allYearMonthTimes;
+}
+
+export function getAllBillingCyclesStartAndEndUnixTimes(startUnixTime: number, endUnixTime: number, statementDate: number): YearMonthUnixTime[] {
+    const allYearMonthTimes: YearMonthUnixTime[] = [];
+
+    if (!startUnixTime || !endUnixTime) {
+        return allYearMonthTimes;
+    }
+
+    let unixTime: number = startUnixTime;
+
+    while (unixTime <= endUnixTime) {
+        const currentDateTime = parseDateTimeFromUnixTime(unixTime);
+        let currentBillingCycleMinDateTime: DateTime;
+
+        if (currentDateTime.getGregorianCalendarDay() > statementDate) {
+            const currentMonthMinDateTime = getMonthFirstDateTimeBySpecifiedUnixTime(unixTime);
+            currentBillingCycleMinDateTime = currentMonthMinDateTime.add(statementDate, 'days');
+        } else {
+            const currentMonthMinDateTime = getMonthFirstDateTimeBySpecifiedUnixTime(unixTime);
+            const previousMonthMinDateTime = currentMonthMinDateTime.add(-1, 'months');
+            currentBillingCycleMinDateTime = previousMonthMinDateTime.add(statementDate, 'days');
+        }
+
+        const currentBillingCycleMaxDateTime = currentBillingCycleMinDateTime.add(1, 'months').subtract(1, 'seconds');
+        const yearMonth: Year0BasedMonth = {
+            year: currentBillingCycleMaxDateTime.getGregorianCalendarYear(),
+            month0base: currentBillingCycleMaxDateTime.getGregorianCalendarMonth() - 1
+        };
+
+        allYearMonthTimes.push(YearMonthUnixTime.of(yearMonth, currentBillingCycleMinDateTime.getUnixTime(), currentBillingCycleMaxDateTime.getUnixTime()));
+        unixTime = currentBillingCycleMaxDateTime.getUnixTime() + 1;
     }
 
     return allYearMonthTimes;

@@ -294,7 +294,8 @@
         "Yearly": "Ежегодно",
         "Quarterly": "Ежеквартально",
         "Monthly": "Ежемесячно",
-        "Daily": "Ежедневно"
+        "Daily": "Ежедневно",
+        "BillingCycle": "Billing Cycle"
     },
     "numeral": {
         "Western Arabic Numerals": "Западно арабские цифры",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "Агрегировать по кварталам",
     "Aggregate by Year": "Агрегировать по годам",
     "Aggregate by Fiscal Year": "Агрегировать по фискальным годам",
+    "Aggregate by Billing Cycle": "Aggregate by Billing Cycle",
     "Year-over-Year": "Year-over-Year",
     "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "Фильтровать счета",

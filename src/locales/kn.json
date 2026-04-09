@@ -294,7 +294,8 @@
         "Yearly": "ವಾರ್ಷಿಕ",
         "Quarterly": "ತ್ರೈಮಾಸಿಕ",
         "Monthly": "ಮಾಸಿಕ",
-        "Daily": "ದೈನಂದಿನ"
+        "Daily": "ದೈನಂದಿನ",
+        "BillingCycle": "Billing Cycle"
     },
     "numeral": {
         "Western Arabic Numerals": "Western Arabic Numerals",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "ತ್ರೈಮಾಸಿಕ ಒಕ್ಕೂಟ",
     "Aggregate by Year": "ವರ್ಷವಾರು ಒಕ್ಕೂಟ",
     "Aggregate by Fiscal Year": "ಹಣಕಾಸು ವರ್ಷವಾರು ಒಕ್ಕೂಟ",
+    "Aggregate by Billing Cycle": "Aggregate by Billing Cycle",
     "Year-over-Year": "Year-over-Year",
     "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "ಖಾತೆಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ",

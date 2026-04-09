@@ -8,7 +8,8 @@ import {
     type YearUnixTime,
     type YearQuarterUnixTime,
     type YearMonthUnixTime,
-    YearMonthDayUnixTime
+    YearMonthDayUnixTime,
+    DateRange
 } from '@/core/datetime.ts';
 import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
 import { ChartDateAggregationType } from '@/core/statistics.ts';
@@ -24,7 +25,9 @@ import {
     getQuarterFirstTimeTimeBySpecifiedUnixTime,
     getMonthFirstDateTimeBySpecifiedUnixTime,
     getDayFirstDateTimeBySpecifiedUnixTime,
+    getBillingCycleLastUnixTimeBySpecifiedUnixTime,
     getAllDaysStartAndEndUnixTimes,
+    getAllBillingCyclesStartAndEndUnixTimes,
     getFiscalYearStartDateTime
 } from '@/lib/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
@@ -43,6 +46,7 @@ export interface AccountBalanceTrendsChartItem {
     dateRangeKey: string;
     lastYearDateRangeKey: string;
     displayDate: string;
+    alternativeDisplayDate: string;
     openingBalance: number;
     closingBalance: number;
     minimumBalance: number;
@@ -59,6 +63,7 @@ export interface CommonAccountBalanceTrendsChartProps {
     timezoneUsedForDateRange: number;
     fiscalYearStart: number;
     account: AccountInfoResponse;
+    statementDate: number | undefined;
 }
 
 export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTrendsChartProps) {
@@ -67,11 +72,12 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         formatDateTimeToGregorianLikeShortYear,
         formatDateTimeToGregorianLikeShortYearMonth,
         formatDateTimeToGregorianLikeYearQuarter,
-        formatDateTimeToGregorianLikeFiscalYear
+        formatDateTimeToGregorianLikeFiscalYear,
+        formatDateRange
     } = useI18n();
 
     const showYearOverYearOnTooltip = ref<boolean>(true);
-    const showPeriodOverPeriodOnTooltip = computed<boolean>(() => props.dateAggregationType === ChartDateAggregationType.Day.type || props.dateAggregationType === ChartDateAggregationType.Month.type || props.dateAggregationType === ChartDateAggregationType.Quarter.type);
+    const showPeriodOverPeriodOnTooltip = computed<boolean>(() => props.dateAggregationType === ChartDateAggregationType.Day.type || props.dateAggregationType === ChartDateAggregationType.Month.type || props.dateAggregationType === ChartDateAggregationType.Quarter.type || props.dateAggregationType === ChartDateAggregationType.BillingCycle.type);
 
     const dataDateRange = computed<AccountBalanceUnixTimeAndBalanceRange | null>(() => {
         if (!props.items || props.items.length < 1) {
@@ -116,6 +122,8 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
 
         if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
             return getAllDaysStartAndEndUnixTimes(dataDateRange.value.minUnixTime, dataDateRange.value.maxUnixTime);
+        } else if (props.dateAggregationType === ChartDateAggregationType.BillingCycle.type) {
+            return getAllBillingCyclesStartAndEndUnixTimes(dataDateRange.value.minUnixTime, dataDateRange.value.maxUnixTime, props.statementDate ?? 1);
         } else {
             const startYearMonth = getGregorianCalendarYearAndMonthFromUnixTime(dataDateRange.value.minUnixTime);
             const endYearMonth = getGregorianCalendarYearAndMonthFromUnixTime(dataDateRange.value.maxUnixTime);
@@ -156,6 +164,9 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             } else if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
                 minDateTime = getDayFirstDateTimeBySpecifiedUnixTime(dateItem.time, transactionTimeUtfOffset);
                 displayDate = formatDateTimeToShortDate(minDateTime);
+            } else if (props.dateAggregationType === ChartDateAggregationType.BillingCycle.type) {
+                minDateTime = getBillingCycleLastUnixTimeBySpecifiedUnixTime(dateItem.time, props.statementDate ?? 1, transactionTimeUtfOffset);
+                displayDate = formatDateTimeToGregorianLikeShortYearMonth(minDateTime);
             } else {
                 return ret;
             }
@@ -179,6 +190,7 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             const minDateTime = parseDateTimeFromUnixTime(dateRange.minUnixTime);
 
             let displayDate = '';
+            let alternativeDisplayDate = '';
 
             if (props.dateAggregationType === ChartDateAggregationType.Year.type) {
                 displayDate = formatDateTimeToGregorianLikeShortYear(minDateTime);
@@ -190,6 +202,10 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                 displayDate = formatDateTimeToGregorianLikeShortYearMonth(minDateTime);
             } else if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
                 displayDate = formatDateTimeToShortDate(minDateTime);
+            } else if (props.dateAggregationType === ChartDateAggregationType.BillingCycle.type) {
+                const maxDateTime = parseDateTimeFromUnixTime(dateRange.maxUnixTime);
+                displayDate = formatDateTimeToGregorianLikeShortYearMonth(maxDateTime);
+                alternativeDisplayDate = formatDateRange(DateRange.Custom.type, dateRange.minUnixTime, dateRange.maxUnixTime);
             } else {
                 return ret;
             }
@@ -256,6 +272,7 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                 dateRangeKey: dateRangeKey,
                 lastYearDateRangeKey: lastYearDateRangeKey,
                 displayDate: displayDate,
+                alternativeDisplayDate: alternativeDisplayDate,
                 openingBalance: lastOpeningBalance,
                 closingBalance: lastClosingBalance,
                 minimumBalance: lastMinimumBalance,

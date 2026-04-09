@@ -294,7 +294,8 @@
         "Yearly": "ஆண்டுவாரியாக",
         "Quarterly": "காலாண்டு வாரியாக",
         "Monthly": "மாதாந்திர",
-        "Daily": "தினசரி"
+        "Daily": "தினசரி",
+        "BillingCycle": "Billing Cycle"
     },
     "numeral": {
         "Western Arabic Numerals": "மேற்கத்திய அரபு எண்கள்",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "காலாண்டு கூட்டமைப்பு",
     "Aggregate by Year": "ஆண்டுவாரி கூட்டமைப்பு",
     "Aggregate by Fiscal Year": "நிதி ஆண்டுவாரி கூட்டமைப்பு",
+    "Aggregate by Billing Cycle": "Aggregate by Billing Cycle",
     "Year-over-Year": "Year-over-Year",
     "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "கணக்குகளை வடிகட்டி செய்",

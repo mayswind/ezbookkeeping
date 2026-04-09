@@ -294,7 +294,8 @@
         "Yearly": "按年",
         "Quarterly": "按季度",
         "Monthly": "按月",
-        "Daily": "按天"
+        "Daily": "按天",
+        "BillingCycle": "按账单周期"
     },
     "numeral": {
         "Western Arabic Numerals": "阿拉伯数字",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "按季度聚合",
     "Aggregate by Year": "按年聚合",
     "Aggregate by Fiscal Year": "按财年聚合",
+    "Aggregate by Billing Cycle": "按账单周期聚合",
     "Year-over-Year": "同比",
     "Period-over-Period": "环比",
     "Filter Accounts": "过滤账户",

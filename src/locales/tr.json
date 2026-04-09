@@ -294,7 +294,8 @@
         "Yearly": "Yıllık",
         "Quarterly": "Çeyreklik",
         "Monthly": "Aylık",
-        "Daily": "Günlük"
+        "Daily": "Günlük",
+        "BillingCycle": "Billing Cycle"
     },
     "numeral": {
         "Western Arabic Numerals": "Batı Arap Rakamları",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "Çeyreğe Göre Topla",
     "Aggregate by Year": "Yıla Göre Topla",
     "Aggregate by Fiscal Year": "Mali Yıla Göre Topla",
+    "Aggregate by Billing Cycle": "Aggregate by Billing Cycle",
     "Year-over-Year": "Year-over-Year",
     "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "Hesapları Filtrele",

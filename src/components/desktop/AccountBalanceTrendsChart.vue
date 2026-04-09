@@ -211,6 +211,10 @@ const chartOptions = computed<object>(() => {
                 let periodOverPeriodDataItemDisplayItems: NameNumeralValue[] | undefined = undefined;
                 let separatorLineIndex: number | undefined = undefined;
 
+                if (dataItem.alternativeDisplayDate) {
+                    header = dataItem.alternativeDisplayDate;
+                }
+
                 if (props.type === AccountBalanceTrendChartType.Boxplot.type) {
                     header += ` ${props.legendName}`;
                     displayItems = getBoxplotChartTooltip(dataItem);

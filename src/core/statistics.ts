@@ -236,6 +236,8 @@ export class ChartDateAggregationType {
     public static readonly Year = new ChartDateAggregationType(2, 'Yearly', 'Aggregate by Year', StatisticsAnalysisType.TrendAnalysis, StatisticsAnalysisType.AssetTrends);
     public static readonly FiscalYear = new ChartDateAggregationType(3, 'FiscalYearly', 'Aggregate by Fiscal Year', StatisticsAnalysisType.TrendAnalysis, StatisticsAnalysisType.AssetTrends);
 
+    public static readonly BillingCycle = new ChartDateAggregationType(11, 'BillingCycle', 'Aggregate by Billing Cycle');
+
     public static readonly Default = ChartDateAggregationType.Month;
 
     public readonly type: number;

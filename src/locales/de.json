@@ -294,7 +294,8 @@
         "Yearly": "Jährlich",
         "Quarterly": "Vierteljährlich",
         "Monthly": "Monatlich",
-        "Daily": "Täglich"
+        "Daily": "Täglich",
+        "BillingCycle": "Billing Cycle"
     },
     "numeral": {
         "Western Arabic Numerals": "Westlich-arabische Ziffern",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "Nach Quartal aggregieren",
     "Aggregate by Year": "Nach Jahr aggregieren",
     "Aggregate by Fiscal Year": "Nach Geschäftsjahr aggregieren",
+    "Aggregate by Billing Cycle": "Aggregate by Billing Cycle",
     "Year-over-Year": "Jahresvergleich",
     "Period-over-Period": "Periodenvergleich",
     "Filter Accounts": "Konten filtern",

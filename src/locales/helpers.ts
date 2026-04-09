@@ -634,7 +634,7 @@ export function useI18n() {
         return ret;
     }
 
-    function getLocalizedChartDateAggregationTypeAndDisplayName(analysisType: StatisticsAnalysisType, fullName: boolean): TypeAndDisplayName[] {
+    function getLocalizedChartDateAggregationTypeAndDisplayName(analysisType: StatisticsAnalysisType, fullName: boolean, includeBillingCycle: boolean): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
         const allTypes: ChartDateAggregationType[] = ChartDateAggregationType.values(analysisType);
 
@@ -642,6 +642,13 @@ export function useI18n() {
             ret.push({
                 type: type.type,
                 displayName: t(fullName ? type.fullName : `granularity.${type.shortName}`)
+            });
+        }
+
+        if (includeBillingCycle) {
+            ret.push({
+                type: ChartDateAggregationType.BillingCycle.type,
+                displayName: t(fullName ? ChartDateAggregationType.BillingCycle.fullName : `granularity.${ChartDateAggregationType.BillingCycle.shortName}`)
             });
         }
 
@@ -2432,8 +2439,8 @@ export function useI18n() {
         getAllAccountBalanceTrendChartTypes: () => getLocalizedDisplayNameAndType(AccountBalanceTrendChartType.values()),
         getAllStatisticsChartDataTypes: (analysisType: StatisticsAnalysisType, withDesktopOnlyChart?: boolean) => getLocalizedDisplayNameAndType(ChartDataType.values(analysisType, withDesktopOnlyChart)),
         getAllStatisticsSortingTypes: (useAlternativeName?: boolean) => getLocalizedDisplayNameAndType(ChartSortingType.values(), useAlternativeName),
-        getAllStatisticsDateAggregationTypes: (analysisType: StatisticsAnalysisType) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, true),
-        getAllStatisticsDateAggregationTypesWithShortName: (analysisType: StatisticsAnalysisType) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, false),
+        getAllStatisticsDateAggregationTypes: (analysisType: StatisticsAnalysisType, includeBillingCycle: boolean) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, true, includeBillingCycle),
+        getAllStatisticsDateAggregationTypesWithShortName: (analysisType: StatisticsAnalysisType, includeBillingCycle: boolean) => getLocalizedChartDateAggregationTypeAndDisplayName(analysisType, false, includeBillingCycle),
         getAllTransactionEditScopeTypes: () => getLocalizedDisplayNameAndType(TransactionEditScopeType.values()),
         getAllTransactionQuickSaveButtonStyles: () => getLocalizedDisplayNameAndType(TransactionQuickSaveButtonStyle.values()),
         getAllTransactionQuickAddButtonActionTypes: () => getLocalizedDisplayNameAndType(TransactionQuickAddButtonActionType.values()),

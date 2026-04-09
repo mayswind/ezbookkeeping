@@ -294,7 +294,8 @@
         "Yearly": "연간",
         "Quarterly": "분기별",
         "Monthly": "월간",
-        "Daily": "일간"
+        "Daily": "일간",
+        "BillingCycle": "Billing Cycle"
     },
     "numeral": {
         "Western Arabic Numerals": "서양 아라비아 숫자",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "분기별 집계",
     "Aggregate by Year": "연도별 집계",
     "Aggregate by Fiscal Year": "회계 연도별 집계",
+    "Aggregate by Billing Cycle": "Aggregate by Billing Cycle",
     "Year-over-Year": "Year-over-Year",
     "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "계좌 필터",

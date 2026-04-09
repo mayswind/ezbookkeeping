@@ -109,7 +109,7 @@ export function getDateRangeKeyWithYearOffset(dateRange: YearUnixTime | FiscalYe
         return (dateRange.year + (yearOffset ?? 0)).toString();
     } else if (dateAggregationType === ChartDateAggregationType.Quarter.type && 'quarter' in dateRange) {
         return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.quarter}`;
-    } else if (dateAggregationType === ChartDateAggregationType.Month.type && 'month0base' in dateRange) {
+    } else if ((dateAggregationType === ChartDateAggregationType.Month.type || dateAggregationType === ChartDateAggregationType.BillingCycle.type) && 'month0base' in dateRange) {
         return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.month0base + 1}`;
     } else if (dateAggregationType === ChartDateAggregationType.Day.type && 'day' in dateRange) {
         return `${dateRange.year + (yearOffset ?? 0)}-${dateRange.month}-${dateRange.day}`;

@@ -294,7 +294,8 @@
         "Yearly": "Yearly",
         "Quarterly": "Quarterly",
         "Monthly": "Monthly",
-        "Daily": "Daily"
+        "Daily": "Daily",
+        "BillingCycle": "Billing Cycle"
     },
     "numeral": {
         "Western Arabic Numerals": "Western Arabic Numerals",
@@ -2210,6 +2211,7 @@
     "Aggregate by Quarter": "四半期ごとに集計",
     "Aggregate by Year": "年ごとに集計",
     "Aggregate by Fiscal Year": "Aggregate by Fiscal Year",
+    "Aggregate by Billing Cycle": "Aggregate by Billing Cycle",
     "Year-over-Year": "Year-over-Year",
     "Period-over-Period": "Period-over-Period",
     "Filter Accounts": "口座で絞り込み",

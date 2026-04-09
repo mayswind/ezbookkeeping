@@ -246,6 +246,7 @@
                         :items="[]"
                         :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
                         :account="currentAccount"
+                        :statement-date="currentAccountStatementDate"
                         :skeleton="true"
                         v-if="showAccountBalanceTrendsCharts && loading"
                     />
@@ -258,6 +259,7 @@
                         :items="reconciliationStatements?.transactions"
                         :legend-name="isCurrentLiabilityAccount ? tt('Account Outstanding Balance') : tt('Account Balance')"
                         :account="currentAccount"
+                        :statement-date="currentAccountStatementDate"
                         v-if="showAccountBalanceTrendsCharts && !loading"
                     />
                 </div>
@@ -320,6 +322,7 @@ import {
     mdiChartWaterfall,
     mdiCalendarTodayOutline,
     mdiCalendarMonthOutline,
+    mdiCalendarTextOutline,
     mdiHomeClockOutline,
     mdiInvoiceTextClockOutline,
     mdiLayersTripleOutline,
@@ -353,6 +356,7 @@ const {
     allTimezoneTypesUsedForDateRange,
     currentAccount,
     currentAccountCurrency,
+    currentAccountStatementDate,
     isCurrentLiabilityAccount,
     exportFileName,
     displayStartDateTime,
@@ -391,6 +395,7 @@ const chartDataDateAggregationTypeIconMap = {
     [ChartDateAggregationType.Quarter.type]: mdiLayersTripleOutline,
     [ChartDateAggregationType.Year.type]: mdiLayersTripleOutline,
     [ChartDateAggregationType.FiscalYear.type]: mdiLayersTripleOutline,
+    [ChartDateAggregationType.BillingCycle.type]: mdiCalendarTextOutline,
 };
 
 const timezoneTypeIconMap = {

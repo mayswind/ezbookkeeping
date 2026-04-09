@@ -277,6 +277,7 @@
                     :fiscal-year-start="fiscalYearStart"
                     :items="reconciliationStatements?.transactions"
                     :account="currentAccount"
+                    :statement-date="currentAccountStatementDate"
                 />
             </f7-card-content>
         </f7-card>
@@ -424,6 +425,7 @@ const {
     isCurrentLiabilityAccount,
     currentAccount,
     currentAccountCurrency,
+    currentAccountStatementDate,
     displayStartDateTime,
     displayEndDateTime,
     displayTotalInflows,

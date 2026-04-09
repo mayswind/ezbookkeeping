@@ -63,11 +63,12 @@ export function useReconciliationStatementPageBase() {
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
     const allChartTypes = computed<TypeAndDisplayName[]>(() => getAllAccountBalanceTrendChartTypes());
-    const allDateAggregationTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsDateAggregationTypesWithShortName(StatisticsAnalysisType.AssetTrends));
+    const allDateAggregationTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsDateAggregationTypesWithShortName(StatisticsAnalysisType.AssetTrends, !!currentAccountStatementDate.value));
     const allTimezoneTypesUsedForDateRange = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
 
     const currentAccount = computed(() => allAccountsMap.value[accountId.value]);
     const currentAccountCurrency = computed<string>(() => currentAccount.value?.currency ?? defaultCurrency.value);
+    const currentAccountStatementDate = computed<number | undefined>(() => accountsStore.getAccountStatementDate(accountId.value) || undefined);
     const isCurrentLiabilityAccount = computed<boolean>(() => currentAccount.value?.isLiability ?? false);
 
     const exportFileName = computed<string>(() => {
@@ -309,6 +310,7 @@ export function useReconciliationStatementPageBase() {
         allTimezoneTypesUsedForDateRange,
         currentAccount,
         currentAccountCurrency,
+        currentAccountStatementDate,
         isCurrentLiabilityAccount,
         exportFileName,
         displayStartDateTime,

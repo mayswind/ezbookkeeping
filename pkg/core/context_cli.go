@@ -12,6 +12,11 @@ type CliContext struct {
 	command *cli.Command
 }
 
+// ClientIP returns the client IP address, for CLI context, it always returns the loopback address
+func (c *CliContext) ClientIP() string {
+	return "127.0.0.1"
+}
+
 // GetContextId returns the current context id
 func (c *CliContext) GetContextId() string {
 	return ""

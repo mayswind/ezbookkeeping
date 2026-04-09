@@ -14,6 +14,11 @@ type CronContext struct {
 	cronJobInterval time.Duration
 }
 
+// ClientIP returns the client IP address, for cron job context, it always returns the loopback address
+func (c *CronContext) ClientIP() string {
+	return "127.0.0.1"
+}
+
 // GetContextId returns the current context id
 func (c *CronContext) GetContextId() string {
 	return c.contextId

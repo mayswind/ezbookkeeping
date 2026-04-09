@@ -9,6 +9,11 @@ type NullContext struct {
 	context.Context
 }
 
+// ClientIP returns the client IP address, for null context, it always returns the loopback address
+func (c *NullContext) ClientIP() string {
+	return "127.0.0.1"
+}
+
 // GetContextId returns the current context id
 func (c *NullContext) GetContextId() string {
 	return nullContextId

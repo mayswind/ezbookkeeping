@@ -383,7 +383,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				Comment:              description,
 				GeoLongitude:         geoLongitude,
 				GeoLatitude:          geoLatitude,
-				CreatedIp:            "127.0.0.1",
+				CreatedIp:            ctx.ClientIP(),
 			},
 			TagIds:                             tagIds,
 			OriginalCategoryName:               subCategoryName,

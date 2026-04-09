@@ -778,7 +778,7 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			Amount:            template.Amount,
 			HideAmount:        template.HideAmount,
 			Comment:           template.Comment,
-			CreatedIp:         "127.0.0.1",
+			CreatedIp:         c.ClientIP(),
 			ScheduledCreated:  true,
 		}
 

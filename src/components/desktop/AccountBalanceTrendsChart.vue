@@ -20,7 +20,7 @@ import { type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { AccountBalanceTrendChartType } from '@/core/statistics.ts';
+import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 import { isArray } from '@/lib/common.ts';
@@ -241,7 +241,17 @@ const chartOptions = computed<object>(() => {
                 }
 
                 if (periodOverPeriodDataItemDisplayItems && periodOverPeriodDataItemDisplayItems.length) {
-                    tooltip += `<td><span class="ms-5" style="float: inline-end">${tt('Period-over-Period')}</span></td>`;
+                    let periodOverPeriodText = tt('Period-over-Period');
+
+                    if (props.dateAggregationType === ChartDateAggregationType.Quarter.type) {
+                        periodOverPeriodText = tt('Quarter-over-Quarter');
+                    } else if (props.dateAggregationType === ChartDateAggregationType.Month.type) {
+                        periodOverPeriodText = tt('Month-over-Month');
+                    } else if (props.dateAggregationType === ChartDateAggregationType.Day.type) {
+                        periodOverPeriodText = tt('Day-over-Day');
+                    }
+
+                    tooltip += `<td><span class="ms-5" style="float: inline-end">${periodOverPeriodText}</span></td>`;
                 }
 
                 tooltip += '</tr>';

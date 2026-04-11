@@ -1571,6 +1571,8 @@
     "Does not start with": "開頭不是",
     "Ends with": "結尾是",
     "Does not end with": "結尾不是",
+    "Matches regex": "正則匹配",
+    "Does not match regex": "不匹配正則",
     "Latitude is between": "緯度介於",
     "Latitude is not between": "緯度不介於",
     "Longitude is between": "經度介於",

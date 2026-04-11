@@ -1571,6 +1571,8 @@
     "Does not start with": "தொடங்கவில்லை",
     "Ends with": "முடிகிறது",
     "Does not end with": "முடியவில்லை",
+    "Matches regex": "Matches regex",
+    "Does not match regex": "Does not match regex",
     "Latitude is between": "Latitude is between",
     "Latitude is not between": "Latitude is not between",
     "Longitude is between": "Longitude is between",

@@ -93,6 +93,8 @@ export enum TransactionExplorerConditionOperatorType {
     NotStartsWith = 'notStartsWith',
     EndsWith = 'endsWith',
     NotEndsWith = 'notEndsWith',
+    RegexMatch = 'regexMatch',
+    NotRegexMatch = 'notRegexMatch',
     LatitudeBetween = 'latitudeBetween',
     LatitudeNotBetween = 'latitudeNotBetween',
     LongitudeBetween = 'longitudeBetween',
@@ -123,6 +125,8 @@ export class TransactionExplorerConditionOperator implements NameValue {
     public static readonly NotStartsWith = new TransactionExplorerConditionOperator('Does not start with', TransactionExplorerConditionOperatorType.NotStartsWith);
     public static readonly EndsWith = new TransactionExplorerConditionOperator('Ends with', TransactionExplorerConditionOperatorType.EndsWith);
     public static readonly NotEndsWith = new TransactionExplorerConditionOperator('Does not end with', TransactionExplorerConditionOperatorType.NotEndsWith);
+    public static readonly RegexMatch = new TransactionExplorerConditionOperator('Matches regex', TransactionExplorerConditionOperatorType.RegexMatch);
+    public static readonly NotRegexMatch = new TransactionExplorerConditionOperator('Does not match regex', TransactionExplorerConditionOperatorType.NotRegexMatch);
     public static readonly LatitudeBetween = new TransactionExplorerConditionOperator('Latitude is between', TransactionExplorerConditionOperatorType.LatitudeBetween);
     public static readonly LatitudeNotBetween = new TransactionExplorerConditionOperator('Latitude is not between', TransactionExplorerConditionOperatorType.LatitudeNotBetween);
     public static readonly LongitudeBetween = new TransactionExplorerConditionOperator('Longitude is between', TransactionExplorerConditionOperatorType.LongitudeBetween);

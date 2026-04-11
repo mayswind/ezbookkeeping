@@ -1571,6 +1571,8 @@
     "Does not start with": "Se ne začne z",
     "Ends with": "Se konča z",
     "Does not end with": "Se ne konča z",
+    "Matches regex": "Matches regex",
+    "Does not match regex": "Does not match regex",
     "Latitude is between": "Latitude is between",
     "Latitude is not between": "Latitude is not between",
     "Longitude is between": "Longitude is between",

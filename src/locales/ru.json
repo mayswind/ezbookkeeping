@@ -1571,6 +1571,8 @@
     "Does not start with": "Не начинается с",
     "Ends with": "Заканчивается с",
     "Does not end with": "Не заканчивается с",
+    "Matches regex": "Matches regex",
+    "Does not match regex": "Does not match regex",
     "Latitude is between": "Latitude is between",
     "Latitude is not between": "Latitude is not between",
     "Longitude is between": "Longitude is between",

@@ -1499,7 +1499,9 @@ type DescriptionConditionOperator = TransactionExplorerConditionOperatorType.IsE
     TransactionExplorerConditionOperatorType.StartsWith |
     TransactionExplorerConditionOperatorType.NotStartsWith |
     TransactionExplorerConditionOperatorType.EndsWith |
-    TransactionExplorerConditionOperatorType.NotEndsWith;
+    TransactionExplorerConditionOperatorType.NotEndsWith |
+    TransactionExplorerConditionOperatorType.RegexMatch |
+    TransactionExplorerConditionOperatorType.NotRegexMatch;
 
 export class TransactionExplorerDescriptionCondition implements TransactionExplorerCondition<TransactionExplorerConditionFieldType.Description, string> {
     public static readonly supportedOperators: PartialRecord<TransactionExplorerConditionOperatorType, true> = {
@@ -1512,8 +1514,13 @@ export class TransactionExplorerDescriptionCondition implements TransactionExplo
         [TransactionExplorerConditionOperatorType.StartsWith]: true,
         [TransactionExplorerConditionOperatorType.NotStartsWith]: true,
         [TransactionExplorerConditionOperatorType.EndsWith]: true,
-        [TransactionExplorerConditionOperatorType.NotEndsWith]: true
+        [TransactionExplorerConditionOperatorType.NotEndsWith]: true,
+        [TransactionExplorerConditionOperatorType.RegexMatch]: true,
+        [TransactionExplorerConditionOperatorType.NotRegexMatch]: true
     };
+    private static cachedRegex: RegExp | undefined = undefined;
+    private static cachedRegexPattern: string | undefined = undefined;
+
     public readonly field = TransactionExplorerConditionFieldType.Description;
     public readonly operator: DescriptionConditionOperator = TransactionExplorerConditionOperatorType.Contains;
     public value: string;
@@ -1554,34 +1561,62 @@ export class TransactionExplorerDescriptionCondition implements TransactionExplo
             return description.endsWith(this.value);
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotEndsWith) {
             return !description.endsWith(this.value);
+        } else if (this.operator === TransactionExplorerConditionOperatorType.RegexMatch) {
+            return this.getCachedRegex()?.test(description) ?? false;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotRegexMatch) {
+            return !(this.getCachedRegex()?.test(description) ?? false);
         }
 
         return false;
     }
 
     public toExpression(): string {
+        const escapedValue = this.value.replace(/'/g, "''");
+
         if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty) {
             return `description IS EMPTY`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
             return `description IS NOT EMPTY`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.Equals) {
-            return `description = '${this.value.replace(/'/g, "''")}'`;
+            return `description = '${escapedValue}'`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotEquals) {
-            return `description <> '${this.value.replace(/'/g, "''")}'`;
+            return `description <> '${escapedValue}'`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.Contains) {
-            return `description CONTAINS '${this.value.replace(/'/g, "''")}'`;
+            return `description CONTAINS '${escapedValue}'`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotContains) {
-            return `description NOT CONTAINS '${this.value.replace(/'/g, "''")}'`;
+            return `description NOT CONTAINS '${escapedValue}'`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.StartsWith) {
-            return `description STARTS WITH '${this.value.replace(/'/g, "''")}'`;
+            return `description STARTS WITH '${escapedValue}'`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotStartsWith) {
-            return `description NOT STARTS WITH '${this.value.replace(/'/g, "''")}'`;
+            return `description NOT STARTS WITH '${escapedValue}'`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.EndsWith) {
-            return `description ENDS WITH '${this.value.replace(/'/g, "''")}'`;
+            return `description ENDS WITH '${escapedValue}'`;
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotEndsWith) {
-            return `description NOT ENDS WITH '${this.value.replace(/'/g, "''")}'`;
+            return `description NOT ENDS WITH '${escapedValue}'`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.RegexMatch) {
+            return `description REGEXP LIKE '${escapedValue}'`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotRegexMatch) {
+            return `description NOT REGEXP LIKE '${escapedValue}'`;
         }
 
         return '';
+    }
+
+    private getCachedRegex(): RegExp | undefined {
+        if (this.operator !== TransactionExplorerConditionOperatorType.RegexMatch && this.operator !== TransactionExplorerConditionOperatorType.NotRegexMatch) {
+            return undefined;
+        }
+
+        if (TransactionExplorerDescriptionCondition.cachedRegexPattern !== this.value) {
+            try {
+                TransactionExplorerDescriptionCondition.cachedRegex = new RegExp(this.value);
+                TransactionExplorerDescriptionCondition.cachedRegexPattern = this.value;
+            } catch {
+                TransactionExplorerDescriptionCondition.cachedRegex = undefined;
+                TransactionExplorerDescriptionCondition.cachedRegexPattern = undefined;
+            }
+        }
+
+        return TransactionExplorerDescriptionCondition.cachedRegex;
     }
 }

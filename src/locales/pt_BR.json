@@ -1571,6 +1571,8 @@
     "Does not start with": "Não começa com",
     "Ends with": "Termina com",
     "Does not end with": "Não termina com",
+    "Matches regex": "Matches regex",
+    "Does not match regex": "Does not match regex",
     "Latitude is between": "Latitude entre",
     "Latitude is not between": "Latitude não entre",
     "Longitude is between": "Longitude entre",

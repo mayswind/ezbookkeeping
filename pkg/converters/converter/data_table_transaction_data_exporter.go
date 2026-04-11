@@ -20,10 +20,20 @@ type DataTableTransactionDataExporter struct {
 
 // BuildExportedContent writes the exported transaction data to the data table builder
 func (c *DataTableTransactionDataExporter) BuildExportedContent(ctx core.Context, dataTableBuilder datatable.TransactionDataTableBuilder, uid int64, transactions []*models.Transaction, accountMap map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTagIndexes map[int64][]int64) error {
+	existsTransferOutTransactions := make(map[int64]bool)
+
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
 
-		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			existsTransferOutTransactions[transaction.TransactionId] = true
+		}
+	}
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN && existsTransferOutTransactions[transaction.RelatedId] {
 			continue
 		}
 
@@ -36,14 +46,25 @@ func (c *DataTableTransactionDataExporter) BuildExportedContent(ctx core.Context
 		dataRowMap[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = dataTableBuilder.ReplaceDelimiters(c.getDisplayTransactionTypeName(transaction.Type))
 		dataRowMap[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = c.getExportedTransactionCategoryName(dataTableBuilder, transaction.CategoryId, categoryMap)
 		dataRowMap[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = c.getExportedTransactionSubCategoryName(dataTableBuilder, transaction.CategoryId, categoryMap)
-		dataRowMap[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = c.getExportedAccountName(dataTableBuilder, transaction.AccountId, accountMap)
-		dataRowMap[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = c.getAccountCurrency(dataTableBuilder, transaction.AccountId, accountMap)
-		dataRowMap[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(transaction.Amount)
+
+		if transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = c.getExportedAccountName(dataTableBuilder, transaction.AccountId, accountMap)
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = c.getAccountCurrency(dataTableBuilder, transaction.AccountId, accountMap)
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(transaction.Amount)
+		} else { // if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = c.getExportedAccountName(dataTableBuilder, transaction.RelatedAccountId, accountMap)
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = c.getAccountCurrency(dataTableBuilder, transaction.RelatedAccountId, accountMap)
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(transaction.RelatedAccountAmount)
+		}
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 			dataRowMap[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = c.getExportedAccountName(dataTableBuilder, transaction.RelatedAccountId, accountMap)
 			dataRowMap[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = c.getAccountCurrency(dataTableBuilder, transaction.RelatedAccountId, accountMap)
 			dataRowMap[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = utils.FormatAmount(transaction.RelatedAccountAmount)
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = c.getExportedAccountName(dataTableBuilder, transaction.AccountId, accountMap)
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_CURRENCY] = c.getAccountCurrency(dataTableBuilder, transaction.AccountId, accountMap)
+			dataRowMap[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = utils.FormatAmount(transaction.Amount)
 		}
 
 		dataRowMap[datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION] = c.getExportedGeographicLocation(transaction)

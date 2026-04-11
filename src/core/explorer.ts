@@ -74,6 +74,7 @@ export class TransactionExplorerConditionField implements NameValue {
 
 export enum TransactionExplorerConditionOperatorType {
     In = 'in',
+    NotIn = 'notIn',
     GreaterThan = 'greaterThan',
     LessThan = 'lessThan',
     Equals = 'equals',
@@ -103,6 +104,7 @@ export class TransactionExplorerConditionOperator implements NameValue {
     private static readonly allInstancesByValue: Record<string, TransactionExplorerConditionOperator> = {};
 
     public static readonly In = new TransactionExplorerConditionOperator('In', TransactionExplorerConditionOperatorType.In);
+    public static readonly NotIn = new TransactionExplorerConditionOperator('Not in', TransactionExplorerConditionOperatorType.NotIn);
     public static readonly GreaterThan = new TransactionExplorerConditionOperator('Greater than', TransactionExplorerConditionOperatorType.GreaterThan);
     public static readonly LessThan = new TransactionExplorerConditionOperator('Less than', TransactionExplorerConditionOperatorType.LessThan);
     public static readonly Equals = new TransactionExplorerConditionOperator('Equal to', TransactionExplorerConditionOperatorType.Equals);

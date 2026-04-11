@@ -1558,6 +1558,7 @@
     "Between": "介于",
     "Not between": "不介于",
     "In": "在范围内",
+    "Not in": "不在范围内",
     "Has any": "包含任意",
     "Has all": "包含全部",
     "Not has any": "不包含任意",

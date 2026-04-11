@@ -301,16 +301,16 @@ export class TransactionExplorerQuery {
 
         switch (field) {
             case TransactionExplorerConditionField.TransactionType:
-                condition = new TransactionExplorerTransactionTypeCondition([ TransactionType.Expense, TransactionType.Income, TransactionType.Transfer ]);
+                condition = new TransactionExplorerTransactionTypeCondition(TransactionExplorerConditionOperatorType.In, [ TransactionType.Expense, TransactionType.Income, TransactionType.Transfer ]);
                 break;
             case TransactionExplorerConditionField.TransactionCategory:
-                condition = new TransactionExplorerTransactionCategoryCondition([]);
+                condition = new TransactionExplorerTransactionCategoryCondition(TransactionExplorerConditionOperatorType.In, []);
                 break;
             case TransactionExplorerConditionField.SourceAccount:
-                condition = new TransactionExplorerSourceAccountCondition([]);
+                condition = new TransactionExplorerSourceAccountCondition(TransactionExplorerConditionOperatorType.In, []);
                 break;
             case TransactionExplorerConditionField.DestinationAccount:
-                condition = new TransactionExplorerDestinationAccountCondition([]);
+                condition = new TransactionExplorerDestinationAccountCondition(TransactionExplorerConditionOperatorType.In, []);
                 break;
             case TransactionExplorerConditionField.SourceAmount:
                 condition = new TransactionExplorerSourceAmountCondition(TransactionExplorerConditionOperatorType.Between, [0, 0]);
@@ -331,7 +331,7 @@ export class TransactionExplorerQuery {
                 condition = new TransactionExplorerDescriptionCondition(TransactionExplorerConditionOperatorType.Contains, '');
                 break;
             default:
-                condition = new TransactionExplorerTransactionTypeCondition([ TransactionType.Expense, TransactionType.Income, TransactionType.Transfer ]);
+                condition = new TransactionExplorerTransactionTypeCondition(TransactionExplorerConditionOperatorType.In, [ TransactionType.Expense, TransactionType.Income, TransactionType.Transfer ]);
                 break;
         }
 
@@ -737,23 +737,23 @@ export class TransactionExplorerConditionWithRelation {
 
             switch (conditionField) {
                 case TransactionExplorerConditionField.TransactionType.value:
-                    if (conditionOperator === TransactionExplorerConditionOperatorType.In && Array.isArray(conditionValue)) {
-                        condition = new TransactionExplorerTransactionTypeCondition(conditionValue as number[]);
+                    if (TransactionExplorerTransactionTypeCondition.supportedOperators[conditionOperator] && Array.isArray(conditionValue)) {
+                        condition = new TransactionExplorerTransactionTypeCondition(conditionOperator as TransactionTypeConditionOperator, conditionValue as number[]);
                     }
                     break;
                 case TransactionExplorerConditionField.TransactionCategory.value:
-                    if (conditionOperator === TransactionExplorerConditionOperatorType.In && Array.isArray(conditionValue)) {
-                        condition = new TransactionExplorerTransactionCategoryCondition(conditionValue as string[]);
+                    if (TransactionExplorerTransactionCategoryCondition.supportedOperators[conditionOperator] && Array.isArray(conditionValue)) {
+                        condition = new TransactionExplorerTransactionCategoryCondition(conditionOperator as TransactionCategoryConditionOperator, conditionValue as string[]);
                     }
                     break;
                 case TransactionExplorerConditionField.SourceAccount.value:
-                    if (conditionOperator === TransactionExplorerConditionOperatorType.In && Array.isArray(conditionValue)) {
-                        condition = new TransactionExplorerSourceAccountCondition(conditionValue as string[]);
+                    if (TransactionExplorerSourceAccountCondition.supportedOperators[conditionOperator] && Array.isArray(conditionValue)) {
+                        condition = new TransactionExplorerSourceAccountCondition(conditionOperator as AccountConditionOperator, conditionValue as string[]);
                     }
                     break;
                 case TransactionExplorerConditionField.DestinationAccount.value:
-                    if (conditionOperator === TransactionExplorerConditionOperatorType.In && Array.isArray(conditionValue)) {
-                        condition = new TransactionExplorerDestinationAccountCondition(conditionValue as string[]);
+                    if (TransactionExplorerDestinationAccountCondition.supportedOperators[conditionOperator] && Array.isArray(conditionValue)) {
+                        condition = new TransactionExplorerDestinationAccountCondition(conditionOperator as AccountConditionOperator, conditionValue as string[]);
                     }
                     break;
                 case TransactionExplorerConditionField.SourceAmount.value:
@@ -831,15 +831,20 @@ export class TransactionExplorerUndefinedCondition implements TransactionExplore
     }
 }
 
+type TransactionTypeConditionOperator = TransactionExplorerConditionOperatorType.In |
+    TransactionExplorerConditionOperatorType.NotIn;
+
 export class TransactionExplorerTransactionTypeCondition implements TransactionExplorerCondition<TransactionExplorerConditionFieldType.TransactionType, number[]> {
     public static readonly supportedOperators: PartialRecord<TransactionExplorerConditionOperatorType, true> = {
-        [TransactionExplorerConditionOperatorType.In]: true
+        [TransactionExplorerConditionOperatorType.In]: true,
+        [TransactionExplorerConditionOperatorType.NotIn]: true
     };
     public readonly field = TransactionExplorerConditionFieldType.TransactionType;
-    public readonly operator: TransactionExplorerConditionOperatorType.In = TransactionExplorerConditionOperatorType.In;
+    public readonly operator: TransactionTypeConditionOperator = TransactionExplorerConditionOperatorType.In;
     public value: number[];
 
-    constructor(value: number[]) {
+    constructor(operator: TransactionTypeConditionOperator, value: number[]) {
+        this.operator = operator;
         this.value = value;
     }
 
@@ -848,7 +853,13 @@ export class TransactionExplorerTransactionTypeCondition implements TransactionE
     }
 
     public match(transaction: TransactionInsightDataItem): boolean {
-        return this.value.includes(transaction.type);
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return this.value.includes(transaction.type);
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return !this.value.includes(transaction.type);
+        }
+
+        return false;
     }
 
     public toExpression(): string {
@@ -863,19 +874,31 @@ export class TransactionExplorerTransactionTypeCondition implements TransactionE
                 return type.toString();
             }
         }).join(', ');
-        return `type IN (${textualTypes})`;
+
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return `type IN (${textualTypes})`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return `type NOT IN (${textualTypes})`;
+        } else {
+            return '';
+        }
     }
 }
 
+type TransactionCategoryConditionOperator = TransactionExplorerConditionOperatorType.In |
+    TransactionExplorerConditionOperatorType.NotIn;
+
 export class TransactionExplorerTransactionCategoryCondition implements TransactionExplorerCondition<TransactionExplorerConditionFieldType.TransactionCategory, string[]> {
     public static readonly supportedOperators: PartialRecord<TransactionExplorerConditionOperatorType, true> = {
-        [TransactionExplorerConditionOperatorType.In]: true
+        [TransactionExplorerConditionOperatorType.In]: true,
+        [TransactionExplorerConditionOperatorType.NotIn]: true
     };
     public readonly field = TransactionExplorerConditionFieldType.TransactionCategory;
-    public readonly operator: TransactionExplorerConditionOperatorType.In = TransactionExplorerConditionOperatorType.In;
+    public readonly operator: TransactionCategoryConditionOperator = TransactionExplorerConditionOperatorType.In;
     public value: string[];
 
-    constructor(value: string[]) {
+    constructor(operator: TransactionCategoryConditionOperator, value: string[]) {
+        this.operator = operator
         this.value = value;
     }
 
@@ -884,7 +907,13 @@ export class TransactionExplorerTransactionCategoryCondition implements Transact
     }
 
     public match(transaction: TransactionInsightDataItem): boolean {
-        return this.value.includes(transaction.primaryCategory?.id ?? '') || this.value.includes(transaction.secondaryCategory?.id ?? transaction.categoryId);
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return this.value.includes(transaction.primaryCategory?.id ?? '') || this.value.includes(transaction.secondaryCategory?.id ?? transaction.categoryId);
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return !this.value.includes(transaction.primaryCategory?.id ?? '') && !this.value.includes(transaction.secondaryCategory?.id ?? transaction.categoryId);
+        }
+
+        return false;
     }
 
     public toExpression(allCategoriesMap: Record<string, TransactionCategory>): string {
@@ -901,19 +930,31 @@ export class TransactionExplorerTransactionCategoryCondition implements Transact
                 return `'${id}'`;
             }
         }).filter(item => !!item).join(', ');
-        return `category IN (${textualCategories})`;
+
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return `category IN (${textualCategories})`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return `category NOT IN (${textualCategories})`;
+        } else {
+            return '';
+        }
     }
 }
 
+type AccountConditionOperator = TransactionExplorerConditionOperatorType.In |
+    TransactionExplorerConditionOperatorType.NotIn;
+
 export class TransactionExplorerSourceAccountCondition implements TransactionExplorerCondition<TransactionExplorerConditionFieldType.SourceAccount, string[]> {
     public static readonly supportedOperators: PartialRecord<TransactionExplorerConditionOperatorType, true> = {
-        [TransactionExplorerConditionOperatorType.In]: true
+        [TransactionExplorerConditionOperatorType.In]: true,
+        [TransactionExplorerConditionOperatorType.NotIn]: true
     };
     public readonly field = TransactionExplorerConditionFieldType.SourceAccount;
-    public readonly operator: TransactionExplorerConditionOperatorType.In = TransactionExplorerConditionOperatorType.In;
+    public readonly operator: AccountConditionOperator = TransactionExplorerConditionOperatorType.In;
     public value: string[];
 
-    constructor(value: string[]) {
+    constructor(operator: AccountConditionOperator, value: string[]) {
+        this.operator = operator;
         this.value = value;
     }
 
@@ -922,7 +963,13 @@ export class TransactionExplorerSourceAccountCondition implements TransactionExp
     }
 
     public match(transaction: TransactionInsightDataItem): boolean {
-        return this.value.includes(transaction.sourceAccountId);
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return this.value.includes(transaction.sourceAccountId);
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return !this.value.includes(transaction.sourceAccountId);
+        }
+
+        return false;
     }
 
     public toExpression(allCategoriesMap: Record<string, TransactionCategory>, allAccountsMap: Record<string, Account>): string {
@@ -939,19 +986,28 @@ export class TransactionExplorerSourceAccountCondition implements TransactionExp
                 return `'${id}'`;
             }
         }).filter(item => !!item).join(', ');
-        return `source_account IN (${textualAccounts})`;
+
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return `source_account IN (${textualAccounts})`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return `source_account NOT IN (${textualAccounts})`;
+        } else {
+            return '';
+        }
     }
 }
 
 export class TransactionExplorerDestinationAccountCondition implements TransactionExplorerCondition<TransactionExplorerConditionFieldType.DestinationAccount, string[]> {
     public static readonly supportedOperators: PartialRecord<TransactionExplorerConditionOperatorType, true> = {
-        [TransactionExplorerConditionOperatorType.In]: true
+        [TransactionExplorerConditionOperatorType.In]: true,
+        [TransactionExplorerConditionOperatorType.NotIn]: true
     };
     public readonly field = TransactionExplorerConditionFieldType.DestinationAccount;
-    public readonly operator: TransactionExplorerConditionOperatorType.In = TransactionExplorerConditionOperatorType.In;
+    public readonly operator: AccountConditionOperator = TransactionExplorerConditionOperatorType.In;
     public value: string[];
 
-    constructor(value: string[]) {
+    constructor(operator: AccountConditionOperator, value: string[]) {
+        this.operator = operator;
         this.value = value;
     }
 
@@ -960,7 +1016,13 @@ export class TransactionExplorerDestinationAccountCondition implements Transacti
     }
 
     public match(transaction: TransactionInsightDataItem): boolean {
-        return this.value.includes(transaction.destinationAccountId);
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return this.value.includes(transaction.destinationAccountId);
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return !this.value.includes(transaction.destinationAccountId);
+        }
+
+        return false;
     }
 
     public toExpression(allCategoriesMap: Record<string, TransactionCategory>, allAccountsMap: Record<string, Account>): string {
@@ -977,7 +1039,14 @@ export class TransactionExplorerDestinationAccountCondition implements Transacti
                 return `'${id}'`;
             }
         }).filter(item => !!item).join(', ');
-        return `destination_account IN (${textualAccounts})`;
+
+        if (this.operator === TransactionExplorerConditionOperatorType.In) {
+            return `destination_account IN (${textualAccounts})`;
+        } else if (this.operator === TransactionExplorerConditionOperatorType.NotIn) {
+            return `destination_account NOT IN (${textualAccounts})`;
+        } else {
+            return '';
+        }
     }
 }
 

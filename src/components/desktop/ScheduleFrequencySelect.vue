@@ -28,14 +28,18 @@
                     <v-list v-if="frequencyType === ScheduledTemplateFrequencyType.Disabled.type">
                         <v-list-item :title="tt('None')"></v-list-item>
                     </v-list>
+                    <v-list v-if="frequencyType === ScheduledTemplateFrequencyType.Daily.type">
+                        <v-list-item :title="tt('Daily')"></v-list-item>
+                    </v-list>
                     <v-list select-strategy="classic" v-model:selected="frequencyValue"
                             v-else-if="frequencyType === ScheduledTemplateFrequencyType.Weekly.type">
                         <v-list-item :key="weekDay.type" :value="weekDay.type" :title="weekDay.displayName"
                                      :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(weekDay.type) }"
                                      v-for="weekDay in allWeekDays">
-                            <template #prepend="{ isActive }">
-                                <v-checkbox density="compact" class="me-1" :model-value="isActive"
-                                            @update:model-value="updateFrequencyValue(weekDay.type, $event)"></v-checkbox>
+                            <template #prepend="{ isSelected, select }">
+                                <v-list-item-action start>
+                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
+                                </v-list-item-action>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -44,9 +48,22 @@
                         <v-list-item :key="monthDay.type" :value="monthDay.type" :title="monthDay.displayName"
                                      :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthDay.type) }"
                                      v-for="monthDay in allAvailableMonthDays">
-                            <template #prepend="{ isActive }">
-                                <v-checkbox density="compact" class="me-1" :model-value="isActive"
-                                            @update:model-value="updateFrequencyValue(monthDay.type, $event)"></v-checkbox>
+                            <template #prepend="{ isSelected, select }">
+                                <v-list-item-action start>
+                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
+                                </v-list-item-action>
+                            </template>
+                        </v-list-item>
+                    </v-list>
+                    <v-list select-strategy="classic" v-model:selected="frequencyValue"
+                            v-else-if="frequencyType === ScheduledTemplateFrequencyType.Yearly.type">
+                        <v-list-item :key="monthAndDay.type" :value="monthAndDay.type" :title="monthAndDay.displayName"
+                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthAndDay.type) }"
+                                     v-for="monthAndDay in allAvailableMonthAndDays">
+                            <template #prepend="{ isSelected, select }">
+                                <v-list-item-action start>
+                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
+                                </v-list-item-action>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -75,8 +92,19 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;
 }>();
 
-const { tt, getMultiMonthdayShortNames, getMultiWeekdayLongNames } = useI18n();
-const { allTransactionScheduledFrequencyTypes, allWeekDays, allAvailableMonthDays, getFrequencyValues } = useScheduleFrequencySelectionBase();
+const {
+    tt,
+    getMultiMonthAndDayLongNames,
+    getMultiMonthdayShortNames,
+    getMultiWeekdayLongNames
+} = useI18n();
+const {
+    allTransactionScheduledFrequencyTypes,
+    allWeekDays,
+    allAvailableMonthDays,
+    allAvailableMonthAndDays,
+    getFrequencyValues
+} = useScheduleFrequencySelectionBase();
 
 const userStore = useUserStore();
 
@@ -92,10 +120,14 @@ const frequencyType = computed<number>({
         if (props.type !== value) {
             emit('update:type', value);
 
-            if (value === ScheduledTemplateFrequencyType.Weekly.type) {
+            if (value === ScheduledTemplateFrequencyType.Daily.type) {
+                frequencyValue.value = [0];
+            } else if (value === ScheduledTemplateFrequencyType.Weekly.type) {
                 frequencyValue.value = [firstDayOfWeek.value];
             } else if (value === ScheduledTemplateFrequencyType.Monthly.type) {
                 frequencyValue.value = [1];
+            } else if (value === ScheduledTemplateFrequencyType.Yearly.type) {
+                frequencyValue.value = [101];
             } else {
                 frequencyValue.value = [];
             }
@@ -113,6 +145,8 @@ const frequencyValue = computed<number[]>({
 const displayFrequency = computed<string>(() => {
     if (frequencyType.value === ScheduledTemplateFrequencyType.Disabled.type) {
         return tt('Disabled');
+    } else if (frequencyType.value === ScheduledTemplateFrequencyType.Daily.type) {
+        return tt('Daily');
     } else if (frequencyType.value === ScheduledTemplateFrequencyType.Weekly.type) {
         if (frequencyValue.value.length) {
             return tt('format.misc.everyMultiDaysOfWeek', {
@@ -129,27 +163,18 @@ const displayFrequency = computed<string>(() => {
         } else {
             return tt('Monthly');
         }
+    } else if (frequencyType.value === ScheduledTemplateFrequencyType.Yearly.type) {
+        if (frequencyValue.value.length) {
+            return tt('format.misc.everyMultiDaysOfYear', {
+                days: getMultiMonthAndDayLongNames(frequencyValue.value)
+            });
+        } else {
+            return tt('Yearly');
+        }
     } else {
         return '';
     }
 });
-
-function updateFrequencyValue(value: number, selected: boolean | null): void {
-    const currentFrequencyValues = frequencyValue.value;
-    const newFrequencyValues: number[] = [];
-
-    for (const currentFrequencyValue of currentFrequencyValues) {
-        if (currentFrequencyValue !== value || selected) {
-            newFrequencyValues.push(currentFrequencyValue);
-        }
-    }
-
-    if (selected) {
-        newFrequencyValues.push(value);
-    }
-
-    frequencyValue.value = sortNumbersArray(newFrequencyValues);
-}
 
 function isFrequencyValueSelected(currentValue: number): boolean {
     return frequencyValue.value.indexOf(currentValue) >= 0;

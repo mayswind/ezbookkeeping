@@ -565,6 +565,7 @@ const pageTypeAndMode = getPageTypeNameMode();
 
 const {
     tt,
+    getMultiMonthAndDayLongNames,
     getMultiMonthdayShortNames,
     getMultiWeekdayLongNames,
     formatDateTimeToLongDate,
@@ -780,7 +781,9 @@ const transactionDisplayScheduledFrequency = computed<string>(() => {
         }
     }
 
-    if (template.scheduledFrequencyType === ScheduledTemplateFrequencyType.Weekly.type) {
+    if (template.scheduledFrequencyType === ScheduledTemplateFrequencyType.Daily.type) {
+        return tt('Daily');
+    } else if (template.scheduledFrequencyType === ScheduledTemplateFrequencyType.Weekly.type) {
         if (scheduledFrequencyValues.length) {
             return tt('format.misc.everyMultiDaysOfWeek', {
                 days: getMultiWeekdayLongNames(scheduledFrequencyValues, firstDayOfWeek.value)
@@ -795,6 +798,14 @@ const transactionDisplayScheduledFrequency = computed<string>(() => {
             });
         } else {
             return tt('Monthly');
+        }
+    } else if (template.scheduledFrequencyType === ScheduledTemplateFrequencyType.Yearly.type) {
+        if (scheduledFrequencyValues.length) {
+            return tt('format.misc.everyMultiDaysOfYear', {
+                days: getMultiMonthAndDayLongNames(scheduledFrequencyValues)
+            });
+        } else {
+            return tt('Yearly');
         }
     } else {
         return '';

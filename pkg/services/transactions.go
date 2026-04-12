@@ -683,7 +683,20 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 
 	for i := 0; i < s.UserDataDBCount(); i++ {
 		var templates []*models.TransactionTemplate
-		err := s.UserDataDBByIndex(i).NewSession(c).Where("deleted=? AND template_type=? AND (scheduled_frequency_type=? OR scheduled_frequency_type=?) AND (scheduled_start_time IS NULL OR scheduled_start_time<=?) AND (scheduled_end_time IS NULL OR scheduled_end_time>=?) AND scheduled_at>=? AND scheduled_at<?", false, models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, startTime.Unix(), startTime.Unix(), minScheduledAt, maxScheduledAt).Find(&templates)
+		err := s.UserDataDBByIndex(i).NewSession(c).Where("deleted=?"+
+			" AND template_type=?"+
+			" AND (scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=?)"+
+			" AND (scheduled_start_time IS NULL OR scheduled_start_time<=?)"+
+			" AND (scheduled_end_time IS NULL OR scheduled_end_time>=?)"+
+			" AND scheduled_at>=?"+
+			" AND scheduled_at<?",
+			false,
+			models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE,
+			models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY,
+			startTime.Unix(),
+			startTime.Unix(),
+			minScheduledAt,
+			maxScheduledAt).Find(&templates)
 
 		if err != nil {
 			return err
@@ -712,7 +725,9 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		}
 
 		if (template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY &&
-			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY) ||
+			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY &&
+			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY &&
+			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY) ||
 			template.ScheduledFrequency == "" {
 			skipCount++
 			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency", template.TemplateId)
@@ -749,6 +764,10 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY && !frequencyValueSet[int64(transactionTime.Day())] {
 			skipCount++
 			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d of month", template.TemplateId, startTimeInUTC.Day())
+			continue
+		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY && !frequencyValueSet[int64(transactionTime.Month())*100+int64(transactionTime.Day())] {
+			skipCount++
+			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d-%d of year", template.TemplateId, startTimeInUTC.Month(), startTimeInUTC.Day())
 			continue
 		}
 

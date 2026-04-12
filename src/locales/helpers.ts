@@ -1688,6 +1688,31 @@ export function useI18n() {
         }
     }
 
+    function getMultiMonthAndDayLongNames(monthAndDays: number[]): string {
+        if (!monthAndDays) {
+            return '';
+        }
+
+        const now: DateTime = getCurrentDateTime();
+
+        const finalMonthAndDayNames: string[] = monthAndDays.map(monthAndDay => {
+            const month = Math.trunc(monthAndDay / 100);
+            const day = monthAndDay % 100;
+            const dateTime = now.set({
+                month: month,
+                dayOfMonth: day,
+                hour: 0,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+            });
+
+            return formatDateTime(dateTime, getLocalizedLongMonthDayFormat(), getDateTimeFormatOptions());
+        });
+
+        return joinMultiText(finalMonthAndDayNames);
+    }
+
     function getMultiMonthdayShortNames(monthDays: number[]): string {
         if (!monthDays) {
             return '';
@@ -2561,6 +2586,7 @@ export function useI18n() {
         getWeekdayShortName,
         getWeekdayLongName,
         getQuarterName,
+        getMultiMonthAndDayLongNames,
         getMultiMonthdayShortNames,
         getMultiWeekdayLongNames,
         getAllLocalizedDigits,

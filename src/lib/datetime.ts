@@ -52,6 +52,11 @@ import {
 } from '@/core/numeral.ts';
 
 import {
+    WESTERNMOST_TIMEZONE_UTC_OFFSET,
+    EASTERNMOST_TIMEZONE_UTC_OFFSET,
+} from '@/consts/timezone.ts';
+
+import {
     isFunction,
     isDefined,
     isObject,
@@ -74,15 +79,12 @@ interface DateTimeFormatResult {
 
 type DateTimeTokenFormatFunction = (d: MomentDateTime, options: DateTimeFormatOptions) => DateTimeFormatResult;
 
-const westernmostTimezoneUtcOffset: number = -720; // Etc/GMT+12 (UTC-12:00)
-const easternmostTimezoneUtcOffset: number = 840; // Pacific/Kiritimati (UTC+14:00)
-
 function getFixedTimezoneName(utcOffset: number): string {
     return `Fixed/Timezone${utcOffset}`;
 }
 
 (function initFixedTimezone(): void {
-    for (let utcOffset = westernmostTimezoneUtcOffset; utcOffset <= easternmostTimezoneUtcOffset; utcOffset += 15) {
+    for (let utcOffset = WESTERNMOST_TIMEZONE_UTC_OFFSET; utcOffset <= EASTERNMOST_TIMEZONE_UTC_OFFSET; utcOffset += 15) {
         const timezoneName = getFixedTimezoneName(utcOffset);
 
         if (moment.tz.zone(timezoneName)) {
@@ -252,6 +254,10 @@ class MomentDateTime implements DateTime {
 
     public getGregorianCalendarYearDashMonth(): TextualYearMonth {
         return (this.instance.year() + '-' + (this.instance.month() + 1).toString().padStart(2, NumeralSystem.WesternArabicNumerals.digitZero)) as TextualYearMonth;
+    }
+
+    public getMaxDayOfGregorianCalendarMonth(): number {
+        return this.instance.clone().endOf('month').date();
     }
 
     public getWeekDay(): WeekDay {

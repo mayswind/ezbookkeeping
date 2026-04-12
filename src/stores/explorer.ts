@@ -10,7 +10,7 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, reversed, keys, values } from '@/core/base.ts';
 import { NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
-import { DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { type DateTime, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountCategory } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -32,6 +32,7 @@ import {
 import {
     type InsightsExplorerNewDisplayOrderRequest,
     type InsightsExplorerInfoResponse,
+    type InsightsExplorerMatchContext,
     InsightsExplorer,
     InsightsExplorerBasicInfo
 } from '@/models/explorer.ts';
@@ -150,6 +151,20 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         return result;
     })();
+
+    function buildInsightsExplorerMatchContext(insightsExplorer: InsightsExplorer, transaction: TransactionInsightDataItem): InsightsExplorerMatchContext {
+        return {
+            getTransactionDateTime(): DateTime {
+                let transactionTimeUtfOffset: number | undefined = undefined;
+
+                if (insightsExplorer.timezoneUsedForDateRange === TimezoneTypeForStatistics.TransactionTimezone.type) {
+                    transactionTimeUtfOffset = transaction.utcOffset;
+                }
+
+                return isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+            }
+        };
+    }
 
     function getDataCategoryInfo(timezoneUsedForDateRange: number, dimension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
         let transactionTimeUtfOffset: number | undefined = undefined;
@@ -600,12 +615,14 @@ export const useExplorersStore = defineStore('explorers', () => {
         const result: TransactionInsightDataItem[] = [];
 
         for (const transaction of allTransactions.value) {
+            const matchOptions: InsightsExplorerMatchContext = buildInsightsExplorerMatchContext(currentInsightsExplorer.value, transaction);
+
             for (const query of currentInsightsExplorer.value.queries) {
                 if (currentInsightsExplorer.value.datatableQuerySource && currentInsightsExplorer.value.datatableQuerySource !== query.id) {
                     continue;
                 }
 
-                if (query.match(transaction)) {
+                if (query.match(transaction, matchOptions)) {
                     result.push(transaction);
                     break;
                 }
@@ -751,8 +768,10 @@ export const useExplorersStore = defineStore('explorers', () => {
                 continue;
             }
 
+            const matchContext: InsightsExplorerMatchContext = buildInsightsExplorerMatchContext(currentInsightsExplorer.value, transaction);
+
             for (const [query, index] of itemAndIndex(currentInsightsExplorer.value.queries)) {
-                if (query.match(transaction)) {
+                if (query.match(transaction, matchContext)) {
                     addTransactionToCategoriedDataMap(currentInsightsExplorer.value.timezoneUsedForDateRange, categoriedDataMap, categoryDimension, seriesDimension, query.name, index, transaction);
 
                     if (categoryDimension !== TransactionExplorerDataDimension.Query) {

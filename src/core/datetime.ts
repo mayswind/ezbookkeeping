@@ -31,6 +31,7 @@ export interface DateTime {
     isLocalizedCalendarFirstDayOfMonth(options: DateTimeFormatOptions): boolean;
     getGregorianCalendarYearDashMonthDashDay(): TextualYearMonthDay;
     getGregorianCalendarYearDashMonth(): TextualYearMonth;
+    getMaxDayOfGregorianCalendarMonth(): number;
     getWeekDay(): WeekDay;
     getWeekDayDisplayName(options: DateTimeFormatOptions): string
     getWeekDayDisplayShortName(options: DateTimeFormatOptions): string;

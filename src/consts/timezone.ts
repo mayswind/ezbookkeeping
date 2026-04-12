@@ -600,3 +600,6 @@ export const ALL_TIMEZONES: TimezoneInfo[] = [
         timezoneName: 'Pacific/Kiritimati'
     }
 ];
+
+export const WESTERNMOST_TIMEZONE_UTC_OFFSET: number = -720; // Etc/GMT+12 (UTC-12:00)
+export const EASTERNMOST_TIMEZONE_UTC_OFFSET: number = 840; // Pacific/Kiritimati (UTC+14:00)

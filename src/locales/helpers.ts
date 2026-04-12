@@ -195,6 +195,7 @@ import {
 } from '@/lib/common.ts';
 
 import {
+    getCurrentDateTime,
     formatCurrentTime,
     formatGregorianCalendarYearDashMonthDashDay,
     formatGregorianCalendarMonthDashDay,
@@ -1059,6 +1060,20 @@ export function useI18n() {
         return getAllWeekdayNames('min');
     }
 
+    function getAllMonths(): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+        const allMonths = Month.values();
+
+        for (const month of allMonths) {
+            ret.push({
+                type: month.month,
+                displayName: t(`datetime.${month.name}.long`)
+            });
+        }
+
+        return ret;
+    }
+
     function getAllWeekDays(firstDayOfWeek?: WeekDayValue): TypeAndDisplayName[] {
         const ret: TypeAndDisplayName[] = [];
         const allWeekDays = WeekDay.values();
@@ -1083,6 +1098,51 @@ export function useI18n() {
                 type: weekDay.type,
                 displayName: t(`datetime.${weekDay.name}.long`)
             });
+        }
+
+        return ret;
+    }
+
+    function getAllHours(): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+        const now: DateTime = getCurrentDateTime();
+        const format: string = getLocalizedShortTimeFormat();
+        const options: DateTimeFormatOptions = getDateTimeFormatOptions();
+
+        for (let i = 0; i < 24; i++) {
+            const dateTime = now.set({
+                hour: i,
+                minute: 0,
+                second: 0,
+                millisecond: 0
+            });
+
+            ret.push({
+                type: i,
+                displayName: dateTime.format(format, options)
+            });
+        }
+
+        return ret;
+    }
+
+    function getAvailableMonthDays(daysInMonth: number, lastDaysOfMonth?: number): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            ret.push({
+                type: i,
+                displayName: getMonthdayShortName(i),
+            });
+        }
+
+        if (isNumber(lastDaysOfMonth) && lastDaysOfMonth > 0) {
+            for (let i = -lastDaysOfMonth; i < 0; i++) {
+                ret.push({
+                    type: i,
+                    displayName: (i === -1) ? t('Last day') : getMonthLastDayShortName(-i),
+                });
+            }
         }
 
         return ret;
@@ -1603,6 +1663,12 @@ export function useI18n() {
     function getMonthdayShortName(monthDay: number): string {
         return t('format.misc.monthDay', {
             ordinal: getMonthdayOrdinal(monthDay)
+        });
+    }
+
+    function getMonthLastDayShortName(ordinal: number): string {
+        return t('format.misc.lastMonthDay', {
+            ordinal: getMonthdayOrdinal(ordinal)
         });
     }
 
@@ -2411,7 +2477,10 @@ export function useI18n() {
         getAllLongWeekdayNames,
         getAllShortWeekdayNames,
         getAllMinWeekdayNames,
+        getAllMonths,
         getAllWeekDays,
+        getAllHours,
+        getAvailableMonthDays,
         getAllCalendarDisplayTypes: () => getAllLocalizedCalendarTypes(CalendarDisplayType.values(), CalendarDisplayType.parse(t('default.calendarDisplayType')), CalendarDisplayType.Default, CalendarDisplayType.LanguageDefaultType),
         getAllDateDisplayTypes: () => getAllLocalizedCalendarTypes(DateDisplayType.values(), DateDisplayType.parse(t('default.dateDisplayType')), DateDisplayType.Default, DateDisplayType.LanguageDefaultType),
         getAllLongDateFormats: (numeralSystem: NumeralSystem, calendarType: CalendarType) => getLocalizedDateTimeFormats<LongDateFormat>('longDate', LongDateFormat.all(), LongDateFormat.values(), 'longDateFormat', LongDateFormat.Default, numeralSystem, calendarType),

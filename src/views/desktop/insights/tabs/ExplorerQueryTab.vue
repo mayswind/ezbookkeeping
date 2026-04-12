@@ -160,13 +160,126 @@
                                                     item-value="type"
                                                     :disabled="loading || disabled || !!editingQuery"
                                                     :placeholder="tt('None')"
+                                                    :items="allAvailableDayOfWeekOptions"
+                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeDayOfWeek.value"
+                                                >
+                                                    <template #item="{ props, item }">
+                                                        <v-list-item :value="item.value" v-bind="props">
+                                                            <template #title>
+                                                                <v-list-item-title>
+                                                                    <div class="d-flex align-center">{{ item.title }}</div>
+                                                                </v-list-item-title>
+                                                            </template>
+                                                        </v-list-item>
+                                                    </template>
+                                                </v-select>
+
+                                                <v-select
+                                                    multiple chips closable-chips
+                                                    density="compact"
+                                                    item-title="displayName"
+                                                    item-value="type"
+                                                    :disabled="loading || disabled || !!editingQuery"
+                                                    :placeholder="tt('None')"
+                                                    :items="allAvailableDayOfMonthOptions"
+                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeDayOfMonth.value"
+                                                >
+                                                    <template #item="{ props, item }">
+                                                        <v-list-item :value="item.value" v-bind="props">
+                                                            <template #title>
+                                                                <v-list-item-title>
+                                                                    <div class="d-flex align-center">{{ item.title }}</div>
+                                                                </v-list-item-title>
+                                                            </template>
+                                                        </v-list-item>
+                                                    </template>
+                                                </v-select>
+
+                                                <v-select
+                                                    multiple chips closable-chips
+                                                    density="compact"
+                                                    item-title="displayName"
+                                                    item-value="type"
+                                                    :disabled="loading || disabled || !!editingQuery"
+                                                    :placeholder="tt('None')"
+                                                    :items="allAvailableMonthOfYearOptions"
+                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeMonthOfYear.value"
+                                                >
+                                                    <template #item="{ props, item }">
+                                                        <v-list-item :value="item.value" v-bind="props">
+                                                            <template #title>
+                                                                <v-list-item-title>
+                                                                    <div class="d-flex align-center">{{ item.title }}</div>
+                                                                </v-list-item-title>
+                                                            </template>
+                                                        </v-list-item>
+                                                    </template>
+                                                </v-select>
+
+                                                <v-select
+                                                    multiple chips closable-chips
+                                                    density="compact"
+                                                    item-title="displayName"
+                                                    item-value="type"
+                                                    :disabled="loading || disabled || !!editingQuery"
+                                                    :placeholder="tt('None')"
+                                                    :items="allAvailableHourOfDayOptions"
+                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeHourOfDay.value"
+                                                >
+                                                    <template #item="{ props, item }">
+                                                        <v-list-item :value="item.value" v-bind="props">
+                                                            <template #title>
+                                                                <v-list-item-title>
+                                                                    <div class="d-flex align-center">{{ item.title }}</div>
+                                                                </v-list-item-title>
+                                                            </template>
+                                                        </v-list-item>
+                                                    </template>
+                                                </v-select>
+
+                                                <div class="d-flex w-100 align-center gap-2"
+                                                     v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimezone.value">
+                                                    <number-input density="compact"
+                                                                  :disabled="loading || disabled || !!editingQuery"
+                                                                  :min-value="WESTERNMOST_TIMEZONE_UTC_OFFSET"
+                                                                  :max-value="EASTERNMOST_TIMEZONE_UTC_OFFSET"
+                                                                  :max-decimal-count="0"
+                                                                  v-model="conditionWithRelation.condition.value[0]"
+                                                                  v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetBetween.value ||
+                                                                        conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetNotBetween.value"
+                                                    />
+                                                    <span class="ms-2 me-2"
+                                                          v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetBetween.value ||
+                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetNotBetween.value">~</span>
+                                                    <number-input density="compact"
+                                                                  :disabled="loading || disabled || !!editingQuery"
+                                                                  :min-value="WESTERNMOST_TIMEZONE_UTC_OFFSET"
+                                                                  :max-value="EASTERNMOST_TIMEZONE_UTC_OFFSET"
+                                                                  :max-decimal-count="0"
+                                                                  v-model="conditionWithRelation.condition.value[1]"
+                                                                  v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetBetween.value ||
+                                                                        conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetNotBetween.value"
+                                                    />
+                                                </div>
+
+                                                <v-select
+                                                    multiple chips closable-chips
+                                                    density="compact"
+                                                    item-title="displayName"
+                                                    item-value="type"
+                                                    :disabled="loading || disabled || !!editingQuery"
+                                                    :placeholder="tt('None')"
                                                     :items="[
                                                         { type: TransactionType.Expense, displayName: tt('Expense') },
                                                         { type: TransactionType.Income, displayName: tt('Income') },
                                                         { type: TransactionType.Transfer, displayName: tt('Transfer') }
                                                     ]"
                                                     v-model="conditionWithRelation.condition.value"
-                                                    v-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionType.value"
+                                                    v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionType.value"
                                                 >
                                                     <template #item="{ props, item }">
                                                         <v-list-item :value="item.value" v-bind="props">
@@ -410,7 +523,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
 
-import { type NameValue, values } from '@/core/base.ts';
+import { type NameValue, type TypeAndDisplayName, values } from '@/core/base.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
@@ -418,6 +531,11 @@ import {
     TransactionExplorerConditionField,
     TransactionExplorerConditionOperator
 } from '@/core/explorer.ts';
+
+import {
+    WESTERNMOST_TIMEZONE_UTC_OFFSET,
+    EASTERNMOST_TIMEZONE_UTC_OFFSET,
+} from '@/consts/timezone.ts';
 
 import {
     type TransactionExplorerCondition,
@@ -457,6 +575,10 @@ const props = defineProps<ExplorerQueryTabProps>();
 const {
     tt,
     joinMultiText,
+    getAllMonths,
+    getAllWeekDays,
+    getAllHours,
+    getAvailableMonthDays,
     getAllTransactionExplorerConditionFields,
     getAllTransactionExplorerConditionOperators
 } = useI18n();
@@ -489,6 +611,10 @@ const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.len
 const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
 
 const allTransactionExplorerConditionFields = computed<NameValue[]>(() => getAllTransactionExplorerConditionFields());
+const allAvailableDayOfWeekOptions = computed<TypeAndDisplayName[]>(() => getAllWeekDays(userStore.currentUserFirstDayOfWeek));
+const allAvailableDayOfMonthOptions = computed<TypeAndDisplayName[]>(() => getAvailableMonthDays(31, 3));
+const allAvailableMonthOfYearOptions = computed<TypeAndDisplayName[]>(() => getAllMonths());
+const allAvailableHourOfDayOptions = computed<TypeAndDisplayName[]>(() => getAllHours());
 
 function getFilteredAccountsDisplayContent(filterAccountIds?: Record<string, boolean>): string {
     if ((props.loading && !hasAnyAccount.value) || !accountsStore.allVisiblePlainAccounts || !accountsStore.allVisiblePlainAccounts.length) {

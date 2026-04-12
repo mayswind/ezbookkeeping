@@ -25,6 +25,11 @@ export const TransactionExplorerConditionRelationPriority: Record<TransactionExp
 
 export enum TransactionExplorerConditionFieldType {
     Undefined = 'undefined',
+    TransactionTimeDayOfWeek = 'transactionTimeDayOfWeek',
+    TransactionTimeDayOfMonth = 'transactionTimeDayOfMonth',
+    TransactionTimeMonthOfYear = 'transactionTimeMonthOfYear',
+    TransactionTimeHourOfDay = 'transactionTimeHourOfDay',
+    TransactionTimezone = 'transactionTimezone',
     TransactionType = 'transactionType',
     TransactionCategory = 'transactionCategory',
     SourceAccount = 'sourceAccount',
@@ -41,6 +46,11 @@ export class TransactionExplorerConditionField implements NameValue {
     private static readonly allInstances: TransactionExplorerConditionField[] = [];
     private static readonly allInstancesByValue: Record<string, TransactionExplorerConditionField> = {};
 
+    public static readonly TransactionTimeDayOfWeek = new TransactionExplorerConditionField('Transaction Day of Week', TransactionExplorerConditionFieldType.TransactionTimeDayOfWeek);
+    public static readonly TransactionTimeDayOfMonth = new TransactionExplorerConditionField('Transaction Day of Month', TransactionExplorerConditionFieldType.TransactionTimeDayOfMonth)
+    public static readonly TransactionTimeMonthOfYear = new TransactionExplorerConditionField('Transaction Month of Year', TransactionExplorerConditionFieldType.TransactionTimeMonthOfYear);
+    public static readonly TransactionTimeHourOfDay = new TransactionExplorerConditionField('Transaction Hour of Day', TransactionExplorerConditionFieldType.TransactionTimeHourOfDay);
+    public static readonly TransactionTimezone = new TransactionExplorerConditionField('Transaction Timezone', TransactionExplorerConditionFieldType.TransactionTimezone);
     public static readonly TransactionType = new TransactionExplorerConditionField('Transaction Type', TransactionExplorerConditionFieldType.TransactionType);
     public static readonly TransactionCategory = new TransactionExplorerConditionField('Category', TransactionExplorerConditionFieldType.TransactionCategory);
     public static readonly SourceAccount = new TransactionExplorerConditionField('Source Account', TransactionExplorerConditionFieldType.SourceAccount);
@@ -95,6 +105,8 @@ export enum TransactionExplorerConditionOperatorType {
     NotEndsWith = 'notEndsWith',
     RegexMatch = 'regexMatch',
     NotRegexMatch = 'notRegexMatch',
+    MinuteOffsetBetween = 'minuteOffsetBetween',
+    MinuteOffsetNotBetween = 'minuteOffsetNotBetween',
     LatitudeBetween = 'latitudeBetween',
     LatitudeNotBetween = 'latitudeNotBetween',
     LongitudeBetween = 'longitudeBetween',
@@ -127,6 +139,8 @@ export class TransactionExplorerConditionOperator implements NameValue {
     public static readonly NotEndsWith = new TransactionExplorerConditionOperator('Does not end with', TransactionExplorerConditionOperatorType.NotEndsWith);
     public static readonly RegexMatch = new TransactionExplorerConditionOperator('Matches regex', TransactionExplorerConditionOperatorType.RegexMatch);
     public static readonly NotRegexMatch = new TransactionExplorerConditionOperator('Does not match regex', TransactionExplorerConditionOperatorType.NotRegexMatch);
+    public static readonly MinuteOffsetBetween = new TransactionExplorerConditionOperator('Minute offset is between', TransactionExplorerConditionOperatorType.MinuteOffsetBetween);
+    public static readonly MinuteOffsetNotBetween = new TransactionExplorerConditionOperator('Minute offset is not between', TransactionExplorerConditionOperatorType.MinuteOffsetNotBetween);
     public static readonly LatitudeBetween = new TransactionExplorerConditionOperator('Latitude is between', TransactionExplorerConditionOperatorType.LatitudeBetween);
     public static readonly LatitudeNotBetween = new TransactionExplorerConditionOperator('Latitude is not between', TransactionExplorerConditionOperatorType.LatitudeNotBetween);
     public static readonly LongitudeBetween = new TransactionExplorerConditionOperator('Longitude is between', TransactionExplorerConditionOperatorType.LongitudeBetween);

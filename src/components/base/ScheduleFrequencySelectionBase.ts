@@ -15,30 +15,18 @@ export interface CommonScheduleFrequencySelectionProps {
     label?: string;
 }
 
-export interface AvailableMonthDay {
-    day: number;
-    displayName: string;
-}
-
 export function useScheduleFrequencySelectionBase() {
-    const { getAllWeekDays, getAllTransactionScheduledFrequencyTypes, getMonthdayShortName } = useI18n();
+    const {
+        getAllWeekDays,
+        getAvailableMonthDays,
+        getAllTransactionScheduledFrequencyTypes
+    } = useI18n();
     const userStore = useUserStore();
 
     const allTransactionScheduledFrequencyTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionScheduledFrequencyTypes());
     const allWeekDays = computed<TypeAndDisplayName[]>(() => getAllWeekDays(userStore.currentUserFirstDayOfWeek));
 
-    const allAvailableMonthDays = computed<AvailableMonthDay[]>(() => {
-        const allAvailableDays = [];
-
-        for (let i = 1; i <= 28; i++) {
-            allAvailableDays.push({
-                day: i,
-                displayName: getMonthdayShortName(i),
-            });
-        }
-
-        return allAvailableDays;
-    });
+    const allAvailableMonthDays = computed<TypeAndDisplayName[]>(() => getAvailableMonthDays(28, 3));
 
     function getFrequencyValues(value: string): number[] {
         const values = value.split(',');

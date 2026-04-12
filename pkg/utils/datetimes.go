@@ -286,6 +286,12 @@ func IsUnixTimeEqualsYearAndMonth(unixTime int64, timezone *time.Location, year 
 	return date.Year() == int(year) && int(date.Month()) == int(month)
 }
 
+// GetMaxDayOfMonth returns the maximum day of the month for the specified year and month
+func GetMaxDayOfMonth(year int, month time.Month) int {
+	t := time.Date(year, month+1, 0, 0, 0, 0, 0, time.UTC)
+	return t.Day()
+}
+
 // GetTimezoneOffsetMinutes returns offset minutes according specified timezone
 func GetTimezoneOffsetMinutes(unixTime int64, timezone *time.Location) int16 {
 	_, tzOffset := parseFromUnixTime(unixTime).In(timezone).Zone()

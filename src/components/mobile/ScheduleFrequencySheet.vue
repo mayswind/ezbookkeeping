@@ -48,10 +48,10 @@
                         <f7-list dividers class="schedule-frequency-value-list no-margin-vertical"
                                  v-if="currentFrequencyType === ScheduledTemplateFrequencyType.Monthly.type">
                             <f7-list-item checkbox
-                                          :class="isChecked(monthDay.day) ? 'list-item-selected' : ''"
-                                          :key="monthDay.day"
-                                          :value="monthDay.day"
-                                          :checked="isChecked(monthDay.day)"
+                                          :class="isChecked(monthDay.type) ? 'list-item-selected' : ''"
+                                          :key="monthDay.type"
+                                          :value="monthDay.type"
+                                          :checked="isChecked(monthDay.type)"
                                           :title="monthDay.displayName"
                                           v-for="monthDay in allAvailableMonthDays"
                                           @change="changeFrequencyValue">

@@ -41,12 +41,12 @@
                     </v-list>
                     <v-list select-strategy="classic" v-model:selected="frequencyValue"
                             v-else-if="frequencyType === ScheduledTemplateFrequencyType.Monthly.type">
-                        <v-list-item :key="monthDay.day" :value="monthDay.day" :title="monthDay.displayName"
-                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthDay.day) }"
+                        <v-list-item :key="monthDay.type" :value="monthDay.type" :title="monthDay.displayName"
+                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthDay.type) }"
                                      v-for="monthDay in allAvailableMonthDays">
                             <template #prepend="{ isActive }">
                                 <v-checkbox density="compact" class="me-1" :model-value="isActive"
-                                            @update:model-value="updateFrequencyValue(monthDay.day, $event)"></v-checkbox>
+                                            @update:model-value="updateFrequencyValue(monthDay.type, $event)"></v-checkbox>
                             </template>
                         </v-list-item>
                     </v-list>

@@ -727,6 +727,16 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			continue
 		}
 
+		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY {
+			maxDayInMonth := utils.GetMaxDayOfMonth(currentTime.Year(), currentTime.Month())
+
+			for i := 0; i < len(frequencyValues); i++ {
+				if frequencyValues[i] < 0 {
+					frequencyValues[i] = int64(maxDayInMonth) + frequencyValues[i] + 1
+				}
+			}
+		}
+
 		frequencyValueSet := utils.ToSet(frequencyValues)
 		templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
 		transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60

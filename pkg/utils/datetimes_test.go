@@ -333,6 +333,32 @@ func TestIsUnixTimeEqualsYearAndMonth(t *testing.T) {
 	assert.Equal(t, false, actualValue)
 }
 
+func TestGetMaxDayOfMonth(t *testing.T) {
+	expectedValue := 31
+	actualValue := GetMaxDayOfMonth(2023, 1)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = 28
+	actualValue = GetMaxDayOfMonth(2023, 2)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = 29
+	actualValue = GetMaxDayOfMonth(2024, 2)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = 30
+	actualValue = GetMaxDayOfMonth(2023, 4)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = 31
+	actualValue = GetMaxDayOfMonth(2023, 12)
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = 28
+	actualValue = GetMaxDayOfMonth(2100, 2)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestGetTimezoneOffsetMinutes_FixedTimezone(t *testing.T) {
 	timezone := time.FixedZone("Test Timezone", 120*60)
 	expectedValue := int16(120)

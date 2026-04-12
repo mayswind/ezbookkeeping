@@ -1693,16 +1693,45 @@ export function useI18n() {
             return '';
         }
 
+        monthDays.sort(function (d1, d2) {
+            if (d1 >= 0 && d2 >= 0) {
+                return d1 - d2;
+            } else if (d1 < 0 && d2 < 0) {
+                return d1 - d2;
+            } else if (d1 >= 0 && d2 < 0) {
+                return -1; // make positive month day come first
+            } else { // if (d1 < 0 && d2 >= 0)
+                return 1; // make positive month day come first
+            }
+        });
+
         if (monthDays.length === 1) {
-            return t('format.misc.monthDay', {
-                ordinal: getMonthdayOrdinal(monthDays[0] as number)
-            });
+            const monthDay = monthDays[0] as number;
+
+            if (monthDay >= 0) {
+                return t('format.misc.monthDay', {
+                    ordinal: getMonthdayOrdinal(monthDay)
+                });
+            } else if (monthDay === -1) {
+                return t('last day');
+            } else {
+                return t('format.misc.lastMonthDayInLowercase', {
+                    ordinal: getMonthdayOrdinal(-monthDay)
+                });
+            }
         } else {
             return t('format.misc.monthDays', {
-                multiMonthDays: joinMultiText(monthDays.map(monthDay =>
-                    t('format.misc.eachMonthDayInMonthDays', {
-                        ordinal: getMonthdayOrdinal(monthDay)
-                    })))
+                multiMonthDays: joinMultiText(monthDays.map(monthDay => {
+                    if (monthDay >= 0) {
+                        return t('format.misc.eachMonthDayInMonthDays', {
+                            ordinal: getMonthdayOrdinal(monthDay)
+                        });
+                    } else {
+                        return t('format.misc.eachLastMonthDayInMonthDays', {
+                            ordinal: getMonthdayOrdinal(-monthDay)
+                        });
+                    }
+                }))
             });
         }
     }

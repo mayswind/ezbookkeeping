@@ -197,7 +197,7 @@ import { type SortableTransactionStatisticDataItem } from '@/models/transaction.
 import type { InsightsExplorer } from '@/models/explorer.ts';
 
 import { isDefined, findNameByValue } from '@/lib/common.ts';
-import { parseDateTimeFromString } from '@/lib/datetime.ts';
+import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 type AxisChartType = InstanceType<typeof AxisChart>;
@@ -248,6 +248,7 @@ const {
     getCurrencyName,
     formatDateTimeToShortDateTime,
     formatDateTimeToShortDate,
+    formatDateTimeToShortTime,
     formatDateTimeToGregorianLikeShortYear,
     formatDateTimeToGregorianLikeShortYearMonth,
     formatDateTimeToGregorianLikeYearQuarter,
@@ -488,6 +489,14 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
         displayName = month ? getMonthLongName(month.name) : tt('Unknown');
     } else if (dimession === TransactionExplorerDataDimension.DateTimeByQuarterOfYear.value) {
         displayName = getQuarterName(parseInt(name));
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByHourOfDay.value) {
+        const dateTime = getCurrentDateTime().set({
+            hour: parseInt(name),
+            minute: 0,
+            second: 0,
+            millisecond: 0
+        });
+        displayName = formatDateTimeToShortTime(dateTime);
     } else if (dimession === TransactionExplorerDataDimension.SourceAccountCurrency.value || dimession === TransactionExplorerDataDimension.DestinationAccountCurrency.value) {
         if (!needI18n) {
             displayName = getCurrencyName(name);

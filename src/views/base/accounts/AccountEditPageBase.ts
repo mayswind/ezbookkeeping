@@ -18,13 +18,13 @@ import {
     getCurrentUnixTime
 } from '@/lib/datetime.ts';
 
-export interface DayAndDisplayName {
-    readonly day: number;
-    readonly displayName: string;
-}
-
 export function useAccountEditPageBase() {
-    const { tt, getAllAccountCategories, getAllAccountTypes, getMonthdayShortName } = useI18n();
+    const {
+        tt,
+        getAvailableMonthDays,
+        getAllAccountCategories,
+        getAllAccountTypes
+    } = useI18n();
 
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
@@ -80,20 +80,13 @@ export function useAccountEditPageBase() {
     const allAccountCategories = computed<LocalizedAccountCategory[]>(() => getAllAccountCategories(customAccountCategoryOrder.value));
     const allAccountTypes = computed<TypeAndDisplayName[]>(() => getAllAccountTypes());
 
-    const allAvailableMonthDays = computed<DayAndDisplayName[]>(() => {
-        const allAvailableDays: DayAndDisplayName[] = [];
+    const allAvailableMonthDays = computed<TypeAndDisplayName[]>(() => {
+        const allAvailableDays: TypeAndDisplayName[] = getAvailableMonthDays(28);
 
-        allAvailableDays.push({
-            day: 0,
+        allAvailableDays.splice(0, 0, {
+            type: 0,
             displayName: tt('Not set'),
         });
-
-        for (let i = 1; i <= 28; i++) {
-            allAvailableDays.push({
-                day: i,
-                displayName: getMonthdayShortName(i),
-            });
-        }
 
         return allAvailableDays;
     });
@@ -114,7 +107,7 @@ export function useAccountEditPageBase() {
 
     function getAccountCreditCardStatementDate(statementDate?: number): string | null {
         for (const item of allAvailableMonthDays.value) {
-            if (item.day === statementDate) {
+            if (item.type === statementDate) {
                 return item.displayName;
             }
         }

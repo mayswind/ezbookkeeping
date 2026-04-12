@@ -189,7 +189,7 @@
                 @click="accountContext.showCreditCardStatementDatePopup = true"
             >
                 <list-item-selection-popup value-type="item"
-                                           key-field="day" value-field="day"
+                                           key-field="type" value-field="type"
                                            title-field="displayName"
                                            :title="tt('Statement Date')"
                                            :enable-filter="true"
@@ -322,7 +322,7 @@
                 @click="accountContext.showCreditCardStatementDatePopup = true"
             >
                 <list-item-selection-popup value-type="item"
-                                           key-field="day" value-field="day"
+                                           key-field="type" value-field="type"
                                            title-field="displayName"
                                            :title="tt('Statement Date')"
                                            :enable-filter="true"

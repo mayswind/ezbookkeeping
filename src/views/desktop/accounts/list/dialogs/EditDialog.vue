@@ -118,7 +118,7 @@
                                 <v-col cols="12" :md="account.type === AccountType.SingleAccount.type || currentAccountIndex >= 0 ? 6 : 12" v-if="currentAccountIndex < 0 && isAccountSupportCreditCardStatementDate">
                                     <v-autocomplete
                                         item-title="displayName"
-                                        item-value="day"
+                                        item-value="type"
                                         auto-select-first
                                         persistent-placeholder
                                         :disabled="loading || submitting"

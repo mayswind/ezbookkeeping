@@ -347,12 +347,20 @@ function onKeyDown(type: string, e: KeyboardEvent): void {
                     setChildInputFocus(minuteInput.value?.$el, 'input');
                 }, 50);
             });
+
+            e.preventDefault();
+            e.stopPropagation();
+            return;
         } else if (type === 'minute') {
             nextTick(() => {
                 setTimeout(() => {
                     setChildInputFocus(secondInput.value?.$el, 'input');
                 }, 50);
             });
+
+            e.preventDefault();
+            e.stopPropagation();
+            return;
         }
     }
 

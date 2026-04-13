@@ -175,7 +175,8 @@ export enum TransactionExplorerChartTypeValue {
     AreaStacked = 'areaStacked',
     Area100PercentStacked = 'area100%Stacked',
     BubbleGrouped = 'bubbleGrouped',
-    Radar = 'radar'
+    Radar = 'radar',
+    Heatmap = 'heatmap'
 }
 
 export class TransactionExplorerChartType implements NameValue {
@@ -191,6 +192,7 @@ export class TransactionExplorerChartType implements NameValue {
     public static readonly AreaStacked = new TransactionExplorerChartType('Area Chart (Stacked)', TransactionExplorerChartTypeValue.AreaStacked, true);
     public static readonly Area100PercentStacked = new TransactionExplorerChartType('Area Chart (100% Stacked)', TransactionExplorerChartTypeValue.Area100PercentStacked, true);
     public static readonly BubbleGrouped = new TransactionExplorerChartType('Bubble Chart (Grouped)', TransactionExplorerChartTypeValue.BubbleGrouped, true);
+    public static readonly Heatmap = new TransactionExplorerChartType('Heatmap Chart', TransactionExplorerChartTypeValue.Heatmap, true);
 
     public static readonly Default = TransactionExplorerChartType.Pie;
 

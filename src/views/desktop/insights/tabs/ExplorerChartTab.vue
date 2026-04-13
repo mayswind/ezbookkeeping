@@ -162,6 +162,28 @@
             v-else-if="!loading"
         />
     </v-card-text>
+    <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExplorer.chartType === TransactionExplorerChartType.Heatmap.value">
+        <heat-map-chart
+            :skeleton="true"
+            :all-category-names="[]"
+            :items="[]"
+            :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.name ?? 'Value')"
+            name-field="name"
+            values-field="values"
+            v-if="loading"
+        />
+        <heat-map-chart
+            :show-value="true"
+            :all-category-names="categoriedNamesSortedByDisplayOrder"
+            :items="seriesDimensionTransactionExplorerData"
+            :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.name ?? 'Value')"
+            :amount-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isAmount"
+            :default-currency="defaultCurrency"
+            name-field="name"
+            values-field="categoryValues"
+            v-else-if="!loading"
+        />
+    </v-card-text>
 </template>
 
 <script setup lang="ts">

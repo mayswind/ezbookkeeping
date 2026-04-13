@@ -2219,8 +2219,8 @@ export function useI18n() {
         }
     }
 
-    function getFormattedNumber(value: number, numeralSystem?: NumeralSystem, precision?: number): string {
-        const numberFormatOptions = getNumberFormatOptions({ numeralSystem, digitGrouping: DigitGroupingType.None });
+    function getFormattedNumber(value: number, numeralSystem?: NumeralSystem, digitGrouping?: DigitGroupingType, precision?: number): string {
+        const numberFormatOptions = getNumberFormatOptions({ numeralSystem, digitGrouping: digitGrouping });
         return formatNumber(value, numberFormatOptions, precision);
     }
 
@@ -2661,8 +2661,9 @@ export function useI18n() {
         formatAmountToWesternArabicNumeralsWithoutDigitGrouping: (value: number, currencyCode?: string) => getFormattedAmount(value, NumeralSystem.WesternArabicNumerals, DigitGroupingType.None, currencyCode),
         formatAmountToLocalizedNumeralsWithCurrency: (value: number | HiddenAmount | NumberWithSuffix, currencyCode?: string | false, currencyDisplayType?: CurrencyDisplayType) => getFormattedAmountWithCurrency(value, currencyCode, currencyDisplayType),
         formatAmountToWesternArabicNumeralsWithCurrency: (value: number | HiddenAmount | NumberWithSuffix, currencyCode?: string | false, currencyDisplayType?: CurrencyDisplayType) => getFormattedAmountWithCurrency(value, currencyCode, currencyDisplayType, NumeralSystem.WesternArabicNumerals),
-        formatNumberToLocalizedNumerals: (value: number, precision?: number) => getFormattedNumber(value, undefined, precision),
-        formatNumberToWesternArabicNumerals: (value: number, precision?: number) => getFormattedNumber(value, NumeralSystem.WesternArabicNumerals, precision),
+        formatNumberToLocalizedNumerals: (value: number, precision?: number) => getFormattedNumber(value, undefined, undefined, precision),
+        formatNumberToWesternArabicNumerals: (value: number, precision?: number) => getFormattedNumber(value, NumeralSystem.WesternArabicNumerals, undefined, precision),
+        formatNumberToWesternArabicNumeralsWithoutDigitGrouping: (value: number, precision?: number) => getFormattedNumber(value, NumeralSystem.WesternArabicNumerals, DigitGroupingType.None, precision),
         formatPercentToLocalizedNumerals: (value: number, precision: number, lowPrecisionValue: string) => getFormattedPercentValue(value, precision, lowPrecisionValue),
         formatPercentToWesternArabicNumerals: (value: number, precision: number, lowPrecisionValue: string) => getFormattedPercentValue(value, precision, lowPrecisionValue, NumeralSystem.WesternArabicNumerals),
         formatVolumeToLocalizedNumerals: getFormattedVolume,

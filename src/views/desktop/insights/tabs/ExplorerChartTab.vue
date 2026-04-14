@@ -152,6 +152,7 @@
             :all-category-names="categoriedNamesSortedByDisplayOrder"
             :items="seriesDimensionTransactionExplorerData"
             :amount-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isAmount"
+            :percent-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isPercent"
             :default-currency="defaultCurrency"
             :enable-click-item="true"
             id-field="id"

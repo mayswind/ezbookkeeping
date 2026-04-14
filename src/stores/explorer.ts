@@ -917,6 +917,32 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountShare) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        const top5AmountSum = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
+                        value = totalSourceAmountSumInDefaultCurrency > 0 ? 100.0 * top5AmountSum / totalSourceAmountSumInDefaultCurrency : 0;
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.TransactionsForEightyPercentOfSourceAmount) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        const eightyPercentAmountThreshold: number = 0.8 * totalSourceAmountSumInDefaultCurrency;
+                        let cumulativeAmount: number = 0;
+                        let cumulativeCount: number = 0;
+                        for (const amount of reversed(allSourceAmountsInDefaultCurrency)) {
+                            cumulativeAmount += amount;
+                            cumulativeCount++;
+
+                            if (cumulativeAmount >= eightyPercentAmountThreshold) {
+                                value = 100.0 * cumulativeCount / allSourceAmountsInDefaultCurrency.length;
+                                break;
+                            }
+                        }
+                    } else {
+                        value = 0;
+                    }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMaximum) {
                     value = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountRange) {

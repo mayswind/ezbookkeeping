@@ -70,6 +70,7 @@ const props = defineProps<{
     displayOrdersField?: string;
     translateName?: boolean;
     amountValue?: boolean;
+    percentValue?: boolean;
     defaultCurrency?: string;
     enableClickItem?: boolean;
     tooltipExtraColumnNames?: string[];
@@ -477,7 +478,7 @@ function getItemName(name: string): string {
 }
 
 function getDisplayValue(value: number): string {
-    if (props.oneHundredPercentStacked) {
+    if (props.oneHundredPercentStacked || props.percentValue) {
         return formatPercentToLocalizedNumerals(value, 2, '<0.01');
     }
 

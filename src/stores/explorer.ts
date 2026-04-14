@@ -874,15 +874,35 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ1Amount || valueMetric === TransactionExplorerValueMetric.SourceAmountQ3Amount || valueMetric === TransactionExplorerValueMetric.SourceAmount10thPercentile || valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile || valueMetric === TransactionExplorerValueMetric.SourceAmount95thPercentile || valueMetric === TransactionExplorerValueMetric.SourceAmount99thPercentile) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.9, item => item));
+
+                        if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ1Amount) {
+                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item));
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ3Amount) {
+                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item));
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount10thPercentile) {
+                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.1, item => item));
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile) {
+                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.9, item => item));
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount95thPercentile) {
+                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.95, item => item));
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount99thPercentile) {
+                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.99, item => item));
+                        }
                     } else {
                         value = 0;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMinimum) {
                     value = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountSum) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        value = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
+                    } else {
+                        value = 0;
+                    }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMaximum) {
                     value = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountRange) {

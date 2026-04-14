@@ -304,7 +304,13 @@ export enum TransactionExplorerValueMetricType {
     SourceAmountSum = 'sourceAmountSum',
     SourceAmountAverage = 'sourceAmountAverage',
     SourceAmountMedian = 'sourceAmountMedian',
+    SourceAmountQ1Amount = 'sourceQ1Amount',
+    SourceAmountQ3Amount = 'sourceQ3Amount',
+    SourceAmount10thPercentile = 'source10thPercentileAmount',
     SourceAmount90thPercentile = 'source90thPercentileAmount',
+    SourceAmount95thPercentile = 'source95thPercentileAmount',
+    SourceAmount99thPercentile = 'source99thPercentileAmount',
+    SourceTop5AmountSum = 'sourceTop5AmountSum',
     SourceAmountMinimum = 'sourceAmountMinimum',
     SourceAmountMaximum = 'sourceAmountMaximum',
     SourceAmountRange = 'sourceAmountRange',
@@ -322,7 +328,13 @@ export class TransactionExplorerValueMetric implements NameValue {
     public static readonly SourceAmountSum = new TransactionExplorerValueMetric('Total Amount', TransactionExplorerValueMetricType.SourceAmountSum, true, true);
     public static readonly SourceAmountAverage = new TransactionExplorerValueMetric('Average Amount', TransactionExplorerValueMetricType.SourceAmountAverage, true, true);
     public static readonly SourceAmountMedian = new TransactionExplorerValueMetric('Median Amount', TransactionExplorerValueMetricType.SourceAmountMedian, true, true);
+    public static readonly SourceAmountQ1Amount = new TransactionExplorerValueMetric('Q1 Amount (First Quartile)', TransactionExplorerValueMetricType.SourceAmountQ1Amount, true, true);
+    public static readonly SourceAmountQ3Amount = new TransactionExplorerValueMetric('Q3 Amount (Third Quartile)', TransactionExplorerValueMetricType.SourceAmountQ3Amount, true, true);
+    public static readonly SourceAmount10thPercentile = new TransactionExplorerValueMetric('10th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount10thPercentile, true, true);
     public static readonly SourceAmount90thPercentile = new TransactionExplorerValueMetric('90th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount90thPercentile, true, true);
+    public static readonly SourceAmount95thPercentile = new TransactionExplorerValueMetric('95th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount95thPercentile, true, true);
+    public static readonly SourceAmount99thPercentile = new TransactionExplorerValueMetric('99th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount99thPercentile, true, true);
+    public static readonly SourceTop5AmountSum = new TransactionExplorerValueMetric('Top 5 Amount Sum', TransactionExplorerValueMetricType.SourceTop5AmountSum, true, true);
     public static readonly SourceAmountMinimum = new TransactionExplorerValueMetric('Minimum Amount', TransactionExplorerValueMetricType.SourceAmountMinimum, true, true);
     public static readonly SourceAmountMaximum = new TransactionExplorerValueMetric('Maximum Amount', TransactionExplorerValueMetricType.SourceAmountMaximum, true, true);
     public static readonly SourceAmountRange = new TransactionExplorerValueMetric('Range (Max - Min)', TransactionExplorerValueMetricType.SourceAmountRange, true, true);

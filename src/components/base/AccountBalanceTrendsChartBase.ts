@@ -17,7 +17,11 @@ import type { AccountInfoResponse } from '@/models/account.ts';
 import type { TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
 import { isArray } from '@/lib/common.ts';
-import { sumAmounts } from '@/lib/numeral.ts';
+import {
+    mean,
+    median,
+    percentile
+} from '@/lib/math.ts';
 import {
     parseDateTimeFromUnixTime,
     getGregorianCalendarYearAndMonthFromUnixTime,
@@ -231,12 +235,12 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
 
                 const openingBalance = dataItems[0]!.accountOpeningBalance;
                 const closingBalance = dataItems[dataItems.length - 1]!.accountClosingBalance;
-                const minimumBalance = Math.min(...dataItems.map(item => item.accountClosingBalance));
-                const maximumBalance = Math.max(...dataItems.map(item => item.accountClosingBalance));
-                const medianBalance = allDataItemsSortedByClosingBalance[Math.floor(allDataItemsSortedByClosingBalance.length / 2)]!.accountClosingBalance;
-                const averageBalance = Math.trunc(sumAmounts(dataItems.map(item => item.accountClosingBalance)) / dataItems.length);
-                const q1Balance = allDataItemsSortedByClosingBalance[Math.floor(allDataItemsSortedByClosingBalance.length / 4)]!.accountClosingBalance;
-                const q3Balance = allDataItemsSortedByClosingBalance[Math.floor(allDataItemsSortedByClosingBalance.length * 3 / 4)]!.accountClosingBalance;
+                const minimumBalance = allDataItemsSortedByClosingBalance[0]!.accountClosingBalance;
+                const maximumBalance = allDataItemsSortedByClosingBalance[allDataItemsSortedByClosingBalance.length - 1]!.accountClosingBalance;
+                const medianBalance = Math.trunc(median(allDataItemsSortedByClosingBalance, item => item.accountClosingBalance));
+                const averageBalance = Math.trunc(mean(dataItems, item => item.accountClosingBalance));
+                const q1Balance = Math.trunc(percentile(allDataItemsSortedByClosingBalance, 0.25, item => item.accountClosingBalance));
+                const q3Balance = Math.trunc(percentile(allDataItemsSortedByClosingBalance, 0.75, item => item.accountClosingBalance));
 
                 if (props.account.isAsset) {
                     lastOpeningBalance = openingBalance;

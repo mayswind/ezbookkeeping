@@ -44,6 +44,11 @@ import {
     isEquals,
 } from '@/lib/common.ts';
 import {
+    median,
+    percentile,
+    sumMaxN
+} from '@/lib/math.ts';
+import {
     getUtcOffsetByUtcOffsetMinutes,
     parseDateTimeFromUnixTime,
     parseDateTimeFromUnixTimeWithTimezoneOffset,
@@ -707,17 +712,16 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         if (sourceAmounts.length > 0) {
             sourceAmounts.sort((a, b) => a - b);
-            statisticData.medianAmount = sourceAmounts[Math.floor(sourceAmounts.length / 2)] as number;
-            statisticData.p90Amount = sourceAmounts[Math.floor(sourceAmounts.length * 9 / 10)] as number;
+            statisticData.medianAmount = Math.trunc(median(sourceAmounts, item => item));
+            statisticData.p90Amount = Math.trunc(percentile(sourceAmounts, 0.9, item => item));
 
-            const q1 = sourceAmounts[Math.floor(sourceAmounts.length / 4)] as number;
-            const q3 = sourceAmounts[Math.floor(sourceAmounts.length * 3 / 4)] as number;
-            statisticData.interquartileRange = q3 - q1;
+            const q1 = percentile(sourceAmounts, 0.25, item => item);
+            const q3 = percentile(sourceAmounts, 0.75, item => item);
+            statisticData.interquartileRange = Math.trunc(q3 - q1);
         }
 
         if (sourceAmounts.length > 5) {
-            const top5Count = Math.ceil(sourceAmounts.length * 0.05);
-            const top5AmountSum = sourceAmounts.slice(-top5Count).reduce((sum, amount) => sum + amount, 0);
+            const top5AmountSum = sumMaxN(sourceAmounts, 5, item => item);
             statisticData.top5AmountShare = statisticData.totalAmount > 0 ? 100.0 * top5AmountSum / statisticData.totalAmount : 0;
         }
 
@@ -866,14 +870,14 @@ export const useExplorersStore = defineStore('explorers', () => {
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedian) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        value = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length / 2)] as number;
+                        value = Math.trunc(median(allSourceAmountsInDefaultCurrency, item => item));
                     } else {
                         value = 0;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        value = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length * 9 / 10)] as number;
+                        value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.9, item => item));
                     } else {
                         value = 0;
                     }
@@ -888,9 +892,9 @@ export const useExplorersStore = defineStore('explorers', () => {
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountInterquartileRange) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        const q1 = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length / 4)] as number;
-                        const q3 = allSourceAmountsInDefaultCurrency[Math.floor(allSourceAmountsInDefaultCurrency.length * 3 / 4)] as number;
-                        value = q3 - q1;
+                        const q1 = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item));
+                        const q3 = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item));
+                        value = Math.trunc(q3 - q1);
                     } else {
                         value = 0;
                     }

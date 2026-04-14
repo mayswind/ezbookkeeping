@@ -10,16 +10,6 @@ import { DEFAULT_DECIMAL_NUMBER_COUNT, MAX_SUPPORTED_DECIMAL_NUMBER_COUNT, DISPL
 
 import { isDefined, isString, isNumber, replaceAll, removeAll } from './common.ts';
 
-export function sumAmounts(amounts: number[]): number {
-    let sum = 0;
-
-    for (const amount of amounts) {
-        sum += amount;
-    }
-
-    return sum;
-}
-
 export function appendDigitGroupingSymbolAndDecimalSeparator(textualNumber: string, options: NumberFormatOptions): string {
     if (!textualNumber) {
         return textualNumber;

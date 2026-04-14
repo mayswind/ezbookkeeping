@@ -302,6 +302,9 @@ export class TransactionExplorerDataDimension implements NameValue {
 export enum TransactionExplorerValueMetricType {
     TransactionCount = 'transactionCount',
     SourceAmountSum = 'sourceAmountSum',
+    SourceIncomeAmountSum = 'sourceIncomeAmountSum',
+    SourceExpenseAmountSum = 'sourceExpenseAmountSum',
+    SourceNetIncomeAmountSum = 'sourceNetIncomeAmountSum',
     SourceAmountAverage = 'sourceAmountAverage',
     SourceAmountMedian = 'sourceAmountMedian',
     SourceAmountQ1Amount = 'sourceQ1Amount',
@@ -325,6 +328,9 @@ export class TransactionExplorerValueMetric implements NameValue {
     private static readonly allInstancesByValue: Record<string, TransactionExplorerValueMetric> = {};
 
     public static readonly TransactionCount = new TransactionExplorerValueMetric('Transaction Count', TransactionExplorerValueMetricType.TransactionCount, false, true);
+    public static readonly SourceIncomeAmountSum = new TransactionExplorerValueMetric('Total Income', TransactionExplorerValueMetricType.SourceIncomeAmountSum, true, true);
+    public static readonly SourceExpenseAmountSum = new TransactionExplorerValueMetric('Total Expense', TransactionExplorerValueMetricType.SourceExpenseAmountSum, true, true);
+    public static readonly SourceNetIncomeAmountSum = new TransactionExplorerValueMetric('Net Income', TransactionExplorerValueMetricType.SourceNetIncomeAmountSum, true, true);
     public static readonly SourceAmountSum = new TransactionExplorerValueMetric('Total Amount', TransactionExplorerValueMetricType.SourceAmountSum, true, true);
     public static readonly SourceAmountAverage = new TransactionExplorerValueMetric('Average Amount', TransactionExplorerValueMetricType.SourceAmountAverage, true, true);
     public static readonly SourceAmountMedian = new TransactionExplorerValueMetric('Median Amount', TransactionExplorerValueMetricType.SourceAmountMedian, true, true);

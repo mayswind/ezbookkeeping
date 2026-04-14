@@ -831,6 +831,8 @@ export const useExplorersStore = defineStore('explorers', () => {
             for (const seriesTransactions of values(allSeriesTransactions)) {
                 const allSourceAmountsInDefaultCurrency: number[] = [];
                 let totalSourceAmountSumInDefaultCurrency: number = 0;
+                let totalSourceIncomeAmountSumInDefaultCurrency: number = 0;
+                let totalSourceExpenseAmountSumInDefaultCurrency: number = 0;
                 let minimumSourceAmountInDefaultCurrency: number = Number.MAX_SAFE_INTEGER;
                 let maximumSourceAmountInDefaultCurrency: number = Number.MIN_SAFE_INTEGER;
 
@@ -850,6 +852,12 @@ export const useExplorersStore = defineStore('explorers', () => {
                     allSourceAmountsInDefaultCurrency.push(amountInDefaultCurrency);
                     totalSourceAmountSumInDefaultCurrency += amountInDefaultCurrency;
 
+                    if (transaction.type === TransactionType.Income) {
+                        totalSourceIncomeAmountSumInDefaultCurrency += amountInDefaultCurrency;
+                    } else if (transaction.type === TransactionType.Expense) {
+                        totalSourceExpenseAmountSumInDefaultCurrency += amountInDefaultCurrency;
+                    }
+
                     if (amountInDefaultCurrency >= 0 && amountInDefaultCurrency < minimumSourceAmountInDefaultCurrency) {
                         minimumSourceAmountInDefaultCurrency = amountInDefaultCurrency;
                     }
@@ -865,6 +873,12 @@ export const useExplorersStore = defineStore('explorers', () => {
                     value = allSourceAmountsInDefaultCurrency.length;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSum) {
                     value = totalSourceAmountSumInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceIncomeAmountSum) {
+                    value = totalSourceIncomeAmountSumInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceExpenseAmountSum) {
+                    value = totalSourceExpenseAmountSumInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceNetIncomeAmountSum) {
+                    value = totalSourceIncomeAmountSumInDefaultCurrency - totalSourceExpenseAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountAverage) {
                     value = allSourceAmountsInDefaultCurrency.length > 0 ? Math.trunc(totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length) : 0;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedian) {

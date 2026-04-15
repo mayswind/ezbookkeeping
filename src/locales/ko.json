@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "목적지 계좌 통화",
     "Value Metric": "값 메트릭",
     "Transaction Count": "거래 수",
+    "Active Transaction Days": "Active Transaction Days",
+    "Transactions per Active Day": "Transactions per Active Day",
     "Expense / Income Ratio": "Expense / Income Ratio",
     "Savings Rate": "Savings Rate",
     "Average Amount": "평균 금액",

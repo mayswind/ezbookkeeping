@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "目标账户货币",
     "Value Metric": "值类型",
     "Transaction Count": "交易数量",
+    "Active Transaction Days": "活跃交易日",
+    "Transactions per Active Day": "每活跃日交易数量",
     "Expense / Income Ratio": "支出/收入比",
     "Savings Rate": "储蓄率",
     "Average Amount": "平均金额",

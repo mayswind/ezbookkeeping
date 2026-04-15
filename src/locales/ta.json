@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "இலக்கு கணக்கு நாணயம்",
     "Value Metric": "மதிப்பு அளவீடு",
     "Transaction Count": "பரிவர்த்தனை எண்ணிக்கை",
+    "Active Transaction Days": "Active Transaction Days",
+    "Transactions per Active Day": "Transactions per Active Day",
     "Expense / Income Ratio": "Expense / Income Ratio",
     "Savings Rate": "Savings Rate",
     "Average Amount": "சராசரி தொகை",

@@ -43,6 +43,7 @@ import {
     isNumber,
     isInteger,
     isEquals,
+    getObjectOwnFieldCount
 } from '@/lib/common.ts';
 import {
     median,
@@ -800,6 +801,11 @@ export const useExplorersStore = defineStore('explorers', () => {
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         const result: CategoriedTransactionExplorerData[] = [];
         const categoriedDataMap = categoriedTransactions.value;
+        let needCalculateDailyTransactionCount: boolean = false;
+
+        if (valueMetric === TransactionExplorerValueMetric.ActiveTransactionDays || valueMetric === TransactionExplorerValueMetric.TransactionsPerDay) {
+            needCalculateDailyTransactionCount = true;
+        }
 
         for (const categoriedTransactions of values(categoriedDataMap)) {
             const dataItems: CategoriedTransactionExplorerDataItem[] = [];
@@ -824,6 +830,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             }
 
             for (const seriesTransactions of values(allSeriesTransactions)) {
+                const transactionDateMapCount: Record<string, number> = {};
                 const allSourceAmountsInDefaultCurrency: number[] = [];
                 let totalSourceAmountSumInDefaultCurrency: number = 0;
                 let totalSourceIncomeAmountSumInDefaultCurrency: number = 0;
@@ -841,6 +848,23 @@ export const useExplorersStore = defineStore('explorers', () => {
                             amountInDefaultCurrency = Math.trunc(amount);
                         } else {
                             continue;
+                        }
+                    }
+
+                    if (needCalculateDailyTransactionCount) {
+                        let transactionTimeUtfOffset: number | undefined = undefined;
+
+                        if (currentInsightsExplorer.value.timezoneUsedForDateRange === TimezoneTypeForStatistics.TransactionTimezone.type) {
+                            transactionTimeUtfOffset = transaction.utcOffset;
+                        }
+
+                        const transactionDateTime: DateTime = isDefined(transactionTimeUtfOffset) ? parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transactionTimeUtfOffset) : parseDateTimeFromUnixTime(transaction.time);
+                        const transactionYearMonthDay: string = transactionDateTime.getGregorianCalendarYearDashMonthDashDay();
+
+                        if (transactionDateMapCount[transactionYearMonthDay]) {
+                            transactionDateMapCount[transactionYearMonthDay]++;
+                        } else {
+                            transactionDateMapCount[transactionYearMonthDay] = 1;
                         }
                     }
 
@@ -866,6 +890,11 @@ export const useExplorersStore = defineStore('explorers', () => {
 
                 if (valueMetric === TransactionExplorerValueMetric.TransactionCount) {
                     value = allSourceAmountsInDefaultCurrency.length;
+                } else if (valueMetric === TransactionExplorerValueMetric.ActiveTransactionDays) {
+                    value = getObjectOwnFieldCount(transactionDateMapCount);
+                } else if (valueMetric === TransactionExplorerValueMetric.TransactionsPerDay) {
+                    const activeDays = getObjectOwnFieldCount(transactionDateMapCount);
+                    value = activeDays > 0 ? allSourceAmountsInDefaultCurrency.length / activeDays : 0;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceIncomeAmountSum) {
                     value = totalSourceIncomeAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceExpenseAmountSum) {

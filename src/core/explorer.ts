@@ -301,6 +301,8 @@ export class TransactionExplorerDataDimension implements NameValue {
 
 export enum TransactionExplorerValueMetricType {
     TransactionCount = 'transactionCount',
+    ActiveTransactionDays = 'activeTransactionDays',
+    TransactionsPerActiveDay = 'transactionsPerActiveDay',
     SourceIncomeAmountSum = 'sourceIncomeAmountSum',
     SourceExpenseAmountSum = 'sourceExpenseAmountSum',
     SourceNetIncomeAmountSum = 'sourceNetIncomeAmountSum',
@@ -334,6 +336,8 @@ export class TransactionExplorerValueMetric implements NameValue {
     private static readonly allInstancesByValue: Record<string, TransactionExplorerValueMetric> = {};
 
     public static readonly TransactionCount = new TransactionExplorerValueMetric('Transaction Count', TransactionExplorerValueMetricType.TransactionCount, false, false, true);
+    public static readonly ActiveTransactionDays = new TransactionExplorerValueMetric('Active Transaction Days', TransactionExplorerValueMetricType.ActiveTransactionDays, false, false, true);
+    public static readonly TransactionsPerDay = new TransactionExplorerValueMetric('Transactions per Active Day', TransactionExplorerValueMetricType.TransactionsPerActiveDay, false, false, true);
     public static readonly SourceIncomeAmountSum = new TransactionExplorerValueMetric('Total Income', TransactionExplorerValueMetricType.SourceIncomeAmountSum, true, false, true);
     public static readonly SourceExpenseAmountSum = new TransactionExplorerValueMetric('Total Expense', TransactionExplorerValueMetricType.SourceExpenseAmountSum, true, false, true);
     public static readonly SourceNetIncomeAmountSum = new TransactionExplorerValueMetric('Net Income', TransactionExplorerValueMetricType.SourceNetIncomeAmountSum, true, false, true);

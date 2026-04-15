@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "Valuta ciljnega računa",
     "Value Metric": "Metrika vrednosti",
     "Transaction Count": "Število transakcij",
+    "Active Transaction Days": "Active Transaction Days",
+    "Transactions per Active Day": "Transactions per Active Day",
     "Expense / Income Ratio": "Expense / Income Ratio",
     "Savings Rate": "Savings Rate",
     "Average Amount": "Povprečni znesek",

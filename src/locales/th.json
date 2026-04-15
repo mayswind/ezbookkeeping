@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "Destination Account Currency",
     "Value Metric": "Value Metric",
     "Transaction Count": "Transaction Count",
+    "Active Transaction Days": "Active Transaction Days",
+    "Transactions per Active Day": "Transactions per Active Day",
     "Expense / Income Ratio": "Expense / Income Ratio",
     "Savings Rate": "Savings Rate",
     "Average Amount": "Average Amount",

@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "目标账户货币",
     "Value Metric": "值类型",
     "Transaction Count": "交易数量",
+    "Expense / Income Ratio": "支出/收入比",
+    "Savings Rate": "储蓄率",
     "Average Amount": "平均金额",
     "Median Amount": "中位数金额",
     "Q1 Amount (First Quartile)": "Q1 金额（第一四分位数）",

@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "Destination Account Currency",
     "Value Metric": "Value Metric",
     "Transaction Count": "Transaction Count",
+    "Expense / Income Ratio": "Expense / Income Ratio",
+    "Savings Rate": "Savings Rate",
     "Average Amount": "Average Amount",
     "Median Amount": "Median Amount",
     "Q1 Amount (First Quartile)": "Q1 Amount (First Quartile)",

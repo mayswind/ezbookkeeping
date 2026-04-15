@@ -301,10 +301,12 @@ export class TransactionExplorerDataDimension implements NameValue {
 
 export enum TransactionExplorerValueMetricType {
     TransactionCount = 'transactionCount',
-    SourceAmountSum = 'sourceAmountSum',
     SourceIncomeAmountSum = 'sourceIncomeAmountSum',
     SourceExpenseAmountSum = 'sourceExpenseAmountSum',
     SourceNetIncomeAmountSum = 'sourceNetIncomeAmountSum',
+    SrouceAmountExpenseIncomeRatio = 'sourceExpenseIncomeRatio',
+    SourceAmountSavingsRate = 'sourceAmountSavingsRate',
+    SourceAmountSum = 'sourceAmountSum',
     SourceAmountAverage = 'sourceAmountAverage',
     SourceAmountMedian = 'sourceAmountMedian',
     SourceAmountQ1Amount = 'sourceQ1Amount',
@@ -333,6 +335,8 @@ export class TransactionExplorerValueMetric implements NameValue {
     public static readonly SourceIncomeAmountSum = new TransactionExplorerValueMetric('Total Income', TransactionExplorerValueMetricType.SourceIncomeAmountSum, true, false, true);
     public static readonly SourceExpenseAmountSum = new TransactionExplorerValueMetric('Total Expense', TransactionExplorerValueMetricType.SourceExpenseAmountSum, true, false, true);
     public static readonly SourceNetIncomeAmountSum = new TransactionExplorerValueMetric('Net Income', TransactionExplorerValueMetricType.SourceNetIncomeAmountSum, true, false, true);
+    public static readonly SrouceAmountExpenseIncomeRatio = new TransactionExplorerValueMetric('Expense / Income Ratio', TransactionExplorerValueMetricType.SrouceAmountExpenseIncomeRatio, false, true, false);
+    public static readonly SourceAmountSavingsRate = new TransactionExplorerValueMetric('Savings Rate', TransactionExplorerValueMetricType.SourceAmountSavingsRate, false, true, false);
     public static readonly SourceAmountSum = new TransactionExplorerValueMetric('Total Amount', TransactionExplorerValueMetricType.SourceAmountSum, true, false, true);
     public static readonly SourceAmountAverage = new TransactionExplorerValueMetric('Average Amount', TransactionExplorerValueMetricType.SourceAmountAverage, true, false, true);
     public static readonly SourceAmountMedian = new TransactionExplorerValueMetric('Median Amount', TransactionExplorerValueMetricType.SourceAmountMedian, true, false, true);

@@ -871,14 +871,18 @@ export const useExplorersStore = defineStore('explorers', () => {
 
                 if (valueMetric === TransactionExplorerValueMetric.TransactionCount) {
                     value = allSourceAmountsInDefaultCurrency.length;
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSum) {
-                    value = totalSourceAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceIncomeAmountSum) {
                     value = totalSourceIncomeAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceExpenseAmountSum) {
                     value = totalSourceExpenseAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceNetIncomeAmountSum) {
                     value = totalSourceIncomeAmountSumInDefaultCurrency - totalSourceExpenseAmountSumInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SrouceAmountExpenseIncomeRatio) {
+                    value = totalSourceIncomeAmountSumInDefaultCurrency !== 0 ? 100.0 * totalSourceExpenseAmountSumInDefaultCurrency / totalSourceIncomeAmountSumInDefaultCurrency : 0;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSavingsRate) {
+                    value = totalSourceIncomeAmountSumInDefaultCurrency !== 0 ? 100.0 * (totalSourceIncomeAmountSumInDefaultCurrency - totalSourceExpenseAmountSumInDefaultCurrency) / totalSourceIncomeAmountSumInDefaultCurrency : 0;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSum) {
+                    value = totalSourceAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountAverage) {
                     value = allSourceAmountsInDefaultCurrency.length > 0 ? Math.trunc(totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length) : 0;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedian) {

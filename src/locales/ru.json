@@ -1806,6 +1806,8 @@
     "Destination Account Currency": "Валюта целевого счёта",
     "Value Metric": "Метрика значения",
     "Transaction Count": "Количество транзакций",
+    "Expense / Income Ratio": "Expense / Income Ratio",
+    "Savings Rate": "Savings Rate",
     "Average Amount": "Средняя сумма",
     "Median Amount": "Медиана сумм",
     "Q1 Amount (First Quartile)": "Q1 Amount (First Quartile)",

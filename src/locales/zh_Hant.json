@@ -1823,6 +1823,8 @@
     "Transactions for 80% of Amount": "貢獻80%金額的交易占比",
     "Range (Max - Min)": "極差 (最大值 - 最小值)",
     "Interquartile Range (Q3 - Q1)": "四分位距 (Q3 - Q1)",
+    "Mean Absolute Deviation": "平均絕對離差",
+    "Median Absolute Deviation": "中位數絕對離差",
     "Variance": "變異數",
     "Standard Deviation": "標準差",
     "Coefficient of Variation": "變異係數",

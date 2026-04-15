@@ -83,6 +83,32 @@ export function cumulativePercentage<T>(sortedValues: T[], percentageThreshold: 
     return 0;
 }
 
+export function meanAbsoluteDeviation<T>(values: T[], meanValue: number, valueFn: (item: T) => number): number {
+    if (values.length < 1) {
+        return 0;
+    }
+
+    let sumOfAbsoluteDifferences: number = 0;
+
+    for (const item of values) {
+        const difference: number = Math.abs(valueFn(item) - meanValue);
+        sumOfAbsoluteDifferences += difference;
+    }
+
+    return sumOfAbsoluteDifferences / values.length;
+}
+
+export function medianAbsoluteDeviation<T>(sortedValues: T[], medianValue: number, valueFn: (item: T) => number): number {
+    if (sortedValues.length < 1) {
+        return 0;
+    }
+
+    const absoluteDeviations: number[] = sortedValues.map(item => Math.abs(valueFn(item) - medianValue));
+    absoluteDeviations.sort((a, b) => a - b);
+
+    return median(absoluteDeviations, x => x);
+}
+
 export function varianceAndStandardDeviation<T>(values: T[], meanValue: number, valueFn: (item: T) => number): { variance: number; standardDeviation: number } {
     if (values.length < 1) {
         return { variance: 0, standardDeviation: 0 };

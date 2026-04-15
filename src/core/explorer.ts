@@ -324,6 +324,8 @@ export enum TransactionExplorerValueMetricType {
     SourceAmountMaximum = 'sourceAmountMaximum',
     SourceAmountRange = 'sourceAmountRange',
     SourceAmountInterquartileRange = 'sourceAmountInterquartileRange',
+    SourceAmountMeanAbsoluteDeviation = 'sourceAmountMeanAbsoluteDeviation',
+    SourceAmountMedianAbsoluteDeviation = 'sourceAmountMedianAbsoluteDeviation',
     SourceAmountVariance = 'sourceAmountVariance',
     SourceAmountStandardDeviation = 'sourceAmountStandardDeviation',
     SourceAmountCoefficientOfVariation = 'sourceAmountCoefficientOfVariation',
@@ -359,6 +361,8 @@ export class TransactionExplorerValueMetric implements NameValue {
     public static readonly SourceAmountMaximum = new TransactionExplorerValueMetric('Maximum Amount', TransactionExplorerValueMetricType.SourceAmountMaximum, true, false, true);
     public static readonly SourceAmountRange = new TransactionExplorerValueMetric('Range (Max - Min)', TransactionExplorerValueMetricType.SourceAmountRange, true, false, true);
     public static readonly SourceAmountInterquartileRange = new TransactionExplorerValueMetric('Interquartile Range (Q3 - Q1)', TransactionExplorerValueMetricType.SourceAmountInterquartileRange, true, false, true);
+    public static readonly SourceAmountMeanAbsoluteDeviation = new TransactionExplorerValueMetric('Mean Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMeanAbsoluteDeviation, true, false, false);
+    public static readonly SourceAmountMedianAbsoluteDeviation = new TransactionExplorerValueMetric('Median Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMedianAbsoluteDeviation, true, false, false);
     public static readonly SourceAmountVariance = new TransactionExplorerValueMetric('Variance', TransactionExplorerValueMetricType.SourceAmountVariance, false, false, false);
     public static readonly SourceAmountStandardDeviation = new TransactionExplorerValueMetric('Standard Deviation', TransactionExplorerValueMetricType.SourceAmountStandardDeviation, false, false, false);
     public static readonly SourceAmountCoefficientOfVariation = new TransactionExplorerValueMetric('Coefficient of Variation', TransactionExplorerValueMetricType.SourceAmountCoefficientOfVariation, false, false, false);

@@ -1823,6 +1823,8 @@
     "Transactions for 80% of Amount": "Transaktionen für 80% des Betrags",
     "Range (Max - Min)": "Spanne (Max - Min)",
     "Interquartile Range (Q3 - Q1)": "Interquartilsabstand (Q3 - Q1)",
+    "Mean Absolute Deviation": "Mean Absolute Deviation",
+    "Median Absolute Deviation": "Median Absolute Deviation",
     "Variance": "Varianz",
     "Standard Deviation": "Standardabweichung",
     "Coefficient of Variation": "Variationskoeffizient",

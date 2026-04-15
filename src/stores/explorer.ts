@@ -50,6 +50,8 @@ import {
     percentile,
     sumMaxN,
     cumulativePercentage,
+    meanAbsoluteDeviation,
+    medianAbsoluteDeviation,
     varianceAndStandardDeviation,
     coefficientOfVariation,
     skewness,
@@ -977,6 +979,21 @@ export const useExplorersStore = defineStore('explorers', () => {
                         const q1 = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item));
                         const q3 = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item));
                         value = Math.trunc(q3 - q1);
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMeanAbsoluteDeviation) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length;
+                        value = Math.trunc(meanAbsoluteDeviation(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, item => item));
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedianAbsoluteDeviation) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        const medianSourceAmountInDefaultCurrency = median(allSourceAmountsInDefaultCurrency, item => item);
+                        value = Math.trunc(medianAbsoluteDeviation(allSourceAmountsInDefaultCurrency, medianSourceAmountInDefaultCurrency, item => item));
                     } else {
                         value = 0;
                     }

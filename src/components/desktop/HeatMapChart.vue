@@ -34,6 +34,7 @@ const props = defineProps<{
     translateName?: boolean;
     valueTypeName: string;
     amountValue?: boolean;
+    percentValue?: boolean;
     defaultCurrency?: string;
 }>();
 
@@ -43,7 +44,8 @@ const {
     tt,
     getCurrentLanguageTextDirection,
     formatAmountToLocalizedNumeralsWithCurrency,
-    formatNumberToLocalizedNumerals
+    formatNumberToLocalizedNumerals,
+    formatPercentToLocalizedNumerals
 } = useI18n();
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
@@ -249,6 +251,10 @@ function getItemName(name: string): string {
 }
 
 function getDisplayValue(value: number): string {
+    if (props.percentValue) {
+        return formatPercentToLocalizedNumerals(value, 2, '<0.01');
+    }
+
     if (props.amountValue) {
         return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
     }

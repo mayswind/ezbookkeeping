@@ -170,7 +170,7 @@ import {
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
 import type { ErrorResponse } from '@/core/api.ts';
 
-import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
+import { AMOUNT_FACTOR, DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
@@ -2189,7 +2189,7 @@ export function useI18n() {
         const currencyName = getCurrencyName(finalCurrencyCode);
 
         if (isNumber(value)) {
-            const isPlural: boolean = value !== 100 && value !== -100;
+            const isPlural: boolean = value !== AMOUNT_FACTOR && value !== -AMOUNT_FACTOR;
             const textualValue = formatAmount(value, numberFormatOptions);
 
             if (!finalCurrencyCode) {

@@ -1824,6 +1824,8 @@
     "Variance": "Variance",
     "Standard Deviation": "Standard Deviation",
     "Coefficient of Variation": "Coefficient of Variation",
+    "Skewness": "Skewness",
+    "Kurtosis": "Kurtosis",
     "Account List": "Список счетов",
     "This Week": "На этой неделе",
     "This Month": "В этом месяце",

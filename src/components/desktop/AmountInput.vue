@@ -81,8 +81,9 @@ import {
 
 import { NumeralSystem, DecimalSeparator } from '@/core/numeral.ts';
 import type { CurrencyPrependAndAppendText } from '@/core/currency.ts';
-import { DEFAULT_DECIMAL_NUMBER_COUNT } from '@/consts/numeral.ts';
+import { DEFAULT_DECIMAL_NUMBER_COUNT, AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+
 import { isNumber, replaceAll } from '@/lib/common.ts';
 import { evaluateExpressionToAmount } from '@/lib/evaluator.ts';
 import type { ComponentDensity, InputVariant } from '@/lib/ui/desktop.ts';
@@ -297,7 +298,7 @@ function getFormattedValue(value: number): string {
 
 function getDisplayCurrencyPrependAndAppendText(): CurrencyPrependAndAppendText | null {
     const numericCurrentValue = parseAmountFromLocalizedNumerals(currentValue.value);
-    const isPlural = numericCurrentValue !== 100 && numericCurrentValue !== -100;
+    const isPlural = numericCurrentValue !== AMOUNT_FACTOR && numericCurrentValue !== -AMOUNT_FACTOR;
 
     return getAmountPrependAndAppendText(props.currency, isPlural);
 }

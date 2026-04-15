@@ -83,6 +83,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, isiOS } from '@/lib/ui/mobile.ts';
 
 import { NumeralSystem } from '@/core/numeral.ts';
+import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { isNumber } from '@/lib/common.ts';
 import logger from '@/lib/logger.ts';
@@ -385,7 +386,7 @@ function confirm(): boolean {
                 finalValue = previous - current;
                 break;
             case '×':
-                finalValue = Math.trunc(previous * current / 100);
+                finalValue = Math.trunc(previous * current / AMOUNT_FACTOR);
                 break;
             default:
                 finalValue = previous;

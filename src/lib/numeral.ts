@@ -6,6 +6,8 @@ import {
     DigitGroupingSymbol
 } from '@/core/numeral.ts';
 
+import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
+
 import { DEFAULT_DECIMAL_NUMBER_COUNT, MAX_SUPPORTED_DECIMAL_NUMBER_COUNT, DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
 import { isDefined, isString, isNumber, replaceAll, removeAll } from './common.ts';
@@ -115,7 +117,7 @@ export function parseAmount(str: string, options: NumberFormatOptions): number {
     let decimalSeparatorPos = str.indexOf(decimalSeparator);
 
     if (decimalSeparatorPos < 0) {
-        return sign * numeralSystem.parseInt(str) * 100;
+        return sign * numeralSystem.parseInt(str) * AMOUNT_FACTOR;
     } else if (decimalSeparatorPos === 0) {
         str = numeralSystem.digitZero + str;
         decimalSeparatorPos++;
@@ -125,13 +127,13 @@ export function parseAmount(str: string, options: NumberFormatOptions): number {
     const decimals = str.substring(decimalSeparatorPos + 1, str.length);
 
     if (decimals.length < 1) {
-        return sign * numeralSystem.parseInt(integer) * 100;
+        return sign * numeralSystem.parseInt(integer) * AMOUNT_FACTOR;
     } else if (decimals.length === 1) {
-        return sign * numeralSystem.parseInt(integer) * 100 + sign * numeralSystem.parseInt(decimals) * 10;
+        return sign * numeralSystem.parseInt(integer) * AMOUNT_FACTOR + sign * numeralSystem.parseInt(decimals) * AMOUNT_FACTOR / 10;
     } else if (decimals.length === 2) {
-        return sign * numeralSystem.parseInt(integer) * 100 + sign * numeralSystem.parseInt(decimals);
+        return sign * numeralSystem.parseInt(integer) * AMOUNT_FACTOR + sign * numeralSystem.parseInt(decimals);
     } else {
-        return sign * numeralSystem.parseInt(integer) * 100 + sign * numeralSystem.parseInt(decimals.substring(0, 2));
+        return sign * numeralSystem.parseInt(integer) * AMOUNT_FACTOR + sign * numeralSystem.parseInt(decimals.substring(0, 2));
     }
 }
 
@@ -252,9 +254,10 @@ export function formatPercent(value: number, precision: number, lowPrecisionValu
 
 export function getAmountWithDecimalNumberCount(amount: number, decimalNumberCount: number): number {
     if (decimalNumberCount === 0) {
-        return Math.trunc(amount / 100) * 100;
+        return Math.trunc(amount / AMOUNT_FACTOR) * AMOUNT_FACTOR;
     } else if (decimalNumberCount === 1) {
-        return Math.trunc(amount / 10) * 10;
+        const factor = AMOUNT_FACTOR / 10;
+        return Math.trunc(amount / factor) * factor;
     }
 
     return amount;

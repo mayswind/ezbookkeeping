@@ -171,6 +171,7 @@ import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts'
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { NumeralSystem } from '@/core/numeral.ts';
+import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 
 import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
@@ -302,7 +303,7 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, di
     let exchangeRateAmount: number | '' | null = 0;
 
     try {
-        exchangeRateAmount = getConvertedAmount(baseAmount.value / 100, fromExchangeRate, toExchangeRate);
+        exchangeRateAmount = getConvertedAmount(baseAmount.value / AMOUNT_FACTOR, fromExchangeRate, toExchangeRate);
     } catch (ex) {
         exchangeRateAmount = 0;
         logger.warn('failed to convert amount by exchange rates, original base amount is ' + baseAmount.value, ex)

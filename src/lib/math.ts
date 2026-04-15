@@ -1,3 +1,5 @@
+import { reversed } from '@/core/base.ts';
+
 export function mean<T>(values: T[], valueFn: (item: T) => number): number {
     if (values.length < 1) {
         return 0;
@@ -58,4 +60,81 @@ export function sumMaxN<T>(sortedValues: T[], n: number, valueFn: (item: T) => n
     }
 
     return sum;
+}
+
+export function cumulativePercentage<T>(sortedValues: T[], percentageThreshold: number, totalValue: number, valueFn: (item: T) => number): number {
+    if (sortedValues.length < 1 || percentageThreshold < 0 || percentageThreshold > 1) {
+        return 0;
+    }
+
+    const thresholdValue: number = percentageThreshold * totalValue;
+    let cumulativeValue: number = 0;
+    let cumulativeCount: number = 0;
+
+    for (const item of reversed(sortedValues)) {
+        cumulativeValue += valueFn(item);
+        cumulativeCount++;
+
+        if (cumulativeValue >= thresholdValue) {
+            return 100.0 * cumulativeCount / sortedValues.length;
+        }
+    }
+
+    return 0;
+}
+
+export function varianceAndStandardDeviation<T>(values: T[], meanValue: number, valueFn: (item: T) => number): { variance: number; standardDeviation: number } {
+    if (values.length < 1) {
+        return { variance: 0, standardDeviation: 0 };
+    }
+
+    let sumOfSquaredDifferences: number = 0;
+
+    for (const item of values) {
+        const difference: number = valueFn(item) - meanValue;
+        sumOfSquaredDifferences += difference * difference;
+    }
+
+    const variance: number = sumOfSquaredDifferences / values.length;
+    const standardDeviation: number = Math.sqrt(variance);
+
+    return { variance, standardDeviation };
+}
+
+export function coefficientOfVariation(standardDeviation: number, meanValue: number): number | undefined {
+    if (meanValue === 0) {
+        return undefined;
+    }
+
+    return standardDeviation / meanValue;
+}
+
+export function skewness<T>(values: T[], meanValue: number, standardDeviation: number, valueFn: (item: T) => number): number {
+    if (values.length < 1 || standardDeviation === 0) {
+        return 0;
+    }
+
+    let sumOfCubedDifferences: number = 0;
+
+    for (const item of values) {
+        const difference: number = valueFn(item) - meanValue;
+        sumOfCubedDifferences += Math.pow(difference, 3);
+    }
+
+    return sumOfCubedDifferences / (values.length * Math.pow(standardDeviation, 3));
+}
+
+export function kurtosis<T>(values: T[], meanValue: number, variance: number, valueFn: (item: T) => number): number {
+    if (values.length < 1 || variance === 0) {
+        return 0;
+    }
+
+    let sumOfQuarticDifferences: number = 0;
+
+    for (const item of values) {
+        const difference: number = valueFn(item) - meanValue;
+        sumOfQuarticDifferences += Math.pow(difference, 4);
+    }
+
+    return sumOfQuarticDifferences / (values.length * Math.pow(variance, 2));
 }

@@ -1824,6 +1824,8 @@
     "Variance": "Variance",
     "Standard Deviation": "Standard Deviation",
     "Coefficient of Variation": "Coefficient of Variation",
+    "Skewness": "Skewness",
+    "Kurtosis": "Kurtosis",
     "Account List": "Liste des comptes",
     "This Week": "Cette semaine",
     "This Month": "Ce mois",

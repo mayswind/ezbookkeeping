@@ -138,6 +138,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { TextDirection } from '@/core/text.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
+import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 
 import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
@@ -277,7 +278,7 @@ function remove(customExchangeRate: LocalizedLatestExchangeRate | null, confirm:
 
 function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, displayLocalizedDigits: boolean): string {
     const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[baseCurrency.value];
-    const exchangeRateAmount = getConvertedAmount(baseAmount.value / 100, fromExchangeRate, toExchangeRate);
+    const exchangeRateAmount = getConvertedAmount(baseAmount.value / AMOUNT_FACTOR, fromExchangeRate, toExchangeRate);
 
     if (!exchangeRateAmount) {
         if (displayLocalizedDigits) {

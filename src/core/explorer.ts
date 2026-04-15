@@ -324,7 +324,9 @@ export enum TransactionExplorerValueMetricType {
     SourceAmountInterquartileRange = 'sourceAmountInterquartileRange',
     SourceAmountVariance = 'sourceAmountVariance',
     SourceAmountStandardDeviation = 'sourceAmountStandardDeviation',
-    SourceAmountCoefficientOfVariation = 'sourceAmountCoefficientOfVariation'
+    SourceAmountCoefficientOfVariation = 'sourceAmountCoefficientOfVariation',
+    SourceAmountSkewness = 'sourceAmountSkewness',
+    SourceAmountKurtosis = 'sourceAmountKurtosis'
 }
 
 export class TransactionExplorerValueMetric implements NameValue {
@@ -356,6 +358,8 @@ export class TransactionExplorerValueMetric implements NameValue {
     public static readonly SourceAmountVariance = new TransactionExplorerValueMetric('Variance', TransactionExplorerValueMetricType.SourceAmountVariance, false, false, false);
     public static readonly SourceAmountStandardDeviation = new TransactionExplorerValueMetric('Standard Deviation', TransactionExplorerValueMetricType.SourceAmountStandardDeviation, false, false, false);
     public static readonly SourceAmountCoefficientOfVariation = new TransactionExplorerValueMetric('Coefficient of Variation', TransactionExplorerValueMetricType.SourceAmountCoefficientOfVariation, false, false, false);
+    public static readonly SourceAmountSkewness = new TransactionExplorerValueMetric('Skewness', TransactionExplorerValueMetricType.SourceAmountSkewness, false, false, false);
+    public static readonly SourceAmountKurtosis = new TransactionExplorerValueMetric('Kurtosis', TransactionExplorerValueMetricType.SourceAmountKurtosis, false, false, false);
 
     public static readonly Default = TransactionExplorerValueMetric.SourceAmountSum;
 

@@ -8,7 +8,7 @@ import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useTransactionTagsStore } from './transactionTag.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
-import { type BeforeResolveFunction, itemAndIndex, reversed, keys, values } from '@/core/base.ts';
+import { type BeforeResolveFunction, itemAndIndex, keys, values } from '@/core/base.ts';
 import { NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
 import { type DateTime, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
@@ -20,6 +20,7 @@ import {
     TransactionExplorerValueMetric,
     DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE
 } from '@/core/explorer.ts';
+import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 
 import { type Account } from '@/models/account.ts';
@@ -46,7 +47,12 @@ import {
 import {
     median,
     percentile,
-    sumMaxN
+    sumMaxN,
+    cumulativePercentage,
+    varianceAndStandardDeviation,
+    coefficientOfVariation,
+    skewness,
+    kurtosis
 } from '@/lib/math.ts';
 import {
     getUtcOffsetByUtcOffsetMinutes,
@@ -726,26 +732,15 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
 
         if (sourceAmounts.length > 0) {
-            const eightyPercentAmountThreshold: number = 0.8 * statisticData.totalAmount;
-            let cumulativeAmount: number = 0;
-            let cumulativeCount: number = 0;
-            for (const amount of reversed(sourceAmounts)) {
-                cumulativeAmount += amount;
-                cumulativeCount++;
-
-                if (cumulativeAmount >= eightyPercentAmountThreshold) {
-                    statisticData.transactionsFor80PercentAmount = 100.0 * cumulativeCount / sourceAmounts.length;
-                    break;
-                }
-            }
+            statisticData.transactionsFor80PercentAmount = cumulativePercentage(sourceAmounts, 0.8, statisticData.totalAmount, item => item);
         }
 
         if (sourceAmounts.length > 0) {
-            const averageAmountForVarianceCalculation: number = statisticData.totalAmount / sourceAmounts.length / 100.0;
-            const sumOfSquaredDifferences: number = sourceAmounts.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageAmountForVarianceCalculation, 2), 0);
-            statisticData.variance = sumOfSquaredDifferences / sourceAmounts.length;
-            statisticData.standardDeviation = Math.sqrt(statisticData.variance);
-            statisticData.coefficientOfVariation = averageAmountForVarianceCalculation !== 0 ? statisticData.standardDeviation / averageAmountForVarianceCalculation : undefined;
+            const averageAmountForVarianceCalculation: number = statisticData.totalAmount / sourceAmounts.length / AMOUNT_FACTOR;
+            const { variance, standardDeviation } = varianceAndStandardDeviation(sourceAmounts, averageAmountForVarianceCalculation, item => item / AMOUNT_FACTOR);
+            statisticData.variance = variance;
+            statisticData.standardDeviation = standardDeviation;
+            statisticData.coefficientOfVariation = coefficientOfVariation(standardDeviation, averageAmountForVarianceCalculation);
         }
 
         return statisticData;
@@ -892,7 +887,12 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ1Amount || valueMetric === TransactionExplorerValueMetric.SourceAmountQ3Amount || valueMetric === TransactionExplorerValueMetric.SourceAmount10thPercentile || valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile || valueMetric === TransactionExplorerValueMetric.SourceAmount95thPercentile || valueMetric === TransactionExplorerValueMetric.SourceAmount99thPercentile) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ1Amount
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmountQ3Amount
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmount10thPercentile
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmount95thPercentile
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmount99thPercentile) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
 
@@ -932,18 +932,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                 } else if (valueMetric === TransactionExplorerValueMetric.TransactionsForEightyPercentOfSourceAmount) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        const eightyPercentAmountThreshold: number = 0.8 * totalSourceAmountSumInDefaultCurrency;
-                        let cumulativeAmount: number = 0;
-                        let cumulativeCount: number = 0;
-                        for (const amount of reversed(allSourceAmountsInDefaultCurrency)) {
-                            cumulativeAmount += amount;
-                            cumulativeCount++;
-
-                            if (cumulativeAmount >= eightyPercentAmountThreshold) {
-                                value = 100.0 * cumulativeCount / allSourceAmountsInDefaultCurrency.length;
-                                break;
-                            }
-                        }
+                        value = cumulativePercentage(allSourceAmountsInDefaultCurrency, 0.8, totalSourceAmountSumInDefaultCurrency, item => item);
                     } else {
                         value = 0;
                     }
@@ -962,17 +951,25 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance || valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation || valueMetric === TransactionExplorerValueMetric.SourceAmountCoefficientOfVariation) {
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmountCoefficientOfVariation
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmountSkewness
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmountKurtosis) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / 100.0;
-                        const sumOfSquaredDifferences = allSourceAmountsInDefaultCurrency.reduce((sum, amount) => sum + Math.pow(amount / 100.0 - averageSourceAmountInDefaultCurrency, 2), 0);
+                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / AMOUNT_FACTOR;
+                        const { variance, standardDeviation } = varianceAndStandardDeviation(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, item => item / AMOUNT_FACTOR);
 
                         if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance) {
-                            value = sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length
+                            value = variance;
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation) {
-                            value = Math.sqrt(sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length);
+                            value = standardDeviation;
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountCoefficientOfVariation) {
-                            value = averageSourceAmountInDefaultCurrency !== 0 ? Math.sqrt(sumOfSquaredDifferences / allSourceAmountsInDefaultCurrency.length) / averageSourceAmountInDefaultCurrency : 0;
+                            value = coefficientOfVariation(standardDeviation, averageSourceAmountInDefaultCurrency) ?? 0;
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSkewness) {
+                            value = skewness(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, standardDeviation, item => item / AMOUNT_FACTOR);
+                        } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountKurtosis) {
+                            value = kurtosis(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, variance, item => item / AMOUNT_FACTOR);
                         }
                     } else {
                         value = 0;

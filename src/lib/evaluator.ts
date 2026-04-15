@@ -1,3 +1,4 @@
+import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '../consts/transaction.ts';
 
 import { replaceAll } from './common.ts';
@@ -10,7 +11,7 @@ type OperatorAndParenthesis = Operator | '(' | ')';
 const maxAllowedDecimalCount = 6;
 const normalizeFactor: number = 1000000;
 const normalizedDecimalsMaxZeroString: string = '000000';
-const normalizedNumberToAmountFactor: number = 10000; // 1000000 / 100
+const normalizedNumberToAmountFactor: number = normalizeFactor / AMOUNT_FACTOR;
 
 const operatorPriority: Record<Operator, number> = {
     '+': 1,

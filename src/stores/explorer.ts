@@ -181,6 +181,7 @@ export const useExplorersStore = defineStore('explorers', () => {
     }
 
     function getDataCategoryInfo(timezoneUsedForDateRange: number, dimension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
+        const defaultCurrency = userStore.currentUserDefaultCurrency;
         let transactionTimeUtfOffset: number | undefined = undefined;
 
         if (timezoneUsedForDateRange === TimezoneTypeForStatistics.TransactionTimezone.type) {
@@ -420,20 +421,52 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryIdType: TransactionExplorerDimensionType.Category,
                 categoryDisplayOrders: [transaction.primaryCategory.displayOrder, transaction.secondaryCategory.displayOrder]
             };
-        } else if (dimension === TransactionExplorerDataDimension.SourceAmount) {
+        } else if (dimension === TransactionExplorerDataDimension.SourceAmount || dimension === TransactionExplorerDataDimension.DestinationAmount) {
+            if (dimension === TransactionExplorerDataDimension.DestinationAmount && transaction.type !== TransactionType.Transfer) {
+                return {
+                    categoryName: 'None',
+                    categoryNameNeedI18n: true,
+                    categoryId: 'none',
+                    categoryIdType: TransactionExplorerDimensionType.Other,
+                    categoryDisplayOrders: [0]
+                };
+            }
+
+            const amount = dimension === TransactionExplorerDataDimension.SourceAmount ? transaction.sourceAmount : transaction.destinationAmount;
+            const account = dimension === TransactionExplorerDataDimension.SourceAmount ? transaction.sourceAccount : transaction.destinationAccount;
+            let amountInDefaultCurrency: number = amount;
+
+            if (!account) {
+                return {
+                    categoryName: 'Unknown',
+                    categoryNameNeedI18n: true,
+                    categoryId: 'unknown',
+                    categoryIdType: TransactionExplorerDimensionType.Other,
+                    categoryDisplayOrders: [0]
+                };
+            }
+
+            if (account.currency !== defaultCurrency) {
+                const exchangedAmount = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
+
+                if (isNumber(exchangedAmount)) {
+                    amountInDefaultCurrency = Math.trunc(exchangedAmount);
+                } else {
+                    return {
+                        categoryName: 'Unknown',
+                        categoryNameNeedI18n: true,
+                        categoryId: 'unknown',
+                        categoryIdType: TransactionExplorerDimensionType.Other,
+                        categoryDisplayOrders: [0]
+                    };
+                }
+            }
+
             return {
-                categoryName: transaction.sourceAmount.toString(10),
-                categoryId: transaction.sourceAmount.toString(10),
+                categoryName: amountInDefaultCurrency.toString(10),
+                categoryId: amountInDefaultCurrency.toString(10),
                 categoryIdType: TransactionExplorerDimensionType.Amount,
-                categoryDisplayOrders: [transaction.sourceAmount]
-            };
-        } else if (dimension === TransactionExplorerDataDimension.DestinationAmount) {
-            return {
-                categoryName: transaction.type === TransactionType.Transfer ? transaction.destinationAmount.toString(10) : 'None',
-                categoryNameNeedI18n: transaction.type !== TransactionType.Transfer,
-                categoryId: transaction.type === TransactionType.Transfer ? transaction.destinationAmount.toString(10) : 'none',
-                categoryIdType: TransactionExplorerDimensionType.Other,
-                categoryDisplayOrders: [transaction.destinationAmount]
+                categoryDisplayOrders: [amountInDefaultCurrency]
             };
         } else {
             return {

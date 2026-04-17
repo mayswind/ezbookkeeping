@@ -1265,7 +1265,7 @@ function exportResults(): void {
                 .filter(item => !item.hidden)
                 .map(item => [
                     item.name,
-                    formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.totalAmount),
+                    formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.totalAmount, defaultCurrency.value),
                     item.percent.toFixed(4)
                 ]),
             supportedMermaidCharts: supportedMermaidCharts

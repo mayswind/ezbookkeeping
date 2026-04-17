@@ -532,7 +532,7 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
     if (dimession === TransactionExplorerDataDimension.SourceAmount.value
         || dimession === TransactionExplorerDataDimension.DestinationAmount.value) {
         if (name !== '' && name !== 'none' && Number.isFinite(parseInt(name))) {
-            displayName = formatAmountToLocalizedNumerals(parseInt(name));
+            displayName = formatAmountToLocalizedNumerals(parseInt(name), defaultCurrency.value);
         }
     }
 
@@ -590,7 +590,7 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
             ],
             data: categoryDimensionTransactionExplorerData.value.map(data => [
                 data.name,
-                valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.totalAmount) : data.totalAmount.toString(10)
+                valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.totalAmount, defaultCurrency.value) : data.totalAmount.toString(10)
             ]),
             supportedMermaidCharts: supportedMermaidCharts
         };

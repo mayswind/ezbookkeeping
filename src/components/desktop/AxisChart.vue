@@ -525,7 +525,7 @@ function exportData(): { headers: string[], data: string[][] } {
             if (props.oneHundredPercentStacked) {
                 return formatNumberToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ?? 0);
             } else {
-                return formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ?? 0);
+                return formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ?? 0, props.defaultCurrency);
             }
         }));
         data.push(row);

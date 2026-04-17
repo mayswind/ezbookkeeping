@@ -256,13 +256,13 @@ export function useReconciliationStatementPageBase() {
             const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
             const type = getDisplayTransactionType(transaction);
             let categoryName = replaceAll(transaction.categoryName, separator, ' ');
-            let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount);
+            let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount, transaction.sourceAccount?.currency);
             let displayAccountName = replaceAll(transaction.sourceAccountName, separator, ' ');
 
             if (transaction.type === TransactionType.ModifyBalance) {
                 categoryName = tt('Modify Balance');
             } else if (transaction.type === TransactionType.Transfer && transaction.destinationAccountId === accountId.value) {
-                displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount);
+                displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount, transaction.destinationAccount?.currency);
             }
 
             if (transaction.type === TransactionType.Transfer && transaction.destinationAccount) {
@@ -272,9 +272,9 @@ export function useReconciliationStatementPageBase() {
             let displayAccountBalance = '';
 
             if (isCurrentLiabilityAccount.value) {
-                displayAccountBalance = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(-transaction.accountClosingBalance);
+                displayAccountBalance = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(-transaction.accountClosingBalance, currentAccountCurrency.value);
             } else {
-                displayAccountBalance = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.accountClosingBalance);
+                displayAccountBalance = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.accountClosingBalance, currentAccountCurrency.value);
             }
 
             const description = replaceAll(transaction.comment || '', separator, ' ');

@@ -2196,7 +2196,7 @@ function exportData(fileType: KnownFileType): void {
         const type = getDisplayTransactionType(transaction);
         const accountName = transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId] ? (allAccountsMap.value[transaction.sourceAccountId]?.name ?? transaction.originalSourceAccountName) : transaction.originalSourceAccountName;
         const amountCurrency = transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId] ? (allAccountsMap.value[transaction.sourceAccountId]?.currency ?? transaction.originalSourceAccountCurrency) : transaction.originalSourceAccountCurrency;
-        const amount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount);
+        const amount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount, amountCurrency);
         const geographicLocation = transaction.geoLocation ? `${transaction.geoLocation.longitude} ${transaction.geoLocation.latitude}` : '';
         let categoryName = transaction.categoryId && transaction.categoryId !== '0' && allCategoriesMap.value[transaction.categoryId] ? (allCategoriesMap.value[transaction.categoryId]?.name ?? transaction.originalCategoryName) : transaction.originalCategoryName;
         let relatedAccountName: string | undefined = undefined;
@@ -2208,7 +2208,7 @@ function exportData(fileType: KnownFileType): void {
         } else if (transaction.type === TransactionType.Transfer) {
             relatedAccountName = transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId] ? (allAccountsMap.value[transaction.destinationAccountId]?.name ?? transaction.originalDestinationAccountName) : transaction.originalDestinationAccountName;
             relatedAccountCurrency = transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId] ? (allAccountsMap.value[transaction.destinationAccountId]?.currency ?? transaction.originalDestinationAccountCurrency) : transaction.originalDestinationAccountCurrency;
-            relatedAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount);
+            relatedAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount, relatedAccountCurrency);
         }
 
         const tagNames: string[] = [];

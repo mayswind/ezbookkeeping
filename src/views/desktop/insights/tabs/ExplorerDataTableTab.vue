@@ -448,13 +448,13 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
                 const type = getDisplayTransactionType(transaction);
 
                 let categoryName = transaction.secondaryCategoryName;
-                let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount);
+                let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount, transaction.sourceAccount?.currency);
                 let displayAccountName = transaction.sourceAccountName;
 
                 if (transaction.type === TransactionType.ModifyBalance) {
                     categoryName = tt('Modify Balance');
                 } else if (transaction.type === TransactionType.Transfer && transaction.sourceAccount?.id !== transaction.destinationAccount?.id && getDisplaySourceAmount(transaction) !== getDisplayDestinationAmount(transaction)) {
-                    displayAmount = displayAmount + ' → ' + formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount);
+                    displayAmount = displayAmount + ' → ' + formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount, transaction.destinationAccount?.currency);
                 }
 
                 if (transaction.type === TransactionType.Transfer && transaction.destinationAccount) {

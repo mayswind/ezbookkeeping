@@ -69,18 +69,6 @@
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.medianAmount) }}</td>
                                 </tr>
                                 <tr>
-                                    <td>{{ tt('90th Percentile Amount') }}</td>
-                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.p90Amount) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ tt('Top 5 Amount Share') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.top5AmountShare) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare, 2, '<0.01') : '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ tt('Transactions for 80% of Amount') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.transactionsFor80PercentAmount) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.transactionsFor80PercentAmount, 2, '<0.01') : '-' }}</td>
-                                </tr>
-                                <tr>
                                     <td>{{ tt('Minimum Amount') }}</td>
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.minimumAmount) }}</td>
                                 </tr>
@@ -89,12 +77,24 @@
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.maximumAmount) }}</td>
                                 </tr>
                                 <tr>
+                                    <td>{{ tt('90th Percentile Amount') }}</td>
+                                    <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.p90Amount) }}</td>
+                                </tr>
+                                <tr>
                                     <td>{{ tt('Range (Max - Min)') }}</td>
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.range) }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Interquartile Range (Q3 - Q1)') }}</td>
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.interquartileRange) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Top 5 Amount Share') }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.top5AmountShare) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare, 2, '<0.01') : '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ tt('Transactions for 80% of Amount') }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.transactionsFor80PercentAmount) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.transactionsFor80PercentAmount, 2, '<0.01') : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Variance') }}</td>

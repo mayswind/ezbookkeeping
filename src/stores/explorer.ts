@@ -135,13 +135,13 @@ export interface InsightsExplorerTransactionStatisticData {
     netIncome: number;
     averageAmount: number;
     medianAmount: number;
-    p90Amount: number;
-    top5AmountShare?: number;
-    transactionsFor80PercentAmount?: number;
     minimumAmount: number;
     maximumAmount: number;
+    p90Amount: number;
     range: number;
     interquartileRange: number;
+    top5AmountShare?: number;
+    transactionsFor80PercentAmount?: number;
     variance?: number;
     standardDeviation?: number;
     coefficientOfVariation?: number;
@@ -689,13 +689,13 @@ export const useExplorersStore = defineStore('explorers', () => {
             netIncome: 0,
             averageAmount: 0,
             medianAmount: 0,
-            p90Amount: 0,
-            top5AmountShare: undefined,
-            transactionsFor80PercentAmount: undefined,
             minimumAmount: Number.MAX_SAFE_INTEGER,
             maximumAmount: Number.MIN_SAFE_INTEGER,
+            p90Amount: 0,
             range: 0,
             interquartileRange: 0,
+            top5AmountShare: undefined,
+            transactionsFor80PercentAmount: undefined,
             variance: undefined,
             standardDeviation: undefined,
             coefficientOfVariation: undefined

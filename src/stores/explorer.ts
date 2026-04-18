@@ -562,7 +562,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryNameNeedI18n: !transaction.sourceAccount.currency,
                 categoryId: transaction.sourceAccount.currency || 'unknown',
                 categoryIdType: TransactionExplorerDimensionType.Other,
-                categoryDisplayOrders: [currencyDisplayOrders[transaction.sourceAccount.currency] || 0]
+                categoryDisplayOrders: [currencyDisplayOrders[transaction.sourceAccount.currency] || Number.MAX_SAFE_INTEGER]
             };
         }  else if (dimension === TransactionExplorerDataDimension.DestinationAccount) {
             const primaryAccount = accountsStore.allAccountsMap[transaction.destinationAccount?.parentId ?? ''] ?? transaction.destinationAccount;
@@ -584,7 +584,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryNameNeedI18n: true,
                 categoryId: transaction.type === TransactionType.Transfer ? (accountCategory?.name || 'unknown') : 'none',
                 categoryIdType: TransactionExplorerDimensionType.Other,
-                categoryDisplayOrders: transaction.type === TransactionType.Transfer ? [accountCategoryDisplayOrder] : [0]
+                categoryDisplayOrders: transaction.type === TransactionType.Transfer ? [accountCategoryDisplayOrder] : [Number.MAX_SAFE_INTEGER]
             };
         } else if (dimension === TransactionExplorerDataDimension.DestinationAccountCurrency) {
             return {
@@ -592,7 +592,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryNameNeedI18n: transaction.type !== TransactionType.Transfer || !transaction.destinationAccount?.currency,
                 categoryId: transaction.type === TransactionType.Transfer ? (transaction.destinationAccount?.currency || 'unknown') : 'none',
                 categoryIdType: TransactionExplorerDimensionType.Other,
-                categoryDisplayOrders: transaction.type === TransactionType.Transfer ? [currencyDisplayOrders[transaction.destinationAccount?.currency ?? ''] || 0] : [0]
+                categoryDisplayOrders: transaction.type === TransactionType.Transfer ? [currencyDisplayOrders[transaction.destinationAccount?.currency ?? ''] || Number.MAX_SAFE_INTEGER] : [Number.MAX_SAFE_INTEGER]
             };
         } else if (dimension === TransactionExplorerDataDimension.PrimaryCategory) {
             return {
@@ -615,7 +615,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                     categoryNameNeedI18n: true,
                     categoryId: 'none',
                     categoryIdType: TransactionExplorerDimensionType.Other,
-                    categoryDisplayOrders: [0]
+                    categoryDisplayOrders: [Number.MAX_SAFE_INTEGER]
                 };
             }
 
@@ -629,7 +629,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                     categoryNameNeedI18n: true,
                     categoryId: 'unknown',
                     categoryIdType: TransactionExplorerDimensionType.Other,
-                    categoryDisplayOrders: [0]
+                    categoryDisplayOrders: [Number.MAX_SAFE_INTEGER]
                 };
             }
 
@@ -644,7 +644,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                         categoryNameNeedI18n: true,
                         categoryId: 'unknown',
                         categoryIdType: TransactionExplorerDimensionType.Other,
-                        categoryDisplayOrders: [0]
+                        categoryDisplayOrders: [Number.MAX_SAFE_INTEGER]
                     };
                 }
             }

@@ -164,7 +164,8 @@ const chartOptions = computed<object>(() => {
                 const name = props.valueTypeName;
                 const value = dataItem && isNumber(dataItem[2]) ? getDisplayValue(dataItem[2]) : '';
 
-                return `<div><span class="chart-pointer" style="background-color: ${params.color}"></span>`
+                return `<div class="d-inline-flex">${params.name}</div><br/>`
+                    + `<div><span class="chart-pointer" style="background-color: ${params.color}"></span>`
                     + `<span>${name}</span>`
                     + `<span class="ms-5">${value}</span>`
                     + '</div>';

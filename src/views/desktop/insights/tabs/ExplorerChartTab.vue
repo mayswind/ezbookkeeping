@@ -157,6 +157,9 @@
             :percent-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isPercent"
             :default-currency="defaultCurrency"
             :enable-click-item="true"
+            :tooltip-extra-column-names="axisChartTooltipExtraColumnNames"
+            :tooltip-extra-column-total-values="axisChartShowYearOverYear || axisChartShowPeriodOverPeriod ? getAxisChartTooltipExtraColumnTotalValues : undefined"
+            :tooltip-extra-column-values="axisChartShowYearOverYear || axisChartShowPeriodOverPeriod ? getAxisChartTooltipExtraColumnValues : undefined"
             id-field="id"
             name-field="name"
             values-field="categoryValues"
@@ -208,7 +211,7 @@ import {
     useExplorersStore
 } from '@/stores/explorer.ts';
 
-import { type NameValue, type TypeAndDisplayName } from '@/core/base.ts';
+import { type NameValue, type TypeAndDisplayName, itemAndIndex, entries } from '@/core/base.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
 import { ChartSortingType, ExportMermaidChartType } from '@/core/statistics.ts';
@@ -222,7 +225,7 @@ import {
 import { type SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 import type { InsightsExplorer } from '@/models/explorer.ts';
 
-import { isDefined, findNameByValue } from '@/lib/common.ts';
+import { isDefined, isNumber, findNameByValue } from '@/lib/common.ts';
 import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
@@ -280,7 +283,8 @@ const {
     formatDateTimeToGregorianLikeYearQuarter,
     formatGregorianYearToGregorianLikeFiscalYear,
     formatAmountToLocalizedNumerals,
-    formatAmountToWesternArabicNumeralsWithoutDigitGrouping
+    formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    formatPercentToLocalizedNumerals
 } = useI18n();
 
 const userStore = useUserStore();
@@ -424,6 +428,76 @@ const seriesDimensionTransactionExplorerData = computed<SeriesDimensionData[]>((
     return result;
 });
 
+const seriesDimensionTransactionExplorerDataMap = computed<Record<string, SeriesDimensionData>>(() => {
+    const result: Record<string, SeriesDimensionData> = {};
+
+    for (const seriesDimensionData of seriesDimensionTransactionExplorerData.value) {
+        result[seriesDimensionData.id] = seriesDimensionData;
+    }
+
+    return result;
+});
+
+const axisChartCategoryIndexYoYMap = computed<Record<number, number>>(() => {
+    const result: Record<number, number> = {};
+
+    if (!axisChartShowYearOverYear.value) {
+        return result;
+    }
+
+    const dateKeyToIndex: Record<string, number> = {};
+    const dateKeyToPreviousYearDateKey: Record<string, string> = {};
+
+    for (const [item, categoryIndex] of itemAndIndex(categoriedDataSortedByDisplayOrder.value)) {
+        const categoriedData = item.originalItem;
+        const name = categoriedData.categoryId;
+        const dimessionType = categoriedData.categoryIdType;
+        const dimension = currentExplorer.value.categoryDimension;
+
+        if (dimension === TransactionExplorerDataDimension.DateTimeByYearMonthDay.value) {
+            const dateTime = parseDateTimeFromString(name, dimessionType);
+
+            if (dateTime) {
+                dateKeyToIndex[dateTime.getGregorianCalendarYearDashMonthDashDay()] = categoryIndex;
+                dateKeyToPreviousYearDateKey[dateTime.getGregorianCalendarYearDashMonthDashDay()] = dateTime.add(-1, 'years').getGregorianCalendarYearDashMonthDashDay();
+            }
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearMonth.value) {
+            const dateTime = parseDateTimeFromString(name, dimessionType);
+
+            if (dateTime) {
+                dateKeyToIndex[dateTime.getGregorianCalendarYearDashMonth()] = categoryIndex;
+                dateKeyToPreviousYearDateKey[dateTime.getGregorianCalendarYearDashMonth()] = dateTime.add(-1, 'years').getGregorianCalendarYearDashMonth();
+            }
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByYearQuarter.value) {
+            const parts = name.split('-');
+            const year = parts.length === 2 ? parseInt(parts[0] as string) : 0;
+            const quarter = parts.length === 2 ? parseInt(parts[1] as string) : 0;
+
+            dateKeyToIndex[`${year}-Q${quarter}`] = categoryIndex;
+            dateKeyToPreviousYearDateKey[`${year}-Q${quarter}`] = `${year - 1}-Q${quarter}`;
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByYear.value) {
+            const year = parseInt(name);
+            dateKeyToIndex[name] = categoryIndex;
+            dateKeyToPreviousYearDateKey[name] = (year - 1).toString(10);
+        } else if (dimension === TransactionExplorerDataDimension.DateTimeByFiscalYear.value) {
+            const year = parseInt(name);
+            dateKeyToIndex[name] = categoryIndex;
+            dateKeyToPreviousYearDateKey[name] = (year - 1).toString(10);
+        }
+    }
+
+    for (const [dateKey, previousYearDateKey] of entries(dateKeyToPreviousYearDateKey)) {
+        const categoryIndex = dateKeyToIndex[dateKey];
+        const previousYearCategoryIndex = dateKeyToIndex[previousYearDateKey];
+
+        if (isNumber(categoryIndex) && isNumber(previousYearCategoryIndex)) {
+            result[categoryIndex] = previousYearCategoryIndex;
+        }
+    }
+
+    return result;
+});
+
 const axisChartDisplayType = computed<AxisChartDisplayType | undefined>(() => {
     if (currentExplorer.value.chartType === TransactionExplorerChartType.ColumnStacked.value
         || currentExplorer.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
@@ -451,6 +525,47 @@ const axisChartStacked = computed<boolean>(() => {
 const axisChart100PercentStacked = computed<boolean>(() => {
     return (currentExplorer.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
         || currentExplorer.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value);
+});
+
+const axisChartShowYearOverYear = computed<boolean>(() => {
+    const dimession = currentExplorer.value.categoryDimension;
+
+    return dimession === TransactionExplorerDataDimension.DateTimeByYearMonthDay.value
+        || dimession === TransactionExplorerDataDimension.DateTimeByYearMonth.value
+        || dimession === TransactionExplorerDataDimension.DateTimeByYearQuarter.value
+        || dimession === TransactionExplorerDataDimension.DateTimeByYear.value
+        || dimession === TransactionExplorerDataDimension.DateTimeByFiscalYear.value;
+});
+
+const axisChartShowPeriodOverPeriod = computed<boolean>(() => {
+    const dimession = currentExplorer.value.categoryDimension;
+
+    return dimession === TransactionExplorerDataDimension.DateTimeByYearMonthDay.value
+        || dimession === TransactionExplorerDataDimension.DateTimeByYearMonth.value
+        || dimession === TransactionExplorerDataDimension.DateTimeByYearQuarter.value;
+});
+
+const axisChartTooltipExtraColumnNames = computed<string[]>(() => {
+    const extraColumnNames: string[] = [];
+    const dimession = currentExplorer.value.categoryDimension;
+
+    if (axisChartShowYearOverYear.value) {
+        extraColumnNames.push(tt('Year-over-Year'));
+    }
+
+    if (axisChartShowPeriodOverPeriod.value) {
+        if (dimession === TransactionExplorerDataDimension.DateTimeByYearQuarter.value) {
+            extraColumnNames.push(tt('Quarter-over-Quarter'));
+        } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearMonth.value) {
+            extraColumnNames.push(tt('Month-over-Month'));
+        } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearMonthDay.value) {
+            extraColumnNames.push(tt('Day-over-Day'));
+        } else {
+            extraColumnNames.push(tt('Period-over-Period'));
+        }
+    }
+
+    return extraColumnNames;
 });
 
 function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string {
@@ -537,6 +652,111 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
     }
 
     return displayName;
+}
+
+function formatDisplayChangeRate(current: number, reference: number): string {
+    if (reference === 0 && current === 0) {
+        return formatPercentToLocalizedNumerals(0, 2, '<0.01');
+    }
+
+    if (reference === 0) {
+        return '-';
+    }
+
+    const rate = (current - reference) / reference * 100;
+    return formatPercentToLocalizedNumerals(rate, 2, '<0.01');
+}
+
+function getAxisChartTooltipExtraColumnTotalValues(categoryIndex: number, totalValue: number, visibleSeriesIds: string[]): string[] {
+    const extraColumnValues: string[] = [];
+
+    if (!axisChartShowYearOverYear.value && !axisChartShowPeriodOverPeriod.value) {
+        return extraColumnValues;
+    }
+
+    if (axisChartShowYearOverYear.value) {
+        const yoyReferenceIndex = axisChartCategoryIndexYoYMap.value[categoryIndex];
+        let displayChangeRate = '-';
+
+        if (isNumber(yoyReferenceIndex)) {
+            let referenceTotalValue = 0;
+
+            for (const seriesId of visibleSeriesIds) {
+                const seriesDimensionData = seriesDimensionTransactionExplorerDataMap.value[seriesId];
+
+                if (seriesDimensionData && seriesDimensionData.categoryValues) {
+                    referenceTotalValue += seriesDimensionData.categoryValues[yoyReferenceIndex] ?? 0;
+                }
+            }
+
+            displayChangeRate = formatDisplayChangeRate(totalValue, referenceTotalValue);
+        }
+
+        extraColumnValues.push(displayChangeRate);
+    }
+
+    if (axisChartShowPeriodOverPeriod.value) {
+        const popReferenceIndex = categoryIndex - 1;
+        let displayChangeRate = '-';
+
+        if (popReferenceIndex >= 0) {
+            let referenceTotalValue = 0;
+
+            for (const seriesId of visibleSeriesIds) {
+                const seriesDimensionData = seriesDimensionTransactionExplorerDataMap.value[seriesId];
+
+                if (seriesDimensionData && seriesDimensionData.categoryValues) {
+                    referenceTotalValue += seriesDimensionData.categoryValues[popReferenceIndex] ?? 0;
+                }
+            }
+
+            displayChangeRate = formatDisplayChangeRate(totalValue, referenceTotalValue);
+        }
+
+        extraColumnValues.push(displayChangeRate);
+    }
+
+    return extraColumnValues;
+}
+
+function getAxisChartTooltipExtraColumnValues(seriesId: string, categoryIndex: number, currentValue: number): string[] {
+    const extraColumnValues: string[] = [];
+
+    if (!axisChartShowYearOverYear.value && !axisChartShowPeriodOverPeriod.value) {
+        return extraColumnValues;
+    }
+
+    const seriesDimensionData = seriesDimensionTransactionExplorerDataMap.value[seriesId];
+
+    if (!seriesDimensionData || !seriesDimensionData.categoryValues) {
+        return extraColumnValues;
+    }
+
+    const values = seriesDimensionData.categoryValues;
+
+    if (axisChartShowYearOverYear.value) {
+        const yoyReferenceIndex = axisChartCategoryIndexYoYMap.value[categoryIndex];
+        let displayChangeRate = '-';
+
+        if (isNumber(yoyReferenceIndex) && yoyReferenceIndex >= 0 && yoyReferenceIndex < values.length) {
+            displayChangeRate = formatDisplayChangeRate(currentValue, values[yoyReferenceIndex] ?? 0);
+        }
+
+        extraColumnValues.push(displayChangeRate);
+    }
+
+    if (axisChartShowPeriodOverPeriod.value) {
+        const popReferenceIndex = categoryIndex - 1;
+        let displayChangeRate = '-';
+
+        if (popReferenceIndex >= 0 && popReferenceIndex < values.length) {
+            displayChangeRate = formatDisplayChangeRate(currentValue, values[popReferenceIndex] ?? 0);
+        }
+
+        extraColumnValues.push(displayChangeRate);
+    }
+
+    return extraColumnValues;
 }
 
 function updateCategoryDimensionType(dimensionType: TransactionExplorerDataDimensionType): void {

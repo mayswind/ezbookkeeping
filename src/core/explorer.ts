@@ -240,51 +240,75 @@ export enum TransactionExplorerDataDimensionType {
     DestinationAccount = 'destinationAccount',
     DestinationAccountCategory = 'destinationAccountCategory',
     DestinationAccountCurrency = 'destinationAccountCurrency',
+    PrimaryCategory = 'primaryCategory',
+    SecondaryCategory = 'secondaryCategory',
     SourceAmount = 'sourceAmount',
     DestinationAmount = 'destinationAmount',
-    PrimaryCategory = 'primaryCategory',
-    SecondaryCategory = 'secondaryCategory'
+    SourceAmountRangeEqualFrequency = 'sourceAmountRangeEqualFrequency',
+    SourceAmountRangeEqualWidth = 'sourceAmountRangeEqualWidth',
+    SourceAmountRangeLogScale = 'sourceAmountRangeLogScale',
+    SourceAmountRangeStandardDeviation = 'sourceAmountRangeStandardDeviation',
+    SourceAmountRangeNaturalBreaks = 'sourceAmountRangeNaturalBreaks',
+    DestinationAmountRangeEqualFrequency = 'destinationAmountRangeEqualFrequency',
+    DestinationAmountRangeEqualWidth = 'destinationAmountRangeEqualWidth',
+    DestinationAmountRangeLogScale = 'destinationAmountRangeLogScale',
+    DestinationAmountRangeStandardDeviation = 'destinationAmountRangeStandardDeviation',
+    DestinationAmountRangeNaturalBreaks = 'destinationAmountRangeNaturalBreaks'
 }
 
 export class TransactionExplorerDataDimension implements NameValue {
     private static readonly allInstances: TransactionExplorerDataDimension[] = [];
     private static readonly allInstancesByValue: Record<string, TransactionExplorerDataDimension> = {};
 
-    public static readonly None = new TransactionExplorerDataDimension('None', TransactionExplorerDataDimensionType.None);
-    public static readonly Query = new TransactionExplorerDataDimension('Query', TransactionExplorerDataDimensionType.Query);
-    public static readonly DateTime = new TransactionExplorerDataDimension('Transaction Time', TransactionExplorerDataDimensionType.DateTime);
-    public static readonly DateTimeByYearMonthDay = new TransactionExplorerDataDimension('Transaction Date', TransactionExplorerDataDimensionType.DateTimeByYearMonthDay);
-    public static readonly DateTimeByYearMonth = new TransactionExplorerDataDimension('Transaction Year-Month', TransactionExplorerDataDimensionType.DateTimeByYearMonth);
-    public static readonly DateTimeByYearQuarter = new TransactionExplorerDataDimension('Transaction Year-Quarter', TransactionExplorerDataDimensionType.DateTimeByYearQuarter);
-    public static readonly DateTimeByYear = new TransactionExplorerDataDimension('Transaction Year', TransactionExplorerDataDimensionType.DateTimeByYear);
-    public static readonly DateTimeByFiscalYear = new TransactionExplorerDataDimension('Transaction Fiscal Year', TransactionExplorerDataDimensionType.DateTimeByFiscalYear);
-    public static readonly DateTimeByDayOfWeek = new TransactionExplorerDataDimension('Transaction Day of Week', TransactionExplorerDataDimensionType.DateTimeByDayOfWeek);
-    public static readonly DateTimeByDayOfMonth = new TransactionExplorerDataDimension('Transaction Day of Month', TransactionExplorerDataDimensionType.DateTimeByDayOfMonth);
-    public static readonly DateTimeByMonthOfYear = new TransactionExplorerDataDimension('Transaction Month of Year', TransactionExplorerDataDimensionType.DateTimeByMonthOfYear);
-    public static readonly DateTimeByQuarterOfYear = new TransactionExplorerDataDimension('Transaction Quarter of Year', TransactionExplorerDataDimensionType.DateTimeByQuarterOfYear);
-    public static readonly DateTimeByHourOfDay = new TransactionExplorerDataDimension('Transaction Hour of Day', TransactionExplorerDataDimensionType.DateTimeByHourOfDay);
-    public static readonly TimezoneOffset = new TransactionExplorerDataDimension('Transaction Timezone', TransactionExplorerDataDimensionType.TimezoneOffset);
-    public static readonly TransactionType = new TransactionExplorerDataDimension('Transaction Type', TransactionExplorerDataDimensionType.TransactionType);
-    public static readonly SourceAccount = new TransactionExplorerDataDimension('Source Account', TransactionExplorerDataDimensionType.SourceAccount);
-    public static readonly SourceAccountCategory = new TransactionExplorerDataDimension('Source Account Category', TransactionExplorerDataDimensionType.SourceAccountCategory);
-    public static readonly SourceAccountCurrency = new TransactionExplorerDataDimension('Source Account Currency', TransactionExplorerDataDimensionType.SourceAccountCurrency);
-    public static readonly DestinationAccount = new TransactionExplorerDataDimension('Destination Account', TransactionExplorerDataDimensionType.DestinationAccount);
-    public static readonly DestinationAccountCategory = new TransactionExplorerDataDimension('Destination Account Category', TransactionExplorerDataDimensionType.DestinationAccountCategory);
-    public static readonly DestinationAccountCurrency = new TransactionExplorerDataDimension('Destination Account Currency', TransactionExplorerDataDimensionType.DestinationAccountCurrency);
-    public static readonly PrimaryCategory = new TransactionExplorerDataDimension('Primary Category', TransactionExplorerDataDimensionType.PrimaryCategory);
-    public static readonly SecondaryCategory = new TransactionExplorerDataDimension('Secondary Category', TransactionExplorerDataDimensionType.SecondaryCategory);
-    public static readonly SourceAmount = new TransactionExplorerDataDimension('Amount', TransactionExplorerDataDimensionType.SourceAmount);
-    public static readonly DestinationAmount = new TransactionExplorerDataDimension('Transfer In Amount', TransactionExplorerDataDimensionType.DestinationAmount);
+    public static readonly None = new TransactionExplorerDataDimension('None', TransactionExplorerDataDimensionType.None, false, false);
+    public static readonly Query = new TransactionExplorerDataDimension('Query', TransactionExplorerDataDimensionType.Query, false, false);
+    public static readonly DateTime = new TransactionExplorerDataDimension('Transaction Time', TransactionExplorerDataDimensionType.DateTime, false, false);
+    public static readonly DateTimeByYearMonthDay = new TransactionExplorerDataDimension('Transaction Date', TransactionExplorerDataDimensionType.DateTimeByYearMonthDay, false, false);
+    public static readonly DateTimeByYearMonth = new TransactionExplorerDataDimension('Transaction Year-Month', TransactionExplorerDataDimensionType.DateTimeByYearMonth, false, false);
+    public static readonly DateTimeByYearQuarter = new TransactionExplorerDataDimension('Transaction Year-Quarter', TransactionExplorerDataDimensionType.DateTimeByYearQuarter, false, false);
+    public static readonly DateTimeByYear = new TransactionExplorerDataDimension('Transaction Year', TransactionExplorerDataDimensionType.DateTimeByYear, false, false);
+    public static readonly DateTimeByFiscalYear = new TransactionExplorerDataDimension('Transaction Fiscal Year', TransactionExplorerDataDimensionType.DateTimeByFiscalYear, false, false);
+    public static readonly DateTimeByDayOfWeek = new TransactionExplorerDataDimension('Transaction Day of Week', TransactionExplorerDataDimensionType.DateTimeByDayOfWeek, false, false);
+    public static readonly DateTimeByDayOfMonth = new TransactionExplorerDataDimension('Transaction Day of Month', TransactionExplorerDataDimensionType.DateTimeByDayOfMonth, false, false);
+    public static readonly DateTimeByMonthOfYear = new TransactionExplorerDataDimension('Transaction Month of Year', TransactionExplorerDataDimensionType.DateTimeByMonthOfYear, false, false);
+    public static readonly DateTimeByQuarterOfYear = new TransactionExplorerDataDimension('Transaction Quarter of Year', TransactionExplorerDataDimensionType.DateTimeByQuarterOfYear, false, false);
+    public static readonly DateTimeByHourOfDay = new TransactionExplorerDataDimension('Transaction Hour of Day', TransactionExplorerDataDimensionType.DateTimeByHourOfDay, false, false);
+    public static readonly TimezoneOffset = new TransactionExplorerDataDimension('Transaction Timezone', TransactionExplorerDataDimensionType.TimezoneOffset, false, false);
+    public static readonly TransactionType = new TransactionExplorerDataDimension('Transaction Type', TransactionExplorerDataDimensionType.TransactionType, false, false);
+    public static readonly SourceAccount = new TransactionExplorerDataDimension('Source Account', TransactionExplorerDataDimensionType.SourceAccount, false, false);
+    public static readonly SourceAccountCategory = new TransactionExplorerDataDimension('Source Account Category', TransactionExplorerDataDimensionType.SourceAccountCategory, false, false);
+    public static readonly SourceAccountCurrency = new TransactionExplorerDataDimension('Source Account Currency', TransactionExplorerDataDimensionType.SourceAccountCurrency, false, false);
+    public static readonly DestinationAccount = new TransactionExplorerDataDimension('Destination Account', TransactionExplorerDataDimensionType.DestinationAccount, false, false);
+    public static readonly DestinationAccountCategory = new TransactionExplorerDataDimension('Destination Account Category', TransactionExplorerDataDimensionType.DestinationAccountCategory, false, false);
+    public static readonly DestinationAccountCurrency = new TransactionExplorerDataDimension('Destination Account Currency', TransactionExplorerDataDimensionType.DestinationAccountCurrency, false, false);
+    public static readonly PrimaryCategory = new TransactionExplorerDataDimension('Primary Category', TransactionExplorerDataDimensionType.PrimaryCategory, false, false);
+    public static readonly SecondaryCategory = new TransactionExplorerDataDimension('Secondary Category', TransactionExplorerDataDimensionType.SecondaryCategory, false, false);
+    public static readonly SourceAmount = new TransactionExplorerDataDimension('Amount', TransactionExplorerDataDimensionType.SourceAmount, false, false);
+    public static readonly DestinationAmount = new TransactionExplorerDataDimension('Transfer In Amount', TransactionExplorerDataDimensionType.DestinationAmount, false, false);
+    public static readonly SourceAmountRangeEqualFrequency = new TransactionExplorerDataDimension('Amount Range (Equal Frequency)', TransactionExplorerDataDimensionType.SourceAmountRangeEqualFrequency, true, false);
+    public static readonly SourceAmountRangeEqualWidth = new TransactionExplorerDataDimension('Amount Range (Equal Width)', TransactionExplorerDataDimensionType.SourceAmountRangeEqualWidth, true, false);
+    public static readonly SourceAmountRangeLogScale = new TransactionExplorerDataDimension('Amount Range (Log Scale)', TransactionExplorerDataDimensionType.SourceAmountRangeLogScale, true, false);
+    public static readonly SourceAmountRangeStandardDeviation = new TransactionExplorerDataDimension('Amount Range (Standard Deviation)', TransactionExplorerDataDimensionType.SourceAmountRangeStandardDeviation, true, false);
+    public static readonly SourceAmountRangeNaturalBreaks = new TransactionExplorerDataDimension('Amount Range (Natural Breaks)', TransactionExplorerDataDimensionType.SourceAmountRangeNaturalBreaks, true, false);
+    public static readonly DestinationAmountRangeEqualFrequency = new TransactionExplorerDataDimension('Transfer In Amount Range (Equal Frequency)', TransactionExplorerDataDimensionType.DestinationAmountRangeEqualFrequency, false, true);
+    public static readonly DestinationAmountRangeEqualWidth = new TransactionExplorerDataDimension('Transfer In Amount Range (Equal Width)', TransactionExplorerDataDimensionType.DestinationAmountRangeEqualWidth, false, true);
+    public static readonly DestinationAmountRangeLogScale = new TransactionExplorerDataDimension('Transfer In Amount Range (Log Scale)', TransactionExplorerDataDimensionType.DestinationAmountRangeLogScale, false, true);
+    public static readonly DestinationAmountRangeStandardDeviation = new TransactionExplorerDataDimension('Transfer In Amount Range (Standard Deviation)', TransactionExplorerDataDimensionType.DestinationAmountRangeStandardDeviation, false, true);
+    public static readonly DestinationAmountRangeNaturalBreaks = new TransactionExplorerDataDimension('Transfer In Amount Range (Natural Breaks)', TransactionExplorerDataDimensionType.DestinationAmountRangeNaturalBreaks, false, true);
 
     public static readonly CategoryDimensionDefault = TransactionExplorerDataDimension.Query;
     public static readonly SeriesDimensionDefault = TransactionExplorerDataDimension.None;
 
     public readonly name: string;
     public readonly value: TransactionExplorerDataDimensionType;
+    public readonly isSourceAmountRange: boolean;
+    public readonly isDestinationAmountRange: boolean;
 
-    private constructor(name: string, value: TransactionExplorerDataDimensionType) {
+    private constructor(name: string, value: TransactionExplorerDataDimensionType, isSourceAmountRange: boolean, isDestinationAmountRange: boolean) {
         this.name = name;
         this.value = value;
+        this.isSourceAmountRange = isSourceAmountRange;
+        this.isDestinationAmountRange = isDestinationAmountRange;
 
         TransactionExplorerDataDimension.allInstances.push(this);
         TransactionExplorerDataDimension.allInstancesByValue[value] = this;

@@ -48,6 +48,18 @@
                     </v-select>
                     <v-select
                         class="flex-0-0"
+                        min-width="220"
+                        item-title="name"
+                        item-value="value"
+                        density="compact"
+                        :disabled="loading || disabled"
+                        :label="tt('Number of Amount Ranges')"
+                        :items="allAmountRangeCounts"
+                        v-model="currentExplorer.amountRangeCount"
+                        v-if="isUsingAmountRange"
+                    />
+                    <v-select
+                        class="flex-0-0"
                         min-width="150"
                         item-title="name"
                         item-value="value"
@@ -211,7 +223,7 @@ import {
     useExplorersStore
 } from '@/stores/explorer.ts';
 
-import { type NameValue, type TypeAndDisplayName, itemAndIndex, entries } from '@/core/base.ts';
+import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, entries } from '@/core/base.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
 import { ChartSortingType, ExportMermaidChartType } from '@/core/statistics.ts';
@@ -274,6 +286,7 @@ const {
     getMonthdayShortName,
     getWeekdayLongName,
     getQuarterName,
+    getCurrentNumeralSystemType,
     getCurrencyName,
     formatDateTimeToShortDateTime,
     formatDateTimeToShortDate,
@@ -292,6 +305,7 @@ const explorersStore = useExplorersStore();
 
 const axisChart = useTemplateRef<AxisChartType>('axisChart');
 
+const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
 const allTransactionExplorerDataDimensions = computed<NameValue[]>(() => getAllTransactionExplorerDataDimensions());
@@ -301,6 +315,17 @@ const allTransactionExplorerChartSortingTypes = computed<TypeAndDisplayName[]>((
 const currentTransactionExplorerCategoryDimensionName = computed<string>(() => findNameByValue(allTransactionExplorerDataDimensions.value, currentExplorer.value.categoryDimension) ?? tt('Unknown'));
 
 const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
+const isUsingAmountRange = computed<boolean>(() => explorersStore.isUsingAmountRange);
+
+const allAmountRangeCounts = computed<NameNumeralValue[]>(() => {
+    const pageCounts: NameNumeralValue[] = [];
+
+    for (let i = 3; i <= 20; i++) {
+        pageCounts.push({ value: i, name: numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(i.toString()) });
+    }
+
+    return pageCounts;
+});
 
 const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[]>(() => {
     if (currentExplorer.value.chartType !== TransactionExplorerChartType.Pie.value && currentExplorer.value.chartType !== TransactionExplorerChartType.Radar.value) {
@@ -573,22 +598,23 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
     let needI18n: boolean | undefined = false;
     let i18nParameters: Record<string, unknown> | undefined = undefined;
     let dimessionType: TransactionExplorerDimensionType = TransactionExplorerDimensionType.Other;
-    let dimession: TransactionExplorerDataDimensionType = TransactionExplorerDataDimension.None.value;
+    let dimessionValue: TransactionExplorerDataDimensionType = TransactionExplorerDataDimension.None.value;
 
     if ('categoryName' in info) {
         name = info.categoryName;
         needI18n = info.categoryNameNeedI18n;
         i18nParameters = info.categoryNameI18nParameters;
         dimessionType = info.categoryIdType;
-        dimession = currentExplorer.value.categoryDimension;
+        dimessionValue = currentExplorer.value.categoryDimension;
     } else if ('seriesName' in info) {
         name = info.seriesName;
         needI18n = info.seriesNameNeedI18n;
         i18nParameters = info.seriesNameI18nParameters;
         dimessionType = info.seriesIdType;
-        dimession = currentExplorer.value.seriesDimension;
+        dimessionValue = currentExplorer.value.seriesDimension;
     }
 
+    const dimession = TransactionExplorerDataDimension.valueOf(dimessionValue);
     let displayName: string = name;
 
     // convert the name to i18n if needed
@@ -599,38 +625,38 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
     }
 
     // convert the name to formatted date time if needed
-    if (dimession === TransactionExplorerDataDimension.DateTime.value) {
+    if (dimession === TransactionExplorerDataDimension.DateTime) {
         const dateTime = parseDateTimeFromString(name, dimessionType);
         displayName = dateTime ? formatDateTimeToShortDateTime(dateTime) : tt('Unknown');
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearMonthDay.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearMonthDay) {
         const dateTime = parseDateTimeFromString(name, dimessionType);
         displayName = dateTime ? formatDateTimeToShortDate(dateTime) : tt('Unknown');
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearMonth.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearMonth) {
         const dateTime = parseDateTimeFromString(name, dimessionType);
         displayName = dateTime ? formatDateTimeToGregorianLikeShortYearMonth(dateTime) : tt('Unknown');
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearQuarter.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYearQuarter) {
         const parts = name.split('-');
         const year = parts.length === 2 ? parts[0] : '';
         const quarter = parts.length === 2 ? parseInt(parts[1] as string) : 0;
         const quarterLastMonth = quarter * 3;
         const dateTime = year && quarterLastMonth ? parseDateTimeFromString(`${year}-${quarterLastMonth.toString(10).padStart(2, NumeralSystem.WesternArabicNumerals.digitZero)}`, TransactionExplorerDimensionType.YearMonth) : undefined;
         displayName = dateTime ? formatDateTimeToGregorianLikeYearQuarter(dateTime) : tt('Unknown');
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYear.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByYear) {
         const dateTime = parseDateTimeFromString(name, dimessionType);
         displayName = dateTime ? formatDateTimeToGregorianLikeShortYear(dateTime) : tt('Unknown');
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByFiscalYear.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByFiscalYear) {
         displayName = formatGregorianYearToGregorianLikeFiscalYear(parseInt(name));
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByDayOfWeek.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByDayOfWeek) {
         const weekDay = WeekDay.parse(name);
         displayName = weekDay ? getWeekdayLongName(weekDay) : tt('Unknown');
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByDayOfMonth.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByDayOfMonth) {
         displayName = getMonthdayShortName(parseInt(name));
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByMonthOfYear.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByMonthOfYear) {
         const month = Month.valueOf(parseInt(name));
         displayName = month ? getMonthLongName(month.name) : tt('Unknown');
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByQuarterOfYear.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByQuarterOfYear) {
         displayName = getQuarterName(parseInt(name));
-    } else if (dimession === TransactionExplorerDataDimension.DateTimeByHourOfDay.value) {
+    } else if (dimession === TransactionExplorerDataDimension.DateTimeByHourOfDay) {
         const dateTime = getCurrentDateTime().set({
             hour: parseInt(name),
             minute: 0,
@@ -638,16 +664,26 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
             millisecond: 0
         });
         displayName = formatDateTimeToShortTime(dateTime);
-    } else if (dimession === TransactionExplorerDataDimension.SourceAccountCurrency.value || dimession === TransactionExplorerDataDimension.DestinationAccountCurrency.value) {
+    } else if (dimession === TransactionExplorerDataDimension.SourceAccountCurrency || dimession === TransactionExplorerDataDimension.DestinationAccountCurrency) {
         if (!needI18n) {
             displayName = getCurrencyName(name);
         }
     }
 
-    if (dimession === TransactionExplorerDataDimension.SourceAmount.value
-        || dimession === TransactionExplorerDataDimension.DestinationAmount.value) {
+    if (dimession === TransactionExplorerDataDimension.SourceAmount
+        || dimession === TransactionExplorerDataDimension.DestinationAmount) {
         if (name !== '' && name !== 'none' && Number.isFinite(parseInt(name))) {
             displayName = formatAmountToLocalizedNumerals(parseInt(name), defaultCurrency.value);
+        }
+    }
+
+    if (dimession?.isSourceAmountRange || dimession?.isDestinationAmountRange) {
+        const rangeParts = name.split('|');
+
+        if (rangeParts && rangeParts.length === 2 && Number.isFinite(parseInt(rangeParts[0] as string)) && Number.isFinite(parseInt(rangeParts[1] as string))) {
+            const from = formatAmountToLocalizedNumerals(parseInt(rangeParts[0] as string), defaultCurrency.value);
+            const to = formatAmountToLocalizedNumerals(parseInt(rangeParts[1] as string), defaultCurrency.value);
+            displayName = `${from} ~ ${to}`;
         }
     }
 

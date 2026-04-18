@@ -72,6 +72,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
     public chartType: TransactionExplorerChartTypeValue;
     public categoryDimension: TransactionExplorerDataDimensionType;
     public seriesDimension: TransactionExplorerDataDimensionType;
+    public amountRangeCount: number;
     public valueMetric: TransactionExplorerValueMetricType;
     public chartSortingType: number;
 
@@ -87,11 +88,12 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         TransactionExplorerChartType.Default.value,
         TransactionExplorerDataDimension.CategoryDimensionDefault.value,
         TransactionExplorerDataDimension.SeriesDimensionDefault.value,
+        5,
         TransactionExplorerValueMetric.Default.value,
         ChartSortingType.Default.type
     );
 
-    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, datatableQuerySource: string, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
+    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, datatableQuerySource: string, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, amountRangeCount: number, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
         this.id = id;
         this.name = name;
         this.displayOrder = displayOrder;
@@ -103,6 +105,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         this.chartType = chartType;
         this.categoryDimension = categoryDimension;
         this.seriesDimension = seriesDimension;
+        this.amountRangeCount = amountRangeCount;
         this.valueMetric = valueMetric;
         this.chartSortingType = chartSortingType;
     }
@@ -116,6 +119,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             chartType: this.chartType,
             categoryDimension: this.categoryDimension,
             seriesDimension: this.seriesDimension,
+            amountRangeCount: this.amountRangeCount,
             valueMetric: this.valueMetric,
             chartSortingType: this.chartSortingType
         };
@@ -147,6 +151,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         let chartType = InsightsExplorer.Default.chartType;
         let categoryDimension = InsightsExplorer.Default.categoryDimension;
         let seriesDimension = InsightsExplorer.Default.seriesDimension;
+        let amountRangeCount = InsightsExplorer.Default.amountRangeCount;
         let valueMetric = InsightsExplorer.Default.valueMetric;
         let chartSortingType = InsightsExplorer.Default.chartSortingType;
         let hasDatatableQuerySource = false;
@@ -174,6 +179,10 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
 
             if (typeof data['seriesDimension'] === 'string') {
                 seriesDimension = data['seriesDimension'] as TransactionExplorerDataDimensionType;
+            }
+
+            if (typeof data['amountRangeCount'] === 'number') {
+                amountRangeCount = data['amountRangeCount'] as number;
             }
 
             if (typeof data['valueMetric'] === 'string') {
@@ -217,6 +226,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             chartType,
             categoryDimension,
             seriesDimension,
+            amountRangeCount,
             valueMetric,
             chartSortingType
         );
@@ -235,6 +245,7 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             InsightsExplorer.Default.chartType,
             InsightsExplorer.Default.categoryDimension,
             InsightsExplorer.Default.seriesDimension,
+            InsightsExplorer.Default.amountRangeCount,
             InsightsExplorer.Default.valueMetric,
             InsightsExplorer.Default.chartSortingType
         );

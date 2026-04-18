@@ -46,6 +46,7 @@ import {
     getObjectOwnFieldCount
 } from '@/lib/common.ts';
 import {
+    mean,
     median,
     percentile,
     sumMaxN,
@@ -127,6 +128,19 @@ export interface CategoriedTransactionExplorerDataItem extends SeriesInfo {
     value: number;
 }
 
+export interface AmountRanges {
+    categorySourceAmountRanges?: number[];
+    categoryDestinationAmountRanges?: number[];
+    seriesSourceAmountRanges?: number[];
+    seriesDestinationAmountRanges?: number[];
+}
+
+export interface TransactionInsightDataItemInQuery {
+    queryIndex: number;
+    queryName: string;
+    transaction: TransactionInsightDataItem;
+}
+
 export interface InsightsExplorerTransactionStatisticData {
     totalCount: number;
     totalAmount: number;
@@ -180,7 +194,180 @@ export const useExplorersStore = defineStore('explorers', () => {
         };
     }
 
-    function getDataCategoryInfo(timezoneUsedForDateRange: number, dimension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
+    function calculateAmountRanges(sortedAmounts: number[], dimension: TransactionExplorerDataDimension, rangeCount: number): number[] {
+        const result: number[] = [];
+
+        if (sortedAmounts.length < 1 || rangeCount <= 0) {
+            return result;
+        }
+
+        const minAmount = sortedAmounts[0] as number;
+        const maxAmount = sortedAmounts[sortedAmounts.length - 1] as number;
+        rangeCount = Math.min(rangeCount, sortedAmounts.length);
+
+        // [min1, max1), [min2, max2), ..., [minN, maxN]
+        if (dimension === TransactionExplorerDataDimension.SourceAmountRangeEqualFrequency
+            || dimension === TransactionExplorerDataDimension.DestinationAmountRangeEqualFrequency) {
+            for (let i = 0; i < rangeCount; i++) {
+                result.push(sortedAmounts[Math.floor(i * (sortedAmounts.length - 1) / rangeCount)] as number);
+            }
+            result.push(maxAmount);
+        } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeEqualWidth
+            || dimension === TransactionExplorerDataDimension.DestinationAmountRangeEqualWidth) {
+            if (minAmount === maxAmount) {
+                return [minAmount, maxAmount];
+            }
+
+            const width: number = (maxAmount - minAmount) / rangeCount;
+
+            for (let i = 0; i < rangeCount; i++) {
+                result.push(minAmount + i * width);
+            }
+            result.push(maxAmount);
+        } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeLogScale
+            || dimension === TransactionExplorerDataDimension.DestinationAmountRangeLogScale) {
+            const epsilon: number = 1e-9;
+
+            const transform = (x: number): number => {
+                if (x === 0) {
+                    return 0;
+                }
+
+                return Math.sign(x) * Math.log(Math.abs(x) + epsilon);
+            };
+
+            const inverse = (y: number): number => {
+                if (y === 0) {
+                    return 0;
+                }
+
+                return Math.sign(y) * (Math.exp(Math.abs(y)) - epsilon);
+            };
+
+            const transformed = sortedAmounts.map(transform).sort((a, b) => a - b);
+
+            const tMin: number = transformed[0] as number;
+            const tMax: number = transformed[transformed.length - 1] as number;
+
+            if (tMin === tMax) {
+                return [minAmount, maxAmount];
+            }
+
+            const width: number = (tMax - tMin) / rangeCount;
+
+            result.push(minAmount);
+            for (let i = 1; i < rangeCount; i++) {
+                result.push(inverse(tMin + i * width));
+            }
+            result.push(maxAmount);
+        } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeStandardDeviation
+            || dimension === TransactionExplorerDataDimension.DestinationAmountRangeStandardDeviation) {
+            if (minAmount === maxAmount) {
+                return [minAmount, maxAmount];
+            }
+
+            const averageAmountForVarianceCalculation: number = mean(sortedAmounts, item => item) / AMOUNT_FACTOR;
+            const { standardDeviation } = varianceAndStandardDeviation(sortedAmounts, averageAmountForVarianceCalculation, item => item / AMOUNT_FACTOR);
+
+            if (standardDeviation === 0) {
+                return [minAmount, maxAmount];
+            }
+
+            const rawBreaks: number[] = [];
+            const halfCount = Math.floor(rangeCount / 2);
+
+            if (rangeCount % 2 === 1) {
+                for (let i = -halfCount; i <= halfCount; i++) {
+                    rawBreaks.push((averageAmountForVarianceCalculation + i * standardDeviation) * AMOUNT_FACTOR);
+                }
+            } else {
+                for (let i = -halfCount; i <= halfCount; i++) {
+                    if (i === 0) {
+                        continue;
+                    }
+                    rawBreaks.push((averageAmountForVarianceCalculation + (i - 0.5) * standardDeviation) * AMOUNT_FACTOR);
+                }
+                rawBreaks.sort((a, b) => a - b);
+            }
+
+            const clipped = rawBreaks.map((v) => Math.max(minAmount, Math.min(maxAmount, v)))
+                .filter((v, i, arr) => i === 0 || v !== arr[i - 1]);
+
+            clipped[0] = minAmount;
+
+            if (clipped[clipped.length - 1] !== maxAmount) {
+                clipped.push(maxAmount);
+            }
+
+            return clipped;
+        } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeNaturalBreaks
+            || dimension === TransactionExplorerDataDimension.DestinationAmountRangeNaturalBreaks) {
+            if (minAmount === maxAmount) {
+                return [minAmount, maxAmount];
+            }
+
+            const n = sortedAmounts.length;
+            const k = Math.min(rangeCount, n);
+
+            const lowerClassLimits: number[][] = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(0));
+            const varianceCombinations: number[][] = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(Infinity));
+
+            for (let i = 1; i <= k; i++) {
+                lowerClassLimits[1]![i] = 1;
+                varianceCombinations[1]![i] = 0;
+            }
+
+            for (let l = 2; l <= n; l++) {
+                let sumZ = 0;
+                let sumZ2 = 0;
+
+                for (let m = 1; m <= l; m++) {
+                    const val = sortedAmounts[l - m] as number;
+                    sumZ += val;
+                    sumZ2 += val * val;
+
+                    const variance = sumZ2 - (sumZ * sumZ) / m;
+
+                    if (m === l) {
+                        for (let j = 1; j <= k; j++) {
+                            if (variance < varianceCombinations[l]![j]!) {
+                                lowerClassLimits[l]![j] = 1;
+                                varianceCombinations[l]![j] = variance;
+                            }
+                        }
+                    } else {
+                        for (let j = 2; j <= k; j++) {
+                            const combined = varianceCombinations[l - m]![j - 1]! + variance;
+                            if (combined < varianceCombinations[l]![j]!) {
+                                lowerClassLimits[l]![j] = l - m + 1;
+                                varianceCombinations[l]![j] = combined;
+                            }
+                        }
+                    }
+                }
+            }
+
+            const breaks: number[] = new Array(k + 1);
+            breaks[k] = maxAmount;
+
+            let currentK = k;
+            let currentIdx = n;
+
+            while (currentK >= 2) {
+                const lowerIdx = lowerClassLimits[currentIdx]![currentK]!;
+                breaks[currentK - 1] = sortedAmounts[lowerIdx - 1] as number;
+                currentIdx = lowerIdx - 1;
+                currentK--;
+            }
+
+            breaks[0] = minAmount;
+            return breaks;
+        }
+
+        return result;
+    }
+
+    function getDataCategoryInfo(timezoneUsedForDateRange: number, dimension: TransactionExplorerDataDimension, sourceAmountRanges: number[] | undefined, destinationAmountRanges: number[] | undefined, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         let transactionTimeUtfOffset: number | undefined = undefined;
 
@@ -468,6 +655,91 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryIdType: TransactionExplorerDimensionType.Amount,
                 categoryDisplayOrders: [amountInDefaultCurrency]
             };
+        } else if (dimension.isSourceAmountRange || dimension.isDestinationAmountRange) {
+            const isSourceAmount = dimension.isSourceAmountRange;
+
+            if (dimension.isDestinationAmountRange && transaction.type !== TransactionType.Transfer) {
+                return {
+                    categoryName: 'None',
+                    categoryNameNeedI18n: true,
+                    categoryId: 'none',
+                    categoryIdType: TransactionExplorerDimensionType.Other,
+                    categoryDisplayOrders: [Number.MAX_SAFE_INTEGER]
+                };
+            }
+
+            const amount = dimension.isSourceAmountRange ? transaction.sourceAmount : transaction.destinationAmount;
+            const account = dimension.isSourceAmountRange ? transaction.sourceAccount : transaction.destinationAccount;
+            let amountInDefaultCurrency: number = amount;
+
+            if (!account) {
+                return {
+                    categoryName: 'Unknown',
+                    categoryNameNeedI18n: true,
+                    categoryId: 'unknown',
+                    categoryIdType: TransactionExplorerDimensionType.Other,
+                    categoryDisplayOrders: [Number.MAX_SAFE_INTEGER]
+                };
+            }
+
+            if (account.currency !== defaultCurrency) {
+                const exchangedAmount = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
+
+                if (isNumber(exchangedAmount)) {
+                    amountInDefaultCurrency = Math.trunc(exchangedAmount);
+                } else {
+                    return {
+                        categoryName: 'Unknown',
+                        categoryNameNeedI18n: true,
+                        categoryId: 'unknown',
+                        categoryIdType: TransactionExplorerDimensionType.Other,
+                        categoryDisplayOrders: [Number.MAX_SAFE_INTEGER]
+                    };
+                }
+            }
+
+            const amountRanges: number[] = isSourceAmount ? (sourceAmountRanges ?? []) : (destinationAmountRanges ?? []);
+            let matchAmountRangeMin: number | undefined = undefined;
+            let matchAmountRangeMax: number | undefined = undefined;
+            let matchAmountRangeIndex: number | undefined = undefined;
+
+            for (let i = 1; i < amountRanges.length; i++) {
+                const amountRangeMin = amountRanges[i - 1] as number;
+                const amountRangeMax = amountRanges[i] as number;
+
+                if (amountInDefaultCurrency < amountRangeMin) {
+                    continue;
+                }
+
+                if (amountInDefaultCurrency > amountRangeMax) {
+                    continue;
+                }
+
+                if (i < amountRanges.length - 1 && amountInDefaultCurrency === amountRangeMax) {
+                    continue;
+                }
+
+                matchAmountRangeMin = amountRangeMin;
+                matchAmountRangeMax = amountRangeMax;
+                matchAmountRangeIndex = i - 1;
+            }
+
+            if (isNumber(matchAmountRangeMin) && isNumber(matchAmountRangeMax) && isNumber(matchAmountRangeIndex)) {
+                return {
+                    categoryName: `${matchAmountRangeMin.toString(10)}|${matchAmountRangeMax.toString(10)}`,
+                    categoryId: matchAmountRangeIndex.toString(10),
+                    categoryIdType: TransactionExplorerDimensionType.Other,
+                    categoryDisplayOrders: [matchAmountRangeIndex]
+                };
+            } else {
+                return {
+                    categoryName: 'Other',
+                    categoryNameNeedI18n: true,
+                    categoryId: 'other',
+                    categoryIdType: TransactionExplorerDimensionType.Other,
+                    categoryDisplayOrders: [Number.MAX_SAFE_INTEGER]
+                };
+            }
         } else {
             return {
                 categoryName: '',
@@ -478,8 +750,37 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
     }
 
-    function addTransactionToCategoriedDataMap(timezoneUsedForDateRange: number, categoriedDataMap: Record<string, CategoriedTransactions>, categoryDimension: TransactionExplorerDataDimension, seriesDemension: TransactionExplorerDataDimension, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
-        const categoriedInfo = getDataCategoryInfo(timezoneUsedForDateRange, categoryDimension, queryName, queryIndex, transaction);
+    function addTransactionToFilteredList(filteredTransactions: TransactionInsightDataItemInQuery[], filteredTransactionSourceAmountsInDefaultCurrency: number[], filteredTransactionDestinationAmountsInDefaultCurrency: number[], defaultCurrency: string, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
+        filteredTransactions.push({
+            queryIndex: queryIndex,
+            queryName: queryName,
+            transaction: transaction
+        });
+
+        let sourceAmountInDefaultCurrency: number | undefined = transaction.sourceAmount;
+        let destinationAmountInDefaultCurrency: number | undefined = transaction.type === TransactionType.Transfer && transaction.destinationAccount ? transaction.destinationAmount : undefined;
+
+        if (transaction.sourceAccount.currency !== defaultCurrency) {
+            const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency);
+            sourceAmountInDefaultCurrency = isNumber(amount) ? Math.trunc(amount) : undefined;
+        }
+
+        if (transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.destinationAccount.currency !== defaultCurrency) {
+            const amount = exchangeRatesStore.getExchangedAmount(transaction.destinationAmount, transaction.destinationAccount.currency, defaultCurrency);
+            destinationAmountInDefaultCurrency = isNumber(amount) ? Math.trunc(amount) : undefined;
+        }
+
+        if (isNumber(sourceAmountInDefaultCurrency)) {
+            filteredTransactionSourceAmountsInDefaultCurrency.push(sourceAmountInDefaultCurrency);
+        }
+
+        if (isNumber(destinationAmountInDefaultCurrency)) {
+            filteredTransactionDestinationAmountsInDefaultCurrency.push(destinationAmountInDefaultCurrency);
+        }
+    }
+
+    function addTransactionToCategoriedDataMap(timezoneUsedForDateRange: number, categoriedDataMap: Record<string, CategoriedTransactions>, categoryDimension: TransactionExplorerDataDimension, seriesDemension: TransactionExplorerDataDimension, allAmountRanges: AmountRanges, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
+        const categoriedInfo = getDataCategoryInfo(timezoneUsedForDateRange, categoryDimension, allAmountRanges.categorySourceAmountRanges, allAmountRanges.categoryDestinationAmountRanges, queryName, queryIndex, transaction);
         let categoriedData = categoriedDataMap[categoriedInfo.categoryId];
 
         if (!categoriedData) {
@@ -495,7 +796,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             categoriedDataMap[categoriedInfo.categoryId] = categoriedData;
         }
 
-        const seriesInfo = getDataCategoryInfo(timezoneUsedForDateRange, seriesDemension, queryName, queryIndex, transaction);
+        const seriesInfo = getDataCategoryInfo(timezoneUsedForDateRange, seriesDemension, allAmountRanges.seriesSourceAmountRanges, allAmountRanges.seriesDestinationAmountRanges, queryName, queryIndex, transaction);
         let seriesData = categoriedData.trasactions[seriesInfo.categoryId];
 
         if (!seriesData) {
@@ -512,6 +813,37 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
 
         seriesData.trasactions.push(transaction);
+    }
+
+    function buildAllAmountRanges(categoryDimension: TransactionExplorerDataDimension, seriesDimension: TransactionExplorerDataDimension, filteredTransactionSourceAmountsInDefaultCurrency: number[], filteredTransactionDestinationAmountsInDefaultCurrency: number[], rangeCount: number): AmountRanges {
+        const allAmountRanges: AmountRanges = {};
+
+        if (categoryDimension.isSourceAmountRange || seriesDimension.isSourceAmountRange) {
+            filteredTransactionSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+            const sorteUniqueAmounts = filteredTransactionSourceAmountsInDefaultCurrency.filter((v, i, a) => i === 0 || v !== a[i - 1]);
+
+            if (categoryDimension.isSourceAmountRange) {
+                allAmountRanges.categorySourceAmountRanges = calculateAmountRanges(sorteUniqueAmounts, categoryDimension, rangeCount);
+            }
+
+            if (seriesDimension.isSourceAmountRange) {
+                allAmountRanges.seriesSourceAmountRanges = calculateAmountRanges(sorteUniqueAmounts, seriesDimension, rangeCount);
+            }
+        }
+
+        if (categoryDimension.isDestinationAmountRange || seriesDimension.isDestinationAmountRange) {
+            filteredTransactionDestinationAmountsInDefaultCurrency.sort((a, b) => a - b);
+            const sorteUniqueAmounts = filteredTransactionDestinationAmountsInDefaultCurrency.filter((v, i, a) => i === 0 || v !== a[i - 1]);
+            if (categoryDimension.isDestinationAmountRange) {
+                allAmountRanges.categoryDestinationAmountRanges = calculateAmountRanges(sorteUniqueAmounts, categoryDimension, rangeCount);
+            }
+
+            if (seriesDimension.isDestinationAmountRange) {
+                allAmountRanges.seriesDestinationAmountRanges = calculateAmountRanges(sorteUniqueAmounts, seriesDimension, rangeCount);
+            }
+        }
+
+        return allAmountRanges;
     }
 
     function loadInsightsExplorerList(explorers: InsightsExplorerBasicInfo[]): void {
@@ -648,6 +980,15 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
 
         return result;
+    });
+
+    const isUsingAmountRange = computed<boolean>(() => {
+        const chartType = TransactionExplorerChartType.valueOf(currentInsightsExplorer.value.chartType);
+        const categoryDimension = TransactionExplorerDataDimension.valueOf(currentInsightsExplorer.value.categoryDimension);
+        const seriesDimension = chartType?.seriesDimensionRequired ? TransactionExplorerDataDimension.valueOf(currentInsightsExplorer.value.seriesDimension) : TransactionExplorerDataDimension.SeriesDimensionDefault;
+        return categoryDimension?.isSourceAmountRange || seriesDimension?.isSourceAmountRange
+            || categoryDimension?.isDestinationAmountRange || seriesDimension?.isDestinationAmountRange
+            || false;
     });
 
     const filteredTransactionsInDataTable = computed<TransactionInsightDataItem[]>(() => {
@@ -795,11 +1136,14 @@ export const useExplorersStore = defineStore('explorers', () => {
             return {};
         }
 
-        const categoriedDataMap: Record<string, CategoriedTransactions> = {};
+        const defaultCurrency = userStore.currentUserDefaultCurrency;
+        const filteredTransactions: TransactionInsightDataItemInQuery[] = [];
+        const filteredTransactionSourceAmountsInDefaultCurrency: number[] = [];
+        const filteredTransactionDestinationAmountsInDefaultCurrency: number[] = [];
 
         for (const transaction of allTransactions.value) {
             if (!currentInsightsExplorer.value.queries || currentInsightsExplorer.value.queries.length < 1) {
-                addTransactionToCategoriedDataMap(currentInsightsExplorer.value.timezoneUsedForDateRange, categoriedDataMap, categoryDimension, seriesDimension, '', 0, transaction);
+                addTransactionToFilteredList(filteredTransactions, filteredTransactionSourceAmountsInDefaultCurrency, filteredTransactionDestinationAmountsInDefaultCurrency, defaultCurrency, '', 0, transaction);
                 continue;
             }
 
@@ -807,13 +1151,20 @@ export const useExplorersStore = defineStore('explorers', () => {
 
             for (const [query, index] of itemAndIndex(currentInsightsExplorer.value.queries)) {
                 if (query.match(transaction, matchContext)) {
-                    addTransactionToCategoriedDataMap(currentInsightsExplorer.value.timezoneUsedForDateRange, categoriedDataMap, categoryDimension, seriesDimension, query.name, index, transaction);
+                    addTransactionToFilteredList(filteredTransactions, filteredTransactionSourceAmountsInDefaultCurrency, filteredTransactionDestinationAmountsInDefaultCurrency, defaultCurrency, query.name, index, transaction);
 
                     if (categoryDimension !== TransactionExplorerDataDimension.Query) {
                         break;
                     }
                 }
             }
+        }
+
+        const categoriedDataMap: Record<string, CategoriedTransactions> = {};
+        const allAmountRanges: AmountRanges = buildAllAmountRanges(categoryDimension, seriesDimension, filteredTransactionSourceAmountsInDefaultCurrency, filteredTransactionDestinationAmountsInDefaultCurrency, currentInsightsExplorer.value.amountRangeCount);
+
+        for (const item of filteredTransactions) {
+            addTransactionToCategoriedDataMap(currentInsightsExplorer.value.timezoneUsedForDateRange, categoriedDataMap, categoryDimension, seriesDimension, allAmountRanges, item.queryName, item.queryIndex, item.transaction);
         }
 
         return categoriedDataMap;
@@ -1523,6 +1874,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         currentInsightsExplorer,
         insightsExplorerListStateInvalid,
         // computed
+        isUsingAmountRange,
         filteredTransactionsInDataTable,
         filteredTransactionsInDataTableStatistic,
         categoriedTransactionExplorerData,

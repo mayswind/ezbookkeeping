@@ -1359,6 +1359,12 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceMaximumAmountShare) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        value = maximumSourceAmountInDefaultCurrency !== Number.MIN_SAFE_INTEGER ? 100.0 * maximumSourceAmountInDefaultCurrency / totalSourceAmountSumInDefaultCurrency : 0;
+                    } else {
+                        value = 0;
+                    }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountSum) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);

@@ -296,6 +296,7 @@ export enum TransactionExplorerValueMetricType {
     SourceAmountInterquartileRange = 'sourceAmountInterquartileRange',
     SourceAmountMeanAbsoluteDeviation = 'sourceAmountMeanAbsoluteDeviation',
     SourceAmountMedianAbsoluteDeviation = 'sourceAmountMedianAbsoluteDeviation',
+    SourceMaximumAmountShare = 'sourceMaximumAmountShare',
     SourceTop5AmountSum = 'sourceTop5AmountSum',
     SourceTop5AmountShare = 'sourceTop5AmountShare',
     TransactionsForEightyPercentOfSourceAmount = 'transactionsForEightyPercentOfSourceAmount',
@@ -333,6 +334,7 @@ export class TransactionExplorerValueMetric implements NameValue {
     public static readonly SourceAmountInterquartileRange = new TransactionExplorerValueMetric('Interquartile Range (Q3 - Q1)', TransactionExplorerValueMetricType.SourceAmountInterquartileRange, true, false, true);
     public static readonly SourceAmountMeanAbsoluteDeviation = new TransactionExplorerValueMetric('Mean Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMeanAbsoluteDeviation, true, false, false);
     public static readonly SourceAmountMedianAbsoluteDeviation = new TransactionExplorerValueMetric('Median Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMedianAbsoluteDeviation, true, false, false);
+    public static readonly SourceMaximumAmountShare = new TransactionExplorerValueMetric('Maximum Amount Share', TransactionExplorerValueMetricType.SourceMaximumAmountShare, false, true, false);
     public static readonly SourceTop5AmountSum = new TransactionExplorerValueMetric('Top 5 Amount Sum', TransactionExplorerValueMetricType.SourceTop5AmountSum, true, false, true);
     public static readonly SourceTop5AmountShare = new TransactionExplorerValueMetric('Top 5 Amount Share', TransactionExplorerValueMetricType.SourceTop5AmountShare, false, true, false);
     public static readonly TransactionsForEightyPercentOfSourceAmount = new TransactionExplorerValueMetric('Transactions for 80% of Amount', TransactionExplorerValueMetricType.TransactionsForEightyPercentOfSourceAmount, false, true, false);

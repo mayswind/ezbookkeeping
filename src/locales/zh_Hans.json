@@ -1830,6 +1830,7 @@
     "90th Percentile Amount": "90百分位金额",
     "95th Percentile Amount": "95百分位金额",
     "99th Percentile Amount": "99百分位金额",
+    "Maximum Amount Share": "最大金额占比",
     "Top 5 Amount Sum": "前5大金额总和",
     "Top 5 Amount Share": "前5大金额占比",
     "Transactions for 80% of Amount": "贡献80%金额的交易占比",

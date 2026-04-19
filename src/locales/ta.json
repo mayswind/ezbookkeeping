@@ -1830,6 +1830,7 @@
     "90th Percentile Amount": "90th Percentile Amount",
     "95th Percentile Amount": "95th Percentile Amount",
     "99th Percentile Amount": "99th Percentile Amount",
+    "Maximum Amount Share": "Maximum Amount Share",
     "Top 5 Amount Sum": "Top 5 Amount Sum",
     "Top 5 Amount Share": "Top 5 Amount Share",
     "Transactions for 80% of Amount": "Transactions for 80% of Amount",

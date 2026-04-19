@@ -15,7 +15,7 @@ import { ThemeType } from '@/core/theme.ts';
 
 import { isArray, isNumber } from '@/lib/common.ts';
 
-interface HeapMapData {
+interface HeatMapData {
     allSeriesNames: string[];
     data: [number, number, number][];
     minValue: number;
@@ -60,7 +60,7 @@ const finalClass = computed<string>(() => {
     if (props.class) {
         finalClass += ` ${props.class}`;
     } else {
-        finalClass += ' heapmap-chart-container';
+        finalClass += ' heatmap-chart-container';
     }
 
     return finalClass;
@@ -75,7 +75,7 @@ const finalStyle = computed<Record<string, string>>(() => {
     return style;
 });
 
-const heatMapData = computed<HeapMapData>(() => {
+const heatMapData = computed<HeatMapData>(() => {
     const allData: [number, number, number][] = [];
     const allSeriesNames: string[] = [];
     let minValue: number = Number.POSITIVE_INFINITY;
@@ -107,7 +107,7 @@ const heatMapData = computed<HeapMapData>(() => {
         }
     }
 
-    const ret: HeapMapData = {
+    const ret: HeatMapData = {
         allSeriesNames: allSeriesNames,
         data: allData,
         minValue: minValue === Number.POSITIVE_INFINITY ? 0 : minValue,
@@ -265,14 +265,14 @@ function getDisplayValue(value: number): string {
 </script>
 
 <style scoped>
-.heapmap-chart-container {
+.heatmap-chart-container {
     width: 100%;
     height: 560px;
     margin-top: 10px;
 }
 
 @media (min-width: 600px) {
-    .heapmap-chart-container {
+    .heatmap-chart-container {
         height: 630px;
     }
 }

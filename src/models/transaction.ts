@@ -558,6 +558,11 @@ export interface TransactionModifyRequest {
     readonly geoLocation?: TransactionGeoLocationRequest;
 }
 
+export interface TransactionBatchUpdateCategoryRequest {
+    readonly transactionIds: string[];
+    readonly categoryId: string;
+}
+
 export interface TransactionMoveBetweenAccountsRequest {
     readonly fromAccountId: string;
     readonly toAccountId: string;

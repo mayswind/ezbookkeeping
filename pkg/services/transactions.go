@@ -434,6 +434,22 @@ func (s *TransactionService) GetTransactionByTransactionId(c core.Context, uid i
 	return transaction, nil
 }
 
+// GetTransactionsByTransactionIds returns transaction models according to transaction ids
+func (s *TransactionService) GetTransactionsByTransactionIds(c core.Context, uid int64, transactionIds []int64) ([]*models.Transaction, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if len(transactionIds) <= 0 {
+		return nil, errs.ErrTransactionIdInvalid
+	}
+
+	var transactions []*models.Transaction
+	err := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=?", uid, false).In("transaction_id", transactionIds).Find(&transactions)
+
+	return transactions, err
+}
+
 // GetAllTransactionCount returns total count of transactions
 func (s *TransactionService) GetAllTransactionCount(c core.Context, uid int64) (int64, error) {
 	return s.GetTransactionCount(c, uid, 0, 0, 0, nil, nil, nil, false, "", "")
@@ -1322,6 +1338,42 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 	return nil
 }
 
+// BatchUpdateTransactionsCategory batch updates the categories of transactions
+func (s *TransactionService) BatchUpdateTransactionsCategory(c core.Context, uid int64, transactionIds []int64, newCategoryId int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	if len(transactionIds) < 1 {
+		return errs.ErrTransactionIdInvalid
+	}
+
+	if newCategoryId <= 0 {
+		return errs.ErrTransactionCategoryIdInvalid
+	}
+
+	uniqueTransactionIds := utils.ToUniqueInt64Slice(transactionIds)
+	now := time.Now().Unix()
+
+	updateModel := &models.Transaction{
+		CategoryId:      newCategoryId,
+		UpdatedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		updatedRows, err := sess.Cols("category_id", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("transaction_id", uniqueTransactionIds).Update(updateModel)
+
+		if err != nil {
+			return err
+		} else if updatedRows < int64(len(uniqueTransactionIds)) {
+			return errs.ErrTransactionNotFound
+		}
+
+		return err
+	})
+}
+
+// MoveAllTransactionsBetweenAccounts moves all transactions from one account to another account, and combine balance modification transactions if necessary
 func (s *TransactionService) MoveAllTransactionsBetweenAccounts(c core.Context, uid int64, fromAccountId int64, toAccountId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid

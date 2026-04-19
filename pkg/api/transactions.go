@@ -1338,6 +1338,105 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	return newTransactionResp, nil
 }
 
+// TransactionBatchUpdateCategoriesHandler batch updates categories of transactions by request parameters for current user
+func (a *TransactionsApi) TransactionBatchUpdateCategoriesHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionBatchUpdateReq models.TransactionBatchUpdateCategoryRequest
+	err := c.ShouldBindJSON(&transactionBatchUpdateReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	clientTimezone, err := c.GetClientTimezone()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] cannot get client timezone, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	transactionIds, err := utils.StringArrayToInt64Array(transactionBatchUpdateReq.TransactionIds)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] parse transaction ids failed, because %s", err.Error())
+		return nil, errs.ErrTransactionIdInvalid
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	category, err := a.transactionCategories.GetCategoryByCategoryId(c, uid, transactionBatchUpdateReq.CategoryId)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] failed to get category \"id:%d\" for user \"uid:%d\", because %s", transactionBatchUpdateReq.CategoryId, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	if category.ParentCategoryId == models.LevelOneTransactionCategoryParentId {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] transaction category \"id:%d\" is not a sub category", category.CategoryId)
+		return nil, errs.ErrCannotUsePrimaryCategoryForTransaction
+	}
+
+	var expectedTransactionType models.TransactionDbType
+
+	if category.Type == models.CATEGORY_TYPE_EXPENSE {
+		expectedTransactionType = models.TRANSACTION_DB_TYPE_EXPENSE
+	} else if category.Type == models.CATEGORY_TYPE_INCOME {
+		expectedTransactionType = models.TRANSACTION_DB_TYPE_INCOME
+	} else if category.Type == models.CATEGORY_TYPE_TRANSFER {
+		expectedTransactionType = models.TRANSACTION_DB_TYPE_TRANSFER_OUT
+	}
+
+	transactions, err := a.transactions.GetTransactionsByTransactionIds(c, uid, transactionIds)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] failed to get transactions for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	allTransactionIds := make([]int64, 0, len(transactions))
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if transaction.Type != expectedTransactionType {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] transaction \"id:%d\" type is not expected type \"%d\" for user \"uid:%d\"", transaction.TransactionId, expectedTransactionType, uid)
+			return nil, errs.ErrTransactionTypeInvalid
+		}
+
+		transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, clientTimezone)
+
+		if !transactionEditable {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] transaction \"id:%d\" is not editable for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrCannotModifyTransactionWithThisTransactionTime
+		}
+
+		allTransactionIds = append(allTransactionIds, transaction.TransactionId)
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			allTransactionIds = append(allTransactionIds, transaction.RelatedId)
+		}
+	}
+
+	err = a.transactions.BatchUpdateTransactionsCategory(c, uid, allTransactionIds, category.CategoryId)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] failed to batch update transactions category for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[transactions.TransactionBatchUpdateCategoriesHandler] user \"uid:%d\" has batch updated category of %d transactions successfully", uid, len(transactionBatchUpdateReq.TransactionIds))
+	return true, nil
+}
+
 // TransactionMoveAllBetweenAccountsHandler moves all transactions from one account to another account for current user
 func (a *TransactionsApi) TransactionMoveAllBetweenAccountsHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionMoveReq models.TransactionMoveBetweenAccountsRequest

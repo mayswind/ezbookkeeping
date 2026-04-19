@@ -325,6 +325,12 @@ type TransactionGetRequest struct {
 	TrimTag      bool  `form:"trim_tag"`
 }
 
+// TransactionBatchUpdateCategoryRequest represents all parameters of transaction batch update category request
+type TransactionBatchUpdateCategoryRequest struct {
+	TransactionIds []string `json:"transactionIds,string" binding:"required"`
+	CategoryId     int64    `json:"categoryId,string" binding:"required"`
+}
+
 // TransactionMoveBetweenAccountsRequest represents all parameters of moving all transactions between accounts request
 type TransactionMoveBetweenAccountsRequest struct {
 	FromAccountId int64 `json:"fromAccountId,string" binding:"required,min=1"`

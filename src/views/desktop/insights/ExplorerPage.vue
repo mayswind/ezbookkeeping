@@ -5,7 +5,7 @@
                 <v-layout>
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-6 my-4">
-                            <btn-vertical-group :disabled="loading || updating" :buttons="allTabs" v-model="activeTab" />
+                            <btn-vertical-group :disabled="loading || updating || isCurrentDataTableEditable" :buttons="allTabs" v-model="activeTab" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows
@@ -13,13 +13,13 @@
                                 style="max-height: calc(100% - 150px)"
                                 direction="vertical"
                                 :prev-icon="mdiMenuUp" :next-icon="mdiMenuDown"
-                                :key="currentExplorer.id" :disabled="loading || updating"
+                                :key="currentExplorer.id" :disabled="loading || updating || isCurrentDataTableEditable"
                                 :model-value="currentExplorer.id">
                             <v-tab class="tab-text-truncate" key="new" value="" @click="createNewExplorer">
                                 <span class="text-truncate">{{ tt('New Explorer') }}</span>
                             </v-tab>
                             <v-tab class="tab-text-truncate" :key="explorer.id" :value="explorer.id"
-                                   :disabled="loading || updating"
+                                   :disabled="loading || updating || isCurrentDataTableEditable"
                                    v-for="explorer in allVisibleExplorers"
                                    @click="loadExplorer(explorer.id)">
                                 <span class="text-truncate">{{ explorer.name || tt('Untitled Explorer') }}</span>
@@ -41,11 +41,11 @@
                                     <span>{{ tt('Insights Explorer') }}</span>
                                     <v-btn-group class="ms-4" color="default" density="comfortable" variant="outlined" divided>
                                         <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
-                                               :disabled="loading || updating || !canShiftDateRange"
+                                               :disabled="loading || updating || !canShiftDateRange || isCurrentDataTableEditable"
                                                @click="shiftDateRange(-1)"/>
                                         <v-menu location="bottom" max-height="500">
                                             <template #activator="{ props }">
-                                                <v-btn :disabled="loading || updating"
+                                                <v-btn :disabled="loading || updating || isCurrentDataTableEditable"
                                                        v-bind="props">{{ displayQueryDateRangeName }}</v-btn>
                                             </template>
                                             <v-list :selected="[currentFilter.dateRangeType]">
@@ -68,7 +68,7 @@
                                             </v-list>
                                         </v-menu>
                                         <v-btn class="button-icon-with-direction" :icon="mdiArrowRight"
-                                               :disabled="loading || updating || !canShiftDateRange"
+                                               :disabled="loading || updating || !canShiftDateRange || isCurrentDataTableEditable"
                                                @click="shiftDateRange(1)"/>
                                     </v-btn-group>
 
@@ -84,7 +84,7 @@
                                     <v-btn class="ms-3"
                                            :color="isCurrentExplorerModified ? 'primary' : 'default'"
                                            :variant="isCurrentExplorerModified ? 'elevated' : 'outlined'"
-                                           :disabled="loading || updating" @click="saveExplorer(false)">
+                                           :disabled="loading || updating || isCurrentDataTableEditable" @click="saveExplorer(false)">
                                         {{ tt('Save Explorer') }}
                                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="updating"></v-progress-circular>
                                         <v-menu activator="parent" :open-on-hover="true">
@@ -113,29 +113,41 @@
                                                                  v-for="timezoneType in allTimezoneTypesUsedForDateRange"
                                                                  @click="currentExplorer.timezoneUsedForDateRange = timezoneType.type"></v-list-item>
                                                 </template>
+                                                <v-list-item :prepend-icon="mdiTableEdit"
+                                                             :title="tt('Enter Edit Mode')"
+                                                             :disabled="loading || updating || filteredTransactionsInDataTable.length < 1"
+                                                             @click="isCurrentDataTableEditable = true"
+                                                             v-if="activeTab === 'table' && !isCurrentDataTableEditable"></v-list-item>
+                                                <v-list-item :prepend-icon="mdiTableCheck"
+                                                             :title="tt('Exit Edit Mode')"
+                                                             :disabled="loading || updating"
+                                                             @click="isCurrentDataTableEditable = false"
+                                                             v-if="activeTab === 'table' && isCurrentDataTableEditable"></v-list-item>
+                                                <v-divider class="my-2" v-if="activeTab === 'table' && !isCurrentDataTableEditable"/>
                                                 <v-list-item :prepend-icon="mdiExport"
                                                              :title="tt('Export Results')"
                                                              :disabled="loading || updating || (activeTab === 'table' && (!filteredTransactionsInDataTable || filteredTransactionsInDataTable.length < 1))"
                                                              @click="exportResults"
-                                                             v-if="activeTab === 'table' || activeTab === 'chart'"></v-list-item>
-                                                <v-divider class="my-2" v-if="currentExplorer.id" />
-                                                <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorerName" v-if="currentExplorer.id">
+                                                             v-if="(activeTab === 'table' || activeTab === 'chart') && !isCurrentDataTableEditable"></v-list-item>
+                                                <v-divider class="my-2" v-if="currentExplorer.id && !isCurrentDataTableEditable" />
+                                                <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorerName" v-if="currentExplorer.id && !isCurrentDataTableEditable">
                                                     <v-list-item-title>{{ tt('Rename Explorer') }}</v-list-item-title>
                                                 </v-list-item>
-                                                <v-list-item :prepend-icon="mdiEyeOffOutline" @click="hideExplorer(true)" v-if="currentExplorer.id && !currentExplorer.hidden">
+                                                <v-list-item :prepend-icon="mdiEyeOffOutline" @click="hideExplorer(true)" v-if="currentExplorer.id && !currentExplorer.hidden && !isCurrentDataTableEditable">
                                                     <v-list-item-title>{{ tt('Hide Explorer') }}</v-list-item-title>
                                                 </v-list-item>
-                                                <v-list-item :prepend-icon="mdiEyeOutline" @click="hideExplorer(false)" v-if="currentExplorer.id && currentExplorer.hidden">
+                                                <v-list-item :prepend-icon="mdiEyeOutline" @click="hideExplorer(false)" v-if="currentExplorer.id && currentExplorer.hidden && !isCurrentDataTableEditable">
                                                     <v-list-item-title>{{ tt('Unhide Explorer') }}</v-list-item-title>
                                                 </v-list-item>
-                                                <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id">
+                                                <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExplorer" v-if="currentExplorer.id && !isCurrentDataTableEditable">
                                                     <v-list-item-title>{{ tt('Delete Explorer') }}</v-list-item-title>
                                                 </v-list-item>
-                                                <v-divider class="my-2"/>
+                                                <v-divider class="my-2" v-if="!isCurrentDataTableEditable"/>
                                                 <v-list-item :prepend-icon="mdiSort"
                                                              :disabled="!allExplorers || allExplorers.length < 2"
                                                              :title="tt('Change Explorer Display Order')"
-                                                             @click="showChangeExplorerDisplayOrderDialog"></v-list-item>
+                                                             @click="showChangeExplorerDisplayOrderDialog"
+                                                             v-if="!isCurrentDataTableEditable"></v-list-item>
                                             </v-list>
                                         </v-menu>
                                     </v-btn>
@@ -149,7 +161,13 @@
                                 <v-window-item value="table">
                                     <explorer-data-table-tab ref="explorerDataTableTab"
                                                              :loading="loading" :disabled="loading || updating"
-                                                             @click:transaction="onShowTransaction" />
+                                                             @click:transaction="onShowTransaction"
+                                                             v-if="!isCurrentDataTableEditable" />
+                                    <explorer-editable-data-table-tab ref="explorerEditableDataTableTab"
+                                                                      :loading="loading" :disabled="loading || updating"
+                                                                      @click:transaction="onShowTransaction"
+                                                                      @update:transactions="onUpdateTransactions"
+                                                                      v-if="isCurrentDataTableEditable" />
                                 </v-window-item>
                                 <v-window-item value="chart">
                                     <explorer-chart-tab ref="explorerChartTab"
@@ -187,6 +205,7 @@ import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
 import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTableTab.vue';
+import ExplorerEditableDataTableTab from '@/views/desktop/insights/tabs/ExplorerEditableDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
 import ExplorerChangeDisplayOrderDialog from '@/views/desktop/insights/dialogs/ExplorerChangeDisplayOrderDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
@@ -238,7 +257,9 @@ import {
     mdiSort,
     mdiHomeClockOutline,
     mdiInvoiceTextClockOutline,
-    mdiExport
+    mdiExport,
+    mdiTableEdit,
+    mdiTableCheck
 } from '@mdi/js';
 
 interface InsightsExplorerProps {
@@ -298,6 +319,7 @@ const initing = ref<boolean>(true);
 const updating = ref<boolean>(false);
 const clientSessionId = ref<string>('');
 const isCurrentExplorerModified = ref<boolean>(false);
+const isCurrentDataTableEditable = ref<boolean>(false);
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
 const activeTab = ref<ExplorerPageTabType>('query');
@@ -724,6 +746,10 @@ function onShowTransaction(transaction: TransactionInsightDataItem): void {
             snackbar.value?.showError(error);
         }
     });
+}
+
+function onUpdateTransactions(): void {
+    reload(false);
 }
 
 function onShowDateRangeError(message: string): void {

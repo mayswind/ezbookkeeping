@@ -1117,6 +1117,51 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
+    function batchUpdateTransactionCategories({ transactionIds, categoryId }: { transactionIds: string[], categoryId: string }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.batchUpdateTransactionCategories({ transactionIds, categoryId }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to update categories for transactions' });
+                    return;
+                }
+
+                if (!transactionListStateInvalid.value) {
+                    updateTransactionListInvalidState(true);
+                }
+
+                if (!transactionReconciliationStatementStateInvalid.value) {
+                    updateTransactionReconciliationStatementInvalidState(true);
+                }
+
+                if (!overviewStore.transactionOverviewStateInvalid) {
+                    overviewStore.updateTransactionOverviewInvalidState(true);
+                }
+
+                if (!statisticsStore.transactionStatisticsStateInvalid) {
+                    statisticsStore.updateTransactionStatisticsInvalidState(true);
+                }
+
+                if (!explorersStore.transactionExplorerStateInvalid) {
+                    explorersStore.updateTransactionExplorerInvalidState(true);
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to update categories for transactions', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to update categories for transactions' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function moveAllTransactionsBetweenAccounts({ fromAccountId, toAccountId }: { fromAccountId: string, toAccountId: string }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.moveAllTransactionsBetweenAccounts({ fromAccountId, toAccountId }).then(response => {
@@ -1472,6 +1517,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         getReconciliationStatements,
         getTransaction,
         saveTransaction,
+        batchUpdateTransactionCategories,
         moveAllTransactionsBetweenAccounts,
         deleteTransaction,
         recognizeReceiptImage,

@@ -191,6 +191,21 @@ export function getObjectOwnFieldCount(object: object): number {
     return count;
 }
 
+export function getObjectOwnFieldWithValueCount(object: object, value: unknown): number {
+    let count = 0;
+
+    if (!object || !isObject(object)) {
+        return count;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const _ of keysIfValueEquals(object, value)) {
+        count++;
+    }
+
+    return count;
+}
+
 export function replaceAll(value: string, originalValue: string, targetValue: string): string {
     // Escape special characters in originalValue to safely use it in a regex pattern.
     // This ensures that characters like . (dot), * (asterisk), +, ?, etc. are treated literally,

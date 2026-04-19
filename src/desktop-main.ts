@@ -65,6 +65,7 @@ import {
 } from 'echarts/charts';
 import {
     GridComponent,
+    CalendarComponent,
     TooltipComponent,
     LegendComponent,
     VisualMapComponent
@@ -115,6 +116,7 @@ import RadarChartComponent from '@/components/desktop/RadarChart.vue';
 import AxisChart from '@/components/desktop/AxisChart.vue';
 import TrendsChart from '@/components/desktop/TrendsChart.vue';
 import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
+import CalendarHeatMapChart from '@/components/desktop/CalendarHeatMapChart.vue';
 import RenameDialog from '@/components/desktop/RenameDialog.vue';
 import DateRangeSelectionDialog from '@/components/desktop/DateRangeSelectionDialog.vue';
 import MonthSelectionDialog from '@/components/desktop/MonthSelectionDialog.vue';
@@ -521,6 +523,7 @@ echarts.use([
     HeatmapChart,
     SankeyChart,
     GridComponent,
+    CalendarComponent,
     TooltipComponent,
     LegendComponent,
     VisualMapComponent
@@ -566,6 +569,7 @@ app.component('RadarChart', RadarChartComponent);
 app.component('AxisChart', AxisChart);
 app.component('TrendsChart', TrendsChart);
 app.component('HeatMapChart', HeatMapChart);
+app.component('CalendarHeatMapChart', CalendarHeatMapChart);
 app.component('RenameDialog', RenameDialog);
 app.component('DateRangeSelectionDialog', DateRangeSelectionDialog);
 app.component('MonthSelectionDialog', MonthSelectionDialog);

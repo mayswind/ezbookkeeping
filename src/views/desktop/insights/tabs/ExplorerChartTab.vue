@@ -12,7 +12,8 @@
                         :disabled="loading || disabled"
                         :label="tt('Chart Type')"
                         :items="allTransactionExplorerChartTypes"
-                        v-model="currentExplorer.chartType"
+                        :model-value="currentExplorer.chartType"
+                        @update:model-value="updateChartType"
                     />
                     <v-select
                         class="flex-0-0"
@@ -20,10 +21,10 @@
                         item-title="name"
                         item-value="value"
                         density="compact"
-                        :disabled="loading || disabled"
+                        :disabled="loading || disabled || isDefined(TransactionExplorerChartType.valueOf(currentExplorer.chartType)?.fixedCategoryDimension)"
                         :label="tt('Axis / Category')"
                         :items="allTransactionExplorerDataDimensions"
-                        :model-value="currentExplorer.categoryDimension"
+                        :model-value="TransactionExplorerChartType.valueOf(currentExplorer.chartType)?.fixedCategoryDimension ?? currentExplorer.categoryDimension"
                         @update:model-value="updateCategoryDimensionType"
                     />
                     <v-select
@@ -75,7 +76,7 @@
                         item-title="displayName"
                         item-value="type"
                         density="compact"
-                        :disabled="loading || disabled"
+                        :disabled="loading || disabled || isDefined(TransactionExplorerChartType.valueOf(currentExplorer.chartType)?.fixedSortingType)"
                         :label="tt('Sort Order')"
                         :items="allTransactionExplorerChartSortingTypes"
                         v-model="currentExplorer.chartSortingType"
@@ -203,6 +204,27 @@
             v-else-if="!loading"
         />
     </v-card-text>
+    <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExplorer.chartType === TransactionExplorerChartType.CalendarHeatmap.value">
+        <calendar-heat-map-chart
+            :skeleton="true"
+            :items="[]"
+            :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.name ?? 'Value')"
+            id-field="id"
+            value-field="totalAmount"
+            v-if="loading"
+        />
+        <calendar-heat-map-chart
+            :show-value="true"
+            :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
+            :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.name ?? 'Value')"
+            :amount-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isAmount"
+            :percent-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isPercent"
+            :default-currency="defaultCurrency"
+            id-field="id"
+            value-field="totalAmount"
+            v-else-if="!loading"
+        />
+    </v-card-text>
 </template>
 
 <script setup lang="ts">
@@ -228,10 +250,11 @@ import { NumeralSystem } from '@/core/numeral.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
 import { ChartSortingType, ExportMermaidChartType } from '@/core/statistics.ts';
 import {
-    TransactionExplorerChartType,
     TransactionExplorerDataDimensionType,
     TransactionExplorerDataDimension,
-    TransactionExplorerValueMetric
+    TransactionExplorerValueMetric,
+    TransactionExplorerChartTypeValue,
+    TransactionExplorerChartType
 } from '@/core/explorer.ts';
 
 import { type SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
@@ -328,7 +351,9 @@ const allAmountRangeCounts = computed<NameNumeralValue[]>(() => {
 });
 
 const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[]>(() => {
-    if (currentExplorer.value.chartType !== TransactionExplorerChartType.Pie.value && currentExplorer.value.chartType !== TransactionExplorerChartType.Radar.value) {
+    if (currentExplorer.value.chartType !== TransactionExplorerChartType.Pie.value
+        && currentExplorer.value.chartType !== TransactionExplorerChartType.Radar.value
+        && currentExplorer.value.chartType !== TransactionExplorerChartType.CalendarHeatmap.value) {
         return [];
     }
 
@@ -793,6 +818,26 @@ function getAxisChartTooltipExtraColumnValues(seriesId: string, categoryIndex: n
     }
 
     return extraColumnValues;
+}
+
+function updateChartType(chartTypeValue: TransactionExplorerChartTypeValue): void {
+    if (currentExplorer.value.chartType !== chartTypeValue) {
+        currentExplorer.value.chartType = chartTypeValue;
+    }
+
+    const chartType = TransactionExplorerChartType.valueOf(chartTypeValue);
+
+    if (isDefined(chartType?.fixedCategoryDimension)) {
+        currentExplorer.value.categoryDimension = chartType.fixedCategoryDimension;
+    }
+
+    if (!chartType?.seriesDimensionRequired) {
+        currentExplorer.value.seriesDimension = TransactionExplorerDataDimension.None.value;
+    }
+
+    if (isDefined(chartType?.fixedSortingType)) {
+        currentExplorer.value.chartSortingType = chartType.fixedSortingType;
+    }
 }
 
 function updateCategoryDimensionType(dimensionType: TransactionExplorerDataDimensionType): void {

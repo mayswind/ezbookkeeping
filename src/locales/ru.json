@@ -1604,6 +1604,7 @@
     "Area Chart (100% Stacked)": "Диаграмма с областями (с 100% накоплением)",
     "Bubble Chart (Grouped)": "Пузырьковая диаграмма (сгрупированная)",
     "Heatmap Chart": "Heatmap Chart",
+    "Calendar Heatmap Chart": "Calendar Heatmap Chart",
     "Sort by": "Сортировать по",
     "Map": "Карта",
     "Provider": "Провайдер",

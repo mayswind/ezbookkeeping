@@ -1,5 +1,6 @@
 import { type NameValue } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
+import { ChartSortingType } from '@/core/statistics.ts';
 
 export enum TransactionExplorerConditionRelation {
     First = 'first',
@@ -163,58 +164,6 @@ export class TransactionExplorerConditionOperator implements NameValue {
 
     public static valueOf(value: string): TransactionExplorerConditionOperator | undefined {
         return TransactionExplorerConditionOperator.allInstancesByValue[value];
-    }
-}
-
-export enum TransactionExplorerChartTypeValue {
-    Pie = 'pie',
-    ColumnStacked = 'columnStacked',
-    Column100PercentStacked = 'column100%Stacked',
-    ColumnGrouped = 'columnGrouped',
-    LineGrouped = 'lineGrouped',
-    AreaStacked = 'areaStacked',
-    Area100PercentStacked = 'area100%Stacked',
-    BubbleGrouped = 'bubbleGrouped',
-    Radar = 'radar',
-    Heatmap = 'heatmap'
-}
-
-export class TransactionExplorerChartType implements NameValue {
-    private static readonly allInstances: TransactionExplorerChartType[] = [];
-    private static readonly allInstancesByValue: Record<string, TransactionExplorerChartType> = {};
-
-    public static readonly Pie = new TransactionExplorerChartType('Pie Chart', TransactionExplorerChartTypeValue.Pie, false);
-    public static readonly Radar = new TransactionExplorerChartType('Radar Chart', TransactionExplorerChartTypeValue.Radar, false);
-    public static readonly ColumnStacked = new TransactionExplorerChartType('Column Chart (Stacked)', TransactionExplorerChartTypeValue.ColumnStacked, true);
-    public static readonly Column100PercentStacked = new TransactionExplorerChartType('Column Chart (100% Stacked)', TransactionExplorerChartTypeValue.Column100PercentStacked, true);
-    public static readonly ColumnGrouped = new TransactionExplorerChartType('Column Chart (Grouped)', TransactionExplorerChartTypeValue.ColumnGrouped, true);
-    public static readonly LineGrouped = new TransactionExplorerChartType('Line Chart (Grouped)', TransactionExplorerChartTypeValue.LineGrouped, true);
-    public static readonly AreaStacked = new TransactionExplorerChartType('Area Chart (Stacked)', TransactionExplorerChartTypeValue.AreaStacked, true);
-    public static readonly Area100PercentStacked = new TransactionExplorerChartType('Area Chart (100% Stacked)', TransactionExplorerChartTypeValue.Area100PercentStacked, true);
-    public static readonly BubbleGrouped = new TransactionExplorerChartType('Bubble Chart (Grouped)', TransactionExplorerChartTypeValue.BubbleGrouped, true);
-    public static readonly Heatmap = new TransactionExplorerChartType('Heatmap Chart', TransactionExplorerChartTypeValue.Heatmap, true);
-
-    public static readonly Default = TransactionExplorerChartType.Pie;
-
-    public readonly name: string;
-    public readonly value: TransactionExplorerChartTypeValue;
-    public readonly seriesDimensionRequired: boolean;
-
-    private constructor(name: string, value: TransactionExplorerChartTypeValue, seriesDimensionRequired: boolean) {
-        this.name = name;
-        this.value = value;
-        this.seriesDimensionRequired = seriesDimensionRequired;
-
-        TransactionExplorerChartType.allInstances.push(this);
-        TransactionExplorerChartType.allInstancesByValue[value] = this;
-    }
-
-    public static values(): TransactionExplorerChartType[] {
-        return TransactionExplorerChartType.allInstances;
-    }
-
-    public static valueOf(value: string): TransactionExplorerChartType | undefined {
-        return TransactionExplorerChartType.allInstancesByValue[value];
     }
 }
 
@@ -418,6 +367,64 @@ export class TransactionExplorerValueMetric implements NameValue {
 
     public static valueOf(value: string): TransactionExplorerValueMetric | undefined {
         return TransactionExplorerValueMetric.allInstancesByValue[value];
+    }
+}
+
+export enum TransactionExplorerChartTypeValue {
+    Pie = 'pie',
+    ColumnStacked = 'columnStacked',
+    Column100PercentStacked = 'column100%Stacked',
+    ColumnGrouped = 'columnGrouped',
+    LineGrouped = 'lineGrouped',
+    AreaStacked = 'areaStacked',
+    Area100PercentStacked = 'area100%Stacked',
+    BubbleGrouped = 'bubbleGrouped',
+    Radar = 'radar',
+    Heatmap = 'heatmap',
+    CalendarHeatmap = 'calendarHeatmap'
+}
+
+export class TransactionExplorerChartType implements NameValue {
+    private static readonly allInstances: TransactionExplorerChartType[] = [];
+    private static readonly allInstancesByValue: Record<string, TransactionExplorerChartType> = {};
+
+    public static readonly Pie = new TransactionExplorerChartType('Pie Chart', TransactionExplorerChartTypeValue.Pie, undefined, false, undefined);
+    public static readonly Radar = new TransactionExplorerChartType('Radar Chart', TransactionExplorerChartTypeValue.Radar, undefined, false, undefined);
+    public static readonly ColumnStacked = new TransactionExplorerChartType('Column Chart (Stacked)', TransactionExplorerChartTypeValue.ColumnStacked, undefined, true, undefined);
+    public static readonly Column100PercentStacked = new TransactionExplorerChartType('Column Chart (100% Stacked)', TransactionExplorerChartTypeValue.Column100PercentStacked, undefined, true, undefined);
+    public static readonly ColumnGrouped = new TransactionExplorerChartType('Column Chart (Grouped)', TransactionExplorerChartTypeValue.ColumnGrouped, undefined, true, undefined);
+    public static readonly LineGrouped = new TransactionExplorerChartType('Line Chart (Grouped)', TransactionExplorerChartTypeValue.LineGrouped, undefined, true, undefined);
+    public static readonly AreaStacked = new TransactionExplorerChartType('Area Chart (Stacked)', TransactionExplorerChartTypeValue.AreaStacked, undefined, true, undefined);
+    public static readonly Area100PercentStacked = new TransactionExplorerChartType('Area Chart (100% Stacked)', TransactionExplorerChartTypeValue.Area100PercentStacked, undefined, true, undefined);
+    public static readonly BubbleGrouped = new TransactionExplorerChartType('Bubble Chart (Grouped)', TransactionExplorerChartTypeValue.BubbleGrouped, undefined, true, undefined);
+    public static readonly Heatmap = new TransactionExplorerChartType('Heatmap Chart', TransactionExplorerChartTypeValue.Heatmap, undefined, true, undefined);
+    public static readonly CalendarHeatmap = new TransactionExplorerChartType('Calendar Heatmap Chart', TransactionExplorerChartTypeValue.CalendarHeatmap, TransactionExplorerDataDimensionType.DateTimeByYearMonthDay, false, ChartSortingType.DisplayOrder.type);
+
+    public static readonly Default = TransactionExplorerChartType.Pie;
+
+    public readonly name: string;
+    public readonly value: TransactionExplorerChartTypeValue;
+    public readonly fixedCategoryDimension: TransactionExplorerDataDimensionType | undefined;
+    public readonly seriesDimensionRequired: boolean;
+    public readonly fixedSortingType: number | undefined;
+
+    private constructor(name: string, value: TransactionExplorerChartTypeValue, fixedCategoryDimension: TransactionExplorerDataDimensionType | undefined, seriesDimensionRequired: boolean, fixedSortingType: number | undefined) {
+        this.name = name;
+        this.value = value;
+        this.fixedCategoryDimension = fixedCategoryDimension;
+        this.seriesDimensionRequired = seriesDimensionRequired;
+        this.fixedSortingType = fixedSortingType;
+
+        TransactionExplorerChartType.allInstances.push(this);
+        TransactionExplorerChartType.allInstancesByValue[value] = this;
+    }
+
+    public static values(): TransactionExplorerChartType[] {
+        return TransactionExplorerChartType.allInstances;
+    }
+
+    public static valueOf(value: string): TransactionExplorerChartType | undefined {
+        return TransactionExplorerChartType.allInstancesByValue[value];
     }
 }
 

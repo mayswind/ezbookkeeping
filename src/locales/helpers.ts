@@ -2617,6 +2617,7 @@ export function useI18n() {
         isLongTimeMinuteTwoDigits,
         isLongTimeSecondTwoDigits,
         // format date time (by calendar display type) functions
+        getCalendarDisplayLongYearFromDateTime: (dateTime: DateTime, numeralSystem?: NumeralSystem) => formatDateTime(dateTime, getLocalizedLongYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem })),
         getCalendarDisplayShortYearFromDateTime: (dateTime: DateTime, numeralSystem?: NumeralSystem) => formatDateTime(dateTime, getLocalizedShortYearFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem })),
         getCalendarDisplayShortMonthFromDateTime: (dateTime: DateTime, numeralSystem?: NumeralSystem) => formatDateTime(dateTime, 'MMM', getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem })),
         getCalendarDisplayDayOfMonthFromDateTime: (dateTime: DateTime, numeralSystem?: NumeralSystem) => formatDateTime(dateTime, getLocalizedShortDayFormat(), getDateTimeFormatOptions({ calendarType: getCurrentCalendarDisplayType().primaryCalendarType, numeralSystem: numeralSystem })),

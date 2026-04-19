@@ -2,9 +2,10 @@ import {
     type GenericNameValue,
     type TypeAndName,
     type TypeAndDisplayName,
+    entries,
     keys,
     keysIfValueEquals,
-    values
+    values,
 } from '@/core/base.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -382,6 +383,21 @@ export function objectFieldToArrayItem(object: object): string[] {
 
     for (const field of keys(object)) {
         ret.push(field);
+    }
+
+    return ret;
+}
+
+export function mapObjectToArray<V, R>(object: Record<string | number | symbol, V>, mapFunc: (value: V, key: string | number | symbol, index: number) => R): R[] {
+    const ret: R[] = [];
+    let index = 0;
+
+    for (const [key, value] of entries(object)) {
+        const mappedValue = mapFunc(value, key, index++);
+
+        if (isDefined(mappedValue)) {
+            ret.push(mappedValue);
+        }
     }
 
     return ret;

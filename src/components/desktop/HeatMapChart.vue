@@ -120,7 +120,7 @@ const heatMapData = computed<HeatMapData>(() => {
 });
 
 const yAxisWidth = computed<number>(() => {
-    let width: number = 90;
+    let width: number = 60;
 
     if (!heatMapData.value || !heatMapData.value.allSeriesNames) {
         return width;

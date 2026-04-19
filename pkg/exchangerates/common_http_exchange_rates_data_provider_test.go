@@ -270,7 +270,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_CentralBankOfUzbekistanDataSo
 	assert.Equal(t, "UZS", exchangeRateResponse.BaseCurrency)
 
 	supportedCurrencyCodes := []string{"AED", "AFN", "AMD", "ARS", "AUD", "AZN",
-		"BDT", "BGN", "BHD", "BND", "BRL", "BYN", "CAD", "CHF", "CNY", "CUP", "CZK",
+		"BDT", "BHD", "BND", "BRL", "BYN", "CAD", "CHF", "CNY", "CUP", "CZK",
 		"DKK", "DZD", "EGP", "EUR", "GBP", "GEL", "HKD", "HUF", "IDR", "ILS", "INR", "IQD", "IRR", "ISK",
 		"JOD", "JPY", "KGS", "KHR", "KRW", "KWD", "KZT", "LAK", "LBP", "LYD",
 		"MAD", "MDL", "MMK", "MNT", "MXN", "MYR", "NOK", "NZD", "OMR", "PHP", "PKR", "PLN",

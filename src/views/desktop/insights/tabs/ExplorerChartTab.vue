@@ -187,12 +187,15 @@
             :all-category-names="[]"
             :items="[]"
             :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.name ?? 'Value')"
+            category-type-name=""
             name-field="name"
             values-field="values"
             v-if="loading"
         />
         <heat-map-chart
+            ref="heatmapChart"
             :show-value="true"
+            :category-type-name="currentTransactionExplorerCategoryDimensionName"
             :all-category-names="categoriedNamesSortedByDisplayOrder"
             :items="seriesDimensionTransactionExplorerData"
             :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.name ?? 'Value')"
@@ -229,6 +232,7 @@
 
 <script setup lang="ts">
 import AxisChart, { type AxisChartDisplayType } from '@/components/desktop/AxisChart.vue';
+import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
 
 import { computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
@@ -265,6 +269,7 @@ import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 type AxisChartType = InstanceType<typeof AxisChart>;
+type HeatMapChartType = InstanceType<typeof HeatMapChart>;
 
 interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
@@ -327,6 +332,7 @@ const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
 const axisChart = useTemplateRef<AxisChartType>('axisChart');
+const heatmapChart = useTemplateRef<HeatMapChartType>('heatmapChart');
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -876,7 +882,7 @@ function onClickTrendChartItem(itemId: string, categoryIndex: number): void {
 }
 
 function buildExportResults(): { headers: string[], data: string[][], supportedMermaidCharts?: ExportMermaidChartType[] } | undefined {
-    if (currentExplorer.value.chartType === TransactionExplorerChartType.Pie.value || currentExplorer.value.chartType === TransactionExplorerChartType.Radar.value) {
+    if (currentExplorer.value.chartType === TransactionExplorerChartType.Pie.value || currentExplorer.value.chartType === TransactionExplorerChartType.Radar.value || currentExplorer.value.chartType === TransactionExplorerChartType.CalendarHeatmap.value) {
         const valueMetric = TransactionExplorerValueMetric.valueOf(currentExplorer.value.valueMetric);
         let supportedMermaidCharts: ExportMermaidChartType[] | undefined = undefined;
 
@@ -927,6 +933,18 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
             headers: results.headers,
             data: results.data,
             supportedMermaidCharts: supportedMermaidCharts
+        };
+    } else if (TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired && currentExplorer.value.chartType === TransactionExplorerChartType.Heatmap.value) {
+        const results = heatmapChart.value?.exportData();
+
+        if (!results) {
+            return undefined;
+        }
+
+        return {
+            headers: results.headers,
+            data: results.data,
+            supportedMermaidCharts: undefined
         };
     } else {
         return undefined;

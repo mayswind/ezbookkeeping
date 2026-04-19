@@ -26,6 +26,7 @@ const props = defineProps<{
     class?: string;
     skeleton?: boolean;
     showValue?: boolean;
+    categoryTypeName: string;
     allCategoryNames: string[];
     items: Record<string, unknown>[];
     nameField: string;
@@ -44,6 +45,7 @@ const {
     tt,
     getCurrentLanguageTextDirection,
     formatAmountToLocalizedNumeralsWithCurrency,
+    formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatNumberToLocalizedNumerals,
     formatPercentToLocalizedNumerals
 } = useI18n();
@@ -265,6 +267,42 @@ function getDisplayValue(value: number): string {
 
     return formatNumberToLocalizedNumerals(value, 2);
 }
+
+function exportData(): { headers: string[], data: string[][] } {
+    const headers: string[] = [];
+    const data: string[][] = [];
+
+    headers.push(props.categoryTypeName);
+
+    for (const categoryName of props.allCategoryNames) {
+        headers.push(categoryName);
+    }
+
+    const allData: Record<string, number> = {};
+
+    for (const item of heatMapData.value.data) {
+        allData[`${item[0]}-${item[1]}`] = item[2];
+    }
+
+    for (const [seriesName, seriesKey] of itemAndIndex(heatMapData.value.allSeriesNames)) {
+        const row: string[] = [];
+        row.push(seriesName);
+        for (let categoryIndex = 0; categoryIndex < props.allCategoryNames.length; categoryIndex++) {
+            const value = allData[`${categoryIndex}-${seriesKey}`];
+            row.push(formatAmountToWesternArabicNumeralsWithoutDigitGrouping(value ?? 0, props.defaultCurrency));
+        }
+        data.push(row);
+    }
+
+    return {
+        headers: headers,
+        data: data
+    };
+}
+
+defineExpose({
+    exportData
+});
 </script>
 
 <style scoped>

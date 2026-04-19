@@ -182,7 +182,10 @@ const chartOptions = computed<object>(() => {
                 max: heatMapData.value.maxValue,
                 calculable: true,
                 inRange: {
-                    color: isDarkMode.value ? [ '#060504', '#c67e48' ] : [ '#faf8f4', '#c67e48' ]
+                    color: isDarkMode.value ? [ '#1a1a1a', '#c67e48' ] : [ '#faf8f4', '#c67e48' ]
+                },
+                textStyle: {
+                    color: isDarkMode.value ? '#888' : '#666'
                 },
                 formatter: (value: string) => {
                     if (!props.showValue) {
@@ -238,8 +241,8 @@ const chartOptions = computed<object>(() => {
                 },
                 emphasis: {
                     itemStyle: {
-                        shadowBlur: 10,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        shadowBlur: 6,
+                        shadowColor: isDarkMode.value ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'
                     }
                 }
             }

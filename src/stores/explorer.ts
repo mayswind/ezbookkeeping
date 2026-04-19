@@ -1302,6 +1302,10 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMinimum) {
+                    value = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMaximum) {
+                    value = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ1Amount
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountQ3Amount
                     || valueMetric === TransactionExplorerValueMetric.SourceAmount10thPercentile
@@ -1327,32 +1331,6 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMinimum) {
-                    value = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountSum) {
-                    if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        value = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
-                    } else {
-                        value = 0;
-                    }
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountShare) {
-                    if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        const top5AmountSum = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
-                        value = totalSourceAmountSumInDefaultCurrency > 0 ? 100.0 * top5AmountSum / totalSourceAmountSumInDefaultCurrency : 0;
-                    } else {
-                        value = 0;
-                    }
-                } else if (valueMetric === TransactionExplorerValueMetric.TransactionsForEightyPercentOfSourceAmount) {
-                    if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        value = cumulativePercentage(allSourceAmountsInDefaultCurrency, 0.8, totalSourceAmountSumInDefaultCurrency, item => item);
-                    } else {
-                        value = 0;
-                    }
-                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMaximum) {
-                    value = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountRange) {
                     const finalMinimumSourceAmountInDefaultCurrency = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
                     const finalMaximumSourceAmountInDefaultCurrency = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
@@ -1378,6 +1356,28 @@ export const useExplorersStore = defineStore('explorers', () => {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
                         const medianSourceAmountInDefaultCurrency = median(allSourceAmountsInDefaultCurrency, item => item);
                         value = Math.trunc(medianAbsoluteDeviation(allSourceAmountsInDefaultCurrency, medianSourceAmountInDefaultCurrency, item => item));
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountSum) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        value = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountShare) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        const top5AmountSum = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
+                        value = totalSourceAmountSumInDefaultCurrency > 0 ? 100.0 * top5AmountSum / totalSourceAmountSumInDefaultCurrency : 0;
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.TransactionsForEightyPercentOfSourceAmount) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        value = cumulativePercentage(allSourceAmountsInDefaultCurrency, 0.8, totalSourceAmountSumInDefaultCurrency, item => item);
                     } else {
                         value = 0;
                     }

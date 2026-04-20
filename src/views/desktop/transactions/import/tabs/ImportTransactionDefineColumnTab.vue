@@ -46,7 +46,7 @@
                 <v-btn class="ms-2" color="secondary" density="compact" variant="outlined"
                        :disabled="!parsedFileDataColumnMapping || !parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) || !parsedFileAllTransactionTypes">
                     <span>{{ tt('Transaction Type Mapping') }}</span>
-                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) && parsedFileAllTransactionTypes">({{ getObjectOwnFieldCount(parsedFileValidMappedTransactionTypes) || tt('None') }})</span>
+                    <span class="ms-1" v-if="parsedFileDataColumnMapping && parsedFileDataColumnMapping.isColumnMappingSet(ImportTransactionColumnType.TransactionType) && parsedFileAllTransactionTypes">({{ formatNumberToLocalizedNumerals(getObjectOwnFieldCount(parsedFileValidMappedTransactionTypes)) || tt('None') }})</span>
                     <v-menu eager activator="parent" location="bottom" max-height="500"
                             :close-on-content-click="false">
                         <v-list class="pa-0">
@@ -229,7 +229,7 @@ import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, keys, entries } from '@/core/base.ts';
-import { type NumeralSystem, KnownAmountFormat } from '@/core/numeral.ts';
+import { KnownAmountFormat } from '@/core/numeral.ts';
 import { type DateFormatOrder, KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownDateTimezoneFormat } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -286,10 +286,10 @@ const props = defineProps<{
 const {
     tt,
     ti,
-    getCurrentNumeralSystemType,
     getLongDateFormatOrder,
     getShortDateFormatOrder,
-    getAllImportTransactionColumnTypes
+    getAllImportTransactionColumnTypes,
+    formatNumberToLocalizedNumerals
 } = useI18n();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -298,7 +298,6 @@ const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
 const parsedFileDataColumnMapping = ref<ImportTransactionDataMapping>(ImportTransactionDataMapping.createEmpty());
 
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const longDateFormatOrder = computed<DateFormatOrder>(() => getLongDateFormatOrder());
 const shortDateFormatOrder = computed<DateFormatOrder>(() => getShortDateFormatOrder());
 const allImportTransactionColumnTypes = computed<TypeAndDisplayName[]>(() => getAllImportTransactionColumnTypes());
@@ -453,10 +452,6 @@ const displayFileAutoDetectedAmountFormat = computed<string>(() => {
     return tt('Unknown');
 });
 
-function getDisplayCount(count: number): string {
-    return numeralSystem.value.formatNumber(count);
-}
-
 function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
     const pageOptions: NameNumeralValue[] = [];
 
@@ -470,7 +465,7 @@ function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
             break;
         }
 
-        pageOptions.push({ value: count, name: getDisplayCount(count) });
+        pageOptions.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
     }
 
     pageOptions.push({ value: -1, name: tt('All') });

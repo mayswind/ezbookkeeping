@@ -310,7 +310,7 @@
         <template #bottom>
             <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="importTransactions">
                 <span :class="{ 'text-error': selectedInvalidTransactionCount > 0 }">
-                    {{ tt('format.misc.selectedCount', { count: getDisplayCount(selectedImportTransactionCount), totalCount: getDisplayCount(importTransactions.length) }) }}
+                    {{ tt('format.misc.selectedCount', { count: formatNumberToLocalizedNumerals(selectedImportTransactionCount), totalCount: formatNumberToLocalizedNumerals(importTransactions.length) }) }}
                 </span>
                 <v-spacer v-if="importTransactions.length > 10"/>
                 <span v-if="importTransactions.length > 10">{{ tt('Transactions Per Page') }}</span>
@@ -416,7 +416,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import { type NameValue, type NameNumeralValue, itemAndIndex, reversed, keys } from '@/core/base.ts';
-import { type NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
+import { AmountFilterType } from '@/core/numeral.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
@@ -509,11 +509,11 @@ const props = defineProps<{
 
 const {
     tt,
-    getCurrentNumeralSystemType,
     formatDateTimeToLongDateTime,
     formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency,
+    formatNumberToLocalizedNumerals,
     getCategorizedAccountsWithDisplayBalance
 } = useI18n();
 
@@ -553,7 +553,6 @@ const currentAmountFilterValue1 = ref<number>(0);
 const currentAmountFilterValue2 = ref<number>(0);
 const currentDescriptionFilterValue = ref<string | null>(null);
 
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
 const customAccountCategoryOrder = computed<string>(() => settingsStore.appSettings.accountCategoryOrders);
 
@@ -1205,10 +1204,6 @@ const displayFilterCustomDateRange = computed<string>(() => {
     return `${minDisplayTime} - ${maxDisplayTime}`
 });
 
-function getDisplayCount(count: number): string {
-    return numeralSystem.value.formatNumber(count);
-}
-
 function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
     const pageOptions: NameNumeralValue[] = [];
 
@@ -1222,7 +1217,7 @@ function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
             break;
         }
 
-        pageOptions.push({ value: count, name: getDisplayCount(count) });
+        pageOptions.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
     }
 
     pageOptions.push({ value: -1, name: tt('All') });
@@ -1777,7 +1772,7 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagIt
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: getDisplayCount(updatedCount)
+                count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
     });
@@ -1840,7 +1835,7 @@ function showBatchAddDialog(type: BatchReplaceDialogDataType): void {
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: getDisplayCount(updatedCount)
+                count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
     });
@@ -1940,7 +1935,7 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: getDisplayCount(updatedCount)
+                count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
     });
@@ -2017,7 +2012,7 @@ function showReplaceAllTypesDialog(): void {
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: getDisplayCount(updatedCount)
+                count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
     });
@@ -2087,7 +2082,7 @@ function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, inval
 
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: getDisplayCount(updatedCount)
+                count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
     });

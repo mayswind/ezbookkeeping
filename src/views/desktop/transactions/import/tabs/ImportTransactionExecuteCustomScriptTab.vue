@@ -19,7 +19,7 @@
             <div class="d-flex w-100 mb-2">
                 <v-btn density="compact" color="default" variant="text"
                        :disabled="disabled || !sandboxLoaded || executingScript || !previewResult">
-                    <span>{{ tt('format.misc.previewCount', { count: previewCount > 0 ? getDisplayCount(previewCount) : tt('All') }) }}</span>
+                    <span>{{ tt('format.misc.previewCount', { count: previewCount > 0 ? formatNumberToLocalizedNumerals(previewCount) : tt('All') }) }}</span>
                     <v-menu activator="parent">
                         <v-list>
                             <v-list-item :key="count.value" :title="count.name"
@@ -50,7 +50,6 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 
 import type { NameNumeralValue } from '@/core/base.ts';
-import type { NumeralSystem } from '@/core/numeral.ts';
 import { KnownDateTimeFormat } from '@/core/datetime.ts';
 import { KnownFileType } from '@/core/file.ts';
 
@@ -107,8 +106,8 @@ const props = defineProps<{
 
 const {
     tt,
-    getCurrentNumeralSystemType,
-    formatDateTimeToGregorianDefaultDateTime
+    formatDateTimeToGregorianDefaultDateTime,
+    formatNumberToLocalizedNumerals
 } = useI18n();
 
 const settingsStore = useSettingsStore();
@@ -124,7 +123,6 @@ const executionError = ref<string>('');
 const previewCount = ref<number>(10);
 
 const currentTimezoneName = computed<string>(() => settingsStore.appSettings.timeZone || getBrowserTimezoneName());
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const previewCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(previewResult.value?.length));
 
 const sampleScript = computed<string>(() => `// ${tt('sample.importTransactionCustomScript.headerComment')}
@@ -195,10 +193,6 @@ const menus = computed<ImportTransactionDefineColumnMenu[]>(() => [
     }
 ]);
 
-function getDisplayCount(count: number): string {
-    return numeralSystem.value.formatNumber(count);
-}
-
 function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
     const pageOptions: NameNumeralValue[] = [];
 
@@ -211,7 +205,7 @@ function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
             break;
         }
 
-        pageOptions.push({ value: count, name: getDisplayCount(count) });
+        pageOptions.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
     }
 
     pageOptions.push({ value: -1, name: tt('All') });

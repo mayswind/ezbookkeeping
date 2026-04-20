@@ -240,7 +240,7 @@
                     </v-window-item>
                     <v-window-item value="finalResult">
                         <h4 class="text-h4 mb-1">{{ tt('Data Import Completed') }}</h4>
-                        <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: getDisplayCount(importedCount || 0) }) }}</p>
+                        <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: formatNumberToLocalizedNumerals(importedCount || 0) }) }}</p>
                     </v-window-item>
                 </v-window>
             </v-card-text>
@@ -298,7 +298,6 @@ import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { type KeyAndName, itemAndIndex } from '@/core/base.ts';
-import { type NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
     type ImportFileTypeSupportedAdditionalOptions,
@@ -346,7 +345,6 @@ defineProps<{
 const {
     tt,
     joinMultiText,
-    getCurrentNumeralSystemType,
     getAllSupportedImportFileCagtegoryAndTypes,
     formatNumberToLocalizedNumerals,
     getLocalizedFileEncodingName
@@ -413,8 +411,6 @@ const submitting = ref<boolean>(false);
 
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
-
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
 const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes());
 const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.subTypes);
@@ -555,10 +551,6 @@ const exportFileGuideDocumentUrl = computed<string | undefined>(() => {
 const exportFileGuideDocumentLanguageName = computed<string | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.document?.displayLanguageName);
 
 const fileName = computed<string>(() => importFile.value?.name || '');
-
-function getDisplayCount(count: number): string {
-    return numeralSystem.value.formatNumber(count);
-}
 
 function loadInitFileTypeFromSettings(): void {
     if (!settingsStore.appSettings.lastSelectedFileTypeInImportTransactionDialog) {
@@ -925,7 +917,7 @@ function submit(): void {
     }
 
     confirmDialog.value?.open('format.misc.confirmImportTransactions', {
-        count: getDisplayCount(transactions.length)
+        count: formatNumberToLocalizedNumerals(transactions.length)
     }).then(() => {
         submitting.value = true;
 

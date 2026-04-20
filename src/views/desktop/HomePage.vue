@@ -202,7 +202,6 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
-import { type NumeralSystem } from '@/core/numeral.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import {
@@ -232,7 +231,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const router = useRouter();
 const theme = useTheme();
 
-const { tt, getCurrentNumeralSystemType } = useI18n();
+const { tt, formatNumberToLocalizedNumerals } = useI18n();
 const {
     showAmountInHomePage,
     allAccounts,
@@ -254,9 +253,8 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const loadingOverview = ref<boolean>(true);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
-const displayAccountCount = computed<string>(() => allAccounts.value ? numeralSystem.value.formatNumber(allAccounts.value.length) : numeralSystem.value.digitZero);
+const displayAccountCount = computed<string>(() => formatNumberToLocalizedNumerals(allAccounts.value?.length ?? 0));
 
 function clickMonthlyIncomeOrExpense(e: MonthlyIncomeAndExpenseCardClickEvent): void {
     const minTime = e.monthStartTime;

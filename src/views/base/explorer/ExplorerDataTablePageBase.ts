@@ -25,7 +25,8 @@ export function useExplorerDataTablePageBase() {
         tt,
         getCurrentNumeralSystemType,
         formatDateTimeToLongDateTime,
-        formatAmountToLocalizedNumeralsWithCurrency
+        formatAmountToLocalizedNumeralsWithCurrency,
+        formatNumberToLocalizedNumerals
     } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -71,7 +72,7 @@ export function useExplorerDataTablePageBase() {
         const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
 
         for (const count of availableCountPerPage) {
-            pageCounts.push({ value: count, name: numeralSystem.value.formatNumber(count) });
+            pageCounts.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
         }
 
         pageCounts.push({ value: -1, name: tt('All') });

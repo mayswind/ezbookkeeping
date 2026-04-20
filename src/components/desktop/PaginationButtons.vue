@@ -13,7 +13,7 @@
                    @click="currentPage = parseInt(page)"
                    v-if="page !== '...'"
             >
-                <span>{{ getDisplayPage(page) }}</span>
+                <span>{{ formatNumberToLocalizedNumerals(parseInt(page)) }}</span>
             </v-btn>
             <v-btn variant="text"
                    color="default"
@@ -53,7 +53,6 @@ import { ref, computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { type NameNumeralValue, keys } from '@/core/base.ts';
-import type { NumeralSystem } from '@/core/numeral.ts';
 import type { ComponentDensity } from '@/lib/ui/desktop.ts';
 
 const props = defineProps<{
@@ -68,21 +67,15 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: number): void;
 }>();
 
-const { tt, getCurrentNumeralSystemType } = useI18n();
+const { tt, formatNumberToLocalizedNumerals } = useI18n();
 
 const showMenus = ref<Record<string, boolean>>({});
-
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
-
-function getDisplayPage(page: number | string): string {
-    return numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(page.toString());
-}
 
 const allPages = computed<NameNumeralValue[]>(() => {
     const pages: NameNumeralValue[] = [];
 
     for (let i = 1; i <= props.totalPageCount; i++) {
-        pages.push({ value: i, name: getDisplayPage(i) });
+        pages.push({ value: i, name: formatNumberToLocalizedNumerals(i) });
     }
 
     return pages;

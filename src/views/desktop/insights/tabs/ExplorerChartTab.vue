@@ -314,7 +314,6 @@ const {
     getMonthdayShortName,
     getWeekdayLongName,
     getQuarterName,
-    getCurrentNumeralSystemType,
     getCurrencyName,
     formatDateTimeToShortDateTime,
     formatDateTimeToShortDate,
@@ -325,6 +324,7 @@ const {
     formatGregorianYearToGregorianLikeFiscalYear,
     formatAmountToLocalizedNumerals,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    formatNumberToLocalizedNumerals,
     formatPercentToLocalizedNumerals
 } = useI18n();
 
@@ -334,7 +334,6 @@ const explorersStore = useExplorersStore();
 const axisChart = useTemplateRef<AxisChartType>('axisChart');
 const heatmapChart = useTemplateRef<HeatMapChartType>('heatmapChart');
 
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
 const allTransactionExplorerDataDimensions = computed<NameValue[]>(() => getAllTransactionExplorerDataDimensions());
@@ -350,7 +349,7 @@ const allAmountRangeCounts = computed<NameNumeralValue[]>(() => {
     const pageCounts: NameNumeralValue[] = [];
 
     for (let i = 3; i <= 20; i++) {
-        pageCounts.push({ value: i, name: numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(i.toString()) });
+        pageCounts.push({ value: i, name: formatNumberToLocalizedNumerals(i) });
     }
 
     return pageCounts;

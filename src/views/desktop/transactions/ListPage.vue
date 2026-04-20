@@ -684,7 +684,7 @@ import {
     DateRangeScene,
     DateRange
 } from '@/core/datetime.ts';
-import { type NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
+import { AmountFilterType } from '@/core/numeral.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
@@ -775,7 +775,7 @@ const {
     tt,
     getAllRecentMonthDateRanges,
     getWeekdayLongName,
-    getCurrentNumeralSystemType
+    formatNumberToLocalizedNumerals
 } = useI18n();
 
 const {
@@ -873,14 +873,13 @@ const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
 const allPageCounts = computed<NameNumeralValue[]>(() => {
     const pageCounts: NameNumeralValue[] = [];
     const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
 
     for (const count of availableCountPerPage) {
-        pageCounts.push({ value: count, name: numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(count.toString()) });
+        pageCounts.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
     }
 
     return pageCounts;

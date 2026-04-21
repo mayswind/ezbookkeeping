@@ -578,8 +578,11 @@ load_env_file() {
         value="$(echo "$value" | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//')"
 
         case "$key" in
-            EBKTOOL_SERVER_BASEURL|EBKTOOL_TOKEN)
-                eval "$key=\"\$value\""
+            EBKTOOL_SERVER_BASEURL)
+                EBKTOOL_SERVER_BASEURL="$value"
+                ;;
+            EBKTOOL_TOKEN)
+                EBKTOOL_TOKEN="$value"
                 ;;
         esac
     done < "$env_file"
@@ -1124,7 +1127,7 @@ call_api() {
         if [ "$json_params" != "{}" ]; then
             if [ -n "$timezone_headers" ]; then
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $authToken" \
                     -H "Content-Type: application/json" \
                     -H "$timezone_headers" \
                     -d "$json_params" \
@@ -1132,7 +1135,7 @@ call_api() {
                 curl_exit_code=$?
             else
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $authToken" \
                     -H "Content-Type: application/json" \
                     -d "$json_params" \
                     "$url")"
@@ -1141,13 +1144,13 @@ call_api() {
         else
             if [ -n "$timezone_headers" ]; then
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $authToken" \
                     -H "$timezone_headers" \
                     "$url")"
                 curl_exit_code=$?
             else
                 response="$(curl -s -X "POST" \
-                    -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                    -H "Authorization: Bearer $authToken" \
                     "$url")"
                 curl_exit_code=$?
             fi
@@ -1162,12 +1165,12 @@ call_api() {
 
         if [ -n "$timezone_headers" ]; then
             response="$(curl -s -X "$method" \
-                -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                -H "Authorization: Bearer $authToken" \
                 -H "$timezone_headers" \
                 "$url")"
         else
             response="$(curl -s -X "$method" \
-                -H "Authorization: Bearer $EBKTOOL_TOKEN" \
+                -H "Authorization: Bearer $authToken" \
                 "$url")"
         fi
         curl_exit_code=$?

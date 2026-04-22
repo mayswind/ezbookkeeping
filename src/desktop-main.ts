@@ -60,6 +60,7 @@ import {
     BoxplotChart,
     CandlestickChart,
     RadarChart,
+    TreemapChart,
     HeatmapChart,
     SankeyChart
 } from 'echarts/charts';
@@ -115,6 +116,7 @@ import PieChartComponent from '@/components/desktop/PieChart.vue';
 import RadarChartComponent from '@/components/desktop/RadarChart.vue';
 import AxisChart from '@/components/desktop/AxisChart.vue';
 import TrendsChart from '@/components/desktop/TrendsChart.vue';
+import TreeMapChart from '@/components/desktop/TreeMapChart.vue';
 import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
 import CalendarHeatMapChart from '@/components/desktop/CalendarHeatMapChart.vue';
 import RenameDialog from '@/components/desktop/RenameDialog.vue';
@@ -520,6 +522,7 @@ echarts.use([
     BoxplotChart,
     CandlestickChart,
     RadarChart,
+    TreemapChart,
     HeatmapChart,
     SankeyChart,
     GridComponent,
@@ -568,6 +571,7 @@ app.component('PieChart', PieChartComponent);
 app.component('RadarChart', RadarChartComponent);
 app.component('AxisChart', AxisChart);
 app.component('TrendsChart', TrendsChart);
+app.component('TreeMapChart', TreeMapChart);
 app.component('HeatMapChart', HeatMapChart);
 app.component('CalendarHeatMapChart', CalendarHeatMapChart);
 app.component('RenameDialog', RenameDialog);

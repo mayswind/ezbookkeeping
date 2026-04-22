@@ -181,6 +181,30 @@
             v-else-if="!loading"
         />
     </v-card-text>
+    <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExplorer.chartType === TransactionExplorerChartType.Treemap.value">
+        <tree-map-chart
+            :skeleton="true"
+            :all-category-names="[]"
+            :items="[]"
+            category-type-name=""
+            name-field="name"
+            values-field="values"
+            v-if="loading"
+        />
+        <tree-map-chart
+            ref="treemapChart"
+            :show-value="true"
+            :category-type-name="currentTransactionExplorerCategoryDimensionName"
+            :all-category-names="categoriedNamesSortedByDisplayOrder"
+            :items="seriesDimensionTransactionExplorerData"
+            :amount-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isAmount"
+            :percent-value="TransactionExplorerValueMetric.valueOf(currentExplorer.valueMetric)?.isPercent"
+            :default-currency="defaultCurrency"
+            name-field="name"
+            values-field="categoryValues"
+            v-else-if="!loading"
+        />
+    </v-card-text>
     <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExplorer.chartType === TransactionExplorerChartType.Heatmap.value">
         <heat-map-chart
             :skeleton="true"
@@ -232,6 +256,7 @@
 
 <script setup lang="ts">
 import AxisChart, { type AxisChartDisplayType } from '@/components/desktop/AxisChart.vue';
+import TreeMapChart from '@/components/desktop/TreeMapChart.vue';
 import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
 
 import { computed, useTemplateRef } from 'vue';
@@ -269,6 +294,7 @@ import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 type AxisChartType = InstanceType<typeof AxisChart>;
+type TreeMapChartType = InstanceType<typeof TreeMapChart>;
 type HeatMapChartType = InstanceType<typeof HeatMapChart>;
 
 interface InsightsExplorerDataTableTabProps {
@@ -332,6 +358,7 @@ const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
 const axisChart = useTemplateRef<AxisChartType>('axisChart');
+const treemapChart = useTemplateRef<TreeMapChartType>('treemapChart');
 const heatmapChart = useTemplateRef<HeatMapChartType>('heatmapChart');
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -932,6 +959,18 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
             headers: results.headers,
             data: results.data,
             supportedMermaidCharts: supportedMermaidCharts
+        };
+    } else if (TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired && currentExplorer.value.chartType === TransactionExplorerChartType.Treemap.value) {
+        const results = treemapChart.value?.exportData();
+
+        if (!results) {
+            return undefined;
+        }
+
+        return {
+            headers: results.headers,
+            data: results.data,
+            supportedMermaidCharts: undefined
         };
     } else if (TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired && currentExplorer.value.chartType === TransactionExplorerChartType.Heatmap.value) {
         const results = heatmapChart.value?.exportData();

@@ -161,6 +161,11 @@ const chartOptions = computed<object>(() => {
                 breadcrumb: {
                     show: false
                 },
+                width: '100%',
+                height: '100%',
+                right: 20,
+                top: 0,
+                bottom: 20,
                 data: treeMapData.value,
                 levels: [
                     {

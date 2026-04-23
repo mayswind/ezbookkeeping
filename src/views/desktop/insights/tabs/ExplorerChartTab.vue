@@ -181,9 +181,10 @@
             v-else-if="!loading"
         />
     </v-card-text>
-    <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExplorer.chartType === TransactionExplorerChartType.Treemap.value">
-        <tree-map-chart
+    <v-card-text :class="{ 'readonly': loading }" v-else-if="TransactionExplorerChartType.valueOf(currentExplorer.chartType)?.seriesDimensionRequired && hierarchyChartDisplayType">
+        <hierarchy-chart
             :skeleton="true"
+            :type="hierarchyChartDisplayType"
             :all-category-names="[]"
             :items="[]"
             category-type-name=""
@@ -191,8 +192,9 @@
             values-field="values"
             v-if="loading"
         />
-        <tree-map-chart
-            ref="treemapChart"
+        <hierarchy-chart
+            ref="hierarchyChart"
+            :type="hierarchyChartDisplayType"
             :show-value="true"
             :category-type-name="currentTransactionExplorerCategoryDimensionName"
             :all-category-names="categoriedNamesSortedByDisplayOrder"
@@ -256,7 +258,7 @@
 
 <script setup lang="ts">
 import AxisChart, { type AxisChartDisplayType } from '@/components/desktop/AxisChart.vue';
-import TreeMapChart from '@/components/desktop/TreeMapChart.vue';
+import HierarchyChart, { type HierarchyChartDisplayType } from '@/components/desktop/HierarchyChart.vue';
 import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
 
 import { computed, useTemplateRef } from 'vue';
@@ -294,7 +296,7 @@ import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 type AxisChartType = InstanceType<typeof AxisChart>;
-type TreeMapChartType = InstanceType<typeof TreeMapChart>;
+type HierarchyChartType = InstanceType<typeof HierarchyChart>;
 type HeatMapChartType = InstanceType<typeof HeatMapChart>;
 
 interface InsightsExplorerDataTableTabProps {
@@ -358,7 +360,7 @@ const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
 const axisChart = useTemplateRef<AxisChartType>('axisChart');
-const treemapChart = useTemplateRef<TreeMapChartType>('treemapChart');
+const hierarchyChart = useTemplateRef<HierarchyChartType>('hierarchyChart');
 const heatmapChart = useTemplateRef<HeatMapChartType>('heatmapChart');
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -592,6 +594,16 @@ const axisChartDisplayType = computed<AxisChartDisplayType | undefined>(() => {
         return 'area';
     } else if (currentExplorer.value.chartType === TransactionExplorerChartType.BubbleGrouped.value) {
         return 'bubble';
+    } else {
+        return undefined;
+    }
+});
+
+const hierarchyChartDisplayType = computed<HierarchyChartDisplayType | undefined>(() => {
+    if (currentExplorer.value.chartType === TransactionExplorerChartType.Treemap.value) {
+        return 'treemap';
+    } else if (currentExplorer.value.chartType === TransactionExplorerChartType.Sunburst.value) {
+        return 'sunburst';
     } else {
         return undefined;
     }
@@ -960,8 +972,8 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
             data: results.data,
             supportedMermaidCharts: supportedMermaidCharts
         };
-    } else if (TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired && currentExplorer.value.chartType === TransactionExplorerChartType.Treemap.value) {
-        const results = treemapChart.value?.exportData();
+    } else if (TransactionExplorerChartType.valueOf(currentExplorer.value.chartType)?.seriesDimensionRequired && hierarchyChartDisplayType.value) {
+        const results = hierarchyChart.value?.exportData();
 
         if (!results) {
             return undefined;

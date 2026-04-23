@@ -1604,6 +1604,7 @@
     "Area Chart (100% Stacked)": "100% 누적 영역 차트",
     "Bubble Chart (Grouped)": "그룹화된 버블 차트",
     "Treemap Chart": "Treemap Chart",
+    "Sunburst Chart": "Sunburst Chart",
     "Heatmap Chart": "Heatmap Chart",
     "Calendar Heatmap Chart": "Calendar Heatmap Chart",
     "Sort by": "정렬 기준",

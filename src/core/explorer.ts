@@ -383,6 +383,7 @@ export enum TransactionExplorerChartTypeValue {
     BubbleGrouped = 'bubbleGrouped',
     Radar = 'radar',
     Treemap = 'treemap',
+    Sunburst = 'sunburst',
     Heatmap = 'heatmap',
     CalendarHeatmap = 'calendarHeatmap'
 }
@@ -401,6 +402,7 @@ export class TransactionExplorerChartType implements NameValue {
     public static readonly Area100PercentStacked = new TransactionExplorerChartType('Area Chart (100% Stacked)', TransactionExplorerChartTypeValue.Area100PercentStacked, undefined, true, undefined);
     public static readonly BubbleGrouped = new TransactionExplorerChartType('Bubble Chart (Grouped)', TransactionExplorerChartTypeValue.BubbleGrouped, undefined, true, undefined);
     public static readonly Treemap = new TransactionExplorerChartType('Treemap Chart', TransactionExplorerChartTypeValue.Treemap, undefined, true, undefined);
+    public static readonly Sunburst = new TransactionExplorerChartType('Sunburst Chart', TransactionExplorerChartTypeValue.Sunburst, undefined, true, undefined);
     public static readonly Heatmap = new TransactionExplorerChartType('Heatmap Chart', TransactionExplorerChartTypeValue.Heatmap, undefined, true, undefined);
     public static readonly CalendarHeatmap = new TransactionExplorerChartType('Calendar Heatmap Chart', TransactionExplorerChartTypeValue.CalendarHeatmap, TransactionExplorerDataDimensionType.DateTimeByYearMonthDay, false, ChartSortingType.DisplayOrder.type);
 

@@ -17,10 +17,12 @@ import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 import { isArray, isString, isNumber } from '@/lib/common.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 
-interface TreeMapDataItem {
+export type HierarchyChartDisplayType = 'treemap' | 'sunburst';
+
+interface HierarchyDataItem {
     name: string;
     value: number;
-    children?: TreeMapDataItem[];
+    children?: HierarchyDataItem[];
     itemStyle: {
         color: ColorStyleValue;
     };
@@ -29,6 +31,7 @@ interface TreeMapDataItem {
 const props = defineProps<{
     class?: string;
     skeleton?: boolean;
+    type: HierarchyChartDisplayType;
     showValue?: boolean;
     categoryTypeName: string;
     allCategoryNames: string[];
@@ -64,14 +67,14 @@ const finalClass = computed<string>(() => {
     if (props.class) {
         finalClass += ` ${props.class}`;
     } else {
-        finalClass += ' treemap-chart-container';
+        finalClass += ' hierarchy-chart-container';
     }
 
     return finalClass;
 });
 
-const treeMapData = computed<TreeMapDataItem[]>(() => {
-    const ret: TreeMapDataItem[] = [];
+const hierarchyData = computed<HierarchyDataItem[]>(() => {
+    const ret: HierarchyDataItem[] = [];
 
     for (const [item, seriesIndex] of itemAndIndex(props.items)) {
         if (props.hiddenField && item[props.hiddenField]) {
@@ -84,7 +87,7 @@ const treeMapData = computed<TreeMapDataItem[]>(() => {
 
         const color: ColorStyleValue = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[seriesIndex % DEFAULT_CHART_COLORS.length]);
 
-        const treeMapItem: TreeMapDataItem = {
+        const hierarchyItem: HierarchyDataItem = {
             name: getItemName(item[props.nameField] as string),
             value: 0,
             children: [],
@@ -96,8 +99,8 @@ const treeMapData = computed<TreeMapDataItem[]>(() => {
         const allAmounts: number[] = item[props.valuesField] as number[];
 
         for (const [amount, categoryIndex] of itemAndIndex(allAmounts)) {
-            treeMapItem.value += amount;
-            treeMapItem.children?.push({
+            hierarchyItem.value += amount;
+            hierarchyItem.children?.push({
                 name: props.allCategoryNames[categoryIndex] ?? '',
                 value: amount,
                 itemStyle: {
@@ -106,13 +109,49 @@ const treeMapData = computed<TreeMapDataItem[]>(() => {
             });
         }
 
-        ret.push(treeMapItem);
+        ret.push(hierarchyItem);
     }
 
     return ret;
 });
 
 const chartOptions = computed<object>(() => {
+    const seriesOptions: Record<string, unknown> = {
+        type: props.type,
+        width: '100%',
+        height: '100%',
+        right: 20,
+        top: 0,
+        bottom: 20,
+        data: hierarchyData.value,
+        levels: [
+            {
+                itemStyle: {
+                    gapWidth: 2
+                }
+            },
+            {
+                itemStyle: {
+                    gapWidth: 1
+                }
+            }
+        ],
+        animation: !props.skeleton,
+        nodeClick: false
+    };
+
+    if (props.type === 'treemap') {
+        seriesOptions['breadcrumb'] = {
+            show: false
+        };
+    } if (props.type === 'sunburst') {
+        seriesOptions['radius'] = [60, '95%'];
+        seriesOptions['itemStyle'] = {
+            borderRadius: 7,
+            borderWidth: 2
+        };
+    }
+
     return {
         tooltip: {
             backgroundColor: isDarkMode.value ? '#333' : '#fff',
@@ -153,34 +192,7 @@ const chartOptions = computed<object>(() => {
                 return tooltip;
             }
         },
-        series: [
-            {
-                type: 'treemap',
-                animation: !props.skeleton,
-                nodeClick: false,
-                breadcrumb: {
-                    show: false
-                },
-                width: '100%',
-                height: '100%',
-                right: 20,
-                top: 0,
-                bottom: 20,
-                data: treeMapData.value,
-                levels: [
-                    {
-                        itemStyle: {
-                            gapWidth: 2
-                        }
-                    },
-                    {
-                        itemStyle: {
-                            gapWidth: 1
-                        }
-                    }
-                ]
-            }
-        ]
+        series: [ seriesOptions ]
     };
 });
 
@@ -210,7 +222,7 @@ function exportData(): { headers: string[], data: string[][] } {
         headers.push(categoryName);
     }
 
-    for (const item of treeMapData.value) {
+    for (const item of hierarchyData.value) {
         const row: string[] = [];
         row.push(item.name);
 
@@ -233,14 +245,14 @@ defineExpose({
 </script>
 
 <style scoped>
-.treemap-chart-container {
+.hierarchy-chart-container {
     width: 100%;
     height: 560px;
     margin-top: 10px;
 }
 
 @media (min-width: 600px) {
-    .treemap-chart-container {
+    .hierarchy-chart-container {
         height: 630px;
     }
 }

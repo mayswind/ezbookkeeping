@@ -1,3 +1,6 @@
+declare module 'vuetify/styles';
+declare module 'framework7-icons';
+
 declare const __EZBOOKKEEPING_IS_PRODUCTION__: boolean;
 declare const __EZBOOKKEEPING_VERSION__: string;
 declare const __EZBOOKKEEPING_BUILD_UNIX_TIME__: string;

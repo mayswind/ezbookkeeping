@@ -18,6 +18,6 @@
     "include": [
         "src/**/*",
         "vite.config.ts",
-        "jest.config.ts"
+        "vitest.config.ts"
     ]
 }

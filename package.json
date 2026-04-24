@@ -16,7 +16,7 @@
     "build": "cross-env NODE_ENV=production vite build",
     "serve:dist": "vite preview",
     "lint": "vue-tsc --noEmit && eslint . --fix",
-    "test": "cross-env TS_NODE_PROJECT=\"./tsconfig.jest.json\" jest"
+    "test": "vitest run"
   },
   "dependencies": {
     "@mdi/js": "7.4.47",
@@ -56,7 +56,6 @@
     "@types/crypto-js": "4.2.2",
     "@types/git-rev-sync": "2.0.2",
     "@types/jalaali-js": "1.2.0",
-    "@types/jest": "30.0.0",
     "@types/node": "25.6.0",
     "@types/ua-parser-js": "0.7.39",
     "@vitejs/plugin-vue": "6.0.6",
@@ -66,16 +65,15 @@
     "eslint": "10.2.1",
     "eslint-plugin-vue": "10.9.0",
     "git-rev-sync": "3.0.2",
-    "jest": "30.3.0",
     "postcss-preset-env": "11.2.1",
     "sass": "1.99.0",
-    "ts-jest": "29.4.9",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
     "vite": "7.3.2",
     "vite-plugin-checker": "0.13.0",
     "vite-plugin-pwa": "1.2.0",
     "vite-plugin-vuetify": "2.1.3",
+    "vitest": "4.1.5",
     "vue-tsc": "3.2.7"
   },
   "browserslist": [

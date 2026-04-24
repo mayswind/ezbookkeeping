@@ -54,7 +54,7 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
 - **Data Import & Export**
     - Supports CSV, OFX, QFX, QIF, IIF, Camt.052, Camt.053, MT940, GnuCash, Firefly III, Beancount and more
 
-For a full list of features, visit the [Full Feature List](https://ezbookkeeping.mayswind.net/comparison/).
+For a full list of features, visit the [Full Feature List](https://ezbookkeeping.mayswind.net/features/).
 
 ## Screenshots
 ### Desktop Version

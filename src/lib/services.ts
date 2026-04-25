@@ -66,6 +66,7 @@ import type {
     TransactionCreateRequest,
     TransactionModifyRequest,
     TransactionBatchUpdateCategoryRequest,
+    TransactionBatchUpdateAccountRequest,
     TransactionMoveBetweenAccountsRequest,
     TransactionDeleteRequest,
     TransactionBatchDeleteRequest,
@@ -616,6 +617,11 @@ export default {
     },
     batchUpdateTransactionCategories: (req: TransactionBatchUpdateCategoryRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/batch_update/category.json', req, {
+            timeout: DEFAULT_BATCH_UPDATE_TRANSACTIONS_API_TIMEOUT
+        } as ApiRequestConfig);
+    },
+    batchUpdateTransactionAccounts: (req: TransactionBatchUpdateAccountRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transactions/batch_update/account.json', req, {
             timeout: DEFAULT_BATCH_UPDATE_TRANSACTIONS_API_TIMEOUT
         } as ApiRequestConfig);
     },

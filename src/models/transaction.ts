@@ -563,6 +563,12 @@ export interface TransactionBatchUpdateCategoryRequest {
     readonly categoryId: string;
 }
 
+export interface TransactionBatchUpdateAccountRequest {
+    readonly transactionIds: string[];
+    readonly accountId: string;
+    readonly isDestinationAccount: boolean;
+}
+
 export interface TransactionMoveBetweenAccountsRequest {
     readonly fromAccountId: string;
     readonly toAccountId: string;

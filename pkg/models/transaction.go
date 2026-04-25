@@ -331,6 +331,13 @@ type TransactionBatchUpdateCategoryRequest struct {
 	CategoryId     int64    `json:"categoryId,string" binding:"required"`
 }
 
+// TransactionBatchUpdateAccountRequest represents all parameters of transaction batch update account request
+type TransactionBatchUpdateAccountRequest struct {
+	TransactionIds       []string `json:"transactionIds,string" binding:"required"`
+	AccountId            int64    `json:"accountId,string" binding:"required"`
+	IsDestinationAccount bool     `json:"isDestinationAccount"`
+}
+
 // TransactionMoveBetweenAccountsRequest represents all parameters of moving all transactions between accounts request
 type TransactionMoveBetweenAccountsRequest struct {
 	FromAccountId int64 `json:"fromAccountId,string" binding:"required,min=1"`

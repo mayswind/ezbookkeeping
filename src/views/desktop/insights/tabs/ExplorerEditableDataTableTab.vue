@@ -91,6 +91,15 @@
                                      :disabled="!isAllSelectedTransactionsTransfer"
                                      @click="batchUpdateTransactionCategories(CategoryType.Transfer)"></v-list-item>
                         <v-divider class="my-2" />
+                        <v-list-item :prepend-icon="mdiTextBoxEditOutline"
+                                     :title="tt('Update Accounts for Transactions')"
+                                     :disabled="selectedTransactionCount < 1"
+                                     @click="batchUpdateTransactionAccounts(false)"></v-list-item>
+                        <v-list-item :prepend-icon="mdiTextBoxEditOutline"
+                                     :title="tt('Update Destination Accounts for Transactions')"
+                                     :disabled="!isAllSelectedTransactionsTransfer"
+                                     @click="batchUpdateTransactionAccounts(true)"></v-list-item>
+                        <v-divider class="my-2" />
                         <v-list-item :prepend-icon="mdiDeleteOutline"
                                      :title="tt('Delete Transactions')"
                                      :disabled="selectedTransactionCount < 1"
@@ -180,6 +189,7 @@
     </v-data-table>
 
     <batch-update-category-dialog ref="batchUpdateCategoryDialog" />
+    <batch-update-account-dialog ref="batchUpdateAccountDialog" />
     <batch-delete-dialog ref="batchDeleteDialog" />
     <snack-bar ref="snackbar" />
 </template>
@@ -188,6 +198,7 @@
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import BatchUpdateCategoryDialog from '@/views/desktop/insights/dialogs/BatchUpdateCategoryDialog.vue';
+import BatchUpdateAccountDialog from '@/views/desktop/insights/dialogs/BatchUpdateAccountDialog.vue';
 import BatchDeleteDialog from '@/views/desktop/insights/dialogs/BatchDeleteDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -216,6 +227,7 @@ import {
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchUpdateCategoryDialogType = InstanceType<typeof BatchUpdateCategoryDialog>;
+type BatchUpdateAccountDialogType = InstanceType<typeof BatchUpdateAccountDialog>;
 type BatchDeleteDialogType = InstanceType<typeof BatchDeleteDialog>;
 
 interface InsightsExplorerDataTableTabProps {
@@ -232,6 +244,7 @@ const emit = defineEmits<{
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchUpdateCategoryDialog = useTemplateRef<BatchUpdateCategoryDialogType>('batchUpdateCategoryDialog');
+const batchUpdateAccountDialog = useTemplateRef<BatchUpdateAccountDialogType>('batchUpdateAccountDialog');
 const batchDeleteDialog = useTemplateRef<BatchDeleteDialogType>('batchDeleteDialog');
 
 const {
@@ -317,6 +330,25 @@ function selectInvert(): void {
 function batchUpdateTransactionCategories(type: CategoryType): void {
     batchUpdateCategoryDialog.value?.open({
         type: type,
+        updateIds: getAllSelectedTransactionIds()
+    }).then(updatedCount => {
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+                count: formatNumberToLocalizedNumerals(updatedCount)
+            });
+        }
+        selectedTransactions.value = {};
+        emit('update:transactions');
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function batchUpdateTransactionAccounts(isDestinationAccount: boolean): void {
+    batchUpdateAccountDialog.value?.open({
+        isDestinationAccount: isDestinationAccount,
         updateIds: getAllSelectedTransactionIds()
     }).then(updatedCount => {
         if (updatedCount > 0) {

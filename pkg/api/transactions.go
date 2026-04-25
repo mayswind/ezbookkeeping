@@ -1437,6 +1437,157 @@ func (a *TransactionsApi) TransactionBatchUpdateCategoriesHandler(c *core.WebCon
 	return true, nil
 }
 
+// TransactionBatchUpdateAccountsHandler batch updates accounts of transactions by request parameters for current user
+func (a *TransactionsApi) TransactionBatchUpdateAccountsHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionBatchUpdateReq models.TransactionBatchUpdateAccountRequest
+	err := c.ShouldBindJSON(&transactionBatchUpdateReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	clientTimezone, err := c.GetClientTimezone()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] cannot get client timezone, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	transactionIds, err := utils.StringArrayToInt64Array(transactionBatchUpdateReq.TransactionIds)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] parse transaction ids failed, because %s", err.Error())
+		return nil, errs.ErrTransactionIdInvalid
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionBatchUpdateAccountsHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	allAccounts, err := a.accounts.GetAllAccountsByUid(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionBatchUpdateAccountsHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	accountMap := a.accounts.GetAccountMapByList(allAccounts)
+	account, exists := accountMap[transactionBatchUpdateReq.AccountId]
+
+	if !exists || account == nil {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] account \"id:%d\" does not exist for user \"uid:%d\"", transactionBatchUpdateReq.AccountId, uid)
+		return nil, errs.ErrAccountNotFound
+	}
+
+	if account.Hidden {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] account \"id:%d\" is hidden for user \"uid:%d\"", account.AccountId, uid)
+		return nil, errs.ErrCannotMoveTransactionFromOrToHiddenAccount
+	}
+
+	if account.Type == models.ACCOUNT_TYPE_MULTI_SUB_ACCOUNTS {
+		log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] account \"id:%d\" is a parent account, cannot be used for transaction of user \"uid:%d\"", account.AccountId, uid)
+		return nil, errs.ErrCannotModifyTransactionInParentAccount
+	}
+
+	transactions, err := a.transactions.GetTransactionsByTransactionIds(c, uid, transactionIds)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionBatchUpdateAccountsHandler] failed to get transactions for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] cannot modify transaction \"id:%d\" for user \"uid:%d\", because transaction type is transfer in", transaction.TransactionId, uid)
+			return nil, errs.ErrTransactionTypeInvalid
+		}
+
+		if transactionBatchUpdateReq.IsDestinationAccount && transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] cannot update destination account of non-transfer transaction \"id:%d\" for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrTransactionDestinationAccountCannotBeSet
+		}
+
+		if !transactionBatchUpdateReq.IsDestinationAccount && account.AccountId == transaction.RelatedAccountId {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] cannot update account to same destination account of transaction \"id:%d\" for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrTransactionSourceAndDestinationIdCannotBeEqual
+		} else if transactionBatchUpdateReq.IsDestinationAccount && account.AccountId == transaction.AccountId {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] cannot update destination account to same source account of transaction \"id:%d\" for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrTransactionSourceAndDestinationIdCannotBeEqual
+		}
+
+		var oldAccount *models.Account
+
+		if !transactionBatchUpdateReq.IsDestinationAccount {
+			oldAccount = accountMap[transaction.AccountId]
+		} else if transactionBatchUpdateReq.IsDestinationAccount {
+			oldAccount = accountMap[transaction.RelatedAccountId]
+		}
+
+		if oldAccount == nil {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] the original account of transaction \"id:%d\" does not exist for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrAccountNotFound
+		}
+
+		if oldAccount.Hidden {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] the original account of transaction \"id:%d\" is hidden for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrCannotMoveTransactionFromOrToHiddenAccount
+		}
+
+		if oldAccount.Currency != account.Currency {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] cannot update account of transaction \"id:%d\", because the original account currency \"%s\" is different from updated account currency \"%s\" for user \"uid:%d\"", transaction.TransactionId, oldAccount.Currency, account.Currency, uid)
+			return nil, errs.ErrCannotMoveTransactionBetweenAccountsWithDifferentCurrencies
+		}
+
+		transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, clientTimezone)
+
+		if !transactionEditable {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] transaction \"id:%d\" is not editable for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrCannotModifyTransactionWithThisTransactionTime
+		}
+	}
+
+	updatedCount := 0
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+
+		if !transactionBatchUpdateReq.IsDestinationAccount && transaction.AccountId != account.AccountId {
+			transaction.AccountId = account.AccountId
+		} else if transactionBatchUpdateReq.IsDestinationAccount && transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT && transaction.RelatedAccountId != account.AccountId {
+			transaction.RelatedAccountId = account.AccountId
+		} else {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateAccountsHandler] skip updating transaction \"id:%d\", because the original account is same as updated account for user \"uid:%d\"", transaction.TransactionId, uid)
+			continue
+		}
+
+		err = a.transactions.ModifyTransaction(c, transaction, 0, nil, nil, nil, nil)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionBatchUpdateAccountsHandler] failed to update transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		updatedCount++
+	}
+
+	if updatedCount < 1 {
+		return nil, errs.ErrNothingWillBeUpdated
+	}
+
+	log.Infof(c, "[transactions.TransactionBatchUpdateAccountsHandler] user \"uid:%d\" has batch updated account of %d transactions successfully", uid, updatedCount)
+	return true, nil
+}
+
 // TransactionMoveAllBetweenAccountsHandler moves all transactions from one account to another account for current user
 func (a *TransactionsApi) TransactionMoveAllBetweenAccountsHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionMoveReq models.TransactionMoveBetweenAccountsRequest

@@ -153,6 +153,8 @@ function open(options: { type: CategoryType; updateIds: string[] }): Promise<num
 }
 
 function reload(): void {
+    loading.value = true;
+
     transactionCategoriesStore.loadAllCategories({ force: true }).then(() => {
         loading.value = false;
     }).catch(error => {

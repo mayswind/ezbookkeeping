@@ -1198,6 +1198,99 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
+    function batchAddTagsToTransaction({ transactionIds, tagIds }: { transactionIds: string[], tagIds: string[] }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.batchAddTagsToTransaction({ transactionIds, tagIds }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to update tags for transactions' });
+                    return;
+                }
+
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    explorer: true
+                });
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to update tags for transactions', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to update tags for transactions' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function batchRemoveTagsFromTransaction({ transactionIds, tagIds }: { transactionIds: string[], tagIds: string[] }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.batchRemoveTagsFromTransaction({ transactionIds, tagIds }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to update tags for transactions' });
+                    return;
+                }
+
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    explorer: true
+                });
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to update tags for transactions', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to update tags for transactions' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function batchClearAllTagsFromTransaction({ transactionIds }: { transactionIds: string[] }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.batchClearAllTagsFromTransaction({ transactionIds }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to update tags for transactions' });
+                    return;
+                }
+
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    explorer: true
+                });
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to update tags for transactions', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to update tags for transactions' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function moveAllTransactionsBetweenAccounts({ fromAccountId, toAccountId }: { fromAccountId: string, toAccountId: string }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.moveAllTransactionsBetweenAccounts({ fromAccountId, toAccountId }).then(response => {
@@ -1574,6 +1667,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
         saveTransaction,
         batchUpdateTransactionCategories,
         batchUpdateTransactionAccounts,
+        batchAddTagsToTransaction,
+        batchRemoveTagsFromTransaction,
+        batchClearAllTagsFromTransaction,
         moveAllTransactionsBetweenAccounts,
         deleteTransaction,
         batchDeleteTransactions,

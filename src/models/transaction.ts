@@ -569,6 +569,20 @@ export interface TransactionBatchUpdateAccountRequest {
     readonly isDestinationAccount: boolean;
 }
 
+export interface TransactionBatchAddTagsRequest {
+    readonly transactionIds: string[];
+    readonly tagIds: string[];
+}
+
+export interface TransactionBatchRemoveTagsRequest {
+    readonly transactionIds: string[];
+    readonly tagIds: string[];
+}
+
+export interface TransactionBatchClearTagsRequest {
+    readonly transactionIds: string[];
+}
+
 export interface TransactionMoveBetweenAccountsRequest {
     readonly fromAccountId: string;
     readonly toAccountId: string;

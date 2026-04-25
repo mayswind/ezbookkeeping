@@ -100,6 +100,19 @@
                                      :disabled="!isAllSelectedTransactionsTransfer"
                                      @click="batchUpdateTransactionAccounts(true)"></v-list-item>
                         <v-divider class="my-2" />
+                        <v-list-item :prepend-icon="mdiTextBoxEditOutline"
+                                     :title="tt('Add Tags to Transactions')"
+                                     :disabled="selectedTransactionCount < 1"
+                                     @click="batchUpdateTransactionTags('add')"></v-list-item>
+                        <v-list-item :prepend-icon="mdiTextBoxEditOutline"
+                                     :title="tt('Remove Tags from Transactions')"
+                                     :disabled="selectedTransactionCount < 1"
+                                     @click="batchUpdateTransactionTags('remove')"></v-list-item>
+                        <v-list-item :prepend-icon="mdiTextBoxEditOutline"
+                                     :title="tt('Clear All Tags from Transactions')"
+                                     :disabled="selectedTransactionCount < 1"
+                                     @click="batchUpdateTransactionTags('clear')"></v-list-item>
+                        <v-divider class="my-2" />
                         <v-list-item :prepend-icon="mdiDeleteOutline"
                                      :title="tt('Delete Transactions')"
                                      :disabled="selectedTransactionCount < 1"
@@ -190,6 +203,7 @@
 
     <batch-update-category-dialog ref="batchUpdateCategoryDialog" />
     <batch-update-account-dialog ref="batchUpdateAccountDialog" />
+    <batch-update-tags-dialog ref="batchUpdateTagsDialog" />
     <batch-delete-dialog ref="batchDeleteDialog" />
     <snack-bar ref="snackbar" />
 </template>
@@ -199,6 +213,7 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import BatchUpdateCategoryDialog from '@/views/desktop/insights/dialogs/BatchUpdateCategoryDialog.vue';
 import BatchUpdateAccountDialog from '@/views/desktop/insights/dialogs/BatchUpdateAccountDialog.vue';
+import BatchUpdateTagsDialog, { type BatchUpdateTagsOperationType } from '@/views/desktop/insights/dialogs/BatchUpdateTagsDialog.vue';
 import BatchDeleteDialog from '@/views/desktop/insights/dialogs/BatchDeleteDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -228,6 +243,7 @@ import {
 type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchUpdateCategoryDialogType = InstanceType<typeof BatchUpdateCategoryDialog>;
 type BatchUpdateAccountDialogType = InstanceType<typeof BatchUpdateAccountDialog>;
+type BatchUpdateTagsDialogType = InstanceType<typeof BatchUpdateTagsDialog>;
 type BatchDeleteDialogType = InstanceType<typeof BatchDeleteDialog>;
 
 interface InsightsExplorerDataTableTabProps {
@@ -245,6 +261,7 @@ const emit = defineEmits<{
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchUpdateCategoryDialog = useTemplateRef<BatchUpdateCategoryDialogType>('batchUpdateCategoryDialog');
 const batchUpdateAccountDialog = useTemplateRef<BatchUpdateAccountDialogType>('batchUpdateAccountDialog');
+const batchUpdateTagsDialog = useTemplateRef<BatchUpdateTagsDialogType>('batchUpdateTagsDialog');
 const batchDeleteDialog = useTemplateRef<BatchDeleteDialogType>('batchDeleteDialog');
 
 const {
@@ -349,6 +366,25 @@ function batchUpdateTransactionCategories(type: CategoryType): void {
 function batchUpdateTransactionAccounts(isDestinationAccount: boolean): void {
     batchUpdateAccountDialog.value?.open({
         isDestinationAccount: isDestinationAccount,
+        updateIds: getAllSelectedTransactionIds()
+    }).then(updatedCount => {
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+                count: formatNumberToLocalizedNumerals(updatedCount)
+            });
+        }
+        selectedTransactions.value = {};
+        emit('update:transactions');
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function batchUpdateTransactionTags(type: BatchUpdateTagsOperationType): void {
+    batchUpdateTagsDialog.value?.open({
+        type: type,
         updateIds: getAllSelectedTransactionIds()
     }).then(updatedCount => {
         if (updatedCount > 0) {

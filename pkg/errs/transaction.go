@@ -45,4 +45,5 @@ var (
 	ErrCannotMoveTransactionFromOrToHiddenAccount                  = NewNormalError(NormalSubcategoryTransaction, 38, http.StatusBadRequest, "cannot move transaction from or to hidden account")
 	ErrCannotMoveTransactionFromOrToParentAccount                  = NewNormalError(NormalSubcategoryTransaction, 39, http.StatusBadRequest, "cannot move transaction from or to parent account")
 	ErrCannotMoveTransactionBetweenAccountsWithDifferentCurrencies = NewNormalError(NormalSubcategoryTransaction, 40, http.StatusBadRequest, "cannot move transaction between accounts with different currencies")
+	ErrCannotAddTagsToTooManyTransactionsOneTime                   = NewNormalError(NormalSubcategoryTransaction, 41, http.StatusBadRequest, "cannot add tags to too many transactions one time")
 )

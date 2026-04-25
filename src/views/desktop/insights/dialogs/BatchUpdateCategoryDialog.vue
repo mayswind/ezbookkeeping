@@ -143,6 +143,7 @@ function open(options: { type: CategoryType; updateIds: string[] }): Promise<num
     type.value = options.type;
     updateIds.value = options.updateIds;
     categoryId.value = '';
+    submitting.value = false;
     showState.value = true;
 
     return new Promise((resolve, reject) => {

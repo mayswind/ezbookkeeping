@@ -31,8 +31,8 @@
                                            :show-selection-primary-text="true"
                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(categoryId, allCategories[CategoryType.Expense])"
                                            :custom-selection-secondary-text="getTransactionSecondaryCategoryName(categoryId, allCategories[CategoryType.Expense])"
-                                           :label="tt('Target Category')"
-                                           :placeholder="tt('Target Category')"
+                                           :label="tt('Expense Category')"
+                                           :placeholder="tt('Expense Category')"
                                            :items="allCategories[CategoryType.Expense]"
                                            v-model="categoryId"
                                            v-if="type === CategoryType.Expense">
@@ -48,8 +48,8 @@
                                            :show-selection-primary-text="true"
                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(categoryId, allCategories[CategoryType.Income])"
                                            :custom-selection-secondary-text="getTransactionSecondaryCategoryName(categoryId, allCategories[CategoryType.Income])"
-                                           :label="tt('Target Category')"
-                                           :placeholder="tt('Target Category')"
+                                           :label="tt('Income Category')"
+                                           :placeholder="tt('Income Category')"
                                            :items="allCategories[CategoryType.Income]"
                                            v-model="categoryId"
                                            v-if="type === CategoryType.Income">
@@ -65,8 +65,8 @@
                                            :show-selection-primary-text="true"
                                            :custom-selection-primary-text="getTransactionPrimaryCategoryName(categoryId, allCategories[CategoryType.Transfer])"
                                            :custom-selection-secondary-text="getTransactionSecondaryCategoryName(categoryId, allCategories[CategoryType.Transfer])"
-                                           :label="tt('Target Category')"
-                                           :placeholder="tt('Target Category')"
+                                           :label="tt('Transfer Category')"
+                                           :placeholder="tt('Transfer Category')"
                                            :items="allCategories[CategoryType.Transfer]"
                                            v-model="categoryId"
                                            v-if="type === CategoryType.Transfer">

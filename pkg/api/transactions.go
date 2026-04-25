@@ -1551,6 +1551,80 @@ func (a *TransactionsApi) TransactionDeleteHandler(c *core.WebContext) (any, *er
 	return true, nil
 }
 
+// TransactionBatchDeleteHandler deletes existed transactions by request parameters for current user
+func (a *TransactionsApi) TransactionBatchDeleteHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionBatchDeleteReq models.TransactionBatchDeleteRequest
+	err := c.ShouldBindJSON(&transactionBatchDeleteReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchDeleteHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	clientTimezone, err := c.GetClientTimezone()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchDeleteHandler] cannot get client timezone, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	transactionIds, err := utils.StringArrayToInt64Array(transactionBatchDeleteReq.Ids)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionBatchDeleteHandler] parse transaction ids failed, because %s", err.Error())
+		return nil, errs.ErrTransactionIdInvalid
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionBatchDeleteHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if !a.users.IsPasswordEqualsUserPassword(transactionBatchDeleteReq.Password, user) {
+		return nil, errs.ErrUserPasswordWrong
+	}
+
+	transactions, err := a.transactions.GetTransactionsByTransactionIds(c, uid, transactionIds)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionBatchDeleteHandler] failed to get transactions for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+		transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, clientTimezone)
+
+		if !transactionEditable {
+			log.Warnf(c, "[transactions.TransactionBatchUpdateCategoriesHandler] transaction \"id:%d\" is not editable for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrCannotModifyTransactionWithThisTransactionTime
+		}
+	}
+
+	deletedCount := 0
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+		err = a.transactions.DeleteTransaction(c, uid, transaction.TransactionId)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.TransactionBatchDeleteHandler] failed to delete transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		deletedCount++
+	}
+
+	log.Infof(c, "[transactions.TransactionBatchDeleteHandler] user \"uid:%d\" has deleted %d transactions", uid, deletedCount)
+	return true, nil
+}
+
 // TransactionParseImportCustomFileDataHandler returns the parsed file data by request parameters for current user
 func (a *TransactionsApi) TransactionParseImportCustomFileDataHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()

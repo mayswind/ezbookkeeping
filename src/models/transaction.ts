@@ -572,6 +572,11 @@ export interface TransactionDeleteRequest {
     readonly id: string;
 }
 
+export interface TransactionBatchDeleteRequest {
+    readonly ids: string[];
+    readonly password: string;
+}
+
 export interface TransactionImportRequest {
     readonly transactions: TransactionCreateRequest[];
     readonly clientSessionId: string;

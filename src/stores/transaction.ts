@@ -610,6 +610,32 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactionReconciliationStatementStateInvalid.value = invalidState;
     }
 
+    function updateStoreInvalidState(options: { transactionList?: boolean, reconciliationStatement?: boolean, accountList?: boolean, overview?: boolean, statistics?: boolean, explorer?: boolean }): void {
+        if (options.transactionList && !transactionListStateInvalid.value) {
+            updateTransactionListInvalidState(true);
+        }
+
+        if (options.reconciliationStatement && !transactionReconciliationStatementStateInvalid.value) {
+            updateTransactionReconciliationStatementInvalidState(true);
+        }
+
+        if (options.accountList && !accountsStore.accountListStateInvalid) {
+            accountsStore.updateAccountListInvalidState(true);
+        }
+
+        if (options.overview && !overviewStore.transactionOverviewStateInvalid) {
+            overviewStore.updateTransactionOverviewInvalidState(true);
+        }
+
+        if (options.statistics && !statisticsStore.transactionStatisticsStateInvalid) {
+            statisticsStore.updateTransactionStatisticsInvalidState(true);
+        }
+
+        if (options.explorer && !explorersStore.transactionExplorerStateInvalid) {
+            explorersStore.updateTransactionExplorerInvalidState(true);
+        }
+    }
+
     function resetTransactions(): void {
         transactionsFilter.value.dateType = DateRange.All.type;
         transactionsFilter.value.maxTime = 0;
@@ -1078,25 +1104,13 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     });
                 }
 
-                if (!transactionReconciliationStatementStateInvalid.value) {
-                    updateTransactionReconciliationStatementInvalidState(true);
-                }
-
-                if (!accountsStore.accountListStateInvalid) {
-                    accountsStore.updateAccountListInvalidState(true);
-                }
-
-                if (!overviewStore.transactionOverviewStateInvalid) {
-                    overviewStore.updateTransactionOverviewInvalidState(true);
-                }
-
-                if (!statisticsStore.transactionStatisticsStateInvalid) {
-                    statisticsStore.updateTransactionStatisticsInvalidState(true);
-                }
-
-                if (!explorersStore.transactionExplorerStateInvalid) {
-                    explorersStore.updateTransactionExplorerInvalidState(true);
-                }
+                updateStoreInvalidState({
+                    reconciliationStatement: true,
+                    accountList: true,
+                    overview: true,
+                    statistics: true,
+                    explorer: true
+                });
 
                 resolve(transaction);
             }).catch(error => {
@@ -1127,25 +1141,13 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     return;
                 }
 
-                if (!transactionListStateInvalid.value) {
-                    updateTransactionListInvalidState(true);
-                }
-
-                if (!transactionReconciliationStatementStateInvalid.value) {
-                    updateTransactionReconciliationStatementInvalidState(true);
-                }
-
-                if (!overviewStore.transactionOverviewStateInvalid) {
-                    overviewStore.updateTransactionOverviewInvalidState(true);
-                }
-
-                if (!statisticsStore.transactionStatisticsStateInvalid) {
-                    statisticsStore.updateTransactionStatisticsInvalidState(true);
-                }
-
-                if (!explorersStore.transactionExplorerStateInvalid) {
-                    explorersStore.updateTransactionExplorerInvalidState(true);
-                }
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    overview: true,
+                    statistics: true,
+                    explorer: true
+                });
 
                 resolve(data.result);
             }).catch(error => {
@@ -1172,29 +1174,14 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     return;
                 }
 
-                if (!transactionListStateInvalid.value) {
-                    updateTransactionListInvalidState(true);
-                }
-
-                if (!transactionReconciliationStatementStateInvalid.value) {
-                    updateTransactionReconciliationStatementInvalidState(true);
-                }
-
-                if (!accountsStore.accountListStateInvalid) {
-                    accountsStore.updateAccountListInvalidState(true);
-                }
-
-                if (!overviewStore.transactionOverviewStateInvalid) {
-                    overviewStore.updateTransactionOverviewInvalidState(true);
-                }
-
-                if (!statisticsStore.transactionStatisticsStateInvalid) {
-                    statisticsStore.updateTransactionStatisticsInvalidState(true);
-                }
-
-                if (!explorersStore.transactionExplorerStateInvalid) {
-                    explorersStore.updateTransactionExplorerInvalidState(true);
-                }
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    accountList: true,
+                    overview: true,
+                    statistics: true,
+                    explorer: true
+                });
 
                 resolve(data.result);
             }).catch(error => {
@@ -1237,25 +1224,13 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     });
                 }
 
-                if (!transactionReconciliationStatementStateInvalid.value) {
-                    updateTransactionReconciliationStatementInvalidState(true);
-                }
-
-                if (!accountsStore.accountListStateInvalid) {
-                    accountsStore.updateAccountListInvalidState(true);
-                }
-
-                if (!overviewStore.transactionOverviewStateInvalid) {
-                    overviewStore.updateTransactionOverviewInvalidState(true);
-                }
-
-                if (!statisticsStore.transactionStatisticsStateInvalid) {
-                    statisticsStore.updateTransactionStatisticsInvalidState(true);
-                }
-
-                if (!explorersStore.transactionExplorerStateInvalid) {
-                    explorersStore.updateTransactionExplorerInvalidState(true);
-                }
+                updateStoreInvalidState({
+                    reconciliationStatement: true,
+                    accountList: true,
+                    overview: true,
+                    statistics: true,
+                    explorer: true
+                });
 
                 resolve(data.result);
             }).catch(error => {
@@ -1265,6 +1240,52 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     reject({ error: error.response.data });
                 } else if (!error.processed) {
                     reject({ message: 'Unable to delete this transaction' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function batchDeleteTransactions({ transactionIds, password }: { transactionIds: string[], password: string }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            services.batchDeleteTransaction({
+                ids: transactionIds,
+                password: password
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to delete these transactions' });
+                    return;
+                }
+
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    accountList: true,
+                    overview: true,
+                    statistics: true,
+                    explorer: true
+                });
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to delete transactions', error);
+
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    accountList: true,
+                    overview: true,
+                    statistics: true,
+                    explorer: true
+                });
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to delete these transactions' });
                 } else {
                     reject(error);
                 }
@@ -1520,6 +1541,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         batchUpdateTransactionCategories,
         moveAllTransactionsBetweenAccounts,
         deleteTransaction,
+        batchDeleteTransactions,
         recognizeReceiptImage,
         cancelRecognizeReceiptImage,
         parseImportCustomFile,

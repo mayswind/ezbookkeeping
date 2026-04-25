@@ -342,6 +342,12 @@ type TransactionDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`
 }
 
+// TransactionBatchDeleteRequest represents all parameters of transaction batch deleting request
+type TransactionBatchDeleteRequest struct {
+	Ids      []string `json:"ids,string" binding:"required"`
+	Password string   `json:"password" binding:"omitempty,min=6,max=128"`
+}
+
 // YearMonthRangeRequest represents all parameters of a request with year and month range
 type YearMonthRangeRequest struct {
 	StartYearMonth string `form:"start_year_month"`

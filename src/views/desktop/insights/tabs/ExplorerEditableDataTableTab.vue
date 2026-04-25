@@ -90,6 +90,12 @@
                                      :title="tt('Update Categories for Transfer Transactions')"
                                      :disabled="!isAllSelectedTransactionsTransfer"
                                      @click="batchUpdateTransactionCategories(CategoryType.Transfer)"></v-list-item>
+                        <v-divider class="my-2" />
+                        <v-list-item :prepend-icon="mdiDeleteOutline"
+                                     :title="tt('Delete Transactions')"
+                                     :disabled="selectedTransactionCount < 1"
+                                     @click="batchDeleteTransactions">
+                        </v-list-item>
                     </v-list>
                 </v-menu>
             </div>
@@ -174,6 +180,7 @@
     </v-data-table>
 
     <batch-update-category-dialog ref="batchUpdateCategoryDialog" />
+    <batch-delete-dialog ref="batchDeleteDialog" />
     <snack-bar ref="snackbar" />
 </template>
 
@@ -181,12 +188,14 @@
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import BatchUpdateCategoryDialog from '@/views/desktop/insights/dialogs/BatchUpdateCategoryDialog.vue';
+import BatchDeleteDialog from '@/views/desktop/insights/dialogs/BatchDeleteDialog.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useExplorerDataTablePageBase } from '@/views/base/explorer/ExplorerDataTablePageBase.ts';
 
+import { keys } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
@@ -201,11 +210,13 @@ import {
     mdiSelectAll,
     mdiSelectInverse,
     mdiMenuDown,
-    mdiTextBoxEditOutline
+    mdiTextBoxEditOutline,
+    mdiDeleteOutline
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchUpdateCategoryDialogType = InstanceType<typeof BatchUpdateCategoryDialog>;
+type BatchDeleteDialogType = InstanceType<typeof BatchDeleteDialog>;
 
 interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
@@ -221,6 +232,7 @@ const emit = defineEmits<{
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchUpdateCategoryDialog = useTemplateRef<BatchUpdateCategoryDialogType>('batchUpdateCategoryDialog');
+const batchDeleteDialog = useTemplateRef<BatchDeleteDialogType>('batchDeleteDialog');
 
 const {
     tt,
@@ -305,8 +317,8 @@ function selectInvert(): void {
 function batchUpdateTransactionCategories(type: CategoryType): void {
     batchUpdateCategoryDialog.value?.open({
         type: type,
-        updateIds: getAllSelectedTransactionIds() }
-    ).then(updatedCount => {
+        updateIds: getAllSelectedTransactionIds()
+    }).then(updatedCount => {
         if (updatedCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
@@ -315,15 +327,48 @@ function batchUpdateTransactionCategories(type: CategoryType): void {
         selectedTransactions.value = {};
         emit('update:transactions');
     }).catch(error => {
-        if (!error.processed) {
+        if (error) {
             snackbar.value?.showError(error);
         }
+    });
+}
+
+function batchDeleteTransactions(): void {
+    batchDeleteDialog.value?.open({
+        updateIds: getAllSelectedTransactionIds()
+    }).then(updatedCount => {
+        if (updatedCount > 0) {
+            snackbar.value?.showMessage('format.misc.youHaveDeletedTransactions', {
+                count: formatNumberToLocalizedNumerals(updatedCount)
+            });
+        }
+        selectedTransactions.value = {};
+        emit('update:transactions');
+    }).catch(error => {
+        if (error) {
+            snackbar.value?.showError(error);
+        }
+        emit('update:transactions');
     });
 }
 
 function showTransaction(transaction: TransactionInsightDataItem): void {
     emit('click:transaction', transaction);
 }
+
+watch(() => filteredTransactions.value, newValue => {
+    const allAvailableTransactionIds: Record<string, boolean> = {};
+
+    for (const transaction of newValue) {
+        allAvailableTransactionIds[transaction.id] = true;
+    }
+
+    for (const transactionId of keys(selectedTransactions.value)) {
+        if (!allAvailableTransactionIds[transactionId]) {
+            delete selectedTransactions.value[transactionId];
+        }
+    }
+});
 </script>
 
 <style>

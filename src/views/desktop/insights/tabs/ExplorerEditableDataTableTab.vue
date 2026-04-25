@@ -412,11 +412,10 @@ function batchDeleteTransactions(): void {
         }
         selectedTransactions.value = {};
         emit('update:transactions');
-    }).catch(error => {
-        if (error) {
-            snackbar.value?.showError(error);
+    }).catch(tryDeleted => {
+        if (tryDeleted) {
+            emit('update:transactions');
         }
-        emit('update:transactions');
     });
 }
 

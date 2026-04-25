@@ -57,14 +57,16 @@ const showState = ref<boolean>(false);
 const deleting = ref<boolean>(false);
 const deleteIds = ref<string[]>([]);
 const currentPassword = ref<string>('');
+const tryDeleted = ref<boolean>(false);
 
 let resolveFunc: ((response: number) => void) | null = null;
-let rejectFunc: ((reason?: unknown) => void) | null = null;
+let rejectFunc: ((tryDeleted: boolean) => void) | null = null;
 
 function open(options: { updateIds: string[] }): Promise<number> {
     deleteIds.value = options.updateIds;
     currentPassword.value = '';
     deleting.value = false;
+    tryDeleted.value = false;
     showState.value = true;
 
     return new Promise((resolve, reject) => {
@@ -75,6 +77,7 @@ function open(options: { updateIds: string[] }): Promise<number> {
 
 function confirm(): void {
     deleting.value = true;
+    tryDeleted.value = true;
 
     transactionsStore.batchDeleteTransactions({
         transactionIds: deleteIds.value,
@@ -93,7 +96,7 @@ function confirm(): void {
 }
 
 function cancel(): void {
-    rejectFunc?.();
+    rejectFunc?.(tryDeleted.value);
     showState.value = false;
 }
 

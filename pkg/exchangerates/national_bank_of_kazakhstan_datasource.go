@@ -15,7 +15,7 @@ import (
 )
 
 const nationalBankOfKazakhstanExchangeRateUrl = "https://www.nationalbank.kz/rss/rates_all.xml"
-const nationalBankOfKazakhstanExchangeRateReferenceUrl = "https://www.nationalbank.kz/"
+const nationalBankOfKazakhstanExchangeRateReferenceUrl = "https://nationalbank.kz/en/exchangerates/ezhednevnye-oficialnye-rynochnye-kursy-valyut"
 const nationalBankOfKazakhstanDataSource = "Қазақстан Республикасының Ұлттық Банкі"
 const nationalBankOfKazakhstanBaseCurrency = "KZT"
 
@@ -118,6 +118,7 @@ func (e *NationalBankOfKazakhstanExchangeRate) ToLatestExchangeRate(c core.Conte
 
 	finalRate := rate / unit
 	if math.IsInf(finalRate, 0) {
+		log.Warnf(c, "[national_bank_of_kazakhstan_datasource.ToLatestExchangeRate] final exchange rate calculation failed, currency is %s, unit is %s, rate is %s", e.Currency, e.Unit, e.Rate)
 		return nil
 	}
 

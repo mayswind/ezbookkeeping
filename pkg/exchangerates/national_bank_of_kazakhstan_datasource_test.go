@@ -55,12 +55,12 @@ func TestNationalBankOfKazakhstanDataSource_StandardDataExtractExchangeRates(t *
 
 	assert.Contains(t, resp.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "USD",
-		Rate:     "450.5",
+		Rate:     "0.0022197558268590455",
 	})
 
 	assert.Contains(t, resp.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "VND",
-		Rate:     "0.0018",
+		Rate:     "555.5555555555555",
 	})
 }
 

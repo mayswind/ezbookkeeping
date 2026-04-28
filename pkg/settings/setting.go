@@ -135,6 +135,7 @@ const (
 	NationalBankOfGeorgiaDataSource    string = "national_bank_of_georgia"
 	CentralBankOfHungaryDataSource     string = "central_bank_of_hungary"
 	BankOfIsraelDataSource             string = "bank_of_israel"
+	NationalBankOfKazakhstanDataSource string = "national_bank_of_kazakhstan"
 	CentralBankOfMyanmarDataSource     string = "central_bank_of_myanmar"
 	NorgesBankDataSource               string = "norges_bank"
 	NationalBankOfPolandDataSource     string = "national_bank_of_poland"
@@ -143,7 +144,6 @@ const (
 	SwissNationalBankDataSource        string = "swiss_national_bank"
 	NationalBankOfUkraineDataSource    string = "national_bank_of_ukraine"
 	CentralBankOfUzbekistanDataSource  string = "central_bank_of_uzbekistan"
-	NationalBankOfKazakhstanDataSource string = "national_bank_of_kazakhstan"
 	UserCustomExchangeRatesDataSource  string = "user_custom"
 )
 
@@ -1197,6 +1197,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		dataSource == NationalBankOfGeorgiaDataSource ||
 		dataSource == CentralBankOfHungaryDataSource ||
 		dataSource == BankOfIsraelDataSource ||
+		dataSource == NationalBankOfKazakhstanDataSource ||
 		dataSource == CentralBankOfMyanmarDataSource ||
 		dataSource == NorgesBankDataSource ||
 		dataSource == NationalBankOfPolandDataSource ||
@@ -1205,7 +1206,6 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		dataSource == SwissNationalBankDataSource ||
 		dataSource == NationalBankOfUkraineDataSource ||
 		dataSource == CentralBankOfUzbekistanDataSource ||
-		dataSource == NationalBankOfKazakhstanDataSource ||
 		dataSource == UserCustomExchangeRatesDataSource {
 		config.ExchangeRatesDataSource = dataSource
 	} else {

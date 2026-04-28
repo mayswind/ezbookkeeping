@@ -40,6 +40,9 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	} else if config.ExchangeRatesDataSource == settings.BankOfIsraelDataSource {
 		Container.current = newCommonHttpExchangeRatesDataProvider(config, &BankOfIsraelDataSource{})
 		return nil
+	} else if config.ExchangeRatesDataSource == settings.NationalBankOfKazakhstanDataSource {
+		Container.current = newCommonHttpExchangeRatesDataProvider(config, &NationalBankOfKazakhstanDataSource{})
+		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfMyanmarDataSource {
 		Container.current = newCommonHttpExchangeRatesDataProvider(config, &CentralBankOfMyanmarDataSource{})
 		return nil
@@ -63,9 +66,6 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfUzbekistanDataSource {
 		Container.current = newCommonHttpExchangeRatesDataProvider(config, &CentralBankOfUzbekistanDataSource{})
-		return nil
-	} else if config.ExchangeRatesDataSource == settings.NationalBankOfKazakhstanDataSource {
-		Container.current = newCommonHttpExchangeRatesDataProvider(config, &NationalBankOfKazakhstanDataSource{})
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.UserCustomExchangeRatesDataSource {
 		Container.current = newUserCustomExchangeRatesDataProvider()

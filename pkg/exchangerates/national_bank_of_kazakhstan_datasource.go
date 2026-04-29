@@ -116,7 +116,7 @@ func (e *NationalBankOfKazakhstanExchangeRate) ToLatestExchangeRate(c core.Conte
 		return nil
 	}
 
-	finalRate := rate / unit
+	finalRate := unit / rate
 	if math.IsInf(finalRate, 0) {
 		log.Warnf(c, "[national_bank_of_kazakhstan_datasource.ToLatestExchangeRate] final exchange rate calculation failed, currency is %s, unit is %s, rate is %s", e.Currency, e.Unit, e.Rate)
 		return nil

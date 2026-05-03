@@ -24,7 +24,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_BankOfCanadaDataSource(t *tes
 	assert.Equal(t, "CAD", exchangeRateResponse.BaseCurrency)
 
 	supportedCurrencyCodes := []string{"AUD", "BRL", "CHF", "CNY", "EUR", "GBP", "HKD", "IDR", "INR",
-		"JPY", "KRW", "MXN", "MYR", "NOK", "NZD", "PEN", "RUB", "SAR", "SEK", "SGD", "THB", "TRY", "TWD",
+		"JPY", "KRW", "MXN", "MYR", "NOK", "NZD", "PEN", "PLN", "RUB", "SAR", "SEK", "SGD", "THB", "TRY", "TWD",
 		"USD", "VND", "ZAR"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)

@@ -3,27 +3,24 @@ name: Build packages for windows
 inputs:
   package-file-name-prefix:
     required: true
-    type: string
-  package-artifact-name-prefix:
-    required: true
-    type: string
+    description: "The prefix for the windows package file name."
   backend-artifact-name-prefix:
     required: true
-    type: string
+    description: "The prefix for the windows backend artifact name."
 
 runs:
   using: "composite"
   steps:
     - name: Download windows-x64 backend file
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: ${{ inputs.backend-artifact-name-prefix }}-windows-x64
         path: ${{ runner.temp }}\backend
 
     - name: Download linux-amd64 packaged files
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
-        name: ${{ inputs.package-artifact-name-prefix }}-linux-amd64
+        name: ${{ inputs.package-file-name-prefix }}-linux-amd64.tar.gz
         path: ${{ runner.temp }}\package
 
     - name: Extract frontend files from linux-amd64 package
@@ -50,8 +47,8 @@ runs:
         Remove-Item -Recurse -Force ezbookkeeping
 
     - name: Upload windows artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
-        name: ${{ inputs.package-artifact-name-prefix }}-windows-x64
+        archive: false
         path: ${{ inputs.package-file-name-prefix }}-windows-x64.zip
         if-no-files-found: error

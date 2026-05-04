@@ -3,31 +3,34 @@ name: Build backend file for windows
 inputs:
   go-version:
     required: false
+    description: "The Go version to use for building the windows backend. The version should be in the format of 'x.y.z'."
     default: "1.26.2"
   mingw-version:
     required: false
+    description: "The MinGW version to use for building the windows backend. The version should be in the format of 'x.y.z'."
     default: "15.2.0"
   mingw-revison:
     required: false
+    description: "The MinGW revision to use for building the windows backend. The revision should be in the format of 'vX-revY'."
     default: "v13-rev1"
   release-build:
     required: false
-    type: string
+    description: "Whether to build the windows backend in release mode. If set to '1', the backend will be built in release mode. Otherwise, it will be built in development mode."
   build-unix-time:
     required: false
-    type: string
+    description: "The unix time to use for building the windows backend. The value should be a string representing the unix time in seconds."
   build-date:
     required: false
-    type: string
+    description: "The date to use for building the windows backend. The value should be a string representing the date in the format of 'YYYYMMDD'."
   check-3rd-api:
     required: false
-    type: string
+    description: "Whether to run integration tests that call third party APIs. If set to '1', the tests will be run. Otherwise, the tests will be skipped."
   skip-tests:
     required: false
-    type: string
+    description: "Whether to skip tests when building the windows backend. If set to '1', the tests will be skipped. Otherwise, the tests will be run."
   backend-artifact-name-prefix:
     required: true
-    type: string
+    description: "The prefix for the windows backend artifact name."
 
 runs:
   using: "composite"
@@ -69,7 +72,7 @@ runs:
         .\build.ps1 backend
 
     - name: Upload windows backend artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.backend-artifact-name-prefix }}-windows-x64
         path: ezbookkeeping.exe

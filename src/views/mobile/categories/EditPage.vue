@@ -130,7 +130,9 @@
             </f7-list-item>
 
             <f7-list-item :title="tt('Visible')" v-if="editCategoryId">
-                <f7-toggle :checked="category.visible" @toggle:change="category.visible = $event"></f7-toggle>
+                <template #after>
+                    <f7-toggle :checked="category.visible" @toggle:change="category.visible = $event"></f7-toggle>
+                </template>
             </f7-list-item>
 
             <f7-list-input

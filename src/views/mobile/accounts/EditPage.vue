@@ -267,7 +267,9 @@
             </f7-list-item>
 
             <f7-list-item :title="tt('Visible')" v-if="editAccountId">
-                <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                <template #after>
+                    <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                </template>
             </f7-list-item>
 
             <f7-list-input
@@ -361,7 +363,9 @@
             </f7-list-item>
 
             <f7-list-item :title="tt('Visible')" v-if="editAccountId">
-                <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                <template #after>
+                    <f7-toggle :checked="account.visible" @toggle:change="account.visible = $event"></f7-toggle>
+                </template>
             </f7-list-item>
 
             <f7-list-input
@@ -537,7 +541,9 @@
                 </f7-list-item>
 
                 <f7-list-item :title="tt('Visible')" v-if="editAccountId && !isNewAccount(subAccount)">
-                    <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
+                    <template #after>
+                        <f7-toggle :checked="subAccount.visible" @toggle:change="subAccount.visible = $event"></f7-toggle>
+                    </template>
                 </f7-list-item>
 
                 <f7-list-input

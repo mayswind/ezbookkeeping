@@ -8,12 +8,20 @@
         <f7-list strong inset dividers class="margin-top">
             <f7-list-item :title="tt('Status')" :after="tt(isEnableApplicationLock ? 'Enabled' : 'Disabled')"></f7-list-item>
             <f7-list-item v-if="isEnableApplicationLock">
-                <span>{{ tt('Unlock with PIN Code') }}</span>
-                <f7-toggle checked disabled></f7-toggle>
+                <template #after-title>
+                    {{ tt('Unlock with PIN Code') }}
+                </template>
+                <template #after>
+                    <f7-toggle checked disabled></f7-toggle>
+                </template>
             </f7-list-item>
             <f7-list-item v-if="isEnableApplicationLock && isSupportedWebAuthn">
-                <span>{{ tt('Unlock with WebAuthn') }}</span>
-                <f7-toggle :checked="isEnableApplicationLockWebAuthn" @toggle:change="isEnableApplicationLockWebAuthn = $event"></f7-toggle>
+                <template #after-title>
+                    {{ tt('Unlock with WebAuthn') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="isEnableApplicationLockWebAuthn" @toggle:change="isEnableApplicationLockWebAuthn = $event"></f7-toggle>
+                </template>
             </f7-list-item>
             <f7-list-button v-if="isEnableApplicationLock" @click="disable(null)">{{ tt('Disable') }}</f7-list-button>
             <f7-list-button v-if="!isEnableApplicationLock" @click="enable(null)">{{ tt('Enable') }}</f7-list-button>

@@ -129,8 +129,13 @@
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical">
-            <f7-list-item :title="tt('Use preset transaction categories')" link="#" @click="showPresetCategories = true">
-                <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
+            <f7-list-item link="#" @click="showPresetCategories = true">
+                <template #after-title>
+                    {{ tt('Use preset transaction categories') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="usePresetCategories" @toggle:change="usePresetCategories = $event"></f7-toggle>
+                </template>
             </f7-list-item>
         </f7-list>
 

@@ -189,7 +189,8 @@
         <f7-popover class="template-popover-menu" target-el="#homepage-add-button"
                     v-model:opened="showTransactionTemplatePopover">
             <f7-list dividers v-if="allTransactionTemplates">
-                <f7-list-item key="AIImageRecognition" :title="tt('AI Image Recognition')"
+                <f7-list-item key="AIImageRecognition" link="#" no-chevron
+                              :title="tt('AI Image Recognition')"
                               @click="showAIReceiptImageRecognitionSheet = true; showTransactionTemplatePopover = false"
                               v-if="isTransactionFromAIImageRecognitionEnabled()">
                     <template #media>

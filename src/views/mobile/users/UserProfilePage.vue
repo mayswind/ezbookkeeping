@@ -18,7 +18,7 @@
 
         <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Default Account" title="Unspecified"></f7-list-item>
-            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Use Last Reconciled Time" title="Disabled" link="#"></f7-list-item>
+            <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Use Last Reconciled Time" title="Disabled"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Editable Transaction Range" title="All" link="#"></f7-list-item>
         </f7-list>
 
@@ -120,7 +120,7 @@
             </f7-list-item>
 
             <f7-list-item
-                link="#"
+                link="#" no-chevron
                 class="list-item-with-header-and-title list-item-no-item-after"
                 popover-open=".use-last-reconciled-time-popover-menu"
                 :header="tt('Use Last Reconciled Time')"

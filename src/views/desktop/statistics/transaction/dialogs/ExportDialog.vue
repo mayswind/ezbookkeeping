@@ -162,7 +162,8 @@ const dataTableHeaders = computed<object[]>(() => {
         value: `column${index}`,
         title: header,
         sortable: index > 0,
-        nowrap: true
+        nowrap: true,
+        fixed: index === 0
     }));
 });
 

@@ -172,6 +172,7 @@
                 <f7-icon f7="creditcard"></f7-icon>
                 <span class="tabbar-label">{{ tt('Accounts') }}</span>
             </f7-link>
+            <!-- "homepage-add-button" must have the "dragenabled" class, otherwise the popover disappears immediately after the second long press -->
             <f7-link id="homepage-add-button" class="link dragenabled"
                      href="/transaction/add" @taphold="openTransactionTemplatePopover">
                 <f7-icon f7="plus_square" class="ebk-tarbar-big-icon"></f7-icon>
@@ -189,15 +190,15 @@
         <f7-popover class="template-popover-menu" target-el="#homepage-add-button"
                     v-model:opened="showTransactionTemplatePopover">
             <f7-list dividers v-if="allTransactionTemplates">
-                <f7-list-item key="AIImageRecognition" link="#" no-chevron
+                <f7-list-item key="AIImageRecognition" link="#" no-chevron popover-close
                               :title="tt('AI Image Recognition')"
-                              @click="showAIReceiptImageRecognitionSheet = true; showTransactionTemplatePopover = false"
+                              @click="showAIReceiptImageRecognitionSheet = true"
                               v-if="isTransactionFromAIImageRecognitionEnabled()">
                     <template #media>
                         <f7-icon f7="wand_stars"></f7-icon>
                     </template>
                 </f7-list-item>
-                <f7-list-item :key="template.id" :title="template.name"
+                <f7-list-item popover-close :key="template.id" :title="template.name"
                               :link="'/transaction/add?templateId=' + template.id"
                               v-for="template in allTransactionTemplates">
                     <template #media>

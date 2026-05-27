@@ -13,7 +13,8 @@
             <f7-popover class="numpad-paste-popover" target-el="#numpad-value"
                         v-model:opened="showPastePopover">
                 <f7-list class="numpad-paste-popover-context-menu-list">
-                    <f7-list-item link="#" no-chevron :title="tt('Paste')" @click="paste"></f7-list-item>
+                    <f7-list-item link="#" no-chevron popover-close
+                                  :title="tt('Paste')" @click="paste"></f7-list-item>
                 </f7-list>
             </f7-popover>
 
@@ -329,8 +330,6 @@ function clear(): void {
 }
 
 function paste(): void {
-    showPastePopover.value = false;
-
     if (pastingAmount.value) {
         pastingAmount.value = false;
         return;

@@ -107,6 +107,12 @@
             "EndYYYY": "FY {EndYYYY}",
             "EndYY": "FY {EndYY}"
         },
+        "volume": {
+            "4K": "4K (approx. {size} KiB)",
+            "2K": "2K (approx. {size} KiB)",
+            "1080p": "1080p (approx. {size} KiB)",
+            "720p": "720p (approx. {size} KiB)"
+        },
         "misc": {
             "nHour": "{n} Hour",
             "nHours": "{n} Hours",
@@ -1479,6 +1485,7 @@
     "Detecting...": "Detecting...",
     "Miscellaneous": "Linh tinh",
     "Default": "Mặc định",
+    "Original": "Original",
     "Included": "Included",
     "Excluded": "Excluded",
     "Done": "Hoàn tất",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "Hiển thị xác nhận mỗi lần",
     "Automatically Add Geolocation": "Tự động thêm vị trí địa lý",
     "Always Show Transaction Pictures": "Always Show Transaction Pictures",
+    "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
     "Import Transaction Dialog": "Import Transaction Dialog",
     "Remember Last Selected File Type": "Remember Last Selected File Type",
     "Insights Explorer Page": "Insights Explorer Page",

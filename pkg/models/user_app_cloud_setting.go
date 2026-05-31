@@ -34,6 +34,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"autoSaveTransactionDraft":                                 USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	"autoGetCurrentGeoLocation":                                USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"alwaysShowTransactionPicturesInMobileTransactionEditPage": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"transactionPictureQuality":                                USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// Import Transaction Dialog
 	"rememberLastSelectedFileTypeInImportTransactionDialog": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"lastSelectedFileTypeInImportTransactionDialog":         USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,

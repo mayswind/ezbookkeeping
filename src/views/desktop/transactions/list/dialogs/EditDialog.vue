@@ -504,6 +504,8 @@ import type { Coordinate } from '@/core/coordinate.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType, TransactionEditScopeType, TransactionQuickAddButtonActionType } from '@/core/transaction.ts';
 import { TemplateType, ScheduledTemplateFrequencyType } from '@/core/template.ts';
+import { KnownFileType } from '@/core/file.ts';
+
 import { KnownErrorCode } from '@/consts/api.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
@@ -529,6 +531,7 @@ import {
 import {
     isSupportGetGeoLocationByClick
 } from '@/lib/map/index.ts';
+import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
 import {
@@ -585,6 +588,7 @@ const {
     transaction,
     defaultCurrency,
     coordinateDisplayType,
+    imageUploadQualityType,
     allTimezones,
     allVisibleAccounts,
     allVisibleCategorizedAccounts,
@@ -1099,7 +1103,11 @@ function uploadPicture(event: Event): void {
     uploadingPicture.value = true;
     submitting.value = true;
 
-    transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
+    compressJpgImageByQuality(pictureFile, imageUploadQualityType.value).then(blob => {
+        return transactionsStore.uploadTransactionPicture({
+            pictureFile: KnownFileType.JPG.createFileFromBlob(blob, "image")
+        });
+    }).then(response => {
         transaction.value.addPicture(response);
         uploadingPicture.value = false;
         submitting.value = false;

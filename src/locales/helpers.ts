@@ -114,6 +114,10 @@ import {
 } from '@/core/color.ts';
 
 import {
+    ImageUploadQualityType
+} from '@/core/image.ts';
+
+import {
     type LocalizedAccountCategory,
     AccountType,
     AccountCategory
@@ -554,6 +558,28 @@ export function useI18n() {
                 type: calendarDisplayType.type,
                 displayName: t('calendar.' + calendarDisplayType.name)
             });
+        }
+
+        return ret;
+    }
+
+    function getAllImageUploadQualityTypes(): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+
+        for (const qualityType of ImageUploadQualityType.values()) {
+            if (isNumber(qualityType.maxLongSidePixels)) {
+                ret.push({
+                    type: qualityType.type,
+                    displayName: t(`format.volume.${qualityType.name}`, {
+                        size: qualityType.estimatedKiB ? appendDigitGroupingSymbolAndDecimalSeparator(qualityType.estimatedKiB.toString(), getNumberFormatOptions({})) : '-',
+                    })
+                });
+            } else {
+                ret.push({
+                    type: qualityType.type,
+                    displayName: t(qualityType.name)
+                })
+            }
         }
 
         return ret;
@@ -2543,6 +2569,7 @@ export function useI18n() {
         getAllCurrencyDisplayTypes,
         getAllCurrencySortingTypes: () => getLocalizedDisplayNameAndType(CurrencySortingType.values()),
         getAllCoordinateDisplayTypes: () => getLocalizedDisplayNameAndTypeWithSystemDefault(CoordinateDisplayType.values(), CoordinateDisplayType.SystemDefaultType, CoordinateDisplayType.Default),
+        getAllImageUploadQualityTypes,
         getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Expense),
         getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Income),
         getAllAccountCategories,

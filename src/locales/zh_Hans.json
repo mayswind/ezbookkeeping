@@ -107,6 +107,12 @@
             "EndYYYY": "{EndYYYY}财年",
             "EndYY": "{EndYY}财年"
         },
+        "volume": {
+            "4K": "4K（约 {size} KiB）",
+            "2K": "2K（约 {size} KiB）",
+            "1080p": "1080p（约 {size} KiB）",
+            "720p": "720p（约 {size} KiB）"
+        },
         "misc": {
             "nHour": "{n} 小时",
             "nHours": "{n} 小时",
@@ -1479,6 +1485,7 @@
     "Detecting...": "正在检测...",
     "Miscellaneous": "杂项",
     "Default": "默认",
+    "Original": "原始",
     "Included": "包含",
     "Excluded": "排除",
     "Done": "完成",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "每次提示确认",
     "Automatically Add Geolocation": "自动添加地理位置",
     "Always Show Transaction Pictures": "总是显示交易图片",
+    "Transaction Picture Upload Quality": "交易图片上传质量",
     "Import Transaction Dialog": "导入交易对话框",
     "Remember Last Selected File Type": "记住上次选择的文件类型",
     "Insights Explorer Page": "洞察探索页面",

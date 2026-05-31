@@ -107,6 +107,12 @@
             "EndYYYY": "ವಿತ್ತೀಯ ವರ್ಷ {EndYYYY}",
             "EndYY": "ವಿತ್ತೀಯ ವರ್ಷ {EndYY}"
         },
+        "volume": {
+            "4K": "4K (approx. {size} KiB)",
+            "2K": "2K (approx. {size} KiB)",
+            "1080p": "1080p (approx. {size} KiB)",
+            "720p": "720p (approx. {size} KiB)"
+        },
         "misc": {
             "nHour": "{n} ಗಂಟೆ",
             "nHours": "{n} ಗಂಟೆಗಳು",
@@ -1479,6 +1485,7 @@
     "Detecting...": "ಪತ್ತೆಹಚ್ಚಲಾಗುತ್ತಿದೆ...",
     "Miscellaneous": "ಇತರೆ",
     "Default": "ಪೂರ್ವನಿರ್ಧಾರಿತ",
+    "Original": "Original",
     "Included": "ಸೇರಿಸಲಾಗಿದೆ",
     "Excluded": "ಹೊರತುಪಡಿಸಲಾಗಿದೆ",
     "Done": "ಮುಗಿದಿದೆ",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "ಪ್ರತಿ ಬಾರಿ ದೃಢೀಕರಣ ತೋರಿಸಿ",
     "Automatically Add Geolocation": "ಭೌಗೋಳಿಕ ಸ್ಥಾನವನ್ನು ಸ್ವಯಂ ಸೇರಿಸಿ",
     "Always Show Transaction Pictures": "ವಹಿವಾಟು ಚಿತ್ರಗಳನ್ನು ಯಾವಾಗಲೂ ತೋರಿಸಿ",
+    "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
     "Import Transaction Dialog": "Import Transaction Dialog",
     "Remember Last Selected File Type": "Remember Last Selected File Type",
     "Insights Explorer Page": "Insights Explorer Page",

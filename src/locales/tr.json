@@ -107,6 +107,12 @@
             "EndYYYY": "{EndYYYY} mali yılı",
             "EndYY": "{EndYY} mali yılı"
         },
+        "volume": {
+            "4K": "4K (approx. {size} KiB)",
+            "2K": "2K (approx. {size} KiB)",
+            "1080p": "1080p (approx. {size} KiB)",
+            "720p": "720p (approx. {size} KiB)"
+        },
         "misc": {
             "nHour": "{n} Saat",
             "nHours": "{n} Saat",
@@ -1479,6 +1485,7 @@
     "Detecting...": "Algılanıyor...",
     "Miscellaneous": "Çeşitli",
     "Default": "Varsayılan",
+    "Original": "Original",
     "Included": "Dahil",
     "Excluded": "Hariç",
     "Done": "Bitti",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "Her Seferinde Onay Göster",
     "Automatically Add Geolocation": "Otomatik Olarak Konum Ekle",
     "Always Show Transaction Pictures": "İşlem Resimlerini Her Zaman Göster",
+    "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
     "Import Transaction Dialog": "Import Transaction Dialog",
     "Remember Last Selected File Type": "Remember Last Selected File Type",
     "Insights Explorer Page": "Insights Explorer Page",

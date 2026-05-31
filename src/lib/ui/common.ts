@@ -3,8 +3,10 @@ import Clipboard from 'clipboard';
 import { ThemeType } from '@/core/theme.ts';
 
 import { type AmountColor, PresetAmountColor } from '@/core/color.ts';
+import type { ImageUploadQualityType } from '@/core/image.ts';
 import { KnownFileType } from '@/core/file.ts';
 
+import { isNumber } from '@/lib/common.ts';
 import logger from '../logger.ts';
 
 export function scrollToSelectedItem(parentEl: Element | null | undefined, containerSelector: string | null, scrollableListSelector: string | null, selectedItemSelector: string): void {
@@ -186,6 +188,14 @@ export function startDownloadFile(fileName: string, fileData: Blob): void {
     document.body.appendChild(dataLink);
 
     dataLink.click();
+}
+
+export function compressJpgImageByQuality(blob: Blob, qualityType: ImageUploadQualityType): Promise<Blob> {
+    if (!isNumber(qualityType.maxLongSidePixels) || qualityType.quality <= 0) {
+        return Promise.resolve(blob);
+    }
+
+    return compressJpgImage(blob, qualityType.maxLongSidePixels, qualityType.maxLongSidePixels, qualityType.quality);
 }
 
 export function compressJpgImage(blob: Blob, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {

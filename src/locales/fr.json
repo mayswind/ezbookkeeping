@@ -107,6 +107,12 @@
             "EndYYYY": "Exercice {EndYYYY}",
             "EndYY": "Exercice {EndYY}"
         },
+        "volume": {
+            "4K": "4K (approx. {size} KiB)",
+            "2K": "2K (approx. {size} KiB)",
+            "1080p": "1080p (approx. {size} KiB)",
+            "720p": "720p (approx. {size} KiB)"
+        },
         "misc": {
             "nHour": "{n} Hour",
             "nHours": "{n} Hours",
@@ -1479,6 +1485,7 @@
     "Detecting...": "Detecting...",
     "Miscellaneous": "Divers",
     "Default": "Par défaut",
+    "Original": "Original",
     "Included": "Included",
     "Excluded": "Excluded",
     "Done": "Terminé",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "Afficher la confirmation à chaque fois",
     "Automatically Add Geolocation": "Ajouter automatiquement la géolocalisation",
     "Always Show Transaction Pictures": "Toujours afficher les images de transaction",
+    "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
     "Import Transaction Dialog": "Import Transaction Dialog",
     "Remember Last Selected File Type": "Remember Last Selected File Type",
     "Insights Explorer Page": "Insights Explorer Page",

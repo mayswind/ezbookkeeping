@@ -107,6 +107,12 @@
             "EndYYYY": "நிதியாண்டு {EndYYYY}",
             "EndYY": "நிதியாண்டு {EndYY}"
         },
+        "volume": {
+            "4K": "4K (approx. {size} KiB)",
+            "2K": "2K (approx. {size} KiB)",
+            "1080p": "1080p (approx. {size} KiB)",
+            "720p": "720p (approx. {size} KiB)"
+        },
         "misc": {
             "nHour": "{n} மணி நேரம்",
             "nHours": "{n} மணி நேரங்கள்",
@@ -1479,6 +1485,7 @@
     "Detecting...": "கண்டறியப்படுகிறது...",
     "Miscellaneous": "இதர",
     "Default": "இயல்புநிலை",
+    "Original": "Original",
     "Included": "சேர்க்கப்பட்டது",
     "Excluded": "விலக்கப்பட்டது",
     "Done": "முடிந்தது",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "ஒவ்வொரு முறை அங்கீகாரம் காட்டு",
     "Automatically Add Geolocation": "புவியியல் நிலையை தானியங்கி சேர்",
     "Always Show Transaction Pictures": "பரிவர்த்தனை படம்களை எப்போதும் காட்டு",
+    "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
     "Import Transaction Dialog": "பரிவர்த்தனை இறக்குமதி உரையாடல்",
     "Remember Last Selected File Type": "கடைசியாக தேர்ந்தெடுத்த கோப்பு வகையை நினைவில் கொள்",
     "Insights Explorer Page": "நுண்ணறிவு ஆய்வுக்கருவி பக்கம்",

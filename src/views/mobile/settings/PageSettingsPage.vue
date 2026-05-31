@@ -188,6 +188,32 @@
                     <f7-toggle :checked="alwaysShowTransactionPicturesInMobileTransactionEditPage" @toggle:change="alwaysShowTransactionPicturesInMobileTransactionEditPage = $event"></f7-toggle>
                 </template>
             </f7-list-item>
+
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="#"
+                @click="showTransactionPictureQualityPopup = true"
+            >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Transaction Picture Upload Quality') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allImageUploadQualityTypes, transactionPictureQuality) }}
+                </template>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Transaction Picture Upload Quality')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Transaction Picture Upload Quality')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allImageUploadQualityTypes"
+                                           v-model:show="showTransactionPictureQualityPopup"
+                                           v-model="transactionPictureQuality">
+                </list-item-selection-popup>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ tt('Account List Page') }}</f7-block-title>
@@ -309,6 +335,7 @@ const {
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
     allAutoSaveTransactionDraftTypes,
+    allImageUploadQualityTypes,
     allReconciliationStatementDateRanges,
     showAmountInHomePage,
     timezoneUsedForStatisticsInHomePage,
@@ -316,6 +343,7 @@ const {
     showTagInTransactionListPage,
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
+    transactionPictureQuality,
     currencySortByInExchangeRatesPage,
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,
@@ -332,6 +360,7 @@ const showTimezoneUsedForStatisticsInHomePagePopup = ref<boolean>(false);
 const showQuickSaveButtonStyleInMobileTransactionListPagePopup = ref<boolean>(false);
 const showQuickAddButtonActionInMobileTransactionEditPagePopup = ref<boolean>(false);
 const showAutoSaveTransactionDraftPopup = ref<boolean>(false);
+const showTransactionPictureQualityPopup = ref<boolean>(false);
 const showReconciliationStatementDefaultDateRangePopup = ref<boolean>(false);
 const showCurrencySortByInExchangeRatesPagePopup = ref<boolean>(false);
 

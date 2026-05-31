@@ -107,6 +107,12 @@
             "EndYYYY": "FL {EndYYYY}",
             "EndYY": "FL {EndYY}"
         },
+        "volume": {
+            "4K": "4K (approx. {size} KiB)",
+            "2K": "2K (approx. {size} KiB)",
+            "1080p": "1080p (approx. {size} KiB)",
+            "720p": "720p (approx. {size} KiB)"
+        },
         "misc": {
             "nHour": "{n} ura",
             "nHours": "{n} ur",
@@ -1479,6 +1485,7 @@
     "Detecting...": "Zaznavanje...",
     "Miscellaneous": "Razno",
     "Default": "Privzeto",
+    "Original": "Original",
     "Included": "Vključeno",
     "Excluded": "Izključeno",
     "Done": "Končano",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "Vsakič prikaži potrditev",
     "Automatically Add Geolocation": "Samodejno dodaj geolokacijo",
     "Always Show Transaction Pictures": "Vedno prikaži slike transakcij",
+    "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
     "Import Transaction Dialog": "Pogovorno okno za uvoz transakcij",
     "Remember Last Selected File Type": "Zapomni si zadnjo izbrano vrsto datoteke",
     "Insights Explorer Page": "Stran za vpoglede in raziskovanje",

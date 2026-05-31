@@ -39,13 +39,14 @@ import { useI18nUIComponents, closeAllDialog } from '@/lib/ui/mobile.ts';
 
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
+import { ImageUploadQualityType } from '@/core/image.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
 import type { RecognizedReceiptImageResponse } from '@/models/large_language_model.ts';
 
 import { generateRandomUUID } from '@/lib/misc.ts';
-import { compressJpgImage } from '@/lib/ui/common.ts';
+import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
 defineProps<{
@@ -75,7 +76,7 @@ function loadImage(image: Blob): void {
     imageFile.value = null;
     imageSrc.value = undefined;
 
-    compressJpgImage(image, 1280, 1280, 0.8).then(blob => {
+    compressJpgImageByQuality(image, ImageUploadQualityType.HD720P).then(blob => {
         imageFile.value = KnownFileType.JPG.createFileFromBlob(blob, "image");
         imageSrc.value = URL.createObjectURL(blob);
         loading.value = false;

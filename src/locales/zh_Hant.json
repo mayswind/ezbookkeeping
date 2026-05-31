@@ -107,6 +107,12 @@
             "EndYYYY": "{EndYYYY}財政年度",
             "EndYY": "{EndYY}財政年度"
         },
+        "volume": {
+            "4K": "4K（約 {size} KiB）",
+            "2K": "2K（約 {size} KiB）",
+            "1080p": "1080p（約 {size} KiB）",
+            "720p": "720p（約 {size} KiB）"
+        },
         "misc": {
             "nHour": "{n} 小時",
             "nHours": "{n} 小時",
@@ -1479,6 +1485,7 @@
     "Detecting...": "正在偵測...",
     "Miscellaneous": "雜項",
     "Default": "預設",
+    "Original": "原始",
     "Included": "包含",
     "Excluded": "排除",
     "Done": "完成",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "每次提示確認",
     "Automatically Add Geolocation": "自動新增地理位置",
     "Always Show Transaction Pictures": "總是顯示交易圖片",
+    "Transaction Picture Upload Quality": "交易圖片上傳質量",
     "Import Transaction Dialog": "匯入交易對話框",
     "Remember Last Selected File Type": "記住上次選擇的檔案類型",
     "Insights Explorer Page": "洞察探索頁面",

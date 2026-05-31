@@ -538,6 +538,7 @@ import {
     TransactionQuickAddButtonActionType
 } from '@/core/transaction.ts';
 import { ScheduledTemplateFrequencyType, TemplateType } from '@/core/template.ts';
+import { KnownFileType } from '@/core/file.ts';
 
 import { TRANSACTION_MAX_AMOUNT, TRANSACTION_MIN_AMOUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
@@ -557,6 +558,7 @@ import { generateRandomUUID } from '@/lib/misc.ts';
 import { getTransactionPrimaryCategoryName, getTransactionSecondaryCategoryName } from '@/lib/category.ts';
 import { type SetTransactionOptions } from '@/lib/transaction.ts';
 import { getMapProvider, isTransactionPicturesEnabled } from '@/lib/server_settings.ts';
+import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
 const props = defineProps<{
@@ -598,6 +600,7 @@ const {
     defaultCurrency,
     firstDayOfWeek,
     coordinateDisplayType,
+    imageUploadQualityType,
     allTimezones,
     allVisibleAccounts,
     allVisibleCategorizedAccounts,
@@ -1286,7 +1289,11 @@ function uploadPicture(event: Event): void {
     uploadingPicture.value = true;
     submitting.value = true;
 
-    transactionsStore.uploadTransactionPicture({ pictureFile }).then(response => {
+    compressJpgImageByQuality(pictureFile, imageUploadQualityType.value).then(blob => {
+        return transactionsStore.uploadTransactionPicture({
+            pictureFile: KnownFileType.JPG.createFileFromBlob(blob, "image")
+        });
+    }).then(response => {
         transaction.value.addPicture(response);
         uploadingPicture.value = false;
         submitting.value = false;

@@ -13,6 +13,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
+import { ImageUploadQualityType } from '@/core/image.ts';
 import { TransactionType, TransactionQuickAddButtonActionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
@@ -114,6 +115,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const defaultAccountId = computed<string>(() => userStore.currentUserDefaultAccountId);
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
     const coordinateDisplayType = computed<number>(() => userStore.currentUserCoordinateDisplayType);
+    const imageUploadQualityType = computed<ImageUploadQualityType>(() => ImageUploadQualityType.valueOf(settingsStore.appSettings.transactionPictureQuality) ?? ImageUploadQualityType.Default);
 
     const allTimezones = computed<LocalizedTimezoneInfo[]>(() => {
         if (type === TransactionEditPageType.Template && transaction.value instanceof TransactionTemplate) {
@@ -533,6 +535,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         defaultAccountId,
         firstDayOfWeek,
         coordinateDisplayType,
+        imageUploadQualityType,
         allTimezones,
         allAccounts,
         allVisibleAccounts,

@@ -107,6 +107,12 @@
             "EndYYYY": "{EndYYYY} фінансовий рік",
             "EndYY": "{EndYY} фінансовий рік"
         },
+        "volume": {
+            "4K": "4K (approx. {size} KiB)",
+            "2K": "2K (approx. {size} KiB)",
+            "1080p": "1080p (approx. {size} KiB)",
+            "720p": "720p (approx. {size} KiB)"
+        },
         "misc": {
             "nHour": "{n} год.",
             "nHours": "{n} год.",
@@ -1479,6 +1485,7 @@
     "Detecting...": "Визначення...",
     "Miscellaneous": "Різне",
     "Default": "По замовчуванню",
+    "Original": "Original",
     "Included": "Включено",
     "Excluded": "Виключено",
     "Done": "Готово",
@@ -2347,6 +2354,7 @@
     "Always Show Confirmation": "Показувати підтвердження щоразу",
     "Automatically Add Geolocation": "Автоматично додавати геолокацію",
     "Always Show Transaction Pictures": "Завжди показувати зображення транзакцій",
+    "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
     "Import Transaction Dialog": "Діалог імпорту транзакцій",
     "Remember Last Selected File Type": "Запам'ятовувати останній вибраний тип файлу",
     "Insights Explorer Page": "Сторінка дослідника інсайтів",

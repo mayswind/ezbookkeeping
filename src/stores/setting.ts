@@ -264,6 +264,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('alwaysShowTransactionPicturesInMobileTransactionEditPage', value);
     }
 
+    function setTransactionPictureQuality(value: number): void {
+        updateApplicationSettingsValue('transactionPictureQuality', value);
+        appSettings.value.transactionPictureQuality = value;
+        updateUserApplicationCloudSettingValue('transactionPictureQuality', value);
+    }
+
     // Import Transaction Dialog
     function setRememberLastSelectedFileTypeInImportTransactionDialog(value: boolean): void {
         updateApplicationSettingsValue('rememberLastSelectedFileTypeInImportTransactionDialog', value);
@@ -560,6 +566,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
+        setTransactionPictureQuality,
         // -- Import Transaction Dialog
         setRememberLastSelectedFileTypeInImportTransactionDialog,
         setLastSelectedFileTypeInImportTransactionDialog,

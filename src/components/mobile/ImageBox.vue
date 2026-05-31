@@ -26,7 +26,7 @@ import { ref, computed, watch } from 'vue';
 const props = defineProps<{
     src: string;
     class?: string;
-    style?: string
+    style?: Record<string, string>;
     alt?: string;
     link?: string;
 }>();

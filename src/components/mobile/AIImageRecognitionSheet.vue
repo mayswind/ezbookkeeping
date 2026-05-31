@@ -49,13 +49,18 @@ import { generateRandomUUID } from '@/lib/misc.ts';
 import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
+export interface AIImageRecognitionResult {
+    response: RecognizedReceiptImageResponse;
+    imageFile: File;
+}
+
 defineProps<{
     show: boolean;
 }>();
 
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
-    (e: 'recognition:change', value: RecognizedReceiptImageResponse): void;
+    (e: 'recognition:change', value: AIImageRecognitionResult): void;
 }>();
 
 const { tt } = useI18n();
@@ -120,6 +125,7 @@ function confirm(): void {
         return;
     }
 
+    const currentImageFile = imageFile.value;
     cancelRecognizingUuid.value = generateRandomUUID();
     recognizing.value = true;
     showCancelableLoading('Recognizing', 'AI can make mistakes. Check important info.', 'Cancel Recognition', cancelRecognize);
@@ -132,7 +138,7 @@ function confirm(): void {
         cancelRecognizingUuid.value = undefined;
         closeAllDialog();
         emit('update:show', false);
-        emit('recognition:change', response);
+        emit('recognition:change', { response: response, imageFile: currentImageFile });
     }).catch(error => {
         if (error.canceled) {
             return;

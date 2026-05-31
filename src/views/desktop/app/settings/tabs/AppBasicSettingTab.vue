@@ -237,6 +237,28 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :title="tt('AI Image Recognition')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="tt('Auto Upload AI Recognition Image as Transaction Picture')"
+                                    :placeholder="tt('Auto Upload AI Recognition Image as Transaction Picture')"
+                                    :items="enableDisableOptions"
+                                    v-model="isAutoUploadTransactionPictureForAIRecognition"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <v-card :title="tt('Import Transaction Dialog')">
                 <v-form>
                     <v-card-text>
@@ -449,6 +471,7 @@ const {
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     transactionPictureQuality,
+    isAutoUploadTransactionPictureForAIRecognition,
     currencySortByInExchangeRatesPage,
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,

@@ -216,6 +216,18 @@
             </f7-list-item>
         </f7-list>
 
+        <f7-block-title>{{ tt('AI Image Recognition') }}</f7-block-title>
+        <f7-list strong inset dividers class="settings-list">
+            <f7-list-item>
+                <template #after-title>
+                    {{ tt('Auto Upload AI Recognition Image as Transaction Picture') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="isAutoUploadTransactionPictureForAIRecognition" @toggle:change="isAutoUploadTransactionPictureForAIRecognition = $event"></f7-toggle>
+                </template>
+            </f7-list-item>
+        </f7-list>
+
         <f7-block-title>{{ tt('Account List Page') }}</f7-block-title>
         <f7-list strong inset dividers class="settings-list">
             <f7-list-item
@@ -344,6 +356,7 @@ const {
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     transactionPictureQuality,
+    isAutoUploadTransactionPictureForAIRecognition,
     currencySortByInExchangeRatesPage,
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,

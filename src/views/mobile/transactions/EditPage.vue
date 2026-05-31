@@ -504,7 +504,7 @@
         <f7-photo-browser ref="pictureBrowser" type="popup" navbar-of-text="/"
                           :navbar-show-count="true" :exposition="false"
                           :photos="transactionPictures" :thumbs="transactionThumbs" />
-        <input ref="pictureInput" type="file" style="display: none" :accept="`${SUPPORTED_IMAGE_EXTENSIONS};capture=camera`" @change="uploadPicture($event)" />
+        <input ref="pictureInput" type="file" style="display: none" :accept="`${SUPPORTED_IMAGE_EXTENSIONS};capture=camera`" @change="onUploadPicture($event)" />
     </f7-page>
 </template>
 
@@ -564,6 +564,7 @@ import logger from '@/lib/logger.ts';
 const props = defineProps<{
     f7route: Router.Route;
     f7router: Router.Router;
+    autoUploadPicture?: File;
 }>();
 
 const query = props.f7route.query;
@@ -1028,6 +1029,11 @@ function init(): void {
             (transaction.value as TransactionTemplate).fillFrom(template);
         }
 
+        if (props.autoUploadPicture) {
+            showTransactionPictures.value = true;
+            uploadPicture(props.autoUploadPicture);
+        }
+
         loading.value = false;
     }).catch(error => {
         logger.error('failed to load essential data for editing transaction', error);
@@ -1271,25 +1277,15 @@ function showOpenPictureDialog(): void {
     pictureInput.value?.click();
 }
 
-function uploadPicture(event: Event): void {
-    if (!event || !event.target) {
+function uploadPicture(file: File): void {
+    if (!file) {
         return;
     }
-
-    const el = event.target as HTMLInputElement;
-
-    if (!el.files || !el.files.length) {
-        return;
-    }
-
-    const pictureFile = el.files[0] as File;
-
-    el.value = '';
 
     uploadingPicture.value = true;
     submitting.value = true;
 
-    compressJpgImageByQuality(pictureFile, imageUploadQualityType.value).then(blob => {
+    compressJpgImageByQuality(file, imageUploadQualityType.value).then(blob => {
         return transactionsStore.uploadTransactionPicture({
             pictureFile: KnownFileType.JPG.createFileFromBlob(blob, "image")
         });
@@ -1339,6 +1335,23 @@ function viewOrRemovePicture(pictureInfo: TransactionPictureInfoBasicResponse): 
 
 function duplicate(withTime?: boolean, withGeoLocation?: boolean): void {
     props.f7router.navigate(`/transaction/add?id=${transaction.value.id}&type=${transaction.value.type}&withTime=${withTime ?? false}&withGeoLocation=${withGeoLocation ?? false}`);
+}
+
+function onUploadPicture(event: Event): void {
+    if (!event || !event.target) {
+        return;
+    }
+
+    const el = event.target as HTMLInputElement;
+
+    if (!el.files || !el.files.length || !el.files[0]) {
+        return;
+    }
+
+    const pictureFile = el.files[0] as File;
+
+    el.value = '';
+    uploadPicture(pictureFile);
 }
 
 function onPageAfterIn(): void {

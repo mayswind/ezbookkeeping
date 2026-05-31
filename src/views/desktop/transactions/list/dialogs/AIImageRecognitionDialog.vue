@@ -66,6 +66,11 @@ import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
 import type { RecognizedReceiptImageResponse } from '@/models/large_language_model.ts';
 
+export interface AIImageRecognitionResult {
+    response: RecognizedReceiptImageResponse;
+    imageFile: File;
+}
+
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
@@ -81,7 +86,7 @@ const transactionsStore = useTransactionsStore();
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const imageInput = useTemplateRef<HTMLInputElement>('imageInput');
 
-let resolveFunc: ((response: RecognizedReceiptImageResponse) => void) | null = null;
+let resolveFunc: ((result: AIImageRecognitionResult) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const showState = ref<boolean>(false);
@@ -112,7 +117,7 @@ function loadImage(file: File): void {
     });
 }
 
-function open(): Promise<RecognizedReceiptImageResponse> {
+function open(): Promise<AIImageRecognitionResult> {
     showState.value = true;
     loading.value = false;
     recognizing.value = false;
@@ -157,6 +162,7 @@ function recognize(): void {
         return;
     }
 
+    const currentImageFile = imageFile.value;
     cancelRecognizingUuid.value = generateRandomUUID();
     recognizing.value = true;
 
@@ -164,7 +170,7 @@ function recognize(): void {
         imageFile: imageFile.value,
         cancelableUuid: cancelRecognizingUuid.value
     }).then(response => {
-        resolveFunc?.(response);
+        resolveFunc?.({ response: response, imageFile: currentImageFile });
         showState.value = false;
         recognizing.value = false;
         cancelRecognizingUuid.value = undefined;

@@ -215,7 +215,7 @@
 </template>
 
 <script setup lang="ts">
-import AIImageRecognitionSheet from '@/components/mobile/AIImageRecognitionSheet.vue';
+import AIImageRecognitionSheet, { type AIImageRecognitionResult } from '@/components/mobile/AIImageRecognitionSheet.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 import type { Router } from 'framework7/types';
@@ -224,6 +224,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import { useHomePageBase } from '@/views/base/HomePageBase.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
@@ -232,8 +233,6 @@ import { useOverviewStore } from '@/stores/overview.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { TemplateType } from '@/core/template.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
-import type { RecognizedReceiptImageResponse } from '@/models/large_language_model.ts';
-
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { getShareCacheImageBlob } from '@/lib/cache.ts';
 import { isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
@@ -255,6 +254,7 @@ const {
     getDisplayExpenseAmount
 } = useHomePageBase();
 
+const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
@@ -326,48 +326,54 @@ function reload(done?: () => void): void {
     });
 }
 
-function onReceiptRecognitionChanged(result: RecognizedReceiptImageResponse): void {
+function onReceiptRecognitionChanged(result: AIImageRecognitionResult): void {
+    const recognizedResponse = result.response;
+    const autoUploadRecognizedImage = settingsStore.appSettings.autoUploadTransactionPictureForAIRecognition;
     const params: string[] = [];
 
-    if (result.type) {
-        params.push(`type=${result.type}`);
+    if (recognizedResponse.type) {
+        params.push(`type=${recognizedResponse.type}`);
     }
 
-    if (result.time) {
-        params.push(`time=${result.time}`);
+    if (recognizedResponse.time) {
+        params.push(`time=${recognizedResponse.time}`);
     }
 
-    if (result.categoryId) {
-        params.push(`categoryId=${result.categoryId}`);
+    if (recognizedResponse.categoryId) {
+        params.push(`categoryId=${recognizedResponse.categoryId}`);
     }
 
-    if (result.sourceAccountId) {
-        params.push(`accountId=${result.sourceAccountId}`);
+    if (recognizedResponse.sourceAccountId) {
+        params.push(`accountId=${recognizedResponse.sourceAccountId}`);
     }
 
-    if (result.destinationAccountId) {
-        params.push(`destinationAccountId=${result.destinationAccountId}`);
+    if (recognizedResponse.destinationAccountId) {
+        params.push(`destinationAccountId=${recognizedResponse.destinationAccountId}`);
     }
 
-    if (result.sourceAmount) {
-        params.push(`amount=${result.sourceAmount}`);
+    if (recognizedResponse.sourceAmount) {
+        params.push(`amount=${recognizedResponse.sourceAmount}`);
     }
 
-    if (result.destinationAmount) {
-        params.push(`destinationAmount=${result.destinationAmount}`);
+    if (recognizedResponse.destinationAmount) {
+        params.push(`destinationAmount=${recognizedResponse.destinationAmount}`);
     }
 
-    if (result.tagIds) {
-        params.push(`tagIds=${result.tagIds.join(',')}`);
+    if (recognizedResponse.tagIds) {
+        params.push(`tagIds=${recognizedResponse.tagIds.join(',')}`);
     }
 
-    if (result.comment) {
-        params.push(`comment=${encodeURIComponent(result.comment)}`);
+    if (recognizedResponse.comment) {
+        params.push(`comment=${encodeURIComponent(recognizedResponse.comment)}`);
     }
 
     params.push(`noTransactionDraft=true`);
 
-    props.f7router.navigate(`/transaction/add?${params.join('&')}`);
+    props.f7router.navigate(`/transaction/add?${params.join('&')}`, {
+        props: {
+            autoUploadPicture: autoUploadRecognizedImage ? result.imageFile : undefined,
+        }
+    });
 }
 
 function onPageAfterIn(): void {

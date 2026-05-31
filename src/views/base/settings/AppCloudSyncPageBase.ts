@@ -62,6 +62,12 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         ]
     },
     {
+        categoryName: 'AI Image Recognition',
+        items: [
+            { settingKey: 'autoUploadTransactionPictureForAIRecognition', settingName: 'Auto Upload AI Recognition Image as Transaction Picture', mobile: true, desktop: true }
+        ]
+    },
+    {
         categoryName: 'Import Transaction Dialog',
         items: [
             { settingKey: 'rememberLastSelectedFileTypeInImportTransactionDialog', relatedSettingKeys: ['lastSelectedFileTypeInImportTransactionDialog'], settingName: 'Remember Last Selected File Type', mobile: false, desktop: true }

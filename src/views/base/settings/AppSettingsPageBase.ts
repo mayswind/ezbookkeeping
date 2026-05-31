@@ -143,6 +143,11 @@ export function useAppSettingPageBase() {
         set: (value: number) => settingsStore.setTransactionPictureQuality(value)
     });
 
+    const isAutoUploadTransactionPictureForAIRecognition = computed<boolean>({
+        get: () => settingsStore.appSettings.autoUploadTransactionPictureForAIRecognition,
+        set: (value: boolean) => settingsStore.setAutoUploadTransactionPictureForAIRecognition(value)
+    });
+
     const currencySortByInExchangeRatesPage = computed<number>({
         get: () => settingsStore.appSettings.currencySortByInExchangeRatesPage,
         set: (value: number) => settingsStore.setCurrencySortByInExchangeRatesPage(value)
@@ -269,6 +274,7 @@ export function useAppSettingPageBase() {
         hasAnyTransactionCategory,
         isAutoUpdateExchangeRatesData,
         transactionPictureQuality,
+        isAutoUploadTransactionPictureForAIRecognition,
         showAccountBalance,
         showAmountInHomePage,
         itemsCountInTransactionListPage,

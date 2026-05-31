@@ -1641,16 +1641,20 @@ function add(template?: TransactionTemplate): void {
 
 function addByRecognizingImage(): void {
     aiImageRecognitionDialog.value?.open().then(result => {
+        const recognizedResponse = result.response;
+        const autoUploadRecognizedImage = settingsStore.appSettings.autoUploadTransactionPictureForAIRecognition;
+
         editDialog.value?.open({
-            time: result.time,
-            type: result.type,
-            categoryId: result.categoryId,
-            accountId: result.sourceAccountId,
-            destinationAccountId: result.destinationAccountId,
-            amount: result.sourceAmount,
-            destinationAmount: result.destinationAmount,
-            tagIds: result.tagIds ? result.tagIds.join(',') : undefined,
-            comment: result.comment,
+            time: recognizedResponse.time,
+            type: recognizedResponse.type,
+            categoryId: recognizedResponse.categoryId,
+            accountId: recognizedResponse.sourceAccountId,
+            destinationAccountId: recognizedResponse.destinationAccountId,
+            amount: recognizedResponse.sourceAmount,
+            destinationAmount: recognizedResponse.destinationAmount,
+            tagIds: recognizedResponse.tagIds ? recognizedResponse.tagIds.join(',') : undefined,
+            comment: recognizedResponse.comment,
+            autoUploadPicture: autoUploadRecognizedImage ? result.imageFile : undefined,
             noTransactionDraft: true
         }).then(result => {
             if (result && result.message) {

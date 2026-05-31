@@ -473,7 +473,7 @@
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
-    <input ref="pictureInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="uploadPicture($event)" />
+    <input ref="pictureInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="onUploadPicture($event)" />
 </template>
 
 <script setup lang="ts">
@@ -553,6 +553,7 @@ export interface TransactionEditOptions extends SetTransactionOptions {
     template?: TransactionTemplate;
     currentTransaction?: Transaction;
     currentTemplate?: TransactionTemplate;
+    autoUploadPicture?: File;
     noTransactionDraft?: boolean;
 }
 
@@ -791,6 +792,10 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
             (transaction.value as TransactionTemplate).fillFrom(template);
         } else {
             setTransactionModel(null, options, true);
+        }
+
+        if (options.autoUploadPicture) {
+            uploadPicture(options.autoUploadPicture);
         }
 
         loading.value = false;
@@ -1085,25 +1090,15 @@ function showOpenPictureDialog(): void {
     pictureInput.value?.click();
 }
 
-function uploadPicture(event: Event): void {
-    if (!event || !event.target) {
+function uploadPicture(file: File): void {
+    if (!file) {
         return;
     }
-
-    const el = event.target as HTMLInputElement;
-
-    if (!el.files || !el.files.length || !el.files[0]) {
-        return;
-    }
-
-    const pictureFile = el.files[0] as File;
-
-    el.value = '';
 
     uploadingPicture.value = true;
     submitting.value = true;
 
-    compressJpgImageByQuality(pictureFile, imageUploadQualityType.value).then(blob => {
+    compressJpgImageByQuality(file, imageUploadQualityType.value).then(blob => {
         return transactionsStore.uploadTransactionPicture({
             pictureFile: KnownFileType.JPG.createFileFromBlob(blob, "image")
         });
@@ -1153,6 +1148,23 @@ function viewOrRemovePicture(pictureInfo: TransactionPictureInfoBasicResponse): 
 
 function onSavingTag(state: boolean): void {
     submitting.value = state;
+}
+
+function onUploadPicture(event: Event): void {
+    if (!event || !event.target) {
+        return;
+    }
+
+    const el = event.target as HTMLInputElement;
+
+    if (!el.files || !el.files.length || !el.files[0]) {
+        return;
+    }
+
+    const pictureFile = el.files[0] as File;
+
+    el.value = '';
+    uploadPicture(pictureFile);
 }
 
 function onShowDateTimeError(error: string): void {

@@ -642,7 +642,7 @@
                                     </v-card-text>
 
                                     <div class="mt-2 mb-4" v-if="pageType === TransactionListPageType.List.type || pageType === TransactionListPageType.Gallery.type">
-                                        <pagination-buttons :totalPageCount="totalPageCount"
+                                        <pagination-buttons :totalPageCount="totalPageCount" :disabled="loading"
                                                             v-model="paginationCurrentPage"></pagination-buttons>
                                     </div>
                                 </v-card>

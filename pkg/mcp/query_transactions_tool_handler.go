@@ -198,7 +198,7 @@ func (h *mcpQueryTransactionsToolHandler) createNewMCPQueryTransactionsResponse(
 			transactionInfo.Type = transactionTypeExpense
 		} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
 			transactionInfo.Type = transactionTypeIncome
-		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
 			transactionInfo.Type = transactionTypeTransfer
 		}
 

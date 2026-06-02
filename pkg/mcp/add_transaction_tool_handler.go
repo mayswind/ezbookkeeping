@@ -76,6 +76,10 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		return nil, nil, errs.ErrIncompleteOrIncorrectSubmission
 	}
 
+	if addTransactionRequest.Type != transactionTypeIncome && addTransactionRequest.Type != transactionTypeExpense && addTransactionRequest.Type != transactionTypeTransfer {
+		return nil, nil, errs.ErrTransactionTypeInvalid
+	}
+
 	if addTransactionRequest.Type == transactionTypeTransfer {
 		if addTransactionRequest.DestinationAccountName == "" || addTransactionRequest.DestinationAmount == "" {
 			return nil, nil, errs.ErrIncompleteOrIncorrectSubmission
@@ -248,6 +252,8 @@ func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addT
 		transactionDbType = models.TRANSACTION_DB_TYPE_INCOME
 	} else if addTransactionRequest.Type == transactionTypeTransfer {
 		transactionDbType = models.TRANSACTION_DB_TYPE_TRANSFER_OUT
+	} else {
+		return nil, errs.ErrTransactionTypeInvalid
 	}
 
 	transactionTime, err := utils.ParseFromLongDateTimeWithTimezoneRFC3339Format(addTransactionRequest.Time)

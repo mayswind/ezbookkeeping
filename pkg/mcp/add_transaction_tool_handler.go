@@ -16,6 +16,7 @@ import (
 const transactionTypeIncome = "income"
 const transactionTypeExpense = "expense"
 const transactionTypeTransfer = "transfer"
+const transactionTypeModifyBalance = "balance_modification"
 
 // MCPAddTransactionRequest represents all parameters of the add transaction request
 type MCPAddTransactionRequest struct {

@@ -16,6 +16,9 @@ param(
     [Parameter(Mandatory=$false)]
     [switch]$rawResponse = $false,
 
+    [Parameter(Mandatory=$false)]
+    [switch]$dryRun = $false,
+
     [Parameter(ValueFromRemainingArguments=$true)]
     [string[]]$CommandArgs
 )
@@ -23,679 +26,22 @@ param(
 $script:EBKTOOL_SERVER_BASEURL = $env:EBKTOOL_SERVER_BASEURL
 $script:EBKTOOL_TOKEN = $env:EBKTOOL_TOKEN
 
-# API Configuration Structure
-$API_CONFIGS = @(
-    @{
-        Name = "tokens-list"
-        Description = "Retrieve all sessions for the current user"
-        Method = "GET"
-        Path = "tokens/list.json"
-        RequiresTimezone = $false
-        RequiredParams = @()
-        OptionalParams = @()
-        ParamTypes = @{}
-        ParamDescriptions = @{}
-        ResponseStructure = @(
-            "["
-            "  {"
-            "    `"tokenId`": `"string (Token ID)`","
-            "    `"tokenType`": `"integer (Token type, 1: Normal Token, 5: MCP Token, 8: API Token)`","
-            "    `"userAgent`": `"string (The User Agent when the session created)`","
-            "    `"lastSeen`": `"integer (Last refresh unix time of the session)`","
-            "    `"isCurrent`": `"boolean (Whether the session is current)`""
-            "  }"
-            "]"
-        )
-        PrettyResponse = @{
-            Type = "simple_array_to_markdown_table"
-            Columns = @("tokenId", "tokenType", "userAgent", "lastSeen", "isCurrent")
-        }
-    }
-    @{
-        Name = "tokens-revoke"
-        Description = "Revoke a specified token"
-        Method = "POST"
-        Path = "tokens/revoke.json"
-        RequiresTimezone = $false
-        RequiredParams = @("tokenId")
-        OptionalParams = @()
-        ParamTypes = @{
-            "tokenId" = "string"
-        }
-        ParamDescriptions = @{
-            "tokenId" = "string (Token ID)"
-        }
-        ResponseStructure = @(
-            "boolean (Whether the token is revoked successfully)"
-        )
-    }
-    @{
-        Name = "accounts-list"
-        Description = "Retrieve all account information"
-        Method = "GET"
-        Path = "accounts/list.json"
-        RequiresTimezone = $false
-        RequiredParams = @()
-        OptionalParams = @()
-        ParamTypes = @{}
-        ParamDescriptions = @{}
-        ResponseStructure = @(
-            "["
-            "  {"
-            "    `"id`": `"string (Account ID)`","
-            "    `"name`": `"string (Account name)`","
-            "    `"parentId`": `"string (Parent account ID, 0 for primary account)`","
-            "    `"category`": `"integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)`","
-            "    `"type`": `"integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)`","
-            "    `"icon`": `"string (Account icon ID)`","
-            "    `"color`": `"string (Account icon color, hex color code RRGGBB)`","
-            "    `"currency`": `"string (Account currency code)`","
-            "    `"balance`": `"integer (Account balance, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
-            "    `"comment`": `"string (Account description)`","
-            "    `"creditCardStatementDate`": `"integer (The statement date of the credit card account)`","
-            "    `"displayOrder`": `"integer (The display order of the account)`","
-            "    `"isAsset`": `"boolean (Whether the account is an asset account)`","
-            "    `"isLiability`": `"boolean (Whether the account is a liability account)`","
-            "    `"hidden`": `"boolean (Whether the account is hidden)`","
-            "    `"subAccounts`": [`"each sub-account object like an account object`"]"
-            "  }"
-            "]"
-        )
-        PrettyResponse = @{
-            Type = "hierarchical_array_to_markdown_table"
-            Columns = @("category", "type", "parentId", "id", "name", "currency", "balance", "hidden", "comment")
-            ChildKey = "subAccounts"
-        }
-    }
-    @{
-        Name = "accounts-add"
-        Description = "Add a new account"
-        Method = "POST"
-        Path = "accounts/add.json"
-        RequiresTimezone = $true
-        RequiredParams = @("name", "category", "type", "icon", "color", "currency")
-        OptionalParams = @("balance", "balanceTime", "comment", "creditCardStatementDate")
-        ParamTypes = @{
-            "name" = "string"
-            "category" = "integer"
-            "type" = "integer"
-            "icon" = "string"
-            "color" = "string"
-            "currency" = "string"
-            "balance" = "integer"
-            "balanceTime" = "integer"
-            "comment" = "string"
-            "creditCardStatementDate" = "integer"
-        }
-        ParamDescriptions = @{
-            "name" = "string (Account name)"
-            "category" = "integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)"
-            "type" = "integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)"
-            "icon" = "string (Account icon ID)"
-            "color" = "string (Account icon color, hex color code RRGGBB)"
-            "currency" = "string (Account currency code, ISO 4217 code, `"---`" for the parent account)"
-            "balance" = "integer (Account balance, supports up to two decimals. For example, a value of `"1234`" represents an amount of `"12.34`". Liability account should set to negative amount)"
-            "balanceTime" = "integer (The unix time when the account balance is the set value. This field is required when balance is set)"
-            "comment" = "string (Account description)"
-            "creditCardStatementDate" = "integer (The statement date of the credit card account)"
-        }
-        ResponseStructure = @(
-            "{"
-            "  `"id`": `"string (Account ID)`","
-            "  `"name`": `"string (Account name)`","
-            "  `"parentId`": `"string (Parent account ID)`","
-            "  `"category`": `"integer (Account category)`","
-            "  `"type`": `"integer (Account type)`","
-            "  `"icon`": `"string (Account icon ID)`","
-            "  `"color`": `"string (Account icon color)`","
-            "  `"currency`": `"string (Account currency code)`","
-            "  `"balance`": `"integer (Account balance)`","
-            "  `"comment`": `"string (Account description)`","
-            "  `"creditCardStatementDate`": `"integer (The statement date of the credit card account)`","
-            "  `"displayOrder`": `"integer (The display order of the account)`","
-            "  `"isAsset`": `"boolean (Whether the account is an asset account)`","
-            "  `"isLiability`": `"boolean (Whether the account is a liability account)`","
-            "  `"hidden`": `"boolean (Whether the account is hidden)`","
-            "  `"subAccounts`": [`"every sub-account object like account object`"]"
-            "}"
-        )
-    }
-    @{
-        Name = "transaction-categories-list"
-        Description = "Retrieve all available transaction categories"
-        Method = "GET"
-        Path = "transaction/categories/list.json"
-        RequiresTimezone = $false
-        RequiredParams = @()
-        OptionalParams = @()
-        ParamTypes = @{}
-        ParamDescriptions = @{}
-        ResponseStructure = @(
-            "{"
-            "  `"transaction category type (1: Income, 2: Expense, 3:Transfer)`": ["
-            "    {"
-            "      `"id`": `"string (Transaction category ID)`","
-            "      `"name`": `"string (Transaction category name)`","
-            "      `"parentId`": `"string (Parent transaction category ID, 0 for primary category)`","
-            "      `"type`": `"integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)`","
-            "      `"icon`": `"string (Transaction category icon ID)`","
-            "      `"color`": `"string (Transaction category icon color, hex color code RRGGBB)`","
-            "      `"comment`": `"string (Transaction category description)`","
-            "      `"displayOrder`": `"integer (The display order of the transaction category)`","
-            "      `"hidden`": `"boolean (Whether the transaction category is hidden)`","
-            "      `"subCategories`": [`"each sub-category object like a transaction category object`"]"
-            "    }"
-            "  ]"
-            "}"
-        )
-        PrettyResponse = @{
-            Type = "hierarchical_object_to_markdown_table"
-            Columns = @("type", "parentId", "id", "name", "hidden", "comment")
-            ChildKey = "subCategories"
-        }
-    }
-    @{
-        Name = "transaction-categories-add"
-        Description = "Add a new transaction category"
-        Method = "POST"
-        Path = "transaction/categories/add.json"
-        RequiresTimezone = $false
-        RequiredParams = @("name", "type", "icon", "color")
-        OptionalParams = @("parentId", "comment")
-        ParamTypes = @{
-            "name" = "string"
-            "type" = "integer"
-            "parentId" = "string"
-            "icon" = "string"
-            "color" = "string"
-            "comment" = "string"
-        }
-        ParamDescriptions = @{
-            "name" = "string (Transaction category name)"
-            "type" = "integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)"
-            "parentId" = "string (Parent transaction category ID, 0 for primary category)"
-            "icon" = "string (Transaction category icon ID)"
-            "color" = "string (Transaction category icon color, hex color code RRGGBB)"
-            "comment" = "string (Transaction category description)"
-        }
-        ResponseStructure = @(
-            "{"
-            "  `"id`": `"string (Transaction category ID)`","
-            "  `"name`": `"string (Transaction category name)`","
-            "  `"parentId`": `"string (Parent transaction category ID)`","
-            "  `"type`": `"integer (Transaction category type)`","
-            "  `"icon`": `"string (Transaction category icon ID)`","
-            "  `"color`": `"string (Transaction category icon color)`","
-            "  `"comment`": `"string (Transaction category description)`","
-            "  `"displayOrder`": `"integer (The display order of the transaction category)`","
-            "  `"hidden`": `"boolean (Whether the transaction category is hidden)`","
-            "  `"subCategories`": [`"each sub-category object like a transaction category object`"]"
-            "}"
-        )
-    }
-    @{
-        Name = "transaction-tags-list"
-        Description = "Retrieve all available transaction tags"
-        Method = "GET"
-        Path = "transaction/tags/list.json"
-        RequiresTimezone = $false
-        RequiredParams = @()
-        OptionalParams = @()
-        ParamTypes = @{}
-        ParamDescriptions = @{}
-        ResponseStructure = @(
-            "["
-            "  {"
-            "    `"id`": `"string (Transaction tag ID)`","
-            "    `"name`": `"string (Transaction tag name)`","
-            "    `"groupId`": `"string (Transaction tag group ID)`","
-            "    `"displayOrder`": `"integer (The display order of the transaction tag)`","
-            "    `"hidden`": `"boolean (Whether the transaction tag is hidden)`""
-            "  }"
-            "]"
-        )
-        PrettyResponse = @{
-            Type = "simple_array_to_markdown_table"
-            Columns = @("groupId", "id", "name", "hidden")
-        }
-    }
-    @{
-        Name = "transaction-tags-add"
-        Description = "Add a new transaction tag"
-        Method = "POST"
-        Path = "transaction/tags/add.json"
-        RequiresTimezone = $false
-        RequiredParams = @("name")
-        OptionalParams = @("groupId")
-        ParamTypes = @{
-            "name" = "string"
-            "groupId" = "string"
-        }
-        ParamDescriptions = @{
-            "name" = "string (Transaction tag name)"
-            "groupId" = "string (Transaction tag group ID, 0 means default group)"
-        }
-        ResponseStructure = @(
-            "{"
-            "  `"id`": `"string (Transaction tag ID)`","
-            "  `"name`": `"string (Transaction tag name)`","
-            "  `"groupId`": `"string (Transaction tag group ID)`","
-            "  `"displayOrder`": `"integer (The display order of the transaction tag)`","
-            "  `"hidden`": `"boolean (Whether the transaction tag is hidden)`""
-            "}"
-        )
-    }
-    @{
-        Name = "transactions-list"
-        Description = "Retrieve transaction data based on specified query criteria (with pagination support)"
-        Method = "GET"
-        Path = "transactions/list.json"
-        RequiresTimezone = $true
-        RequiredParams = @("count")
-        OptionalParams = @("type", "category_ids", "account_ids", "tag_filter", "amount_filter", "keyword", "must_have_pictures", "max_time", "min_time", "page", "with_count", "with_pictures", "trim_account", "trim_category", "trim_tag")
-        ParamTypes = @{
-            "count" = "integer"
-            "type" = "integer"
-            "category_ids" = "string"
-            "account_ids" = "string"
-            "tag_filter" = "string"
-            "amount_filter" = "string"
-            "keyword" = "string"
-            "must_have_pictures" = "boolean"
-            "max_time" = "integer"
-            "min_time" = "integer"
-            "page" = "integer"
-            "with_count" = "boolean"
-            "with_pictures" = "boolean"
-            "trim_account" = "boolean"
-            "trim_category" = "boolean"
-            "trim_tag" = "boolean"
-        }
-        ParamDescriptions = @{
-            "count" = "integer (The count of transactions per page, maximum is 50)"
-            "type" = "integer (Filter transaction by type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)"
-            "category_ids" = "string (Filter by category IDs, separated by comma)"
-            "account_ids" = "string (Filter by account IDs, separated by comma)"
-            "tag_filter" = "string (Filter by tags)"
-            "amount_filter" = "string (Filter by amount)"
-            "keyword" = "string (Filter by keyword)"
-            "must_have_pictures" = "boolean (Whether to only get transactions with pictures)"
-            "max_time" = "integer (The maximum time sequence ID, Set to 0 for latest)"
-            "min_time" = "integer (The minimum time sequence ID)"
-            "page" = "integer (Specified page integer)"
-            "with_count" = "boolean (Whether to get total count)"
-            "with_pictures" = "boolean (Whether to get picture IDs)"
-            "trim_account" = "boolean (Whether to get account ID only)"
-            "trim_category" = "boolean (Whether to get category ID only)"
-            "trim_tag" = "boolean (Whether to get tag IDs only)"
-        }
-        ResponseStructure = @(
-            "{"
-            "  `"items`": ["
-            "    {"
-            "      `"id`": `"string (Transaction ID)`","
-            "      `"timeSequenceId`": `"string (Transaction time sequence ID)`","
-            "      `"type`": `"integer (Transaction type)`","
-            "      `"categoryId`": `"string (Transaction category ID)`","
-            "      `"category`": `"object (Transaction category object)`","
-            "      `"time`": `"integer (Transaction unix time)`","
-            "      `"utcOffset`": `"integer (Transaction time zone offset minutes)`","
-            "      `"sourceAccountId`": `"string (Source account ID)`","
-            "      `"sourceAccount`": `"object (Source account object)`","
-            "      `"destinationAccountId`": `"string (Destination account ID)`","
-            "      `"destinationAccount`": `"object (Destination account object)`","
-            "      `"sourceAmount`": `"integer (Source amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
-            "      `"destinationAmount`": `"integer (Destination amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
-            "      `"hideAmount`": `"boolean (Whether to hide the amount)`","
-            "      `"tagIds`": [`"each string representing a transaction tag ID`"],"
-            "      `"tags`": [`"each object representing a transaction tag object`"],"
-            "      `"pictures`": [`"each object representing a transaction picture object`"],"
-            "      `"comment`": `"string (Transaction description)`","
-            "      `"geoLocation`": `"object (Transaction geographic location)`","
-            "      `"editable`": `"boolean (Whether the transaction is editable)`""
-            "    }"
-            "  ],"
-            "  `"nextTimeSequenceId`": `"integer (The next cursor 'max_time' parameter when requesting older data)`","
-            "  `"totalCount`": `"integer (The total count of transactions)`""
-            "}"
-        )
-        PrettyResponse = @{
-            Type = "nested_array_to_markdown_table"
-            Columns = @("id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment")
-            DataPath = "items"
-            Metadata = @(
-                @{ Field = "totalCount"; Label = "Total Count" },
-                @{ Field = "nextTimeSequenceId"; Label = "Next Time Sequence ID" }
-            )
-        }
-    }
-    @{
-        Name = "transactions-list-all"
-        Description = "Retrieve all transaction data matching the specified query criteria"
-        Method = "GET"
-        Path = "transactions/list/all.json"
-        RequiresTimezone = $true
-        RequiredParams = @()
-        OptionalParams = @("type", "category_ids", "account_ids", "tag_filter", "amount_filter", "keyword", "must_have_pictures", "start_time", "end_time", "with_pictures", "trim_account", "trim_category", "trim_tag")
-        ParamTypes = @{
-            "type" = "integer"
-            "category_ids" = "string"
-            "account_ids" = "string"
-            "tag_filter" = "string"
-            "amount_filter" = "string"
-            "keyword" = "string"
-            "must_have_pictures" = "boolean"
-            "start_time" = "integer"
-            "end_time" = "integer"
-            "with_pictures" = "boolean"
-            "trim_account" = "boolean"
-            "trim_category" = "boolean"
-            "trim_tag" = "boolean"
-        }
-        ParamDescriptions = @{
-            "type" = "integer (Filter transaction by type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)"
-            "category_ids" = "string (Filter by category IDs, separated by comma)"
-            "account_ids" = "string (Filter by account IDs, separated by comma)"
-            "tag_filter" = "string (Filter by tags)"
-            "amount_filter" = "string (Filter by amount)"
-            "keyword" = "string (Filter by keyword)"
-            "must_have_pictures" = "boolean (Whether to only get transactions with pictures)"
-            "start_time" = "integer (Transaction list start unix time)"
-            "end_time" = "integer (Transaction list end unix time)"
-            "with_pictures" = "boolean (Whether to get picture IDs)"
-            "trim_account" = "boolean (Whether to get account ID only)"
-            "trim_category" = "boolean (Whether to get category ID only)"
-            "trim_tag" = "boolean (Whether to get tag IDs only)"
-        }
-        ResponseStructure = @(
-            "["
-            "  {"
-            "    `"id`": `"string (Transaction ID)`","
-            "    `"timeSequenceId`": `"string (Transaction time sequence ID)`","
-            "    `"type`": `"integer (Transaction type)`","
-            "    `"categoryId`": `"string (Transaction category ID)`","
-            "    `"category`": `"object (Transaction category object)`","
-            "    `"time`": `"integer (Transaction unix time)`","
-            "    `"utcOffset`": `"integer (Transaction time zone offset minutes)`","
-            "    `"sourceAccountId`": `"string (Source account ID)`","
-            "    `"sourceAccount`": `"object (Source account object)`","
-            "    `"destinationAccountId`": `"string (Destination account ID)`","
-            "    `"destinationAccount`": `"object (Destination account object)`","
-            "    `"sourceAmount`": `"integer (Source amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
-            "    `"destinationAmount`": `"integer (Destination amount, supports up to two decimals. For example, a value of '1234' represents an amount of '12.34')`","
-            "    `"hideAmount`": `"boolean (Whether to hide the amount)`","
-            "    `"tagIds`": [`"each string representing a transaction tag ID`"],"
-            "    `"tags`": [`"each object representing a transaction tag object`"],"
-            "    `"pictures`": [`"each object representing a transaction picture object`"],"
-            "    `"comment`": `"string (Transaction description)`","
-            "    `"geoLocation`": `"object (Transaction geographic location)`","
-            "    `"editable`": `"boolean (Whether the transaction is editable)`""
-            "  }"
-            "]"
-        )
-        PrettyResponse = @{
-            Type = "simple_array_to_markdown_table"
-            Columns = @("id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment")
-        }
-    }
-    @{
-        Name = "transactions-add"
-        Description = "Add a new transaction"
-        Method = "POST"
-        Path = "transactions/add.json"
-        RequiresTimezone = $true
-        RequiredParams = @("type", "categoryId", "time", "utcOffset", "sourceAccountId", "sourceAmount")
-        OptionalParams = @("destinationAccountId", "destinationAmount", "hideAmount", "tagIds", "pictureIds", "comment", "geoLocation")
-        ParamTypes = @{
-            "type" = "integer"
-            "categoryId" = "string"
-            "time" = "integer"
-            "utcOffset" = "integer"
-            "sourceAccountId" = "string"
-            "sourceAmount" = "integer"
-            "destinationAccountId" = "string"
-            "destinationAmount" = "integer"
-            "hideAmount" = "boolean"
-            "tagIds" = "string_array"
-            "pictureIds" = "string_array"
-            "comment" = "string"
-            "geoLocation" = "geo_location"
-        }
-        ParamDescriptions = @{
-            "type" = "integer (Transaction type, 1: Balance Modification, 2: Income, 3: Expense, 4: Transfer)"
-            "categoryId" = "string (Transaction category ID, supports secondary category)"
-            "time" = "integer (Transaction unix time)"
-            "utcOffset" = "integer (Transaction time zone offset minutes)"
-            "sourceAccountId" = "string (Source account ID, supports account without sub-accounts or sub-account)"
-            "sourceAmount" = "integer (Source amount, supports up to two decimals. For example, a value of `"1234`" represents an amount of `"12.34`")"
-            "destinationAccountId" = "string (Destination account ID, supports account without sub-accounts or sub-account)"
-            "destinationAmount" = "integer (Destination amount, supports up to two decimals. For example, a value of `"1234`" represents an amount of `"12.34`")"
-            "hideAmount" = "boolean (Whether to hide amount)"
-            "tagIds" = "string (Transaction tag IDs, separated by comma, e.g. `"tagid1,tagid2`")"
-            "pictureIds" = "string (Transaction picture IDs, separated by comma, e.g. `"picid1,picid2`")"
-            "comment" = "string (Transaction description)"
-            "geoLocation" = "string (Transaction geographic location, format: longitude,latitude, e.g. `"116.33,39.93`")"
-        }
-        ResponseStructure = @(
-            "{"
-            "  `"id`": `"string (Transaction ID)`","
-            "  `"timeSequenceId`": `"string (Transaction time sequence ID)`","
-            "  `"type`": `"integer (Transaction type)`","
-            "  `"categoryId`": `"string (Transaction category ID)`","
-            "  `"category`": `"object (Transaction category object)`","
-            "  `"time`": `"integer (Transaction unix time)`","
-            "  `"utcOffset`": `"integer (Transaction time zone offset minutes)`","
-            "  `"sourceAccountId`": `"string (Source account ID)`","
-            "  `"sourceAccount`": `"object (Source account object)`","
-            "  `"destinationAccountId`": `"string (Destination account ID)`","
-            "  `"destinationAccount`": `"object (Destination account object)`","
-            "  `"sourceAmount`": `"integer (Source amount)`","
-            "  `"destinationAmount`": `"integer (Destination amount)`","
-            "  `"hideAmount`": `"boolean (Whether to hide the amount)`","
-            "  `"tagIds`": [`"each string representing a transaction tag ID`"],"
-            "  `"tags`": [`"each object representing a transaction tag object`"],"
-            "  `"pictures`": [`"each object representing a transaction picture object`"],"
-            "  `"comment`": `"string (Transaction description)`","
-            "  `"geoLocation`": `"object (Transaction geographic location)`","
-            "  `"editable`": `"boolean (Whether the transaction is editable)`""
-            "}"
-        )
-    }
-    @{
-        Name = "exchangerates-latest"
-        Description = "Retrieve the latest exchange rate data"
-        Method = "GET"
-        Path = "exchange_rates/latest.json"
-        RequiresTimezone = $false
-        RequiredParams = @()
-        OptionalParams = @()
-        ParamTypes = @{}
-        ParamDescriptions = @{}
-        ResponseStructure = @(
-            "{"
-            "  `"dataSource`": `"string (Exchange rate data source name)`","
-            "  `"referenceUrl`": `"string (Exchange rate data reference URL)`","
-            "  `"updateTime`": `"integer (Exchange rate data update unix time)`","
-            "  `"baseCurrency`": `"string (Base currency code)`","
-            "  `"exchangeRates`": ["
-            "    {"
-            "      `"currency`": `"string (Currency code)`","
-            "      `"rate`": `"string (Exchange rate, 1 unit of base currency equals to how many units of this currency)`""
-            "    }"
-            "  ]"
-            "}"
-        )
-        PrettyResponse = @{
-            Type = "nested_array_to_markdown_table"
-            Columns = @("currency", "rate")
-            DataPath = "exchangeRates"
-            Metadata = @(
-                @{ Field = "dataSource"; Label = "Data Source" },
-                @{ Field = "baseCurrency"; Label = "Base Currency" },
-                @{ Field = "updateTime"; Label = "Update Time" }
-            )
-        }
-    }
-    @{
-        Name = "server-version"
-        Description = "Retrieve ezBookkeeping server version information"
-        Method = "GET"
-        Path = "systems/version.json"
-        RequiresTimezone = $false
-        RequiredParams = @()
-        OptionalParams = @()
-        ParamTypes = @{}
-        ParamDescriptions = @{}
-        ResponseStructure = @(
-            "{"
-            "  `"version`": `"string (Server version)`","
-            "  `"commitHash`": `"string (Git commit hash)`""
-            "}"
-        )
-    }
-)
+$script:API_CONFIGS = @()
 
-# Reference: https://github.com/unicode-org/cldr/blob/main/common/supplemental/windowsZones.xml
-$TIMEZONE_IANA_NAMES = @{
-    "Dateline Standard Time" = "Etc/GMT+12"
-    "UTC-11" = "Etc/GMT+11"
-    "Aleutian Standard Time" = "America/Adak"
-    "Hawaiian Standard Time" = "Pacific/Honolulu"
-    "Marquesas Standard Time" = "Pacific/Marquesas"
-    "Alaskan Standard Time" = "America/Anchorage"
-    "UTC-09" = "Etc/GMT+9"
-    "Pacific Standard Time (Mexico)" = "America/Tijuana"
-    "UTC-08" = "Etc/GMT+8"
-    "Pacific Standard Time" = "America/Los_Angeles"
-    "US Mountain Standard Time" = "America/Phoenix"
-    "Mountain Standard Time (Mexico)" = "America/Mazatlan"
-    "Mountain Standard Time" = "America/Denver"
-    "Yukon Standard Time" = "America/Whitehorse"
-    "Central America Standard Time" = "America/Guatemala"
-    "Central Standard Time" = "America/Chicago"
-    "Easter Island Standard Time" = "Pacific/Easter"
-    "Central Standard Time (Mexico)" = "America/Mexico_City"
-    "Canada Central Standard Time" = "America/Regina"
-    "SA Pacific Standard Time" = "America/Bogota"
-    "Eastern Standard Time (Mexico)" = "America/Cancun"
-    "Eastern Standard Time" = "America/New_York"
-    "Haiti Standard Time" = "America/Port-au-Prince"
-    "Cuba Standard Time" = "America/Havana"
-    "US Eastern Standard Time" = "America/Indianapolis"
-    "Turks And Caicos Standard Time" = "America/Grand_Turk"
-    "Paraguay Standard Time" = "America/Asuncion"
-    "Atlantic Standard Time" = "America/Halifax"
-    "Venezuela Standard Time" = "America/Caracas"
-    "Central Brazilian Standard Time" = "America/Cuiaba"
-    "SA Western Standard Time" = "America/La_Paz"
-    "Pacific SA Standard Time" = "America/Santiago"
-    "Newfoundland Standard Time" = "America/St_Johns"
-    "Tocantins Standard Time" = "America/Araguaina"
-    "E. South America Standard Time" = "America/Sao_Paulo"
-    "SA Eastern Standard Time" = "America/Cayenne"
-    "Argentina Standard Time" = "America/Buenos_Aires"
-    "Greenland Standard Time" = "America/Godthab"
-    "Montevideo Standard Time" = "America/Montevideo"
-    "Magallanes Standard Time" = "America/Punta_Arenas"
-    "Saint Pierre Standard Time" = "America/Miquelon"
-    "Bahia Standard Time" = "America/Bahia"
-    "UTC-02" = "Etc/GMT+2"
-    "Azores Standard Time" = "Atlantic/Azores"
-    "Cape Verde Standard Time" = "Atlantic/Cape_Verde"
-    "UTC" = "Etc/UTC"
-    "GMT Standard Time" = "Europe/London"
-    "Greenwich Standard Time" = "Atlantic/Reykjavik"
-    "Sao Tome Standard Time" = "Africa/Sao_Tome"
-    "Morocco Standard Time" = "Africa/Casablanca"
-    "W. Europe Standard Time" = "Europe/Berlin"
-    "Central Europe Standard Time" = "Europe/Budapest"
-    "Romance Standard Time" = "Europe/Paris"
-    "Central European Standard Time" = "Europe/Warsaw"
-    "W. Central Africa Standard Time" = "Africa/Lagos"
-    "Jordan Standard Time" = "Asia/Amman"
-    "GTB Standard Time" = "Europe/Bucharest"
-    "Middle East Standard Time" = "Asia/Beirut"
-    "Egypt Standard Time" = "Africa/Cairo"
-    "E. Europe Standard Time" = "Europe/Chisinau"
-    "Syria Standard Time" = "Asia/Damascus"
-    "West Bank Standard Time" = "Asia/Hebron"
-    "South Africa Standard Time" = "Africa/Johannesburg"
-    "FLE Standard Time" = "Europe/Kiev"
-    "Israel Standard Time" = "Asia/Jerusalem"
-    "South Sudan Standard Time" = "Africa/Juba"
-    "Kaliningrad Standard Time" = "Europe/Kaliningrad"
-    "Sudan Standard Time" = "Africa/Khartoum"
-    "Libya Standard Time" = "Africa/Tripoli"
-    "Namibia Standard Time" = "Africa/Windhoek"
-    "Arabic Standard Time" = "Asia/Baghdad"
-    "Turkey Standard Time" = "Europe/Istanbul"
-    "Arab Standard Time" = "Asia/Riyadh"
-    "Belarus Standard Time" = "Europe/Minsk"
-    "Russian Standard Time" = "Europe/Moscow"
-    "E. Africa Standard Time" = "Africa/Nairobi"
-    "Iran Standard Time" = "Asia/Tehran"
-    "Arabian Standard Time" = "Asia/Dubai"
-    "Astrakhan Standard Time" = "Europe/Astrakhan"
-    "Azerbaijan Standard Time" = "Asia/Baku"
-    "Russia Time Zone 3" = "Europe/Samara"
-    "Mauritius Standard Time" = "Indian/Mauritius"
-    "Saratov Standard Time" = "Europe/Saratov"
-    "Georgian Standard Time" = "Asia/Tbilisi"
-    "Volgograd Standard Time" = "Europe/Volgograd"
-    "Caucasus Standard Time" = "Asia/Yerevan"
-    "Afghanistan Standard Time" = "Asia/Kabul"
-    "West Asia Standard Time" = "Asia/Tashkent"
-    "Ekaterinburg Standard Time" = "Asia/Yekaterinburg"
-    "Pakistan Standard Time" = "Asia/Karachi"
-    "Qyzylorda Standard Time" = "Asia/Qyzylorda"
-    "India Standard Time" = "Asia/Calcutta"
-    "Sri Lanka Standard Time" = "Asia/Colombo"
-    "Nepal Standard Time" = "Asia/Katmandu"
-    "Central Asia Standard Time" = "Asia/Bishkek"
-    "Bangladesh Standard Time" = "Asia/Dhaka"
-    "Omsk Standard Time" = "Asia/Omsk"
-    "Myanmar Standard Time" = "Asia/Rangoon"
-    "SE Asia Standard Time" = "Asia/Bangkok"
-    "Altai Standard Time" = "Asia/Barnaul"
-    "W. Mongolia Standard Time" = "Asia/Hovd"
-    "North Asia Standard Time" = "Asia/Krasnoyarsk"
-    "N. Central Asia Standard Time" = "Asia/Novosibirsk"
-    "Tomsk Standard Time" = "Asia/Tomsk"
-    "China Standard Time" = "Asia/Shanghai"
-    "North Asia East Standard Time" = "Asia/Irkutsk"
-    "Singapore Standard Time" = "Asia/Singapore"
-    "W. Australia Standard Time" = "Australia/Perth"
-    "Taipei Standard Time" = "Asia/Taipei"
-    "Ulaanbaatar Standard Time" = "Asia/Ulaanbaatar"
-    "Aus Central W. Standard Time" = "Australia/Eucla"
-    "Transbaikal Standard Time" = "Asia/Chita"
-    "Tokyo Standard Time" = "Asia/Tokyo"
-    "North Korea Standard Time" = "Asia/Pyongyang"
-    "Korea Standard Time" = "Asia/Seoul"
-    "Yakutsk Standard Time" = "Asia/Yakutsk"
-    "Cen. Australia Standard Time" = "Australia/Adelaide"
-    "AUS Central Standard Time" = "Australia/Darwin"
-    "E. Australia Standard Time" = "Australia/Brisbane"
-    "AUS Eastern Standard Time" = "Australia/Sydney"
-    "West Pacific Standard Time" = "Pacific/Port_Moresby"
-    "Tasmania Standard Time" = "Australia/Hobart"
-    "Vladivostok Standard Time" = "Asia/Vladivostok"
-    "Lord Howe Standard Time" = "Australia/Lord_Howe"
-    "Bougainville Standard Time" = "Pacific/Bougainville"
-    "Russia Time Zone 10" = "Asia/Srednekolymsk"
-    "Magadan Standard Time" = "Asia/Magadan"
-    "Norfolk Standard Time" = "Pacific/Norfolk"
-    "Sakhalin Standard Time" = "Asia/Sakhalin"
-    "Central Pacific Standard Time" = "Pacific/Guadalcanal"
-    "Russia Time Zone 11" = "Asia/Kamchatka"
-    "New Zealand Standard Time" = "Pacific/Auckland"
-    "UTC+12" = "Etc/GMT-12"
-    "Fiji Standard Time" = "Pacific/Fiji"
-    "Chatham Islands Standard Time" = "Pacific/Chatham"
-    "UTC+13" = "Etc/GMT-13"
-    "Tonga Standard Time" = "Pacific/Tongatapu"
-    "Samoa Standard Time" = "Pacific/Apia"
-    "Line Islands Standard Time" = "Pacific/Kiritimati"
+function Load-ApiConfigs {
+    $configPath = Join-Path -Path $PSScriptRoot -ChildPath 'api-configs.json'
+
+    if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
+        Write-Red "Error: API configuration file not found: $configPath"
+        exit 1
+    }
+
+    try {
+        $script:API_CONFIGS = Get-Content -Raw -LiteralPath $configPath -ErrorAction Stop | ConvertFrom-Json -AsHashtable -ErrorAction Stop
+    } catch {
+        Write-Red "Error: Failed to load API configuration file: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 function Write-Red($msg) {
@@ -790,6 +136,24 @@ function Initialize-EnvironmentVariables {
 function Url-Encode {
     param([string]$text)
     return [System.Uri]::EscapeDataString($text)
+}
+
+function Format-ParamValue {
+    param($Value)
+
+    if ($Value -is [bool]) {
+        return $Value.ToString().ToLower()
+    }
+
+    if ($Value -is [Array]) {
+        return ($Value -join ",")
+    }
+
+    if ($Value -is [Hashtable] -or $Value -is [PSCustomObject]) {
+        return ($Value | ConvertTo-Json -Depth 10 -Compress)
+    }
+
+    return [string]$Value
 }
 
 function Format-Json {
@@ -1134,6 +498,9 @@ function Write-Result {
         "nested_array_to_markdown_table" {
             $dataPath = $prettyConfig.DataPath
             if ($dataPath) {
+                if ($dataPath.StartsWith(".")) {
+                    $dataPath = $dataPath.Substring(1)
+                }
                 $nestedData = $ResultData.$dataPath
             } else {
                 $nestedData = $ResultData
@@ -1167,7 +534,7 @@ function Show-Help {
     Write-Host "A command-line tool for calling ezBookkeeping APIs"
     Write-Host ""
     Write-Host "Usage:"
-    Write-Host "    ebktools.ps1 [-tzName <name>] [-tzOffset <offset>] [-rawResponse] <command> [command-options]"
+    Write-Host "    ebktools.ps1 [-tzName <name>] [-tzOffset <offset>] [-rawResponse] [-dryRun] <command> [command-options]"
     Write-Host ""
     Write-Host "Environment Variables (Required):"
     Write-Host "    EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)"
@@ -1177,8 +544,9 @@ function Show-Help {
     Write-Host ""
     Write-Host "Global Options:"
     Write-Host "    -tzName <name>              The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'."
-    Write-Host "    -tzOffset <offset>          The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '-tzName' and '-tzOffset' are set, '-tzName' takes priority. If neither is set, the current system time zone is used by default."
+    Write-Host "    -tzOffset <offset>          The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '-tzName' and '-tzOffset' are set, '-tzOffset' takes priority. If neither is set, the current system time zone is used by default."
     Write-Host "    -rawResponse                Display the response in raw JSON format instead of formatted table."
+    Write-Host "    -dryRun                     Print the request method, URL, headers, and JSON body without sending it."
     Write-Host ""
     Write-Host "Commands:"
     Write-Host "    list                        List all available API commands"
@@ -1204,14 +572,19 @@ function Show-Help {
     Write-Host ""
     Write-Host "    # Call API with timezone offset"
     Write-Host "    ebktools.ps1 -tzOffset $exampleTimezoneOffset transactions-list -count 10"
+    Write-Host ""
+    Write-Host "    # Preview a request without sending it"
+    Write-Host "    ebktools.ps1 -dryRun transactions-add -type 3 -categoryId 0 -time 1710000000 -utcOffset 480 -sourceAccountId 1 -sourceAmount -1234"
 }
 
 function Show-CommandList {
     Write-Host "Available API Commands:"
     Write-Host ""
 
+    $nameWidth = (($API_CONFIGS | ForEach-Object { $_.Name.Length } | Measure-Object -Maximum).Maximum + 2)
+
     foreach ($config in $API_CONFIGS) {
-        $name = $config.Name.PadRight(31)
+        $name = $config.Name.PadRight($nameWidth)
         Write-Host "  $name$($config.Description)"
     }
 
@@ -1293,12 +666,23 @@ function Parse-CommandArgs {
         if ($arg.StartsWith("-")) {
             $paramName = $arg.Substring(1)
 
-            if ($i + 1 -lt $commandArgs.Count -and -not $commandArgs[$i + 1].StartsWith("-")) {
+            if ($i + 1 -lt $commandArgs.Count) {
                 $paramType = "string"
                 $paramValue = $commandArgs[$i + 1]
 
                 if ($paramTypes -and $paramTypes.ContainsKey($paramName)) {
                     $paramType = $paramTypes[$paramName]
+                } elseif ($paramTypes) {
+                    Write-Red "Error: Unknown parameter '-$paramName'"
+                    exit 1
+                }
+
+                if ($paramValue.StartsWith("-")) {
+                    $possibleParamName = $paramValue.Substring(1)
+                    if ($paramTypes -and $paramTypes.ContainsKey($possibleParamName)) {
+                        Write-Red "Error: Parameter '-$paramName' requires a value"
+                        exit 1
+                    }
                 }
 
                 try {
@@ -1309,7 +693,7 @@ function Parse-CommandArgs {
                         }
                         "boolean" {
                             if ($paramValue -match "^(true|false|1|0)$") {
-                                $params[$paramName] = ($paramValue -eq "true" -or $paramValue -eq "1").ToString().ToLower()
+                                $params[$paramName] = ($paramValue -eq "true" -or $paramValue -eq "1")
                             } else {
                                 Write-Red "Error: Parameter '-$paramName' must be a boolean value (true/false or 1/0)"
                                 exit 1
@@ -1335,6 +719,9 @@ function Parse-CommandArgs {
                             }
 
                             $params[$paramName] = $geoLocation
+                        }
+                        "json" {
+                            $params[$paramName] = $paramValue | ConvertFrom-Json -AsHashtable -NoEnumerate
                         }
                         default {
                             $params[$paramName] = $paramValue
@@ -1378,15 +765,23 @@ function Invoke-Api {
     $authToken = $script:EBKTOOL_TOKEN
 
     if (-not $serverBaseUrl) {
-        Write-Red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
-        Write-Host "Please set it to your ezBookkeeping server base URL (e.g., http://localhost:8080)"
-        exit 1
+        if ($script:dryRun) {
+            $serverBaseUrl = "http://example.local"
+        } else {
+            Write-Red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
+            Write-Host "Please set it to your ezBookkeeping server base URL (e.g., http://localhost:8080)"
+            exit 1
+        }
     }
 
     if (-not $authToken) {
-        Write-Red "Error: Environment variable 'EBKTOOL_TOKEN' is not set."
-        Write-Host "Please set it to your API token."
-        exit 1
+        if ($script:dryRun) {
+            $authToken = "DRY_RUN_TOKEN"
+        } else {
+            Write-Red "Error: Environment variable 'EBKTOOL_TOKEN' is not set."
+            Write-Host "Please set it to your API token."
+            exit 1
+        }
     }
 
     $currentTimezoneName = Get-SystemTimezoneName
@@ -1445,25 +840,64 @@ function Invoke-Api {
         if ($config.Method -eq "POST") {
             $headers["Content-Type"] = "application/json"
 
-            Write-Yellow "Calling API: $($config.Method) $url"
+            Write-Yellow "$(if ($script:dryRun) { 'Dry run' } else { 'Calling API' }): $($config.Method) $url"
             Write-Host ""
 
             if ($params.Count -gt 0) {
                 $body = ConvertTo-Json -Depth 10 $params
+                if ($script:dryRun) {
+                    Write-Host "Headers:"
+                    Write-Host "  Authorization: Bearer ***"
+                    Write-Host "  Content-Type: application/json"
+                    if ($headers.ContainsKey("X-Timezone-Name")) {
+                        Write-Host "  X-Timezone-Name: $($headers["X-Timezone-Name"])"
+                    } elseif ($headers.ContainsKey("X-Timezone-Offset")) {
+                        Write-Host "  X-Timezone-Offset: $($headers["X-Timezone-Offset"])"
+                    }
+                    Write-Host ""
+                    Write-Host "Body:"
+                    Write-Host ($body | Format-Json)
+                    return
+                }
                 $response = Invoke-WebRequest -Uri $url -Method POST -Headers $headers -Body $body -ErrorAction Stop -UseBasicParsing
             } else {
+                if ($script:dryRun) {
+                    Write-Host "Headers:"
+                    Write-Host "  Authorization: Bearer ***"
+                    Write-Host "  Content-Type: application/json"
+                    if ($headers.ContainsKey("X-Timezone-Name")) {
+                        Write-Host "  X-Timezone-Name: $($headers["X-Timezone-Name"])"
+                    } elseif ($headers.ContainsKey("X-Timezone-Offset")) {
+                        Write-Host "  X-Timezone-Offset: $($headers["X-Timezone-Offset"])"
+                    }
+                    Write-Host ""
+                    Write-Host "Body:"
+                    Write-Host "{}"
+                    return
+                }
                 $response = Invoke-WebRequest -Uri $url -Method POST -Headers $headers -ErrorAction Stop -UseBasicParsing
             }
 
             $response = ConvertFrom-Json $response.Content
         } else {
             if ($params.Count -gt 0) {
-                $queryString = ($params.GetEnumerator() | ForEach-Object { "$($_.Key)=$(Url-Encode $_.Value)" }) -join "&"
+                $queryString = ($params.GetEnumerator() | ForEach-Object { "$($_.Key)=$(Url-Encode (Format-ParamValue $_.Value))" }) -join "&"
                 $url = "${url}?$queryString"
             }
 
-            Write-Yellow "Calling API: $($config.Method) $url"
+            Write-Yellow "$(if ($script:dryRun) { 'Dry run' } else { 'Calling API' }): $($config.Method) $url"
             Write-Host ""
+
+            if ($script:dryRun) {
+                Write-Host "Headers:"
+                Write-Host "  Authorization: Bearer ***"
+                if ($headers.ContainsKey("X-Timezone-Name")) {
+                    Write-Host "  X-Timezone-Name: $($headers["X-Timezone-Name"])"
+                } elseif ($headers.ContainsKey("X-Timezone-Offset")) {
+                    Write-Host "  X-Timezone-Offset: $($headers["X-Timezone-Offset"])"
+                }
+                return
+            }
 
             $response = Invoke-WebRequest -Uri $url -Method $config.Method -Headers $headers -ErrorAction Stop -UseBasicParsing
             $response = ConvertFrom-Json $response.Content
@@ -1506,6 +940,7 @@ function Invoke-Api {
 }
 
 function Main {
+    Load-ApiConfigs
     Initialize-EnvironmentVariables
 
     if ($Command -eq "list") {

@@ -1,65 +1,112 @@
 ---
 name: ezbookkeeping
-description: Use ezBookkeeping API Tools script to record new transactions, query transactions, retrieve account information, retrieve categories, retrieve tags, and retrieve exchange rate data in the self hosted personal finance application ezBookkeeping.
+description: Use ezBookkeeping API Tools to query and manage a self-hosted ezBookkeeping instance, including accounts, transaction categories, tag groups, tags, transactions, exchange rates, sessions, and server version. Use when an agent needs to list, inspect, create, modify, move, hide, delete, or batch-update personal finance records through ezBookkeeping API commands.
 ---
 
 # ezBookkeeping API Tools
 
-## Usage
+Use the bundled scripts in `scripts/` to call ezBookkeeping `/api/v1` endpoints. Prefer the script over hand-written HTTP calls because it handles authentication, timezone headers, parameter typing, formatted output, and dry-run previews.
 
-### List all supported commands
+## Setup
 
-Linux / macOS
+Set credentials in environment variables, or in a `.env` file in the current directory, parent directory, or home directory:
 
-```bash
-sh scripts/ebktools.sh list
+```text
+EBKTOOL_SERVER_BASEURL=http://localhost:8080
+EBKTOOL_TOKEN=YOUR_TOKEN
 ```
 
-Windows
+The scripts load command definitions from `scripts/api-configs.json`. To discover current coverage and exact parameters, run:
 
 ```powershell
 scripts\ebktools.ps1 list
+scripts\ebktools.ps1 help transactions-add
 ```
-
-### Show help for a specific command
-
-Linux / macOS
 
 ```bash
-sh scripts/ebktools.sh help <command>
+sh scripts/ebktools.sh list
+sh scripts/ebktools.sh help transactions-add
 ```
 
-Windows
+## Command Use
 
-```powershell
-scripts\ebktools.ps1 help <command>
-```
-
-### Call API
-
-Linux / macOS
-
-```bash
-sh scripts/ebktools.sh [global-options] <command> [command-options]
-```
-
-Windows
+Use PowerShell on Windows:
 
 ```powershell
 scripts\ebktools.ps1 [global-options] <command> [command-options]
 ```
 
-## Troubleshooting
+Use POSIX shell on Linux/macOS:
 
-If the script reports that the environment variable `EBKTOOL_SERVER_BASEURL` or `EBKTOOL_TOKEN` is not set, user can define them as system environment variables, or create a `.env` file in the user home directory that contains these two variables and place it there.
+```bash
+sh scripts/ebktools.sh [global-options] <command> [command-options]
+```
 
-The meanings of these environment variables are as follows:
+Global options:
 
-| Variable | Required | Description |
+| PowerShell | Shell | Purpose |
 | --- | --- | --- |
-| `EBKTOOL_SERVER_BASEURL` | Required | ezBookkeeping server base URL (e.g., `http://localhost:8080`) |
-| `EBKTOOL_TOKEN` | Required | ezBookkeeping API token |
+| `-tzName <name>` | `--tz-name <name>` | Send an IANA timezone name, such as `Asia/Shanghai`. |
+| `-tzOffset <minutes>` | `--tz-offset <minutes>` | Send timezone offset minutes, such as `480`. |
+| `-rawResponse` | `--raw-response` | Print raw JSON instead of tables. |
+| `-dryRun` | `--dry-run` | Print method, URL, headers, and body without sending the request. |
 
-## Reference
+Use dry-run before destructive or broad write operations, then ask the user to confirm before executing the real command. This especially applies to `tokens-revoke`, `accounts-delete`, `accounts-sub-account-delete`, category/tag/tag-group deletes, `transactions-delete`, `transactions-batch-delete`, `transactions-move-all`, transaction batch updates, and `exchangerates-custom-delete`.
 
-ezBookkeeping: [https://ezbookkeeping.mayswind.net](https://ezbookkeeping.mayswind.net)
+## Parameter Rules
+
+Pass amounts as integer minor units: `1234` means `12.34`; expenses or liabilities may require negative values, such as `-1234`.
+
+Pass comma-separated IDs for `string_array` parameters such as `tagIds`, `pictureIds`, `transactionIds`, and `ids`:
+
+```powershell
+scripts\ebktools.ps1 -dryRun transactions-batch-add-tags -transactionIds 1001,1002 -tagIds 8,9
+```
+
+Pass `geo_location` as `longitude,latitude`:
+
+```powershell
+scripts\ebktools.ps1 -dryRun transactions-add -type 3 -categoryId 12 -time 1710000000 -utcOffset 480 -sourceAccountId 1 -sourceAmount -1234 -geoLocation 116.33,39.93
+```
+
+Pass object or array parameters as JSON strings for commands such as `accounts-move`, `transaction-categories-add-batch`, `transaction-tags-add-batch`, and tag/category/account move commands:
+
+```powershell
+scripts\ebktools.ps1 -dryRun accounts-move -newDisplayOrders '[{"id":"1","displayOrder":1}]'
+```
+
+```bash
+sh scripts/ebktools.sh --dry-run accounts-move --newDisplayOrders '[{"id":"1","displayOrder":1}]'
+```
+
+## Common Workflows
+
+Inspect current bookkeeping data before writing:
+
+```powershell
+scripts\ebktools.ps1 accounts-list
+scripts\ebktools.ps1 transaction-categories-list
+scripts\ebktools.ps1 transaction-tags-list
+scripts\ebktools.ps1 transactions-list -count 20
+```
+
+Create or modify a transaction:
+
+```powershell
+scripts\ebktools.ps1 -dryRun transactions-add -type 3 -categoryId 12 -time 1710000000 -utcOffset 480 -sourceAccountId 1 -sourceAmount -1234 -tagIds 8,9 -comment "Lunch"
+scripts\ebktools.ps1 help transactions-modify
+```
+
+Update supporting metadata:
+
+```powershell
+scripts\ebktools.ps1 -dryRun transaction-tags-add -name "Business" -groupId 0
+scripts\ebktools.ps1 -dryRun transaction-categories-hide -id 12 -hidden true
+```
+
+Manage exchange rates:
+
+```powershell
+scripts\ebktools.ps1 exchangerates-latest
+scripts\ebktools.ps1 -dryRun exchangerates-custom-update -currency USD -rate 7.2
+```

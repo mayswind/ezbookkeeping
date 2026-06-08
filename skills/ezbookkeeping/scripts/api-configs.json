@@ -1,0 +1,1403 @@
+[
+  {
+    "Name": "tokens-list",
+    "Description": "Retrieve all sessions for the current user",
+    "Method": "GET",
+    "Path": "tokens/list.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [],
+    "ParamTypes": {},
+    "ParamDescriptions": {},
+    "PrettyResponse": {
+      "Type": "simple_array_to_markdown_table",
+      "Columns": [
+        "tokenId",
+        "tokenType",
+        "userAgent",
+        "lastSeen",
+        "isCurrent"
+      ]
+    }
+  },
+  {
+    "Name": "tokens-revoke",
+    "Description": "Revoke a specified token",
+    "Method": "POST",
+    "Path": "tokens/revoke.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "tokenId"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "tokenId": "string"
+    },
+    "ParamDescriptions": {
+      "tokenId": "string (Token ID)"
+    }
+  },
+  {
+    "Name": "accounts-list",
+    "Description": "Retrieve account information",
+    "Method": "GET",
+    "Path": "accounts/list.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [
+      "visible_only"
+    ],
+    "ParamTypes": {
+      "visible_only": "boolean"
+    },
+    "ParamDescriptions": {
+      "visible_only": "boolean (Whether to return visible accounts only)"
+    },
+    "PrettyResponse": {
+      "Type": "hierarchical_array_to_markdown_table",
+      "Columns": [
+        "category",
+        "type",
+        "parentId",
+        "id",
+        "name",
+        "currency",
+        "balance",
+        "hidden",
+        "comment"
+      ],
+      "ChildKey": "subAccounts"
+    }
+  },
+  {
+    "Name": "accounts-get",
+    "Description": "Retrieve one account by ID",
+    "Method": "GET",
+    "Path": "accounts/get.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Account ID)"
+    }
+  },
+  {
+    "Name": "accounts-add",
+    "Description": "Add a new account",
+    "Method": "POST",
+    "Path": "accounts/add.json",
+    "RequiresTimezone": true,
+    "RequiredParams": [
+      "name",
+      "category",
+      "type",
+      "icon",
+      "color",
+      "currency"
+    ],
+    "OptionalParams": [
+      "balance",
+      "balanceTime",
+      "comment",
+      "creditCardStatementDate",
+      "subAccounts",
+      "clientSessionId"
+    ],
+    "ParamTypes": {
+      "name": "string",
+      "icon": "string",
+      "color": "string",
+      "currency": "string",
+      "comment": "string",
+      "clientSessionId": "string",
+      "category": "integer",
+      "type": "integer",
+      "balance": "integer",
+      "balanceTime": "integer",
+      "creditCardStatementDate": "integer",
+      "subAccounts": "json"
+    },
+    "ParamDescriptions": {
+      "name": "string (Account name)",
+      "category": "integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)",
+      "type": "integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)",
+      "icon": "string (Account icon ID)",
+      "color": "string (Account icon color, hex color code RRGGBB)",
+      "currency": "string (Account currency code, ISO 4217 code; --- for parent account)",
+      "balance": "integer (Account balance, scaled by 100; liability account should use negative amount)",
+      "balanceTime": "integer (Unix time when the opening balance applies)",
+      "comment": "string (Account description)",
+      "creditCardStatementDate": "integer (Statement date for credit card account, 0-28)",
+      "subAccounts": "json (Sub-account create/modify requests)",
+      "clientSessionId": "string (Client session ID for duplicate submission protection)"
+    }
+  },
+  {
+    "Name": "accounts-modify",
+    "Description": "Modify an existing account",
+    "Method": "POST",
+    "Path": "accounts/modify.json",
+    "RequiresTimezone": true,
+    "RequiredParams": [
+      "id",
+      "name",
+      "category",
+      "icon",
+      "color",
+      "hidden"
+    ],
+    "OptionalParams": [
+      "currency",
+      "balance",
+      "balanceTime",
+      "lastReconciledTime",
+      "comment",
+      "creditCardStatementDate",
+      "subAccounts",
+      "clientSessionId"
+    ],
+    "ParamTypes": {
+      "id": "string",
+      "name": "string",
+      "icon": "string",
+      "color": "string",
+      "currency": "string",
+      "comment": "string",
+      "clientSessionId": "string",
+      "category": "integer",
+      "balance": "integer",
+      "balanceTime": "integer",
+      "lastReconciledTime": "integer",
+      "creditCardStatementDate": "integer",
+      "hidden": "boolean",
+      "subAccounts": "json"
+    },
+    "ParamDescriptions": {
+      "id": "string (Account ID)",
+      "name": "string (Account name)",
+      "category": "integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)",
+      "icon": "string (Account icon ID)",
+      "color": "string (Account icon color, hex color code RRGGBB)",
+      "currency": "string (Account currency code, ISO 4217 code; --- for parent account)",
+      "balance": "integer (Account balance, scaled by 100; liability account should use negative amount)",
+      "balanceTime": "integer (Unix time when the opening balance applies)",
+      "lastReconciledTime": "integer (Last reconciled unix time)",
+      "comment": "string (Account description)",
+      "creditCardStatementDate": "integer (Statement date for credit card account, 0-28)",
+      "hidden": "boolean (Whether the account is hidden)",
+      "subAccounts": "json (Sub-account create/modify requests)",
+      "clientSessionId": "string (Client session ID for duplicate submission protection)"
+    }
+  },
+  {
+    "Name": "accounts-update-last-reconciled-time",
+    "Description": "Update last reconciled time for an account",
+    "Method": "POST",
+    "Path": "accounts/update/last_reconciled_time.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id",
+      "lastReconciledTime"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string",
+      "lastReconciledTime": "integer"
+    },
+    "ParamDescriptions": {
+      "id": "string (Account ID)",
+      "lastReconciledTime": "integer (Last reconciled unix time)"
+    }
+  },
+  {
+    "Name": "accounts-hide",
+    "Description": "Hide or unhide an account",
+    "Method": "POST",
+    "Path": "accounts/hide.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id",
+      "hidden"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string",
+      "hidden": "boolean"
+    },
+    "ParamDescriptions": {
+      "id": "string (Account ID)",
+      "hidden": "boolean (Whether the account is hidden)"
+    }
+  },
+  {
+    "Name": "accounts-move",
+    "Description": "Update account display order",
+    "Method": "POST",
+    "Path": "accounts/move.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "newDisplayOrders"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "newDisplayOrders": "json"
+    },
+    "ParamDescriptions": {
+      "newDisplayOrders": "json (Array of objects: [{\"id\":\"123\",\"displayOrder\":1}])"
+    }
+  },
+  {
+    "Name": "accounts-delete",
+    "Description": "Delete an account",
+    "Method": "POST",
+    "Path": "accounts/delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Account ID)"
+    }
+  },
+  {
+    "Name": "accounts-sub-account-delete",
+    "Description": "Delete a sub-account",
+    "Method": "POST",
+    "Path": "accounts/sub_account/delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Account ID)"
+    }
+  },
+  {
+    "Name": "transaction-categories-list",
+    "Description": "Retrieve transaction categories",
+    "Method": "GET",
+    "Path": "transaction/categories/list.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [
+      "type",
+      "parent_id"
+    ],
+    "ParamTypes": {
+      "type": "integer",
+      "parent_id": "string"
+    },
+    "ParamDescriptions": {
+      "type": "integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)",
+      "parent_id": "string (Filter by parent transaction category ID; -1 means all)"
+    },
+    "PrettyResponse": {
+      "Type": "hierarchical_object_to_markdown_table",
+      "Columns": [
+        "type",
+        "parentId",
+        "id",
+        "name",
+        "hidden",
+        "comment"
+      ],
+      "ChildKey": "subCategories"
+    }
+  },
+  {
+    "Name": "transaction-categories-get",
+    "Description": "Retrieve one transaction category by ID",
+    "Method": "GET",
+    "Path": "transaction/categories/get.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction category ID)"
+    }
+  },
+  {
+    "Name": "transaction-categories-add",
+    "Description": "Add a new transaction category",
+    "Method": "POST",
+    "Path": "transaction/categories/add.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "name",
+      "type",
+      "icon",
+      "color"
+    ],
+    "OptionalParams": [
+      "parentId",
+      "comment",
+      "clientSessionId"
+    ],
+    "ParamTypes": {
+      "name": "string",
+      "icon": "string",
+      "color": "string",
+      "parentId": "string",
+      "comment": "string",
+      "clientSessionId": "string",
+      "type": "integer"
+    },
+    "ParamDescriptions": {
+      "name": "string (Transaction category name)",
+      "type": "integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)",
+      "parentId": "string (Parent transaction category ID, 0 for primary category)",
+      "icon": "string (Transaction category icon ID)",
+      "color": "string (Transaction category color, hex color code RRGGBB)",
+      "comment": "string (Transaction category description)",
+      "clientSessionId": "string (Client session ID for duplicate submission protection)"
+    }
+  },
+  {
+    "Name": "transaction-categories-add-batch",
+    "Description": "Add multiple transaction categories",
+    "Method": "POST",
+    "Path": "transaction/categories/add_batch.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "categories"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "categories": "json"
+    },
+    "ParamDescriptions": {
+      "categories": "json (Batch category tree, see help and API model for shape)"
+    }
+  },
+  {
+    "Name": "transaction-categories-modify",
+    "Description": "Modify a transaction category",
+    "Method": "POST",
+    "Path": "transaction/categories/modify.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id",
+      "name",
+      "parentId",
+      "icon",
+      "color",
+      "hidden"
+    ],
+    "OptionalParams": [
+      "comment"
+    ],
+    "ParamTypes": {
+      "id": "string",
+      "name": "string",
+      "parentId": "string",
+      "icon": "string",
+      "color": "string",
+      "comment": "string",
+      "hidden": "boolean"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction category ID)",
+      "name": "string (Transaction category name)",
+      "parentId": "string (Parent transaction category ID, 0 for primary category)",
+      "icon": "string (Transaction category icon ID)",
+      "color": "string (Transaction category color, hex color code RRGGBB)",
+      "comment": "string (Transaction category description)",
+      "hidden": "boolean (Whether the category is hidden)"
+    }
+  },
+  {
+    "Name": "transaction-categories-hide",
+    "Description": "Hide or unhide a transaction category",
+    "Method": "POST",
+    "Path": "transaction/categories/hide.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id",
+      "hidden"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string",
+      "hidden": "boolean"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction category ID)",
+      "hidden": "boolean (Whether the category is hidden)"
+    }
+  },
+  {
+    "Name": "transaction-categories-move",
+    "Description": "Update transaction category display order",
+    "Method": "POST",
+    "Path": "transaction/categories/move.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "newDisplayOrders"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "newDisplayOrders": "json"
+    },
+    "ParamDescriptions": {
+      "newDisplayOrders": "json (Array of objects: [{\"id\":\"123\",\"displayOrder\":1}])"
+    }
+  },
+  {
+    "Name": "transaction-categories-delete",
+    "Description": "Delete a transaction category",
+    "Method": "POST",
+    "Path": "transaction/categories/delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction category ID)"
+    }
+  },
+  {
+    "Name": "transaction-tag-groups-list",
+    "Description": "Retrieve transaction tag groups",
+    "Method": "GET",
+    "Path": "transaction/tags/groups/list.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [],
+    "ParamTypes": {},
+    "ParamDescriptions": {},
+    "PrettyResponse": {
+      "Type": "simple_array_to_markdown_table",
+      "Columns": [
+        "id",
+        "name",
+        "displayOrder"
+      ]
+    }
+  },
+  {
+    "Name": "transaction-tag-groups-get",
+    "Description": "Retrieve one transaction tag group by ID",
+    "Method": "GET",
+    "Path": "transaction/tags/groups/get.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction tag group ID)"
+    }
+  },
+  {
+    "Name": "transaction-tag-groups-add",
+    "Description": "Add a transaction tag group",
+    "Method": "POST",
+    "Path": "transaction/tags/groups/add.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "name"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "name": "string"
+    },
+    "ParamDescriptions": {
+      "name": "string (Transaction tag group name)"
+    }
+  },
+  {
+    "Name": "transaction-tag-groups-modify",
+    "Description": "Modify a transaction tag group",
+    "Method": "POST",
+    "Path": "transaction/tags/groups/modify.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id",
+      "name"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string",
+      "name": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction tag group ID)",
+      "name": "string (Transaction tag group name)"
+    }
+  },
+  {
+    "Name": "transaction-tag-groups-move",
+    "Description": "Update transaction tag group display order",
+    "Method": "POST",
+    "Path": "transaction/tags/groups/move.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "newDisplayOrders"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "newDisplayOrders": "json"
+    },
+    "ParamDescriptions": {
+      "newDisplayOrders": "json (Array of objects: [{\"id\":\"123\",\"displayOrder\":1}])"
+    }
+  },
+  {
+    "Name": "transaction-tag-groups-delete",
+    "Description": "Delete a transaction tag group",
+    "Method": "POST",
+    "Path": "transaction/tags/groups/delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction tag group ID)"
+    }
+  },
+  {
+    "Name": "transaction-tags-list",
+    "Description": "Retrieve transaction tags",
+    "Method": "GET",
+    "Path": "transaction/tags/list.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [],
+    "ParamTypes": {},
+    "ParamDescriptions": {},
+    "PrettyResponse": {
+      "Type": "simple_array_to_markdown_table",
+      "Columns": [
+        "groupId",
+        "id",
+        "name",
+        "hidden"
+      ]
+    }
+  },
+  {
+    "Name": "transaction-tags-get",
+    "Description": "Retrieve one transaction tag by ID",
+    "Method": "GET",
+    "Path": "transaction/tags/get.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction tag ID)"
+    }
+  },
+  {
+    "Name": "transaction-tags-add",
+    "Description": "Add a new transaction tag",
+    "Method": "POST",
+    "Path": "transaction/tags/add.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "name"
+    ],
+    "OptionalParams": [
+      "groupId"
+    ],
+    "ParamTypes": {
+      "name": "string",
+      "groupId": "string"
+    },
+    "ParamDescriptions": {
+      "name": "string (Transaction tag name)",
+      "groupId": "string (Transaction tag group ID, 0 means default group)"
+    }
+  },
+  {
+    "Name": "transaction-tags-add-batch",
+    "Description": "Add multiple transaction tags",
+    "Method": "POST",
+    "Path": "transaction/tags/add_batch.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "tags",
+      "groupId"
+    ],
+    "OptionalParams": [
+      "skipExists"
+    ],
+    "ParamTypes": {
+      "tags": "json",
+      "groupId": "string",
+      "skipExists": "boolean"
+    },
+    "ParamDescriptions": {
+      "tags": "json (Array of tag create requests: [{\"name\":\"name\",\"groupId\":\"0\"}])",
+      "groupId": "string (Transaction tag group ID, 0 means default group)",
+      "skipExists": "boolean (Whether to ignore existing tags in batch creation)"
+    }
+  },
+  {
+    "Name": "transaction-tags-modify",
+    "Description": "Modify a transaction tag",
+    "Method": "POST",
+    "Path": "transaction/tags/modify.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id",
+      "name"
+    ],
+    "OptionalParams": [
+      "groupId"
+    ],
+    "ParamTypes": {
+      "id": "string",
+      "name": "string",
+      "groupId": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction tag ID)",
+      "name": "string (Transaction tag name)",
+      "groupId": "string (Transaction tag group ID, 0 means default group)"
+    }
+  },
+  {
+    "Name": "transaction-tags-hide",
+    "Description": "Hide or unhide a transaction tag",
+    "Method": "POST",
+    "Path": "transaction/tags/hide.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id",
+      "hidden"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string",
+      "hidden": "boolean"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction tag ID)",
+      "hidden": "boolean (Whether the tag is hidden)"
+    }
+  },
+  {
+    "Name": "transaction-tags-move",
+    "Description": "Update transaction tag display order",
+    "Method": "POST",
+    "Path": "transaction/tags/move.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "newDisplayOrders"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "newDisplayOrders": "json"
+    },
+    "ParamDescriptions": {
+      "newDisplayOrders": "json (Array of objects: [{\"id\":\"123\",\"displayOrder\":1}])"
+    }
+  },
+  {
+    "Name": "transaction-tags-delete",
+    "Description": "Delete a transaction tag",
+    "Method": "POST",
+    "Path": "transaction/tags/delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction tag ID)"
+    }
+  },
+  {
+    "Name": "transactions-count",
+    "Description": "Count transactions matching query criteria",
+    "Method": "GET",
+    "Path": "transactions/count.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [
+      "type",
+      "category_ids",
+      "account_ids",
+      "tag_filter",
+      "amount_filter",
+      "keyword",
+      "must_have_pictures",
+      "max_time",
+      "min_time"
+    ],
+    "ParamTypes": {
+      "type": "integer",
+      "max_time": "integer",
+      "min_time": "integer",
+      "category_ids": "string",
+      "account_ids": "string",
+      "tag_filter": "string",
+      "amount_filter": "string",
+      "keyword": "string",
+      "must_have_pictures": "boolean"
+    },
+    "ParamDescriptions": {
+      "type": "integer (Filter by transaction type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)",
+      "category_ids": "string (Filter by category IDs, separated by comma)",
+      "account_ids": "string (Filter by account IDs, separated by comma)",
+      "tag_filter": "string (Filter by tags, e.g. type:tagid,tagid; another filter)",
+      "amount_filter": "string (Filter by amount)",
+      "keyword": "string (Filter by keyword)",
+      "must_have_pictures": "boolean (Whether to only get transactions with pictures)",
+      "max_time": "integer (Maximum transaction time sequence ID)",
+      "min_time": "integer (Minimum transaction time sequence ID)"
+    }
+  },
+  {
+    "Name": "transactions-list",
+    "Description": "Retrieve transaction data based on query criteria with pagination",
+    "Method": "GET",
+    "Path": "transactions/list.json",
+    "RequiresTimezone": true,
+    "RequiredParams": [
+      "count"
+    ],
+    "OptionalParams": [
+      "type",
+      "category_ids",
+      "account_ids",
+      "tag_filter",
+      "amount_filter",
+      "keyword",
+      "must_have_pictures",
+      "max_time",
+      "min_time",
+      "page",
+      "with_count",
+      "with_pictures",
+      "trim_account",
+      "trim_category",
+      "trim_tag"
+    ],
+    "ParamTypes": {
+      "count": "integer",
+      "type": "integer",
+      "max_time": "integer",
+      "min_time": "integer",
+      "page": "integer",
+      "category_ids": "string",
+      "account_ids": "string",
+      "tag_filter": "string",
+      "amount_filter": "string",
+      "keyword": "string",
+      "must_have_pictures": "boolean",
+      "with_count": "boolean",
+      "with_pictures": "boolean",
+      "trim_account": "boolean",
+      "trim_category": "boolean",
+      "trim_tag": "boolean"
+    },
+    "ParamDescriptions": {
+      "count": "integer (Transactions per page, maximum is 50)",
+      "type": "integer (Filter by transaction type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)",
+      "category_ids": "string (Filter by category IDs, separated by comma)",
+      "account_ids": "string (Filter by account IDs, separated by comma)",
+      "tag_filter": "string (Filter by tags, e.g. type:tagid,tagid; another filter)",
+      "amount_filter": "string (Filter by amount)",
+      "keyword": "string (Filter by keyword)",
+      "must_have_pictures": "boolean (Whether to only get transactions with pictures)",
+      "max_time": "integer (Maximum time sequence ID; 0 for latest)",
+      "min_time": "integer (Minimum time sequence ID)",
+      "page": "integer (Page number)",
+      "with_count": "boolean (Whether to include total count)",
+      "with_pictures": "boolean (Whether to include transaction picture IDs)",
+      "trim_account": "boolean (Whether to return account IDs only)",
+      "trim_category": "boolean (Whether to return category IDs only)",
+      "trim_tag": "boolean (Whether to return tag IDs only)"
+    },
+    "PrettyResponse": {
+      "Type": "nested_array_to_markdown_table",
+      "Columns": [
+        "id",
+        "type",
+        "time",
+        "utcOffset",
+        "categoryId",
+        "sourceAccountId",
+        "sourceAmount",
+        "destinationAccountId",
+        "destinationAmount",
+        "tagIds",
+        "geoLocation",
+        "comment"
+      ],
+      "DataPath": "items",
+      "Metadata": [
+        {
+          "Field": "totalCount",
+          "Label": "Total Count"
+        },
+        {
+          "Field": "nextTimeSequenceId",
+          "Label": "Next Time Sequence ID"
+        }
+      ]
+    }
+  },
+  {
+    "Name": "transactions-list-by-month",
+    "Description": "Retrieve transactions in a specified month",
+    "Method": "GET",
+    "Path": "transactions/list/by_month.json",
+    "RequiresTimezone": true,
+    "RequiredParams": [
+      "year",
+      "month"
+    ],
+    "OptionalParams": [
+      "type",
+      "category_ids",
+      "account_ids",
+      "tag_filter",
+      "amount_filter",
+      "keyword",
+      "must_have_pictures",
+      "with_pictures",
+      "trim_account",
+      "trim_category",
+      "trim_tag"
+    ],
+    "ParamTypes": {
+      "year": "integer",
+      "month": "integer",
+      "type": "integer",
+      "category_ids": "string",
+      "account_ids": "string",
+      "tag_filter": "string",
+      "amount_filter": "string",
+      "keyword": "string",
+      "must_have_pictures": "boolean",
+      "with_pictures": "boolean",
+      "trim_account": "boolean",
+      "trim_category": "boolean",
+      "trim_tag": "boolean"
+    },
+    "ParamDescriptions": {
+      "year": "integer (Gregorian year)",
+      "month": "integer (1-based month)",
+      "type": "integer (Filter by transaction type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)",
+      "category_ids": "string (Filter by category IDs, separated by comma)",
+      "account_ids": "string (Filter by account IDs, separated by comma)",
+      "tag_filter": "string (Filter by tags, e.g. type:tagid,tagid; another filter)",
+      "amount_filter": "string (Filter by amount)",
+      "keyword": "string (Filter by keyword)",
+      "must_have_pictures": "boolean (Whether to only get transactions with pictures)",
+      "with_pictures": "boolean (Whether to include transaction picture IDs)",
+      "trim_account": "boolean (Whether to return account IDs only)",
+      "trim_category": "boolean (Whether to return category IDs only)",
+      "trim_tag": "boolean (Whether to return tag IDs only)"
+    },
+    "PrettyResponse": {
+      "Type": "nested_array_to_markdown_table",
+      "Columns": [
+        "id",
+        "type",
+        "time",
+        "utcOffset",
+        "categoryId",
+        "sourceAccountId",
+        "sourceAmount",
+        "destinationAccountId",
+        "destinationAmount",
+        "tagIds",
+        "geoLocation",
+        "comment"
+      ],
+      "DataPath": "items",
+      "Metadata": [
+        {
+          "Field": "totalCount",
+          "Label": "Total Count"
+        },
+        {
+          "Field": "nextTimeSequenceId",
+          "Label": "Next Time Sequence ID"
+        }
+      ]
+    }
+  },
+  {
+    "Name": "transactions-list-all",
+    "Description": "Retrieve all transaction data matching query criteria",
+    "Method": "GET",
+    "Path": "transactions/list/all.json",
+    "RequiresTimezone": true,
+    "RequiredParams": [],
+    "OptionalParams": [
+      "type",
+      "category_ids",
+      "account_ids",
+      "tag_filter",
+      "amount_filter",
+      "keyword",
+      "must_have_pictures",
+      "start_time",
+      "end_time",
+      "with_pictures",
+      "trim_account",
+      "trim_category",
+      "trim_tag"
+    ],
+    "ParamTypes": {
+      "type": "integer",
+      "start_time": "integer",
+      "end_time": "integer",
+      "category_ids": "string",
+      "account_ids": "string",
+      "tag_filter": "string",
+      "amount_filter": "string",
+      "keyword": "string",
+      "must_have_pictures": "boolean",
+      "with_pictures": "boolean",
+      "trim_account": "boolean",
+      "trim_category": "boolean",
+      "trim_tag": "boolean"
+    },
+    "ParamDescriptions": {
+      "type": "integer (Filter by transaction type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)",
+      "category_ids": "string (Filter by category IDs, separated by comma)",
+      "account_ids": "string (Filter by account IDs, separated by comma)",
+      "tag_filter": "string (Filter by tags, e.g. type:tagid,tagid; another filter)",
+      "amount_filter": "string (Filter by amount)",
+      "keyword": "string (Filter by keyword)",
+      "must_have_pictures": "boolean (Whether to only get transactions with pictures)",
+      "start_time": "integer (Transaction list start unix time)",
+      "end_time": "integer (Transaction list end unix time)",
+      "with_pictures": "boolean (Whether to include transaction picture IDs)",
+      "trim_account": "boolean (Whether to return account IDs only)",
+      "trim_category": "boolean (Whether to return category IDs only)",
+      "trim_tag": "boolean (Whether to return tag IDs only)"
+    },
+    "PrettyResponse": {
+      "Type": "simple_array_to_markdown_table",
+      "Columns": [
+        "id",
+        "type",
+        "time",
+        "utcOffset",
+        "categoryId",
+        "sourceAccountId",
+        "sourceAmount",
+        "destinationAccountId",
+        "destinationAmount",
+        "tagIds",
+        "geoLocation",
+        "comment"
+      ]
+    }
+  },
+  {
+    "Name": "transactions-get",
+    "Description": "Retrieve one transaction by ID",
+    "Method": "GET",
+    "Path": "transactions/get.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [
+      "with_pictures"
+    ],
+    "ParamTypes": {
+      "id": "string",
+      "with_pictures": "boolean"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction ID)",
+      "with_pictures": "boolean (Whether to include transaction picture IDs)"
+    }
+  },
+  {
+    "Name": "transactions-add",
+    "Description": "Add a new transaction",
+    "Method": "POST",
+    "Path": "transactions/add.json",
+    "RequiresTimezone": true,
+    "RequiredParams": [
+      "type",
+      "categoryId",
+      "time",
+      "utcOffset",
+      "sourceAccountId",
+      "sourceAmount"
+    ],
+    "OptionalParams": [
+      "destinationAccountId",
+      "destinationAmount",
+      "hideAmount",
+      "tagIds",
+      "pictureIds",
+      "comment",
+      "geoLocation",
+      "clientSessionId"
+    ],
+    "ParamTypes": {
+      "type": "integer",
+      "time": "integer",
+      "utcOffset": "integer",
+      "sourceAmount": "integer",
+      "destinationAmount": "integer",
+      "categoryId": "string",
+      "sourceAccountId": "string",
+      "destinationAccountId": "string",
+      "comment": "string",
+      "clientSessionId": "string",
+      "hideAmount": "boolean",
+      "tagIds": "string_array",
+      "pictureIds": "string_array",
+      "geoLocation": "geo_location"
+    },
+    "ParamDescriptions": {
+      "type": "integer (Transaction type, 1: Balance Modification, 2: Income, 3: Expense, 4: Transfer)",
+      "categoryId": "string (Transaction category ID; use 0 for balance modification)",
+      "time": "integer (Transaction unix time)",
+      "utcOffset": "integer (Transaction timezone offset minutes, e.g. 480 for UTC+8)",
+      "sourceAccountId": "string (Source account ID, supports account without sub-accounts or sub-account)",
+      "sourceAmount": "integer (Source amount, scaled by 100; 1234 means 12.34)",
+      "destinationAccountId": "string (Destination account ID for transfers)",
+      "destinationAmount": "integer (Destination amount for transfers, scaled by 100)",
+      "hideAmount": "boolean (Whether to hide amount)",
+      "tagIds": "string (Transaction tag IDs, separated by comma)",
+      "pictureIds": "string (Transaction picture IDs, separated by comma)",
+      "comment": "string (Transaction description)",
+      "geoLocation": "string (Transaction geographic location, format: longitude,latitude)",
+      "clientSessionId": "string (Client session ID for duplicate submission protection)"
+    }
+  },
+  {
+    "Name": "transactions-modify",
+    "Description": "Modify an existing transaction",
+    "Method": "POST",
+    "Path": "transactions/modify.json",
+    "RequiresTimezone": true,
+    "RequiredParams": [
+      "id",
+      "categoryId",
+      "time",
+      "utcOffset",
+      "sourceAccountId",
+      "sourceAmount"
+    ],
+    "OptionalParams": [
+      "destinationAccountId",
+      "destinationAmount",
+      "hideAmount",
+      "tagIds",
+      "pictureIds",
+      "comment",
+      "geoLocation"
+    ],
+    "ParamTypes": {
+      "time": "integer",
+      "utcOffset": "integer",
+      "sourceAmount": "integer",
+      "destinationAmount": "integer",
+      "id": "string",
+      "categoryId": "string",
+      "sourceAccountId": "string",
+      "destinationAccountId": "string",
+      "comment": "string",
+      "hideAmount": "boolean",
+      "tagIds": "string_array",
+      "pictureIds": "string_array",
+      "geoLocation": "geo_location"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction ID)",
+      "categoryId": "string (Transaction category ID; use 0 for balance modification)",
+      "time": "integer (Transaction unix time)",
+      "utcOffset": "integer (Transaction timezone offset minutes, e.g. 480 for UTC+8)",
+      "sourceAccountId": "string (Source account ID, supports account without sub-accounts or sub-account)",
+      "sourceAmount": "integer (Source amount, scaled by 100; 1234 means 12.34)",
+      "destinationAccountId": "string (Destination account ID for transfers)",
+      "destinationAmount": "integer (Destination amount for transfers, scaled by 100)",
+      "hideAmount": "boolean (Whether to hide amount)",
+      "tagIds": "string (Transaction tag IDs, separated by comma)",
+      "pictureIds": "string (Transaction picture IDs, separated by comma)",
+      "comment": "string (Transaction description)",
+      "geoLocation": "string (Transaction geographic location, format: longitude,latitude)"
+    }
+  },
+  {
+    "Name": "transactions-batch-update-category",
+    "Description": "Batch update transaction category",
+    "Method": "POST",
+    "Path": "transactions/batch_update/category.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "transactionIds",
+      "categoryId"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "transactionIds": "string_array",
+      "categoryId": "string"
+    },
+    "ParamDescriptions": {
+      "transactionIds": "string (Transaction IDs, separated by comma)",
+      "categoryId": "string (Transaction category ID; use 0 for balance modification)"
+    }
+  },
+  {
+    "Name": "transactions-batch-update-account",
+    "Description": "Batch update transaction account",
+    "Method": "POST",
+    "Path": "transactions/batch_update/account.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "transactionIds",
+      "accountId"
+    ],
+    "OptionalParams": [
+      "isDestinationAccount"
+    ],
+    "ParamTypes": {
+      "transactionIds": "string_array",
+      "accountId": "string",
+      "isDestinationAccount": "boolean"
+    },
+    "ParamDescriptions": {
+      "transactionIds": "string (Transaction IDs, separated by comma)",
+      "accountId": "string (Target account ID)",
+      "isDestinationAccount": "boolean (Whether to update destination account for transfer transactions)"
+    }
+  },
+  {
+    "Name": "transactions-batch-add-tags",
+    "Description": "Batch add tags to transactions",
+    "Method": "POST",
+    "Path": "transactions/batch_update/tag/add.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "transactionIds",
+      "tagIds"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "transactionIds": "string_array",
+      "tagIds": "string_array"
+    },
+    "ParamDescriptions": {
+      "transactionIds": "string (Transaction IDs, separated by comma)",
+      "tagIds": "string (Transaction tag IDs, separated by comma)"
+    }
+  },
+  {
+    "Name": "transactions-batch-remove-tags",
+    "Description": "Batch remove tags from transactions",
+    "Method": "POST",
+    "Path": "transactions/batch_update/tag/remove.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "transactionIds",
+      "tagIds"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "transactionIds": "string_array",
+      "tagIds": "string_array"
+    },
+    "ParamDescriptions": {
+      "transactionIds": "string (Transaction IDs, separated by comma)",
+      "tagIds": "string (Transaction tag IDs, separated by comma)"
+    }
+  },
+  {
+    "Name": "transactions-batch-clear-tags",
+    "Description": "Batch clear all tags from transactions",
+    "Method": "POST",
+    "Path": "transactions/batch_update/tag/clear.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "transactionIds"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "transactionIds": "string_array"
+    },
+    "ParamDescriptions": {
+      "transactionIds": "string (Transaction IDs, separated by comma)"
+    }
+  },
+  {
+    "Name": "transactions-move-all",
+    "Description": "Move all transactions from one account to another",
+    "Method": "POST",
+    "Path": "transactions/move/all.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "fromAccountId",
+      "toAccountId"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "fromAccountId": "string",
+      "toAccountId": "string"
+    },
+    "ParamDescriptions": {
+      "fromAccountId": "string (Source account ID)",
+      "toAccountId": "string (Destination account ID)"
+    }
+  },
+  {
+    "Name": "transactions-delete",
+    "Description": "Delete one transaction",
+    "Method": "POST",
+    "Path": "transactions/delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "id"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "id": "string"
+    },
+    "ParamDescriptions": {
+      "id": "string (Transaction ID)"
+    }
+  },
+  {
+    "Name": "transactions-batch-delete",
+    "Description": "Batch delete transactions",
+    "Method": "POST",
+    "Path": "transactions/batch_delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "ids"
+    ],
+    "OptionalParams": [
+      "password"
+    ],
+    "ParamTypes": {
+      "ids": "string_array",
+      "password": "string"
+    },
+    "ParamDescriptions": {
+      "ids": "string (Transaction IDs, separated by comma)",
+      "password": "string (Current user password, if server requires confirmation)"
+    }
+  },
+  {
+    "Name": "exchangerates-latest",
+    "Description": "Retrieve the latest exchange rate data",
+    "Method": "GET",
+    "Path": "exchange_rates/latest.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [],
+    "ParamTypes": {},
+    "ParamDescriptions": {},
+    "PrettyResponse": {
+      "Type": "nested_array_to_markdown_table",
+      "Columns": [
+        "currency",
+        "rate"
+      ],
+      "DataPath": "exchangeRates",
+      "Metadata": [
+        {
+          "Field": "dataSource",
+          "Label": "Data Source"
+        },
+        {
+          "Field": "baseCurrency",
+          "Label": "Base Currency"
+        },
+        {
+          "Field": "updateTime",
+          "Label": "Update Time"
+        }
+      ]
+    }
+  },
+  {
+    "Name": "exchangerates-custom-update",
+    "Description": "Update a user custom exchange rate",
+    "Method": "POST",
+    "Path": "exchange_rates/user_custom/update.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "currency",
+      "rate"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "currency": "string",
+      "rate": "string"
+    },
+    "ParamDescriptions": {
+      "currency": "string (Currency code, ISO 4217)",
+      "rate": "string (Custom exchange rate)"
+    }
+  },
+  {
+    "Name": "exchangerates-custom-delete",
+    "Description": "Delete a user custom exchange rate",
+    "Method": "POST",
+    "Path": "exchange_rates/user_custom/delete.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [
+      "currency"
+    ],
+    "OptionalParams": [],
+    "ParamTypes": {
+      "currency": "string"
+    },
+    "ParamDescriptions": {
+      "currency": "string (Currency code, ISO 4217)"
+    }
+  },
+  {
+    "Name": "server-version",
+    "Description": "Retrieve ezBookkeeping server version information",
+    "Method": "GET",
+    "Path": "systems/version.json",
+    "RequiresTimezone": false,
+    "RequiredParams": [],
+    "OptionalParams": [],
+    "ParamTypes": {},
+    "ParamDescriptions": {}
+  }
+]

@@ -3,543 +3,15 @@
 # ezBookkeeping API Tools
 # A command-line tool for calling ezBookkeeping APIs
 
-# API Configuration Structure
-API_CONFIGS='[
-    {
-    "Name": "tokens-list",
-    "Description": "Retrieve all sessions for the current user",
-    "Method": "GET",
-    "Path": "tokens/list.json",
-    "RequiresTimezone": false,
-    "RequiredParams": [],
-    "OptionalParams": [],
-    "ParamTypes": {},
-    "ParamDescriptions": {},
-    "ResponseStructure": [
-      "[",
-      "  {",
-      "    \"tokenId\": \"string (Token ID)\",",
-      "    \"tokenType\": \"integer (Token type, 1: Normal Token, 5: MCP Token, 8: API Token)\",",
-      "    \"userAgent\": \"string (The User Agent when the session created)\",",
-      "    \"lastSeen\": \"integer (Last refresh unix time of the session)\",",
-      "    \"isCurrent\": \"boolean (Whether the session is current)\"",
-      "  }",
-      "]"
-    ],
-    "PrettyResponse": {
-      "Type": "simple_array_to_markdown_table",
-      "Columns": ["tokenId", "tokenType", "userAgent", "lastSeen", "isCurrent"]
-    }
-  },
-  {
-    "Name": "tokens-revoke",
-    "Description": "Revoke a specified token",
-    "Method": "POST",
-    "Path": "tokens/revoke.json",
-    "RequiresTimezone": false,
-    "RequiredParams": ["tokenId"],
-    "OptionalParams": [],
-    "ParamTypes": {
-      "tokenId": "string"
-    },
-    "ParamDescriptions": {
-      "tokenId": "string (Token ID)"
-    },
-    "ResponseStructure": [
-      "boolean (Whether the token is revoked successfully)"
-    ]
-  },
-  {
-    "Name": "accounts-list",
-    "Description": "Retrieve all account information",
-    "Method": "GET",
-    "Path": "accounts/list.json",
-    "RequiresTimezone": false,
-    "RequiredParams": [],
-    "OptionalParams": [],
-    "ParamTypes": {},
-    "ParamDescriptions": {},
-    "ResponseStructure": [
-      "[",
-      "  {",
-      "    \"id\": \"string (Account ID)\",",
-      "    \"name\": \"string (Account name)\",",
-      "    \"parentId\": \"string (Parent account ID, 0 for primary account)\",",
-      "    \"category\": \"integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)\",",
-      "    \"type\": \"integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)\",",
-      "    \"icon\": \"string (Account icon ID)\",",
-      "    \"color\": \"string (Account icon color, hex color code RRGGBB)\",",
-      "    \"currency\": \"string (Account currency code)\",",
-      "    \"balance\": \"integer (Account balance, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
-      "    \"comment\": \"string (Account description)\",",
-      "    \"creditCardStatementDate\": \"integer (The statement date of the credit card account)\",",
-      "    \"displayOrder\": \"integer (The display order of the account)\",",
-      "    \"isAsset\": \"boolean (Whether the account is an asset account)\",",
-      "    \"isLiability\": \"boolean (Whether the account is a liability account)\",",
-      "    \"hidden\": \"boolean (Whether the account is hidden)\",",
-      "    \"subAccounts\": [\"each sub-account object like an account object\"]",
-      "  }",
-      "]"
-    ],
-    "PrettyResponse": {
-      "Type": "hierarchical_array_to_markdown_table",
-      "Columns": ["category", "type", "parentId", "id", "name", "currency", "balance", "hidden", "comment"],
-      "ChildKey": "subAccounts"
-    }
-  },
-  {
-    "Name": "accounts-add",
-    "Description": "Add a new account",
-    "Method": "POST",
-    "Path": "accounts/add.json",
-    "RequiresTimezone": true,
-    "RequiredParams": ["name", "category", "type", "icon", "color", "currency"],
-    "OptionalParams": ["balance", "balanceTime", "comment", "creditCardStatementDate"],
-    "ParamTypes": {
-      "name": "string",
-      "category": "integer",
-      "type": "integer",
-      "icon": "string",
-      "color": "string",
-      "currency": "string",
-      "balance": "integer",
-      "balanceTime": "integer",
-      "comment": "string",
-      "creditCardStatementDate": "integer"
-    },
-    "ParamDescriptions": {
-      "name": "string (Account name)",
-      "category": "integer (Account category, 1: Cash, 2: Checking Account, 3: Credit Card, 4: Virtual Account, 5: Debt Account, 6: Receivables, 7: Investment Account, 8: Savings Account, 9: Certificate of Deposit)",
-      "type": "integer (Account type, 1: Single Account, 2: Multiple Sub-accounts)",
-      "icon": "string (Account icon ID)",
-      "color": "string (Account icon color, hex color code RRGGBB)",
-      "currency": "string (Account currency code, ISO 4217 code, '"'"'---'"'"' for the parent account)",
-      "balance": "integer (Account balance, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"'. Liability account should set to negative amount)",
-      "balanceTime": "integer (The unix time when the account balance is the set value. This field is required when balance is set)",
-      "comment": "string (Account description)",
-      "creditCardStatementDate": "integer (The statement date of the credit card account)"
-    },
-    "ResponseStructure": [
-      "{",
-      "  \"id\": \"string (Account ID)\",",
-      "  \"name\": \"string (Account name)\",",
-      "  \"parentId\": \"string (Parent account ID)\",",
-      "  \"category\": \"integer (Account category)\",",
-      "  \"type\": \"integer (Account type)\",",
-      "  \"icon\": \"string (Account icon ID)\",",
-      "  \"color\": \"string (Account icon color)\",",
-      "  \"currency\": \"string (Account currency code)\",",
-      "  \"balance\": \"integer (Account balance)\",",
-      "  \"comment\": \"string (Account description)\",",
-      "  \"creditCardStatementDate\": \"integer (The statement date of the credit card account)\",",
-      "  \"displayOrder\": \"integer (The display order of the account)\",",
-      "  \"isAsset\": \"boolean (Whether the account is an asset account)\",",
-      "  \"isLiability\": \"boolean (Whether the account is a liability account)\",",
-      "  \"hidden\": \"boolean (Whether the account is hidden)\",",
-      "  \"subAccounts\": [\"every sub-account object like account object\"]",
-      "}"
-    ]
-  },
-  {
-    "Name": "transaction-categories-list",
-    "Description": "Retrieve all available transaction categories",
-    "Method": "GET",
-    "Path": "transaction/categories/list.json",
-    "RequiresTimezone": false,
-    "RequiredParams": [],
-    "OptionalParams": [],
-    "ParamTypes": {},
-    "ParamDescriptions": {},
-    "ResponseStructure": [
-      "{",
-      "  \"transaction category type (1: Income, 2: Expense, 3:Transfer)\": [",
-      "    {",
-      "      \"id\": \"string (Transaction category ID)\",",
-      "      \"name\": \"string (Transaction category name)\",",
-      "      \"parentId\": \"string (Parent transaction category ID, 0 for primary category)\",",
-      "      \"type\": \"integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)\",",
-      "      \"icon\": \"string (Transaction category icon ID)\",",
-      "      \"color\": \"string (Transaction category icon color, hex color code RRGGBB)\",",
-      "      \"comment\": \"string (Transaction category description)\",",
-      "      \"displayOrder\": \"integer (The display order of the transaction category)\",",
-      "      \"hidden\": \"boolean (Whether the transaction category is hidden)\",",
-      "      \"subCategories\": [\"each sub-category object like a transaction category object\"]",
-      "    }",
-      "  ]",
-      "}"
-    ],
-    "PrettyResponse": {
-      "Type": "hierarchical_object_to_markdown_table",
-      "Columns": ["type", "parentId", "id", "name", "hidden", "comment"],
-      "ChildKey": "subCategories"
-    }
-  },
-  {
-    "Name": "transaction-categories-add",
-    "Description": "Add a new transaction category",
-    "Method": "POST",
-    "Path": "transaction/categories/add.json",
-    "RequiresTimezone": false,
-    "RequiredParams": ["name", "type", "icon", "color"],
-    "OptionalParams": ["parentId", "comment"],
-    "ParamTypes": {
-      "name": "string",
-      "type": "integer",
-      "parentId": "string",
-      "icon": "string",
-      "color": "string",
-      "comment": "string"
-    },
-    "ParamDescriptions": {
-      "name": "string (Transaction category name)",
-      "type": "integer (Transaction category type, 1: Income, 2: Expense, 3: Transfer)",
-      "parentId": "string (Parent transaction category ID, 0 for primary category)",
-      "icon": "string (Transaction category icon ID)",
-      "color": "string (Transaction category icon color, hex color code RRGGBB)",
-      "comment": "string (Transaction category description)"
-    },
-    "ResponseStructure": [
-      "{",
-      "  \"id\": \"string (Transaction category ID)\",",
-      "  \"name\": \"string (Transaction category name)\",",
-      "  \"parentId\": \"string (Parent transaction category ID)\",",
-      "  \"type\": \"integer (Transaction category type)\",",
-      "  \"icon\": \"string (Transaction category icon ID)\",",
-      "  \"color\": \"string (Transaction category icon color)\",",
-      "  \"comment\": \"string (Transaction category description)\",",
-      "  \"displayOrder\": \"integer (The display order of the transaction category)\",",
-      "  \"hidden\": \"boolean (Whether the transaction category is hidden)\",",
-      "  \"subCategories\": [\"each sub-category object like a transaction category object\"]",
-      "}"
-    ]
-  },
-  {
-    "Name": "transaction-tags-list",
-    "Description": "Retrieve all available transaction tags",
-    "Method": "GET",
-    "Path": "transaction/tags/list.json",
-    "RequiresTimezone": false,
-    "RequiredParams": [],
-    "OptionalParams": [],
-    "ParamTypes": {},
-    "ParamDescriptions": {},
-    "ResponseStructure": [
-      "[",
-      "  {",
-      "    \"id\": \"string (Transaction tag ID)\",",
-      "    \"name\": \"string (Transaction tag name)\",",
-      "    \"groupId\": \"string (Transaction tag group ID)\",",
-      "    \"displayOrder\": \"integer (The display order of the transaction tag)\",",
-      "    \"hidden\": \"boolean (Whether the transaction tag is hidden)\"",
-      "  }",
-      "]"
-    ],
-    "PrettyResponse": {
-      "Type": "simple_array_to_markdown_table",
-      "Columns": ["groupId", "id", "name", "hidden"]
-    }
-  },
-  {
-    "Name": "transaction-tags-add",
-    "Description": "Add a new transaction tag",
-    "Method": "POST",
-    "Path": "transaction/tags/add.json",
-    "RequiresTimezone": false,
-    "RequiredParams": ["name"],
-    "OptionalParams": ["groupId"],
-    "ParamTypes": {
-      "name": "string",
-      "groupId": "string"
-    },
-    "ParamDescriptions": {
-      "name": "string (Transaction tag name)",
-      "groupId": "string (Transaction tag group ID, 0 means default group)"
-    },
-    "ResponseStructure": [
-      "{",
-      "  \"id\": \"string (Transaction tag ID)\",",
-      "  \"name\": \"string (Transaction tag name)\",",
-      "  \"groupId\": \"string (Transaction tag group ID)\",",
-      "  \"displayOrder\": \"integer (The display order of the transaction tag)\",",
-      "  \"hidden\": \"boolean (Whether the transaction tag is hidden)\"",
-      "}"
-    ]
-  },
-  {
-    "Name": "transactions-list",
-    "Description": "Retrieve transaction data based on specified query criteria (with pagination support)",
-    "Method": "GET",
-    "Path": "transactions/list.json",
-    "RequiresTimezone": true,
-    "RequiredParams": ["count"],
-    "OptionalParams": ["type", "category_ids", "account_ids", "tag_filter", "amount_filter", "keyword", "must_have_pictures", "max_time", "min_time", "page", "with_count", "with_pictures", "trim_account", "trim_category", "trim_tag"],
-    "ParamTypes": {
-      "count": "integer",
-      "type": "integer",
-      "category_ids": "string",
-      "account_ids": "string",
-      "tag_filter": "string",
-      "amount_filter": "string",
-      "keyword": "string",
-      "must_have_pictures": "boolean",
-      "max_time": "integer",
-      "min_time": "integer",
-      "page": "integer",
-      "with_count": "boolean",
-      "with_pictures": "boolean",
-      "trim_account": "boolean",
-      "trim_category": "boolean",
-      "trim_tag": "boolean"
-    },
-    "ParamDescriptions": {
-      "count": "integer (The count of transactions per page, maximum is 50)",
-      "type": "integer (Filter transaction by type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)",
-      "category_ids": "string (Filter by category IDs, separated by comma)",
-      "account_ids": "string (Filter by account IDs, separated by comma)",
-      "tag_filter": "string (Filter by tags)",
-      "amount_filter": "string (Filter by amount)",
-      "keyword": "string (Filter by keyword)",
-      "must_have_pictures": "boolean (Whether to only get transactions with pictures)",
-      "max_time": "integer (The maximum time sequence ID, Set to 0 for latest)",
-      "min_time": "integer (The minimum time sequence ID)",
-      "page": "integer (Specified page integer)",
-      "with_count": "boolean (Whether to get total count)",
-      "with_pictures": "boolean (Whether to get picture IDs)",
-      "trim_account": "boolean (Whether to get account ID only)",
-      "trim_category": "boolean (Whether to get category ID only)",
-      "trim_tag": "boolean (Whether to get tag IDs only)"
-    },
-    "ResponseStructure": [
-      "{",
-      "  \"items\": [",
-      "    {",
-      "      \"id\": \"string (Transaction ID)\",",
-      "      \"timeSequenceId\": \"string (Transaction time sequence ID)\",",
-      "      \"type\": \"integer (Transaction type)\",",
-      "      \"categoryId\": \"string (Transaction category ID)\",",
-      "      \"category\": \"object (Transaction category object)\",",
-      "      \"time\": \"integer (Transaction unix time)\",",
-      "      \"utcOffset\": \"integer (Transaction time zone offset minutes)\",",
-      "      \"sourceAccountId\": \"string (Source account ID)\",",
-      "      \"sourceAccount\": \"object (Source account object)\",",
-      "      \"destinationAccountId\": \"string (Destination account ID)\",",
-      "      \"destinationAccount\": \"object (Destination account object)\",",
-      "      \"sourceAmount\": \"integer (Source amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
-      "      \"destinationAmount\": \"integer (Destination amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
-      "      \"hideAmount\": \"boolean (Whether to hide the amount)\",",
-      "      \"tagIds\": [\"each string representing a transaction tag ID\"],",
-      "      \"tags\": [\"each object representing a transaction tag object\"],",
-      "      \"pictures\": [\"each object representing a transaction picture object\"],",
-      "      \"comment\": \"string (Transaction description)\",",
-      "      \"geoLocation\": \"object (Transaction geographic location)\",",
-      "      \"editable\": \"boolean (Whether the transaction is editable)\"",
-      "    }",
-      "  ],",
-      "  \"nextTimeSequenceId\": \"integer (The next cursor '"'"'max_time'"'"' parameter when requesting older data)\",",
-      "  \"totalCount\": \"integer (The total count of transactions)\"",
-      "}"
-    ],
-    "PrettyResponse": {
-      "Type": "nested_array_to_markdown_table",
-      "Columns": ["id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment"],
-      "DataPath": ".items",
-      "Metadata": [
-        {"Field": "totalCount", "Label": "Total Count"},
-        {"Field": "nextTimeSequenceId", "Label": "Next Time Sequence ID"}
-      ]
-    }
-  },
-  {
-    "Name": "transactions-list-all",
-    "Description": "Retrieve all transaction data matching the specified query criteria",
-    "Method": "GET",
-    "Path": "transactions/list/all.json",
-    "RequiresTimezone": true,
-    "RequiredParams": [],
-    "OptionalParams": ["type", "category_ids", "account_ids", "tag_filter", "amount_filter", "keyword", "must_have_pictures", "start_time", "end_time", "with_pictures", "trim_account", "trim_category", "trim_tag"],
-    "ParamTypes": {
-      "type": "integer",
-      "category_ids": "string",
-      "account_ids": "string",
-      "tag_filter": "string",
-      "amount_filter": "string",
-      "keyword": "string",
-      "must_have_pictures": "boolean",
-      "start_time": "integer",
-      "end_time": "integer",
-      "with_pictures": "boolean",
-      "trim_account": "boolean",
-      "trim_category": "boolean",
-      "trim_tag": "boolean"
-    },
-    "ParamDescriptions": {
-      "type": "integer (Filter transaction by type, 1: Balance modification, 2: Income, 3: Expense, 4: Transfer)",
-      "category_ids": "string (Filter by category IDs, separated by comma)",
-      "account_ids": "string (Filter by account IDs, separated by comma)",
-      "tag_filter": "string (Filter by tags)",
-      "amount_filter": "string (Filter by amount)",
-      "keyword": "string (Filter by keyword)",
-      "must_have_pictures": "boolean (Whether to only get transactions with pictures)",
-      "start_time": "integer (Transaction list start unix time)",
-      "end_time": "integer (Transaction list end unix time)",
-      "with_pictures": "boolean (Whether to get picture IDs)",
-      "trim_account": "boolean (Whether to get account ID only)",
-      "trim_category": "boolean (Whether to get category ID only)",
-      "trim_tag": "boolean (Whether to get tag IDs only)"
-    },
-    "ResponseStructure": [
-      "[",
-      "  {",
-      "    \"id\": \"string (Transaction ID)\",",
-      "    \"timeSequenceId\": \"string (Transaction time sequence ID)\",",
-      "    \"type\": \"integer (Transaction type)\",",
-      "    \"categoryId\": \"string (Transaction category ID)\",",
-      "    \"category\": \"object (Transaction category object)\",",
-      "    \"time\": \"integer (Transaction unix time)\",",
-      "    \"utcOffset\": \"integer (Transaction time zone offset minutes)\",",
-      "    \"sourceAccountId\": \"string (Source account ID)\",",
-      "    \"sourceAccount\": \"object (Source account object)\",",
-      "    \"destinationAccountId\": \"string (Destination account ID)\",",
-      "    \"destinationAccount\": \"object (Destination account object)\",",
-      "    \"sourceAmount\": \"integer (Source amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
-      "    \"destinationAmount\": \"integer (Destination amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')\",",
-      "    \"hideAmount\": \"boolean (Whether to hide the amount)\",",
-      "    \"tagIds\": [\"each string representing a transaction tag ID\"],",
-      "    \"tags\": [\"each object representing a transaction tag object\"],",
-      "    \"pictures\": [\"each object representing a transaction picture object\"],",
-      "    \"comment\": \"string (Transaction description)\",",
-      "    \"geoLocation\": \"object (Transaction geographic location)\",",
-      "    \"editable\": \"boolean (Whether the transaction is editable)\"",
-      "  }",
-      "]"
-    ],
-    "PrettyResponse": {
-      "Type": "simple_array_to_markdown_table",
-      "Columns": ["id", "type", "time", "utcOffset", "categoryId", "sourceAccountId", "sourceAmount", "destinationAccountId", "destinationAmount", "tagIds", "geoLocation", "comment"]
-    }
-  },
-  {
-    "Name": "transactions-add",
-    "Description": "Add a new transaction",
-    "Method": "POST",
-    "Path": "transactions/add.json",
-    "RequiresTimezone": true,
-    "RequiredParams": ["type", "categoryId", "time", "utcOffset", "sourceAccountId", "sourceAmount"],
-    "OptionalParams": ["destinationAccountId", "destinationAmount", "hideAmount", "tagIds", "pictureIds", "comment", "geoLocation"],
-    "ParamTypes": {
-      "type": "integer",
-      "categoryId": "string",
-      "time": "integer",
-      "utcOffset": "integer",
-      "sourceAccountId": "string",
-      "sourceAmount": "integer",
-      "destinationAccountId": "string",
-      "destinationAmount": "integer",
-      "hideAmount": "boolean",
-      "tagIds": "string_array",
-      "pictureIds": "string_array",
-      "comment": "string",
-      "geoLocation": "geo_location"
-    },
-    "ParamDescriptions": {
-      "type": "integer (Transaction type, 1: Balance Modification, 2: Income, 3: Expense, 4: Transfer)",
-      "categoryId": "string (Transaction category ID, supports secondary category)",
-      "time": "integer (Transaction unix time)",
-      "utcOffset": "integer (Transaction time zone offset minutes)",
-      "sourceAccountId": "string (Source account ID, supports account without sub-accounts or sub-account)",
-      "sourceAmount": "integer (Source amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')",
-      "destinationAccountId": "string (Destination account ID, supports account without sub-accounts or sub-account)",
-      "destinationAmount": "integer (Destination amount, supports up to two decimals. For example, a value of '"'"'1234'"'"' represents an amount of '"'"'12.34'"'"')",
-      "hideAmount": "boolean (Whether to hide amount)",
-      "tagIds": "string (Transaction tag IDs, separated by comma, e.g. '"'"'tagid1,tagid2'"'"')",
-      "pictureIds": "string (Transaction picture IDs, separated by comma, e.g. '"'"'picid1,picid2'"'"')",
-      "comment": "string (Transaction description)",
-      "geoLocation": "string (Transaction geographic location, format: longitude,latitude, e.g. '"'"'116.33,39.93'"'"')"
-    },
-    "ResponseStructure": [
-      "{",
-      "  \"id\": \"string (Transaction ID)\",",
-      "  \"timeSequenceId\": \"string (Transaction time sequence ID)\",",
-      "  \"type\": \"integer (Transaction type)\",",
-      "  \"categoryId\": \"string (Transaction category ID)\",",
-      "  \"category\": \"object (Transaction category object)\",",
-      "  \"time\": \"integer (Transaction unix time)\",",
-      "  \"utcOffset\": \"integer (Transaction time zone offset minutes)\",",
-      "  \"sourceAccountId\": \"string (Source account ID)\",",
-      "  \"sourceAccount\": \"object (Source account object)\",",
-      "  \"destinationAccountId\": \"string (Destination account ID)\",",
-      "  \"destinationAccount\": \"object (Destination account object)\",",
-      "  \"sourceAmount\": \"integer (Source amount)\",",
-      "  \"destinationAmount\": \"integer (Destination amount)\",",
-      "  \"hideAmount\": \"boolean (Whether to hide the amount)\",",
-      "  \"tagIds\": [\"each string representing a transaction tag ID\"],",
-      "  \"tags\": [\"each object representing a transaction tag object\"],",
-      "  \"pictures\": [\"each object representing a transaction picture object\"],",
-      "  \"comment\": \"string (Transaction description)\",",
-      "  \"geoLocation\": \"object (Transaction geographic location)\",",
-      "  \"editable\": \"boolean (Whether the transaction is editable)\"",
-      "}"
-    ]
-  },
-  {
-    "Name": "exchangerates-latest",
-    "Description": "Retrieve the latest exchange rate data",
-    "Method": "GET",
-    "Path": "exchange_rates/latest.json",
-    "RequiresTimezone": false,
-    "RequiredParams": [],
-    "OptionalParams": [],
-    "ParamTypes": {},
-    "ParamDescriptions": {},
-    "ResponseStructure": [
-      "{",
-      "  \"dataSource\": \"string (Exchange rate data source name)\",",
-      "  \"referenceUrl\": \"string (Exchange rate data reference URL)\",",
-      "  \"updateTime\": \"integer (Exchange rate data update unix time)\",",
-      "  \"baseCurrency\": \"string (Base currency code)\",",
-      "  \"exchangeRates\": [",
-      "    {",
-      "      \"currency\": \"string (Currency code)\",",
-      "      \"rate\": \"string (Exchange rate, 1 unit of base currency equals to how many units of this currency)\"",
-      "    }",
-      "  ]",
-      "}"
-    ],
-    "PrettyResponse": {
-      "Type": "nested_array_to_markdown_table",
-      "Columns": ["currency", "rate"],
-      "DataPath": ".exchangeRates",
-      "Metadata": [
-        {"Field": "dataSource", "Label": "Data Source"},
-        {"Field": "baseCurrency", "Label": "Base Currency"},
-        {"Field": "updateTime", "Label": "Update Time"}
-      ]
-    }
-  },
-  {
-    "Name": "server-version",
-    "Description": "Retrieve ezBookkeeping server version information",
-    "Method": "GET",
-    "Path": "systems/version.json",
-    "RequiresTimezone": false,
-    "RequiredParams": [],
-    "OptionalParams": [],
-    "ParamTypes": {},
-    "ParamDescriptions": {},
-    "ResponseStructure": [
-      "{",
-      "  \"version\": \"string (Server version)\",",
-      "  \"commitHash\": \"string (Git commit hash)\"",
-      "}"
-    ]
-  }
-]'
+SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
+API_CONFIGS=""
 
 EBKTOOL_SERVER_BASEURL="${EBKTOOL_SERVER_BASEURL}"
 EBKTOOL_TOKEN="${EBKTOOL_TOKEN}"
 TIMEZONE_NAME=""
 TIMEZONE_OFFSET=""
 RAW_RESPONSE="false"
+DRY_RUN="false"
 
 echo_red() {
     printf '\033[31m%s\033[0m\n' "$1"
@@ -557,6 +29,20 @@ check_dependency() {
             exit 127
         fi
     done
+}
+
+load_api_configs() {
+    config_file="$SCRIPT_DIR/api-configs.json"
+
+    if [ ! -f "$config_file" ]; then
+        echo_red "Error: API configuration file not found: $config_file"
+        exit 1
+    fi
+
+    if ! API_CONFIGS="$(jq -c '.' "$config_file" 2>/dev/null)"; then
+        echo_red "Error: Failed to load API configuration file: $config_file"
+        exit 1
+    fi
 }
 
 load_env_file() {
@@ -789,6 +275,10 @@ print_result() {
             ;;
         nested_array_to_markdown_table)
             data_path="$(echo "$pretty_config" | jq -r '.DataPath // "."')"
+            case "$data_path" in
+                .*) ;;
+                *) data_path=".$data_path" ;;
+            esac
             nested_data="$(printf "%s\n" "$result_data" | jq -r "$data_path")"
 
             metadata="$(echo "$pretty_config" | jq -r '.Metadata // null')"
@@ -818,7 +308,7 @@ ezBookkeeping API Tools
 A command-line tool for calling ezBookkeeping APIs
 
 Usage:
-    ebktools.sh [--tz-name <name>] [--tz-offset <offset>] [--raw-response] <command> [command-options]
+    ebktools.sh [--tz-name <name>] [--tz-offset <offset>] [--raw-response] [--dry-run] <command> [command-options]
 
 Environment Variables (Required):
     EBKTOOL_SERVER_BASEURL      ezBookkeeping server base URL (e.g., http://localhost:8080)
@@ -828,8 +318,9 @@ Environment Variables (Required):
 
 Global Options:
     --tz-name <name>            The IANA timezone name of current timezone. For example, for Beijing Time it is 'Asia/Shanghai'.
-    --tz-offset <offset>        The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '--tz-name' and '--tz-offset' are set, '--tz-name' takes priority. If neither is set, the current system time zone is used by default.
+    --tz-offset <offset>        The offset in minutes of the current timezone from UTC. For example, for Beijing Time which is UTC+8, the value is '480'. If both '--tz-name' and '--tz-offset' are set, '--tz-offset' takes priority. If neither is set, the current system time zone is used by default.
     --raw-response              Display the response in raw JSON format instead of formatted table.
+    --dry-run                   Print the request method, URL, headers, and JSON body without sending it.
 
 Commands:
     list                        List all available API commands
@@ -855,6 +346,9 @@ Examples:
 
     # Call API with timezone offset
     ebktools.sh --tz-offset ${example_timezone_offset} transactions-list --count 10
+
+    # Preview a request without sending it
+    ebktools.sh --dry-run transactions-add --type 3 --categoryId 0 --time 1710000000 --utcOffset 480 --sourceAccountId 1 --sourceAmount -1234
 EOF
 }
 
@@ -862,8 +356,10 @@ list_commands() {
     echo "Available API Commands:"
     echo ""
 
+    name_width="$(echo "$API_CONFIGS" | jq '[.[].Name | length] | max + 2')"
+
     echo "$API_CONFIGS" | jq -r '.[] | "\(.Name)|\(.Description)"' | while IFS='|' read -r name desc; do
-        printf "  %-30s %s\n" "$name" "$desc"
+        printf "  %-*s %s\n" "$name_width" "$name" "$desc"
     done
 
     echo ""
@@ -956,15 +452,23 @@ call_api() {
     authToken="$EBKTOOL_TOKEN"
 
     if [ -z "$serverBaseUrl" ]; then
-        echo_red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
-        echo "Please set it to your ezBookkeeping server base URL (e.g., http://localhost:8080)"
-        exit 1
+        if [ "$DRY_RUN" = "true" ]; then
+            serverBaseUrl="http://example.local"
+        else
+            echo_red "Error: Environment variable 'EBKTOOL_SERVER_BASEURL' is not set."
+            echo "Please set it to your ezBookkeeping server base URL (e.g., http://localhost:8080)"
+            exit 1
+        fi
     fi
 
     if [ -z "$authToken" ]; then
-        echo_red "Error: Environment variable 'EBKTOOL_TOKEN' is not set."
-        echo "Please set it to your API token."
-        exit 1
+        if [ "$DRY_RUN" = "true" ]; then
+            authToken="DRY_RUN_TOKEN"
+        else
+            echo_red "Error: Environment variable 'EBKTOOL_TOKEN' is not set."
+            echo "Please set it to your API token."
+            exit 1
+        fi
     fi
 
     requires_timezone="$(echo "$config" | jq -r '.RequiresTimezone // false')"
@@ -999,6 +503,11 @@ call_api() {
         echo "$param_type"
     }
 
+    has_param_type() {
+        param_name="$1"
+        echo "$config" | jq -e --arg p "$param_name" '.ParamTypes | has($p)' >/dev/null 2>&1
+    }
+
     validate_param() {
         param_name="$1"
         param_value="$2"
@@ -1023,11 +532,18 @@ call_api() {
                     exit 1
                 fi
                 ;;
+            json)
+                if ! printf "%s\n" "$param_value" | jq -e '.' >/dev/null 2>&1; then
+                    echo_red "Error: Parameter '--${param_name}' must be valid JSON"
+                    exit 1
+                fi
+                ;;
         esac
     }
 
     params=""
     json_params="{}"
+    present_params="|"
     while [ $# -gt 0 ]; do
         case "${1}" in
             --*)
@@ -1038,15 +554,18 @@ call_api() {
                     exit 1
                 fi
 
-                case "$2" in
-                    --*)
-                        echo_red "Error: Parameter '--${param_name}' requires a value"
-                        exit 1
-                        ;;
-                esac
-
                 param_value="$2"
-                param_type="$(get_param_type "$param_name")"
+                if has_param_type "$param_name"; then
+                    param_type="$(get_param_type "$param_name")"
+                else
+                    echo_red "Error: Unknown parameter '--${param_name}'"
+                    exit 1
+                fi
+
+                if [ "${param_value#--}" != "$param_value" ]; then
+                    echo_red "Error: Parameter '--${param_name}' requires a value"
+                    exit 1
+                fi
 
                 validate_param "$param_name" "$param_value" "$param_type"
 
@@ -1056,6 +575,7 @@ call_api() {
                 else
                     params="${params}&${param_name}=${encoded_value}"
                 fi
+                present_params="${present_params}${param_name}|"
 
                 case "$param_type" in
                     integer)
@@ -1085,6 +605,9 @@ call_api() {
                         geo_json="$(jq -n --arg lat "$latitude" --arg lon "$longitude" '{latitude: ($lat | tonumber), longitude: ($lon | tonumber)}')"
                         json_params="$(echo "$json_params" | jq --arg k "$param_name" --argjson v "$geo_json" '. + {($k): $v}')"
                         ;;
+                    json)
+                        json_params="$(echo "$json_params" | jq --arg k "$param_name" --argjson v "$param_value" '. + {($k): $v}')"
+                        ;;
                     *)
                         json_params="$(echo "$json_params" | jq --arg k "$param_name" --arg v "$param_value" '. + {($k): $v}')"
                         ;;
@@ -1103,10 +626,13 @@ call_api() {
         i=0
         while [ "$i" -lt "$required_count" ]; do
             param="$(echo "$config" | jq -r --argjson idx "$i" '.RequiredParams[$idx]')"
-            if ! echo "$params" | grep -q "${param}="; then
-                echo_red "Error: Required parameter '--${param}' is missing"
-                exit 1
-            fi
+            case "$present_params" in
+                *"|${param}|"*) ;;
+                *)
+                    echo_red "Error: Required parameter '--${param}' is missing"
+                    exit 1
+                    ;;
+            esac
             i=$((i + 1))
         done
     fi
@@ -1125,8 +651,25 @@ call_api() {
     fi
 
     if [ "$method" = "POST" ]; then
-        echo_yellow "Calling API: $method $url"
+        if [ "$DRY_RUN" = "true" ]; then
+            echo_yellow "Dry run: $method $url"
+        else
+            echo_yellow "Calling API: $method $url"
+        fi
         echo ""
+
+        if [ "$DRY_RUN" = "true" ]; then
+            echo "Headers:"
+            echo "  Authorization: Bearer ***"
+            echo "  Content-Type: application/json"
+            if [ -n "$timezone_headers" ]; then
+                echo "  $timezone_headers"
+            fi
+            echo ""
+            echo "Body:"
+            printf "%s\n" "$json_params" | jq '.'
+            return
+        fi
 
         if [ "$json_params" != "{}" ]; then
             if [ -n "$timezone_headers" ]; then
@@ -1164,8 +707,21 @@ call_api() {
             url="${url}?${params}"
         fi
 
-        echo_yellow "Calling API: $method $url"
+        if [ "$DRY_RUN" = "true" ]; then
+            echo_yellow "Dry run: $method $url"
+        else
+            echo_yellow "Calling API: $method $url"
+        fi
         echo ""
+
+        if [ "$DRY_RUN" = "true" ]; then
+            echo "Headers:"
+            echo "  Authorization: Bearer ***"
+            if [ -n "$timezone_headers" ]; then
+                echo "  $timezone_headers"
+            fi
+            return
+        fi
 
         if [ -n "$timezone_headers" ]; then
             response="$(curl -s -X "$method" \
@@ -1206,6 +762,7 @@ call_api() {
 
 main() {
     check_dependency "grep sed awk date curl jq"
+    load_api_configs
 
     load_env_from_paths
 
@@ -1231,6 +788,10 @@ main() {
                 ;;
             --raw-response)
                 RAW_RESPONSE="true"
+                shift
+                ;;
+            --dry-run)
+                DRY_RUN="true"
                 shift
                 ;;
             --help | -h)

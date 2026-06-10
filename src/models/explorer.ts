@@ -1828,13 +1828,13 @@ export abstract class AbstractTransactionExplorerDescriptionCondition<T = Descri
         [TransactionExplorerConditionOperatorType.RegexMatch]: true,
         [TransactionExplorerConditionOperatorType.NotRegexMatch]: true
     };
-    private static cachedRegex: RegExp | undefined = undefined;
-    private static cachedRegexPattern: string | undefined = undefined;
 
     public abstract readonly field: T;
     public readonly operator: DescriptionConditionOperator = TransactionExplorerConditionOperatorType.Contains;
     public value: string;
     protected abstract readonly caseInsensitive: boolean;
+    private cachedRegex: RegExp | undefined = undefined;
+    private cachedRegexPattern: string | undefined = undefined;
 
     constructor(operator: DescriptionConditionOperator, value: string) {
         this.operator = operator;
@@ -1929,7 +1929,7 @@ export abstract class AbstractTransactionExplorerDescriptionCondition<T = Descri
             return undefined;
         }
 
-        if (AbstractTransactionExplorerDescriptionCondition.cachedRegexPattern !== this.value) {
+        if (this.cachedRegexPattern !== this.value) {
             try {
                 let regex: RegExp;
 
@@ -1939,15 +1939,15 @@ export abstract class AbstractTransactionExplorerDescriptionCondition<T = Descri
                     regex = new RegExp(this.value);
                 }
 
-                AbstractTransactionExplorerDescriptionCondition.cachedRegex = regex;
-                AbstractTransactionExplorerDescriptionCondition.cachedRegexPattern = this.value;
+                this.cachedRegex = regex;
+                this.cachedRegexPattern = this.value;
             } catch {
-                AbstractTransactionExplorerDescriptionCondition.cachedRegex = undefined;
-                AbstractTransactionExplorerDescriptionCondition.cachedRegexPattern = undefined;
+                this.cachedRegex = undefined;
+                this.cachedRegexPattern = undefined;
             }
         }
 
-        return AbstractTransactionExplorerDescriptionCondition.cachedRegex;
+        return this.cachedRegex;
     }
 }
 

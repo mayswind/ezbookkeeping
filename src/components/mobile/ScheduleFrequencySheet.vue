@@ -38,6 +38,18 @@
                             <f7-list-item :title="tt('Daily')"></f7-list-item>
                         </f7-list>
                         <f7-list dividers class="schedule-frequency-value-list no-margin-vertical"
+                                 v-if="currentFrequencyType === ScheduledTemplateFrequencyType.EveryNDays.type">
+                            <f7-list-item checkbox
+                                          :class="isChecked(n.type) ? 'list-item-selected' : ''"
+                                          :key="n.type"
+                                          :value="n.type"
+                                          :checked="isChecked(n.type)"
+                                          :title="n.displayName"
+                                          v-for="n in allAvailableNDays"
+                                          @change="setFrequencyValue">
+                            </f7-list-item>
+                        </f7-list>
+                        <f7-list dividers class="schedule-frequency-value-list no-margin-vertical"
                                  v-if="currentFrequencyType === ScheduledTemplateFrequencyType.Weekly.type">
                             <f7-list-item checkbox
                                           :class="isChecked(weekDay.type) ? 'list-item-selected' : ''"
@@ -112,6 +124,7 @@ const {
     allWeekDays,
     allAvailableMonthDays,
     allAvailableMonthAndDays,
+    allAvailableNDays,
     getFrequencyValues
 } = useScheduleFrequencySelectionBase();
 
@@ -132,6 +145,8 @@ function changeFrequencyType(value: number): void {
 
         if (value === ScheduledTemplateFrequencyType.Daily.type) {
             currentFrequencyValue.value = [0];
+        } else if (value === ScheduledTemplateFrequencyType.EveryNDays.type) {
+            currentFrequencyValue.value = [1];
         } else if (value === ScheduledTemplateFrequencyType.Weekly.type) {
             currentFrequencyValue.value = [firstDayOfWeek.value];
         } else if (value === ScheduledTemplateFrequencyType.Monthly.type) {
@@ -141,6 +156,16 @@ function changeFrequencyType(value: number): void {
         } else {
             currentFrequencyValue.value = [];
         }
+    }
+}
+
+function setFrequencyValue(e: Event): void {
+    const currentValue = parseInt((e.target as HTMLInputElement).value);
+
+    if ((e.target as HTMLInputElement).checked) {
+        currentFrequencyValue.value.splice(0, currentFrequencyValue.value.length, currentValue);
+    } else {
+        currentFrequencyValue.value.splice(0, currentFrequencyValue.value.length);
     }
 }
 

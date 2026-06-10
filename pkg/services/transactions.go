@@ -778,14 +778,14 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		var templates []*models.TransactionTemplate
 		err := s.UserDataDBByIndex(i).NewSession(c).Where("deleted=?"+
 			" AND template_type=?"+
-			" AND (scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=?)"+
+			" AND (scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=?)"+
 			" AND (scheduled_start_time IS NULL OR scheduled_start_time<=?)"+
 			" AND (scheduled_end_time IS NULL OR scheduled_end_time>=?)"+
 			" AND scheduled_at>=?"+
 			" AND scheduled_at<?",
 			false,
 			models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE,
-			models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY,
+			models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS,
 			startTime.Unix(),
 			startTime.Unix(),
 			minScheduledAt,
@@ -820,7 +820,8 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		if (template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY &&
 			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY &&
 			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY &&
-			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY) ||
+			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY &&
+			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS) ||
 			template.ScheduledFrequency == "" {
 			skipCount++
 			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency", template.TemplateId)
@@ -862,6 +863,24 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			skipCount++
 			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d-%d of year", template.TemplateId, startTimeInUTC.Month(), startTimeInUTC.Day())
 			continue
+		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS {
+			if template.ScheduledStartTime == nil || len(frequencyValues) != 1 || frequencyValues[0] <= 0 {
+				skipCount++
+				log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency for every N days", template.TemplateId)
+				continue
+			}
+
+			n := frequencyValues[0]
+			startDate := time.Unix(*template.ScheduledStartTime, 0).In(templateTimeZone)
+			startDateOnly := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, templateTimeZone)
+			transactionDateOnly := time.Date(transactionTime.Year(), transactionTime.Month(), transactionTime.Day(), 0, 0, 0, 0, templateTimeZone)
+			daysDiff := int(transactionDateOnly.Sub(startDateOnly).Hours() / 24)
+
+			if daysDiff < 0 || int64(daysDiff)%n != 0 {
+				skipCount++
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, days diff is %d with interval %d", template.TemplateId, daysDiff, n)
+				continue
+			}
 		}
 
 		if template.ScheduledStartTime != nil && *template.ScheduledStartTime > transactionUnixTime {

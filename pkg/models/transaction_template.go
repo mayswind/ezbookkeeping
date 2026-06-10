@@ -21,11 +21,12 @@ type TransactionScheduleFrequencyType byte
 
 // Transaction template schedule frequency types
 const (
-	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED TransactionScheduleFrequencyType = 0
-	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY   TransactionScheduleFrequencyType = 1
-	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY  TransactionScheduleFrequencyType = 2
-	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY    TransactionScheduleFrequencyType = 3
-	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY   TransactionScheduleFrequencyType = 4
+	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED     TransactionScheduleFrequencyType = 0
+	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY       TransactionScheduleFrequencyType = 1
+	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY      TransactionScheduleFrequencyType = 2
+	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY        TransactionScheduleFrequencyType = 3
+	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY       TransactionScheduleFrequencyType = 4
+	TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS TransactionScheduleFrequencyType = 5
 )
 
 // TransactionTemplate represents transaction template stored in database

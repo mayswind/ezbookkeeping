@@ -143,6 +143,18 @@ func (a *TransactionTemplatesApi) TemplateCreateHandler(c *core.WebContext) (any
 		} else if *templateCreateReq.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED && *templateCreateReq.ScheduledFrequency == "" {
 			return nil, errs.ErrScheduledTransactionFrequencyInvalid
 		}
+
+		if *templateCreateReq.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS {
+			frequencyValue, err := utils.StringToInt(*templateCreateReq.ScheduledFrequency)
+
+			if err != nil || frequencyValue <= 0 {
+				return nil, errs.ErrScheduledTransactionFrequencyInvalid
+			}
+		}
+
+		if *templateCreateReq.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS && templateCreateReq.ScheduledStartDate == nil {
+			return nil, errs.ErrScheduledTransactionStartDateRequired
+		}
 	}
 
 	if len(templateCreateReq.TagIds) > maximumTagsCountOfTemplate {
@@ -241,6 +253,18 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 			return nil, errs.ErrScheduledTransactionFrequencyInvalid
 		} else if *templateModifyReq.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED && *templateModifyReq.ScheduledFrequency == "" {
 			return nil, errs.ErrScheduledTransactionFrequencyInvalid
+		}
+
+		if *templateModifyReq.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS {
+			frequencyValue, err := utils.StringToInt(*templateModifyReq.ScheduledFrequency)
+
+			if err != nil || frequencyValue <= 0 {
+				return nil, errs.ErrScheduledTransactionFrequencyInvalid
+			}
+		}
+
+		if *templateModifyReq.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS && templateModifyReq.ScheduledStartDate == nil {
+			return nil, errs.ErrScheduledTransactionStartDateRequired
 		}
 	}
 

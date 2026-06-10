@@ -33,6 +33,7 @@ export class ScheduledTemplateFrequencyType implements TypeAndName {
 
     public static readonly Disabled = new ScheduledTemplateFrequencyType(0, 'Disabled');
     public static readonly Daily = new ScheduledTemplateFrequencyType(3, 'Daily');
+    public static readonly EveryNDays = new ScheduledTemplateFrequencyType(5, 'Every N Days');
     public static readonly Weekly = new ScheduledTemplateFrequencyType(1, 'Weekly');
     public static readonly Monthly = new ScheduledTemplateFrequencyType(2, 'Monthly');
     public static readonly Yearly = new ScheduledTemplateFrequencyType(4, 'Yearly');

@@ -791,6 +791,14 @@ const transactionDisplayScheduledFrequency = computed<string>(() => {
 
     if (template.scheduledFrequencyType === ScheduledTemplateFrequencyType.Daily.type) {
         return tt('Daily');
+    } else if (template.scheduledFrequencyType === ScheduledTemplateFrequencyType.EveryNDays.type) {
+        if (scheduledFrequencyValues.length) {
+            return tt('format.misc.everyNDays', {
+                n: scheduledFrequencyValues[0]
+            });
+        } else {
+            return tt('Every N Days');
+        }
     } else if (template.scheduledFrequencyType === ScheduledTemplateFrequencyType.Weekly.type) {
         if (scheduledFrequencyValues.length) {
             return tt('format.misc.everyMultiDaysOfWeek', {

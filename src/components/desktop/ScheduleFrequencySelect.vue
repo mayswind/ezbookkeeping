@@ -31,6 +31,18 @@
                     <v-list v-if="frequencyType === ScheduledTemplateFrequencyType.Daily.type">
                         <v-list-item :title="tt('Daily')"></v-list-item>
                     </v-list>
+                    <v-list select-strategy="single-leaf" v-model:selected="frequencyValue"
+                            v-else-if="frequencyType === ScheduledTemplateFrequencyType.EveryNDays.type">
+                        <v-list-item :key="n.type" :value="n.type" :title="n.displayName"
+                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(n.type) }"
+                                     v-for="n in allAvailableNDays">
+                            <template #prepend="{ isSelected, select }">
+                                <v-list-item-action start>
+                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
+                                </v-list-item-action>
+                            </template>
+                        </v-list-item>
+                    </v-list>
                     <v-list select-strategy="classic" v-model:selected="frequencyValue"
                             v-else-if="frequencyType === ScheduledTemplateFrequencyType.Weekly.type">
                         <v-list-item :key="weekDay.type" :value="weekDay.type" :title="weekDay.displayName"
@@ -103,6 +115,7 @@ const {
     allWeekDays,
     allAvailableMonthDays,
     allAvailableMonthAndDays,
+    allAvailableNDays,
     getFrequencyValues
 } = useScheduleFrequencySelectionBase();
 
@@ -128,6 +141,8 @@ const frequencyType = computed<number>({
                 frequencyValue.value = [1];
             } else if (value === ScheduledTemplateFrequencyType.Yearly.type) {
                 frequencyValue.value = [101];
+            } else if (value === ScheduledTemplateFrequencyType.EveryNDays.type) {
+                frequencyValue.value = [1];
             } else {
                 frequencyValue.value = [];
             }
@@ -147,6 +162,14 @@ const displayFrequency = computed<string>(() => {
         return tt('Disabled');
     } else if (frequencyType.value === ScheduledTemplateFrequencyType.Daily.type) {
         return tt('Daily');
+    } else if (frequencyType.value === ScheduledTemplateFrequencyType.EveryNDays.type) {
+        if (frequencyValue.value.length) {
+            return tt('format.misc.everyNDays', {
+                n: frequencyValue.value[0]
+            });
+        } else {
+            return tt('Every N Days');
+        }
     } else if (frequencyType.value === ScheduledTemplateFrequencyType.Weekly.type) {
         if (frequencyValue.value.length) {
             return tt('format.misc.everyMultiDaysOfWeek', {

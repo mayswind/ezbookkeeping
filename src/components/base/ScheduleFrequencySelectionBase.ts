@@ -23,7 +23,8 @@ export function useScheduleFrequencySelectionBase() {
         getAllWeekDays,
         getAvailableMonthDays,
         getAllTransactionScheduledFrequencyTypes,
-        formatDateTimeToLongMonthDay
+        formatDateTimeToLongMonthDay,
+        formatNumberToLocalizedNumerals
     } = useI18n();
     const userStore = useUserStore();
 
@@ -59,6 +60,19 @@ export function useScheduleFrequencySelectionBase() {
         return ret;
     });
 
+    const allAvailableNDays = computed<TypeAndDisplayName[]>(() => {
+        const ret: TypeAndDisplayName[] = [];
+
+        for (let n = 1; n <= 31; n++) {
+            ret.push({
+                type: n,
+                displayName: formatNumberToLocalizedNumerals(n)
+            });
+        }
+
+        return ret;
+    });
+
     function getFrequencyValues(value: string): number[] {
         const values = value.split(',');
         const ret: number[] = [];
@@ -78,6 +92,7 @@ export function useScheduleFrequencySelectionBase() {
         allWeekDays,
         allAvailableMonthDays,
         allAvailableMonthAndDays,
+        allAvailableNDays,
         // functions
         getFrequencyValues
     };

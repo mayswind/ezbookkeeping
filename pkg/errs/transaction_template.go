@@ -11,4 +11,5 @@ var (
 	ErrScheduledTransactionFrequencyInvalid                  = NewNormalError(NormalSubcategoryTemplate, 4, http.StatusBadRequest, "scheduled transaction frequency is invalid")
 	ErrTransactionTemplateHasTooManyTags                     = NewNormalError(NormalSubcategoryTemplate, 5, http.StatusBadRequest, "transaction template has too many tags")
 	ErrScheduledTransactionTemplateStartDataLaterThanEndDate = NewNormalError(NormalSubcategoryTemplate, 6, http.StatusBadRequest, "scheduled transaction start date is later than end time")
+	ErrScheduledTransactionStartDateRequired                 = NewNormalError(NormalSubcategoryTemplate, 7, http.StatusBadRequest, "scheduled transaction start date is required")
 )

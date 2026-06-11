@@ -1,4 +1,5 @@
 import { keys, keysIfValueEquals, values } from '@/core/base.ts';
+import { NormalizedText } from '@/core/text.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
 import { type AccountBalance, type CategorizedAccount, Account } from '@/models/account.ts';
@@ -74,7 +75,7 @@ export function getAccountMapByName(allAccounts: Account[]): Record<string, Acco
 export function filterCategorizedAccounts(categorizedAccountsMap: Record<number, CategorizedAccount>, customAccountCategoryOrder: string, allowAccountName?: string, showHidden?: boolean): CategorizedAccount[] {
     const ret: CategorizedAccount[] = [];
     const allCategories = AccountCategory.values(customAccountCategoryOrder);
-    const lowercaseFilterContent = allowAccountName ? allowAccountName.toLowerCase() : '';
+    const normalizedFilterContent = allowAccountName ? NormalizedText.normalizeForSearch(allowAccountName) : '';
 
     for (const accountCategory of allCategories) {
         const categorizedAccount = categorizedAccountsMap[accountCategory.type];
@@ -90,7 +91,7 @@ export function filterCategorizedAccounts(categorizedAccountsMap: Record<number,
                 continue;
             }
 
-            const accountMatchesName = !lowercaseFilterContent || account.name.toLowerCase().includes(lowercaseFilterContent);
+            const accountMatchesName = !normalizedFilterContent || NormalizedText.normalizeForSearch(account.name).includes(normalizedFilterContent);
             const filteredSubAccounts: Account[] = [];
 
             if (account.subAccounts) {
@@ -99,7 +100,7 @@ export function filterCategorizedAccounts(categorizedAccountsMap: Record<number,
                         continue;
                     }
 
-                    if (!accountMatchesName && lowercaseFilterContent && !subAccount.name.toLowerCase().includes(lowercaseFilterContent)) {
+                    if (!accountMatchesName && normalizedFilterContent && !NormalizedText.normalizeForSearch(subAccount.name).includes(normalizedFilterContent)) {
                         continue;
                     }
 

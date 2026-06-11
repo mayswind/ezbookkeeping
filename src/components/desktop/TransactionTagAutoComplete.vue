@@ -14,6 +14,7 @@
         :label="showLabel ? tt('Tags') : undefined"
         :placeholder="tt('None')"
         :items="allTagsWithGroupHeader"
+        :custom-filter="filterTag"
         :model-value="modelValue"
         v-model:search="tagSearchContent"
         @update:modelValue="updateModelValue"
@@ -66,10 +67,15 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import { useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { type CommonTransactionTagSelectionProps, useTransactionTagSelectionBase } from '@/components/base/TransactionTagSelectionBase.ts';
+import {
+    type TransactionTagWithGroupHeader,
+    type CommonTransactionTagSelectionProps,
+    useTransactionTagSelectionBase
+} from '@/components/base/TransactionTagSelectionBase.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
+import { NormalizedText } from '@/core/text.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
 
 import type { ComponentDensity, InputVariant } from '@/lib/ui/desktop.ts';
@@ -126,6 +132,24 @@ function saveNewTag(tagName: string): void {
             snackbar.value?.showError(error);
         }
     });
+}
+
+function filterTag(value: string, query: string, item?: { value: unknown, raw: TransactionTagWithGroupHeader }): boolean {
+    if (!item) {
+        return false;
+    }
+
+    if ('type' in item.raw) {
+        return true;
+    }
+
+    const normalizedFilterContent = NormalizedText.normalizeForSearch(query || '');
+
+    if (!normalizedFilterContent) {
+        return true;
+    }
+
+    return NormalizedText.normalizeForSearch(item.raw.name).indexOf(normalizedFilterContent) >= 0;
 }
 
 function updateModelValue(newValue: string[]) {

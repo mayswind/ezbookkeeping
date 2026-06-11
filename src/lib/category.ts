@@ -1,4 +1,5 @@
 import { reversed, keys, values } from '@/core/base.ts';
+import { NormalizedText } from '@/core/text.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
@@ -140,7 +141,7 @@ export function filterTransactionCategories(allTransactionCategories: Record<num
             || allowCategoryTypes[CategoryType.Transfer]);
 
     const allCategoryTypes = [ CategoryType.Income, CategoryType.Expense, CategoryType.Transfer ];
-    const lowercaseFilterContent = allowCategoryName ? allowCategoryName.toLowerCase() : '';
+    const normalizedFilterContent = allowCategoryName ? NormalizedText.normalizeForSearch(allowCategoryName) : '';
 
     for (const categoryType of allCategoryTypes) {
         const allCategories = allTransactionCategories[categoryType];
@@ -160,7 +161,7 @@ export function filterTransactionCategories(allTransactionCategories: Record<num
                 continue;
             }
 
-            const categoryMatchesName = !lowercaseFilterContent || category.name.toLowerCase().includes(lowercaseFilterContent);
+            const categoryMatchesName = !normalizedFilterContent || NormalizedText.normalizeForSearch(category.name).includes(normalizedFilterContent);
             const filteredSubCategories: TransactionCategory[] = [];
 
             if (category.subCategories) {
@@ -169,7 +170,7 @@ export function filterTransactionCategories(allTransactionCategories: Record<num
                         continue;
                     }
 
-                    if (!categoryMatchesName && lowercaseFilterContent && !subCategory.name.toLowerCase().includes(lowercaseFilterContent)) {
+                    if (!categoryMatchesName && normalizedFilterContent && !NormalizedText.normalizeForSearch(subCategory.name).includes(normalizedFilterContent)) {
                         continue;
                     }
 

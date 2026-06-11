@@ -37,6 +37,7 @@
 import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
+import { NormalizedText } from '@/core/text.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 
 import {
@@ -74,13 +75,13 @@ function filterCurrency(value: string, query: string, item?: { value: unknown, r
         return false;
     }
 
-    const lowerCaseFilterContent = query.toLowerCase() || '';
+    const normalizedFilterContent = NormalizedText.normalizeForSearch(query || '');
 
-    if (!lowerCaseFilterContent) {
+    if (!normalizedFilterContent) {
         return true;
     }
 
-    return item.raw.displayName.toLowerCase().indexOf(lowerCaseFilterContent) >= 0
-        || item.raw.currencyCode.toLowerCase().indexOf(lowerCaseFilterContent) >= 0;
+    return NormalizedText.normalizeForSearch(item.raw.displayName).indexOf(normalizedFilterContent) >= 0
+        || NormalizedText.normalizeForSearch(item.raw.currencyCode).indexOf(normalizedFilterContent) >= 0;
 }
 </script>

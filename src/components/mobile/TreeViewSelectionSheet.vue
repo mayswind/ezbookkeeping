@@ -54,6 +54,8 @@ import type { Sheet, Searchbar } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { type TwoLevelItemSelectionBaseProps, useTwoLevelItemSelectionBase } from '@/components/base/TwoLevelItemSelectionBase.ts';
 
+import { NormalizedText } from '@/core/text.ts';
+
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type Framework7Dom, scrollSheetToTop } from '@/lib/ui/mobile.ts';
 
@@ -101,17 +103,17 @@ function isPrimaryItemHasSecondaryValue(primaryItem: Record<string, unknown>): b
         return false;
     }
 
-    const lowerCaseFilterContent = filterContent.value?.toLowerCase() ?? '';
+    const normalizedFilterContent = NormalizedText.normalizeForSearch(filterContent.value ?? '');
 
     for (const secondaryItem of subItems) {
         if (props.secondaryHiddenField && (secondaryItem as Record<string, unknown>)[props.secondaryHiddenField]) {
             continue;
         }
 
-        if (props.primaryTitleField && lowerCaseFilterContent) {
+        if (props.primaryTitleField && normalizedFilterContent) {
             const title = ti((secondaryItem as Record<string, unknown>)[props.primaryTitleField] as string, !!props.primaryTitleI18n);
 
-            if (title.toLowerCase().indexOf(lowerCaseFilterContent) >= 0) {
+            if (NormalizedText.normalizeForSearch(title).indexOf(normalizedFilterContent) >= 0) {
                 return true;
             }
         }

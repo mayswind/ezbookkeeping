@@ -5,6 +5,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import { values } from '@/core/base.ts';
+import { NormalizedText } from '@/core/text.ts';
 import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
 import { TransactionTag } from '@/models/transaction_tag.ts';
@@ -45,7 +46,7 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
         return ret;
     });
 
-    const lowerCaseTagSearchContent = computed<string>(() => tagSearchContent.value.toLowerCase());
+    const normalizedTagSearchContent = computed<string>(() => NormalizedText.normalizeForSearch(tagSearchContent.value));
 
     const allTagsWithGroupHeader = computed<TransactionTagWithGroupHeader[]>(() => getTagsWithGroupHeader(tag => {
         if (!tag.hidden) {
@@ -56,7 +57,7 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
             return true;
         }
 
-        if (lowerCaseTagSearchContent.value && tag.name.toLowerCase().indexOf(lowerCaseTagSearchContent.value) >= 0 && isAllFilteredTagHidden.value) {
+        if (normalizedTagSearchContent.value && NormalizedText.normalizeForSearch(tag.name).indexOf(normalizedTagSearchContent.value) >= 0 && isAllFilteredTagHidden.value) {
             return true;
         }
 
@@ -64,8 +65,8 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
     }));
 
     const filteredTagsWithGroupHeader = computed<TransactionTagWithGroupHeader[]>(() => getTagsWithGroupHeader(tag => {
-        if (lowerCaseTagSearchContent.value) {
-            if (tag.name.toLowerCase().indexOf(lowerCaseTagSearchContent.value) >= 0 && (!tag.hidden || isAllFilteredTagHidden.value)) {
+        if (normalizedTagSearchContent.value) {
+            if (NormalizedText.normalizeForSearch(tag.name).indexOf(normalizedTagSearchContent.value) >= 0 && (!tag.hidden || isAllFilteredTagHidden.value)) {
                 return true;
             } else {
                 return false;
@@ -76,11 +77,11 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
     }));
 
     const isAllFilteredTagHidden = computed<boolean>(() => {
-        const lowerCaseTagSearchContent = tagSearchContent.value.toLowerCase();
+        const lowerCaseTagSearchContent = NormalizedText.normalizeForSearch(tagSearchContent.value);
         let hiddenCount = 0;
 
         for (const tag of values(transactionTagsStore.allTransactionTagsMap)) {
-            if (!lowerCaseTagSearchContent || tag.name.toLowerCase().indexOf(lowerCaseTagSearchContent) >= 0) {
+            if (!lowerCaseTagSearchContent || NormalizedText.normalizeForSearch(tag.name).indexOf(lowerCaseTagSearchContent) >= 0) {
                 if (!tag.hidden) {
                     return false;
                 }

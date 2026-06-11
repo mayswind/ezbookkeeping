@@ -1,4 +1,5 @@
 import { type PartialRecord, itemAndIndex, keysIfValueEquals } from '@/core/base.ts';
+import { NormalizedText } from '@/core/text.ts';
 import { type DateTime } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountType } from '@/core/account.ts';
@@ -883,6 +884,7 @@ export class TransactionExplorerConditionWithRelation {
 
 export interface InsightsExplorerMatchContext {
     getTransactionDateTime(): DateTime;
+    getNormalizedDescription(): NormalizedText;
 }
 
 export interface TransactionExplorerCondition<T = TransactionExplorerConditionFieldType, V = string | string[] | number[]> {
@@ -1833,8 +1835,8 @@ export abstract class AbstractTransactionExplorerDescriptionCondition<T = Descri
     public readonly operator: DescriptionConditionOperator = TransactionExplorerConditionOperatorType.Contains;
     public value: string;
     protected abstract readonly caseInsensitive: boolean;
+    private cachedNormalizedValue: NormalizedText | undefined = undefined;
     private cachedRegex: RegExp | undefined = undefined;
-    private cachedRegexPattern: string | undefined = undefined;
 
     constructor(operator: DescriptionConditionOperator, value: string) {
         this.operator = operator;
@@ -1849,30 +1851,29 @@ export abstract class AbstractTransactionExplorerDescriptionCondition<T = Descri
         return this.value;
     }
 
-    public match(transaction: TransactionInsightDataItem): boolean {
-        const description = transaction.comment ? (this.caseInsensitive ? transaction.comment.toLowerCase() : transaction.comment) : '';
-        const keyword = this.caseInsensitive ? this.value.toLowerCase() : this.value;
+    public match(transaction: TransactionInsightDataItem, context: InsightsExplorerMatchContext): boolean {
+        const description = transaction.comment ? (this.caseInsensitive ? context.getNormalizedDescription().normalizedText : transaction.comment) : '';
 
         if (this.operator === TransactionExplorerConditionOperatorType.IsEmpty) {
             return description.length === 0;
         } else if (this.operator === TransactionExplorerConditionOperatorType.IsNotEmpty) {
             return description.length > 0;
         } else if (this.operator === TransactionExplorerConditionOperatorType.Equals) {
-            return description === keyword;
+            return description === this.getCachedNormalizedValue();
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotEquals) {
-            return description !== keyword;
+            return description !== this.getCachedNormalizedValue();
         } else if (this.operator === TransactionExplorerConditionOperatorType.Contains) {
-            return description.includes(keyword);
+            return description.includes(this.getCachedNormalizedValue());
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotContains) {
-            return !description.includes(keyword);
+            return !description.includes(this.getCachedNormalizedValue());
         } else if (this.operator === TransactionExplorerConditionOperatorType.StartsWith) {
-            return description.startsWith(keyword);
+            return description.startsWith(this.getCachedNormalizedValue());
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotStartsWith) {
-            return !description.startsWith(keyword);
+            return !description.startsWith(this.getCachedNormalizedValue());
         } else if (this.operator === TransactionExplorerConditionOperatorType.EndsWith) {
-            return description.endsWith(keyword);
+            return description.endsWith(this.getCachedNormalizedValue());
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotEndsWith) {
-            return !description.endsWith(keyword);
+            return !description.endsWith(this.getCachedNormalizedValue());
         } else if (this.operator === TransactionExplorerConditionOperatorType.RegexMatch) {
             return this.getCachedRegex()?.test(description) ?? false;
         } else if (this.operator === TransactionExplorerConditionOperatorType.NotRegexMatch) {
@@ -1924,26 +1925,38 @@ export abstract class AbstractTransactionExplorerDescriptionCondition<T = Descri
         return '';
     }
 
+    private getCachedNormalizedValue(): string {
+        if (!this.caseInsensitive) {
+            return this.value;
+        }
+
+        if (this.cachedNormalizedValue && this.cachedNormalizedValue.originalText === this.value) {
+            return this.cachedNormalizedValue.normalizedText;
+        }
+
+        const normalizedValue = NormalizedText.of(this.value);
+        this.cachedNormalizedValue = normalizedValue;
+        return normalizedValue.normalizedText;
+    }
+
     private getCachedRegex(): RegExp | undefined {
         if (this.operator !== TransactionExplorerConditionOperatorType.RegexMatch && this.operator !== TransactionExplorerConditionOperatorType.NotRegexMatch) {
             return undefined;
         }
 
-        if (this.cachedRegexPattern !== this.value) {
+        if (!this.cachedNormalizedValue || this.cachedNormalizedValue.originalText !== this.value) {
             try {
                 let regex: RegExp;
 
                 if (this.caseInsensitive) {
-                    regex = new RegExp(this.value, 'i');
+                    regex = new RegExp(this.getCachedNormalizedValue(), 'i');
                 } else {
-                    regex = new RegExp(this.value);
+                    regex = new RegExp(this.getCachedNormalizedValue());
                 }
 
                 this.cachedRegex = regex;
-                this.cachedRegexPattern = this.value;
             } catch {
                 this.cachedRegex = undefined;
-                this.cachedRegexPattern = undefined;
             }
         }
 

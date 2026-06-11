@@ -7,6 +7,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
 import { entries, keys, values } from '@/core/base.ts';
+import { NormalizedText } from '@/core/text.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
 import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
@@ -54,7 +55,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
     const tagFilterStateMap = ref<Record<string, TransactionTagFilterState>>({});
     const groupTagFilterTypesMap = ref<Record<string, TransactionGroupTagFilterTypes>>(getEmptyGroupTagFilterTypesMap(transactionTagsStore.allTransactionTagsByGroupMap));
 
-    const lowerCaseFilterContent = computed<string>(() => filterContent.value.toLowerCase());
+    const normalizedFilterContent = computed<string>(() => NormalizedText.normalizeForSearch(filterContent.value));
 
     const title = computed<string>(() => {
         return 'Filter Transaction Tags';
@@ -118,7 +119,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
                     continue;
                 }
 
-                if (lowerCaseFilterContent.value && !tag.name.toLowerCase().includes(lowerCaseFilterContent.value)) {
+                if (normalizedFilterContent.value && !NormalizedText.normalizeForSearch(tag.name).includes(normalizedFilterContent.value)) {
                     continue;
                 }
 

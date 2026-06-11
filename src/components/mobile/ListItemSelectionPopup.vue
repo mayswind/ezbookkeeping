@@ -56,6 +56,8 @@ import type { Searchbar } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { NormalizedText } from '@/core/text.ts';
+
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
@@ -96,11 +98,11 @@ const showSearchbar = ref<boolean>(false);
 const filteredItems = computed<unknown[]>(() => {
     const finalItems: unknown[] = [];
     const items = props.items;
-    const lowerCaseFilterContent = filterContent.value?.toLowerCase() ?? '';
+    const normalizedFilterContent = NormalizedText.normalizeForSearch(filterContent.value ?? '');
 
     for (const item of items) {
         if (props.valueType === 'index') {
-            if (!props.enableFilter || !lowerCaseFilterContent || String(item).toLowerCase().indexOf(lowerCaseFilterContent) >= 0) {
+            if (!props.enableFilter || !normalizedFilterContent || NormalizedText.normalizeForSearch(String(item)).indexOf(normalizedFilterContent) >= 0) {
                 finalItems.push(item);
                 continue;
             }
@@ -111,21 +113,21 @@ const filteredItems = computed<unknown[]>(() => {
                 continue;
             }
 
-            if (!props.enableFilter || !lowerCaseFilterContent) {
+            if (!props.enableFilter || !normalizedFilterContent) {
                 finalItems.push(item);
                 continue;
             }
 
             const title = ti(itemRecord[props.titleField] as string, !!props.titleI18n);
 
-            if (title.toLowerCase().indexOf(lowerCaseFilterContent) >= 0) {
+            if (NormalizedText.normalizeForSearch(title).indexOf(normalizedFilterContent) >= 0) {
                 finalItems.push(item);
                 continue;
             }
 
             const afterText = getItemAfterText(item);
 
-            if (afterText.toLowerCase().indexOf(lowerCaseFilterContent) >= 0) {
+            if (NormalizedText.normalizeForSearch(afterText).indexOf(normalizedFilterContent) >= 0) {
                 finalItems.push(item);
                 continue;
             }

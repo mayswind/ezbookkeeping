@@ -1816,7 +1816,7 @@
     "All Queries": "Усі запити",
     "Axis / Category": "Вісь / категорія",
     "Series": "Серія",
-    "Description (Case Insensitive)": "Description (Case Insensitive)",
+    "Description (Ignore Case)": "Description (Ignore Case)",
     "Transaction Date": "Дата транзакції",
     "Transaction Year-Month": "Рік-місяць транзакції",
     "Transaction Year-Quarter": "Рік-квартал транзакції",

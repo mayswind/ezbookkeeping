@@ -1816,7 +1816,7 @@
     "All Queries": "所有查询",
     "Axis / Category": "轴 / 分类",
     "Series": "系列",
-    "Description (Case Insensitive)": "描述（忽略大小写）",
+    "Description (Ignore Case)": "描述（忽略大小写）",
     "Transaction Date": "交易日期",
     "Transaction Year-Month": "交易年月",
     "Transaction Year-Quarter": "交易年季度",

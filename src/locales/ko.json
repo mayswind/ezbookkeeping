@@ -1816,7 +1816,7 @@
     "All Queries": "모든 쿼리",
     "Axis / Category": "축 / 범주",
     "Series": "시리즈",
-    "Description (Case Insensitive)": "Description (Case Insensitive)",
+    "Description (Ignore Case)": "Description (Ignore Case)",
     "Transaction Date": "거래 날짜",
     "Transaction Year-Month": "거래 연-월",
     "Transaction Year-Quarter": "거래 연-분기",

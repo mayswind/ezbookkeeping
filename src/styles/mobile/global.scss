@@ -336,24 +336,24 @@ html[dir="rtl"] i.icon.icon-with-direction {
 }
 
 /** Replacing the default style of @vuepic/vue-datepicker **/
-.dp__theme_light {
+.dp--theme-light {
     --dp-primary-color: #c67e48;
     --dp-background-color: inherit;
     --dp-border-color: #aaa;
     --dp-menu-border-color: #aaa;
 
-    .dp__overlay {
+    .dp--overlay {
         --dp-background-color: #e1e1e2;
     }
 }
 
-.dp__theme_dark {
+.dp--theme-dark {
     --dp-primary-color: #c67e48;
     --dp-background-color: inherit;
     --dp-border-color: #555;
     --dp-menu-border-color: #555;
 
-    .dp__overlay {
+    .dp--overlay {
         --dp-background-color: #1f1f1f;
     }
 }
@@ -830,32 +830,38 @@ html[dir="rtl"] .combination-list-wrapper .list.combination-list-header .combina
 }
 
 /** Fix @vuepic/vue-datepicker style issue **/
-.dp__main.dp__flex_display {
+.dp--main.dp--flex-display {
     flex-direction: column;
 }
 
-.dp__main .dp--tp-wrap {
+.dp--main .dp--tp-wrap {
     max-width: 100%;
 }
 
-.dp__main .dp__menu_inner {
+.dp--main .dp--menu-inner {
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.dp__main .dp__menu_inner .dp--header-wrap > .dp__month_year_wrap > button {
+.dp--main .dp--menu-inner .dp--header-wrap > .dp--month-year-wrap > button {
     width: unset;
 }
 
-.dp__main .dp__calendar .dp__calendar_item {
+.dp--main .dp--calendar .dp--calendar-item {
     flex: 1;
 }
 
-.dp__main .dp__calendar .dp__calendar_item > .dp__cell_inner {
+.dp--main .dp--calendar .dp--calendar-item > .dp--cell-inner {
     width: 100%;
 }
 
-html[dir="rtl"] .dp__main .dp__btn.dp--arrow-btn-nav {
+.dp--btn {
+    border: none;
+    background: none;
+    font: inherit;
+}
+
+html[dir="rtl"] .dp--main .dp--btn.dp--arrow-btn-nav {
     transform: scaleX(-1);
 }
 

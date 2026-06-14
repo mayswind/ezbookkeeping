@@ -459,7 +459,7 @@ watch(mode, (newValue) => {
 </script>
 
 <style>
-.date-time-selection-sheet .dp__menu {
+.date-time-selection-sheet .dp--menu {
     border: 0;
 }
 

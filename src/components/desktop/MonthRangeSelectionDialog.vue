@@ -111,12 +111,7 @@ watch(() => props.maxTime, (newValue) => {
 </script>
 
 <style>
-.month-range-selection-dialog .dp__preset_ranges {
-    white-space: nowrap !important;
-}
-
-.month-range-selection-dialog .dp__overlay {
+.month-range-selection-dialog .dp--main .dp--instance-calendar .dp--overlay.dp--overlay-relative {
     width: 100% !important;
-    height: 100% !important;
 }
 </style>

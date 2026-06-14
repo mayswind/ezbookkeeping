@@ -1941,34 +1941,34 @@ init(props);
     font-weight: bold;
 }
 
-.transaction-calendar-container .dp__main .dp__menu {
+.transaction-calendar-container .dp--main .dp--menu {
     --dp-border-radius: 6px;
     --dp-menu-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
 }
 
-.transaction-calendar-container .dp__main .dp__calendar {
+.transaction-calendar-container .dp--main .dp--calendar {
     --dp-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
 }
 
-.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row {
+.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row {
     --dp-cell-size: 80px;
     --dp-primary-color: rgba(var(--v-theme-primary), var(--v-activated-opacity));
     --dp-primary-text-color: rgb(var(--v-theme-primary));
 }
 
-.transaction-calendar-container .dp__main.transaction-calendar-with-alternate-date .dp__calendar .dp__calendar_row {
+.transaction-calendar-container .dp--main.transaction-calendar-with-alternate-date .dp--calendar .dp--calendar-row {
     --dp-cell-size: 100px;
 }
 
-.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item {
+.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item {
     overflow: hidden;
 }
 
-.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date {
+.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date {
     font-size: 0.9rem;
 }
 
-.transaction-calendar-container .dp__main .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
+.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
     font-size: 0.95rem;
 }
 

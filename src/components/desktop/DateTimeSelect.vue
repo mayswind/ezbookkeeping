@@ -382,7 +382,7 @@ function onKeyDown(type: string, e: KeyboardEvent): void {
     max-height: inherit !important;
 }
 
-.date-time-select-menu .dp__menu {
+.date-time-select-menu .dp--menu {
     border: 0;
 }
 

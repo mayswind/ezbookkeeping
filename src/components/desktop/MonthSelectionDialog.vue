@@ -91,12 +91,7 @@ watch(() => props.show, (newValue) => {
 </script>
 
 <style>
-.month-selection-dialog .dp__preset_ranges {
-    white-space: nowrap !important;
-}
-
-.month-selection-dialog .dp__overlay {
+.month-selection-dialog .dp--main .dp--instance-calendar .dp--overlay.dp--overlay-relative {
     width: 100% !important;
-    height: 100% !important;
 }
 </style>

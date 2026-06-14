@@ -121,15 +121,15 @@ function getDisplayDay(date: Date): string {
 
 .transaction-calendar-alternate-date {
     margin-top: -3px;
-    opacity: 0.5;
+    opacity: 0.6;
 }
 
-.dp__cell_disabled .transaction-calendar-alternate-date {
+.dp--cell-disabled .transaction-calendar-alternate-date {
     opacity: 0.8;
 }
 
-.dp__main.transaction-calendar .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date,
-.dp__main.transaction-calendar .dp__calendar .dp__calendar_row > .dp__calendar_item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
+.dp--main.transaction-calendar .dp--calendar .dp--calendar-row > .dp--calendar-item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date,
+.dp--main.transaction-calendar .dp--calendar .dp--calendar-row > .dp--calendar-item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
     display: block;
     width: 100%;
     overflow: hidden;

@@ -95,7 +95,7 @@ function onSheetClosed(): void {
 </script>
 
 <style>
-.fiscal-year-start-selection-sheet .dp__menu {
+.fiscal-year-start-selection-sheet .dp--menu {
     border: 0;
 }
 </style>

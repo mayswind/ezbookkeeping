@@ -38,7 +38,7 @@
             </div>
         </template>
         <template #am-pm-button="{ toggle, value }">
-            <button class="dp__pm_am_button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
+            <button class="dp--pm-am-button" tabindex="0" @click="toggle">{{ tt(`datetime.${value}.content`) }}</button>
         </template>
     </vue-date-picker>
 </template>
@@ -174,12 +174,12 @@ defineExpose({
     font-size: 0.8rem;
 }
 
-.dp__cell_disabled .datetime-picker-alternate-date,
-.dp__cell_offset .datetime-picker-alternate-date {
+.dp--cell-disabled .datetime-picker-alternate-date,
+.dp--cell-offset .datetime-picker-alternate-date {
     opacity: 0.8;
 }
 
-.dp__main.datetime-picker .dp__calendar .dp__calendar_row > .dp__calendar_item .datetime-picker-display-dates > span.datetime-picker-alternate-date {
+.dp--main.datetime-picker .dp--calendar .dp--calendar-row > .dp--calendar-item .datetime-picker-display-dates > span.datetime-picker-alternate-date {
     display: block;
     width: 100%;
     overflow: hidden;
@@ -187,7 +187,7 @@ defineExpose({
     white-space: nowrap;
 }
 
-.dp__main.datetime-picker.datetime-picker-with-alternate-date .dp__calendar .dp__calendar_row {
+.dp--main.datetime-picker.datetime-picker-with-alternate-date .dp--calendar .dp--calendar-row {
     --dp-cell-size: 45px;
 }
 </style>

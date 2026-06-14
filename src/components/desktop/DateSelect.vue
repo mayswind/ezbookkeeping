@@ -82,7 +82,7 @@ const displayTime = computed<string>({
     max-height: inherit !important;
 }
 
-.date-select-menu .dp__menu {
+.date-select-menu .dp--menu {
     border: 0;
 }
 </style>

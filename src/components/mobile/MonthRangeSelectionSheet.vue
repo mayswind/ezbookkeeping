@@ -100,15 +100,15 @@ function onSheetClosed(): void {
 </script>
 
 <style>
-.month-range-selection-sheet .dp__main .dp__instance_calendar .dp__overlay.dp--overlay-relative {
+.month-range-selection-sheet .dp--main .dp--instance-calendar .dp--overlay.dp--overlay-relative {
     width: 100% !important;
 }
 
-.month-range-selection-sheet .dp__main .dp__instance_calendar .dp__overlay.dp--overlay-relative .dp__selection_grid_header .dp--year-mode-picker .dp--arrow-btn-nav {
+.month-range-selection-sheet .dp--main .dp--instance-calendar .dp--overlay.dp--overlay-relative .dp--selection-grid-header .dp--year-mode-picker .dp--arrow-btn-nav {
     display: flex;
 }
 
-.month-range-selection-sheet .dp__main .dp__instance_calendar .dp__overlay.dp--overlay-relative .dp__selection_grid_header .dp--year-mode-picker .dp--year-select+.dp--arrow-btn-nav {
+.month-range-selection-sheet .dp--main .dp--instance-calendar .dp--overlay.dp--overlay-relative .dp--selection-grid-header .dp--year-mode-picker .dp--year-select+.dp--arrow-btn-nav {
     justify-content: end;
 }
 </style>

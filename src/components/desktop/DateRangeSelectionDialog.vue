@@ -16,13 +16,17 @@
                 </div>
             </template>
             <v-card-text class="w-100 d-flex justify-center">
-                <date-time-picker :is-dark-mode="isDarkMode"
-                                  :enable-time-picker="true"
-                                  :vertical="true"
-                                  :preset-dates="presetRanges"
-                                  :show-alternate-dates="true"
-                                  v-model="dateRange">
-                </date-time-picker>
+                <v-row class="match-height">
+                    <v-col>
+                        <date-time-picker :is-dark-mode="isDarkMode"
+                                          :enable-time-picker="true"
+                                          :vertical="true"
+                                          :preset-dates="presetRanges"
+                                          :show-alternate-dates="true"
+                                          v-model="dateRange">
+                        </date-time-picker>
+                    </v-col>
+                </v-row>
             </v-card-text>
             <v-card-text>
                 <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
@@ -106,7 +110,7 @@ watch(() => props.maxTime, (newValue) => {
 </script>
 
 <style>
-.date-range-selection-dialog .dp__preset_ranges {
+.date-range-selection-dialog .dp--main .dp--instance-calendar .dp--preset-ranges {
     white-space: nowrap !important;
 }
 </style>

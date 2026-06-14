@@ -76,7 +76,7 @@ function onSheetClosed(): void {
 </script>
 
 <style>
-.date-selection-sheet .dp__menu {
+.date-selection-sheet .dp--menu {
     border: 0;
 }
 </style>

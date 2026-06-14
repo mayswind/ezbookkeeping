@@ -1,7 +1,8 @@
 <template>
     <vue-date-picker inline auto-apply
                      month-picker
-                     :class="monthPickerClass"
+                     :class="finalMonthPickerClass"
+                     :config="{'modeHeight': 255}"
                      :input-attrs="{ clearable: !!clearable }"
                      :dark="isDarkMode"
                      :year-range="yearRange"
@@ -62,6 +63,16 @@ const yearRange = getAllowedYearRange();
 
 const isYearFirst = computed<boolean>(() => isLongDateMonthAfterYear());
 
+const finalMonthPickerClass = computed<string>(() => {
+    let classes = 'month-picker';
+
+    if (props.monthPickerClass) {
+        classes += ` ${props.monthPickerClass}`;
+    }
+
+    return classes;
+});
+
 const dateTime = computed<MonthSelectionValue | MonthSelectionValue[]>({
     get: () => {
         if (isArray(props.modelValue)) {
@@ -107,3 +118,9 @@ function getDisplayMonth(month: number): string {
     }
 }
 </script>
+
+<style>
+.dp--main.month-picker .dp--instance-calendar .dp--overlay.dp--overlay-relative .dp--overlay-container {
+    height: 220px; /* total height is 255px, and the height of header if 35px */
+}
+</style>

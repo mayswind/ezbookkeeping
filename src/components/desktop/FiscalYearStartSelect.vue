@@ -71,7 +71,7 @@ watch(selectedFiscalYearStart, (newValue) => {
     max-height: inherit !important;
 }
 
-.fiscal-year-start-select-menu .dp__menu {
+.fiscal-year-start-select-menu .dp--menu {
     border: 0;
 }
 </style>

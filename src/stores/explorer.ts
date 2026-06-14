@@ -614,14 +614,14 @@ export const useExplorersStore = defineStore('explorers', () => {
                 categoryName: transaction.primaryCategory.name,
                 categoryId: transaction.primaryCategory.id,
                 categoryIdType: TransactionExplorerDimensionType.Category,
-                categoryDisplayOrders: [transaction.primaryCategory.displayOrder]
+                categoryDisplayOrders: [transaction.primaryCategory.type, transaction.primaryCategory.displayOrder]
             };
         } else if (dimension === TransactionExplorerDataDimension.SecondaryCategory) {
             return {
                 categoryName: transaction.secondaryCategory.name,
                 categoryId: transaction.categoryId,
                 categoryIdType: TransactionExplorerDimensionType.Category,
-                categoryDisplayOrders: [transaction.primaryCategory.displayOrder, transaction.secondaryCategory.displayOrder]
+                categoryDisplayOrders: [transaction.primaryCategory.type, transaction.primaryCategory.displayOrder, transaction.secondaryCategory.displayOrder]
             };
         } else if (dimension === TransactionExplorerDataDimension.SourceAmount || dimension === TransactionExplorerDataDimension.DestinationAmount) {
             if (dimension === TransactionExplorerDataDimension.DestinationAmount && transaction.type !== TransactionType.Transfer) {

@@ -7,6 +7,8 @@ import ja from './ja.json';
 import kn from './kn.json';
 import ko from './ko.json';
 import nl from './nl.json';
+import ptBR from './pt_BR.json';
+import ro from './ro.json';
 import ru from './ru.json';
 import sl from './sl.json';
 import ta from './ta.json';
@@ -16,8 +18,6 @@ import uk from './uk.json';
 import vi from './vi.json';
 import zhHans from './zh_Hans.json';
 import zhHant from './zh_Hant.json';
-import ptBR from './pt_BR.json';
-import ro from './ro.json';
 
 export interface LanguageInfo {
     readonly name: string;
@@ -109,11 +109,11 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         content: ptBR
     },
     'ro': {
-    name: 'Romanian',
-    displayName: 'Română',
-    alternativeLanguageTag: 'ro-RO',
-    textDirection: 'ltr',
-    content: ro
+        name: 'Romanian',
+        displayName: 'Română',
+        alternativeLanguageTag: 'ro-RO',
+        textDirection: 'ltr',
+        content: ro
     },
     'ru': {
         name: 'Russian',

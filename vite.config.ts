@@ -225,6 +225,10 @@ export default defineConfig(() => {
                                 test: /[\\/]node_modules[\\/](moment|moment-timezone)[\\/]/i
                             },
                             {
+                                name:  'echarts',
+                                test: /[\\/]node_modules[\\/](echarts|zrender|tslib|resize-detector)[\\/]/i
+                            },
+                            {
                                 name:  'vendor-mobile',
                                 test: /[\\/]node_modules[\\/](dom7|framework7.*|skeleton-elements|swiper)[\\/]/i
                             },
@@ -233,7 +237,7 @@ export default defineConfig(() => {
                                 test: id => {
                                     if (/[\\/]node_modules[\\/](vuetify|vue-router|vue3-perfect-scrollbar|perfect-scrollbar|vuedraggable|sortablejs|@mdi.*)[\\/]/i.test(id)) {
                                         return true;
-                                    } else if (/[\\/]node_modules[\\/](echarts|zrender|tslib|resize-detector|vue-echarts)[\\/]/i.test(id)) {
+                                    } else if (/[\\/]node_modules[\\/]vue-echarts[\\/]/i.test(id)) {
                                         return true;
                                     } else if (/plugin-vuetify:/i.test(id)) {
                                         return true;
@@ -251,7 +255,7 @@ export default defineConfig(() => {
                                 test: id => {
                                     if (/[\\/]src[\\/](core|consts|models|stores)[\\/]/i.test(id)) {
                                         return true;
-                                    } else if (/[\\/]src[\\/]lib[\\/](map[\\/]|ui[\\/]common|[a-zA-Z0-9-_]+\.(js|ts))/i.test(id)) {
+                                    } else if (/[\\/]src[\\/]lib[\\/](map[\\/]|ui[\\/]common|calendar[\\/]|[a-zA-Z0-9-_]+\.(js|ts))/i.test(id)) {
                                         return true;
                                     } else if (/[\\/]src[\\/]components[\\/](base|common)[\\/]/i.test(id)) {
                                         return true;

@@ -17,6 +17,7 @@ import vi from './vi.json';
 import zhHans from './zh_Hans.json';
 import zhHant from './zh_Hant.json';
 import ptBR from './pt_BR.json';
+import ro from './ro.json';
 
 export interface LanguageInfo {
     readonly name: string;
@@ -106,6 +107,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'pt-BR',
         textDirection: 'ltr',
         content: ptBR
+    },
+    'ro': {
+    name: 'Romanian',
+    displayName: 'Română',
+    alternativeLanguageTag: 'ro-RO',
+    textDirection: 'ltr',
+    content: ro
     },
     'ru': {
         name: 'Russian',

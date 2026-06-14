@@ -144,6 +144,8 @@ func startWebServer(c *core.CliContext) error {
 	}
 
 	router.StaticFile("/mobile", filepath.Join(config.StaticRootPath, "mobile.html"))
+	router.Match([]string{http.MethodHead, http.MethodGet}, "/mobile#/*fragment", bindLocalFile(filepath.Join(config.StaticRootPath, "mobile.html")))  // add compatibility for browsers that send the full URL with the fragment to the server
+	router.Match([]string{http.MethodHead, http.MethodGet}, "/mobile#!/*fragment", bindLocalFile(filepath.Join(config.StaticRootPath, "mobile.html"))) // add compatibility for browsers that send the full URL with the fragment to the server
 	router.Static("/mobile/js", filepath.Join(config.StaticRootPath, "js"))
 	router.Static("/mobile/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/mobile/img", filepath.Join(config.StaticRootPath, "img"))
@@ -160,6 +162,7 @@ func startWebServer(c *core.CliContext) error {
 	}
 
 	router.StaticFile("/desktop", filepath.Join(config.StaticRootPath, "desktop.html"))
+	router.Match([]string{http.MethodHead, http.MethodGet}, "/desktop#/*fragment", bindLocalFile(filepath.Join(config.StaticRootPath, "desktop.html"))) // add compatibility for browsers that send the full URL with the fragment to the server
 	router.Static("/desktop/js", filepath.Join(config.StaticRootPath, "js"))
 	router.Static("/desktop/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/desktop/img", filepath.Join(config.StaticRootPath, "img"))
@@ -505,6 +508,12 @@ func startWebServer(c *core.CliContext) error {
 func bindMiddleware(fn core.MiddlewareHandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fn(core.WrapWebContext(c))
+	}
+}
+
+func bindLocalFile(filePath string) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		ginCtx.File(filePath)
 	}
 }
 

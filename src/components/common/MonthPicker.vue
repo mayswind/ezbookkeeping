@@ -120,7 +120,15 @@ function getDisplayMonth(month: number): string {
 </script>
 
 <style>
+.dp--main.month-picker .dp--instance-calendar .dp--menu--inner-stretched {
+    padding: 0;
+}
+
 .dp--main.month-picker .dp--instance-calendar .dp--overlay.dp--overlay-relative .dp--overlay-container {
     height: 220px; /* total height is 255px, and the height of header if 35px */
+}
+
+.dp--main.month-picker .dp--instance-calendar .dp--overlay.dp--overlay-relative {
+    background-color: transparent;
 }
 </style>

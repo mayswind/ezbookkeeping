@@ -37,17 +37,20 @@ const tokenCookieParam = "ebk_auth_token"
 // WebContext represents the request and response context
 type WebContext struct {
 	*gin.Context
+	trustedProxies []*net.IPNet
 	// DO NOT ADD ANY FIELD IN THIS CONTEXT, THIS CONTEXT IS JUST A WRAPPER
 }
 
 func (c *WebContext) ClientPort() uint16 {
-	remotePort := c.GetHeader(RemoteClientPortHeader)
+	if c.isTrustedProxy() {
+		remotePort := c.GetHeader(RemoteClientPortHeader)
 
-	if remotePort != "" {
-		remotePortNum, err := strconv.ParseInt(remotePort, 10, 32)
+		if remotePort != "" {
+			remotePortNum, err := strconv.ParseInt(remotePort, 10, 32)
 
-		if err == nil {
-			return uint16(remotePortNum)
+			if err == nil {
+				return uint16(remotePortNum)
+			}
 		}
 	}
 
@@ -223,7 +226,7 @@ func (c *WebContext) GetResponseError() *errs.Error {
 	return err.(*errs.Error)
 }
 
-// GetClientTimezoneOffset returns the client timezone offset
+// getClientTimezoneOffset returns the client timezone offset
 func (c *WebContext) getClientTimezoneOffset() (int16, error) {
 	value := c.GetHeader(ClientTimezoneOffsetHeaderName)
 	offset, err := strconv.Atoi(value)
@@ -235,16 +238,38 @@ func (c *WebContext) getClientTimezoneOffset() (int16, error) {
 	return int16(offset), nil
 }
 
-// GetClientTimezoneName returns the client timezone name
+// getClientTimezoneName returns the client timezone name
 func (c *WebContext) getClientTimezoneName() string {
 	value := c.GetHeader(ClientTimezoneNameHeaderName)
 
 	return value
 }
 
+// isTrustedProxy returns whether the given ip is from a trusted proxy
+func (c *WebContext) isTrustedProxy() bool {
+	if c.trustedProxies == nil {
+		return false
+	}
+
+	ip := net.ParseIP(c.RemoteIP())
+
+	if ip == nil {
+		return false
+	}
+
+	for _, cidr := range c.trustedProxies {
+		if cidr.Contains(ip) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // WrapWebContext returns a context wrapped by this file
-func WrapWebContext(ginCtx *gin.Context) *WebContext {
+func WrapWebContext(ginCtx *gin.Context, trustedCIDRs []*net.IPNet) *WebContext {
 	return &WebContext{
-		Context: ginCtx,
+		Context:        ginCtx,
+		trustedProxies: trustedCIDRs,
 	}
 }

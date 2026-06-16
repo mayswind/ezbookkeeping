@@ -25,13 +25,13 @@ var (
 	}
 )
 
-// ExternalAuthListHanlder returns external authentications list of current user
-func (a *UserExternalAuthsApi) ExternalAuthListHanlder(c *core.WebContext) (any, *errs.Error) {
+// ExternalAuthListHandler returns external authentications list of current user
+func (a *UserExternalAuthsApi) ExternalAuthListHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
 	userExternalAuths, err := a.userExternalAuths.GetUserAllExternalAuthsByUid(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[user_external_auths.ExternalAuthListHanlder] failed to get all external authentications for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[user_external_auths.ExternalAuthListHandler] failed to get all external authentications for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

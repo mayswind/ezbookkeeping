@@ -63,7 +63,7 @@ export function useScheduleFrequencySelectionBase() {
     const allAvailableNDays = computed<TypeAndDisplayName[]>(() => {
         const ret: TypeAndDisplayName[] = [];
 
-        for (let n = 1; n <= 31; n++) {
+        for (let n = 1; n <= 180; n++) {
             ret.push({
                 type: n,
                 displayName: formatNumberToLocalizedNumerals(n)

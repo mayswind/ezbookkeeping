@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }" v-if="mode !== TransactionEditPageMode.View || transaction.type !== TransactionType.ModifyBalance">
                 <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': inputIsEmpty || submitting }" @click="save(AfterSaveAction.GoBack)" v-if="mode !== TransactionEditPageMode.View"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': inputIsEmpty || submitting || recognizing }" @click="save(AfterSaveAction.GoBack)" v-if="mode !== TransactionEditPageMode.View"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -448,6 +448,9 @@
         </f7-actions>
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
+            <f7-actions-group v-if="mode !== TransactionEditPageMode.View && pageTypeAndMode?.type === TransactionEditPageType.Transaction && isTransactionFromAITextRecognitionEnabled()">
+                <f7-actions-button @click="recognizeFromClipboard">{{ tt('AI Clipboard Text Recognition') }}</f7-actions-button>
+            </f7-actions-group>
             <f7-actions-group v-if="mode !== TransactionEditPageMode.View && transaction.type === TransactionType.Transfer">
                 <f7-actions-button @click="swapTransactionData(true, false)">{{ tt('Swap Account') }}</f7-actions-button>
                 <f7-actions-button @click="swapTransactionData(false, true)">{{ tt('Swap Amount') }}</f7-actions-button>
@@ -474,14 +477,14 @@
         </f7-actions>
 
         <template #fixed v-if="quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomLeftFloating.type || quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomCenterFloating.type || quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomRightFloating.type">
-            <f7-fab id="quick-save-button" :class="{ 'disabled': inputIsEmpty || submitting }" :position="quickSaveButtonFloatingPosition"
+            <f7-fab id="quick-save-button" :class="{ 'disabled': inputIsEmpty || submitting || recognizing }" :position="quickSaveButtonFloatingPosition"
                     :text="tt(quickSaveButtonTitle)"
                     @click="quickSave" v-if="mode !== TransactionEditPageMode.View">
             </f7-fab>
         </template>
 
         <f7-toolbar id="quick-save-button" tabbar bottom v-if="quickSaveButtonStyleType === TransactionQuickSaveButtonStyle.BottomFixed.type && mode !== TransactionEditPageMode.View">
-            <f7-link :class="{ 'disabled': inputIsEmpty || submitting }" @click="quickSave">
+            <f7-link :class="{ 'disabled': inputIsEmpty || submitting || recognizing }" @click="quickSave">
                 <span class="tabbar-primary-link">{{ tt(quickSaveButtonTitle) }}</span>
             </f7-link>
         </f7-toolbar>
@@ -501,6 +504,7 @@
             </f7-list>
         </f7-popover>
 
+        <a-i-text-recognition-sheet v-model:show="showAITextRecognitionSheet" @text:confirm="recognizeText" />
         <f7-photo-browser ref="pictureBrowser" type="popup" navbar-of-text="/"
                           :navbar-show-count="true" :exposition="false"
                           :photos="transactionPictures" :thumbs="transactionThumbs" />
@@ -557,7 +561,11 @@ import { formatCoordinate } from '@/lib/coordinate.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { getTransactionPrimaryCategoryName, getTransactionSecondaryCategoryName } from '@/lib/category.ts';
 import { type SetTransactionOptions } from '@/lib/transaction.ts';
-import { getMapProvider, isTransactionPicturesEnabled } from '@/lib/server_settings.ts';
+import {
+    isTransactionFromAITextRecognitionEnabled,
+    isTransactionPicturesEnabled,
+    getMapProvider
+} from '@/lib/server_settings.ts';
 import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -590,6 +598,7 @@ const {
     duplicateFromId,
     clientSessionId,
     loading,
+    recognizing,
     submitting,
     submitted,
     uploadingPicture,
@@ -627,6 +636,7 @@ const {
     inputEmptyProblemMessage,
     inputIsEmpty,
     setTransactionModel,
+    updateTransactionModelFromRecognizedResponse,
     updateTransactionModelByAfterSaveAction,
     updateTransactionTime,
     updateTransactionTimezone,
@@ -634,6 +644,8 @@ const {
     getDisplayAmount,
     getTransactionPictureUrl
 } = useTransactionEditPageBase(pageTypeAndMode?.type || TransactionEditPageType.Transaction, pageTypeAndMode?.mode, query['type'] ? parseInt(query['type']) : undefined);
+
+const isSupportClipboard = !!navigator.clipboard;
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
@@ -645,8 +657,6 @@ const transactionTemplatesStore = useTransactionTemplatesStore();
 
 const pictureBrowser = useTemplateRef<PhotoBrowser.PhotoBrowser>('pictureBrowser');
 const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
-
-const isSupportClipboard = !!navigator.clipboard;
 
 const loadingError = ref<unknown | null>(null);
 const removingPictureId = ref<string | null>(null);
@@ -670,6 +680,7 @@ const showTransactionTagSheet = ref<boolean>(false);
 const showTransactionPictures = ref<boolean>(pageTypeAndMode?.type === TransactionEditPageType.Transaction
     && (pageTypeAndMode?.mode === TransactionEditPageMode.Add || pageTypeAndMode?.mode === TransactionEditPageMode.Edit)
     && settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage);
+const showAITextRecognitionSheet = ref<boolean>(false);
 
 const quickSaveButtonStyleType = computed<number>(() => settingsStore.appSettings.quickSaveButtonStyleInMobileTransactionListPage);
 const quickSaveButtonFloatingPosition = computed<string>(() => {
@@ -1191,6 +1202,53 @@ function quickSave(): void {
     }
 
     save(AfterSaveAction.GoBack);
+}
+
+function recognizeText(text: string): void {
+    if (recognizing.value || loading.value || submitting.value) {
+        return;
+    }
+
+    if (!text || !text.trim()) {
+        return;
+    }
+
+    recognizing.value = true;
+    showLoading(() => recognizing.value);
+
+    transactionsStore.recognizeTransactionText({ text }).then(response => {
+        updateTransactionModelFromRecognizedResponse(response);
+        hideLoading();
+        recognizing.value = false;
+    }).catch(error => {
+        hideLoading();
+        recognizing.value = false;
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function recognizeFromClipboard(): void {
+    if (recognizing.value || loading.value || submitting.value) {
+        return;
+    }
+
+    if (isSupportClipboard && !isiOS()) {
+        navigator.clipboard.readText().then(text => {
+            if (text && text.trim()) {
+                recognizeText(text.trim());
+            } else {
+                showAITextRecognitionSheet.value = true;
+            }
+        }).catch(error => {
+            logger.error('failed to read clipboard', error);
+            showAITextRecognitionSheet.value = true;
+        });
+    } else {
+        showAITextRecognitionSheet.value = true;
+    }
 }
 
 function pasteAmount(type: 'sourceAmount' | 'destinationAmount'): void {

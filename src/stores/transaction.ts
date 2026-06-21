@@ -37,7 +37,7 @@ import {
     type ExportTransactionDataRequest
 } from '@/models/data_management.ts';
 import type {
-    RecognizedReceiptImageResponse
+    RecognizedTransactionResponse
 } from '@/models/large_language_model.ts';
 
 import {
@@ -1429,7 +1429,32 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function recognizeReceiptImage({ imageFile, cancelableUuid }: { imageFile: File, cancelableUuid?: string }): Promise<RecognizedReceiptImageResponse> {
+    function recognizeTransactionText({ text }: { text: string }): Promise<RecognizedTransactionResponse> {
+        return new Promise((resolve, reject) => {
+            services.recognizeTransactionText({ text }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to recognize text' });
+                    return;
+                }
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to recognize text', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to recognize text' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function recognizeReceiptImage({ imageFile, cancelableUuid }: { imageFile: File, cancelableUuid?: string }): Promise<RecognizedTransactionResponse> {
         return new Promise((resolve, reject) => {
             services.recognizeReceiptImage({ imageFile, cancelableUuid }).then(response => {
                 const data = response.data;
@@ -1682,6 +1707,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         moveAllTransactionsBetweenAccounts,
         deleteTransaction,
         batchDeleteTransactions,
+        recognizeTransactionText,
         recognizeReceiptImage,
         cancelRecognizeReceiptImage,
         parseImportCustomFile,

@@ -81,6 +81,7 @@ import MapSheet from '@/components/mobile/MapSheet.vue';
 import TransactionTagSelectionSheet from '@/components/mobile/TransactionTagSelectionSheet.vue';
 import ScheduleFrequencySheet from '@/components/mobile/ScheduleFrequencySheet.vue';
 import AccountBalanceTrendsBarChart from '@/components/mobile/AccountBalanceTrendsBarChart.vue';
+import AITextRecognitionSheet from '@/components/mobile/AITextRecognitionSheet.vue';
 import AIImageRecognitionSheet from '@/components/mobile/AIImageRecognitionSheet.vue';
 
 import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.ts';
@@ -177,6 +178,7 @@ app.component('MapSheet', MapSheet);
 app.component('TransactionTagSelectionSheet', TransactionTagSelectionSheet);
 app.component('ScheduleFrequencySheet', ScheduleFrequencySheet);
 app.component('AccountBalanceTrendsBarChart', AccountBalanceTrendsBarChart);
+app.component('AITextRecognitionSheet', AITextRecognitionSheet);
 app.component('AIImageRecognitionSheet', AIImageRecognitionSheet);
 
 app.directive('TextareaAutoSize', TextareaAutoSize);

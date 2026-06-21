@@ -55,8 +55,12 @@ export function isMCPServerEnabled(): boolean {
     return getServerSetting('mcp') === 1;
 }
 
+export function isTransactionFromAITextRecognitionEnabled(): boolean {
+    return getServerSetting('llmtr') === 1;
+}
+
 export function isTransactionFromAIImageRecognitionEnabled(): boolean {
-    return getServerSetting('llmt') === 1;
+    return getServerSetting('llmir') === 1;
 }
 
 export function getLoginPageTips(): Record<string, string>{

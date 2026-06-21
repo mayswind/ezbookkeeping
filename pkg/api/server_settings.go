@@ -12,8 +12,12 @@ import (
 
 const ezbookkeepingServerSettingsGlobalVariableName = "EZBOOKKEEPING_SERVER_SETTINGS"
 const ezbookkeepingServerSettingsGlobalVariableFullName = "window." + ezbookkeepingServerSettingsGlobalVariableName
-const ezbookkeepingServerSettingsJavascriptFileHeader = ezbookkeepingServerSettingsGlobalVariableFullName +
-	"=" + ezbookkeepingServerSettingsGlobalVariableFullName + "||{};\n"
+const ezbookkeepingServerSettingsGlobalVariableAlias = "_"
+const ezbookkeepingServerSettingsJavascriptFileHeader = "(function () {\n" +
+	ezbookkeepingServerSettingsGlobalVariableFullName +
+	"=" + ezbookkeepingServerSettingsGlobalVariableFullName + "||{};\n" +
+	"const " + ezbookkeepingServerSettingsGlobalVariableAlias + "=" + ezbookkeepingServerSettingsGlobalVariableFullName + ";\n"
+const ezbookkeepingServerSettingsJavascriptFileFooter = "})();\n"
 
 // ServerSettingsApi represents server settings api
 type ServerSettingsApi struct {
@@ -56,9 +60,15 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 		a.appendBooleanSetting(builder, "mcp", config.EnableMCPServer)
 	}
 
+	if config.TextRecognitionLLMConfig != nil && config.TextRecognitionLLMConfig.LLMProvider != "" {
+		if config.TransactionFromAITextRecognition {
+			a.appendBooleanSetting(builder, "llmtr", config.TransactionFromAITextRecognition)
+		}
+	}
+
 	if config.ReceiptImageRecognitionLLMConfig != nil && config.ReceiptImageRecognitionLLMConfig.LLMProvider != "" {
 		if config.TransactionFromAIImageRecognition {
-			a.appendBooleanSetting(builder, "llmt", config.TransactionFromAIImageRecognition)
+			a.appendBooleanSetting(builder, "llmir", config.TransactionFromAIImageRecognition)
 		}
 	}
 
@@ -133,11 +143,13 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 		a.appendIntegerSetting(builder, "errt", int(config.ExchangeRatesRequestTimeout))
 	}
 
+	builder.WriteString(ezbookkeepingServerSettingsJavascriptFileFooter)
+
 	return []byte(builder.String()), "", nil
 }
 
 func (a *ServerSettingsApi) appendStringSetting(builder *strings.Builder, key string, value string) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableAlias)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]=")
@@ -148,7 +160,7 @@ func (a *ServerSettingsApi) appendStringSetting(builder *strings.Builder, key st
 }
 
 func (a *ServerSettingsApi) appendMultiLanguageTipSetting(builder *strings.Builder, key string, value settings.MultiLanguageContentConfig) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableAlias)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]={\n")
@@ -168,7 +180,7 @@ func (a *ServerSettingsApi) appendMultiLanguageTipSetting(builder *strings.Build
 }
 
 func (a *ServerSettingsApi) appendBooleanSetting(builder *strings.Builder, key string, value bool) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableAlias)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]=")
@@ -183,7 +195,7 @@ func (a *ServerSettingsApi) appendBooleanSetting(builder *strings.Builder, key s
 }
 
 func (a *ServerSettingsApi) appendIntegerSetting(builder *strings.Builder, key string, value int) {
-	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableFullName)
+	builder.WriteString(ezbookkeepingServerSettingsGlobalVariableAlias)
 	builder.WriteString("[")
 	a.appendEncodedString(builder, key)
 	builder.WriteString("]=")

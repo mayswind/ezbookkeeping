@@ -1,4 +1,4 @@
-export interface RecognizedReceiptImageResponse {
+export interface RecognizedTransactionResponse {
     readonly type: number;
     readonly time?: number;
     readonly categoryId?: string;

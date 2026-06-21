@@ -25,6 +25,7 @@ import type { TransactionTag } from '@/models/transaction_tag.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
+import type { RecognizedTransactionResponse } from '@/models/large_language_model.ts';
 
 import {
     isArray,
@@ -99,6 +100,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
 
     const clientSessionId = ref<string>('');
     const loading = ref<boolean>(true);
+    const recognizing = ref<boolean>(false);
     const submitting = ref<boolean>(false);
     const submitted = ref<boolean>(false);
     const uploadingPicture = ref<boolean>(false);
@@ -418,6 +420,22 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         );
     }
 
+    function updateTransactionModelFromRecognizedResponse(response: RecognizedTransactionResponse): void {
+        const options: SetTransactionOptions = {
+            type: response.type,
+            time: response.time,
+            categoryId: response.categoryId,
+            accountId: response.sourceAccountId,
+            destinationAccountId: response.destinationAccountId,
+            amount: response.sourceAmount,
+            destinationAmount: response.destinationAmount,
+            tagIds: response.tagIds ? response.tagIds.join(',') : undefined,
+            comment: response.comment
+        };
+
+        setTransactionModel(null, options, true);
+    }
+
     function updateTransactionModelByAfterSaveAction(afterSaveAction: AfterSaveAction, initOptions?: SetTransactionOptions): void {
         if (afterSaveAction === AfterSaveAction.StayWithNewTransaction) {
             transaction.value = createNewTransactionModel(transactionDefaultType);
@@ -521,6 +539,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         duplicateFromId,
         clientSessionId,
         loading,
+        recognizing,
         submitting,
         submitted,
         uploadingPicture,
@@ -569,6 +588,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         // functions
         createNewTransactionModel,
         setTransactionModel,
+        updateTransactionModelFromRecognizedResponse,
         updateTransactionModelByAfterSaveAction,
         updateTransactionTime,
         updateTransactionTimezone,

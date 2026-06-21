@@ -8,5 +8,7 @@ var (
 	ErrNoAIRecognitionImage                 = NewNormalError(NormalSubcategoryLargeLanguageModel, 1, http.StatusBadRequest, "no image for AI recognition")
 	ErrAIRecognitionImageIsEmpty            = NewNormalError(NormalSubcategoryLargeLanguageModel, 2, http.StatusBadRequest, "image for AI recognition is empty")
 	ErrExceedMaxAIRecognitionImageFileSize  = NewNormalError(NormalSubcategoryLargeLanguageModel, 3, http.StatusBadRequest, "exceed the maximum size of image file for AI recognition")
-	ErrNoTransactionInformationInImage      = NewNormalError(NormalSubcategoryLargeLanguageModel, 4, http.StatusBadRequest, "no transaction information detected")
+	ErrNoTransactionInformation             = NewNormalError(NormalSubcategoryLargeLanguageModel, 4, http.StatusBadRequest, "no transaction information detected")
+	ErrNoAIRecognitionText                  = NewNormalError(NormalSubcategoryLargeLanguageModel, 5, http.StatusBadRequest, "no text for AI recognition")
+	ErrAIRecognitionTextIsEmpty             = NewNormalError(NormalSubcategoryLargeLanguageModel, 6, http.StatusBadRequest, "text for AI recognition is empty")
 )

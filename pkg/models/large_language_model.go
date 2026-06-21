@@ -1,7 +1,12 @@
 package models
 
-// RecognizedReceiptImageResponse represents a view-object of recognized receipt image response
-type RecognizedReceiptImageResponse struct {
+// TransactionTextRecognitionRequest represents the request of recognizing transaction from text
+type TransactionTextRecognitionRequest struct {
+	Text string `json:"text"`
+}
+
+// RecognizedTransactionResponse represents a view-object of recognized transaction response
+type RecognizedTransactionResponse struct {
 	Type                 TransactionType `json:"type"`
 	Time                 int64           `json:"time,omitempty"`
 	CategoryId           int64           `json:"categoryId,string,omitempty"`
@@ -13,8 +18,8 @@ type RecognizedReceiptImageResponse struct {
 	Comment              string          `json:"comment,omitempty"`
 }
 
-// RecognizedReceiptImageResult represents the result of recognized receipt image
-type RecognizedReceiptImageResult struct {
+// RecognizedTransactionResult represents the result of recognized transaction
+type RecognizedTransactionResult struct {
 	Type                   string   `json:"type,omitempty" jsonschema:"enum=income,enum=expense,enum=transfer" jsonschema_description:"Transaction type (income, expense, transfer)"`
 	Time                   string   `json:"time" jsonschema:"format=date-time" jsonschema_description:"Transaction time in long date time format (YYYY-MM-DD HH:mm:ss, e.g. 2023-01-01 12:00:00)"`
 	Amount                 string   `json:"amount,omitempty" jsonschema_description:"Transaction amount"`

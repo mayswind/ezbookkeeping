@@ -313,14 +313,14 @@ func FormatTimezoneOffset(unixTime int64, timezone *time.Location) string {
 	tzMinutesOffset := GetTimezoneOffsetMinutes(unixTime, timezone)
 
 	sign := "+"
+
+	if tzMinutesOffset < 0 {
+		sign = "-"
+		tzMinutesOffset = -tzMinutesOffset
+	}
+
 	hourAbsOffset := tzMinutesOffset / 60
 	minuteAbsOffset := tzMinutesOffset % 60
-
-	if hourAbsOffset < 0 {
-		sign = "-"
-		hourAbsOffset = -hourAbsOffset
-		minuteAbsOffset = -minuteAbsOffset
-	}
 
 	return fmt.Sprintf("%s%02d:%02d", sign, hourAbsOffset, minuteAbsOffset)
 }
@@ -336,14 +336,14 @@ func FormatTimezoneOffsetFromHoursOffset(hoursOffset string) (string, error) {
 	tzMinutesOffset := int16(hoursOffsetValue * 60)
 
 	sign := "+"
+
+	if tzMinutesOffset < 0 {
+		sign = "-"
+		tzMinutesOffset = -tzMinutesOffset
+	}
+
 	hourAbsOffset := tzMinutesOffset / 60
 	minuteAbsOffset := tzMinutesOffset % 60
-
-	if hourAbsOffset < 0 {
-		sign = "-"
-		hourAbsOffset = -hourAbsOffset
-		minuteAbsOffset = -minuteAbsOffset
-	}
 
 	return fmt.Sprintf("%s%02d:%02d", sign, hourAbsOffset, minuteAbsOffset), nil
 }

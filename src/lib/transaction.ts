@@ -48,7 +48,9 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         transaction.utcOffset = getTimezoneOffsetMinutes(transaction.time, transaction.timeZone);
     }
 
-    if (!options.type && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
+    if (options.type === TransactionType.Income || options.type === TransactionType.Expense || options.type === TransactionType.Transfer) {
+        transaction.type = options.type;
+    } else if (!options.type && options.categoryId && options.categoryId !== '0' && allCategoriesMap[options.categoryId]) {
         const category = allCategoriesMap[options.categoryId] as TransactionCategory;
         const type = categoryTypeToTransactionType(category.type);
 

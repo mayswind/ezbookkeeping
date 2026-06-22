@@ -2367,6 +2367,7 @@
     "Automatically Add Geolocation": "ಭೌಗೋಳಿಕ ಸ್ಥಾನವನ್ನು ಸ್ವಯಂ ಸೇರಿಸಿ",
     "Always Show Transaction Pictures": "ವಹಿವಾಟು ಚಿತ್ರಗಳನ್ನು ಯಾವಾಗಲೂ ತೋರಿಸಿ",
     "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
+    "Always Require Confirmation of Clipboard Content Before Submission": "Always Require Confirmation of Clipboard Content Before Submission",
     "Auto Upload AI Recognition Image as Transaction Picture": "Auto Upload AI Recognition Image as Transaction Picture",
     "Import Transaction Dialog": "Import Transaction Dialog",
     "Remember Last Selected File Type": "Remember Last Selected File Type",

@@ -2367,6 +2367,7 @@
     "Automatically Add Geolocation": "Samodejno dodaj geolokacijo",
     "Always Show Transaction Pictures": "Vedno prikaži slike transakcij",
     "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
+    "Always Require Confirmation of Clipboard Content Before Submission": "Always Require Confirmation of Clipboard Content Before Submission",
     "Auto Upload AI Recognition Image as Transaction Picture": "Auto Upload AI Recognition Image as Transaction Picture",
     "Import Transaction Dialog": "Pogovorno okno za uvoz transakcij",
     "Remember Last Selected File Type": "Zapomni si zadnjo izbrano vrsto datoteke",

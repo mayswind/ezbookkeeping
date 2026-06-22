@@ -497,7 +497,7 @@
             <v-card-text>
                 <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn color="primary" :disabled="!pastedText || !pastedText.trim() || recognizing" @click="showPasteTextDialog = false; recognizeText(pastedText);">
-                        {{ tt('Confirm') }}
+                        {{ tt('Recognize') }}
                     </v-btn>
                     <v-btn color="secondary" variant="tonal" :disabled="recognizing" @click="showPasteTextDialog = false; pastedText = '';">{{ tt('Cancel') }}</v-btn>
                 </div>
@@ -997,16 +997,18 @@ function recognizeFromClipboard(): void {
         return;
     }
 
+    pastedText.value = '';
+
     navigator.clipboard.readText().then(text => {
-        if (text && text.trim()) {
-            recognizeText(text.trim());
+        pastedText.value = text && text.trim() ? text.trim() : '';
+
+        if (pastedText.value && !settingsStore.appSettings.alwaysRequireConfirmationOfClipboardContentBeforeSubmission) {
+            recognizeText(pastedText.value);
         } else {
-            pastedText.value = '';
             showPasteTextDialog.value = true;
         }
     }).catch(error => {
         logger.error('failed to read clipboard', error);
-        pastedText.value = '';
         showPasteTextDialog.value = true;
     });
 }

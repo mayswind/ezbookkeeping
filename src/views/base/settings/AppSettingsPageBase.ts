@@ -143,6 +143,11 @@ export function useAppSettingPageBase() {
         set: (value: number) => settingsStore.setTransactionPictureQuality(value)
     });
 
+    const isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission = computed<boolean>({
+        get: () => settingsStore.appSettings.alwaysRequireConfirmationOfClipboardContentBeforeSubmission,
+        set: (value: boolean) => settingsStore.setAlwaysRequireConfirmationOfClipboardContentBeforeSubmission(value)
+    });
+
     const isAutoUploadTransactionPictureForAIRecognition = computed<boolean>({
         get: () => settingsStore.appSettings.autoUploadTransactionPictureForAIRecognition,
         set: (value: boolean) => settingsStore.setAutoUploadTransactionPictureForAIRecognition(value)
@@ -274,6 +279,7 @@ export function useAppSettingPageBase() {
         hasAnyTransactionCategory,
         isAutoUpdateExchangeRatesData,
         transactionPictureQuality,
+        isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission,
         isAutoUploadTransactionPictureForAIRecognition,
         showAccountBalance,
         showAmountInHomePage,

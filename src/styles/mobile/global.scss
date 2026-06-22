@@ -829,6 +829,35 @@ html[dir="rtl"] .combination-list-wrapper .list.combination-list-header .combina
     padding-inline-end: var(--f7-safe-area-right) !important;
 }
 
+/** paste context menu **/
+.paste-context-menu-popover.popover {
+    width: auto;
+
+    .paste-context-menu-list.list {
+        :first-child li:first-child a {
+            &.active-state {
+                border-radius: unset;
+            }
+
+            > .item-content {
+                min-height: var(--ebk-popover-context-menu-min-height);
+
+                > .item-inner {
+                    min-height: var(--ebk-popover-context-menu-min-height);
+                    padding-top: var(--ebk-popover-context-menu-vertical-padding);
+                    padding-bottom: var(--ebk-popover-context-menu-vertical-padding);
+                    padding-left: var(--ebk-popover-context-menu-left-padding);
+                    padding-right: var(--ebk-popover-context-menu-right-padding);
+
+                    > .item-title {
+                        font-size: var(--ebk-popover-context-menu-button-font-size);
+                    }
+                }
+            }
+        }
+    }
+}
+
 /** Fix @vuepic/vue-datepicker style issue **/
 .dp--main.dp--flex-display {
     flex-direction: column;

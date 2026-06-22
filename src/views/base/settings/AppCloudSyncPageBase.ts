@@ -62,6 +62,12 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         ]
     },
     {
+        categoryName: 'AI Clipboard Text Recognition',
+        items: [
+            { settingKey: 'alwaysRequireConfirmationOfClipboardContentBeforeSubmission', settingName: 'Always Require Confirmation of Clipboard Content Before Submission', mobile: true, desktop: true }
+        ]
+    },
+    {
         categoryName: 'AI Image Recognition',
         items: [
             { settingKey: 'autoUploadTransactionPictureForAIRecognition', settingName: 'Auto Upload AI Recognition Image as Transaction Picture', mobile: true, desktop: true }

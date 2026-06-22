@@ -2367,6 +2367,7 @@
     "Automatically Add Geolocation": "Otomatik Olarak Konum Ekle",
     "Always Show Transaction Pictures": "İşlem Resimlerini Her Zaman Göster",
     "Transaction Picture Upload Quality": "İşlem Görseli Yükleme Kalitesi",
+    "Always Require Confirmation of Clipboard Content Before Submission": "Always Require Confirmation of Clipboard Content Before Submission",
     "Auto Upload AI Recognition Image as Transaction Picture": "Yapay Zeka Tanıma Görselini İşlem Görseli Olarak Otomatik Yükle",
     "Import Transaction Dialog": "İşlem İçe Aktarma Penceresi",
     "Remember Last Selected File Type": "Son Seçilen Dosya Türünü Hatırla",

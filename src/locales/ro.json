@@ -2367,6 +2367,7 @@
     "Automatically Add Geolocation": "Adaugă geolocația în mod automat",
     "Always Show Transaction Pictures": "Arată întotdeauna imaginile tranzacțiilor",
     "Transaction Picture Upload Quality": "Calitate încărcare imagine tranzacție",
+    "Always Require Confirmation of Clipboard Content Before Submission": "Always Require Confirmation of Clipboard Content Before Submission",
     "Auto Upload AI Recognition Image as Transaction Picture": "Încarcă automat imaginea recunoscută prin IA ca imagine a tranzacției",
     "Import Transaction Dialog": "Fereastră de import tranzacții",
     "Remember Last Selected File Type": "Ține minte ultimul tip de fișier selectat",

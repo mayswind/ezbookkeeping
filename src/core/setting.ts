@@ -60,6 +60,8 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     autoGetCurrentGeoLocation: boolean;
     alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
     transactionPictureQuality: number;
+    // AI Clipboard Text Recognition
+    alwaysRequireConfirmationOfClipboardContentBeforeSubmission: boolean;
     // AI Image Recognition
     autoUploadTransactionPictureForAIRecognition: boolean;
     // Import Transaction Dialog
@@ -143,6 +145,8 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'autoGetCurrentGeoLocation': UserApplicationCloudSettingType.Boolean,
     'alwaysShowTransactionPicturesInMobileTransactionEditPage': UserApplicationCloudSettingType.Boolean,
     'transactionPictureQuality': UserApplicationCloudSettingType.Number,
+    // AI Clipboard Text Recognition
+    'alwaysRequireConfirmationOfClipboardContentBeforeSubmission': UserApplicationCloudSettingType.Boolean,
     // AI Image Recognition
     'autoUploadTransactionPictureForAIRecognition': UserApplicationCloudSettingType.Boolean,
     // Import Transaction Dialog
@@ -208,6 +212,8 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     autoGetCurrentGeoLocation: false,
     alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
     transactionPictureQuality: ImageUploadQualityType.Default.type,
+    // AI Clipboard Text Recognition
+    alwaysRequireConfirmationOfClipboardContentBeforeSubmission: true,
     // AI Image Recognition
     autoUploadTransactionPictureForAIRecognition: false,
     // Import Transaction Dialog

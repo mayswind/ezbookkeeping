@@ -270,6 +270,13 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('transactionPictureQuality', value);
     }
 
+    // AI Clipboard Text Recognition
+    function setAlwaysRequireConfirmationOfClipboardContentBeforeSubmission(value: boolean): void {
+        updateApplicationSettingsValue('alwaysRequireConfirmationOfClipboardContentBeforeSubmission', value);
+        appSettings.value.alwaysRequireConfirmationOfClipboardContentBeforeSubmission = value;
+        updateUserApplicationCloudSettingValue('alwaysRequireConfirmationOfClipboardContentBeforeSubmission', value);
+    }
+
     // AI Image Recognition
     function setAutoUploadTransactionPictureForAIRecognition(value: boolean): void {
         updateApplicationSettingsValue('autoUploadTransactionPictureForAIRecognition', value);
@@ -574,6 +581,8 @@ export const useSettingsStore = defineStore('settings', () => {
         setAutoGetCurrentGeoLocation,
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
         setTransactionPictureQuality,
+        // -- AI Clipboard Text Recognition
+        setAlwaysRequireConfirmationOfClipboardContentBeforeSubmission,
         // -- AI Image Recognition
         setAutoUploadTransactionPictureForAIRecognition,
         // -- Import Transaction Dialog

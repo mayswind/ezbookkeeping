@@ -7,33 +7,51 @@
                 <f7-link icon-f7="xmark" :class="{ 'disabled': recognizing }"
                          @click="cancel"></f7-link>
             </div>
+            <div id="clipboard-text-recognition-sheet-toolbar-space"
+                 class="clipboard-text-recognition-sheet-toolbar-space" @click="onToolbarClick()"></div>
             <div class="right">
                 <f7-button round fill icon-f7="checkmark_alt"
                            :class="{ 'disabled': !pastedText }"
                            @click="confirm"></f7-button>
             </div>
         </f7-toolbar>
-        <f7-page-content class="no-margin-vertical no-padding-vertical">
-            <div class="text-recognition-container display-flex justify-content-center align-items-center text-align-center padding-horizontal" @click="pasteFromClipboard">
-                <div class="display-inline-flex flex-direction-column">
-                    <textarea ref="pastedTextArea" class="text-align-center" :placeholder="tt('Click here to paste a transaction description')" v-model="pastedText"
-                              @input="onPastedTextInput" @change="onPastedTextChanged"></textarea>
-                    <small class="margin-top-half">{{ tt('Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</small>
+        <f7-page-content class="margin-top">
+            <div class="padding-horizontal padding-bottom">
+                <f7-list strong inset class="no-margin margin-vertical">
+                    <f7-list-input
+                        type="textarea"
+                        class="clipboard-text"
+                        :placeholder="tt('Click here to paste a transaction description')"
+                        v-model:value="pastedText"
+                    ></f7-list-input>
+                </f7-list>
+                <div class="margin-top-half display-flex justify-content-center align-items-center text-align-center">
+                    <small>{{ tt('Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</small>
                 </div>
             </div>
         </f7-page-content>
+
+        <f7-popover class="paste-context-menu-popover" target-el="#clipboard-text-recognition-sheet-toolbar-space"
+                    v-model:opened="showPastePopover">
+            <f7-list class="paste-context-menu-list">
+                <f7-list-item link="#" no-chevron popover-close
+                              :title="tt('Paste')" @click="pasteFromClipboard"></f7-list-item>
+            </f7-list>
+        </f7-popover>
     </f7-sheet>
 </template>
 
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { isiOS } from '@/lib/ui/mobile.ts';
 
 import logger from '@/lib/logger.ts';
 
-defineProps<{
+const props = defineProps<{
     show: boolean;
+    initialText?: string;
 }>();
 
 const emit = defineEmits<{
@@ -43,24 +61,32 @@ const emit = defineEmits<{
 
 const { tt } = useI18n();
 
-const pastedTextArea = useTemplateRef<HTMLTextAreaElement>('pastedTextArea');
+const isSupportClipboard = !!navigator.clipboard;
 
 const pastedText = ref<string>('');
 const recognizing = ref<boolean>(false);
-
-function autosizeTextareaHeight(textarea: HTMLTextAreaElement, resetScroll: boolean): void {
-    if (resetScroll) {
-        textarea.scrollTop = 0;
-    }
-
-    textarea.style.height = '';
-    textarea.style.height = Math.min(textarea.scrollHeight, 400) + 'px';
-}
+const pastingAmount = ref<boolean>(false);
+const showPastePopover = ref<boolean>(false);
 
 function pasteFromClipboard(): void {
+    if (pastingAmount.value) {
+        pastingAmount.value = false;
+        return;
+    }
+
+    pastingAmount.value = true;
+
     navigator.clipboard.readText().then((text) => {
+        pastingAmount.value = false;
+
+        if (!text.trim()) {
+            return;
+        }
+
         pastedText.value = text;
     }).catch(error => {
+        // Do not set pastingAmount to false here
+        // In iOS, system will show the paste context menu, if user click outside, the paste action should not be triggered again
         logger.error('failed to read clipboard', error);
     });
 }
@@ -86,41 +112,38 @@ function close(): void {
 }
 
 function onSheetOpen(): void {
-    pastedText.value = '';
+    pastedText.value = props.initialText || '';
     recognizing.value = false;
-    autosizeTextareaHeight(pastedTextArea.value as HTMLTextAreaElement, true);
 }
 
 function onSheetClosed(): void {
     close();
 }
 
-function onPastedTextInput(event: Event): void {
-    autosizeTextareaHeight(event.target as HTMLTextAreaElement, false);
-}
+function onToolbarClick(): void {
+    if (!isSupportClipboard) {
+        return;
+    }
 
-function onPastedTextChanged(event: Event): void {
-    autosizeTextareaHeight(event.target as HTMLTextAreaElement, false);
+    if (isiOS()) {
+        pasteFromClipboard();
+    } else {
+        showPastePopover.value = true;
+    }
 }
 </script>
 
 <style>
-.text-recognition-container {
-    --ebk-ai-text-recognition-height: 310px;
-    height: var(--ebk-ai-text-recognition-height);
-    border: 1px solid var(--f7-page-master-border-color);
-    font-size: var(--f7-input-font-size);
+.clipboard-text-recognition-sheet-toolbar-space {
+    width: 100%;
+    height: 100%;
+}
+
+.clipboard-text {
+    height: 200px;
 
     @media (min-height: 630px) {
-        --ebk-ai-text-recognition-height: 525px;
-    }
-
-    textarea::placeholder {
-        color: var(--f7-text-color);
-    }
-
-    textarea:focus::placeholder {
-        opacity: 0.5;
+        height: 370px;
     }
 }
 </style>

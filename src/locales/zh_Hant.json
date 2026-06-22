@@ -2367,6 +2367,7 @@
     "Automatically Add Geolocation": "自動新增地理位置",
     "Always Show Transaction Pictures": "總是顯示交易圖片",
     "Transaction Picture Upload Quality": "交易圖片上傳質量",
+    "Always Require Confirmation of Clipboard Content Before Submission": "提交前總是要求確認剪貼簿內容",
     "Auto Upload AI Recognition Image as Transaction Picture": "AI識圖後自動上傳圖片作為交易圖片",
     "Import Transaction Dialog": "匯入交易對話框",
     "Remember Last Selected File Type": "記住上次選擇的檔案類型",

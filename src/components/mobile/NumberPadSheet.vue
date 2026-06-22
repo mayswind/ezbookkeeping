@@ -10,9 +10,9 @@
                 <span id="numpad-value" class="numpad-value" :class="currentDisplayNumClass">{{ currentDisplay }}</span>
             </div>
 
-            <f7-popover class="numpad-paste-popover" target-el="#numpad-value"
+            <f7-popover class="paste-context-menu-popover" target-el="#numpad-value"
                         v-model:opened="showPastePopover">
-                <f7-list class="numpad-paste-popover-context-menu-list">
+                <f7-list class="paste-context-menu">
                     <f7-list-item link="#" no-chevron popover-close
                                   :title="tt('Paste')" @click="paste"></f7-list-item>
                 </f7-list>
@@ -551,33 +551,5 @@ watch(() => props.flipNegative, (newValue) => {
 
 .numpad-button-text-confirm {
     font-size: var(--ebk-numpad-confirm-button-font-size);
-}
-
-.numpad-paste-popover.popover {
-    width: auto;
-
-    .numpad-paste-popover-context-menu-list.list {
-        :first-child li:first-child a {
-            &.active-state {
-                border-radius: unset;
-            }
-
-            > .item-content {
-                min-height: var(--ebk-popover-context-menu-min-height);
-
-                > .item-inner {
-                    min-height: var(--ebk-popover-context-menu-min-height);
-                    padding-top: var(--ebk-popover-context-menu-vertical-padding);
-                    padding-bottom: var(--ebk-popover-context-menu-vertical-padding);
-                    padding-left: var(--ebk-popover-context-menu-left-padding);
-                    padding-right: var(--ebk-popover-context-menu-right-padding);
-
-                    > .item-title {
-                        font-size: var(--ebk-popover-context-menu-button-font-size);
-                    }
-                }
-            }
-        }
-    }
 }
 </style>

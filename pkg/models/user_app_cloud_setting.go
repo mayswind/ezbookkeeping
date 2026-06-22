@@ -35,6 +35,8 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"autoGetCurrentGeoLocation":                                USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"alwaysShowTransactionPicturesInMobileTransactionEditPage": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"transactionPictureQuality":                                USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
+	// AI Clipboard Text Recognition
+	"alwaysRequireConfirmationOfClipboardContentBeforeSubmission": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// AI Image Recognition
 	"autoUploadTransactionPictureForAIRecognition": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Import Transaction Dialog

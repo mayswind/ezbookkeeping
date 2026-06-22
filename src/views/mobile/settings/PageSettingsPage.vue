@@ -216,6 +216,18 @@
             </f7-list-item>
         </f7-list>
 
+        <f7-block-title>{{ tt('AI Clipboard Text Recognition') }}</f7-block-title>
+        <f7-list strong inset dividers class="settings-list">
+            <f7-list-item>
+                <template #after-title>
+                    {{ tt('Always Require Confirmation of Clipboard Content Before Submission') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission" @toggle:change="isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission = $event"></f7-toggle>
+                </template>
+            </f7-list-item>
+        </f7-list>
+
         <f7-block-title>{{ tt('AI Image Recognition') }}</f7-block-title>
         <f7-list strong inset dividers class="settings-list">
             <f7-list-item>
@@ -356,6 +368,7 @@ const {
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     transactionPictureQuality,
+    isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission,
     isAutoUploadTransactionPictureForAIRecognition,
     currencySortByInExchangeRatesPage,
     accountsIncludedInHomePageOverviewDisplayContent,

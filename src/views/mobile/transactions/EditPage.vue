@@ -504,7 +504,7 @@
             </f7-list>
         </f7-popover>
 
-        <a-i-text-recognition-sheet v-model:show="showAITextRecognitionSheet" @text:confirm="recognizeText" />
+        <a-i-text-recognition-sheet :initial-text="pastedText" v-model:show="showAITextRecognitionSheet" @text:confirm="recognizeText" />
         <f7-photo-browser ref="pictureBrowser" type="popup" navbar-of-text="/"
                           :navbar-show-count="true" :exposition="false"
                           :photos="transactionPictures" :thumbs="transactionThumbs" />
@@ -517,7 +517,7 @@ import { ref, computed, useTemplateRef } from 'vue';
 import type { PhotoBrowser, Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useI18nUIComponents, isiOS, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
+import { useI18nUIComponents, isiOS, showLoading, hideLoading, closeAllDialog } from '@/lib/ui/mobile.ts';
 import {
     TransactionEditPageMode,
     TransactionEditPageType,
@@ -588,7 +588,7 @@ const {
     formatGregorianTextualYearMonthDayToLongDate,
     parseAmountFromLocalizedNumerals
 } = useI18n();
-const { showAlert, showConfirm, showToast, routeBackOnError } = useI18nUIComponents();
+const { showAlert, showConfirm, showCancelableLoading, showToast, routeBackOnError } = useI18nUIComponents();
 
 const {
     mode,
@@ -660,6 +660,7 @@ const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
 
 const loadingError = ref<unknown | null>(null);
 const removingPictureId = ref<string | null>(null);
+const pastedText = ref<string>('');
 const transactionDateTimeSheetMode = ref<string>('time');
 const showTimeInDefaultTimezone = ref<boolean>(false);
 const showQuickSavePopover = ref<boolean>(false);
@@ -1214,14 +1215,14 @@ function recognizeText(text: string): void {
     }
 
     recognizing.value = true;
-    showLoading(() => recognizing.value);
+    showCancelableLoading('Recognizing', 'AI can make mistakes. Check important info.');
 
     transactionsStore.recognizeTransactionText({ text }).then(response => {
         updateTransactionModelFromRecognizedResponse(response);
-        hideLoading();
+        closeAllDialog();
         recognizing.value = false;
     }).catch(error => {
-        hideLoading();
+        closeAllDialog();
         recognizing.value = false;
 
         if (!error.processed) {
@@ -1235,10 +1236,14 @@ function recognizeFromClipboard(): void {
         return;
     }
 
+    pastedText.value = '';
+
     if (isSupportClipboard && !isiOS()) {
         navigator.clipboard.readText().then(text => {
-            if (text && text.trim()) {
-                recognizeText(text.trim());
+            pastedText.value = text && text.trim() ? text.trim() : '';
+
+            if (pastedText.value && !settingsStore.appSettings.alwaysRequireConfirmationOfClipboardContentBeforeSubmission) {
+                recognizeText(pastedText.value);
             } else {
                 showAITextRecognitionSheet.value = true;
             }

@@ -267,9 +267,9 @@ export function useI18nUIComponents() {
         });
     }
 
-    function showCancelableLoading(title: string, message: string, cancelButtonText: string, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
+    function showCancelableLoading(title: string, message: string, cancelButtonText?: string, cancelCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
         const cancelButton: Dialog.DialogButton = {
-            text: tt(cancelButtonText),
+            text: cancelButtonText ? tt(cancelButtonText) : '',
             onClick: (dialog, event) => {
                 if (cancelCallback) {
                     cancelCallback(dialog, event);
@@ -283,7 +283,7 @@ export function useI18nUIComponents() {
                 content: `<div class="preloader"><span class="preloader-inner">${[0, 1, 2, 3, 4, 5, 6, 7].map(() => '<span class="preloader-inner-line"></span>').join('')}</span></div>` + (message ? `<br/><div class="margin-top">${tt(message)}</div>` : ''),
                 cssClass: 'dialog-preloader',
                 animate: isEnableAnimate(),
-                buttons: [cancelButton]
+                buttons: cancelButtonText ? [cancelButton] : []
             }).open();
         });
     }

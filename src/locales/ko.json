@@ -2367,6 +2367,7 @@
     "Automatically Add Geolocation": "지리적 위치 자동 추가",
     "Always Show Transaction Pictures": "거래 사진 항상 표시",
     "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
+    "Always Require Confirmation of Clipboard Content Before Submission": "Always Require Confirmation of Clipboard Content Before Submission",
     "Auto Upload AI Recognition Image as Transaction Picture": "Auto Upload AI Recognition Image as Transaction Picture",
     "Import Transaction Dialog": "거래 가져오기 대화 상자",
     "Remember Last Selected File Type": "마지막으로 선택한 파일 유형 기억",

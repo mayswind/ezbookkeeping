@@ -237,6 +237,28 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :title="tt('AI Clipboard Text Recognition')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="tt('Always Require Confirmation of Clipboard Content Before Submission')"
+                                    :placeholder="tt('Always Require Confirmation of Clipboard Content Before Submission')"
+                                    :items="enableDisableOptions"
+                                    v-model="isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <v-card :title="tt('AI Image Recognition')">
                 <v-form>
                     <v-card-text>
@@ -471,6 +493,7 @@ const {
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     transactionPictureQuality,
+    isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission,
     isAutoUploadTransactionPictureForAIRecognition,
     currencySortByInExchangeRatesPage,
     accountsIncludedInHomePageOverviewDisplayContent,

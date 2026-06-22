@@ -2367,6 +2367,7 @@
     "Automatically Add Geolocation": "Geolocation automatisch hinzufügen",
     "Always Show Transaction Pictures": "Transaktionsbilder immer anzeigen",
     "Transaction Picture Upload Quality": "Transaction Picture Upload Quality",
+    "Always Require Confirmation of Clipboard Content Before Submission": "Always Require Confirmation of Clipboard Content Before Submission",
     "Auto Upload AI Recognition Image as Transaction Picture": "Auto Upload AI Recognition Image as Transaction Picture",
     "Import Transaction Dialog": "Transaktionsimport-Dialog",
     "Remember Last Selected File Type": "Zuletzt ausgewählten Dateityp merken",

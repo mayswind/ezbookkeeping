@@ -16,7 +16,7 @@
             </div>
         </f7-toolbar>
         <f7-page-content class="margin-top">
-            <div class="padding-horizontal padding-bottom">
+            <div class="padding-horizontal padding-bottom clipboard-text-recognition-sheet-content">
                 <f7-list strong inset class="no-margin margin-vertical">
                     <f7-list-input
                         type="textarea"
@@ -139,11 +139,15 @@ function onToolbarClick(): void {
     height: 100%;
 }
 
-.clipboard-text {
-    height: 200px;
+.clipboard-text-recognition-sheet-content {
+    font-size: var(--f7-input-font-size);
 
-    @media (min-height: 630px) {
-        height: 370px;
+    .clipboard-text {
+        height: 200px;
+
+        @media (min-height: 630px) {
+            height: 370px;
+        }
     }
 }
 </style>

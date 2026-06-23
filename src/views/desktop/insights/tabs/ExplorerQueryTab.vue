@@ -431,7 +431,7 @@
 
                                                 <v-text-field disabled density="compact"
                                                               :placeholder="tt('None')"
-                                                              v-else-if="(conditionWithRelation.condition.field === TransactionExplorerConditionField.Description.value || conditionWithRelation.condition.field === TransactionExplorerConditionField.DescriptionCaseInsensitive.value) &&
+                                                              v-else-if="(conditionWithRelation.condition.field === TransactionExplorerConditionField.Description.value || conditionWithRelation.condition.field === TransactionExplorerConditionField.DescriptionCaseInsensitive.value || conditionWithRelation.condition.field === TransactionExplorerConditionField.DescriptionNormalized.value) &&
                                                                          conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsEmpty.value || conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsNotEmpty.value"
                                                 />
 
@@ -439,7 +439,7 @@
                                                               :disabled="loading || disabled || !!editingQuery"
                                                               :placeholder="tt('None')"
                                                               v-model="conditionWithRelation.condition.value"
-                                                              v-else-if="(conditionWithRelation.condition.field === TransactionExplorerConditionField.Description.value || conditionWithRelation.condition.field === TransactionExplorerConditionField.DescriptionCaseInsensitive.value) &&
+                                                              v-else-if="(conditionWithRelation.condition.field === TransactionExplorerConditionField.Description.value || conditionWithRelation.condition.field === TransactionExplorerConditionField.DescriptionCaseInsensitive.value || conditionWithRelation.condition.field === TransactionExplorerConditionField.DescriptionNormalized.value) &&
                                                                          conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsEmpty.value && conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.IsNotEmpty.value"
                                                 />
                                             </div>

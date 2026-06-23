@@ -7,6 +7,7 @@ export enum TextDirection {
 
 export class NormalizedText {
     private readonly text: string;
+    private cachedLowerCase: string | undefined;
     private cachedNormalized: string | undefined;
 
     private constructor(text: string) {
@@ -17,12 +18,24 @@ export class NormalizedText {
         return this.text;
     }
 
+    public get lowerCaseText(): string {
+        if (this.cachedLowerCase === undefined) {
+            this.cachedLowerCase = NormalizedText.caseInsensitiveText(this.text);
+        }
+
+        return this.cachedLowerCase;
+    }
+
     public get normalizedText(): string {
         if (this.cachedNormalized === undefined) {
             this.cachedNormalized = NormalizedText.normalizeForSearch(this.text);
         }
 
         return this.cachedNormalized;
+    }
+
+    public static caseInsensitiveText(text: string): string {
+        return text.toLowerCase();
     }
 
     public static normalizeForSearch(text: string): string {

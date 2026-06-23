@@ -146,7 +146,7 @@ function onToolbarClick(): void {
         height: 200px;
 
         @media (min-height: 630px) {
-            height: 370px;
+            height: 362px;
         }
     }
 }

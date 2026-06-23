@@ -189,7 +189,15 @@
 
         <f7-popover class="template-popover-menu" target-el="#homepage-add-button"
                     v-model:opened="showTransactionTemplatePopover">
-            <f7-list dividers v-if="allTransactionTemplates">
+            <f7-list dividers v-if="isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates && allTransactionTemplates.length)">
+                <f7-list-item key="AIClipboardTextRecognition" link="#" no-chevron popover-close
+                              :title="tt('AI Clipboard Text Recognition')"
+                              @click="addByRecognizingClipboardText"
+                              v-if="isTransactionFromAITextRecognitionEnabled()">
+                    <template #media>
+                        <f7-icon f7="wand_stars"></f7-icon>
+                    </template>
+                </f7-list-item>
                 <f7-list-item key="AIImageRecognition" link="#" no-chevron popover-close
                               :title="tt('AI Image Recognition')"
                               @click="showAIReceiptImageRecognitionSheet = true"
@@ -221,7 +229,7 @@ import { ref, computed, useTemplateRef } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { useI18nUIComponents, isiOS } from '@/lib/ui/mobile.ts';
 import { useHomePageBase } from '@/views/base/HomePageBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
@@ -233,9 +241,15 @@ import { useOverviewStore } from '@/stores/overview.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { TemplateType } from '@/core/template.ts';
 import { TransactionTemplate } from '@/models/transaction_template.ts';
+
+import { isFunction } from '@/lib/common.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { getShareCacheImageBlob } from '@/lib/cache.ts';
-import { isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
+import {
+    isTransactionFromAITextRecognitionEnabled,
+    isTransactionFromAIImageRecognitionEnabled
+} from '@/lib/server_settings.ts';
+import logger from '@/lib/logger.ts';
 
 type AIImageRecognitionSheetType = InstanceType<typeof AIImageRecognitionSheet>;
 
@@ -324,6 +338,32 @@ function reload(done?: () => void): void {
             showToast(error.message || error);
         }
     });
+}
+
+function addByRecognizingClipboardText(): void {
+    if (navigator.clipboard && isFunction(navigator.clipboard.readText) && !isiOS()) {
+        navigator.clipboard.readText().then(text => {
+            const clipboardText = text && text.trim() ? text.trim() : '';
+            props.f7router.navigate('/transaction/add', {
+                props: {
+                    autoRecognizeClipboardText: clipboardText,
+                }
+            });
+        }).catch(error => {
+            logger.error('failed to read clipboard', error);
+            props.f7router.navigate('/transaction/add', {
+                props: {
+                    autoRecognizeClipboardText: '',
+                }
+            });
+        });
+    } else {
+        props.f7router.navigate('/transaction/add', {
+            props: {
+                autoRecognizeClipboardText: '',
+            }
+        });
+    }
 }
 
 function onReceiptRecognitionChanged(result: AIImageRecognitionResult): void {

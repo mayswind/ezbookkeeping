@@ -63,8 +63,13 @@
                                             <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading || !canAddTransaction" @click="add()">
                                                 {{ tt('Add') }}
-                                                <v-menu activator="parent" max-height="500" :open-on-hover="true" v-if="isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates && allTransactionTemplates.length)">
+                                                <v-menu activator="parent" max-height="500" :open-on-hover="true" v-if="isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates && allTransactionTemplates.length)">
                                                     <v-list>
+                                                        <v-list-item key="AIClipboardTextRecognition"
+                                                                     :title="tt('AI Clipboard Text Recognition')"
+                                                                     :prepend-icon="mdiMagicStaff"
+                                                                     v-if="isTransactionFromAITextRecognitionEnabled()"
+                                                                     @click="addByRecognizingClipboardText"></v-list-item>
                                                         <v-list-item key="AIImageRecognition"
                                                                      :title="tt('AI Image Recognition')"
                                                                      :prepend-icon="mdiMagicStaff"
@@ -740,6 +745,7 @@ import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts'
 import type { TransactionTemplate } from '@/models/transaction_template.ts';
 
 import {
+    isFunction,
     isDefined,
     isObject,
     isString,
@@ -768,7 +774,12 @@ import {
     transactionTypeToCategoryType
 } from '@/lib/category.ts';
 import { allTransactionPictures } from '@/lib/transaction.ts';
-import { isDataExportingEnabled, isDataImportingEnabled, isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
+import {
+    isDataExportingEnabled,
+    isDataImportingEnabled,
+    isTransactionFromAITextRecognitionEnabled,
+    isTransactionFromAIImageRecognitionEnabled
+} from '@/lib/server_settings.ts';
 import { scrollToSelectedItem, startDownloadFile } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -1606,7 +1617,7 @@ function changeAmountFilter(filterType: string): void {
     updateUrlWhenChanged(changed);
 }
 
-function add(template?: TransactionTemplate): void {
+function add(template?: TransactionTemplate, autoRecognizeClipboardText?: string): void {
     const currentUnixTime = getCurrentUnixTime();
 
     let newTransactionTime: number | undefined = undefined;
@@ -1625,7 +1636,8 @@ function add(template?: TransactionTemplate): void {
         categoryId: queryAllFilterCategoryIdsCount.value === 1 ? query.value.categoryIds : '',
         accountId: queryAllFilterAccountIdsCount.value === 1 ? query.value.accountIds : '',
         tagIds: objectFieldWithValueToArrayItem(queryAllFilterTagIds.value, true).join(',') || '',
-        template: template
+        template: template,
+        autoRecognizeClipboardText: autoRecognizeClipboardText
     }).then(result => {
         if (result && result.message) {
             snackbar.value?.showMessage(result.message);
@@ -1637,6 +1649,20 @@ function add(template?: TransactionTemplate): void {
             snackbar.value?.showError(error);
         }
     });
+}
+
+function addByRecognizingClipboardText(): void {
+    if (navigator.clipboard && isFunction(navigator.clipboard.readText)) {
+        navigator.clipboard.readText().then(text => {
+            const clipboardText = text && text.trim() ? text.trim() : '';
+            add(undefined, clipboardText);
+        }).catch(error => {
+            logger.error('failed to read clipboard', error);
+            add(undefined, '');
+        });
+    } else {
+        add(undefined, '');
+    }
 }
 
 function addByRecognizingImage(): void {

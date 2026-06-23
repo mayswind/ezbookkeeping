@@ -548,6 +548,7 @@ import { TransactionTemplate } from '@/models/transaction_template.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 
+import { isDefined } from '@/lib/common.ts';
 import {
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
@@ -591,6 +592,7 @@ export interface TransactionEditOptions extends SetTransactionOptions {
     currentTransaction?: Transaction;
     currentTemplate?: TransactionTemplate;
     autoUploadPicture?: File;
+    autoRecognizeClipboardText?: string;
     noTransactionDraft?: boolean;
 }
 
@@ -840,6 +842,16 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
         }
 
         loading.value = false;
+
+        if (isDefined(options.autoRecognizeClipboardText)) {
+            pastedText.value = options.autoRecognizeClipboardText;
+
+            if (pastedText.value && !settingsStore.appSettings.alwaysRequireConfirmationOfClipboardContentBeforeSubmission) {
+                recognizeText(pastedText.value);
+            } else {
+                showPasteTextDialog.value = true;
+            }
+        }
     }).catch(error => {
         logger.error('failed to load essential data for editing transaction', error);
 

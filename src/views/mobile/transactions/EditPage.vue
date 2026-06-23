@@ -552,6 +552,7 @@ import { TransactionTemplate } from '@/models/transaction_template.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 
+import { isDefined } from '@/lib/common.ts';
 import {
     getTimezoneOffset,
     getTimezoneOffsetMinutes,
@@ -573,6 +574,7 @@ const props = defineProps<{
     f7route: Router.Route;
     f7router: Router.Router;
     autoUploadPicture?: File;
+    autoRecognizeClipboardText?: string;
 }>();
 
 const query = props.f7route.query;
@@ -1055,6 +1057,16 @@ function init(): void {
         }
 
         loading.value = false;
+
+        if (isDefined(props.autoRecognizeClipboardText)) {
+            pastedText.value = props.autoRecognizeClipboardText;
+
+            if (pastedText.value && !settingsStore.appSettings.alwaysRequireConfirmationOfClipboardContentBeforeSubmission) {
+                recognizeText(pastedText.value);
+            } else {
+                showAITextRecognitionSheet.value = true;
+            }
+        }
     }).catch(error => {
         logger.error('failed to load essential data for editing transaction', error);
 

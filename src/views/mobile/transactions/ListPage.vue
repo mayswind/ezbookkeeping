@@ -988,7 +988,8 @@ function init(): void {
         categoryIds: initQuery['categoryIds'],
         accountIds: initQuery['accountIds'],
         tagFilter: initQuery['tagFilter'],
-        keyword: initQuery['keyword']
+        keyword: initQuery['keyword'],
+        matchMode: initQuery['matchMode'] && parseInt(initQuery['matchMode']) >= 0 ? parseInt(initQuery['matchMode']) : undefined
     });
 
     reload();

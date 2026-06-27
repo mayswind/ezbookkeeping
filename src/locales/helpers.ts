@@ -32,7 +32,8 @@ import {
 } from '@/core/base.ts';
 
 import {
-    TextDirection
+    TextDirection,
+    KeywordMatchMode
 } from '@/core/text.ts';
 
 import {
@@ -2569,6 +2570,7 @@ export function useI18n() {
         getAllCurrencyDisplayTypes,
         getAllCurrencySortingTypes: () => getLocalizedDisplayNameAndType(CurrencySortingType.values()),
         getAllCoordinateDisplayTypes: () => getLocalizedDisplayNameAndTypeWithSystemDefault(CoordinateDisplayType.values(), CoordinateDisplayType.SystemDefaultType, CoordinateDisplayType.Default),
+        getAllKeywordMatchModes: () => getLocalizedDisplayNameAndType(KeywordMatchMode.values()),
         getAllImageUploadQualityTypes,
         getAllExpenseAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Expense),
         getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Income),

@@ -12,6 +12,7 @@ export function useStatisticsSettingPageBase() {
     const {
         getAllDateRanges,
         getAllTimezoneTypesUsedForStatistics,
+        getAllKeywordMatchModes,
         getAllCategoricalChartTypes,
         getAllTrendChartTypes,
         getAllStatisticsChartDataTypes,
@@ -22,6 +23,7 @@ export function useStatisticsSettingPageBase() {
 
     const allChartDataTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsChartDataTypes(StatisticsAnalysisType.CategoricalAnalysis));
     const allTimezoneTypesUsedForStatistics = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
+    const allKeywordMatchModes = computed<TypeAndDisplayName[]>(() => getAllKeywordMatchModes());
     const allSortingTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsSortingTypes());
     const allCategoricalChartTypes = computed<TypeAndDisplayName[]>(() => getAllCategoricalChartTypes());
     const allCategoricalChartDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, {}));
@@ -37,6 +39,11 @@ export function useStatisticsSettingPageBase() {
     const defaultTimezoneType = computed<number>({
         get: () => settingsStore.appSettings.statistics.defaultTimezoneType,
         set: (value: number) => settingsStore.setStatisticsDefaultTimezoneType(value)
+    });
+
+    const defaultKeywordMatchMode = computed<number>({
+        get: () => settingsStore.appSettings.statistics.defaultKeywordMatchMode,
+        set: (value: number) => settingsStore.setStatisticsDefaultKeywordMatchMode(value)
     });
 
     const defaultSortingType = computed<number>({
@@ -78,6 +85,7 @@ export function useStatisticsSettingPageBase() {
         // computed states
         allChartDataTypes,
         allTimezoneTypesUsedForStatistics,
+        allKeywordMatchModes,
         allSortingTypes,
         allCategoricalChartTypes,
         allCategoricalChartDateRanges,
@@ -86,6 +94,7 @@ export function useStatisticsSettingPageBase() {
         allAssetTrendsChartDateRanges,
         defaultChartDataType,
         defaultTimezoneType,
+        defaultKeywordMatchMode,
         defaultSortingType,
         defaultCategoricalChartType,
         defaultCategoricalChartDateRange,

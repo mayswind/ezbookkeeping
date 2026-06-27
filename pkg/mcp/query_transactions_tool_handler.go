@@ -24,6 +24,7 @@ type MCPQueryTransactionsRequest struct {
 	SecondaryCategoryName string `json:"category_name,omitempty" jsonschema_description:"Primary or secondary category name to filter transactions by (optional)"`
 	AccountName           string `json:"account_name,omitempty" jsonschema_description:"Account name to filter transactions by (optional)"`
 	Keyword               string `json:"keyword,omitempty" jsonschema_description:"Keyword to search in transaction description (optional)"`
+	MatchMode             string `json:"match_mode,omitempty" jsonschema:"enum=default,enum=ignore_case" jsonschema_description:"Match mode for keyword search (optional, leave empty for database default setting, ignore_case for case-insensitive search)"`
 	Count                 int32  `json:"count,omitempty" jsonschema:"default=100" jsonschema_description:"Maximum number of results to return (default: 100)"`
 	Page                  int32  `json:"page,omitempty" jsonschema:"default=1" jsonschema_description:"Page number for pagination (default: 1)"`
 	ResponseFields        string `json:"response_fields,omitempty" jsonschema_description:"Comma-separated list of optional fields to include in the response (optional, leave empty for all fields, available fields: time, currency, category_name, account_name, comment)"`
@@ -159,14 +160,20 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 		}
 	}
 
-	totalCount, err := services.GetTransactionService().GetTransactionCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, filterCategoryIds, filterAccountIds, nil, false, "", queryTransactionsRequest.Keyword, false)
+	matchModeType := core.MATCH_MODE_DEFAULT
+
+	if queryTransactionsRequest.MatchMode == "ignore_case" {
+		matchModeType = core.MATCH_MODE_IGNORE_CASE
+	}
+
+	totalCount, err := services.GetTransactionService().GetTransactionCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, filterCategoryIds, filterAccountIds, nil, false, "", queryTransactionsRequest.Keyword, matchModeType, false)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionListHandler] failed to get transaction count for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, nil, err
 	}
 
-	transactions, err := services.GetTransactionService().GetTransactionsByMaxTimeUpToCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, filterCategoryIds, filterAccountIds, nil, false, "", queryTransactionsRequest.Keyword, false, queryTransactionsRequest.Page, queryTransactionsRequest.Count, pageCountForLoadTransactions, false, true)
+	transactions, err := services.GetTransactionService().GetTransactionsByMaxTimeUpToCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, filterCategoryIds, filterAccountIds, nil, false, "", queryTransactionsRequest.Keyword, matchModeType, false, queryTransactionsRequest.Page, queryTransactionsRequest.Count, pageCountForLoadTransactions, false, true)
 	structuredResponse, response, err := h.createNewMCPQueryTransactionsResponse(c, &queryTransactionsRequest, transactions, totalCount, services.GetAccountService().GetAccountMapByList(allAccounts), services.GetTransactionCategoryService().GetCategoryMapByList(allCategories))
 
 	if err != nil {

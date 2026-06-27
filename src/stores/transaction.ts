@@ -12,6 +12,7 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, entries, keys } from '@/core/base.ts';
 import { type TextualYearMonth, DateRange } from '@/core/datetime.ts';
+import { KeywordMatchMode } from '@/core/text.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { ImportFileTypeSupportedAdditionalOptions } from '@/core/file.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
@@ -71,6 +72,7 @@ export interface TransactionListPartialFilter {
     tagFilter?: string;
     amountFilter?: string;
     keyword?: string;
+    matchMode?: number;
 }
 
 export interface TransactionListFilter extends TransactionListPartialFilter {
@@ -83,6 +85,7 @@ export interface TransactionListFilter extends TransactionListPartialFilter {
     tagFilter: string;
     amountFilter: string;
     keyword: string;
+    matchMode: number;
 }
 
 export interface TransactionTotalAmount {
@@ -123,7 +126,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
         accountIds: '',
         tagFilter: '',
         amountFilter: '',
-        keyword: ''
+        keyword: '',
+        matchMode: KeywordMatchMode.Default.type
     });
 
     const transactions = ref<TransactionMonthList[]>([]);
@@ -646,6 +650,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactionsFilter.value.tagFilter = '';
         transactionsFilter.value.amountFilter = '';
         transactionsFilter.value.keyword = '';
+        transactionsFilter.value.matchMode = KeywordMatchMode.Default.type;
         transactions.value = [];
         transactionsNextTimeId.value = 0;
         transactionListStateInvalid.value = true;
@@ -712,6 +717,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
         } else {
             transactionsFilter.value.keyword = '';
         }
+
+        if (filter && isNumber(filter.matchMode)) {
+            transactionsFilter.value.matchMode = filter.matchMode;
+        } else {
+            transactionsFilter.value.matchMode = settingsStore.appSettings.defaultKeywordMatchModeInTransactionListPage;
+        }
     }
 
     function updateTransactionListFilter(filter: TransactionListPartialFilter): boolean {
@@ -770,6 +781,11 @@ export const useTransactionsStore = defineStore('transactions', () => {
             changed = true;
         }
 
+        if (filter && isNumber(filter.matchMode) && transactionsFilter.value.matchMode !== filter.matchMode) {
+            transactionsFilter.value.matchMode = filter.matchMode;
+            changed = true;
+        }
+
         return changed;
     }
 
@@ -809,6 +825,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         if (transactionsFilter.value.keyword) {
             querys.push('keyword=' + encodeURIComponent(transactionsFilter.value.keyword));
+            querys.push('matchMode=' + transactionsFilter.value.matchMode);
         }
 
         return querys.join('&');
@@ -823,7 +840,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
             accountIds: transactionsFilter.value.accountIds,
             tagFilter: transactionsFilter.value.tagFilter,
             amountFilter: transactionsFilter.value.amountFilter,
-            keyword: transactionsFilter.value.keyword
+            keyword: transactionsFilter.value.keyword,
+            matchMode: transactionsFilter.value.matchMode
         };
     }
 
@@ -850,7 +868,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 accountIds: transactionsFilter.value.accountIds,
                 tagFilter: transactionsFilter.value.tagFilter,
                 amountFilter: transactionsFilter.value.amountFilter,
-                keyword: transactionsFilter.value.keyword
+                keyword: transactionsFilter.value.keyword,
+                matchMode: transactionsFilter.value.matchMode
             }).then(response => {
                 const data = response.data;
 
@@ -930,6 +949,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 tagFilter: transactionsFilter.value.tagFilter,
                 amountFilter: transactionsFilter.value.amountFilter,
                 keyword: transactionsFilter.value.keyword,
+                matchMode: transactionsFilter.value.matchMode,
                 mustHavePictures: !!mustHavePictures,
                 withPictures: !!withPictures
             }).then(response => {

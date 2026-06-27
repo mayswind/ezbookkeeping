@@ -88,6 +88,29 @@
                     <f7-toggle :checked="showTagInTransactionListPage" @toggle:change="showTagInTransactionListPage = $event"></f7-toggle>
                 </template>
             </f7-list-item>
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="#"
+                @click="showKeywordMatchModeInTransactionListPagePopup = true"
+            >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Keyword Search Matching Mode') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allKeywordMatchModes, defaultKeywordMatchModeInTransactionListPage) }}
+                </template>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Default Keyword Search Matching Mode')"
+                                           :enable-filter="false"
+                                           :items="allKeywordMatchModes"
+                                           v-model:show="showKeywordMatchModeInTransactionListPagePopup"
+                                           v-model="defaultKeywordMatchModeInTransactionListPage">
+                </list-item-selection-popup>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ tt('Transaction Edit Page') }}</f7-block-title>
@@ -358,6 +381,7 @@ const {
     hasAnyTransactionCategory,
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
+    allKeywordMatchModes,
     allAutoSaveTransactionDraftTypes,
     allImageUploadQualityTypes,
     allReconciliationStatementDateRanges,
@@ -365,6 +389,7 @@ const {
     timezoneUsedForStatisticsInHomePage,
     showTotalAmountInTransactionListPage,
     showTagInTransactionListPage,
+    defaultKeywordMatchModeInTransactionListPage,
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     transactionPictureQuality,
@@ -383,6 +408,7 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const showTimezoneUsedForStatisticsInHomePagePopup = ref<boolean>(false);
+const showKeywordMatchModeInTransactionListPagePopup = ref<boolean>(false);
 const showQuickSaveButtonStyleInMobileTransactionListPagePopup = ref<boolean>(false);
 const showQuickAddButtonActionInMobileTransactionEditPagePopup = ref<boolean>(false);
 const showAutoSaveTransactionDraftPopup = ref<boolean>(false);

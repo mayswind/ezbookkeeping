@@ -47,7 +47,8 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         items: [
             { settingKey: 'itemsCountInTransactionListPage', settingName: 'Transactions Per Page', mobile: false, desktop: true },
             { settingKey: 'showTotalAmountInTransactionListPage', settingName: 'Show Monthly Total Amount', mobile: true, desktop: true },
-            { settingKey: 'showTagInTransactionListPage', settingName: 'Show Transaction Tags', mobile: true, desktop: true }
+            { settingKey: 'showTagInTransactionListPage', settingName: 'Show Transaction Tags', mobile: true, desktop: true },
+            { settingKey: 'defaultKeywordMatchModeInTransactionListPage', settingName: 'Default Keyword Search Matching Mode', mobile: true, desktop: true }
         ]
     },
     {
@@ -117,6 +118,7 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
             { settingKey: 'statistics.defaultTimezoneType', settingName: 'Timezone Used for Date Range', mobile: true, desktop: true },
             { settingKey: 'statistics.defaultAccountFilter', settingName: 'Default Account Filter', mobile: true, desktop: true },
             { settingKey: 'statistics.defaultTransactionCategoryFilter', settingName: 'Default Transaction Category Filter', mobile: true, desktop: true },
+            { settingKey: 'statistics.defaultKeywordMatchMode', settingName: 'Default Keyword Search Matching Mode', mobile: true, desktop: true },
             { settingKey: 'statistics.defaultSortingType', settingName: 'Default Sort Order', mobile: true, desktop: true }
         ]
     },

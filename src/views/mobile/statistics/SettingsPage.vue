@@ -56,6 +56,32 @@
                 </list-item-selection-popup>
             </f7-list-item>
 
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="#"
+                @click="showDefaultKeywordMatchModePopup = true"
+            >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Keyword Search Matching Mode') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allKeywordMatchModes, defaultKeywordMatchMode) }}
+                </template>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Default Keyword Search Matching Mode')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Matching Mode')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allKeywordMatchModes"
+                                           v-model:show="showDefaultKeywordMatchModePopup"
+                                           v-model="defaultKeywordMatchMode">
+                </list-item-selection-popup>
+            </f7-list-item>
+
             <f7-list-item :title="tt('Default Account Filter')" link="/settings/filter/account?type=statisticsDefault"></f7-list-item>
 
             <f7-list-item :title="tt('Default Transaction Category Filter')" link="/settings/filter/category?type=statisticsDefault"></f7-list-item>
@@ -212,6 +238,7 @@ const { tt } = useI18n();
 const {
     allChartDataTypes,
     allTimezoneTypesUsedForStatistics,
+    allKeywordMatchModes,
     allSortingTypes,
     allCategoricalChartTypes,
     allCategoricalChartDateRanges,
@@ -219,6 +246,7 @@ const {
     allAssetTrendsChartDateRanges,
     defaultChartDataType,
     defaultTimezoneType,
+    defaultKeywordMatchMode,
     defaultSortingType,
     defaultCategoricalChartType,
     defaultCategoricalChartDateRange,
@@ -230,6 +258,7 @@ import { findDisplayNameByType } from '@/lib/common.ts';
 
 const showDefaultChartDataTypePopup = ref<boolean>(false);
 const showDefaultTimezoneTypePopup = ref<boolean>(false);
+const showDefaultKeywordMatchModePopup = ref<boolean>(false);
 const showDefaultSortingTypePopup = ref<boolean>(false);
 const showDefaultCategoricalChartTypePopup = ref<boolean>(false);
 const showDefaultCategoricalChartDateRangePopup = ref<boolean>(false);

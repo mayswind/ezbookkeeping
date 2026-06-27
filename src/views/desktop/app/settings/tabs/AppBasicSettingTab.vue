@@ -184,6 +184,17 @@
                                     v-model="showTagInTransactionListPage"
                                 />
                             </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="tt('Default Keyword Search Matching Mode')"
+                                    :placeholder="tt('Default Keyword Search Matching Mode')"
+                                    :items="allKeywordMatchModes"
+                                    v-model="defaultKeywordMatchModeInTransactionListPage"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -476,6 +487,7 @@ const {
     allTimezones,
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
+    allKeywordMatchModes,
     allAutoSaveTransactionDraftTypes,
     allImageUploadQualityTypes,
     allReconciliationStatementDateRanges,
@@ -490,6 +502,7 @@ const {
     timezoneUsedForStatisticsInHomePage,
     showTotalAmountInTransactionListPage,
     showTagInTransactionListPage,
+    defaultKeywordMatchModeInTransactionListPage,
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,
     transactionPictureQuality,

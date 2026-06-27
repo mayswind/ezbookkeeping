@@ -10,10 +10,9 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 import { entries, values } from '@/core/base.ts';
 import { type DateTime, type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { KeywordMatchMode } from '@/core/text.ts';
 import { CategoryType } from '@/core/category.ts';
-import {
-    TransactionRelatedAccountType
-} from '@/core/transaction.ts';
+import { TransactionRelatedAccountType } from '@/core/transaction.ts';
 import {
     StatisticsAnalysisType,
     CategoricalChartType,
@@ -136,6 +135,7 @@ export interface TransactionStatisticsPartialFilter {
     filterCategoryIds?: Record<string, boolean>;
     tagFilter?: string;
     keyword?: string;
+    matchMode?: number;
     sortingType?: number;
 }
 
@@ -157,6 +157,7 @@ export interface TransactionStatisticsFilter extends TransactionStatisticsPartia
     filterCategoryIds: Record<string, boolean>;
     tagFilter: string;
     keyword: string;
+    matchMode: number;
     sortingType: number;
 }
 
@@ -185,6 +186,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         filterCategoryIds: {},
         tagFilter: '',
         keyword: '',
+        matchMode: KeywordMatchMode.Default.type,
         sortingType: ChartSortingType.Default.type
     });
 
@@ -1332,6 +1334,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         transactionStatisticsFilter.value.filterCategoryIds = {};
         transactionStatisticsFilter.value.tagFilter = '';
         transactionStatisticsFilter.value.keyword = '';
+        transactionStatisticsFilter.value.matchMode = KeywordMatchMode.Default.type;
         transactionCategoryStatisticsData.value = null;
         transactionCategoryTrendsData.value = [];
         transactionStatisticsStateInvalid.value = true;
@@ -1517,6 +1520,12 @@ export const useStatisticsStore = defineStore('statistics', () => {
             transactionStatisticsFilter.value.keyword = '';
         }
 
+        if (filter && isNumber(filter.matchMode)) {
+            transactionStatisticsFilter.value.matchMode = filter.matchMode;
+        } else {
+            transactionStatisticsFilter.value.matchMode = settingsStore.appSettings.statistics.defaultKeywordMatchMode;
+        }
+
         if (filter && isInteger(filter.sortingType)) {
             transactionStatisticsFilter.value.sortingType = filter.sortingType;
         } else {
@@ -1620,6 +1629,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
             changed = true;
         }
 
+        if (filter && isNumber(filter.matchMode) && transactionStatisticsFilter.value.matchMode !== filter.matchMode) {
+            transactionStatisticsFilter.value.matchMode = filter.matchMode;
+            changed = true;
+        }
+
         if (filter && isInteger(filter.sortingType) && transactionStatisticsFilter.value.sortingType !== filter.sortingType) {
             transactionStatisticsFilter.value.sortingType = filter.sortingType;
             changed = true;
@@ -1690,6 +1704,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
         if (transactionStatisticsFilter.value.keyword) {
             querys.push('keyword=' + encodeURIComponent(transactionStatisticsFilter.value.keyword));
+            querys.push('matchMode=' + transactionStatisticsFilter.value.matchMode);
         }
 
         querys.push('sortingType=' + transactionStatisticsFilter.value.sortingType);
@@ -1792,6 +1807,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
             if (transactionStatisticsFilter.value.keyword) {
                 querys.push('keyword=' + encodeURIComponent(transactionStatisticsFilter.value.keyword));
+                querys.push('matchMode=' + transactionStatisticsFilter.value.matchMode);
             }
         }
 
@@ -1820,6 +1836,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 endTime: transactionStatisticsFilter.value.categoricalChartEndTime,
                 tagFilter: transactionStatisticsFilter.value.tagFilter,
                 keyword: transactionStatisticsFilter.value.keyword,
+                matchMode: transactionStatisticsFilter.value.matchMode,
                 useTransactionTimezone: settingsStore.appSettings.statistics.defaultTimezoneType === TimezoneTypeForStatistics.TransactionTimezone.type
             }).then(response => {
                 const data = response.data;
@@ -1862,6 +1879,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 endYearMonth: transactionStatisticsFilter.value.trendChartEndYearMonth,
                 tagFilter: transactionStatisticsFilter.value.tagFilter,
                 keyword: transactionStatisticsFilter.value.keyword,
+                matchMode: transactionStatisticsFilter.value.matchMode,
                 useTransactionTimezone: settingsStore.appSettings.statistics.defaultTimezoneType === TimezoneTypeForStatistics.TransactionTimezone.type
             }).then(response => {
                 const data = response.data;

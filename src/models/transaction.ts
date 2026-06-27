@@ -614,6 +614,7 @@ export interface TransactionListByMaxTimeRequest {
     readonly tagFilter: string;
     readonly amountFilter: string;
     readonly keyword: string;
+    readonly matchMode: number;
     readonly mustHavePictures?: boolean;
     readonly withPictures?: boolean;
 }
@@ -627,6 +628,7 @@ export interface TransactionListInMonthByPageRequest {
     readonly tagFilter: string;
     readonly amountFilter: string;
     readonly keyword: string;
+    readonly matchMode: number;
     readonly mustHavePictures?: boolean;
     readonly withPictures?: boolean;
 }
@@ -673,6 +675,7 @@ export interface TransactionStatisticRequest {
     readonly endTime: number;
     readonly tagFilter: string;
     readonly keyword: string;
+    readonly matchMode: number;
     readonly useTransactionTimezone: boolean;
 }
 
@@ -684,6 +687,7 @@ export interface YearMonthRangeRequest {
 export interface TransactionStatisticTrendsRequest extends YearMonthRangeRequest {
     readonly tagFilter: string;
     readonly keyword: string;
+    readonly matchMode: number;
     readonly useTransactionTimezone: boolean;
 }
 

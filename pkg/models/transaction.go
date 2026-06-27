@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
@@ -216,6 +217,7 @@ type TransactionCountRequest struct {
 	TagFilter        string          `form:"tag_filter" binding:"validTagFilter"`
 	AmountFilter     string          `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword          string          `form:"keyword"`
+	MatchMode        core.MatchMode  `form:"match_mode" binding:"min=0,max=1"`
 	MustHavePictures bool            `form:"must_have_pictures"`
 	MaxTime          int64           `form:"max_time" binding:"min=0"` // Transaction time sequence id
 	MinTime          int64           `form:"min_time" binding:"min=0"` // Transaction time sequence id
@@ -229,6 +231,7 @@ type TransactionListByMaxTimeRequest struct {
 	TagFilter        string          `form:"tag_filter" binding:"validTagFilter"`
 	AmountFilter     string          `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword          string          `form:"keyword"`
+	MatchMode        core.MatchMode  `form:"match_mode" binding:"min=0,max=1"`
 	MustHavePictures bool            `form:"must_have_pictures"`
 	MaxTime          int64           `form:"max_time" binding:"min=0"` // Transaction time sequence id
 	MinTime          int64           `form:"min_time" binding:"min=0"` // Transaction time sequence id
@@ -251,6 +254,7 @@ type TransactionListInMonthByPageRequest struct {
 	TagFilter        string          `form:"tag_filter" binding:"validTagFilter"`
 	AmountFilter     string          `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword          string          `form:"keyword"`
+	MatchMode        core.MatchMode  `form:"match_mode" binding:"min=0,max=1"`
 	MustHavePictures bool            `form:"must_have_pictures"`
 	WithPictures     bool            `form:"with_pictures"`
 	TrimAccount      bool            `form:"trim_account"`
@@ -266,6 +270,7 @@ type TransactionAllListRequest struct {
 	TagFilter        string          `form:"tag_filter" binding:"validTagFilter"`
 	AmountFilter     string          `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword          string          `form:"keyword"`
+	MatchMode        core.MatchMode  `form:"match_mode" binding:"min=0,max=1"`
 	MustHavePictures bool            `form:"must_have_pictures"`
 	StartTime        int64           `form:"start_time" binding:"min=0"`
 	EndTime          int64           `form:"end_time" binding:"min=0"`
@@ -284,19 +289,21 @@ type TransactionReconciliationStatementRequest struct {
 
 // TransactionStatisticRequest represents all parameters of transaction statistic request
 type TransactionStatisticRequest struct {
-	StartTime              int64  `form:"start_time" binding:"min=0"`
-	EndTime                int64  `form:"end_time" binding:"min=0"`
-	TagFilter              string `form:"tag_filter" binding:"validTagFilter"`
-	Keyword                string `form:"keyword"`
-	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
+	StartTime              int64          `form:"start_time" binding:"min=0"`
+	EndTime                int64          `form:"end_time" binding:"min=0"`
+	TagFilter              string         `form:"tag_filter" binding:"validTagFilter"`
+	Keyword                string         `form:"keyword"`
+	MatchMode              core.MatchMode `form:"match_mode" binding:"min=0,max=1"`
+	UseTransactionTimezone bool           `form:"use_transaction_timezone"`
 }
 
 // TransactionStatisticTrendsRequest represents all parameters of transaction statistic trends request
 type TransactionStatisticTrendsRequest struct {
 	YearMonthRangeRequest
-	TagFilter              string `form:"tag_filter" binding:"validTagFilter"`
-	Keyword                string `form:"keyword"`
-	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
+	TagFilter              string         `form:"tag_filter" binding:"validTagFilter"`
+	Keyword                string         `form:"keyword"`
+	MatchMode              core.MatchMode `form:"match_mode" binding:"min=0,max=1"`
+	UseTransactionTimezone bool           `form:"use_transaction_timezone"`
 }
 
 // TransactionStatisticAssetTrendsRequest represents all parameters of transaction statistic asset trends request

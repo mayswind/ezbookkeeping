@@ -1,6 +1,7 @@
 import { type WeekDayValue, WeekDay } from './datetime.ts';
 import { TimezoneTypeForStatistics } from './timezone.ts';
 import { CurrencySortingType } from './currency.ts';
+import { KeywordMatchMode } from './text.ts';
 import { ImageUploadQualityType } from './image.ts';
 import {
     TransactionQuickSaveButtonStyle,
@@ -55,6 +56,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     itemsCountInTransactionListPage: number;
     showTotalAmountInTransactionListPage: boolean;
     showTagInTransactionListPage: boolean;
+    defaultKeywordMatchModeInTransactionListPage: number;
     // Transaction Edit Page
     autoSaveTransactionDraft: string;
     autoGetCurrentGeoLocation: boolean;
@@ -87,6 +89,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
         defaultTimezoneType: number;
         defaultAccountFilter: Record<string, boolean>;
         defaultTransactionCategoryFilter: Record<string, boolean>;
+        defaultKeywordMatchMode: number;
         defaultSortingType: number;
         defaultCategoricalChartType: number;
         defaultCategoricalChartDataRangeType: number;
@@ -138,6 +141,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'itemsCountInTransactionListPage': UserApplicationCloudSettingType.Number,
     'showTotalAmountInTransactionListPage': UserApplicationCloudSettingType.Boolean,
     'showTagInTransactionListPage': UserApplicationCloudSettingType.Boolean,
+    'defaultKeywordMatchModeInTransactionListPage': UserApplicationCloudSettingType.Number,
     // Transaction Edit Page
     'quickSaveButtonStyleInMobileTransactionListPage': UserApplicationCloudSettingType.Number,
     'quickAddButtonActionInMobileTransactionEditPage': UserApplicationCloudSettingType.Number,
@@ -171,6 +175,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'statistics.defaultTimezoneType': UserApplicationCloudSettingType.Number,
     'statistics.defaultAccountFilter': UserApplicationCloudSettingType.StringBooleanMap,
     'statistics.defaultTransactionCategoryFilter': UserApplicationCloudSettingType.StringBooleanMap,
+    'statistics.defaultKeywordMatchMode': UserApplicationCloudSettingType.Number,
     'statistics.defaultSortingType': UserApplicationCloudSettingType.Number,
     'statistics.defaultCategoricalChartType': UserApplicationCloudSettingType.Number,
     'statistics.defaultCategoricalChartDataRangeType': UserApplicationCloudSettingType.Number,
@@ -205,6 +210,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,
     showTagInTransactionListPage: true,
+    defaultKeywordMatchModeInTransactionListPage: KeywordMatchMode.Default.type,
     // Transaction Edit Page
     quickSaveButtonStyleInMobileTransactionListPage: TransactionQuickSaveButtonStyle.Default.type,
     quickAddButtonActionInMobileTransactionEditPage: TransactionQuickAddButtonActionType.Default.type,
@@ -239,6 +245,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
         defaultTimezoneType: TimezoneTypeForStatistics.Default.type,
         defaultAccountFilter: {},
         defaultTransactionCategoryFilter: {},
+        defaultKeywordMatchMode: KeywordMatchMode.Default.type,
         defaultSortingType: ChartSortingType.Default.type,
         defaultCategoricalChartType: CategoricalChartType.Default.type,
         defaultCategoricalChartDataRangeType: DEFAULT_CATEGORICAL_CHART_DATA_RANGE.type,

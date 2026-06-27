@@ -1,8 +1,36 @@
+import type { TypeAndName } from '@/core/base.ts';
 import { FOLDED_CHARACTER_MAP } from '@/consts/text.ts';
 
 export enum TextDirection {
     LTR = 'ltr',
     RTL = 'rtl'
+}
+
+export class KeywordMatchMode implements TypeAndName {
+    private static readonly allInstances: KeywordMatchMode[] = [];
+    private static readonly allInstancesByType: Record<number, KeywordMatchMode> = {};
+
+    public static readonly Default = new KeywordMatchMode(0, 'Database Default Setting');
+    public static readonly IgnoreCase = new KeywordMatchMode(1, 'Ignore Case');
+
+    public readonly type: number;
+    public readonly name: string;
+
+    private constructor(type: number, name: string) {
+        this.type = type;
+        this.name = name;
+
+        KeywordMatchMode.allInstances.push(this);
+        KeywordMatchMode.allInstancesByType[type] = this;
+    }
+
+    public static values(): KeywordMatchMode[] {
+        return KeywordMatchMode.allInstances;
+    }
+
+    public static valueOf(type: number): KeywordMatchMode | undefined {
+        return KeywordMatchMode.allInstancesByType[type];
+    }
 }
 
 export class NormalizedText {

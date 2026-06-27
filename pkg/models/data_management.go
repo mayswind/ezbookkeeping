@@ -1,5 +1,7 @@
 package models
 
+import "github.com/mayswind/ezbookkeeping/pkg/core"
+
 // ClearDataRequest represents all parameters of clear user data request
 type ClearDataRequest struct {
 	Password string `json:"password" binding:"omitempty,min=6,max=128"`
@@ -31,6 +33,7 @@ type ExportTransactionDataRequest struct {
 	TagFilter    string          `form:"tag_filter" binding:"validTagFilter"`
 	AmountFilter string          `form:"amount_filter" binding:"validAmountFilter"`
 	Keyword      string          `form:"keyword"`
+	MatchMode    core.MatchMode  `form:"match_mode" binding:"min=0,max=1"`
 	MaxTime      int64           `form:"max_time" binding:"min=0"` // Unix timestamp in seconds
 	MinTime      int64           `form:"min_time" binding:"min=0"` // Unix timestamp in seconds
 }

@@ -233,6 +233,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('showTagInTransactionListPage', value);
     }
 
+    function setDefaultKeywordMatchModeInTransactionListPage(value: number): void {
+        updateApplicationSettingsValue('defaultKeywordMatchModeInTransactionListPage', value);
+        appSettings.value.defaultKeywordMatchModeInTransactionListPage = value;
+        updateUserApplicationCloudSettingValue('defaultKeywordMatchModeInTransactionListPage', value);
+    }
+
     // Transaction Edit Page
     function setQuickSaveButtonStyleInMobileTransactionListPage(value: number): void {
         updateApplicationSettingsValue('quickSaveButtonStyleInMobileTransactionListPage', value);
@@ -392,6 +398,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateApplicationSettingsSubValue('statistics', 'defaultTransactionCategoryFilter', value);
         appSettings.value.statistics.defaultTransactionCategoryFilter = value;
         updateUserApplicationCloudSettingValue('statistics.defaultTransactionCategoryFilter', value);
+    }
+
+    function setStatisticsDefaultKeywordMatchMode(value: number): void {
+        updateApplicationSettingsSubValue('statistics', 'defaultKeywordMatchMode', value);
+        appSettings.value.statistics.defaultKeywordMatchMode = value;
+        updateUserApplicationCloudSettingValue('statistics.defaultKeywordMatchMode', value);
     }
 
     function setStatisticsSortingType(value: number): void {
@@ -574,6 +586,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setItemsCountInTransactionListPage,
         setShowTotalAmountInTransactionListPage,
         setShowTagInTransactionListPage,
+        setDefaultKeywordMatchModeInTransactionListPage,
         // -- Transaction Edit Page
         setQuickSaveButtonStyleInMobileTransactionListPage,
         setQuickAddButtonActionInMobileTransactionEditPage,
@@ -607,6 +620,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setStatisticsDefaultTimezoneType,
         setStatisticsDefaultAccountFilter,
         setStatisticsDefaultTransactionCategoryFilter,
+        setStatisticsDefaultKeywordMatchMode,
         setStatisticsSortingType,
         setStatisticsDefaultCategoricalChartType,
         setStatisticsDefaultCategoricalChartDateRange,

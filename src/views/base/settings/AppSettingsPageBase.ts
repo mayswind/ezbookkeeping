@@ -26,6 +26,7 @@ export function useAppSettingPageBase() {
         getAllTimezones,
         getAllTimezoneTypesUsedForStatistics,
         getAllCurrencySortingTypes,
+        getAllKeywordMatchModes,
         getAllImageUploadQualityTypes,
         setTimeZone
     } = useI18n();
@@ -52,6 +53,7 @@ export function useAppSettingPageBase() {
     const allTimezones = computed<LocalizedTimezoneInfo[]>(() => getAllTimezones(getCurrentUnixTime(), true));
     const allTimezoneTypesUsedForStatistics = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
     const allCurrencySortingTypes = computed<TypeAndDisplayName[]>(() => getAllCurrencySortingTypes());
+    const allKeywordMatchModes = computed<TypeAndDisplayName[]>(() => getAllKeywordMatchModes());
 
     const allAutoSaveTransactionDraftTypes = computed<NameValue[]>(() => {
         return [
@@ -115,6 +117,11 @@ export function useAppSettingPageBase() {
     const showTagInTransactionListPage = computed<boolean>({
         get: () => settingsStore.appSettings.showTagInTransactionListPage,
         set: (value) => settingsStore.setShowTagInTransactionListPage(value)
+    });
+
+    const defaultKeywordMatchModeInTransactionListPage = computed<number>({
+        get: () => settingsStore.appSettings.defaultKeywordMatchModeInTransactionListPage,
+        set: (value: number) => settingsStore.setDefaultKeywordMatchModeInTransactionListPage(value)
     });
 
     const itemsCountInTransactionListPage = computed<number>({
@@ -270,6 +277,7 @@ export function useAppSettingPageBase() {
         allTimezones,
         allTimezoneTypesUsedForStatistics,
         allCurrencySortingTypes,
+        allKeywordMatchModes,
         allAutoSaveTransactionDraftTypes,
         allImageUploadQualityTypes,
         allReconciliationStatementDateRanges,
@@ -287,6 +295,7 @@ export function useAppSettingPageBase() {
         timezoneUsedForStatisticsInHomePage,
         showTotalAmountInTransactionListPage,
         showTagInTransactionListPage,
+        defaultKeywordMatchModeInTransactionListPage,
         autoSaveTransactionDraft,
         isAutoGetCurrentGeoLocation,
         currencySortByInExchangeRatesPage,

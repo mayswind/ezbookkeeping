@@ -260,7 +260,7 @@ export function useI18nUIComponents() {
             f7.dialog.create({
                 title: tt('global.app.title'),
                 text: tt(message),
-                content: `<div class="dialog-input-field input"><input type="text" class="dialog-input" value="${currentValue || ''}"></div>`,
+                content: `<div class="dialog-input-field input"><input type="text" class="dialog-input" value="${currentValue || ''}" placeholder="${tt(message)}"></div>`,
                 animate: isEnableAnimate(),
                 buttons: textDirection == TextDirection.RTL ? [confirmButton, cancelButton] : [cancelButton, confirmButton]
             }).open();

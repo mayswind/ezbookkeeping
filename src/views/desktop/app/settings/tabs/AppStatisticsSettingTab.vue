@@ -34,6 +34,18 @@
                                     item-title="displayName"
                                     item-value="type"
                                     persistent-placeholder
+                                    :label="tt('Default Keyword Search Matching Mode')"
+                                    :placeholder="tt('Default Keyword Search Matching Mode')"
+                                    :items="allKeywordMatchModes"
+                                    v-model="defaultKeywordMatchMode"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
                                     :label="tt('Default Sort Order')"
                                     :placeholder="tt('Default Sort Order')"
                                     :items="allSortingTypes"
@@ -169,6 +181,7 @@ const { tt } = useI18n();
 const {
     allChartDataTypes,
     allTimezoneTypesUsedForStatistics,
+    allKeywordMatchModes,
     allSortingTypes,
     allCategoricalChartTypes,
     allCategoricalChartDateRanges,
@@ -177,6 +190,7 @@ const {
     allAssetTrendsChartDateRanges,
     defaultChartDataType,
     defaultTimezoneType,
+    defaultKeywordMatchMode,
     defaultSortingType,
     defaultCategoricalChartType,
     defaultCategoricalChartDateRange,

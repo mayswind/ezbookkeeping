@@ -812,7 +812,8 @@ interface TransactionListProps {
     initAccountIds?: string,
     initTagFilter?: string,
     initAmountFilter?: string,
-    initKeyword?: string
+    initKeyword?: string,
+    initMatchMode?: string
 }
 
 const props = defineProps<TransactionListProps>();
@@ -1198,7 +1199,8 @@ function init(initProps: TransactionListProps): void {
         accountIds: initProps.initAccountIds,
         tagFilter: initProps.initTagFilter,
         amountFilter: initProps.initAmountFilter || '',
-        keyword: initProps.initKeyword || ''
+        keyword: initProps.initKeyword || '',
+        matchMode: initProps.initMatchMode && parseInt(initProps.initMatchMode) >= 0 ? parseInt(initProps.initMatchMode) : undefined
     });
 
     if (initProps.initPageType) {
@@ -1829,7 +1831,8 @@ onBeforeRouteUpdate((to) => {
             initAccountIds: (to.query['accountIds'] as string | null) || undefined,
             initTagFilter: (to.query['tagFilter'] as string | null) || undefined,
             initAmountFilter: (to.query['amountFilter'] as string | null) || undefined,
-            initKeyword: (to.query['keyword'] as string | null) || undefined
+            initKeyword: (to.query['keyword'] as string | null) || undefined,
+            initMatchMode: (to.query['matchMode'] as string | null) || undefined
         });
     } else {
         init({});

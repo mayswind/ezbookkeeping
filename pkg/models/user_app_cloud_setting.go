@@ -25,9 +25,10 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"overviewAccountFilterInHomePage":             USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
 	"overviewTransactionCategoryFilterInHomePage": USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
 	// Transaction List Page
-	"itemsCountInTransactionListPage":      USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
-	"showTotalAmountInTransactionListPage": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
-	"showTagInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"itemsCountInTransactionListPage":              USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
+	"showTotalAmountInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"showTagInTransactionListPage":                 USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"defaultKeywordMatchModeInTransactionListPage": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// Transaction Edit Page
 	"quickSaveButtonStyleInMobileTransactionListPage":          USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"quickAddButtonActionInMobileTransactionEditPage":          USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
@@ -61,6 +62,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"statistics.defaultTimezoneType":                  USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"statistics.defaultAccountFilter":                 USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
 	"statistics.defaultTransactionCategoryFilter":     USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
+	"statistics.defaultKeywordMatchMode":              USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"statistics.defaultSortingType":                   USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"statistics.defaultCategoricalChartType":          USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"statistics.defaultCategoricalChartDataRangeType": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,

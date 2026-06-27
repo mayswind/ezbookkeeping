@@ -113,6 +113,17 @@
                                                                  v-for="timezoneType in allTimezoneTypesUsedForDateRange"
                                                                  @click="currentExplorer.timezoneUsedForDateRange = timezoneType.type"></v-list-item>
                                                 </template>
+                                                <v-divider class="my-2" v-if="activeTab === 'query'"/>
+                                                <v-list-item :prepend-icon="mdiApplicationImport"
+                                                             :title="tt('Import Queries')"
+                                                             :disabled="loading || updating"
+                                                             @click="importQueries"
+                                                             v-if="activeTab === 'query'"></v-list-item>
+                                                <v-list-item :prepend-icon="mdiApplicationExport"
+                                                             :title="tt('Export Queries')"
+                                                             :disabled="loading || updating"
+                                                             @click="exportQueries"
+                                                             v-if="activeTab === 'query'"></v-list-item>
                                                 <v-list-item :prepend-icon="mdiTableEdit"
                                                              :title="tt('Enter Edit Mode')"
                                                              :disabled="loading || updating || filteredTransactionsInDataTable.length < 1"
@@ -190,6 +201,8 @@
 
     <explorer-change-display-order-dialog ref="explorerChangeDisplayOrderDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
+    <query-import-dialog ref="queryImportDialog" />
+    <query-export-dialog ref="queryExportDialog" />
     <export-dialog ref="exportDialog" />
 
     <rename-dialog ref="renameDialog"
@@ -209,6 +222,8 @@ import ExplorerEditableDataTableTab from '@/views/desktop/insights/tabs/Explorer
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
 import ExplorerChangeDisplayOrderDialog from '@/views/desktop/insights/dialogs/ExplorerChangeDisplayOrderDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
+import QueryImportDialog from '@/views/desktop/insights/dialogs/QueryImportDialog.vue';
+import QueryExportDialog from '@/views/desktop/insights/dialogs/QueryExportDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
 import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
@@ -230,7 +245,7 @@ import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 
 import { type TransactionInsightDataItem, Transaction } from '@/models/transaction.ts';
-import { InsightsExplorerBasicInfo, InsightsExplorer } from '@/models/explorer.ts';
+import { InsightsExplorerBasicInfo, InsightsExplorer, TransactionExplorerQuery } from '@/models/explorer.ts';
 
 import {
     parseDateTimeFromUnixTime,
@@ -257,6 +272,8 @@ import {
     mdiSort,
     mdiHomeClockOutline,
     mdiInvoiceTextClockOutline,
+    mdiApplicationImport,
+    mdiApplicationExport,
     mdiExport,
     mdiTableEdit,
     mdiTableCheck
@@ -281,6 +298,8 @@ type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
 type ExplorerChangeDisplayOrderDialogType = InstanceType<typeof ExplorerChangeDisplayOrderDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
+type QueryImportDialogType = InstanceType<typeof QueryImportDialog>;
+type QueryExportDialogType = InstanceType<typeof QueryExportDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 const router = useRouter();
@@ -311,6 +330,8 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
 const explorerChangeDisplayOrderDialog = useTemplateRef<ExplorerChangeDisplayOrderDialogType>('explorerChangeDisplayOrderDialog');
+const queryImportDialog = useTemplateRef<QueryImportDialogType>('queryImportDialog');
+const queryExportDialog = useTemplateRef<QueryExportDialogType>('queryExportDialog');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
@@ -644,6 +665,28 @@ function removeExplorer(): void {
             }
         });
     });
+}
+
+function importQueries(): void {
+    if (activeTab.value === 'query') {
+        queryImportDialog.value?.open().then((queries: TransactionExplorerQuery[]) => {
+            if (!queries || queries.length < 1) {
+                return;
+            }
+
+            explorersStore.currentInsightsExplorer.queries.length = 0;
+            explorersStore.currentInsightsExplorer.queries.push(...queries);
+            isCurrentExplorerModified.value = true;
+        });
+    }
+}
+
+function exportQueries(): void {
+    if (activeTab.value === 'query') {
+        queryExportDialog.value?.open({
+            queriesJson: explorersStore.currentInsightsExplorer.getQueryiesPrettyJson()
+        });
+    }
 }
 
 function exportResults(): void {

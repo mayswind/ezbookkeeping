@@ -126,6 +126,10 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         };
     }
 
+    public getQueryiesPrettyJson(): string {
+        return JSON.stringify(this.queries.map(q => q.toJsonObject()), null, 4);
+    }
+
     public toCreateRequest(clientSessionId: string): InsightsExplorerCreateRequest {
         return {
             name: this.name,
@@ -664,6 +668,34 @@ export class TransactionExplorerQuery {
         }
 
         return new TransactionExplorerQuery(id, name, conditions);
+    }
+
+    public static parseFromQueryiesJson(json: string): TransactionExplorerQuery[] {
+        const queryItems = JSON.parse(json);
+
+        if (!Array.isArray(queryItems)) {
+            throw new Error('Invalid JSON format for queries');
+        }
+
+        const queries: TransactionExplorerQuery[] = [];
+        const queryIds: Record<string, boolean> = {};
+
+        for (const queryItem of queryItems) {
+            const query = TransactionExplorerQuery.parse(queryItem);
+
+            if (!query) {
+                throw new Error('Invalid query format in JSON');
+            }
+
+            if (queryIds[query.id]) {
+                throw new Error(`Duplicate query ID found: ${query.id}`);
+            }
+
+            queries.push(query);
+            queryIds[query.id] = true;
+        }
+
+        return queries;
     }
 }
 

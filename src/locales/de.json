@@ -137,7 +137,7 @@
             "everyNDays": "Alle {n} Tage",
             "youHaveAccounts": "Sie haben {count} Konten erfasst",
             "addNewTag": "Neuen Tag \"{tag}\" hinzufügen",
-            "clickToSelectedFile": "Klicken Sie, um die Importdatei auszuwählen ({extensions})",
+            "clickToSelectedFile": "Klicken, um die Importdatei auszuwählen ({extensions})",
             "previewCount": "Vorschauanzahl: {count}",
             "selectedCount": "{count} von {totalCount} ausgewählt",
             "queryIndex": "Abfrage #{index}",
@@ -705,7 +705,7 @@
             },
             "Dollar": {
                 "normal": "Dollar",
-                "plural": "Dollars"
+                "plural": "Dollar"
             },
             "Dong": {
                 "normal": "Dong",
@@ -732,8 +732,8 @@
                 "plural": "Forint"
             },
             "Franc": {
-                "normal": "Franc",
-                "plural": "Francs"
+                "normal": "Franken",
+                "plural": "Franken"
             },
             "Gourde": {
                 "normal": "Gourde",
@@ -860,8 +860,8 @@
                 "plural": "Pesos"
             },
             "Pound": {
-                "normal": "Pound",
-                "plural": "Pounds"
+                "normal": "Pfund",
+                "plural": "Pfund"
             },
             "Pula": {
                 "normal": "Pula",
@@ -1044,22 +1044,22 @@
         "Investment Income": "Investitionseinkommen",
         "Rental Income": "Mieteinnahmen",
         "Interest Income": "Zinserträge",
-        "Gift & Lucky Money": "Geschenk & Glücksspiel",
+        "Gift & Lucky Money": "Geschenke",
         "Winnings Income": "Gewinneinkommen",
-        "Windfall": "Glücksfall",
+        "Windfall": "Unvorhergesehenes",
         "Other Income": "Andere Einnahmen",
         "Transfer Category": "Überweisungskategorie",
         "General Transfer": "Allgemeiner Überweisung",
         "Bank Transfer": "Banküberweisung",
         "Credit Card Repayment": "Kreditkartenrückzahlung",
-        "Deposits & Withdrawals": "Einzahlungen & Abhebungen",
+        "Deposits & Withdrawals": "Ein- & Auszahlungen",
         "Loan & Debt": "Darlehen & Schulden",
         "Borrowing Money": "Geld leihen",
         "Lending Money": "Geld verleihen",
         "Repayment": "Rückzahlung",
         "Debt Collection": "Schuldeneintreibung",
-        "Out-of-Pocket Expense": "Aus eigener Tasche",
-        "Reimbursement": "Erstattung",
+        "Out-of-Pocket Expense": "Barausgaben",
+        "Reimbursement": "Rückerstattung",
         "Other Transfer": "Andere Überweisung"
     },
     "mapprovider": {
@@ -1915,14 +1915,14 @@
     "Transfer In": "Eingehende Überweisung",
     "Transfer Out": "Ausgehende Überweisung",
     "Cash": "Bargeld",
-    "Checking Account": "Girokonto",
+    "Checking Account": "Bankkonto",
     "Credit Card": "Kreditkarte",
     "Virtual Account": "Virtuelles Konto",
     "Debt Account": "Schuldenkonto",
     "Receivables": "Forderungen",
     "Investment Account": "Investitionskonto",
     "Savings Account": "Sparkonto",
-    "Certificate of Deposit": "Einlagenzertifikat",
+    "Certificate of Deposit": "Einlagen-Depot",
     "Balance": "Saldo",
     "Outstanding Balance": "Ausstehender Saldo",
     "Unable to retrieve account list": "Kontoliste kann nicht abgerufen werden",
@@ -1948,10 +1948,10 @@
     "Account Color": "Kontofarbe",
     "Sub-account Color": "Teilkontofarbe",
     "Currency": "Währung",
-    "Account Balance": "Kontostand",
-    "Account Outstanding Balance": "Ausstehender Kontostand",
+    "Account Balance": "Konto-Saldo",
+    "Account Outstanding Balance": "Ausstehender Konto-Saldo",
     "Sub-account Balance": "Teilkontostand",
-    "Sub-account Outstanding Balance": "Ausstehender Teilkontostand",
+    "Sub-account Outstanding Balance": "Ausstehender Teilkonto-Saldo",
     "Balance Time": "Saldozeit",
     "Sub-account Balance Time": "Teilkonto-Saldozeit",
     "Last Reconciled Time": "Letzte Überprüfungszeit",
@@ -1991,7 +1991,7 @@
     "Unable to move transactions": "Transaktionen können nicht verschoben werden",
     "All transactions in this account have been moved.": "Alle Transaktionen in diesem Konto wurden verschoben.",
     "Reconciliation Statement": "Kontenabstimmung",
-    "Account Balance Trends": "Kontostand-Trends",
+    "Account Balance Trends": "Kontosaldo-Trends",
     "Update Closing Balance": "Abschlusssaldo aktualisieren",
     "Please enter the new closing balance for this account": "Bitte geben Sie den neuen Abschlusssaldo für dieses Konto ein",
     "Transaction": "Transaktion",
@@ -2028,8 +2028,8 @@
     "AI Clipboard Text Recognition": "AI Clipboard Text Recognition",
     "Unable to recognize text": "Unable to recognize text",
     "AI text recognition is disabled": "AI text recognition is disabled",
-    "Click here to paste a transaction description": "Click here to paste a transaction description",
-    "Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.": "Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.",
+    "Click here to paste a transaction description": "Klicken, um eine Transaktionsbeschreibung einzufügen",
+    "Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.": "Hochgeladener Text und persönliche Daten werden an ein Sprachmodell gesendet. Bitte beachten Sie mögliche Datenschutzrisiken.",
     "AI Image Recognition": "KI-Bilderkennung",
     "Unable to load image": "Bild kann nicht geladen werden",
     "Unable to recognize image": "Bild kann nicht erkannt werden",
@@ -2037,7 +2037,7 @@
     "You can drag and drop, paste or click to select a receipt or transaction image": "Sie können ein Beleg- oder Transaktionsbild per Drag & Drop, Einfügen oder Klicken auswählen",
     "Release to load image": "Loslassen, um Bild zu laden",
     "Loading image...": "Bild wird geladen...",
-    "Click here to select a receipt or transaction image": "Klicken Sie hier, um ein Beleg- oder Transaktionsbild auszuwählen",
+    "Click here to select a receipt or transaction image": "Klicken, um ein Beleg- oder Transaktionsbild auszuwählen",
     "Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.": "Das hochgeladene Bild und persönliche Daten werden an das große Sprachmodell gesendet. Bitte beachten Sie mögliche Datenschutzrisiken.",
     "AI can make mistakes. Check important info.": "KI kann Fehler machen. Überprüfen Sie wichtige Informationen.",
     "Category": "Kategorie",

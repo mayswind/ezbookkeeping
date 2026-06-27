@@ -32,6 +32,8 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { TransactionExplorerQuery } from '@/models/explorer.ts';
 
+import { isTextualUUID } from '@/lib/common.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -62,7 +64,52 @@ function confirm(): void {
     }
 
     try {
-        const queries: TransactionExplorerQuery[] = TransactionExplorerQuery.parseFromQueryiesJson(queriesJson.value);
+        const queryItems = JSON.parse(queriesJson.value);
+
+        if (!Array.isArray(queryItems)) {
+            snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
+            return;
+        }
+
+        if (!queryItems || queryItems.length < 1) {
+            snackbar.value?.showError('No valid queries found in the input. Please make sure the queries are valid and try again.');
+            return;
+        }
+
+        const queries: TransactionExplorerQuery[] = [];
+        const queryIds: Record<string, boolean> = {};
+
+        for (const queryItem of queryItems) {
+            let originalId: string = '';
+
+            if (!('id' in queryItem) || !queryItem['id']) {
+                queryItem['id'] = generateRandomUUID();
+            } else {
+                const queryId = queryItem['id'];
+
+                if (!isTextualUUID(queryId)) {
+                    snackbar.value?.showMessage('format.misc.queryIdInvalidTip', { id: queryId });
+                    return;
+                }
+
+                originalId = queryId;
+            }
+
+            const query = TransactionExplorerQuery.parse(queryItem);
+
+            if (!query) {
+                snackbar.value?.showMessage('format.misc.queryInvalidTip', { id: originalId });
+                return;
+            }
+
+            if (queryIds[query.id]) {
+                snackbar.value?.showMessage('format.misc.queryIdDuplicatedTip', { id: query.id });
+                return;
+            }
+
+            queries.push(query);
+            queryIds[query.id] = true;
+        }
 
         if (!queries || queries.length < 1) {
             snackbar.value?.showError('No valid queries found in the input. Please make sure the queries are valid and try again.');

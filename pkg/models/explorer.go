@@ -2,7 +2,7 @@ package models
 
 import "encoding/json"
 
-// InsightsExplorer represents a saved insights explorer configuration
+// InsightsExplorer represents a saved exploration configuration
 type InsightsExplorer struct {
 	ExplorerId      int64  `xorm:"PK"`
 	Uid             int64  `xorm:"INDEX(IDX_insights_explorer_uid_deleted_order) NOT NULL"`
@@ -16,14 +16,14 @@ type InsightsExplorer struct {
 	DeletedUnixTime int64
 }
 
-// InsightsExplorerCreateRequest represents all parameters of insights explorer creation request
+// InsightsExplorerCreateRequest represents all parameters of exploration creation request
 type InsightsExplorerCreateRequest struct {
 	Name            string         `json:"name" binding:"required,notBlank,max=64"`
 	Data            map[string]any `json:"data" binding:"required"`
 	ClientSessionId string         `json:"clientSessionId"`
 }
 
-// InsightsExplorerModifyRequest represents all parameters of insights explorer modification request
+// InsightsExplorerModifyRequest represents all parameters of exploration modification request
 type InsightsExplorerModifyRequest struct {
 	Id              int64          `json:"id,string" binding:"required,min=0"`
 	Name            string         `json:"name" binding:"required,notBlank,max=64"`
@@ -32,18 +32,18 @@ type InsightsExplorerModifyRequest struct {
 	ClientSessionId string         `json:"clientSessionId"`
 }
 
-// InsightsExplorerGetRequest represents all parameters of insights explorer getting request
+// InsightsExplorerGetRequest represents all parameters of exploration getting request
 type InsightsExplorerGetRequest struct {
 	Id int64 `form:"id,string" binding:"required,min=1"`
 }
 
-// InsightsExplorerHideRequest represents all parameters of insights explorer hiding request
+// InsightsExplorerHideRequest represents all parameters of exploration hiding request
 type InsightsExplorerHideRequest struct {
 	Id     int64 `json:"id,string" binding:"required,min=1"`
 	Hidden bool  `json:"hidden"`
 }
 
-// InsightsExplorerMoveRequest represents all parameters of insights explorer moving request
+// InsightsExplorerMoveRequest represents all parameters of exploration moving request
 type InsightsExplorerMoveRequest struct {
 	NewDisplayOrders []*InsightsExplorerNewDisplayOrderRequest `json:"newDisplayOrders" binding:"required,min=1"`
 }
@@ -54,12 +54,12 @@ type InsightsExplorerNewDisplayOrderRequest struct {
 	DisplayOrder int32 `json:"displayOrder"`
 }
 
-// InsightsExplorerDeleteRequest represents all parameters of insights explorer deleting request
+// InsightsExplorerDeleteRequest represents all parameters of exploration deleting request
 type InsightsExplorerDeleteRequest struct {
 	Id int64 `json:"id,string" binding:"required,min=1"`
 }
 
-// InsightsExplorerInfoResponse represents a view-object of insights explorer info
+// InsightsExplorerInfoResponse represents a view-object of exploration info
 type InsightsExplorerInfoResponse struct {
 	Id           int64          `json:"id,string"`
 	Name         string         `json:"name"`

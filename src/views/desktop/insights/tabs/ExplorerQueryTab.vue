@@ -600,9 +600,9 @@ const editingQuery = ref<TransactionExplorerQuery | undefined>(undefined);
 const editingQueryName = ref<string>('');
 
 const queries = computed<TransactionExplorerQuery[]>({
-    get: () => explorersStore.currentInsightsExplorer.queries,
+    get: () => explorersStore.currentExploration.queries,
     set: (value: TransactionExplorerQuery[]) => {
-        explorersStore.currentInsightsExplorer.queries = value;
+        explorersStore.currentExploration.queries = value;
     }
 });
 
@@ -725,8 +725,8 @@ function removeQuery(query: TransactionExplorerQuery, queryIndex: number): void 
         queries.value.splice(queryIndex, 1);
     }
 
-    if (explorersStore.currentInsightsExplorer.datatableQuerySource === query.id) {
-        explorersStore.currentInsightsExplorer.datatableQuerySource = '';
+    if (explorersStore.currentExploration.datatableQuerySource === query.id) {
+        explorersStore.currentExploration.datatableQuerySource = '';
     }
 
     if (queries.value.length < 1) {
@@ -884,7 +884,7 @@ function getExpression(query: TransactionExplorerQuery, queryIndex: number): str
     try {
         return query.toExpression(transactionCategoriesStore.allTransactionCategoriesMap, accountsStore.allAccountsMap, transactionTagsStore.allTransactionTagsMap);
     } catch (ex) {
-        logger.error('failed to generate expression for explorer query#' + queryIndex, ex);
+        logger.error('failed to generate expression for exploration query#' + queryIndex, ex);
         snackbar.value?.showError(tt('Failed to generate expression'));
         return tt('Failed to generate expression');
     }

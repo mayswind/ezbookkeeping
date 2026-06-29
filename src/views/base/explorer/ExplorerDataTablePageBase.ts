@@ -12,7 +12,7 @@ import type { NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
-import type { InsightsExplorer} from '@/models/explorer.ts';
+import type { InsightsExplorer } from '@/models/explorer.ts';
 
 import {
     getUtcOffsetByUtcOffsetMinutes,
@@ -38,7 +38,7 @@ export function useExplorerDataTablePageBase() {
     const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
-    const currentExplorer = computed<InsightsExplorer>(() => explorersStore.currentInsightsExplorer);
+    const currentExploration = computed<InsightsExplorer>(() => explorersStore.currentExploration);
 
     const filteredTransactions = computed<TransactionInsightDataItem[]>(() => explorersStore.filteredTransactionsInDataTable);
 
@@ -50,7 +50,7 @@ export function useExplorerDataTablePageBase() {
             value: ''
         });
 
-        for (const [query, index] of itemAndIndex(currentExplorer.value.queries)) {
+        for (const [query, index] of itemAndIndex(currentExploration.value.queries)) {
             if (query.name) {
                 sources.push({
                     name: query.name,
@@ -83,7 +83,7 @@ export function useExplorerDataTablePageBase() {
     const skeletonData = computed<number[]>(() => {
         const data: number[] = [];
 
-        for (let i = 0; i < currentExplorer.value.countPerPage; i++) {
+        for (let i = 0; i < currentExploration.value.countPerPage; i++) {
             data.push(i);
         }
 
@@ -96,7 +96,7 @@ export function useExplorerDataTablePageBase() {
         }
 
         const count = filteredTransactions.value.length;
-        return Math.ceil(count / currentExplorer.value.countPerPage);
+        return Math.ceil(count / currentExploration.value.countPerPage);
     });
 
     const dataTableHeaders = computed<object[]>(() => {
@@ -189,7 +189,7 @@ export function useExplorerDataTablePageBase() {
         // states
         currentPage,
         // computed states
-        currentExplorer,
+        currentExploration,
         filteredTransactions,
         allDataTableQuerySources,
         allPageCounts,

@@ -32,16 +32,16 @@
                                 color: 'error-darken-1'
                             },
                             {
-                                title: 'Insights Explorers',
-                                count: displayDataStatistics ? displayDataStatistics.totalInsightsExplorerCount : '-',
-                                icon: mdiCompassOutline,
-                                color: 'warning'
-                            },
-                            {
                                 title: 'Accounts',
                                 count: displayDataStatistics ? displayDataStatistics.totalAccountCount : '-',
                                 icon: mdiCreditCardOutline,
                                 color: 'primary'
+                            },
+                            {
+                                title: 'Explorations',
+                                count: displayDataStatistics ? displayDataStatistics.totalExplorationCount : '-',
+                                icon: mdiCompassOutline,
+                                color: 'warning'
                             },
                             {
                                 title: 'Transaction Categories',

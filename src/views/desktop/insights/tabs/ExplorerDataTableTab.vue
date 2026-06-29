@@ -12,7 +12,7 @@
                         :disabled="loading || disabled"
                         :label="tt('Data Source')"
                         :items="allDataTableQuerySources"
-                        v-model="currentExplorer.datatableQuerySource"
+                        v-model="currentExploration.datatableQuerySource"
                     />
                     <v-select
                         class="flex-0-0"
@@ -23,7 +23,7 @@
                         :disabled="loading || disabled"
                         :label="tt('Transactions Per Page')"
                         :items="allPageCounts"
-                        v-model="currentExplorer.countPerPage"
+                        v-model="currentExploration.countPerPage"
                     />
                     <v-spacer/>
                     <div class="d-flex align-center">
@@ -125,7 +125,7 @@
         :headers="dataTableHeaders"
         :items="filteredTransactions"
         :hover="true"
-        v-model:items-per-page="currentExplorer.countPerPage"
+        v-model:items-per-page="currentExploration.countPerPage"
         v-model:page="currentPage"
     >
         <template #item.time="{ item }">
@@ -252,7 +252,7 @@ const {
 
 const {
     currentPage,
-    currentExplorer,
+    currentExploration,
     filteredTransactions,
     allDataTableQuerySources,
     allPageCounts,

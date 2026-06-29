@@ -30,8 +30,8 @@ var (
 	}
 )
 
-// GetTotalInsightsExplorersCountByUid returns total insights explorers count of user
-func (s *InsightsExplorerService) GetTotalInsightsExplorersCountByUid(c core.Context, uid int64) (int64, error) {
+// GetTotalExplorationsCountByUid returns total explorations count of user
+func (s *InsightsExplorerService) GetTotalExplorationsCountByUid(c core.Context, uid int64) (int64, error) {
 	if uid <= 0 {
 		return 0, errs.ErrUserIdInvalid
 	}
@@ -41,8 +41,8 @@ func (s *InsightsExplorerService) GetTotalInsightsExplorersCountByUid(c core.Con
 	return count, err
 }
 
-// GetAllInsightsExplorerNamesByUid returns all insights explorer models of user without data
-func (s *InsightsExplorerService) GetAllInsightsExplorerNamesByUid(c core.Context, uid int64) ([]*models.InsightsExplorer, error) {
+// GetAllExplorationNamesByUid returns all exploration names
+func (s *InsightsExplorerService) GetAllExplorationNamesByUid(c core.Context, uid int64) ([]*models.InsightsExplorer, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -53,18 +53,18 @@ func (s *InsightsExplorerService) GetAllInsightsExplorerNamesByUid(c core.Contex
 	return explorers, err
 }
 
-// GetInsightsExplorerByExplorerId returns a insights explorer model according to insights explorer id
-func (s *InsightsExplorerService) GetInsightsExplorerByExplorerId(c core.Context, uid int64, explorerId int64) (*models.InsightsExplorer, error) {
+// GetExplorationByExplorationId returns a exploration model according to exploration id
+func (s *InsightsExplorerService) GetExplorationByExplorationId(c core.Context, uid int64, explorationId int64) (*models.InsightsExplorer, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
 
-	if explorerId <= 0 {
+	if explorationId <= 0 {
 		return nil, errs.ErrInsightsExplorerIdInvalid
 	}
 
-	explorer := &models.InsightsExplorer{}
-	has, err := s.UserDataDB(uid).NewSession(c).ID(explorerId).Where("uid=? AND deleted=?", uid, false).Get(explorer)
+	exploration := &models.InsightsExplorer{}
+	has, err := s.UserDataDB(uid).NewSession(c).ID(explorationId).Where("uid=? AND deleted=?", uid, false).Get(exploration)
 
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (s *InsightsExplorerService) GetInsightsExplorerByExplorerId(c core.Context
 		return nil, errs.ErrInsightsExplorerNotFound
 	}
 
-	return explorer, nil
+	return exploration, nil
 }
 
 // GetMaxDisplayOrder returns the max display order
@@ -81,52 +81,52 @@ func (s *InsightsExplorerService) GetMaxDisplayOrder(c core.Context, uid int64) 
 		return 0, errs.ErrUserIdInvalid
 	}
 
-	explorer := &models.InsightsExplorer{}
-	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "display_order").Where("uid=? AND deleted=?", uid, false).OrderBy("display_order desc").Limit(1).Get(explorer)
+	exploration := &models.InsightsExplorer{}
+	has, err := s.UserDataDB(uid).NewSession(c).Cols("uid", "deleted", "display_order").Where("uid=? AND deleted=?", uid, false).OrderBy("display_order desc").Limit(1).Get(exploration)
 
 	if err != nil {
 		return 0, err
 	}
 
 	if has {
-		return explorer.DisplayOrder, nil
+		return exploration.DisplayOrder, nil
 	} else {
 		return 0, nil
 	}
 }
 
-// CreateInsightsExplorer saves a new insights explorer model to database
-func (s *InsightsExplorerService) CreateInsightsExplorer(c core.Context, explorer *models.InsightsExplorer) error {
-	if explorer.Uid <= 0 {
+// CreateExploration saves a new exploration model to database
+func (s *InsightsExplorerService) CreateExploration(c core.Context, exploration *models.InsightsExplorer) error {
+	if exploration.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	explorer.ExplorerId = s.GenerateUuid(uuid.UUID_TYPE_EXPLORER)
+	exploration.ExplorerId = s.GenerateUuid(uuid.UUID_TYPE_EXPLORER)
 
-	if explorer.ExplorerId < 1 {
+	if exploration.ExplorerId < 1 {
 		return errs.ErrSystemIsBusy
 	}
 
-	explorer.Deleted = false
-	explorer.CreatedUnixTime = time.Now().Unix()
-	explorer.UpdatedUnixTime = time.Now().Unix()
+	exploration.Deleted = false
+	exploration.CreatedUnixTime = time.Now().Unix()
+	exploration.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(explorer.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		_, err := sess.Insert(explorer)
+	return s.UserDataDB(exploration.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+		_, err := sess.Insert(exploration)
 		return err
 	})
 }
 
-// ModifyInsightsExplorer saves an existed insights explorer model to database
-func (s *InsightsExplorerService) ModifyInsightsExplorer(c core.Context, explorer *models.InsightsExplorer) error {
-	if explorer.Uid <= 0 {
+// ModifyExploration saves an existed exploration model to database
+func (s *InsightsExplorerService) ModifyExploration(c core.Context, exploration *models.InsightsExplorer) error {
+	if exploration.Uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	explorer.UpdatedUnixTime = time.Now().Unix()
+	exploration.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(explorer.Uid).DoTransaction(c, func(sess *xorm.Session) error {
-		updatedRows, err := sess.ID(explorer.ExplorerId).Cols("name", "data", "updated_unix_time").Where("uid=? AND deleted=?", explorer.Uid, false).Update(explorer)
+	return s.UserDataDB(exploration.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+		updatedRows, err := sess.ID(exploration.ExplorerId).Cols("name", "data", "updated_unix_time").Where("uid=? AND deleted=?", exploration.Uid, false).Update(exploration)
 
 		if err != nil {
 			return err
@@ -138,8 +138,8 @@ func (s *InsightsExplorerService) ModifyInsightsExplorer(c core.Context, explore
 	})
 }
 
-// HideInsightsExplorer updates hidden field of given insights explorer ids
-func (s *InsightsExplorerService) HideInsightsExplorer(c core.Context, uid int64, ids []int64, hidden bool) error {
+// HideExploration updates hidden field of given exploration ids
+func (s *InsightsExplorerService) HideExploration(c core.Context, uid int64, ids []int64, hidden bool) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -164,20 +164,20 @@ func (s *InsightsExplorerService) HideInsightsExplorer(c core.Context, uid int64
 	})
 }
 
-// ModifyInsightsExplorerDisplayOrders updates display order of given insights explorers
-func (s *InsightsExplorerService) ModifyInsightsExplorerDisplayOrders(c core.Context, uid int64, explorers []*models.InsightsExplorer) error {
+// ModifyExplorationDisplayOrders updates display order of given explorations
+func (s *InsightsExplorerService) ModifyExplorationDisplayOrders(c core.Context, uid int64, explorations []*models.InsightsExplorer) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
 
-	for i := 0; i < len(explorers); i++ {
-		explorers[i].UpdatedUnixTime = time.Now().Unix()
+	for i := 0; i < len(explorations); i++ {
+		explorations[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
 	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
-		for i := 0; i < len(explorers); i++ {
-			explorer := explorers[i]
-			updatedRows, err := sess.ID(explorer.ExplorerId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(explorer)
+		for i := 0; i < len(explorations); i++ {
+			exploration := explorations[i]
+			updatedRows, err := sess.ID(exploration.ExplorerId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(exploration)
 
 			if err != nil {
 				return err
@@ -190,8 +190,8 @@ func (s *InsightsExplorerService) ModifyInsightsExplorerDisplayOrders(c core.Con
 	})
 }
 
-// DeleteInsightsExplorer deletes an existed insights explorer from database
-func (s *InsightsExplorerService) DeleteInsightsExplorer(c core.Context, uid int64, explorerId int64) error {
+// DeleteExploration deletes an existed exploration from database
+func (s *InsightsExplorerService) DeleteExploration(c core.Context, uid int64, explorerId int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}
@@ -216,8 +216,8 @@ func (s *InsightsExplorerService) DeleteInsightsExplorer(c core.Context, uid int
 	})
 }
 
-// DeleteAllInsightsExplorers deletes all existed insights explorers from database
-func (s *InsightsExplorerService) DeleteAllInsightsExplorers(c core.Context, uid int64) error {
+// DeleteAllExplorations deletes all existed explorations from database
+func (s *InsightsExplorerService) DeleteAllExplorations(c core.Context, uid int64) error {
 	if uid <= 0 {
 		return errs.ErrUserIdInvalid
 	}

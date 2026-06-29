@@ -11,25 +11,25 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 )
 
-// InsightsExplorersApi represents insights explorers api
+// InsightsExplorersApi represents insights explorer api
 type InsightsExplorersApi struct {
 	insightsExploreres *services.InsightsExplorerService
 }
 
-// Initialize a insights explorers api singleton instance
+// Initialize a insights explorer api singleton instance
 var (
 	InsightsExplorers = &InsightsExplorersApi{
 		insightsExploreres: services.InsightsExplorers,
 	}
 )
 
-// InsightsExplorerListHandler returns insights explorer list of current user
+// InsightsExplorerListHandler returns exploration list of current user
 func (a *InsightsExplorersApi) InsightsExplorerListHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
-	explorers, err := a.insightsExploreres.GetAllInsightsExplorerNamesByUid(c, uid)
+	explorers, err := a.insightsExploreres.GetAllExplorationNamesByUid(c, uid)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerListHandler] failed to get insights explorers for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerListHandler] failed to get explorations for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
@@ -39,7 +39,7 @@ func (a *InsightsExplorersApi) InsightsExplorerListHandler(c *core.WebContext) (
 		explorerResps[i], err = explorers[i].ToInsightsExplorerInfoResponse()
 
 		if err != nil {
-			log.Errorf(c, "[explorers.InsightsExplorerListHandler] failed to get insights explorer response for user \"uid:%d\", because %s", uid, err.Error())
+			log.Errorf(c, "[explorers.InsightsExplorerListHandler] failed to get exploration response for user \"uid:%d\", because %s", uid, err.Error())
 			return nil, errs.ErrInsightsExplorerDataInvalid
 		}
 	}
@@ -49,7 +49,7 @@ func (a *InsightsExplorersApi) InsightsExplorerListHandler(c *core.WebContext) (
 	return explorerResps, nil
 }
 
-// InsightsExplorerGetHandler returns one specific insights explorer of current user
+// InsightsExplorerGetHandler returns one specific exploration of current user
 func (a *InsightsExplorersApi) InsightsExplorerGetHandler(c *core.WebContext) (any, *errs.Error) {
 	var explorerGetReq models.InsightsExplorerGetRequest
 	err := c.ShouldBindQuery(&explorerGetReq)
@@ -60,24 +60,24 @@ func (a *InsightsExplorersApi) InsightsExplorerGetHandler(c *core.WebContext) (a
 	}
 
 	uid := c.GetCurrentUid()
-	explorer, err := a.insightsExploreres.GetInsightsExplorerByExplorerId(c, uid, explorerGetReq.Id)
+	explorer, err := a.insightsExploreres.GetExplorationByExplorationId(c, uid, explorerGetReq.Id)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerGetHandler] failed to get insights explorer \"id:%d\" for user \"uid:%d\", because %s", explorerGetReq.Id, uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerGetHandler] failed to get exploration \"id:%d\" for user \"uid:%d\", because %s", explorerGetReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	explorerResp, err := explorer.ToInsightsExplorerInfoResponse()
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerGetHandler] failed to get insights explorer response for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerGetHandler] failed to get exploration response for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrInsightsExplorerDataInvalid
 	}
 
 	return explorerResp, nil
 }
 
-// InsightsExplorerCreateHandler saves a new insights explorer by request parameters for current user
+// InsightsExplorerCreateHandler saves a new exploration by request parameters for current user
 func (a *InsightsExplorersApi) InsightsExplorerCreateHandler(c *core.WebContext) (any, *errs.Error) {
 	var explorerCreateReq models.InsightsExplorerCreateRequest
 	err := c.ShouldBindJSON(&explorerCreateReq)
@@ -99,30 +99,30 @@ func (a *InsightsExplorersApi) InsightsExplorerCreateHandler(c *core.WebContext)
 	explorer, err := a.createNewInsightsExplorerModel(uid, &explorerCreateReq, maxOrderId+1)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to parse insights explorer data for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to parse exploration data for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrInsightsExplorerDataInvalid
 	}
 
-	err = a.insightsExploreres.CreateInsightsExplorer(c, explorer)
+	err = a.insightsExploreres.CreateExploration(c, explorer)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to create insights explorer \"id:%d\" for user \"uid:%d\", because %s", explorer.ExplorerId, uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to create exploration \"id:%d\" for user \"uid:%d\", because %s", explorer.ExplorerId, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.Infof(c, "[explorers.InsightsExplorerCreateHandler] user \"uid:%d\" has created a new insights explorer \"id:%d\" successfully", uid, explorer.ExplorerId)
+	log.Infof(c, "[explorers.InsightsExplorerCreateHandler] user \"uid:%d\" has created a new exploration \"id:%d\" successfully", uid, explorer.ExplorerId)
 
 	explorerResp, err := explorer.ToInsightsExplorerInfoResponse()
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to get insights explorer response for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to get exploration response for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrInsightsExplorerDataInvalid
 	}
 
 	return explorerResp, nil
 }
 
-// InsightsExplorerModifyHandler saves an existed insights explorer by request parameters for current user
+// InsightsExplorerModifyHandler saves an existed exploration by request parameters for current user
 func (a *InsightsExplorersApi) InsightsExplorerModifyHandler(c *core.WebContext) (any, *errs.Error) {
 	var explorerModifyReq models.InsightsExplorerModifyRequest
 	err := c.ShouldBindJSON(&explorerModifyReq)
@@ -133,17 +133,17 @@ func (a *InsightsExplorersApi) InsightsExplorerModifyHandler(c *core.WebContext)
 	}
 
 	uid := c.GetCurrentUid()
-	explorer, err := a.insightsExploreres.GetInsightsExplorerByExplorerId(c, uid, explorerModifyReq.Id)
+	explorer, err := a.insightsExploreres.GetExplorationByExplorationId(c, uid, explorerModifyReq.Id)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to get insights explorer \"id:%d\" for user \"uid:%d\", because %s", explorerModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to get exploration \"id:%d\" for user \"uid:%d\", because %s", explorerModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	newData, err := json.Marshal(explorerModifyReq.Data)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to parse insights explorer data for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to parse exploration data for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrInsightsExplorerDataInvalid
 	}
 
@@ -158,28 +158,28 @@ func (a *InsightsExplorersApi) InsightsExplorerModifyHandler(c *core.WebContext)
 		return nil, errs.ErrNothingWillBeUpdated
 	}
 
-	err = a.insightsExploreres.ModifyInsightsExplorer(c, newExplorer)
+	err = a.insightsExploreres.ModifyExploration(c, newExplorer)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to update insights explorer \"id:%d\" for user \"uid:%d\", because %s", explorerModifyReq.Id, uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to update exploration \"id:%d\" for user \"uid:%d\", because %s", explorerModifyReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.Infof(c, "[explorers.InsightsExplorerModifyHandler] user \"uid:%d\" has updated insights explorer \"id:%d\" successfully", uid, explorerModifyReq.Id)
+	log.Infof(c, "[explorers.InsightsExplorerModifyHandler] user \"uid:%d\" has updated exploration \"id:%d\" successfully", uid, explorerModifyReq.Id)
 
 	explorer.Name = newExplorer.Name
 	explorer.Data = newExplorer.Data
 	explorerResp, err := explorer.ToInsightsExplorerInfoResponse()
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to get insights explorer response for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerModifyHandler] failed to get exploration response for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.ErrInsightsExplorerDataInvalid
 	}
 
 	return explorerResp, nil
 }
 
-// InsightsExplorerHideHandler hides a insights explorer by request parameters for current user
+// InsightsExplorerHideHandler hides a exploration by request parameters for current user
 func (a *InsightsExplorersApi) InsightsExplorerHideHandler(c *core.WebContext) (any, *errs.Error) {
 	var explorerHideReq models.InsightsExplorerHideRequest
 	err := c.ShouldBindJSON(&explorerHideReq)
@@ -190,18 +190,18 @@ func (a *InsightsExplorersApi) InsightsExplorerHideHandler(c *core.WebContext) (
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.insightsExploreres.HideInsightsExplorer(c, uid, []int64{explorerHideReq.Id}, explorerHideReq.Hidden)
+	err = a.insightsExploreres.HideExploration(c, uid, []int64{explorerHideReq.Id}, explorerHideReq.Hidden)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerHideHandler] failed to hide insights explorer \"id:%d\" for user \"uid:%d\", because %s", explorerHideReq.Id, uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerHideHandler] failed to hide exploration \"id:%d\" for user \"uid:%d\", because %s", explorerHideReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.Infof(c, "[explorers.InsightsExplorerHideHandler] user \"uid:%d\" has hidden insights explorer \"id:%d\"", uid, explorerHideReq.Id)
+	log.Infof(c, "[explorers.InsightsExplorerHideHandler] user \"uid:%d\" has hidden exploration \"id:%d\"", uid, explorerHideReq.Id)
 	return true, nil
 }
 
-// InsightsExplorerMoveHandler moves display order of existed insights explorers by request parameters for current user
+// InsightsExplorerMoveHandler moves display order of existed explorations by request parameters for current user
 func (a *InsightsExplorersApi) InsightsExplorerMoveHandler(c *core.WebContext) (any, *errs.Error) {
 	var explorerMoveReq models.InsightsExplorerMoveRequest
 	err := c.ShouldBindJSON(&explorerMoveReq)
@@ -225,18 +225,18 @@ func (a *InsightsExplorersApi) InsightsExplorerMoveHandler(c *core.WebContext) (
 		explorers[i] = explorer
 	}
 
-	err = a.insightsExploreres.ModifyInsightsExplorerDisplayOrders(c, uid, explorers)
+	err = a.insightsExploreres.ModifyExplorationDisplayOrders(c, uid, explorers)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerMoveHandler] failed to move insights explorers for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerMoveHandler] failed to move explorations for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.Infof(c, "[explorers.InsightsExplorerMoveHandler] user \"uid:%d\" has moved insights explorers", uid)
+	log.Infof(c, "[explorers.InsightsExplorerMoveHandler] user \"uid:%d\" has moved explorations", uid)
 	return true, nil
 }
 
-// InsightsExplorerDeleteHandler deletes an existed insights explorer by request parameters for current user
+// InsightsExplorerDeleteHandler deletes an existed exploration by request parameters for current user
 func (a *InsightsExplorersApi) InsightsExplorerDeleteHandler(c *core.WebContext) (any, *errs.Error) {
 	var explorerDeleteReq models.InsightsExplorerDeleteRequest
 	err := c.ShouldBindJSON(&explorerDeleteReq)
@@ -247,14 +247,14 @@ func (a *InsightsExplorersApi) InsightsExplorerDeleteHandler(c *core.WebContext)
 	}
 
 	uid := c.GetCurrentUid()
-	err = a.insightsExploreres.DeleteInsightsExplorer(c, uid, explorerDeleteReq.Id)
+	err = a.insightsExploreres.DeleteExploration(c, uid, explorerDeleteReq.Id)
 
 	if err != nil {
-		log.Errorf(c, "[explorers.InsightsExplorerDeleteHandler] failed to delete insights explorer \"id:%d\" for user \"uid:%d\", because %s", explorerDeleteReq.Id, uid, err.Error())
+		log.Errorf(c, "[explorers.InsightsExplorerDeleteHandler] failed to delete exploration \"id:%d\" for user \"uid:%d\", because %s", explorerDeleteReq.Id, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	log.Infof(c, "[explorers.InsightsExplorerDeleteHandler] user \"uid:%d\" has deleted insights explorer \"id:%d\"", uid, explorerDeleteReq.Id)
+	log.Infof(c, "[explorers.InsightsExplorerDeleteHandler] user \"uid:%d\" has deleted exploration \"id:%d\"", uid, explorerDeleteReq.Id)
 	return true, nil
 }
 

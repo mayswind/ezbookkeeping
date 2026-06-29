@@ -1,6 +1,7 @@
 package converters
 
 import (
+	"github.com/mayswind/ezbookkeeping/pkg/converters/ai"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/alipay"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/beancount"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/camt"
@@ -40,6 +41,8 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 		return _default.DefaultTransactionDataTSVFileConverter, nil
 	} else if fileType == "ezbookkeeping_json" {
 		return _default.DefaultTransactionDataJsonFileImporter, nil
+	} else if fileType == "ai_txt" {
+		return ai.AIRecognizedTransactionDataImporter, nil
 	} else if fileType == "ofx" {
 		return ofx.OFXTransactionDataImporter, nil
 	} else if fileType == "qfx" {

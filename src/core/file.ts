@@ -85,7 +85,9 @@ export interface ImportFileType extends ImportFileTypeAndExtensions {
     readonly subTypes?: ImportFileTypeSubType[];
     readonly supportedEncodings?: string[];
     readonly dataFromTextbox?: boolean;
+    readonly needAITextRecognition?: boolean;
     readonly supportedAdditionalOptions?: ImportFileTypeSupportedAdditionalOptions;
+    readonly supportedAIAdditionalPrompt?: boolean;
     readonly document?: {
         readonly supportMultiLanguages: boolean | string;
         readonly anchor: string;
@@ -110,7 +112,9 @@ export interface LocalizedImportFileType extends ImportFileTypeAndExtensions {
     readonly subTypes?: LocalizedImportFileTypeSubType[];
     readonly supportedEncodings?: LocalizedImportFileTypeSupportedEncodings[];
     readonly dataFromTextbox?: boolean;
+    readonly needAITextRecognition?: boolean;
     readonly supportedAdditionalOptions?: ImportFileTypeSupportedAdditionalOptions;
+    readonly supportedAIAdditionalPrompt?: boolean;
     readonly document?: LocalizedImportFileDocument;
 }
 

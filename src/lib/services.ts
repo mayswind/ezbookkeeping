@@ -675,7 +675,7 @@ export default {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         } as ApiRequestConfig);
     },
-    parseImportTransaction: ({ fileType, additionalOptions, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoSeparator, geoOrder, tagSeparator }: { fileType: string, additionalOptions?: ImportFileTypeSupportedAdditionalOptions, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, amountDecimalSeparator?: string, amountDigitGroupingSymbol?: string, geoSeparator?: string, geoOrder?: string, tagSeparator?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+    parseImportTransaction: ({ fileType, additionalOptions, aiAdditionalPrompt, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoSeparator, geoOrder, tagSeparator }: { fileType: string, additionalOptions?: ImportFileTypeSupportedAdditionalOptions, aiAdditionalPrompt?: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, amountDecimalSeparator?: string, amountDigitGroupingSymbol?: string, geoSeparator?: string, geoOrder?: string, tagSeparator?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
         let textualAdditionalOptions: string | undefined = undefined;
         let textualColumnMapping: string | undefined = undefined;
         let textualTransactionTypeMapping: string | undefined = undefined;
@@ -700,6 +700,7 @@ export default {
         return axios.postForm<ApiResponse<ImportTransactionResponsePageWrapper>>('v1/transactions/parse_import.json', {
             fileType: fileType,
             options: textualAdditionalOptions,
+            aiPrompt: aiAdditionalPrompt,
             fileEncoding: fileEncoding,
             file: importFile,
             columnMapping: textualColumnMapping,

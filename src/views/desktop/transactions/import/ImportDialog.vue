@@ -182,6 +182,17 @@
                                 </v-select>
                             </v-col>
 
+                            <v-col cols="12" md="12" v-if="supportedAIAdditionalPrompt">
+                                <v-textarea
+                                    type="text"
+                                    persistent-placeholder
+                                    rows="2"
+                                    :disabled="submitting"
+                                    :placeholder="tt('Additional Prompt')"
+                                    v-model="importAIAdditionalPrompt"
+                                />
+                            </v-col>
+
                             <v-col cols="12" md="12" v-if="!isImportDataFromTextbox">
                                 <v-text-field
                                     readonly
@@ -314,6 +325,7 @@ import { ImportTransaction } from '@/models/imported_transaction.ts';
 import { isDefined, isNumber } from '@/lib/common.ts';
 import { findExtensionByType, isFileExtensionSupported, detectFileEncoding } from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
+import { isTransactionFromAITextRecognitionEnabled } from '@/lib/server_settings.ts';
 import logger from '@/lib/logger.ts';
 
 import {
@@ -402,6 +414,7 @@ const processCustomFileFormatMethod = ref<ImportCustomFileFormatProcessMethod>(I
 const importFile = ref<File | null>(null);
 const importData = ref<string>('');
 const importAdditionalOptions = ref<ImportFileTypeSupportedAdditionalOptions>({});
+const importAIAdditionalPrompt = ref<string>('');
 const parsedFileData = ref<string[][] | undefined>(undefined);
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
 
@@ -412,7 +425,7 @@ const submitting = ref<boolean>(false);
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes());
+const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes(isTransactionFromAITextRecognitionEnabled()));
 const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.subTypes);
 const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => {
     const supportedEncodings = allSupportedImportFileTypesMap.value[fileType.value]?.supportedEncodings;
@@ -450,6 +463,7 @@ const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings
 const isCustomFileFormat = computed<boolean>(() => fileType.value === 'dsv' || fileType.value === 'dsv_data' || fileType.value === 'excel');
 const isImportDataFromTextbox = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.dataFromTextbox ?? false);
 const supportedAdditionalOptions = computed<ImportFileTypeSupportedAdditionalOptions | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedAdditionalOptions);
+const supportedAIAdditionalPrompt = computed<boolean>(() => !!allSupportedImportFileTypesMap.value[fileType.value]?.supportedAIAdditionalPrompt);
 
 const allSteps = computed<StepBarItem[]>(() => {
     const steps: StepBarItem[] = [
@@ -607,6 +621,7 @@ function open(): Promise<void> {
     importFile.value = null;
     importData.value = '';
     importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
+    importAIAdditionalPrompt.value = '';
     parsedFileData.value = undefined;
     importTransactionDefineColumnTab.value?.reset();
     importTransactionExecuteCustomScriptTab.value?.reset();
@@ -762,6 +777,8 @@ function parseData(): void {
             uploadFile = KnownFileType.TSV.createFile(importData.value, 'import');
         } else if (type === 'custom_ssv') {
             uploadFile = KnownFileType.TXT.createFile(importData.value, 'import');
+        } else if (type === 'ai_txt') {
+            uploadFile = KnownFileType.TXT.createFile(importData.value, 'import');
         } else {
             snackbar.value?.showError('Parameter Invalid');
             return;
@@ -850,6 +867,7 @@ function parseData(): void {
         transactionsStore.parseImportTransaction({
             fileType: type,
             additionalOptions: importAdditionalOptions.value,
+            aiAdditionalPrompt: supportedAIAdditionalPrompt.value ? importAIAdditionalPrompt.value : undefined,
             fileEncoding: encoding,
             importFile: uploadFile,
             columnMapping: columnMapping,

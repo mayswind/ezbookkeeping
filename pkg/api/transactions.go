@@ -2286,7 +2286,17 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		textualOption = textualOptions[0]
 	}
 
-	additionalOptions := converter.ParseImporterOptions(textualOption)
+	additionalOptions := converter.ParseImporterOptions(a.CurrentConfig(), textualOption)
+
+	if fileType == "ai_txt" {
+		aiAdditionalPrompts := form.Value["aiPrompt"]
+		aiAdditionalPrompt := ""
+
+		if len(aiAdditionalPrompts) > 0 {
+			aiAdditionalPrompt = aiAdditionalPrompts[0]
+			additionalOptions = additionalOptions.WithAIAdditionalPrompt(aiAdditionalPrompt)
+		}
+	}
 
 	var dataImporter converter.TransactionDataImporter
 
@@ -2390,6 +2400,10 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.Or(err, errs.ErrImportFileTypeNotSupported)
 	}
 
+	if fileType == "ai_txt" && (a.CurrentConfig().TextRecognitionLLMConfig == nil || a.CurrentConfig().TextRecognitionLLMConfig.LLMProvider == "" || !a.CurrentConfig().TransactionFromAITextRecognition) {
+		return nil, errs.ErrLargeLanguageModelProviderNotEnabled
+	}
+
 	importFiles := form.File["file"]
 
 	if len(importFiles) < 1 {
@@ -2433,6 +2447,10 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	}
 
 	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_IMPORT_TRANSACTION) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	if fileType == "ai_txt" && user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_TEXT_RECOGNITION) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 

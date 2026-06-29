@@ -7,7 +7,7 @@ import (
 )
 
 func TestParseImporterOptions(t *testing.T) {
-	actualValue := ParseImporterOptions("payeeAsTag,memberAsTag")
+	actualValue := ParseImporterOptions(nil, "payeeAsTag,memberAsTag")
 	expectedValue := TransactionDataImporterOptions{
 		payeeAsTag:    true,
 		memberAsTag:   true,
@@ -20,7 +20,7 @@ func TestParseImporterOptions(t *testing.T) {
 	assert.Equal(t, false, actualValue.IsProjectAsTag())
 	assert.Equal(t, false, actualValue.IsMerchantAsTag())
 
-	actualValue = ParseImporterOptions("")
+	actualValue = ParseImporterOptions(nil, "")
 	expectedValue = TransactionDataImporterOptions{
 		payeeAsTag:    false,
 		memberAsTag:   false,
@@ -35,7 +35,7 @@ func TestParseImporterOptions(t *testing.T) {
 }
 
 func TestParseImporterOptions_WithAllOptions(t *testing.T) {
-	actualValue := ParseImporterOptions("payeeAsTag,payeeAsDescription,memberAsTag,projectAsTag,merchantAsTag")
+	actualValue := ParseImporterOptions(nil, "payeeAsTag,payeeAsDescription,memberAsTag,projectAsTag,merchantAsTag")
 	expectedValue := TransactionDataImporterOptions{
 		payeeAsTag:         true,
 		payeeAsDescription: true,
@@ -52,7 +52,7 @@ func TestParseImporterOptions_WithAllOptions(t *testing.T) {
 }
 
 func TestParseImporterOptions_WithInvalidOptions(t *testing.T) {
-	actualValue := ParseImporterOptions("invalidOption,payeeAsTag,memberAsTag")
+	actualValue := ParseImporterOptions(nil, "invalidOption,payeeAsTag,memberAsTag")
 	expectedValue := TransactionDataImporterOptions{
 		payeeAsTag:    true,
 		memberAsTag:   true,
@@ -65,7 +65,7 @@ func TestParseImporterOptions_WithInvalidOptions(t *testing.T) {
 	assert.Equal(t, false, actualValue.IsProjectAsTag())
 	assert.Equal(t, false, actualValue.IsMerchantAsTag())
 
-	actualValue = ParseImporterOptions("invalidOption")
+	actualValue = ParseImporterOptions(nil, "invalidOption")
 	expectedValue = TransactionDataImporterOptions{
 		payeeAsTag:    false,
 		memberAsTag:   false,

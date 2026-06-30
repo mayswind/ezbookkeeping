@@ -164,3 +164,33 @@ export function kurtosis<T>(values: T[], meanValue: number, variance: number, va
 
     return sumOfQuarticDifferences / (values.length * Math.pow(variance, 2));
 }
+
+export function giniCoefficient<T>(sortedValues: T[], totalValue: number, valueFn: (item: T) => number): number {
+    if (sortedValues.length < 1 || totalValue === 0) {
+        return 0;
+    }
+
+    const n: number = sortedValues.length;
+    let weightedSum: number = 0;
+
+    for (let i = 0; i < n; i++) {
+        weightedSum += (i + 1) * valueFn(sortedValues[i] as T);
+    }
+
+    return (2 * weightedSum) / (n * totalValue) - (n + 1) / n;
+}
+
+export function herfindahlHirschmanIndex<T>(values: T[], totalValue: number, valueFn: (item: T) => number): number {
+    if (values.length < 1 || totalValue === 0) {
+        return 0;
+    }
+
+    let hhi: number = 0;
+
+    for (const item of values) {
+        const share: number = valueFn(item) / totalValue;
+        hhi += share * share;
+    }
+
+    return hhi;
+}

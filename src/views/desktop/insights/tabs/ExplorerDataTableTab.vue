@@ -89,6 +89,10 @@
                                     <td class="text-end">{{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.interquartileRange) }}</td>
                                 </tr>
                                 <tr>
+                                    <td>{{ tt('Median-to-Mean Ratio') }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.medianToMeanRatio) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.medianToMeanRatio, 2) : '-' }}</td>
+                                </tr>
+                                <tr>
                                     <td>{{ tt('Top 5 Amount Share') }}</td>
                                     <td class="text-end">{{ isDefined(filteredTransactionsStatistic.top5AmountShare) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare, 2, '<0.01') : '-' }}</td>
                                 </tr>

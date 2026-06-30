@@ -57,7 +57,9 @@ import {
     varianceAndStandardDeviation,
     coefficientOfVariation,
     skewness,
-    kurtosis
+    kurtosis,
+    giniCoefficient,
+    herfindahlHirschmanIndex
 } from '@/lib/math.ts';
 import {
     getUtcOffsetByUtcOffsetMinutes,
@@ -155,6 +157,7 @@ export interface InsightsExplorerTransactionStatisticData {
     p90Amount: number;
     range: number;
     interquartileRange: number;
+    medianToMeanRatio?: number;
     top5AmountShare?: number;
     transactionsFor80PercentAmount?: number;
     variance?: number;
@@ -1050,6 +1053,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             p90Amount: 0,
             range: 0,
             interquartileRange: 0,
+            medianToMeanRatio: undefined,
             top5AmountShare: undefined,
             transactionsFor80PercentAmount: undefined,
             variance: undefined,
@@ -1116,6 +1120,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             const q1 = percentile(sourceAmounts, 0.25, item => item);
             const q3 = percentile(sourceAmounts, 0.75, item => item);
             statisticData.interquartileRange = Math.trunc(q3 - q1);
+            statisticData.medianToMeanRatio = statisticData.averageAmount !== 0 ? statisticData.medianAmount / statisticData.averageAmount : undefined;
         }
 
         if (sourceAmounts.length > 5) {
@@ -1374,6 +1379,15 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedianToMeanRatio) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0 && totalSourceAmountSumInDefaultCurrency !== 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        const medianSourceAmountInDefaultCurrency = median(allSourceAmountsInDefaultCurrency, item => item);
+                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length;
+                        value = averageSourceAmountInDefaultCurrency !== 0 ? medianSourceAmountInDefaultCurrency / averageSourceAmountInDefaultCurrency : 0;
+                    } else {
+                        value = 0;
+                    }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceMaximumAmountShare) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         value = maximumSourceAmountInDefaultCurrency !== Number.MIN_SAFE_INTEGER ? 100.0 * maximumSourceAmountInDefaultCurrency / totalSourceAmountSumInDefaultCurrency : 0;
@@ -1402,6 +1416,31 @@ export const useExplorersStore = defineStore('explorers', () => {
                     } else {
                         value = 0;
                     }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountOutlierCount
+                    || valueMetric === TransactionExplorerValueMetric.SourceAmountOutlierRatio) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        const q1 = percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item);
+                        const q3 = percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item);
+                        const iqr = q3 - q1;
+                        const lowerBound = q1 - 1.5 * iqr;
+                        const upperBound = q3 + 1.5 * iqr;
+
+                        let outlierCount = 0;
+                        for (const amount of allSourceAmountsInDefaultCurrency) {
+                            if (amount < lowerBound || amount > upperBound) {
+                                outlierCount++;
+                            }
+                        }
+
+                        if (valueMetric === TransactionExplorerValueMetric.SourceAmountOutlierCount) {
+                            value = outlierCount;
+                        } else {
+                            value = allSourceAmountsInDefaultCurrency.length > 0 ? 100.0 * outlierCount / allSourceAmountsInDefaultCurrency.length : 0;
+                        }
+                    } else {
+                        value = 0;
+                    }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountCoefficientOfVariation
@@ -1422,6 +1461,19 @@ export const useExplorersStore = defineStore('explorers', () => {
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountKurtosis) {
                             value = kurtosis(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, variance, item => item / AMOUNT_FACTOR);
                         }
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountGiniCoefficient) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0 && totalSourceAmountSumInDefaultCurrency !== 0) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        value = giniCoefficient(allSourceAmountsInDefaultCurrency, totalSourceAmountSumInDefaultCurrency, item => item);
+                    } else {
+                        value = 0;
+                    }
+                } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountHerfindahlHirschmanIndex) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0 && totalSourceAmountSumInDefaultCurrency !== 0) {
+                        value = herfindahlHirschmanIndex(allSourceAmountsInDefaultCurrency, totalSourceAmountSumInDefaultCurrency, item => item);
                     } else {
                         value = 0;
                     }

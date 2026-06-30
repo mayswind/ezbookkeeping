@@ -300,15 +300,20 @@ export enum TransactionExplorerValueMetricType {
     SourceAmountInterquartileRange = 'sourceAmountInterquartileRange',
     SourceAmountMeanAbsoluteDeviation = 'sourceAmountMeanAbsoluteDeviation',
     SourceAmountMedianAbsoluteDeviation = 'sourceAmountMedianAbsoluteDeviation',
+    SourceAmountMedianToMeanRatio = 'sourceAmountMedianToMeanRatio',
     SourceMaximumAmountShare = 'sourceMaximumAmountShare',
     SourceTop5AmountSum = 'sourceTop5AmountSum',
     SourceTop5AmountShare = 'sourceTop5AmountShare',
     TransactionsForEightyPercentOfSourceAmount = 'transactionsForEightyPercentOfSourceAmount',
+    SourceAmountOutlierCount = 'sourceAmountOutlierCount',
+    SourceAmountOutlierRatio = 'sourceAmountOutlierRatio',
     SourceAmountVariance = 'sourceAmountVariance',
     SourceAmountStandardDeviation = 'sourceAmountStandardDeviation',
     SourceAmountCoefficientOfVariation = 'sourceAmountCoefficientOfVariation',
     SourceAmountSkewness = 'sourceAmountSkewness',
-    SourceAmountKurtosis = 'sourceAmountKurtosis'
+    SourceAmountKurtosis = 'sourceAmountKurtosis',
+    SourceAmountGiniCoefficient = 'sourceAmountGiniCoefficient',
+    SourceAmountHerfindahlHirschmanIndex = 'sourceAmountHerfindahlHirschmanIndex'
 }
 
 export class TransactionExplorerValueMetric implements NameValue {
@@ -338,15 +343,20 @@ export class TransactionExplorerValueMetric implements NameValue {
     public static readonly SourceAmountInterquartileRange = new TransactionExplorerValueMetric('Interquartile Range (Q3 - Q1)', TransactionExplorerValueMetricType.SourceAmountInterquartileRange, true, false, true);
     public static readonly SourceAmountMeanAbsoluteDeviation = new TransactionExplorerValueMetric('Mean Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMeanAbsoluteDeviation, true, false, false);
     public static readonly SourceAmountMedianAbsoluteDeviation = new TransactionExplorerValueMetric('Median Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMedianAbsoluteDeviation, true, false, false);
+    public static readonly SourceAmountMedianToMeanRatio = new TransactionExplorerValueMetric('Median-to-Mean Ratio', TransactionExplorerValueMetricType.SourceAmountMedianToMeanRatio, false, false, false);
     public static readonly SourceMaximumAmountShare = new TransactionExplorerValueMetric('Maximum Amount Share', TransactionExplorerValueMetricType.SourceMaximumAmountShare, false, true, false);
     public static readonly SourceTop5AmountSum = new TransactionExplorerValueMetric('Top 5 Amount Sum', TransactionExplorerValueMetricType.SourceTop5AmountSum, true, false, true);
     public static readonly SourceTop5AmountShare = new TransactionExplorerValueMetric('Top 5 Amount Share', TransactionExplorerValueMetricType.SourceTop5AmountShare, false, true, false);
     public static readonly TransactionsForEightyPercentOfSourceAmount = new TransactionExplorerValueMetric('Transactions for 80% of Amount', TransactionExplorerValueMetricType.TransactionsForEightyPercentOfSourceAmount, false, true, false);
+    public static readonly SourceAmountOutlierCount = new TransactionExplorerValueMetric('Outlier Count', TransactionExplorerValueMetricType.SourceAmountOutlierCount, false, false, true);
+    public static readonly SourceAmountOutlierRatio = new TransactionExplorerValueMetric('Outlier Ratio', TransactionExplorerValueMetricType.SourceAmountOutlierRatio, false, true, false);
     public static readonly SourceAmountVariance = new TransactionExplorerValueMetric('Variance', TransactionExplorerValueMetricType.SourceAmountVariance, false, false, false);
     public static readonly SourceAmountStandardDeviation = new TransactionExplorerValueMetric('Standard Deviation', TransactionExplorerValueMetricType.SourceAmountStandardDeviation, false, false, false);
     public static readonly SourceAmountCoefficientOfVariation = new TransactionExplorerValueMetric('Coefficient of Variation', TransactionExplorerValueMetricType.SourceAmountCoefficientOfVariation, false, false, false);
     public static readonly SourceAmountSkewness = new TransactionExplorerValueMetric('Skewness', TransactionExplorerValueMetricType.SourceAmountSkewness, false, false, false);
     public static readonly SourceAmountKurtosis = new TransactionExplorerValueMetric('Kurtosis', TransactionExplorerValueMetricType.SourceAmountKurtosis, false, false, false);
+    public static readonly SourceAmountGiniCoefficient = new TransactionExplorerValueMetric('Gini Coefficient', TransactionExplorerValueMetricType.SourceAmountGiniCoefficient, false, false, false);
+    public static readonly SourceAmountHerfindahlHirschmanIndex = new TransactionExplorerValueMetric('Herfindahl-Hirschman Index', TransactionExplorerValueMetricType.SourceAmountHerfindahlHirschmanIndex, false, false, false);
 
     public static readonly Default = TransactionExplorerValueMetric.SourceAmountSum;
 

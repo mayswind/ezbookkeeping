@@ -226,6 +226,10 @@
                                     <span class="ms-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
                                 </a>
                             </v-col>
+
+                            <v-col cols="12" md="12" v-if="needAITextRecognition">
+                                <span>{{ tt('Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
+                            </v-col>
                         </v-row>
                     </v-window-item>
                     <v-window-item value="defineColumn">
@@ -462,6 +466,7 @@ const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings
 });
 const isCustomFileFormat = computed<boolean>(() => fileType.value === 'dsv' || fileType.value === 'dsv_data' || fileType.value === 'excel');
 const isImportDataFromTextbox = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.dataFromTextbox ?? false);
+const needAITextRecognition = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.needAITextRecognition ?? false);
 const supportedAdditionalOptions = computed<ImportFileTypeSupportedAdditionalOptions | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedAdditionalOptions);
 const supportedAIAdditionalPrompt = computed<boolean>(() => !!allSupportedImportFileTypesMap.value[fileType.value]?.supportedAIAdditionalPrompt);
 

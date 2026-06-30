@@ -2,9 +2,58 @@ import { TransactionType } from '@/core/transaction.ts';
 
 import type { TransactionCreateRequest, TransactionGeoLocationResponse } from './transaction.ts';
 
+// 组合键分隔符：用于在批量创建对话框中唯一标识“一级分类名 + 二级分类名”或“账户名 + 币种”。
+// 选用单元分隔符 U+001F（ASCII 0x1F），它不会出现在用户填写的分类名 / 账户名 / 币种中，可避免歧义与碰撞。
+const IMPORT_COMPOSITE_KEY_SEPARATOR = '\u001f';
+
+// 构造"一级分类名 + 二级分类名"的组合键
+// primaryCategoryName: 一级分类名（可能为空字符串）
+// subCategoryName: 二级分类名
+export function getImportCategoryCompositeKey(primaryCategoryName: string, subCategoryName: string): string {
+    return `${primaryCategoryName}${IMPORT_COMPOSITE_KEY_SEPARATOR}${subCategoryName}`;
+}
+
+// 解析"一级分类名 + 二级分类名"的组合键
+// key: 由 getImportCategoryCompositeKey 生成的组合键
+export function parseImportCategoryCompositeKey(key: string): { primaryCategoryName: string, subCategoryName: string } {
+    const separatorIndex = key.indexOf(IMPORT_COMPOSITE_KEY_SEPARATOR);
+
+    if (separatorIndex < 0) {
+        return { primaryCategoryName: '', subCategoryName: key };
+    }
+
+    return {
+        primaryCategoryName: key.substring(0, separatorIndex),
+        subCategoryName: key.substring(separatorIndex + IMPORT_COMPOSITE_KEY_SEPARATOR.length)
+    };
+}
+
+// 构造"账户名 + 币种"的组合键
+// accountName: 账户名
+// accountCurrency: 账户币种（可能为空字符串）
+export function getImportAccountCompositeKey(accountName: string, accountCurrency: string): string {
+    return `${accountName}${IMPORT_COMPOSITE_KEY_SEPARATOR}${accountCurrency}`;
+}
+
+// 解析"账户名 + 币种"的组合键
+// key: 由 getImportAccountCompositeKey 生成的组合键
+export function parseImportAccountCompositeKey(key: string): { accountName: string, accountCurrency: string } {
+    const separatorIndex = key.indexOf(IMPORT_COMPOSITE_KEY_SEPARATOR);
+
+    if (separatorIndex < 0) {
+        return { accountName: key, accountCurrency: '' };
+    }
+
+    return {
+        accountName: key.substring(0, separatorIndex),
+        accountCurrency: key.substring(separatorIndex + IMPORT_COMPOSITE_KEY_SEPARATOR.length)
+    };
+}
+
 export class ImportTransaction implements ImportTransactionResponse {
     public type: number;
     public categoryId: string;
+    public originalPrimaryCategoryName: string;
     public originalCategoryName: string;
     public time: number;
     public utcOffset: number;
@@ -31,6 +80,7 @@ export class ImportTransaction implements ImportTransactionResponse {
     private constructor(response: ImportTransactionResponse, index: number) {
         this.type = response.type;
         this.categoryId = response.categoryId;
+        this.originalPrimaryCategoryName = response.originalPrimaryCategoryName || '';
         this.originalCategoryName = response.originalCategoryName;
         this.time = response.time;
         this.utcOffset = response.utcOffset;
@@ -124,6 +174,7 @@ export interface ImportTransactionRequestItem {
 export interface ImportTransactionResponse {
     readonly type: number;
     readonly categoryId: string;
+    readonly originalPrimaryCategoryName?: string;
     readonly originalCategoryName: string;
     readonly time: number;
     readonly utcOffset: number;

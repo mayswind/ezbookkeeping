@@ -425,7 +425,7 @@ import { ImportTransactionColumnType } from '@/core/import_transaction.ts';
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
-import { ImportTransaction } from '@/models/imported_transaction.ts';
+import { ImportTransaction, getImportCategoryCompositeKey, getImportAccountCompositeKey } from '@/models/imported_transaction.ts';
 
 import {
     isString,
@@ -898,6 +898,12 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
     },
     {
         prependIcon: mdiShapePlusOutline,
+        title: tt('Create Nonexistent Accounts'),
+        disabled: isEditing.value || !allInvalidAccountItemsForCreate.value || allInvalidAccountItemsForCreate.value.length < 1,
+        onClick: () => showBatchCreateInvalidItemDialog('account', allInvalidAccountItemsForCreate.value)
+    },
+    {
+        prependIcon: mdiShapePlusOutline,
         title: tt('Create Nonexistent Transaction Tags'),
         disabled: isEditing.value || !allInvalidTransactionTagNames.value || allInvalidTransactionTagNames.value.length < 1,
         onClick: () => showBatchCreateInvalidItemDialog('tag', allInvalidTransactionTagNames.value)
@@ -1190,6 +1196,7 @@ const allInvalidExpenseCategoryNames = computed<NameValue[]>(() => getCurrentInv
 const allInvalidIncomeCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Income));
 const allInvalidTransferCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Transfer));
 const allInvalidAccountNames = computed<NameValue[]>(() => getCurrentInvalidAccountNames());
+const allInvalidAccountItemsForCreate = computed<NameValue[]>(() => getCurrentInvalidAccountNamesForCreate());
 const allInvalidTransactionTagNames = computed<NameValue[]>(() => getCurrentInvalidTagNames());
 const allOriginalTransactionTagNames = computed<NameValue[]>(() => getAllOriginalTagNames());
 
@@ -1418,7 +1425,7 @@ function getDestinationAccountDisplayName(transaction: ImportTransaction): strin
 }
 
 function getCurrentInvalidCategoryNames(transactionType: TransactionType): NameValue[] {
-    const invalidCategoryNames: Record<string, boolean> = {};
+    const invalidCategoryKeys: Record<string, boolean> = {};
     const invalidCategories: NameValue[] = [];
 
     if (!props.importTransactions || props.importTransactions.length < 1) {
@@ -1429,15 +1436,31 @@ function getCurrentInvalidCategoryNames(transactionType: TransactionType): NameV
         const categoryId = importTransaction.categoryId;
 
         if (importTransaction.type === transactionType && (!categoryId || categoryId === '0' || !allCategoriesMap.value[categoryId])) {
-            invalidCategoryNames[importTransaction.originalCategoryName] = true;
-        }
-    }
+            const primaryCategoryName = importTransaction.originalPrimaryCategoryName || '';
+            const subCategoryName = importTransaction.originalCategoryName;
+            // 用"一级名 + 二级名"的组合键去重，避免不同一级下的同名二级被合并
+            const compositeKey = getImportCategoryCompositeKey(primaryCategoryName, subCategoryName);
 
-    for (const name of keys(invalidCategoryNames)) {
-        invalidCategories.push({
-            name: name || tt('(Empty)'),
-            value: name
-        });
+            if (invalidCategoryKeys[compositeKey]) {
+                continue;
+            }
+
+            invalidCategoryKeys[compositeKey] = true;
+
+            // 列表展示名：有一级时显示"一级 / 二级"，否则只显示二级（空则显示占位符）
+            let displayName: string;
+
+            if (primaryCategoryName) {
+                displayName = `${primaryCategoryName} / ${subCategoryName || tt('(Empty)')}`;
+            } else {
+                displayName = subCategoryName || tt('(Empty)');
+            }
+
+            invalidCategories.push({
+                name: displayName,
+                value: compositeKey
+            });
+        }
     }
 
     return invalidCategories;
@@ -1469,6 +1492,49 @@ function getCurrentInvalidAccountNames(): NameValue[] {
             name: name || tt('(Empty)'),
             value: name
         });
+    }
+
+    return invalidAccounts;
+}
+
+// 收集需要"创建"的无效账户：value 用"账户名 + 币种"组合键以携带币种（创建账户时需要），name 仅展示账户名。
+// 与 getCurrentInvalidAccountNames 区分开，后者 value=账户名 用于"替换"流程的匹配，不能改动。
+function getCurrentInvalidAccountNamesForCreate(): NameValue[] {
+    const invalidAccountNames: Record<string, boolean> = {};
+    const invalidAccounts: NameValue[] = [];
+
+    if (!props.importTransactions || props.importTransactions.length < 1) {
+        return invalidAccounts;
+    }
+
+    for (const importTransaction of props.importTransactions) {
+        const sourceAccountId = importTransaction.sourceAccountId;
+        const destinationAccountId = importTransaction.destinationAccountId;
+
+        if (!sourceAccountId || sourceAccountId === '0' || !allAccountsMap.value[sourceAccountId]) {
+            const accountName = importTransaction.originalSourceAccountName;
+
+            // 同名账户只取首次出现的币种（正常导出中同名账户币种一致）
+            if (!invalidAccountNames[accountName]) {
+                invalidAccountNames[accountName] = true;
+                invalidAccounts.push({
+                    name: accountName || tt('(Empty)'),
+                    value: getImportAccountCompositeKey(accountName, importTransaction.originalSourceAccountCurrency || '')
+                });
+            }
+        }
+
+        if (importTransaction.type === TransactionType.Transfer && isString(importTransaction.originalDestinationAccountName) && (!destinationAccountId || destinationAccountId === '0' || !allAccountsMap.value[destinationAccountId])) {
+            const accountName = importTransaction.originalDestinationAccountName;
+
+            if (!invalidAccountNames[accountName]) {
+                invalidAccountNames[accountName] = true;
+                invalidAccounts.push({
+                    name: accountName || tt('(Empty)'),
+                    value: getImportAccountCompositeKey(accountName, importTransaction.originalDestinationAccountCurrency || '')
+                });
+            }
+        }
     }
 
     return invalidAccounts;
@@ -2045,8 +2111,9 @@ function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, inval
 
                 if (type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory') {
                     const categoryId = importTransaction.categoryId;
-                    const originalCategoryName = importTransaction.originalCategoryName;
-                    const targetItem = sourceTargetMap[originalCategoryName];
+                    // 用"一级名 + 二级名"的组合键回填，确保对应到正确一级下的二级分类
+                    const compositeKey = getImportCategoryCompositeKey(importTransaction.originalPrimaryCategoryName || '', importTransaction.originalCategoryName);
+                    const targetItem = sourceTargetMap[compositeKey];
 
                     if (importTransaction.type !== TransactionType.ModifyBalance && targetItem && (!categoryId || categoryId === '0' || !allCategoriesMap.value[categoryId])) {
                         if (type === 'expenseCategory' && importTransaction.type === TransactionType.Expense) {
@@ -2068,6 +2135,25 @@ function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, inval
 
                         if (targetItem && (!tagId || tagId === '0' || !allTagsMap.value[tagId])) {
                             importTransaction.tagIds[tagIndex] = targetItem;
+                            updated = true;
+                        }
+                    }
+                } else if (type === 'account') {
+                    // sourceTargetMap 以"账户名"为 key 映射到新建账户 id
+                    const sourceAccountId = importTransaction.sourceAccountId;
+                    const sourceTargetItem = sourceTargetMap[importTransaction.originalSourceAccountName];
+
+                    if (sourceTargetItem && (!sourceAccountId || sourceAccountId === '0' || !allAccountsMap.value[sourceAccountId])) {
+                        importTransaction.sourceAccountId = sourceTargetItem;
+                        updated = true;
+                    }
+
+                    if (importTransaction.type === TransactionType.Transfer && isString(importTransaction.originalDestinationAccountName)) {
+                        const destinationAccountId = importTransaction.destinationAccountId;
+                        const destinationTargetItem = sourceTargetMap[importTransaction.originalDestinationAccountName];
+
+                        if (destinationTargetItem && (!destinationAccountId || destinationAccountId === '0' || !allAccountsMap.value[destinationAccountId])) {
+                            importTransaction.destinationAccountId = destinationTargetItem;
                             updated = true;
                         }
                     }

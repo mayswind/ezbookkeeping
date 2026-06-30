@@ -2189,6 +2189,7 @@
     "Create Nonexistent Expense Categories": "创建不存在的支出分类",
     "Create Nonexistent Income Categories": "创建不存在的收入分类",
     "Create Nonexistent Transfer Categories": "创建不存在的转账分类",
+    "Create Nonexistent Accounts": "创建不存在的账户",
     "Create Nonexistent Transaction Tags": "创建不存在的交易标签",
     "Batch Convert Expense Transaction to Income Transaction": "批量转换支出交易为收入交易",
     "Batch Convert Expense Transaction to Transfer Transaction": "批量转换支出交易为转账交易",

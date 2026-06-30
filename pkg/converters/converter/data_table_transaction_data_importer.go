@@ -386,6 +386,7 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 				CreatedIp:            ctx.ClientIP(),
 			},
 			TagIds:                             tagIds,
+			OriginalPrimaryCategoryName:        categoryName,
 			OriginalCategoryName:               subCategoryName,
 			OriginalSourceAccountName:          accountName,
 			OriginalSourceAccountCurrency:      accountCurrency,

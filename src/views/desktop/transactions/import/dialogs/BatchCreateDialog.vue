@@ -6,6 +6,7 @@
                     <h4 class="text-h4 text-wrap" v-if="type === 'expenseCategory'">{{ tt('Create Nonexistent Expense Categories') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="type === 'incomeCategory'">{{ tt('Create Nonexistent Income Categories') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="type === 'transferCategory'">{{ tt('Create Nonexistent Transfer Categories') }}</h4>
+                    <h4 class="text-h4 text-wrap" v-if="type === 'account'">{{ tt('Create Nonexistent Accounts') }}</h4>
                     <h4 class="text-h4 text-wrap" v-if="type === 'tag'">{{ tt('Create Nonexistent Transaction Tags') }}</h4>
                     <v-spacer/>
                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
@@ -36,12 +37,12 @@
                         <v-list class="py-0" density="compact" select-strategy="classic"
                                 :disabled="submitting" v-model:selected="selectedNames">
                             <v-list-item class="mx-1 px-2 py-0"
-                                         :key="item.value" :value="item.name" :title="item.name"
+                                         :key="item.value" :value="item.value" :title="item.name"
                                          v-for="item in invalidItems">
                                 <template #prepend="{ isActive }">
                                     <v-list-item-action start>
                                         <v-checkbox-btn :model-value="isActive"
-                                                        @update:model-value="updateSelectedNames(item.name, $event)"></v-checkbox-btn>
+                                                        @update:model-value="updateSelectedNames(item.value, $event)"></v-checkbox-btn>
                                     </v-list-item-action>
                                 </template>
                             </v-list-item>
@@ -71,19 +72,25 @@ import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useUserStore } from '@/stores/user.ts';
+import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
-import { type NameValue, values } from '@/core/base.ts';
+import { type NameValue, keys } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
+import { AccountCategory } from '@/core/account.ts';
 import { AUTOMATICALLY_CREATED_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
 import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
-import { type TransactionCategoryCreateRequest, type TransactionCategoryCreateWithSubCategories, TransactionCategory } from '@/models/transaction_category.ts';
+import { TransactionCategory } from '@/models/transaction_category.ts';
 import { type TransactionTagCreateRequest, TransactionTag } from '@/models/transaction_tag.ts';
+import { Account } from '@/models/account.ts';
+import { parseImportCategoryCompositeKey, parseImportAccountCompositeKey } from '@/models/imported_transaction.ts';
 
 import { isDefined, arrayItemToObjectField } from '@/lib/common.ts';
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 
 import {
     mdiSelectAll,
@@ -92,7 +99,7 @@ import {
     mdiDotsVertical
 } from '@mdi/js';
 
-export type BatchCreateDialogDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'tag';
+export type BatchCreateDialogDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'account' | 'tag';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
@@ -102,6 +109,8 @@ interface BatchCreateDialogResponse {
 
 const { tt } = useI18n();
 
+const userStore = useUserStore();
+const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 
@@ -132,55 +141,124 @@ function updateSelectedNames(value: string, selected: boolean | null): void {
     selectedNames.value = newSelectedNames;
 }
 
-function buildBatchCreateCategoryResponse(createdCategories: Record<number, TransactionCategory[]>): BatchCreateDialogResponse {
-    const displayNameSourceItemMap: Record<string, string> = {};
+interface SelectedCategoryItem {
+    // 选项 value（"一级名 + 二级名"组合键，一级可能为空）
+    compositeKey: string;
+    // 原始一级名（可能为空，空时回退到默认一级名）
+    primaryCategoryName: string;
+    // 二级名
+    subCategoryName: string;
+}
+
+// 按一级分类分组创建：一级已存在则复用、不存在则创建，再在其下创建缺失的二级，
+// 返回 组合键 -> 新建/复用的二级分类 id 的映射，供调用方回填交易的 categoryId
+// categoryType: 分类类型（支出/收入/转账）
+// defaultPrimaryCategoryName: 当原始一级名为空时使用的默认一级名
+// selectedItems: 用户在对话框中选中的待创建项
+async function createCategoriesHierarchically(categoryType: CategoryType, defaultPrimaryCategoryName: string, selectedItems: SelectedCategoryItem[]): Promise<Record<string, string>> {
     const sourceTargetMap: Record<string, string> = {};
 
-    for (const item of (invalidItems.value || [])) {
-        displayNameSourceItemMap[item.name] = item.value;
+    // 按"实际使用的一级名"分组（原始一级为空时回退到默认一级名）
+    const groupedItems: Record<string, SelectedCategoryItem[]> = {};
+
+    for (const item of selectedItems) {
+        const primaryCategoryName = item.primaryCategoryName || defaultPrimaryCategoryName;
+
+        if (!groupedItems[primaryCategoryName]) {
+            groupedItems[primaryCategoryName] = [];
+        }
+
+        groupedItems[primaryCategoryName]!.push(item);
     }
 
-    for (const categories of values(createdCategories)) {
-        for (const category of categories) {
-            if (!category.subCategories || category.subCategories.length < 1) {
+    for (const primaryCategoryName of keys(groupedItems)) {
+        // 查找已存在的同名一级分类，存在则复用，否则新建一级
+        const existingPrimaryCategories = transactionCategoriesStore.allTransactionCategories[categoryType] || [];
+        let parentCategory: TransactionCategory | undefined = existingPrimaryCategories.find(category => category.name === primaryCategoryName);
+
+        if (!parentCategory) {
+            const newPrimaryCategory = TransactionCategory.createNewCategory(categoryType);
+            newPrimaryCategory.name = primaryCategoryName;
+            newPrimaryCategory.icon = AUTOMATICALLY_CREATED_CATEGORY_ICON_ID;
+            newPrimaryCategory.color = DEFAULT_CATEGORY_COLOR;
+            parentCategory = await transactionCategoriesStore.saveCategory({ category: newPrimaryCategory, isEdit: false, clientSessionId: '' });
+        }
+
+        // 该一级下已存在的二级名 -> id，用于复用并避免重复创建
+        const subCategoryIdByName: Record<string, string> = {};
+
+        for (const subCategory of (parentCategory.subCategories || [])) {
+            subCategoryIdByName[subCategory.name] = subCategory.id;
+        }
+
+        for (const item of groupedItems[primaryCategoryName]!) {
+            const existingSubCategoryId = subCategoryIdByName[item.subCategoryName];
+
+            if (isDefined(existingSubCategoryId)) {
+                sourceTargetMap[item.compositeKey] = existingSubCategoryId;
                 continue;
             }
 
-            for (const subCategory of category.subCategories) {
-                const sourceItem = displayNameSourceItemMap[subCategory.name];
+            const newSubCategory = TransactionCategory.createNewCategory(categoryType, parentCategory.id);
+            newSubCategory.name = item.subCategoryName;
+            newSubCategory.icon = AUTOMATICALLY_CREATED_CATEGORY_ICON_ID;
+            const createdSubCategory = await transactionCategoriesStore.saveCategory({ category: newSubCategory, isEdit: false, clientSessionId: '' });
 
-                if (!isDefined(sourceItem)) {
-                    continue;
-                }
-
-                sourceTargetMap[sourceItem] = subCategory.id;
-            }
+            subCategoryIdByName[item.subCategoryName] = createdSubCategory.id;
+            sourceTargetMap[item.compositeKey] = createdSubCategory.id;
         }
     }
 
-    const response: BatchCreateDialogResponse = {
-        sourceTargetMap: sourceTargetMap
-    };
-
-    return response;
+    return sourceTargetMap;
 }
 
-function buildBatchCreateTagResponse(createdTags: TransactionTag[]): BatchCreateDialogResponse {
-    const displayNameSourceItemMap: Record<string, string> = {};
+// 逐个创建不存在的账户：账户分类默认用"现金"，币种取自 CSV（缺失时回退用户默认币种），
+// 返回 账户名 -> 新建账户 id 的映射，供调用方回填交易的 sourceAccountId / destinationAccountId
+// selectedKeys: 用户选中的"账户名 + 币种"组合键列表
+async function createNonexistentAccounts(selectedKeys: string[]): Promise<Record<string, string>> {
     const sourceTargetMap: Record<string, string> = {};
+    const balanceTime = getCurrentUnixTime();
 
-    for (const item of (invalidItems.value || [])) {
-        displayNameSourceItemMap[item.name] = item.value;
-    }
+    for (const compositeKey of selectedKeys) {
+        const parsed = parseImportAccountCompositeKey(compositeKey);
+        const accountName = parsed.accountName;
+        const accountCurrency = parsed.accountCurrency || userStore.currentUserDefaultCurrency;
 
-    for (const tag of createdTags) {
-        const sourceItem = displayNameSourceItemMap[tag.name];
+        // 已存在同名账户则直接复用，避免重复创建
+        const existingAccount = accountsStore.allAccounts.find(account => account.name === accountName);
 
-        if (!isDefined(sourceItem)) {
+        if (existingAccount) {
+            sourceTargetMap[accountName] = existingAccount.id;
             continue;
         }
 
-        sourceTargetMap[sourceItem] = tag.id;
+        const newAccount = Account.createNewAccount(AccountCategory.Cash, accountCurrency, balanceTime);
+        newAccount.name = accountName;
+
+        const createdAccount = await accountsStore.saveAccount({ account: newAccount, subAccounts: [], isEdit: false, clientSessionId: '' });
+        sourceTargetMap[accountName] = createdAccount.id;
+    }
+
+    return sourceTargetMap;
+}
+
+function buildBatchCreateTagResponse(createdTags: TransactionTag[]): BatchCreateDialogResponse {
+    const createdTagIdMap: Record<string, string> = {};
+    const sourceTargetMap: Record<string, string> = {};
+
+    // 新建标签名 -> id（标签的 value 即为标签名本身）
+    for (const tag of createdTags) {
+        createdTagIdMap[tag.name] = tag.id;
+    }
+
+    for (const item of (invalidItems.value || [])) {
+        const targetItem = createdTagIdMap[item.value];
+
+        if (!isDefined(targetItem)) {
+            continue;
+        }
+
+        sourceTargetMap[item.value] = targetItem;
     }
 
     const response: BatchCreateDialogResponse = {
@@ -204,7 +282,7 @@ function open(options: { type: BatchCreateDialogDataType, invalidItems?: NameVal
 }
 
 function selectAllItems(): void {
-    selectedNames.value = (invalidItems.value || []).map(item => item.name);
+    selectedNames.value = (invalidItems.value || []).map(item => item.value);
 }
 
 function selectNoneItems(): void {
@@ -216,8 +294,8 @@ function selectInvertItems(): void {
     selectedNames.value = [];
 
     for (const item of (invalidItems.value || [])) {
-        if (!currentSelectedNames[item.name]) {
-            selectedNames.value.push(item.name);
+        if (!currentSelectedNames[item.value]) {
+            selectedNames.value.push(item.value);
         }
     }
 }
@@ -227,44 +305,35 @@ function confirm(): void {
         submitting.value = true;
 
         let categoryType: CategoryType = CategoryType.Expense;
-        let primaryCategoryName = '';
+        let defaultPrimaryCategoryName = '';
 
         if (type.value === 'expenseCategory') {
             categoryType = CategoryType.Expense;
-            primaryCategoryName = tt('Default Expense Category');
+            defaultPrimaryCategoryName = tt('Default Expense Category');
         } else if (type.value === 'incomeCategory') {
             categoryType = CategoryType.Income;
-            primaryCategoryName = tt('Default Income Category');
+            defaultPrimaryCategoryName = tt('Default Income Category');
         } else if (type.value === 'transferCategory') {
             categoryType = CategoryType.Transfer;
-            primaryCategoryName = tt('Default Transfer Category');
+            defaultPrimaryCategoryName = tt('Default Transfer Category');
         }
 
-        const subCategories: TransactionCategoryCreateRequest[] = [];
+        // 解析选中项：每项携带原始一级名（可能为空）与二级名
+        const selectedItems: SelectedCategoryItem[] = selectedNames.value.map(compositeKey => {
+            const parsed = parseImportCategoryCompositeKey(compositeKey);
+            return {
+                compositeKey: compositeKey,
+                primaryCategoryName: parsed.primaryCategoryName,
+                subCategoryName: parsed.subCategoryName
+            };
+        });
 
-        for (const item of selectedNames.value) {
-            const category: TransactionCategory = TransactionCategory.createNewCategory(categoryType);
-            category.name = item;
-            category.icon = AUTOMATICALLY_CREATED_CATEGORY_ICON_ID;
-            subCategories.push(category.toCreateRequest(''));
-        }
-
-        const submitCategories: TransactionCategoryCreateWithSubCategories[] = [{
-            name: primaryCategoryName,
-            type: categoryType,
-            icon: AUTOMATICALLY_CREATED_CATEGORY_ICON_ID,
-            color: DEFAULT_CATEGORY_COLOR,
-            subCategories: subCategories
-        }];
-
-        transactionCategoriesStore.addCategories({
-            categories: submitCategories
-        }).then(response => {
+        createCategoriesHierarchically(categoryType, defaultPrimaryCategoryName, selectedItems).then(sourceTargetMap => {
             transactionCategoriesStore.loadAllCategories({ force: false }).then(() => {
                 submitting.value = false;
                 showState.value = false;
 
-                resolveFunc?.(buildBatchCreateCategoryResponse(response));
+                resolveFunc?.({ sourceTargetMap: sourceTargetMap });
             }).catch(error => {
                 submitting.value = false;
 
@@ -306,6 +375,21 @@ function confirm(): void {
                     snackbar.value?.showError(error);
                 }
             });
+        }).catch(error => {
+            submitting.value = false;
+
+            if (!error.processed) {
+                snackbar.value?.showError(error);
+            }
+        });
+    } else if (type.value === 'account') {
+        submitting.value = true;
+
+        createNonexistentAccounts(selectedNames.value).then(sourceTargetMap => {
+            submitting.value = false;
+            showState.value = false;
+
+            resolveFunc?.({ sourceTargetMap: sourceTargetMap });
         }).catch(error => {
             submitting.value = false;
 

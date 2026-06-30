@@ -1358,8 +1358,8 @@ export const useExplorersStore = defineStore('explorers', () => {
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountInterquartileRange) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
                         allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        const q1 = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item));
-                        const q3 = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item));
+                        const q1 = percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item);
+                        const q3 = percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item);
                         value = Math.trunc(q3 - q1);
                     } else {
                         value = 0;

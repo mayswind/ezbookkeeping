@@ -42,7 +42,9 @@ func GetTransactionDataImporter(fileType string) (converter.TransactionDataImpor
 	} else if fileType == "ezbookkeeping_json" {
 		return _default.DefaultTransactionDataJsonFileImporter, nil
 	} else if fileType == "ai_txt" {
-		return ai.AIRecognizedTransactionDataImporter, nil
+		return ai.AIRecognizedTextTransactionDataImporter, nil
+	} else if fileType == "ai_image" {
+		return ai.AIRecognizedImageTransactionDataImporter, nil
 	} else if fileType == "ofx" {
 		return ofx.OFXTransactionDataImporter, nil
 	} else if fileType == "qfx" {

@@ -1555,7 +1555,7 @@ export function useI18n() {
         return availableExchangeRates;
     }
 
-    function getAllSupportedImportFileCagtegoryAndTypes(supportAITextRecognition: boolean): LocalizedImportFileCategoryAndTypes[] {
+    function getAllSupportedImportFileCagtegoryAndTypes(supportAITextRecognition: boolean, supportAIImageRecognition: boolean): LocalizedImportFileCategoryAndTypes[] {
         const allSupportedImportFileCategoryAndTypes: LocalizedImportFileCategoryAndTypes[] = [];
 
         for (const categoryAndTypes of SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES) {
@@ -1566,6 +1566,10 @@ export function useI18n() {
 
             for (const fileType of categoryAndTypes.fileTypes) {
                 if (fileType.needAITextRecognition && !supportAITextRecognition) {
+                    continue;
+                }
+
+                if (fileType.needAIImageRecognition && !supportAIImageRecognition) {
                     continue;
                 }
 
@@ -1653,6 +1657,7 @@ export function useI18n() {
                     supportedEncodings: supportedEncodings.length ? supportedEncodings : undefined,
                     dataFromTextbox: fileType.dataFromTextbox,
                     needAITextRecognition: fileType.needAITextRecognition,
+                    needAIImageRecognition: fileType.needAIImageRecognition,
                     supportedAdditionalOptions: fileType.supportedAdditionalOptions,
                     supportedAIAdditionalPrompt: fileType.supportedAIAdditionalPrompt,
                     document: document

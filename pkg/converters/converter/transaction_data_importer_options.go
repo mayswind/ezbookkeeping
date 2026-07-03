@@ -15,6 +15,7 @@ type TransactionDataImporterOptions struct {
 	projectAsTag       bool
 	merchantAsTag      bool
 	aiAdditionalPrompt string
+	aiImageContentType string
 }
 
 // DefaultImporterOptions provides the default options for transaction data importer
@@ -26,6 +27,7 @@ var DefaultImporterOptions = TransactionDataImporterOptions{
 	projectAsTag:       false,
 	merchantAsTag:      false,
 	aiAdditionalPrompt: "",
+	aiImageContentType: "",
 }
 
 // GetCurrentConfig returns the current config
@@ -61,6 +63,11 @@ func (o TransactionDataImporterOptions) IsMerchantAsTag() bool {
 // GetAIAdditionalPrompt returns the additional prompt for AI-based transaction data importer
 func (o TransactionDataImporterOptions) GetAIAdditionalPrompt() string {
 	return o.aiAdditionalPrompt
+}
+
+// GetAIImageContentType returns the content type of the AI recognition image
+func (o TransactionDataImporterOptions) GetAIImageContentType() string {
+	return o.aiImageContentType
 }
 
 // WithPayeeAsTag sets the option to import payee as tag
@@ -105,6 +112,13 @@ func (o TransactionDataImporterOptions) WithAIAdditionalPrompt(prompt string) Tr
 	return cloned
 }
 
+// WithAIImageContentType sets the content type of the AI recognition image
+func (o TransactionDataImporterOptions) WithAIImageContentType(contentType string) TransactionDataImporterOptions {
+	cloned := o.Clone()
+	cloned.aiImageContentType = contentType
+	return cloned
+}
+
 // Clone creates a copy of the options instance
 func (o TransactionDataImporterOptions) Clone() TransactionDataImporterOptions {
 	return TransactionDataImporterOptions{
@@ -115,6 +129,7 @@ func (o TransactionDataImporterOptions) Clone() TransactionDataImporterOptions {
 		projectAsTag:       o.projectAsTag,
 		merchantAsTag:      o.merchantAsTag,
 		aiAdditionalPrompt: o.aiAdditionalPrompt,
+		aiImageContentType: o.aiImageContentType,
 	}
 }
 

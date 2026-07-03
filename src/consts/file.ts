@@ -209,6 +209,13 @@ export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndType
                 needAITextRecognition: true,
                 supportedAIAdditionalPrompt: true
             },
+            {
+                type: 'ai_image',
+                name: 'AI Batch Image Recognition',
+                extensions: '.jpg,.jpeg,.png,.gif,.webp',
+                needAIImageRecognition: true,
+                supportedAIAdditionalPrompt: true
+            },
         ]
     },
     {

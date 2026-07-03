@@ -243,6 +243,7 @@ func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext
 		"AllTransferCategoryNames": strings.Join(transferCategoryNames, "\n"),
 		"AllAccountNames":          strings.Join(accountNames, "\n"),
 		"AllTagNames":              strings.Join(tagNames, "\n"),
+		"AdditionalNotes":          "",
 	}
 
 	var bodyBuffer bytes.Buffer

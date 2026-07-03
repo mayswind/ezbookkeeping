@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :persistent="!!persistent" v-model="showState">
+    <v-dialog :persistent="!!persistent || loading || submitting" v-model="showState">
         <v-card class="pa-sm-1 pa-md-2">
             <template #title>
                 <div class="d-flex align-center justify-center">
@@ -193,7 +193,7 @@
                                 />
                             </v-col>
 
-                            <v-col cols="12" md="12" v-if="!isImportDataFromTextbox">
+                            <v-col cols="12" md="12" v-if="!isImportDataFromTextbox && !isAIImageImport">
                                 <v-text-field
                                     readonly
                                     persistent-placeholder
@@ -218,6 +218,31 @@
                                 />
                             </v-col>
 
+                            <v-col cols="12" md="12" v-if="isAIImageImport">
+                                <div class="text-subtitle-1 mb-2">{{ tt('Image Files') }}</div>
+                                <div class="import-transaction-images d-flex gap-2 overflow-x-auto">
+                                    <div :key="picIdx" v-for="(imageItem, picIdx) in importImageFiles">
+                                        <v-avatar rounded="lg" variant="tonal" size="120"
+                                                  class="cursor-pointer import-image"
+                                                  color="rgba(0,0,0,0)" @click="removeImportImageFile(picIdx)">
+                                            <v-img :src="imageItem.previewUrl"></v-img>
+                                            <div class="picture-control-icon">
+                                                <v-icon size="48" :icon="mdiTrashCanOutline" />
+                                            </div>
+                                        </v-avatar>
+                                    </div>
+                                    <div>
+                                        <v-avatar rounded="lg" variant="tonal" size="120"
+                                                  class="import-image import-image-add"
+                                                  :class="{ 'enabled': !submitting, 'cursor-pointer': !submitting }"
+                                                  color="rgba(0,0,0,0)" @click="showOpenFileDialog">
+                                            <v-tooltip activator="parent" v-if="!submitting">{{ tt('Add Picture') }}</v-tooltip>
+                                            <v-icon class="import-image-add-icon" size="48" :icon="mdiImagePlusOutline" />
+                                        </v-avatar>
+                                    </div>
+                                </div>
+                            </v-col>
+
                             <v-col cols="12" md="12" v-if="exportFileGuideDocumentUrl">
                                 <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
                                     <v-icon :icon="mdiHelpCircleOutline" size="16" />
@@ -229,6 +254,9 @@
 
                             <v-col cols="12" md="12" v-if="needAITextRecognition">
                                 <span>{{ tt('Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
+                            </v-col>
+                            <v-col cols="12" md="12" v-if="needAIImageRecognition">
+                                <span>{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
                             </v-col>
                         </v-row>
                     </v-window-item>
@@ -244,6 +272,14 @@
                             ref="importTransactionExecuteCustomScriptTab"
                             :parsed-file-data="parsedFileData"
                             :disabled="loading || submitting"
+                        />
+                    </v-window-item>
+                    <v-window-item value="recognizeImages">
+                        <import-transaction-recognize-images-tab
+                            ref="importTransactionRecognizeImagesTab"
+                            :disabled="loading || submitting"
+                            :submitting="submitting"
+                            :import-images="importImageFiles"
                         />
                     </v-window-item>
                     <v-window-item value="checkData">
@@ -263,11 +299,14 @@
                 <div class="d-flex justify-center justify-sm-space-between flex-wrap mt-sm-1 mt-md-2 gap-4">
                     <v-btn color="secondary" variant="tonal" :disabled="loading || submitting"
                            :prepend-icon="mdiClose" @click="close(false)"
-                           v-if="currentStep !== 'finalResult'">{{ tt('Cancel') }}</v-btn>
+                           v-if="currentStep !== 'finalResult' && (currentStep !== 'recognizeImages' || !submitting)">{{ tt('Cancel') }}</v-btn>
+                    <v-btn color="secondary" variant="tonal" :disabled="loading"
+                           :prepend-icon="mdiClose" @click="cancelBatchRecognizeImages()"
+                           v-if="currentStep === 'recognizeImages' && submitting">{{ tt('Cancel Recognition') }}</v-btn>
                     <v-btn class="button-icon-with-direction" color="primary"
-                           :disabled="loading || submitting || (!isImportDataFromTextbox && !importFile) || (isImportDataFromTextbox && !importData) || (!isImportDataFromTextbox && allSupportedEncodings && fileEncoding === 'auto' && !autoDetectedFileEncoding)"
+                           :disabled="loading || submitting || (!isImportDataFromTextbox && !isAIImageImport && !importFile) || (isImportDataFromTextbox && !importData) || (!isImportDataFromTextbox && !isAIImageImport && allSupportedEncodings && fileEncoding === 'auto' && !autoDetectedFileEncoding) || (!isImportDataFromTextbox && isAIImageImport && importImageFiles.length === 0)"
                            :append-icon="!submitting ? mdiArrowRight : undefined" @click="parseData"
-                           v-if="currentStep === 'defineColumn' || currentStep === 'executeCustomScript' || currentStep === 'uploadFile'">
+                           v-if="currentStep === 'defineColumn' || currentStep === 'executeCustomScript' || currentStep === 'recognizeImages' || currentStep === 'uploadFile'">
                         {{ tt('Next') }}
                         <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                     </v-btn>
@@ -289,7 +328,7 @@
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
-    <input ref="fileInput" type="file" style="display: none" :accept="supportedImportFileExtensions" @change="setImportFile($event)" />
+    <input ref="fileInput" type="file" style="display: none" :accept="supportedImportFileExtensions" :multiple="isAIImageImport" @change="setImportFile($event)" />
 </template>
 
 <script setup lang="ts">
@@ -298,6 +337,7 @@ import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import ImportTransactionDefineColumnTab from './tabs/ImportTransactionDefineColumnTab.vue';
 import ImportTransactionExecuteCustomScriptTab from './tabs/ImportTransactionExecuteCustomScriptTab.vue';
+import ImportTransactionRecognizeImagesTab, { type BatchImportImageItem } from './tabs/ImportTransactionRecognizeImagesTab.vue';
 import ImportTransactionCheckDataTab from './tabs/ImportTransactionCheckDataTab.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -322,14 +362,16 @@ import {
     type LocalizedImportFileTypeSupportedEncodings,
     KnownFileType
 } from '@/core/file.ts';
+import { ImageUploadQualityType } from '@/core/image.ts';
 import { UTF_8 } from '@/consts/file.ts';
 
-import { ImportTransaction } from '@/models/imported_transaction.ts';
+import { type ImportTransactionResponse, ImportTransaction } from '@/models/imported_transaction.ts';
 
 import { isDefined, isNumber } from '@/lib/common.ts';
 import { findExtensionByType, isFileExtensionSupported, detectFileEncoding } from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
-import { isTransactionFromAITextRecognitionEnabled } from '@/lib/server_settings.ts';
+import { isTransactionFromAITextRecognitionEnabled, isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
+import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
 import {
@@ -339,16 +381,19 @@ import {
     mdiDotsVertical,
     mdiHelpCircleOutline,
     mdiClose,
-    mdiArrowRight
+    mdiArrowRight,
+    mdiImagePlusOutline,
+    mdiTrashCanOutline
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type ImportTransactionDefineColumnTabType = InstanceType<typeof ImportTransactionDefineColumnTab>;
 type ImportTransactionExecuteCustomScriptTabType = InstanceType<typeof ImportTransactionExecuteCustomScriptTab>;
+type ImportTransactionRecognizeImagesTabType = InstanceType<typeof ImportTransactionRecognizeImagesTab>;
 type ImportTransactionCheckDataTabType = InstanceType<typeof ImportTransactionCheckDataTab>;
 
-type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'executeCustomScript' | 'checkData' | 'finalResult';
+type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'executeCustomScript' | 'recognizeImages' | 'checkData' | 'finalResult';
 enum ImportCustomFileFormatProcessMethod {
     ColumnMapping,
     CustomScript
@@ -360,6 +405,7 @@ defineProps<{
 
 const {
     tt,
+    te,
     joinMultiText,
     getAllSupportedImportFileCagtegoryAndTypes,
     formatNumberToLocalizedNumerals,
@@ -378,6 +424,7 @@ const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const importTransactionDefineColumnTab = useTemplateRef<ImportTransactionDefineColumnTabType>('importTransactionDefineColumnTab');
 const importTransactionExecuteCustomScriptTab = useTemplateRef<ImportTransactionExecuteCustomScriptTabType>('importTransactionExecuteCustomScriptTab');
+const importTransactionRecognizeImagesTab = useTemplateRef<ImportTransactionRecognizeImagesTabType>('importTransactionRecognizeImagesTab');
 const importTransactionCheckDataTab = useTemplateRef<ImportTransactionCheckDataTabType>('importTransactionCheckDataTab');
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
@@ -416,9 +463,11 @@ const detectingFileEncoding = ref<boolean>(false);
 const autoDetectedFileEncoding = ref<string | undefined>(undefined);
 const processCustomFileFormatMethod = ref<ImportCustomFileFormatProcessMethod>(ImportCustomFileFormatProcessMethod.ColumnMapping);
 const importFile = ref<File | null>(null);
+const importImageFiles = ref<BatchImportImageItem[]>([]);
 const importData = ref<string>('');
 const importAdditionalOptions = ref<ImportFileTypeSupportedAdditionalOptions>({});
 const importAIAdditionalPrompt = ref<string>('');
+const importImageCancelRecognizingUuid = ref<string | undefined>(undefined);
 const parsedFileData = ref<string[][] | undefined>(undefined);
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
 
@@ -429,7 +478,7 @@ const submitting = ref<boolean>(false);
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes(isTransactionFromAITextRecognitionEnabled()));
+const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes(isTransactionFromAITextRecognitionEnabled(), isTransactionFromAIImageRecognitionEnabled()));
 const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.subTypes);
 const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => {
     const supportedEncodings = allSupportedImportFileTypesMap.value[fileType.value]?.supportedEncodings;
@@ -467,6 +516,8 @@ const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings
 const isCustomFileFormat = computed<boolean>(() => fileType.value === 'dsv' || fileType.value === 'dsv_data' || fileType.value === 'excel');
 const isImportDataFromTextbox = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.dataFromTextbox ?? false);
 const needAITextRecognition = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.needAITextRecognition ?? false);
+const isAIImageImport = computed<boolean>(() => fileType.value === 'ai_image');
+const needAIImageRecognition = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.needAIImageRecognition ?? false);
 const supportedAdditionalOptions = computed<ImportFileTypeSupportedAdditionalOptions | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedAdditionalOptions);
 const supportedAIAdditionalPrompt = computed<boolean>(() => !!allSupportedImportFileTypesMap.value[fileType.value]?.supportedAIAdditionalPrompt);
 
@@ -493,6 +544,14 @@ const allSteps = computed<StepBarItem[]>(() => {
                 subTitle: tt('Define and Check Column Mapping')
             });
         }
+    }
+
+    if (isAIImageImport.value) {
+        steps.push({
+            name: 'recognizeImages',
+            title: tt('Recognize Images'),
+            subTitle: tt('Recognize Transactions from Images')
+        });
     }
 
     steps.push(...[
@@ -634,6 +693,7 @@ function open(): Promise<void> {
     importTransactionCheckDataTab.value?.reset();
     showState.value = true;
     clientSessionId.value = generateRandomUUID();
+    clearImportImageFiles();
 
     const promises = [
         accountsStore.loadAllAccounts({ force: false }),
@@ -678,25 +738,58 @@ function setImportFile(event: Event): void {
     const el = event.target as HTMLInputElement;
 
     if (!el.files || !el.files.length || !el.files[0]) {
+        el.value = '';
         return;
     }
 
-    importFile.value = el.files[0] as File;
-    detectingFileEncoding.value = false;
-    autoDetectedFileEncoding.value = undefined;
-    el.value = '';
+    if (isAIImageImport.value) {
+        for (const file of el.files) {
+            importImageFiles.value.push({
+                file: file,
+                previewUrl: URL.createObjectURL(file),
+                status: 'pending'
+            });
+        }
 
-    if (allSupportedEncodings.value) {
-        detectingFileEncoding.value = true;
+        el.value = '';
+    } else {
+        importFile.value = el.files[0] as File;
+        detectingFileEncoding.value = false;
+        autoDetectedFileEncoding.value = undefined;
+        el.value = '';
 
-        detectFileEncoding(importFile.value).then(detectedEncoding => {
-            detectingFileEncoding.value = false;
-            autoDetectedFileEncoding.value = detectedEncoding;
-        }).catch(() => {
-            detectingFileEncoding.value = false;
-            autoDetectedFileEncoding.value = undefined;
-        });
+        if (allSupportedEncodings.value) {
+            detectingFileEncoding.value = true;
+
+            detectFileEncoding(importFile.value).then(detectedEncoding => {
+                detectingFileEncoding.value = false;
+                autoDetectedFileEncoding.value = detectedEncoding;
+            }).catch(() => {
+                detectingFileEncoding.value = false;
+                autoDetectedFileEncoding.value = undefined;
+            });
+        }
     }
+}
+
+function removeImportImageFile(index: number): void {
+    const targetImageFile = importImageFiles.value[index];
+
+    if (targetImageFile && targetImageFile.previewUrl) {
+        URL.revokeObjectURL(targetImageFile.previewUrl);
+    }
+
+    importImageFiles.value.splice(index, 1);
+}
+
+function clearImportImageFiles(): void {
+    for (const item of importImageFiles.value) {
+        if (item.previewUrl) {
+            URL.revokeObjectURL(item.previewUrl);
+        }
+    }
+
+    importImageFiles.value.length = 0;
 }
 
 function reloadBasisData(): void {
@@ -739,6 +832,106 @@ function reloadBasisData(): void {
     });
 }
 
+function recognizeImage(item: BatchImportImageItem, additionalPrompt?: string): Promise<ImportTransactionResponse[]> {
+    return new Promise<ImportTransactionResponse[]>((resolve, reject) => {
+        compressJpgImageByQuality(item.file, ImageUploadQualityType.HD720P).then(blob => {
+            const compressedFile = KnownFileType.JPG.createFileFromBlob(blob, "image");
+            importImageCancelRecognizingUuid.value = generateRandomUUID();
+
+            transactionsStore.parseImportTransaction({
+                fileType: 'ai_image',
+                aiAdditionalPrompt: additionalPrompt,
+                importFile: compressedFile,
+                cancelableUuid: importImageCancelRecognizingUuid.value
+            }).then(response => {
+                resolve(response.items || []);
+            }).catch(error => {
+                reject(error);
+            });
+        }).catch(error => {
+            logger.error('failed to compress image', error);
+            reject('Unable to load image');
+        });
+    });
+}
+
+function batchRecognizeImages(): Promise<void> {
+    for (const item of importImageFiles.value) {
+        item.status = 'pending';
+        item.failureReason = undefined;
+    }
+
+    return new Promise<void>((resolve, reject) => {
+        const finish = function (): void {
+            const allFailed = importImageFiles.value.every(item => item.status === 'failed');
+            importImageCancelRecognizingUuid.value = '';
+
+            if (allFailed) {
+                snackbar.value?.showError('Unable to recognize image');
+                reject();
+            } else {
+                resolve();
+            }
+        }
+
+        const recurseRecognizeImage = function (index: number): void {
+            if (!submitting.value) {
+                finish();
+                return;
+            }
+
+            if (index >= importImageFiles.value.length) {
+                finish();
+                return;
+            }
+
+            const item = importImageFiles.value[index];
+
+            if (!item) {
+                finish();
+                return;
+            }
+
+            item.status = 'recognizing';
+
+            recognizeImage(item, supportedAIAdditionalPrompt.value ? importAIAdditionalPrompt.value : undefined).then(results => {
+                if (submitting.value) {
+                    if (!importTransactions.value) {
+                        importTransactions.value = [];
+                    }
+
+                    for (const [importTransactionResp, index] of itemAndIndex(results)) {
+                        importTransactions.value.push(ImportTransaction.of(importTransactionResp, index));
+                    }
+
+                    item.status = 'success';
+                }
+
+                recurseRecognizeImage(index + 1);
+            }).catch(error => {
+                if (submitting.value) {
+                    item.status = 'failed';
+                    item.failureReason = te(error.message || error || 'An error occurred');
+                }
+
+                recurseRecognizeImage(index + 1);
+            });
+        }
+
+        recurseRecognizeImage(0);
+    });
+}
+
+function cancelBatchRecognizeImages(): void {
+    submitting.value = false;
+
+    if (importImageCancelRecognizingUuid.value) {
+        transactionsStore.cancelRecognizeReceiptImage(importImageCancelRecognizingUuid.value);
+    }
+
+    snackbar.value?.showMessage('User Canceled');
+}
+
 function parseData(): void {
     let uploadFile: File;
     let type: string = fileType.value;
@@ -746,6 +939,56 @@ function parseData(): void {
 
     if (allFileSubTypes.value) {
         type = fileSubType.value;
+    }
+
+    if (isAIImageImport.value && currentStep.value === 'uploadFile') {
+        if (importImageFiles.value.length < 1) {
+            snackbar.value?.showError('Please select a file to import');
+            return;
+        }
+
+        currentStep.value = 'recognizeImages';
+        submitting.value = true;
+        importTransactions.value = undefined;
+
+        batchRecognizeImages().then(() => {
+            if (!importTransactions.value || importTransactions.value.length < 1) {
+                if (submitting.value) {
+                    currentStep.value = 'uploadFile';
+                    snackbar.value?.showMessage('No data to import');
+                }
+                submitting.value = false;
+                return;
+            }
+
+            importTransactionCheckDataTab.value?.reset();
+
+            if (importTransactions.value.length > 0 && importTransactions.value.length < 10) {
+                importTransactionCheckDataTab.value?.setCountPerPage(-1);
+            } else {
+                importTransactionCheckDataTab.value?.setCountPerPage(10);
+            }
+
+            const anyFailed = importImageFiles.value.some(item => item.status === 'failed');
+
+            if (submitting.value && !anyFailed) {
+                currentStep.value = 'checkData';
+            }
+
+            submitting.value = false;
+        }).catch(() => {
+            submitting.value = false;
+        });
+
+        return;
+    } else if (isAIImageImport.value && currentStep.value === 'recognizeImages') {
+        if (!importTransactions.value || importTransactions.value.length < 1) {
+            snackbar.value?.showError('No data to import');
+            return;
+        }
+
+        currentStep.value = 'checkData';
+        return;
     }
 
     if (allSupportedEncodings.value) {
@@ -1044,6 +1287,7 @@ watch(fileType, (newValue) => {
     parsedFileData.value = undefined;
     importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
     importTransactions.value = undefined;
+    clearImportImageFiles();
 });
 
 watch(fileSubType, (newValue) => {
@@ -1066,3 +1310,47 @@ defineExpose({
     open
 });
 </script>
+
+<style>
+.import-transaction-images {
+    .import-image {
+        .picture-control-icon {
+            display: none;
+            position: absolute;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .picture-control-icon > i.v-icon {
+            background-color: transparent;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    }
+
+    .import-image:hover {
+        .picture-control-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+    }
+
+    .import-image-add {
+        border: 2px dashed rgba(var(--v-theme-grey-500));
+    }
+
+    .import-image-add .import-image-add-icon {
+        color: rgba(var(--v-theme-grey-500));
+    }
+
+    .import-image-add.enabled:hover {
+        border: 2px dashed rgba(var(--v-theme-grey-700));
+    }
+
+    .import-image-add.enabled:hover .import-image-add-icon {
+        color: rgba(var(--v-theme-grey-700));
+    }
+}
+</style>

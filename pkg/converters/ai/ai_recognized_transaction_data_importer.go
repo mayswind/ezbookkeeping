@@ -15,27 +15,55 @@ var aiRecognizedTransactionTypeNameMapping = map[models.TransactionType]string{
 	models.TRANSACTION_TYPE_TRANSFER: utils.IntToString(int(models.TRANSACTION_TYPE_TRANSFER)),
 }
 
-// aiRecognizedTransactionDataImporter represents transaction data importer using AI
-type aiRecognizedTransactionDataImporter struct{}
+// aiRecognizedTextTransactionDataImporter represents transaction data importer using AI text recognition
+type aiRecognizedTextTransactionDataImporter struct{}
 
-// AIRecognizedTransactionDataImporter is the singleton instance
-var AIRecognizedTransactionDataImporter = &aiRecognizedTransactionDataImporter{}
+// AIRecognizedTextTransactionDataImporter is the singleton instance
+var AIRecognizedTextTransactionDataImporter = &aiRecognizedTextTransactionDataImporter{}
 
-// ParseImportedData returns the imported transaction data parsed by AI
-func (c *aiRecognizedTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, fileData []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	aiRecognizedTransactionDataParser, err := createNewAITransactionDataParser(additionalOptions.GetCurrentConfig())
+// aiRecognizedImageTransactionDataImporter represents transaction data importer using AI image recognition
+type aiRecognizedImageTransactionDataImporter struct{}
+
+// AIRecognizedImageTransactionDataImporter is the singleton instance
+var AIRecognizedImageTransactionDataImporter = &aiRecognizedImageTransactionDataImporter{}
+
+// ParseImportedData returns the imported transaction data parsed by AI text recognition
+func (c *aiRecognizedTextTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, fileData []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+	aiRecognizedTransactionDataParser, err := createNewAITextTransactionDataParser(additionalOptions.GetCurrentConfig())
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	recognizedTransactions, err := aiRecognizedTransactionDataParser.parse(ctx, user, string(fileData), additionalOptions.GetAIAdditionalPrompt(), defaultTimezone, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+	recognizedTransactions, err := aiRecognizedTransactionDataParser.parseText(ctx, user, string(fileData), additionalOptions.GetAIAdditionalPrompt(), defaultTimezone, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	transactionDataTable, err := createNewAIRecognizedTransactionDataTable(recognizedTransactions)
+	return getImportTransactionResponse(ctx, user, recognizedTransactions, defaultTimezone, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+}
+
+// ParseImportedData returns the imported transaction data parsed by AI image recognition
+func (c *aiRecognizedImageTransactionDataImporter) ParseImportedData(ctx core.Context, user *models.User, fileData []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+	aiRecognizedTransactionDataParser, err := createNewAIImageTransactionDataParser(additionalOptions.GetCurrentConfig())
+
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
+	recognizedTransactions, err := aiRecognizedTransactionDataParser.parseImage(ctx, user, fileData, additionalOptions.GetAIAdditionalPrompt(), additionalOptions, defaultTimezone, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
+	return getImportTransactionResponse(ctx, user, recognizedTransactions, defaultTimezone, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)
+}
+
+// getImportTransactionResponse returns the imported transaction data parsed by AI recognized results
+func getImportTransactionResponse(ctx core.Context, user *models.User, results []*models.RecognizedTransactionResult, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
+	transactionDataTable, err := createNewAIRecognizedTransactionDataTable(results)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err

@@ -675,7 +675,7 @@ export default {
             timeout: DEFAULT_UPLOAD_API_TIMEOUT
         } as ApiRequestConfig);
     },
-    parseImportTransaction: ({ fileType, additionalOptions, aiAdditionalPrompt, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoSeparator, geoOrder, tagSeparator }: { fileType: string, additionalOptions?: ImportFileTypeSupportedAdditionalOptions, aiAdditionalPrompt?: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, amountDecimalSeparator?: string, amountDigitGroupingSymbol?: string, geoSeparator?: string, geoOrder?: string, tagSeparator?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
+    parseImportTransaction: ({ fileType, additionalOptions, aiAdditionalPrompt, fileEncoding, importFile, columnMapping, transactionTypeMapping, hasHeaderLine, timeFormat, timezoneFormat, amountDecimalSeparator, amountDigitGroupingSymbol, geoSeparator, geoOrder, tagSeparator, cancelableUuid }: { fileType: string, additionalOptions?: ImportFileTypeSupportedAdditionalOptions, aiAdditionalPrompt?: string, fileEncoding?: string, importFile: File, columnMapping?: Record<number, number>, transactionTypeMapping?: Record<string, TransactionType>, hasHeaderLine?: boolean, timeFormat?: string, timezoneFormat?: string, amountDecimalSeparator?: string, amountDigitGroupingSymbol?: string, geoSeparator?: string, geoOrder?: string, tagSeparator?: string, cancelableUuid?: string }): ApiResponsePromise<ImportTransactionResponsePageWrapper> => {
         let textualAdditionalOptions: string | undefined = undefined;
         let textualColumnMapping: string | undefined = undefined;
         let textualTransactionTypeMapping: string | undefined = undefined;
@@ -714,7 +714,8 @@ export default {
             geoOrder: geoOrder,
             tagSeparator: tagSeparator
         }, {
-            timeout: DEFAULT_UPLOAD_API_TIMEOUT
+            timeout: DEFAULT_UPLOAD_API_TIMEOUT,
+            cancelableUuid: cancelableUuid
         } as ApiRequestConfig);
     },
     importTransactions: (req: TransactionImportRequest): ApiResponsePromise<number> => {

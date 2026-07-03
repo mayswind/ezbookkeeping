@@ -2288,7 +2288,7 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 
 	additionalOptions := converter.ParseImporterOptions(a.CurrentConfig(), textualOption)
 
-	if fileType == "ai_txt" {
+	if fileType == "ai_txt" || fileType == "ai_image" {
 		aiAdditionalPrompts := form.Value["aiPrompt"]
 		aiAdditionalPrompt := ""
 
@@ -2404,6 +2404,10 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.ErrLargeLanguageModelProviderNotEnabled
 	}
 
+	if fileType == "ai_image" && (a.CurrentConfig().ReceiptImageRecognitionLLMConfig == nil || a.CurrentConfig().ReceiptImageRecognitionLLMConfig.LLMProvider == "" || !a.CurrentConfig().TransactionFromAIImageRecognition) {
+		return nil, errs.ErrLargeLanguageModelProviderNotEnabled
+	}
+
 	importFiles := form.File["file"]
 
 	if len(importFiles) < 1 {
@@ -2416,9 +2420,27 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 		return nil, errs.ErrUploadedFileEmpty
 	}
 
-	if importFiles[0].Size > int64(a.CurrentConfig().MaxImportFileSize) {
-		log.Warnf(c, "[transactions.TransactionParseImportFileHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of import file for user \"uid:%d\"", importFiles[0].Size, a.CurrentConfig().MaxImportFileSize, uid)
+	maxImportFileSize := int64(a.CurrentConfig().MaxImportFileSize)
+
+	if fileType == "ai_image" {
+		maxImportFileSize = int64(a.CurrentConfig().MaxAIRecognitionPictureFileSize)
+	}
+
+	if importFiles[0].Size > maxImportFileSize {
+		log.Warnf(c, "[transactions.TransactionParseImportFileHandler] the upload file size \"%d\" exceeds the maximum size \"%d\" of import file for user \"uid:%d\"", importFiles[0].Size, maxImportFileSize, uid)
 		return nil, errs.ErrExceedMaxUploadFileSize
+	}
+
+	if fileType == "ai_image" {
+		fileExtension := utils.GetFileNameExtension(importFiles[0].Filename)
+		contentType := utils.GetImageContentType(fileExtension)
+
+		if contentType == "" {
+			log.Warnf(c, "[transactions.TransactionParseImportFileHandler] the file extension \"%s\" of image in request is not supported for user \"uid:%d\"", fileExtension, uid)
+			return nil, errs.ErrImageTypeNotSupported
+		}
+
+		additionalOptions = additionalOptions.WithAIImageContentType(contentType)
 	}
 
 	importFile, err := importFiles[0].Open()
@@ -2451,6 +2473,10 @@ func (a *TransactionsApi) TransactionParseImportFileHandler(c *core.WebContext) 
 	}
 
 	if fileType == "ai_txt" && user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_TEXT_RECOGNITION) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	if fileType == "ai_image" && user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_IMAGE_RECOGNITION) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 

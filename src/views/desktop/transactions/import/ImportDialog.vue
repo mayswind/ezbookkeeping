@@ -900,7 +900,8 @@ function batchRecognizeImages(): Promise<void> {
                         importTransactions.value = [];
                     }
 
-                    for (const [importTransactionResp, index] of itemAndIndex(results)) {
+                    for (const importTransactionResp of results) {
+                        const index = importTransactions.value.length;
                         importTransactions.value.push(ImportTransaction.of(importTransactionResp, index));
                     }
 

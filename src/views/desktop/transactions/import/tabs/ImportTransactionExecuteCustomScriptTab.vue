@@ -82,6 +82,7 @@ import {
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 type SandboxRequest = {
+    source: string;
     parsedFileData: string[][];
     code: string;
 };
@@ -111,6 +112,71 @@ const {
 } = useI18n();
 
 const settingsStore = useSettingsStore();
+
+const sandboxMessageSignature: string = '#ezBookkeeping-sandbox-message#';
+const sandboxBuildinScripts: string = `
+<script>
+window.TransactionType = {
+    Income: 'Income',
+    Expense: 'Expense',
+    Transfer: 'Transfer'
+};
+
+window.parseDateTime = function(dateTime, format) {
+    return {
+        dateTime: dateTime,
+        format: format
+    };
+};
+
+window.parseUtcOffset = function(timezoneName) {
+    return {
+        name: timezoneName
+    };
+};
+
+window.addEventListener('message', function (event) {
+    if (!event.data || typeof event.data !== 'string' || event.data[0] !== '{' || event.data.indexOf('${sandboxMessageSignature}') <= 0) {
+        return;
+    }
+
+    try {
+        const data = JSON.parse(event.data);
+
+        if (!data || !data.source || data.source !== '${sandboxMessageSignature}') {
+            return;
+        }
+
+        const parsedFileData = data.parsedFileData;
+        eval(data.code);
+
+        if (window.parse) {
+            const result = [];
+
+            for (let i = 0; i < parsedFileData.length; i++) {
+                try {
+                    const row = parsedFileData[i];
+                    const transaction = window.parse(row, i);
+
+                    if (transaction) {
+                        result.push(transaction);
+                    }
+                } catch (error) {
+                    window.parent.postMessage({ error: error.message }, '*');
+                    return;
+                }
+            }
+
+            window.parent.postMessage({ result: JSON.stringify(result) }, '*');
+        } else {
+            window.parent.postMessage({ knownError: 'No parse function defined' }, '*');
+        }
+    } catch (error) {
+        window.parent.postMessage({ error: error.message }, '*');
+    }
+});
+<\/script>
+`;
 
 const sandbox = useTemplateRef<HTMLIFrameElement>('sandbox');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -218,60 +284,7 @@ function reloadSandbox(): void {
 
     if (sandbox.value) {
         sandbox.value.src = 'about:blank';
-        sandbox.value.srcdoc = `
-            <script>
-                window.TransactionType = {
-                    Income: 'Income',
-                    Expense: 'Expense',
-                    Transfer: 'Transfer'
-                };
-
-                window.parseDateTime = function(dateTime, format) {
-                    return {
-                        dateTime: dateTime,
-                        format: format
-                    };
-                };
-
-                window.parseUtcOffset = function(timezoneName) {
-                    return {
-                        name: timezoneName
-                    };
-                };
-
-                window.addEventListener('message', function (event) {
-                    try {
-                        const data = JSON.parse(event.data);
-                        const parsedFileData = data.parsedFileData;
-                        eval(data.code);
-
-                        if (window.parse) {
-                            const result = [];
-
-                            for (let i = 0; i < parsedFileData.length; i++) {
-                                try {
-                                    const row = parsedFileData[i];
-                                    const transaction = window.parse(row, i);
-
-                                    if (transaction) {
-                                        result.push(transaction);
-                                    }
-                                } catch (error) {
-                                    window.parent.postMessage({ error: error.message }, '*');
-                                    return;
-                                }
-                            }
-
-                            window.parent.postMessage({ result: JSON.stringify(result) }, '*');
-                        } else {
-                            window.parent.postMessage({ knownError: 'No parse function defined' }, '*');
-                        }
-                    } catch (error) {
-                        window.parent.postMessage({ error: error.message }, '*');
-                    }
-                });
-            <\/script>
-        `;
+        sandbox.value.srcdoc = sandboxBuildinScripts;
 
         sandbox.value.onload = () => {
             sandboxLoaded.value = true;
@@ -287,6 +300,7 @@ function executeCustomScript(): void {
     executingScript.value = true;
 
     const sandboxRequest: SandboxRequest = {
+        source: sandboxMessageSignature,
         parsedFileData: props.parsedFileData || [],
         code: customScript.value + `\n\n;if (typeof parse !== 'undefined') { window.parse = parse; }`
     };

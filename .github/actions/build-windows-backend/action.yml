@@ -4,7 +4,7 @@ inputs:
   go-version:
     required: false
     description: "The Go version to use for building the windows backend. The version should be in the format of 'x.y.z'."
-    default: "1.26.2"
+    default: "1.26.4"
   mingw-version:
     required: false
     description: "The MinGW version to use for building the windows backend. The version should be in the format of 'x.y.z'."

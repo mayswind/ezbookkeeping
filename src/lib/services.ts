@@ -697,6 +697,12 @@ export default {
             textualHasHeaderLine = 'true';
         }
 
+        let timeout: number = DEFAULT_UPLOAD_API_TIMEOUT;
+
+        if (fileType === 'ai_txt' || fileType === 'ai_image') {
+            timeout = DEFAULT_LLM_API_TIMEOUT;
+        }
+
         return axios.postForm<ApiResponse<ImportTransactionResponsePageWrapper>>('v1/transactions/parse_import.json', {
             fileType: fileType,
             options: textualAdditionalOptions,
@@ -714,7 +720,7 @@ export default {
             geoOrder: geoOrder,
             tagSeparator: tagSeparator
         }, {
-            timeout: DEFAULT_UPLOAD_API_TIMEOUT,
+            timeout: timeout,
             cancelableUuid: cancelableUuid
         } as ApiRequestConfig);
     },

@@ -3,7 +3,7 @@
         <div class="text-center">{{ progressText }}</div>
 
         <v-progress-linear class="my-4" rounded color="primary" height="20"
-                           :model-value="progressPercent" :indeterminate="submitting && progressPercent === 0" />
+                           :striped="!!submitting" :model-value="processedPercent" :buffer-value="progressingPercent" />
 
         <v-list class="recognition-failed-list" v-if="importProgress.failedCount > 0">
             <template :key="index" v-for="(item, index) in importImages">
@@ -56,12 +56,20 @@ const importProgress = computed<{ successCount: number, failedCount: number }>((
     return { successCount, failedCount };
 });
 
-const progressPercent = computed<number>(() => {
+const processedPercent = computed<number>(() => {
     if (props.importImages.length < 1) {
         return 0;
     }
 
     return Math.round(((importProgress.value.successCount + importProgress.value.failedCount) / props.importImages.length) * 100);
+});
+
+const progressingPercent = computed<number>(() => {
+    if (props.importImages.length < 1) {
+        return 0;
+    }
+
+    return Math.min(100, Math.round(((importProgress.value.successCount + importProgress.value.failedCount + 1) / props.importImages.length) * 100));
 });
 
 const progressText = computed<string>(() => {

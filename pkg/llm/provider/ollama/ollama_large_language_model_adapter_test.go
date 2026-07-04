@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 func TestOllamaLargeLanguageModelAdapter_buildJsonRequestBody_TextualUserPrompt(t *testing.T) {
@@ -49,6 +50,27 @@ func TestOllamaLargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(t 
 	assert.Nil(t, err)
 
 	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"messages\":[{\"role\":\"system\",\"content\":\"What's in this image?\"},{\"role\":\"user\",\"content\":\"\",\"images\":[\"ZmFrZWRhdGE=\"]}],\"format\":\"json\"}", string(bodyBytes))
+}
+
+func TestOllamaLargeLanguageModelAdapter_buildJsonRequestBody_ThinkingHigh(t *testing.T) {
+	adapter := &OllamaLargeLanguageModelAdapter{
+		OllamaModelID:       "test",
+		OllamaThinkingLevel: settings.LLMThinkingHigh,
+	}
+
+	request := &data.LargeLanguageModelRequest{
+		SystemPrompt: "You are a helpful assistant.",
+		UserPrompt:   []byte("Hello, how are you?"),
+	}
+
+	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	err = json.Unmarshal(bodyBytes, &body)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"messages\":[{\"role\":\"system\",\"content\":\"You are a helpful assistant.\"},{\"role\":\"user\",\"content\":\"Hello, how are you?\"}],\"think\":\"high\",\"format\":\"json\"}", string(bodyBytes))
 }
 
 func TestOllamaLargeLanguageModelAdapter_ParseTextualResponse_ValidJsonResponse(t *testing.T) {

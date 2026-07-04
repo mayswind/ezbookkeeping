@@ -80,6 +80,20 @@ const (
 	GoogleAILLMProvider            string = "google_ai"
 )
 
+// LLMThinkingLevel represents the thinking level of a large language model
+type LLMThinkingLevel string
+
+// LLM thinking levels
+const (
+	LLMThinkingDefault  LLMThinkingLevel = ""
+	LLMThinkingDisabled LLMThinkingLevel = "off"
+	LLMThinkingEnabled  LLMThinkingLevel = "on"
+	LLMThinkingLow      LLMThinkingLevel = "low"
+	LLMThinkingMedium   LLMThinkingLevel = "medium"
+	LLMThinkingHigh     LLMThinkingLevel = "high"
+	LLMThinkingXHigh    LLMThinkingLevel = "xhigh"
+)
+
 // Uuid generator types
 const (
 	InternalUuidGeneratorType string = "internal"
@@ -167,6 +181,7 @@ const (
 
 	defaultAIRecognitionPictureMaxSize                 uint32 = 10485760 // 10MB
 	defaultAnthropicLargeLanguageModelAPIMaximumTokens uint32 = 1024
+	defaultAnthropicLargeLanguageModelThinkingBudget   uint32 = 1024
 	defaultLargeLanguageModelAPIRequestTimeout         uint32 = 60000 // 60 seconds
 
 	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
@@ -244,32 +259,35 @@ type WebDAVConfig struct {
 
 // LLMConfig represents the Large Language Model setting config
 type LLMConfig struct {
-	LLMProvider                         string
-	OpenAIAPIKey                        string
-	OpenAIModelID                       string
-	OpenAICompatibleBaseURL             string
-	OpenAICompatibleAPIKey              string
-	OpenAICompatibleModelID             string
-	AnthropicAPIKey                     string
-	AnthropicModelID                    string
-	AnthropicMaxTokens                  uint32
-	AnthropicCompatibleBaseURL          string
-	AnthropicCompatibleAPIVersion       string
-	AnthropicCompatibleAPIKey           string
-	AnthropicCompatibleModelID          string
-	AnthropicCompatibleMaxTokens        uint32
-	OpenRouterAPIKey                    string
-	OpenRouterModelID                   string
-	OllamaServerURL                     string
-	OllamaModelID                       string
-	LMStudioServerURL                   string
-	LMStudioToken                       string
-	LMStudioModelID                     string
-	GoogleAIAPIKey                      string
-	GoogleAIModelID                     string
-	LargeLanguageModelAPIRequestTimeout uint32
-	LargeLanguageModelAPIProxy          string
-	LargeLanguageModelAPISkipTLSVerify  bool
+	LLMProvider                             string
+	EnableThinking                          LLMThinkingLevel
+	OpenAIAPIKey                            string
+	OpenAIModelID                           string
+	OpenAICompatibleBaseURL                 string
+	OpenAICompatibleAPIKey                  string
+	OpenAICompatibleModelID                 string
+	AnthropicAPIKey                         string
+	AnthropicModelID                        string
+	AnthropicMaxTokens                      uint32
+	AnthropicThinkingBudgetTokens           uint32
+	AnthropicCompatibleBaseURL              string
+	AnthropicCompatibleAPIVersion           string
+	AnthropicCompatibleAPIKey               string
+	AnthropicCompatibleModelID              string
+	AnthropicCompatibleMaxTokens            uint32
+	AnthropicCompatibleThinkingBudgetTokens uint32
+	OpenRouterAPIKey                        string
+	OpenRouterModelID                       string
+	OllamaServerURL                         string
+	OllamaModelID                           string
+	LMStudioServerURL                       string
+	LMStudioToken                           string
+	LMStudioModelID                         string
+	GoogleAIAPIKey                          string
+	GoogleAIModelID                         string
+	LargeLanguageModelAPIRequestTimeout     uint32
+	LargeLanguageModelAPIProxy              string
+	LargeLanguageModelAPISkipTLSVerify      bool
 }
 
 // MultiLanguageContentConfig represents a multi-language content setting config
@@ -891,6 +909,26 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 		return nil, errs.ErrInvalidLLMProvider
 	}
 
+	thinkingLevel := getConfigItemStringValue(configFile, sectionName, "enable_thinking")
+
+	if thinkingLevel == string(LLMThinkingDefault) {
+		llmConfig.EnableThinking = LLMThinkingDefault
+	} else if thinkingLevel == string(LLMThinkingDisabled) {
+		llmConfig.EnableThinking = LLMThinkingDisabled
+	} else if thinkingLevel == string(LLMThinkingEnabled) {
+		llmConfig.EnableThinking = LLMThinkingEnabled
+	} else if thinkingLevel == string(LLMThinkingLow) {
+		llmConfig.EnableThinking = LLMThinkingLow
+	} else if thinkingLevel == string(LLMThinkingMedium) {
+		llmConfig.EnableThinking = LLMThinkingMedium
+	} else if thinkingLevel == string(LLMThinkingHigh) {
+		llmConfig.EnableThinking = LLMThinkingHigh
+	} else if thinkingLevel == string(LLMThinkingXHigh) {
+		llmConfig.EnableThinking = LLMThinkingXHigh
+	} else {
+		return nil, errs.ErrInvalidLLMThinkingLevel
+	}
+
 	llmConfig.OpenAIAPIKey = getConfigItemStringValue(configFile, sectionName, "openai_api_key")
 	llmConfig.OpenAIModelID = getConfigItemStringValue(configFile, sectionName, "openai_model_id")
 
@@ -901,12 +939,14 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 	llmConfig.AnthropicAPIKey = getConfigItemStringValue(configFile, sectionName, "anthropic_api_key")
 	llmConfig.AnthropicModelID = getConfigItemStringValue(configFile, sectionName, "anthropic_model_id")
 	llmConfig.AnthropicMaxTokens = getConfigItemUint32Value(configFile, sectionName, "anthropic_max_tokens", defaultAnthropicLargeLanguageModelAPIMaximumTokens)
+	llmConfig.AnthropicThinkingBudgetTokens = getConfigItemUint32Value(configFile, sectionName, "anthropic_thinking_budget_tokens", defaultAnthropicLargeLanguageModelThinkingBudget)
 
 	llmConfig.AnthropicCompatibleBaseURL = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_base_url")
 	llmConfig.AnthropicCompatibleAPIVersion = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_api_version")
 	llmConfig.AnthropicCompatibleAPIKey = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_api_key")
 	llmConfig.AnthropicCompatibleModelID = getConfigItemStringValue(configFile, sectionName, "anthropic_compatible_model_id")
 	llmConfig.AnthropicCompatibleMaxTokens = getConfigItemUint32Value(configFile, sectionName, "anthropic_compatible_max_tokens", defaultAnthropicLargeLanguageModelAPIMaximumTokens)
+	llmConfig.AnthropicCompatibleThinkingBudgetTokens = getConfigItemUint32Value(configFile, sectionName, "anthropic_compatible_thinking_budget_tokens", defaultAnthropicLargeLanguageModelThinkingBudget)
 
 	llmConfig.OpenRouterAPIKey = getConfigItemStringValue(configFile, sectionName, "openrouter_api_key")
 	llmConfig.OpenRouterModelID = getConfigItemStringValue(configFile, sectionName, "openrouter_model_id")

@@ -8,6 +8,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 func TestCommonAnthropicMessagesAPILargeLanguageModelAdapter_buildJsonRequestBody_TextualUserPrompt(t *testing.T) {
@@ -56,6 +57,26 @@ func TestCommonAnthropicMessagesAPILargeLanguageModelAdapter_buildJsonRequestBod
 	assert.Nil(t, err)
 
 	assert.Equal(t, "{\"model\":\"test\",\"max_tokens\":128,\"stream\":false,\"system\":\"What's in this image?\",\"messages\":[{\"role\":\"user\",\"content\":[{\"source\":{\"data\":\"ZmFrZWRhdGE=\",\"media_type\":\"image/png\",\"type\":\"base64\"},\"type\":\"image\"}]}],\"thinking\":{\"type\":\"disabled\"}}", string(bodyBytes))
+}
+
+func TestCommonAnthropicMessagesAPILargeLanguageModelAdapter_buildJsonRequestBody_ThinkingEnabled(t *testing.T) {
+	adapter := &CommonAnthropicMessagesAPILargeLanguageModelAdapter{
+		apiProvider: &AnthropicOfficialMessagesAPIProvider{
+			AnthropicModelID:              "test",
+			AnthropicMaxTokens:            2048,
+			AnthropicThinkingBudgetTokens: 1024,
+		},
+		ThinkingLevel: settings.LLMThinkingEnabled,
+	}
+
+	request := &data.LargeLanguageModelRequest{
+		UserPrompt: []byte("Hello, how are you?"),
+	}
+
+	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "{\"model\":\"test\",\"max_tokens\":2048,\"stream\":false,\"messages\":[{\"role\":\"user\",\"content\":\"Hello, how are you?\"}],\"thinking\":{\"type\":\"enabled\",\"budget_tokens\":1024}}", string(bodyBytes))
 }
 
 func TestCommonAnthropicMessagesAPILargeLanguageModelAdapter_ParseTextualResponse_ValidJsonResponse(t *testing.T) {

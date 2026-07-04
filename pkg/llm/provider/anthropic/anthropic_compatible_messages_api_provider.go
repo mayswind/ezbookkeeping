@@ -13,11 +13,12 @@ const anthropicCompatibleMessagesPath = "messages"
 // AnthropicCompatibleMessagesAPIProvider defines the structure of Anthropic compatible messages API provider
 type AnthropicCompatibleMessagesAPIProvider struct {
 	AnthropicMessagesAPIProvider
-	AnthropicCompatibleBaseURL    string
-	AnthropicCompatibleAPIVersion string
-	AnthropicCompatibleAPIKey     string
-	AnthropicCompatibleModelID    string
-	AnthropicCompatibleMaxTokens  uint32
+	AnthropicCompatibleBaseURL              string
+	AnthropicCompatibleAPIVersion           string
+	AnthropicCompatibleAPIKey               string
+	AnthropicCompatibleModelID              string
+	AnthropicCompatibleMaxTokens            uint32
+	AnthropicCompatibleThinkingBudgetTokens uint32
 }
 
 // BuildMessagesHttpRequest returns the messages http request by Anthropic compatible messages API provider
@@ -49,6 +50,11 @@ func (p *AnthropicCompatibleMessagesAPIProvider) GetMaxTokens() uint32 {
 	return p.AnthropicCompatibleMaxTokens
 }
 
+// GetThinkingBudgetTokens returns the thinking budget tokens of Anthropic compatible messages API provider
+func (p *AnthropicCompatibleMessagesAPIProvider) GetThinkingBudgetTokens() uint32 {
+	return p.AnthropicCompatibleThinkingBudgetTokens
+}
+
 func (p *AnthropicCompatibleMessagesAPIProvider) getFinalMessagesRequestUrl() string {
 	url := p.AnthropicCompatibleBaseURL
 
@@ -63,10 +69,11 @@ func (p *AnthropicCompatibleMessagesAPIProvider) getFinalMessagesRequestUrl() st
 // NewAnthropicCompatibleLargeLanguageModelProvider creates a new Anthropic compatible large language model provider instance
 func NewAnthropicCompatibleLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
 	return newCommonAnthropicMessagesAPILargeLanguageModelAdapter(llmConfig, enableResponseLog, &AnthropicCompatibleMessagesAPIProvider{
-		AnthropicCompatibleBaseURL:    llmConfig.AnthropicCompatibleBaseURL,
-		AnthropicCompatibleAPIVersion: llmConfig.AnthropicCompatibleAPIVersion,
-		AnthropicCompatibleAPIKey:     llmConfig.AnthropicCompatibleAPIKey,
-		AnthropicCompatibleModelID:    llmConfig.AnthropicCompatibleModelID,
-		AnthropicCompatibleMaxTokens:  llmConfig.AnthropicCompatibleMaxTokens,
+		AnthropicCompatibleBaseURL:              llmConfig.AnthropicCompatibleBaseURL,
+		AnthropicCompatibleAPIVersion:           llmConfig.AnthropicCompatibleAPIVersion,
+		AnthropicCompatibleAPIKey:               llmConfig.AnthropicCompatibleAPIKey,
+		AnthropicCompatibleModelID:              llmConfig.AnthropicCompatibleModelID,
+		AnthropicCompatibleMaxTokens:            llmConfig.AnthropicCompatibleMaxTokens,
+		AnthropicCompatibleThinkingBudgetTokens: llmConfig.AnthropicCompatibleThinkingBudgetTokens,
 	})
 }

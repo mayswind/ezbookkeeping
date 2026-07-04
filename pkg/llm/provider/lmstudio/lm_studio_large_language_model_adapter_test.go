@@ -8,6 +8,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/llm/data"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 func TestLMStudioLargeLanguageModelAdapter_buildJsonRequestBody_TextualUserPrompt(t *testing.T) {
@@ -50,6 +51,27 @@ func TestLMStudioLargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(
 	assert.Nil(t, err)
 
 	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"system_prompt\":\"What's in this image?\",\"input\":[{\"type\":\"image\",\"data_url\":\"data:image/png;base64,ZmFrZWRhdGE=\"}]}", string(bodyBytes))
+}
+
+func TestLMStudioLargeLanguageModelAdapter_buildJsonRequestBody_ReasoningHigh(t *testing.T) {
+	adapter := &LMStudioLargeLanguageModelAdapter{
+		LMStudioModelID:       "test",
+		LMStudioThinkingLevel: settings.LLMThinkingHigh,
+	}
+
+	request := &data.LargeLanguageModelRequest{
+		SystemPrompt: "You are a helpful assistant.",
+		UserPrompt:   []byte("Hello, how are you?"),
+	}
+
+	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	err = json.Unmarshal(bodyBytes, &body)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"system_prompt\":\"You are a helpful assistant.\",\"reasoning\":\"high\",\"input\":[{\"type\":\"text\",\"content\":\"Hello, how are you?\"}]}", string(bodyBytes))
 }
 
 func TestLMStudioLargeLanguageModelAdapter_ParseTextualResponse_ValidJsonResponse(t *testing.T) {

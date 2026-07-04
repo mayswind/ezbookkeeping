@@ -29,7 +29,8 @@ type OpenAIChatCompletionsAPIProvider interface {
 // CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter defines the structure of OpenAI common compatible large language model adapter based on chat completions api
 type CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter struct {
 	common.HttpLargeLanguageModelAdapter
-	apiProvider OpenAIChatCompletionsAPIProvider
+	apiProvider   OpenAIChatCompletionsAPIProvider
+	ThinkingLevel settings.LLMThinkingLevel
 }
 
 // OpenAIMessageRole defines the role of OpenAI chat completions message
@@ -50,11 +51,17 @@ const (
 	OpenAIChatCompletionsRequestResponseFormatTypeJsonSchema OpenAIChatCompletionsRequestResponseFormatType = "json_schema"
 )
 
+// OpenAIChatCompletionsRequestReasoning defines the reasoning structure of OpenAI chat completions request
+type OpenAIChatCompletionsRequestReasoning struct {
+	Effort string `json:"effort"`
+}
+
 // OpenAIChatCompletionsRequest defines the structure of OpenAI chat completions request
 type OpenAIChatCompletionsRequest struct {
 	Model          string                                      `json:"model"`
 	Stream         bool                                        `json:"stream"`
 	Messages       []any                                       `json:"messages"`
+	Reasoning      *OpenAIChatCompletionsRequestReasoning      `json:"reasoning,omitempty"`
 	ResponseFormat *OpenAIChatCompletionsRequestResponseFormat `json:"response_format,omitempty"`
 }
 
@@ -94,6 +101,16 @@ type OpenAIChatCompletionsResponseChoice struct {
 // OpenAIChatCompletionsResponseMessage defines the structure of OpenAI chat completions response message
 type OpenAIChatCompletionsResponseMessage struct {
 	Content *string `json:"content"`
+}
+
+// OpenAI Chat Completions Request Reasoning Efforts Mapping
+var openAIChatCompletionsRequestReasoningEffortsMapping = map[settings.LLMThinkingLevel]string{
+	settings.LLMThinkingDisabled: "none",
+	settings.LLMThinkingLow:      "low",
+	settings.LLMThinkingMedium:   "medium",
+	settings.LLMThinkingEnabled:  "medium",
+	settings.LLMThinkingHigh:     "high",
+	settings.LLMThinkingXHigh:    "xhigh",
 }
 
 // BuildTextualRequest returns the http request by OpenAI common compatible adapter
@@ -149,6 +166,12 @@ func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) buildJsonReque
 		Model:    p.apiProvider.GetModelID(),
 		Stream:   request.Stream,
 		Messages: make([]any, 0, 2),
+	}
+
+	if thinkingLevel, exists := openAIChatCompletionsRequestReasoningEffortsMapping[p.ThinkingLevel]; exists {
+		chatCompletionsRequest.Reasoning = &OpenAIChatCompletionsRequestReasoning{
+			Effort: thinkingLevel,
+		}
 	}
 
 	if request.SystemPrompt != "" {
@@ -215,6 +238,7 @@ func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) buildJsonReque
 
 func newCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter(llmConfig *settings.LLMConfig, enableResponseLog bool, apiProvider OpenAIChatCompletionsAPIProvider) provider.LargeLanguageModelProvider {
 	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: apiProvider,
+		apiProvider:   apiProvider,
+		ThinkingLevel: llmConfig.EnableThinking,
 	})
 }

@@ -20,9 +20,10 @@ const lmStudioChatPath = "api/v1/chat"
 // LMStudioLargeLanguageModelAdapter defines the structure of LM Studio large language model adapter
 type LMStudioLargeLanguageModelAdapter struct {
 	common.HttpLargeLanguageModelAdapter
-	LMStudioServerURL string
-	LMStudioToken     string
-	LMStudioModelID   string
+	LMStudioServerURL     string
+	LMStudioToken         string
+	LMStudioModelID       string
+	LMStudioThinkingLevel settings.LLMThinkingLevel
 }
 
 // LMStudioChatRequest defines the structure of LM Studio chat request
@@ -30,6 +31,7 @@ type LMStudioChatRequest struct {
 	Model        string                      `json:"model"`
 	Stream       bool                        `json:"stream"`
 	SystemPrompt string                      `json:"system_prompt,omitempty"`
+	Reasoning    string                      `json:"reasoning,omitempty"`
 	Input        []*LMStudioChatRequestInput `json:"input"`
 }
 
@@ -48,6 +50,16 @@ type LMStudioChatResponse struct {
 // LMStudioChatResponseOutput defines the structure of LM Studio chat response message
 type LMStudioChatResponseOutput struct {
 	Content *string `json:"content"`
+}
+
+// LM Studio Chat Thinking Types Mapping
+var lmStudioChatReasoningTypesMapping = map[settings.LLMThinkingLevel]string{
+	settings.LLMThinkingDisabled: "off",
+	settings.LLMThinkingEnabled:  "on",
+	settings.LLMThinkingLow:      "low",
+	settings.LLMThinkingMedium:   "medium",
+	settings.LLMThinkingHigh:     "high",
+	settings.LLMThinkingXHigh:    "high",
 }
 
 // BuildTextualRequest returns the http request by LM Studio large language model adapter
@@ -106,6 +118,10 @@ func (p *LMStudioLargeLanguageModelAdapter) buildJsonRequestBody(c core.Context,
 		Input:  make([]*LMStudioChatRequestInput, 0, 1),
 	}
 
+	if thinkingLevel, exists := lmStudioChatReasoningTypesMapping[p.LMStudioThinkingLevel]; exists {
+		chatRequest.Reasoning = thinkingLevel
+	}
+
 	if request.SystemPrompt != "" {
 		chatRequest.SystemPrompt = request.SystemPrompt
 	}
@@ -150,8 +166,9 @@ func (p *LMStudioLargeLanguageModelAdapter) getLMStudioRequestUrl() string {
 // NewLMStudioLargeLanguageModelProvider creates a new LM Studio large language model provider instance
 func NewLMStudioLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
 	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &LMStudioLargeLanguageModelAdapter{
-		LMStudioServerURL: llmConfig.LMStudioServerURL,
-		LMStudioToken:     llmConfig.LMStudioToken,
-		LMStudioModelID:   llmConfig.LMStudioModelID,
+		LMStudioServerURL:     llmConfig.LMStudioServerURL,
+		LMStudioToken:         llmConfig.LMStudioToken,
+		LMStudioModelID:       llmConfig.LMStudioModelID,
+		LMStudioThinkingLevel: llmConfig.EnableThinking,
 	})
 }

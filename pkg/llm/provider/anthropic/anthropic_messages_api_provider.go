@@ -11,9 +11,10 @@ import (
 // AnthropicOfficialMessagesAPIProvider defines the structure of Anthropic official messages API provider
 type AnthropicOfficialMessagesAPIProvider struct {
 	AnthropicMessagesAPIProvider
-	AnthropicAPIKey    string
-	AnthropicModelID   string
-	AnthropicMaxTokens uint32
+	AnthropicAPIKey               string
+	AnthropicModelID              string
+	AnthropicMaxTokens            uint32
+	AnthropicThinkingBudgetTokens uint32
 }
 
 const anthropicMessagesUrl = "https://api.anthropic.com/v1/messages"
@@ -43,11 +44,17 @@ func (p *AnthropicOfficialMessagesAPIProvider) GetMaxTokens() uint32 {
 	return p.AnthropicMaxTokens
 }
 
+// GetThinkingBudgetTokens returns the thinking budget tokens of Anthropic official messages API provider
+func (p *AnthropicOfficialMessagesAPIProvider) GetThinkingBudgetTokens() uint32 {
+	return p.AnthropicThinkingBudgetTokens
+}
+
 // NewAnthropicLargeLanguageModelProvider creates a new Anthropic large language model provider instance
 func NewAnthropicLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
 	return newCommonAnthropicMessagesAPILargeLanguageModelAdapter(llmConfig, enableResponseLog, &AnthropicOfficialMessagesAPIProvider{
-		AnthropicAPIKey:    llmConfig.AnthropicAPIKey,
-		AnthropicModelID:   llmConfig.AnthropicModelID,
-		AnthropicMaxTokens: llmConfig.AnthropicMaxTokens,
+		AnthropicAPIKey:               llmConfig.AnthropicAPIKey,
+		AnthropicModelID:              llmConfig.AnthropicModelID,
+		AnthropicMaxTokens:            llmConfig.AnthropicMaxTokens,
+		AnthropicThinkingBudgetTokens: llmConfig.AnthropicThinkingBudgetTokens,
 	})
 }

@@ -20,8 +20,9 @@ const ollamaChatCompletionsPath = "api/chat"
 // OllamaLargeLanguageModelAdapter defines the structure of Ollama large language model adapter
 type OllamaLargeLanguageModelAdapter struct {
 	common.HttpLargeLanguageModelAdapter
-	OllamaServerURL string
-	OllamaModelID   string
+	OllamaServerURL     string
+	OllamaModelID       string
+	OllamaThinkingLevel settings.LLMThinkingLevel
 }
 
 // OllamaMessageRole defines the role of Ollama chat message
@@ -37,6 +38,7 @@ type OllamaChatRequest struct {
 	Model    string                      `json:"model"`
 	Stream   bool                        `json:"stream"`
 	Messages []*OllamaChatRequestMessage `json:"messages"`
+	Think    any                         `json:"think,omitempty"`
 	Format   string                      `json:"format,omitempty"`
 }
 
@@ -55,6 +57,16 @@ type OllamaChatResponse struct {
 // OllamaChatResponseMessage defines the structure of Ollama chat response message
 type OllamaChatResponseMessage struct {
 	Content *string `json:"content"`
+}
+
+// Ollama Chat Thinking Types Mapping
+var ollamaChatThinkingTypesMapping = map[settings.LLMThinkingLevel]any{
+	settings.LLMThinkingDisabled: false,
+	settings.LLMThinkingEnabled:  true,
+	settings.LLMThinkingLow:      "low",
+	settings.LLMThinkingMedium:   "medium",
+	settings.LLMThinkingHigh:     "high",
+	settings.LLMThinkingXHigh:    "max",
 }
 
 // BuildTextualRequest returns the http request by Ollama large language model adapter
@@ -109,6 +121,10 @@ func (p *OllamaLargeLanguageModelAdapter) buildJsonRequestBody(c core.Context, u
 		Messages: make([]*OllamaChatRequestMessage, 0, 2),
 	}
 
+	if thinkingLevel, exists := ollamaChatThinkingTypesMapping[p.OllamaThinkingLevel]; exists {
+		chatRequest.Think = thinkingLevel
+	}
+
 	if request.SystemPrompt != "" {
 		chatRequest.Messages = append(chatRequest.Messages, &OllamaChatRequestMessage{
 			Role:    OllamaMessageRoleSystem,
@@ -160,7 +176,8 @@ func (p *OllamaLargeLanguageModelAdapter) getOllamaRequestUrl() string {
 // NewOllamaLargeLanguageModelProvider creates a new Ollama large language model provider instance
 func NewOllamaLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
 	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &OllamaLargeLanguageModelAdapter{
-		OllamaServerURL: llmConfig.OllamaServerURL,
-		OllamaModelID:   llmConfig.OllamaModelID,
+		OllamaServerURL:     llmConfig.OllamaServerURL,
+		OllamaModelID:       llmConfig.OllamaModelID,
+		OllamaThinkingLevel: llmConfig.EnableThinking,
 	})
 }

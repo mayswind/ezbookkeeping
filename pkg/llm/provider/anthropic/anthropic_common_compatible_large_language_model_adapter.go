@@ -26,12 +26,16 @@ type AnthropicMessagesAPIProvider interface {
 
 	// GetMaxTokens returns the max tokens to generate
 	GetMaxTokens() uint32
+
+	// GetThinkingBudgetTokens returns the thinking budget tokens, only used when thinking is enabled
+	GetThinkingBudgetTokens() uint32
 }
 
 // CommonAnthropicMessagesAPILargeLanguageModelAdapter defines the structure of Anthropic common compatible large language model adapter based on messages api
 type CommonAnthropicMessagesAPILargeLanguageModelAdapter struct {
 	common.HttpLargeLanguageModelAdapter
-	apiProvider AnthropicMessagesAPIProvider
+	apiProvider   AnthropicMessagesAPIProvider
+	ThinkingLevel settings.LLMThinkingLevel
 }
 
 // AnthropicMessageRole defines the role of Anthropic message
@@ -47,6 +51,7 @@ type AnthropicThinkingType string
 // Anthropic Thinking Types
 const (
 	AnthropicThinkingTypeDisabled AnthropicThinkingType = "disabled"
+	AnthropicThinkingTypeEnabled  AnthropicThinkingType = "enabled"
 )
 
 // AnthropicMessagesRequest defines the structure of Anthropic messages request
@@ -80,7 +85,8 @@ type AnthropicMessagesRequestBase64ImageSource struct {
 
 // AnthropicMessagesRequestThinkingConfigParam defines the structure of Anthropic messages request thinking config param
 type AnthropicMessagesRequestThinkingConfigParam struct {
-	Type AnthropicThinkingType `json:"type"`
+	Type         AnthropicThinkingType `json:"type"`
+	BudgetTokens uint32                `json:"budget_tokens,omitempty"`
 }
 
 // AnthropicMessagesResponse defines the structure of Anthropic messages response
@@ -123,13 +129,29 @@ func (p *CommonAnthropicMessagesAPILargeLanguageModelAdapter) ParseTextualRespon
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
-	if messagesResponse == nil || messagesResponse.Content == nil || len(messagesResponse.Content) < 1 || messagesResponse.Content[0].Text == nil {
+	if messagesResponse == nil || messagesResponse.Content == nil || len(messagesResponse.Content) < 1 {
 		log.Errorf(c, "[anthropic_common_compatible_large_language_model_adapter.ParseTextualResponse] messages response is invalid for user \"uid:%d\"", uid)
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 
+	hasTextField := false
+	content := ""
+
+	for i := 0; i < len(messagesResponse.Content); i++ {
+		if messagesResponse.Content[i].Text != nil {
+			hasTextField = true
+			content = *messagesResponse.Content[i].Text
+			break
+		}
+	}
+
+	if !hasTextField {
+		log.Errorf(c, "[anthropic_common_compatible_large_language_model_adapter.ParseTextualResponse] messages response content has no text field for user \"uid:%d\"", uid)
+		return nil, errs.ErrFailedToRequestRemoteApi
+	}
+
 	textualResponse := &data.LargeLanguageModelTextualResponse{
-		Content: *messagesResponse.Content[0].Text,
+		Content: content,
 	}
 
 	return textualResponse, nil
@@ -140,14 +162,21 @@ func (p *CommonAnthropicMessagesAPILargeLanguageModelAdapter) buildJsonRequestBo
 		return nil, errs.ErrInvalidLLMModelId
 	}
 
+	thinkingConfig := &AnthropicMessagesRequestThinkingConfigParam{
+		Type: AnthropicThinkingTypeDisabled,
+	}
+
+	if p.ThinkingLevel != settings.LLMThinkingDefault && p.ThinkingLevel != settings.LLMThinkingDisabled {
+		thinkingConfig.Type = AnthropicThinkingTypeEnabled
+		thinkingConfig.BudgetTokens = p.apiProvider.GetThinkingBudgetTokens()
+	}
+
 	messagesRequest := &AnthropicMessagesRequest{
 		Model:     p.apiProvider.GetModelID(),
 		MaxTokens: p.apiProvider.GetMaxTokens(),
 		Stream:    request.Stream,
 		Messages:  make([]any, 0, 1),
-		Thinking: &AnthropicMessagesRequestThinkingConfigParam{
-			Type: AnthropicThinkingTypeDisabled,
-		},
+		Thinking:  thinkingConfig,
 	}
 
 	if request.SystemPrompt != "" {
@@ -191,6 +220,7 @@ func (p *CommonAnthropicMessagesAPILargeLanguageModelAdapter) buildJsonRequestBo
 
 func newCommonAnthropicMessagesAPILargeLanguageModelAdapter(llmConfig *settings.LLMConfig, enableResponseLog bool, apiProvider AnthropicMessagesAPIProvider) provider.LargeLanguageModelProvider {
 	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &CommonAnthropicMessagesAPILargeLanguageModelAdapter{
-		apiProvider: apiProvider,
+		apiProvider:   apiProvider,
+		ThinkingLevel: llmConfig.EnableThinking,
 	})
 }

@@ -21,13 +21,26 @@ const googleAIGenerateContentAPIFormat = "https://generativelanguage.googleapis.
 // GoogleAILargeLanguageModelAdapter defines the structure of Google AI large language model adapter
 type GoogleAILargeLanguageModelAdapter struct {
 	common.HttpLargeLanguageModelAdapter
-	GoogleAIAPIKey  string
-	GoogleAIModelID string
+	GoogleAIAPIKey        string
+	GoogleAIModelID       string
+	GoogleAIThinkingLevel settings.LLMThinkingLevel
 }
 
 // GoogleAIGenerateContentRequest defines the structure of Google AI generate content request
 type GoogleAIGenerateContentRequest struct {
-	Contents []*GoogleAIGenerateContentRequestContent `json:"contents"`
+	Contents          []*GoogleAIGenerateContentRequestContent        `json:"contents"`
+	SystemInstruction *GoogleAIGenerateContentRequestContent          `json:"systemInstruction,omitempty"`
+	GenerationConfig  *GoogleAIGenerateContentRequestGenerationConfig `json:"generationConfig,omitempty"`
+}
+
+// GoogleAIGenerateContentRequestGenerationConfig defines the structure of Google AI generate content request generation config
+type GoogleAIGenerateContentRequestGenerationConfig struct {
+	ThinkingConfig *GoogleAIGenerateContentRequestThinkingConfig `json:"thinkingConfig,omitempty"`
+}
+
+// GoogleAIGenerateContentRequestThinkingConfig defines the structure of Google AI generate content request thinking config
+type GoogleAIGenerateContentRequestThinkingConfig struct {
+	ThinkingLevel string `json:"thinkingLevel"`
 }
 
 // GoogleAIGenerateContentRequestContent defines the structure of Google AI generate content request content
@@ -65,6 +78,16 @@ type GoogleAIGenerateContentResponseContent struct {
 // GoogleAIGenerateContentResponseContentPart defines the structure of Google AI generate content response content part
 type GoogleAIGenerateContentResponseContentPart struct {
 	Text *string `json:"text"`
+}
+
+// Google AI Thinking Levels Mapping
+var googleAIGenerateThinkingLevelsMapping = map[settings.LLMThinkingLevel]string{
+	settings.LLMThinkingDisabled: "MINIMAL",
+	settings.LLMThinkingLow:      "LOW",
+	settings.LLMThinkingMedium:   "MEDIUM",
+	settings.LLMThinkingEnabled:  "MEDIUM",
+	settings.LLMThinkingHigh:     "HIGH",
+	settings.LLMThinkingXHigh:    "HIGH",
 }
 
 // BuildTextualRequest returns the http request by Google AI large language model adapter
@@ -120,15 +143,27 @@ func (p *GoogleAILargeLanguageModelAdapter) buildJsonRequestBody(c core.Context,
 	generateContentRequest := &GoogleAIGenerateContentRequest{
 		Contents: []*GoogleAIGenerateContentRequestContent{
 			{
-				Parts: make([]*GoogleAIGenerateContentRequestContentPart, 0, 2),
+				Parts: make([]*GoogleAIGenerateContentRequestContentPart, 0, 1),
 			},
 		},
 	}
 
+	if thinkingLevel, exists := googleAIGenerateThinkingLevelsMapping[p.GoogleAIThinkingLevel]; exists {
+		generateContentRequest.GenerationConfig = &GoogleAIGenerateContentRequestGenerationConfig{
+			ThinkingConfig: &GoogleAIGenerateContentRequestThinkingConfig{
+				ThinkingLevel: thinkingLevel,
+			},
+		}
+	}
+
 	if request.SystemPrompt != "" {
-		generateContentRequest.Contents[0].Parts = append(generateContentRequest.Contents[0].Parts, &GoogleAIGenerateContentRequestContentPart{
-			Text: request.SystemPrompt,
-		})
+		generateContentRequest.SystemInstruction = &GoogleAIGenerateContentRequestContent{
+			Parts: []*GoogleAIGenerateContentRequestContentPart{
+				{
+					Text: request.SystemPrompt,
+				},
+			},
+		}
 	}
 
 	if len(request.UserPrompt) > 0 {
@@ -161,7 +196,8 @@ func (p *GoogleAILargeLanguageModelAdapter) buildJsonRequestBody(c core.Context,
 // NewGoogleAILargeLanguageModelProvider creates a new Google AI large language model provider instance
 func NewGoogleAILargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableResponseLog bool) provider.LargeLanguageModelProvider {
 	return common.NewCommonHttpLargeLanguageModelProvider(llmConfig, enableResponseLog, &GoogleAILargeLanguageModelAdapter{
-		GoogleAIAPIKey:  llmConfig.GoogleAIAPIKey,
-		GoogleAIModelID: llmConfig.GoogleAIModelID,
+		GoogleAIAPIKey:        llmConfig.GoogleAIAPIKey,
+		GoogleAIModelID:       llmConfig.GoogleAIModelID,
+		GoogleAIThinkingLevel: llmConfig.EnableThinking,
 	})
 }

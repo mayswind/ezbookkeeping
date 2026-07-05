@@ -120,6 +120,8 @@
             "nDay": "{n} Gün",
             "nDays": "{n} Gün",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "{name} ile giriş yap",
             "hoursBehindDefaultTimezone": "Varsayılan saat diliminin {hours} saat gerisinde",
             "hoursAheadOfDefaultTimezone": "Varsayılan saat diliminin {hours} saat ilerisinde",

@@ -352,7 +352,7 @@
                                         rows="3"
                                         :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting || recognizing"
-                                        :label="tt('Description')"
+                                        :label="transactionDescriptionTitle"
                                         :placeholder="tt('Your transaction description (optional)')"
                                         v-model="transaction.comment"
                                     />
@@ -653,6 +653,7 @@ const {
     transactionDisplayTimezone,
     transactionTimezoneTimeDifference,
     geoLocationStatusInfo,
+    transactionDescriptionTitle,
     inputEmptyProblemMessage,
     inputIsEmpty,
     createNewTransactionModel,

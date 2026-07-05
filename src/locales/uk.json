@@ -120,6 +120,8 @@
             "nDay": "{n} дн.",
             "nDays": "{n} дн.",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "Увійти за допомогою {name}",
             "hoursBehindDefaultTimezone": "{hours} год позаду часового поясу за замовчуванням",
             "hoursAheadOfDefaultTimezone": "{hours} год попереду часового поясу за замовчуванням",

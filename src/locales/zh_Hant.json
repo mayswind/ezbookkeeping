@@ -120,6 +120,8 @@
             "nDay": "{n} 天",
             "nDays": "{n} 天",
             "multiTextJoinSeparator": "、",
+            "charactersRemaining": "剩餘 {count} 個字元",
+            "charactersOverLimit": "超過 {count} 個字元",
             "loginWithCustomProvider": "使用 {name} 登入",
             "hoursBehindDefaultTimezone": "比預設時區晚{hours}小時",
             "hoursAheadOfDefaultTimezone": "比預設時區早{hours}小時",

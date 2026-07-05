@@ -120,6 +120,8 @@
             "nDay": "{n} Día",
             "nDays": "{n} Días",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "Iniciar sesión con {name}",
             "hoursBehindDefaultTimezone": "{hours} hora(s) de retraso en la zona horaria predeterminada",
             "hoursAheadOfDefaultTimezone": "{hours} hora(s) por delante de la zona horaria predeterminada",

@@ -17,7 +17,7 @@ import { ImageUploadQualityType } from '@/core/image.ts';
 import { TransactionType, TransactionQuickAddButtonActionType } from '@/core/transaction.ts';
 import { TemplateType } from '@/core/template.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
-import { TRANSACTION_MAX_PICTURE_COUNT } from '@/consts/transaction.ts';
+import { TRANSACTION_MAX_PICTURE_COUNT, TRANSACTION_MAX_COMMENT_LENGTH, TRANSACTION_COMMENT_HINT_MIN_LENGTH } from '@/consts/transaction.ts';
 
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -79,6 +79,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         getCurrentNumeralSystemType,
         getTimezoneDifferenceDisplayText,
         formatAmountToLocalizedNumeralsWithCurrency,
+        formatNumberToLocalizedNumerals,
         getAdaptiveAmountRate,
         getCategorizedAccountsWithDisplayBalance
     } = useI18n();
@@ -323,6 +324,22 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             return tt('Getting Location...');
         } else {
             return tt('No Location');
+        }
+    });
+
+    const transactionDescriptionTitle = computed<string>(() => {
+        if (!transaction.value.comment || transaction.value.comment.length < TRANSACTION_COMMENT_HINT_MIN_LENGTH) {
+            return tt('Description');
+        }
+
+        if (transaction.value.comment.length > TRANSACTION_MAX_COMMENT_LENGTH) {
+            return tt('Description') + ` (${tt('format.misc.charactersOverLimit', {
+                count: formatNumberToLocalizedNumerals(transaction.value.comment.length - TRANSACTION_MAX_COMMENT_LENGTH)
+            })})`;
+        } else {
+            return tt('Description') + ` (${tt('format.misc.charactersRemaining', {
+                count: formatNumberToLocalizedNumerals(TRANSACTION_MAX_COMMENT_LENGTH - transaction.value.comment.length)
+            })})`;
         }
     });
 
@@ -583,6 +600,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         transactionDisplayTimezone,
         transactionTimezoneTimeDifference,
         geoLocationStatusInfo,
+        transactionDescriptionTitle,
         inputEmptyProblemMessage,
         inputIsEmpty,
         // functions

@@ -120,6 +120,8 @@
             "nDay": "{n} நாள்",
             "nDays": "{n} நாட்கள்",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "{name} மூலம் உள்நுழைக",
             "hoursBehindDefaultTimezone": "இயல்பு நேர மண்டலத்தை விட {hours} மணி நேரம் பின்னால்",
             "hoursAheadOfDefaultTimezone": "இயல்பு நேர மண்டலத்தை விட {hours} மணி நேரம் முன்னால்",

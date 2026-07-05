@@ -120,6 +120,8 @@
             "nDay": "{n} Day",
             "nDays": "{n} Days",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "Log in with {name}",
             "hoursBehindDefaultTimezone": "{hours} heure(s) de retard sur le fuseau horaire par défaut",
             "hoursAheadOfDefaultTimezone": "{hours} heure(s) d'avance sur le fuseau horaire par défaut",

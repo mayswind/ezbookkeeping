@@ -427,7 +427,7 @@
                 class="transaction-edit-comment"
                 style="height: auto"
                 :class="{ 'readonly': mode === TransactionEditPageMode.View }"
-                :label="tt('Description')"
+                :label="transactionDescriptionTitle"
                 :placeholder="mode !== TransactionEditPageMode.View ? tt('Your transaction description (optional)') : ''"
                 v-textarea-auto-size
                 v-model:value="transaction.comment"
@@ -635,6 +635,7 @@ const {
     transactionDisplayTimezone,
     transactionTimezoneTimeDifference,
     geoLocationStatusInfo,
+    transactionDescriptionTitle,
     inputEmptyProblemMessage,
     inputIsEmpty,
     setTransactionModel,

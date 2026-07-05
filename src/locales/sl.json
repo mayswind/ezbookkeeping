@@ -120,6 +120,8 @@
             "nDay": "{n} dan",
             "nDays": "{n} dan",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "Prijavi se preko {name}",
             "hoursBehindDefaultTimezone": "{hours} ura(ur) za privzetim časovnim pasom",
             "hoursAheadOfDefaultTimezone": "{hours} ura(ur) po privzetem časovnem pasu",

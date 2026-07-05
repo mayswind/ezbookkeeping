@@ -120,6 +120,8 @@
             "nDay": "{n} zi",
             "nDays": "{n} zile",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "Autentificare cu {name}",
             "hoursBehindDefaultTimezone": "cu {hours} oră/ore în urma fusului orar implicit",
             "hoursAheadOfDefaultTimezone": "cu {hours} oră/ore înaintea fusului orar implicit",

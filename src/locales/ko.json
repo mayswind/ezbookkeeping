@@ -120,6 +120,8 @@
             "nDay": "{n} Day",
             "nDays": "{n} Days",
             "multiTextJoinSeparator": ", ",
+            "charactersRemaining": "{count} character(s) remaining",
+            "charactersOverLimit": "{count} character(s) over limit",
             "loginWithCustomProvider": "Log in with {name}",
             "hoursBehindDefaultTimezone": "기본 시간대보다 {hours}시간 느립니다",
             "hoursAheadOfDefaultTimezone": "기본 시간대보다 {hours}시간 빠릅니다",

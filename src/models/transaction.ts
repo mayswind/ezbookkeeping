@@ -254,6 +254,7 @@ export class Transaction implements TransactionInfoResponse {
 
         return {
             id: this.id,
+            type: this.type,
             categoryId: categoryId,
             time: this.time,
             utcOffset: this.utcOffset,
@@ -544,6 +545,7 @@ export interface TransactionCreateRequest {
 
 export interface TransactionModifyRequest {
     readonly id: string;
+    readonly type: number;
     readonly categoryId: string;
     readonly time: number;
     readonly utcOffset: number;

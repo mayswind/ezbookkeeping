@@ -10,17 +10,17 @@
         </f7-navbar>
 
         <f7-block :class="{ 'no-margin-top margin-bottom': true, 'disabled': loading }">
-            <f7-segmented strong round :class="{ 'readonly': pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add }">
+            <f7-segmented strong round :class="{ 'readonly': pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit }">
                 <f7-button round :text="tt('Expense')" :active="transaction.type === TransactionType.Expense"
-                           :disabled="pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && transaction.type !== TransactionType.Expense"
+                           :disabled="pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit && transaction.type !== TransactionType.Expense"
                            v-if="transaction.type !== TransactionType.ModifyBalance"
                            @click="transaction.type = TransactionType.Expense"></f7-button>
                 <f7-button round :text="tt('Income')" :active="transaction.type === TransactionType.Income"
-                           :disabled="pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && transaction.type !== TransactionType.Income"
+                           :disabled="pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit && transaction.type !== TransactionType.Income"
                            v-if="transaction.type !== TransactionType.ModifyBalance"
                            @click="transaction.type = TransactionType.Income"></f7-button>
                 <f7-button round :text="tt('Transfer')" :active="transaction.type === TransactionType.Transfer"
-                           :disabled="pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && transaction.type !== TransactionType.Transfer"
+                           :disabled="pageTypeAndMode?.type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit && transaction.type !== TransactionType.Transfer"
                            v-if="transaction.type !== TransactionType.ModifyBalance"
                            @click="transaction.type = TransactionType.Transfer"></f7-button>
                 <f7-button round :text="tt('Modify Balance')" :active="transaction.type === TransactionType.ModifyBalance"

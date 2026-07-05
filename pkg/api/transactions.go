@@ -1209,6 +1209,20 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionTypeInvalid
 	}
 
+	newTransactionType, err := transactionModifyReq.Type.ToTransactionDbType()
+
+	if err != nil {
+		return nil, errs.ErrTransactionTypeInvalid
+	}
+
+	if (transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE && newTransactionType != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE) ||
+		(transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE && newTransactionType == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE) {
+		log.Warnf(c, "[transactions.TransactionModifyHandler] cannot modify transaction type from \"%d\" to \"%d\"", transaction.Type, newTransactionType)
+		return nil, errs.ErrTransactionTypeInvalid
+	}
+
+	changeToTransfer := newTransactionType == models.TRANSACTION_DB_TYPE_TRANSFER_OUT && transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT
+
 	if transaction.Type == models.TRANSACTION_DB_TYPE_MODIFY_BALANCE && transactionModifyReq.CategoryId != 0 {
 		log.Warnf(c, "[transactions.TransactionModifyHandler] balance modification transaction cannot set category id")
 		return nil, errs.ErrBalanceModificationTransactionCannotSetCategory
@@ -1242,6 +1256,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	newTransaction := &models.Transaction{
 		TransactionId:     transaction.TransactionId,
 		Uid:               uid,
+		Type:              newTransactionType,
 		CategoryId:        transactionModifyReq.CategoryId,
 		TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionModifyReq.Time),
 		TimezoneUtcOffset: transactionModifyReq.UtcOffset,
@@ -1251,7 +1266,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		Comment:           transactionModifyReq.Comment,
 	}
 
-	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
+	if newTransaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		newTransaction.RelatedAccountId = transactionModifyReq.DestinationAccountId
 		newTransaction.RelatedAccountAmount = transactionModifyReq.DestinationAmount
 	}
@@ -1261,13 +1276,14 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		newTransaction.GeoLatitude = transactionModifyReq.GeoLocation.Latitude
 	}
 
-	if newTransaction.CategoryId == transaction.CategoryId &&
+	if newTransaction.Type == transaction.Type &&
+		newTransaction.CategoryId == transaction.CategoryId &&
 		utils.GetUnixTimeFromTransactionTime(newTransaction.TransactionTime) == utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime) &&
 		newTransaction.TimezoneUtcOffset == transaction.TimezoneUtcOffset &&
 		newTransaction.AccountId == transaction.AccountId &&
 		newTransaction.Amount == transaction.Amount &&
-		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountId == transaction.RelatedAccountId) &&
-		(transaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountAmount == transaction.RelatedAccountAmount) &&
+		(newTransaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountId == transaction.RelatedAccountId) &&
+		(newTransaction.Type != models.TRANSACTION_DB_TYPE_TRANSFER_OUT || newTransaction.RelatedAccountAmount == transaction.RelatedAccountAmount) &&
 		newTransaction.HideAmount == transaction.HideAmount &&
 		newTransaction.Comment == transaction.Comment &&
 		newTransaction.GeoLongitude == transaction.GeoLongitude &&
@@ -1338,7 +1354,7 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 		}
 	}
 
-	err = a.transactions.ModifyTransaction(c, newTransaction, len(transactionTagIds), addTransactionTagIds, removeTransactionTagIds, addTransactionPictureIds, removeTransactionPictureIds)
+	err = a.transactions.ModifyTransaction(c, newTransaction, changeToTransfer, len(transactionTagIds), addTransactionTagIds, removeTransactionTagIds, addTransactionPictureIds, removeTransactionPictureIds)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionModifyHandler] failed to update transaction \"id:%d\" for user \"uid:%d\", because %s", transactionModifyReq.Id, uid, err.Error())
@@ -1347,7 +1363,6 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 
 	log.Infof(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
 
-	newTransaction.Type = transaction.Type
 	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds, transactionEditable)
 	newTransactionResp.Pictures = a.GetTransactionPictureInfoResponseList(newPictureInfos)
 
@@ -1603,7 +1618,7 @@ func (a *TransactionsApi) TransactionBatchUpdateAccountsHandler(c *core.WebConte
 			continue
 		}
 
-		err = a.transactions.ModifyTransaction(c, transaction, 0, nil, nil, nil, nil)
+		err = a.transactions.ModifyTransaction(c, transaction, false, 0, nil, nil, nil, nil)
 
 		if err != nil {
 			log.Errorf(c, "[transactions.TransactionBatchUpdateAccountsHandler] failed to update transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())

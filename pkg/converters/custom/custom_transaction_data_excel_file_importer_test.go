@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -122,19 +121,6 @@ func TestCustomTransactionDataParser_ParseOOXMLExcelDataLines_MultipleSheet(t *t
 	assert.Equal(t, "5-C3", allLines[8][2])
 }
 
-func TestCustomTransactionDataParser_ParseOOXMLExcelDataLines_MultipleSheetWithDifferentColumnCount(t *testing.T) {
-	importer, err := CreateNewCustomTransactionDataExcelFileParser("custom_xlsx")
-	assert.Nil(t, err)
-
-	context := core.NewNullContext()
-
-	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_with_different_header_row_excel_file.xlsx")
-	assert.Nil(t, err)
-
-	_, err = importer.ParseDataLines(context, testdata)
-	assert.EqualError(t, err, errs.ErrFieldsInMultiTableAreDifferent.Message)
-}
-
 func TestCustomTransactionDataParser_ParseMSCFBExcelDataLines_EmptyData(t *testing.T) {
 	importer, err := CreateNewCustomTransactionDataExcelFileParser("custom_xls")
 	assert.Nil(t, err)
@@ -238,17 +224,4 @@ func TestCustomTransactionDataParser_ParseMSCFBExcelDataLines_MultipleSheet(t *t
 	assert.Equal(t, "5-A3", allLines[8][0])
 	assert.Equal(t, "5-B3", allLines[8][1])
 	assert.Equal(t, "5-C3", allLines[8][2])
-}
-
-func TestCustomTransactionDataParser_ParseMSCFBExcelDataLines_MultipleSheetWithDifferentColumnCount(t *testing.T) {
-	importer, err := CreateNewCustomTransactionDataExcelFileParser("custom_xls")
-	assert.Nil(t, err)
-
-	context := core.NewNullContext()
-
-	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_with_different_header_row_excel_file.xls")
-	assert.Nil(t, err)
-
-	_, err = importer.ParseDataLines(context, testdata)
-	assert.EqualError(t, err, errs.ErrFieldsInMultiTableAreDifferent.Message)
 }

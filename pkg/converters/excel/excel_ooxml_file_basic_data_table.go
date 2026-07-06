@@ -201,22 +201,24 @@ func CreateNewExcelOOXMLFileBasicDataTable(data []byte, hasTitleLine bool) (data
 
 		row := allData[0]
 
-		if i == 0 {
-			for j := 0; j < len(row); j++ {
-				headerItem := row[j]
+		if hasTitleLine {
+			if i == 0 {
+				for j := 0; j < len(row); j++ {
+					headerItem := row[j]
 
-				if headerItem == "" {
-					break
+					if headerItem == "" {
+						break
+					}
+
+					firstRowItems = append(firstRowItems, headerItem)
 				}
+			} else {
+				for j := 0; j < min(len(row), len(firstRowItems)); j++ {
+					headerItem := row[j]
 
-				firstRowItems = append(firstRowItems, headerItem)
-			}
-		} else {
-			for j := 0; j < min(len(row), len(firstRowItems)); j++ {
-				headerItem := row[j]
-
-				if headerItem != firstRowItems[j] {
-					return nil, errs.ErrFieldsInMultiTableAreDifferent
+					if headerItem != firstRowItems[j] {
+						return nil, errs.ErrFieldsInMultiTableAreDifferent
+					}
 				}
 			}
 		}
@@ -238,4 +240,61 @@ func CreateNewExcelOOXMLFileBasicDataTable(data []byte, hasTitleLine bool) (data
 		headerLineColumnNames: headerLineColumnNames,
 		hasTitleLine:          hasTitleLine,
 	}, nil
+}
+
+// CreateNewExcelOOXMLFileBasicDataTables returns excel (Office Open XML) data tables by file binary data, one per worksheet
+func CreateNewExcelOOXMLFileBasicDataTables(data []byte, hasTitleLine bool) ([]datatable.BasicDataTable, error) {
+	reader := bytes.NewReader(data)
+	file, err := excelize.OpenReader(reader)
+
+	defer file.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	sheetNames := file.GetSheetList()
+	var dataTables []datatable.BasicDataTable
+
+	for i := 0; i < len(sheetNames); i++ {
+		sheetName := sheetNames[i]
+		allData, err := file.GetRows(sheetName)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if allData == nil || len(allData) < 1 {
+			continue
+		}
+
+		row := allData[0]
+
+		var headerLineColumnNames []string = nil
+
+		if hasTitleLine {
+			for j := 0; j < len(row); j++ {
+				headerItem := row[j]
+
+				if headerItem == "" {
+					break
+				}
+
+				headerLineColumnNames = append(headerLineColumnNames, headerItem)
+			}
+		}
+
+		dataTables = append(dataTables, &ExcelOOXMLFileBasicDataTable{
+			sheets: []*excelOOXMLSheet{
+				{
+					sheetName: sheetName,
+					allData:   allData,
+				},
+			},
+			headerLineColumnNames: headerLineColumnNames,
+			hasTitleLine:          hasTitleLine,
+		})
+	}
+
+	return dataTables, nil
 }

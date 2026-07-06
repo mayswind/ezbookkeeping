@@ -462,3 +462,219 @@ func TestCreateNewExcelOOXMLFileBasicDataTable_MultipleSheetsWithDifferentHeader
 	_, err = CreateNewExcelOOXMLFileBasicDataTable(testdata, true)
 	assert.EqualError(t, err, errs.ErrFieldsInMultiTableAreDifferent.Message)
 }
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_TableCount_SingleSheet(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(tables))
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_TableCount_MultipleSheets(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 4, len(tables))
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_TableCount_EmptyContent(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/empty_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(tables))
+
+	tables, err = CreateNewExcelOOXMLFileBasicDataTables(testdata, false)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(tables))
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_DataRowCount_SingleSheet(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, false)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(tables))
+	assert.Equal(t, 3, tables[0].DataRowCount())
+
+	tables, err = CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(tables))
+	assert.Equal(t, 2, tables[0].DataRowCount())
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_DataRowCount_MultipleSheets(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, false)
+	assert.Nil(t, err)
+	assert.Equal(t, 4, len(tables))
+	assert.Equal(t, 3, tables[0].DataRowCount())
+	assert.Equal(t, 2, tables[1].DataRowCount())
+	assert.Equal(t, 1, tables[2].DataRowCount())
+	assert.Equal(t, 3, tables[3].DataRowCount())
+
+	tables, err = CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 4, len(tables))
+	assert.Equal(t, 2, tables[0].DataRowCount())
+	assert.Equal(t, 1, tables[1].DataRowCount())
+	assert.Equal(t, 0, tables[2].DataRowCount())
+	assert.Equal(t, 2, tables[3].DataRowCount())
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_DataRowCount_DifferentHeaders(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_with_different_header_row_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(tables))
+	assert.Equal(t, 2, tables[0].DataRowCount())
+	assert.Equal(t, 1, tables[1].DataRowCount())
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_HeaderColumnNames(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, false)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(tables))
+	assert.Nil(t, tables[0].HeaderColumnNames())
+
+	tables, err = CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(tables))
+	assert.EqualValues(t, []string{"A1", "B1", "C1"}, tables[0].HeaderColumnNames())
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_HeaderColumnNames_DifferentHeaders(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_with_different_header_row_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(tables))
+	assert.EqualValues(t, []string{"1-A1", "1-B1", "1-C1"}, tables[0].HeaderColumnNames())
+	assert.EqualValues(t, []string{"2-A1", "2-B1"}, tables[1].HeaderColumnNames())
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_DataRowIterator_SingleSheet(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(tables))
+
+	iterator := tables[0].DataRowIterator()
+	assert.True(t, iterator.HasNext())
+
+	row1 := iterator.Next()
+	assert.NotNil(t, row1)
+	assert.Equal(t, "A2", row1.GetData(0))
+	assert.Equal(t, "B2", row1.GetData(1))
+	assert.Equal(t, "C2", row1.GetData(2))
+	assert.True(t, iterator.HasNext())
+
+	row2 := iterator.Next()
+	assert.NotNil(t, row2)
+	assert.Equal(t, "A3", row2.GetData(0))
+	assert.Equal(t, "B3", row2.GetData(1))
+	assert.Equal(t, "C3", row2.GetData(2))
+	assert.False(t, iterator.HasNext())
+
+	assert.Nil(t, iterator.Next())
+	assert.False(t, iterator.HasNext())
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_DataRowIterator_MultipleSheets(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 4, len(tables))
+
+	// table 0 (sheet 1)
+	iterator0 := tables[0].DataRowIterator()
+	assert.True(t, iterator0.HasNext())
+	row := iterator0.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "1-A2", row.GetData(0))
+	assert.True(t, iterator0.HasNext())
+	row = iterator0.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "1-A3", row.GetData(0))
+	assert.False(t, iterator0.HasNext())
+	assert.Nil(t, iterator0.Next())
+
+	// table 1 (sheet 3)
+	iterator1 := tables[1].DataRowIterator()
+	assert.True(t, iterator1.HasNext())
+	row = iterator1.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "3-A2", row.GetData(0))
+	assert.False(t, iterator1.HasNext())
+	assert.Nil(t, iterator1.Next())
+
+	// table 2 (sheet 4) - only header, no data rows
+	iterator2 := tables[2].DataRowIterator()
+	assert.False(t, iterator2.HasNext())
+	assert.Nil(t, iterator2.Next())
+
+	// table 3 (sheet 5)
+	iterator3 := tables[3].DataRowIterator()
+	assert.True(t, iterator3.HasNext())
+	row = iterator3.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "5-A2", row.GetData(0))
+	assert.True(t, iterator3.HasNext())
+	row = iterator3.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "5-A3", row.GetData(0))
+	assert.False(t, iterator3.HasNext())
+	assert.Nil(t, iterator3.Next())
+}
+
+func TestCreateNewExcelOOXMLFileBasicDataTables_DataRowIterator_DifferentHeaders(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_with_different_header_row_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelOOXMLFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(tables))
+
+	// table 0 (sheet 0)
+	iterator0 := tables[0].DataRowIterator()
+	assert.True(t, iterator0.HasNext())
+	row := iterator0.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "1-A2", row.GetData(0))
+	assert.Equal(t, "1-B2", row.GetData(1))
+	assert.Equal(t, "1-C2", row.GetData(2))
+	assert.True(t, iterator0.HasNext())
+	row = iterator0.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "1-A3", row.GetData(0))
+	assert.Equal(t, "1-B3", row.GetData(1))
+	assert.Equal(t, "1-C3", row.GetData(2))
+	assert.False(t, iterator0.HasNext())
+
+	// table 1 (sheet 1)
+	iterator1 := tables[1].DataRowIterator()
+	assert.True(t, iterator1.HasNext())
+	row = iterator1.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "2-A2", row.GetData(0))
+	assert.Equal(t, "2-B2", row.GetData(1))
+	assert.False(t, iterator1.HasNext())
+}

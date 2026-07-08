@@ -10,7 +10,7 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, keys, values } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
-import { NumeralSystem, AmountFilterType } from '@/core/numeral.ts';
+import { NumeralSystem } from '@/core/numeral.ts';
 import { type DateTime, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountCategory } from '@/core/account.ts';
@@ -1608,28 +1608,6 @@ export const useExplorersStore = defineStore('explorers', () => {
         return querys.join('&');
     }
 
-    function getTransactionListPageParams(dimensionType: TransactionExplorerDimensionType, itemId: string): string {
-        const querys: string[] = [];
-
-        if (dimensionType === TransactionExplorerDimensionType.TransactionType) {
-            querys.push(`type=${itemId}`);
-        } else if (dimensionType === TransactionExplorerDimensionType.Account) {
-            querys.push(`accountIds=${itemId}`);
-        } else if (dimensionType === TransactionExplorerDimensionType.Category) {
-            querys.push(`categoryIds=${itemId}`);
-        } else if (dimensionType === TransactionExplorerDimensionType.Amount) {
-            querys.push(`amountFilter=${encodeURIComponent(AmountFilterType.EqualTo.toTextualFilter(parseInt(itemId)))}`);
-        } else {
-            return '';
-        }
-
-        querys.push('dateType=' + transactionExplorerFilter.value.dateRangeType);
-        querys.push('minTime=' + transactionExplorerFilter.value.startTime);
-        querys.push('maxTime=' + transactionExplorerFilter.value.endTime);
-
-        return querys.join('&');
-    }
-
     function loadAllTransactions({ force }: { force: boolean }): Promise<TransactionInfoResponse[]> {
         return new Promise((resolve, reject) => {
             services.getAllTransactions({
@@ -1951,6 +1929,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         filteredTransactionsInDataTable,
         filteredTransactionsInDataTableStatistic,
         categoriedTransactionExplorerData,
+        categoriedTransactions,
         // functions
         updateTransactionExplorerInvalidState,
         updateInsightsExplorerListInvalidState,
@@ -1959,7 +1938,6 @@ export const useExplorersStore = defineStore('explorers', () => {
         initTransactionExplorerFilter,
         updateTransactionExplorerFilter,
         getTransactionExplorerPageParams,
-        getTransactionListPageParams,
         loadAllTransactions,
         loadAllExplorationBasicInfos,
         getExploration,

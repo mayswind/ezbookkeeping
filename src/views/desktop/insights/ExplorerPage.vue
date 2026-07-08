@@ -182,7 +182,8 @@
                                 </v-window-item>
                                 <v-window-item value="chart">
                                     <explorer-chart-tab ref="explorerChartTab"
-                                                        :loading="loading" :disabled="loading || updating" />
+                                                        :loading="loading" :disabled="loading || updating"
+                                                        @click:transaction="onShowTransaction" />
                                 </v-window-item>
                             </v-window>
                         </v-card>

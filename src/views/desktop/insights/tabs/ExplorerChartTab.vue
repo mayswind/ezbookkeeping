@@ -254,15 +254,17 @@
             v-else-if="!loading"
         />
     </v-card-text>
+
+    <transaction-list-dialog ref="transactionListDialog" @click:transaction="onClickTransaction" />
 </template>
 
 <script setup lang="ts">
 import AxisChart, { type AxisChartDisplayType } from '@/components/desktop/AxisChart.vue';
 import HierarchyChart, { type HierarchyChartDisplayType } from '@/components/desktop/HierarchyChart.vue';
 import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
+import TransactionListDialog from '@/views/desktop/insights/dialogs/TransactionListDialog.vue';
 
 import { computed, useTemplateRef } from 'vue';
-import { useRouter } from 'vue-router';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -288,7 +290,7 @@ import {
     TransactionExplorerChartType
 } from '@/core/explorer.ts';
 
-import { type SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
+import type { SortableTransactionStatisticDataItem, TransactionInsightDataItem } from '@/models/transaction.ts';
 import type { InsightsExplorer } from '@/models/explorer.ts';
 
 import { isDefined, isNumber, findNameByValue } from '@/lib/common.ts';
@@ -298,6 +300,7 @@ import { sortStatisticsItems } from '@/lib/statistics.ts';
 type AxisChartType = InstanceType<typeof AxisChart>;
 type HierarchyChartType = InstanceType<typeof HierarchyChart>;
 type HeatMapChartType = InstanceType<typeof HeatMapChart>;
+type TransactionListDialogType = InstanceType<typeof TransactionListDialog>;
 
 interface InsightsExplorerDataTableTabProps {
     loading?: boolean;
@@ -330,7 +333,9 @@ interface SeriesDimensionData extends SortableTransactionStatisticDataItem, Reco
 
 defineProps<InsightsExplorerDataTableTabProps>();
 
-const router = useRouter();
+const emit = defineEmits<{
+    (e: 'click:transaction', value: TransactionInsightDataItem): void;
+}>();
 
 const {
     tt,
@@ -362,6 +367,7 @@ const explorersStore = useExplorersStore();
 const axisChart = useTemplateRef<AxisChartType>('axisChart');
 const hierarchyChart = useTemplateRef<HierarchyChartType>('hierarchyChart');
 const heatmapChart = useTemplateRef<HeatMapChartType>('heatmapChart');
+const transactionListDialog = useTemplateRef<TransactionListDialogType>('transactionListDialog');
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
@@ -894,29 +900,52 @@ function updateCategoryDimensionType(dimensionType: TransactionExplorerDataDimen
     }
 }
 
+function showClickedTransactionList(categoryId: string, seriesId?: string): void {
+    const categoriedData = explorersStore.categoriedTransactions[categoryId];
+
+    if (!categoriedData) {
+        return;
+    }
+
+    const seriesData = seriesId ? categoriedData.trasactions[seriesId] : undefined;
+    let title: string = tt('Transaction List');
+
+    if (seriesData) {
+        if (currentExploration.value.seriesDimension === TransactionExplorerDataDimension.None.value) {
+            title = getCategoriedDataDisplayName(categoriedData);
+        } else {
+            title = getCategoriedDataDisplayName(seriesData);
+        }
+    } else {
+        title = getCategoriedDataDisplayName(categoriedData);
+    }
+
+    transactionListDialog.value?.open({
+        title: title,
+        categoryId: categoryId,
+        seriesId: seriesId
+    });
+}
+
 function onClickPieChartItem(item: Record<string, unknown>): void {
     if (!item || !('id' in item) || !('dimension' in item)) {
         return;
     }
 
     const data = (item as unknown) as CategoryDimensionData;
-    const params: string = explorersStore.getTransactionListPageParams(data.dimension, data.id);
-
-    if (params) {
-        router.push(`/transaction/list?${params}`);
-    }
+    showClickedTransactionList(data.id);
 }
 
 function onClickTrendChartItem(itemId: string, categoryIndex: number): void {
     const categoryData = categoriedDataSortedByDisplayOrder.value[categoryIndex];
 
     if (categoryData) {
-        const params: string = explorersStore.getTransactionListPageParams(categoryData.originalItem.categoryIdType, categoryData.originalItem.categoryId);
-
-        if (params && categoryData.originalItem.categoryId !== 'none' && categoryData.originalItem.categoryId !== 'unknown') {
-            router.push(`/transaction/list?${params}`);
-        }
+        showClickedTransactionList(categoryData.originalItem.categoryId, itemId);
     }
+}
+
+function onClickTransaction(transaction: TransactionInsightDataItem): void {
+    emit('click:transaction', transaction);
 }
 
 function buildExportResults(): { headers: string[], data: string[][], supportedMermaidCharts?: ExportMermaidChartType[] } | undefined {

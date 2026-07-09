@@ -37,6 +37,9 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfHungaryDataSource {
 		Container.current = newCommonHttpExchangeRatesDataProvider(config, &CentralBankOfHungaryDataSource{})
 		return nil
+	} else if config.ExchangeRatesDataSource == settings.CentralBankOfTheArgentineRepublicDataSource {
+		Container.current = newCommonHttpExchangeRatesDataProvider(config, &CentralBankOfTheArgentineRepublicDataSource{})
+		return nil
 	} else if config.ExchangeRatesDataSource == settings.BankOfIsraelDataSource {
 		Container.current = newCommonHttpExchangeRatesDataProvider(config, &BankOfIsraelDataSource{})
 		return nil

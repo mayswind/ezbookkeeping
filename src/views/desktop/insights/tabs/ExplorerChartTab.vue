@@ -196,6 +196,7 @@
             ref="hierarchyChart"
             :type="hierarchyChartDisplayType"
             :show-value="true"
+            :enable-click-item="true"
             :category-type-name="currentTransactionExplorerCategoryDimensionName"
             :all-category-names="categoriedNamesSortedByDisplayOrder"
             :items="seriesDimensionTransactionExplorerData"
@@ -205,6 +206,7 @@
             name-field="name"
             values-field="categoryValues"
             v-else-if="!loading"
+            @click="onClickHierarchyChartItem"
         />
     </v-card-text>
     <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExploration.chartType === TransactionExplorerChartType.Heatmap.value">
@@ -221,6 +223,7 @@
         <heat-map-chart
             ref="heatmapChart"
             :show-value="true"
+            :enable-click-item="true"
             :category-type-name="currentTransactionExplorerCategoryDimensionName"
             :all-category-names="categoriedNamesSortedByDisplayOrder"
             :items="seriesDimensionTransactionExplorerData"
@@ -231,6 +234,7 @@
             name-field="name"
             values-field="categoryValues"
             v-else-if="!loading"
+            @click="onClickHeatmapChartItem"
         />
     </v-card-text>
     <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExploration.chartType === TransactionExplorerChartType.CalendarHeatmap.value">
@@ -244,6 +248,7 @@
         />
         <calendar-heat-map-chart
             :show-value="true"
+            :enable-click-item="true"
             :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
             :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.name ?? 'Value')"
             :amount-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isAmount"
@@ -252,6 +257,7 @@
             id-field="id"
             value-field="totalAmount"
             v-else-if="!loading"
+            @click="onClickCalendarHeatmapChartItem"
         />
     </v-card-text>
 
@@ -900,7 +906,7 @@ function updateCategoryDimensionType(dimensionType: TransactionExplorerDataDimen
     }
 }
 
-function showClickedTransactionList(categoryId: string, seriesId?: string): void {
+function showClickedTransactionList({ categoryId, seriesId, title }: { categoryId: string, seriesId?: string, title?: string }): void {
     const categoriedData = explorersStore.categoriedTransactions[categoryId];
 
     if (!categoriedData) {
@@ -908,16 +914,17 @@ function showClickedTransactionList(categoryId: string, seriesId?: string): void
     }
 
     const seriesData = seriesId ? categoriedData.trasactions[seriesId] : undefined;
-    let title: string = tt('Transaction List');
 
-    if (seriesData) {
-        if (currentExploration.value.seriesDimension === TransactionExplorerDataDimension.None.value) {
-            title = getCategoriedDataDisplayName(categoriedData);
+    if (!title) {
+        if (seriesData) {
+            if (currentExploration.value.seriesDimension === TransactionExplorerDataDimension.None.value) {
+                title = getCategoriedDataDisplayName(categoriedData);
+            } else {
+                title = getCategoriedDataDisplayName(seriesData);
+            }
         } else {
-            title = getCategoriedDataDisplayName(seriesData);
+            title = getCategoriedDataDisplayName(categoriedData);
         }
-    } else {
-        title = getCategoriedDataDisplayName(categoriedData);
     }
 
     transactionListDialog.value?.open({
@@ -933,15 +940,52 @@ function onClickPieChartItem(item: Record<string, unknown>): void {
     }
 
     const data = (item as unknown) as CategoryDimensionData;
-    showClickedTransactionList(data.id);
+    showClickedTransactionList({
+        categoryId: data.id
+    });
 }
 
 function onClickTrendChartItem(itemId: string, categoryIndex: number): void {
     const categoryData = categoriedDataSortedByDisplayOrder.value[categoryIndex];
 
     if (categoryData) {
-        showClickedTransactionList(categoryData.originalItem.categoryId, itemId);
+        showClickedTransactionList({
+            categoryId: categoryData.originalItem.categoryId,
+            seriesId: itemId
+        });
     }
+}
+
+function onClickHierarchyChartItem(categoryIndex: number, seriesIndex: number): void {
+    const categoryData = categoriedDataSortedByDisplayOrder.value[categoryIndex];
+    const seriesData = seriesDimensionTransactionExplorerData.value[seriesIndex];
+
+    if (categoryData && seriesData) {
+        showClickedTransactionList({
+            categoryId: categoryData.originalItem.categoryId,
+            seriesId: seriesData.id,
+            title: categoryData.name
+        });
+    }
+}
+
+function onClickHeatmapChartItem(categoryIndex: number, seriesIndex: number): void {
+    const categoryData = categoriedDataSortedByDisplayOrder.value[categoryIndex];
+    const seriesData = seriesDimensionTransactionExplorerData.value[seriesIndex];
+
+    if (categoryData && seriesData) {
+        showClickedTransactionList({
+            categoryId: categoryData.originalItem.categoryId,
+            seriesId: seriesData.id
+        });
+    }
+}
+
+function onClickCalendarHeatmapChartItem(date: string, displayDate: string): void {
+    showClickedTransactionList({
+        categoryId: date,
+        title: displayDate
+    });
 }
 
 function onClickTransaction(transaction: TransactionInsightDataItem): void {

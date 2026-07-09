@@ -1,10 +1,12 @@
 <template>
-    <v-chart autoresize :class="finalClass" :style="finalStyle" :option="chartOptions" />
+    <v-chart autoresize :class="finalClass" :style="finalStyle" :option="chartOptions"
+             @click="clickItem" />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useTheme } from 'vuetify';
+import type { ECElementEvent } from 'echarts/core';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -26,6 +28,7 @@ const props = defineProps<{
     class?: string;
     skeleton?: boolean;
     showValue?: boolean;
+    enableClickItem?: boolean;
     categoryTypeName: string;
     allCategoryNames: string[];
     items: Record<string, unknown>[];
@@ -37,6 +40,10 @@ const props = defineProps<{
     amountValue?: boolean;
     percentValue?: boolean;
     defaultCurrency?: string;
+}>();
+
+const emit = defineEmits<{
+    (e: 'click', categoryIndex: number, seriesIndex: number): void;
 }>();
 
 const theme = useTheme();
@@ -266,6 +273,22 @@ function getDisplayValue(value: number): string {
     }
 
     return formatNumberToLocalizedNumerals(value, 2);
+}
+
+function clickItem(e: ECElementEvent): void {
+    if (!props.enableClickItem || e.componentType !== 'series') {
+        return;
+    }
+
+    const dataItem = e.data as [number, number, number];
+
+    if (!dataItem) {
+        return;
+    }
+
+    const categoryIndex = dataItem[0];
+    const seriesIndex = dataItem[1];
+    emit('click', categoryIndex, seriesIndex);
 }
 
 function exportData(): { headers: string[], data: string[][] } {

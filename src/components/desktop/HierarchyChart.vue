@@ -1,10 +1,12 @@
 <template>
-    <v-chart autoresize :class="finalClass" :option="chartOptions" />
+    <v-chart autoresize :class="finalClass" :option="chartOptions"
+             @click="clickItem" />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useTheme } from 'vuetify';
+import type { ECElementEvent } from 'echarts/core';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -22,6 +24,8 @@ export type HierarchyChartDisplayType = 'treemap' | 'sunburst';
 interface HierarchyDataItem {
     name: string;
     value: number;
+    categoryIndex?: number;
+    seriesIndex?: number;
     children?: HierarchyDataItem[];
     itemStyle: {
         color: ColorStyleValue;
@@ -33,6 +37,7 @@ const props = defineProps<{
     skeleton?: boolean;
     type: HierarchyChartDisplayType;
     showValue?: boolean;
+    enableClickItem?: boolean;
     categoryTypeName: string;
     allCategoryNames: string[];
     items: Record<string, unknown>[];
@@ -44,6 +49,10 @@ const props = defineProps<{
     amountValue?: boolean;
     percentValue?: boolean;
     defaultCurrency?: string;
+}>();
+
+const emit = defineEmits<{
+    (e: 'click', categoryIndex: number, seriesIndex: number): void;
 }>();
 
 const theme = useTheme();
@@ -103,6 +112,8 @@ const hierarchyData = computed<HierarchyDataItem[]>(() => {
             hierarchyItem.children?.push({
                 name: props.allCategoryNames[categoryIndex] ?? '',
                 value: amount,
+                categoryIndex: categoryIndex,
+                seriesIndex: seriesIndex,
                 itemStyle: {
                     color: color
                 }
@@ -210,6 +221,18 @@ function getDisplayValue(value: number): string {
     }
 
     return formatNumberToLocalizedNumerals(value, 2);
+}
+
+function clickItem(e: ECElementEvent): void {
+    if (!props.enableClickItem || e.componentType !== 'series' || !e.data) {
+        return;
+    }
+
+    const dataItem = e.data as HierarchyDataItem;
+
+    if (isNumber(dataItem.categoryIndex) && isNumber(dataItem.seriesIndex)) {
+        emit('click', dataItem.categoryIndex, dataItem.seriesIndex);
+    }
 }
 
 function exportData(): { headers: string[], data: string[][] } {

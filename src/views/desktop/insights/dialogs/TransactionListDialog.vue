@@ -165,10 +165,8 @@ const transactions = computed<TransactionInsightDataItem[]>(() => {
         return transactionList;
     }
 
-    const seriesData = seriesId.value ? categoriedData.trasactions[seriesId.value] : undefined;
-
-    if (seriesData) {
-        transactionList = seriesData.trasactions;
+    if (seriesId.value) {
+        transactionList = categoriedData.trasactions[seriesId.value]?.trasactions ?? [];
     } else {
         for (const seriesTransactions of values(categoriedData.trasactions)) {
             transactionList.push(...seriesTransactions.trasactions);

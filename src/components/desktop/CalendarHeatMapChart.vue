@@ -1,10 +1,12 @@
 <template>
-    <v-chart autoresize :class="finalClass" :style="finalStyle" :option="chartOptions" />
+    <v-chart autoresize :class="finalClass" :style="finalStyle" :option="chartOptions"
+             @click="clickItem" />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useTheme } from 'vuetify';
+import type { ECElementEvent } from 'echarts/core';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -37,6 +39,7 @@ const props = defineProps<{
     class?: string;
     skeleton?: boolean;
     showValue?: boolean;
+    enableClickItem?: boolean;
     items: Record<string, unknown>[];
     idField: string;
     valueField: string;
@@ -46,6 +49,10 @@ const props = defineProps<{
     amountValue?: boolean;
     percentValue?: boolean;
     defaultCurrency?: string;
+}>();
+
+const emit = defineEmits<{
+    (e: 'click', date: string, displayDate: string, value: number): void;
 }>();
 
 const theme = useTheme();
@@ -257,6 +264,24 @@ function getDisplayValue(value: number): string {
     }
 
     return formatNumberToLocalizedNumerals(value, 2);
+}
+
+function clickItem(e: ECElementEvent): void {
+    if (!props.enableClickItem || e.componentType !== 'series') {
+        return;
+    }
+
+    const dataItem = e.data as [string, number];
+
+    if (!dataItem || !dataItem[0]) {
+        return;
+    }
+
+    const date = dataItem[0];
+    const dateTime = parseDateTimeFromKnownDateTimeFormat(date, KnownDateTimeFormat.DefaultDate);
+    const displayDate = dateTime ? formatDateTimeToLongDate(dateTime) : '';
+    const value = isNumber(dataItem[1]) ? dataItem[1] : 0;
+    emit('click', date, displayDate, value);
 }
 </script>
 

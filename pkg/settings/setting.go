@@ -159,7 +159,14 @@ const (
 	SwissNationalBankDataSource        string = "swiss_national_bank"
 	NationalBankOfUkraineDataSource    string = "national_bank_of_ukraine"
 	CentralBankOfUzbekistanDataSource  string = "central_bank_of_uzbekistan"
+	ArgentinaDatosDataSource           string = "argentina_datos"
 	UserCustomExchangeRatesDataSource  string = "user_custom"
+)
+
+// ArgentinaDatos exchange rates data source settings
+const (
+	ArgentinaDatosRateTypeBuy  string = "buy"
+	ArgentinaDatosRateTypeSell string = "sell"
 )
 
 const (
@@ -472,6 +479,8 @@ type Config struct {
 	ExchangeRatesRequestTimeoutExceedDefaultValue bool
 	ExchangeRatesProxy                            string
 	ExchangeRatesSkipTLSVerify                    bool
+	ExchangeRatesArgentinaDatosExchangeHouse      string
+	ExchangeRatesArgentinaDatosRateType           string
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -1266,6 +1275,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		dataSource == SwissNationalBankDataSource ||
 		dataSource == NationalBankOfUkraineDataSource ||
 		dataSource == CentralBankOfUzbekistanDataSource ||
+		dataSource == ArgentinaDatosDataSource ||
 		dataSource == UserCustomExchangeRatesDataSource {
 		config.ExchangeRatesDataSource = dataSource
 	} else {
@@ -1280,6 +1290,14 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 	}
 
 	config.ExchangeRatesSkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "skip_tls_verify", false)
+
+	config.ExchangeRatesArgentinaDatosExchangeHouse = getConfigItemStringValue(configFile, sectionName, "argentina_datos_exchange_house")
+	config.ExchangeRatesArgentinaDatosRateType = getConfigItemStringValue(configFile, sectionName, "argentina_datos_rate_type", ArgentinaDatosRateTypeSell)
+
+	if config.ExchangeRatesArgentinaDatosRateType != ArgentinaDatosRateTypeBuy &&
+		config.ExchangeRatesArgentinaDatosRateType != ArgentinaDatosRateTypeSell {
+		config.ExchangeRatesArgentinaDatosRateType = ArgentinaDatosRateTypeSell
+	}
 
 	return nil
 }

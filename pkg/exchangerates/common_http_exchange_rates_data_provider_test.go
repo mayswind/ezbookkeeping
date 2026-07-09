@@ -145,8 +145,9 @@ func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfKazakhstan(t *t
 	assert.Equal(t, "KZT", exchangeRateResponse.BaseCurrency)
 
 	supportedCurrencyCodes := []string{"AED", "AMD", "AUD", "AZN", "BRL", "BYN", "CAD", "CHF", "CNY", "CZK",
-		"DKK", "EUR", "GBP", "GEL", "HKD", "HUF", "INR", "IRR", "JPY", "KGS", "KRW", "KWD", "MDL", "MXN",
-		"MYR", "NOK", "PLN", "RUB", "SAR", "SEK", "SGD", "THB", "TJS", "TRY", "UAH", "USD", "UZS", "ZAR"}
+		"DKK", "EGP", "EUR", "GBP", "GEL", "HKD", "HUF", "IDR", "ILS", "INR", "IRR", "JPY",
+		"KGS", "KRW", "KWD", "MDL", "MNT", "MXN", "MYR", "NOK", "OMR", "PKR", "PLN", "QAR", "RON", "RUB",
+		"SAR", "SEK", "SGD", "THB", "TJS", "TRY", "UAH", "USD", "UZS", "VND", "ZAR"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }

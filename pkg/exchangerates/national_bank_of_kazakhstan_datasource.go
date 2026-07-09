@@ -19,7 +19,7 @@ const nationalBankOfKazakhstanExchangeRateReferenceUrl = "https://nationalbank.k
 const nationalBankOfKazakhstanDataSource = "Қазақстан Республикасының Ұлттық Банкі"
 const nationalBankOfKazakhstanBaseCurrency = "KZT"
 
-const nationalBankOfKazakhstanUpdateDateFormat = "02.01.2006"
+const nationalBankOfKazakhstanUpdateDateFormat = "02.01.2006 15:04"
 const nationalBankOfKazakhstanUpdateDateTimezone = "Asia/Almaty"
 
 // NationalBankOfKazakhstanDataSource defines the structure of exchange rates data source of the national bank of Kazakhstan
@@ -65,7 +65,15 @@ func (e *NationalBankOfKazakhstanExchangeRates) ToLatestExchangeRateResponse(c c
 			continue
 		}
 
-		updateTime, err := time.ParseInLocation(nationalBankOfKazakhstanUpdateDateFormat, exchangeRate.Date, timezone)
+		var updateDateTime string
+
+		if exchangeRate.Currency == "USD" {
+			updateDateTime = exchangeRate.Date + " 15:30" // The weighted average exchange rate of tenge against US dollar fixed on the stock exchange as of 15:30 Astana time is set as an official exchange rate of the national currency tenge against US dollar for the next business day after the trading day.
+		} else {
+			updateDateTime = exchangeRate.Date + " 16:00" // The exchange rate of tenge against other currencies is calculated through the cross rates fixed as of 16:00 Astana time.
+		}
+
+		updateTime, err := time.ParseInLocation(nationalBankOfKazakhstanUpdateDateFormat, updateDateTime, timezone)
 
 		if err != nil {
 			log.Errorf(c, "[central_bank_of_kazakhstan_datasource.ToLatestExchangeRateResponse] failed to parse update date, datetime is %s", exchangeRate.Date)

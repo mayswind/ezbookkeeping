@@ -43,7 +43,7 @@ func TestNationalBankOfKazakhstanDataSource_StandardDataExtractUpdateTime(t *tes
 	resp, err := dataSource.Parse(context, []byte(nationalBankOfKazakhstanMinimumRequiredContent))
 	assert.Equal(t, nil, err)
 
-	assert.Equal(t, int64(1777316400), resp.UpdateTime)
+	assert.Equal(t, int64(1777374000), resp.UpdateTime)
 }
 
 func TestNationalBankOfKazakhstanDataSource_StandardDataExtractExchangeRates(t *testing.T) {

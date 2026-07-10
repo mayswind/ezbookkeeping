@@ -65,6 +65,43 @@ func TestCentralBankOfArgentinaDataSource_StandardDataExtractExchangeRates(t *te
 	})
 }
 
+func TestCentralBankOfArgentinaDataSource_PerUnitQuantity(t *testing.T) {
+	dataSource := &CentralBankOfArgentinaDataSource{}
+	context := core.NewNullContext()
+
+	content := "{\n" +
+		"  \"status\": 200,\n" +
+		"  \"results\": {\n" +
+		"    \"fecha\": \"2026-07-08\",\n" +
+		"    \"detalle\": [\n" +
+		"      {\n" +
+		"        \"codigoMoneda\": \"USD\",\n" +
+		"        \"descripcion\": \"DOLAR E.E.U.U.\",\n" +
+		"        \"tipoPase\": 0,\n" +
+		"        \"tipoCotizacion\": 1488\n" +
+		"      },\n" +
+		"      {\n" +
+		"        \"codigoMoneda\": \"VND\",\n" +
+		"        \"descripcion\": \"DONG VIETNAM (C/1.000 UNIDADES)\",\n" +
+		"        \"tipoPase\": 0.03803,\n" +
+		"        \"tipoCotizacion\": 56.588705\n" +
+		"      }\n" +
+		"    ]\n" +
+		"  }\n" +
+		"}"
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(content))
+	assert.Equal(t, nil, err)
+
+	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
+		Currency: "VND",
+		Rate:     "17.671370991790678",
+	})
+	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
+		Currency: "USD",
+		Rate:     "0.0006720430107526882",
+	})
+}
+
 func TestCentralBankOfArgentinaDataSource_BlankContent(t *testing.T) {
 	dataSource := &CentralBankOfArgentinaDataSource{}
 	context := core.NewNullContext()

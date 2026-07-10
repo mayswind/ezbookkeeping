@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"math"
 	"net/http"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -18,8 +20,12 @@ const centralBankOfArgentinaExchangeRateUrl = "https://api.bcra.gob.ar/estadisti
 const centralBankOfArgentinaExchangeRateReferenceUrl = "https://www.bcra.gob.ar/en/central-bank-api-catalog/"
 const centralBankOfArgentinaDataSource = "Banco Central de la República Argentina"
 const centralBankOfArgentinaBaseCurrency = "ARS"
+
 const centralBankOfArgentinaDataUpdateDateFormat = "2006-01-02"
 const centralBankOfArgentinaUpdateDateTimezone = "America/Buenos_Aires"
+
+// centralBankOfArgentinaPerUnitQuantityPattern matches the per-unit quantity declared in the descripcion
+var centralBankOfArgentinaPerUnitQuantityPattern = regexp.MustCompile(`C/(\d+(?:\.\d+)*)\s+UNIDADES`)
 
 // CentralBankOfArgentinaDataSource defines the structure of exchange rates data source of the central bank of Argentina
 type CentralBankOfArgentinaDataSource struct {
@@ -103,7 +109,29 @@ func (e *CentralBankOfArgentinaDetailItem) ToLatestExchangeRate(c core.Context) 
 		return nil
 	}
 
-	finalRate := 1 / e.ARSQuoteRate
+	unit := 1.0
+
+	if e.Descripcion != "" {
+		matches := centralBankOfArgentinaPerUnitQuantityPattern.FindStringSubmatch(e.Descripcion)
+
+		if len(matches) > 1 {
+			parsedUnit, err := utils.StringToFloat64(strings.ReplaceAll(matches[1], ".", ""))
+
+			if err != nil {
+				log.Warnf(c, "[central_bank_of_argentina_datasource.ToLatestExchangeRate] failed to parse per-unit quantity, currency is %s, descripcion is %s", e.CurrencyCode, e.Descripcion)
+				return nil
+			}
+
+			if parsedUnit <= 0 {
+				log.Warnf(c, "[central_bank_of_argentina_datasource.ToLatestExchangeRate] per-unit quantity is invalid, currency is %s, descripcion is %s", e.CurrencyCode, e.Descripcion)
+				return nil
+			}
+
+			unit = parsedUnit
+		}
+	}
+
+	finalRate := unit / e.ARSQuoteRate
 
 	if math.IsInf(finalRate, 0) {
 		return nil

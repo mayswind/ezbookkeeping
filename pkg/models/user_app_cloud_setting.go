@@ -17,6 +17,8 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	// Basic Settings
 	"showAccountBalance":          USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"autoUpdateExchangeRatesData": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	// General Settings
+	"chartColors": USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	// Navigation Bar
 	"showAddTransactionButtonInDesktopNavbar": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Overview Page

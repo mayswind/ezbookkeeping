@@ -43,6 +43,8 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     // Application Lock
     applicationLock: boolean;
     applicationLockWebAuthn: boolean;
+    // General Settings
+    chartColors: string;
     // Navigation Bar
     showAddTransactionButtonInDesktopNavbar: boolean;
     // Overview Page
@@ -130,6 +132,8 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     // Basic Settings
     'showAccountBalance': UserApplicationCloudSettingType.Boolean,
     'autoUpdateExchangeRatesData': UserApplicationCloudSettingType.Boolean,
+    // General Settings
+    'chartColors': UserApplicationCloudSettingType.String,
     // Navigation Bar
     'showAddTransactionButtonInDesktopNavbar': UserApplicationCloudSettingType.Boolean,
     // Overview Page
@@ -199,6 +203,8 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     // Application Lock
     applicationLock: false,
     applicationLockWebAuthn: false,
+    // General Settings
+    chartColors: '',
     // Navigation Bar
     showAddTransactionButtonInDesktopNavbar: true,
     // Overview Page

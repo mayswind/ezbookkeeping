@@ -21,6 +21,7 @@ import StatisticsSettingsPage from '@/views/mobile/statistics/SettingsPage.vue';
 
 import TextSizeSettingsPage from '@/views/mobile/settings/TextSizeSettingsPage.vue';
 import PageSettingsPage from '@/views/mobile/settings/PageSettingsPage.vue';
+import ChartColorSchemeSettingsPage from '@/views/mobile/settings/ChartColorSchemeSettingsPage.vue';
 import AccountCategoryDisplayOrderSettingsPage from '@/views/mobile/settings/AccountCategoryDisplayOrderSettingsPage.vue';
 import ApplicationCloudSyncSettingsPage from '@/views/mobile/settings/ApplicationCloudSyncSettingsPage.vue';
 import BrowserCacheSettingPage from '@/views/mobile/settings/BrowserCacheSettingPage.vue';
@@ -239,6 +240,11 @@ const routes: Router.RouteParameters[] = [
     {
         path: '/settings/page',
         async: asyncResolve(PageSettingsPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/settings/chart_color_scheme',
+        async: asyncResolve(ChartColorSchemeSettingsPage),
         beforeEnter: [checkLogin]
     },
     {

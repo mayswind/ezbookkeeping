@@ -11,10 +11,11 @@ import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
+
 import { itemAndIndex } from '@/core/base.ts';
 import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 import { isArray, isString, isNumber } from '@/lib/common.ts';
 import { getDisplayColor } from '@/lib/color.ts';
@@ -65,7 +66,11 @@ const {
     formatPercentToLocalizedNumerals
 } = useI18n();
 
+const settingsStore = useSettingsStore();
+
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const chartColors = computed<ColorValue[]>(() => settingsStore.chartColorList);
+
 const finalClass = computed<string>(() => {
     let finalClass = '';
 
@@ -94,7 +99,7 @@ const hierarchyData = computed<HierarchyDataItem[]>(() => {
             continue;
         }
 
-        const color: ColorStyleValue = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : DEFAULT_CHART_COLORS[seriesIndex % DEFAULT_CHART_COLORS.length]);
+        const color: ColorStyleValue = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : chartColors.value[seriesIndex % chartColors.value.length]);
 
         const hierarchyItem: HierarchyDataItem = {
             name: getItemName(item[props.nameField] as string),

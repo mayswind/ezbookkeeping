@@ -165,6 +165,14 @@ export function useAppSettingPageBase() {
         set: (value: number) => settingsStore.setCurrencySortByInExchangeRatesPage(value)
     });
 
+    const chartColorSchemeContent = computed<string>(() => {
+        if (!settingsStore.appSettings.chartColors) {
+            return tt('Default');
+        }
+
+        return tt('Custom');
+    });
+
     const accountsIncludedInHomePageOverviewDisplayContent = computed<string>(() => {
         const excludeAccountIds = settingsStore.appSettings.overviewAccountFilterInHomePage;
         return getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allPlainAccounts);
@@ -299,6 +307,7 @@ export function useAppSettingPageBase() {
         autoSaveTransactionDraft,
         isAutoGetCurrentGeoLocation,
         currencySortByInExchangeRatesPage,
+        chartColorSchemeContent,
         accountsIncludedInHomePageOverviewDisplayContent,
         accountsIncludedInTotalDisplayContent,
         accountCategorysDisplayOrderContent,

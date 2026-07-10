@@ -28,6 +28,12 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         ]
     },
     {
+        categoryName: 'General Settings',
+        items: [
+            { settingKey: 'chartColors', settingName: 'Chart Color Scheme', mobile: true, desktop: true }
+        ]
+    },
+    {
         categoryName: 'Navigation Bar',
         items: [
             { settingKey: 'showAddTransactionButtonInDesktopNavbar', settingName: 'Show Add Transaction Button', mobile: false, desktop: true }

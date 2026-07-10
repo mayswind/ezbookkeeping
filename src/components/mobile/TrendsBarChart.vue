@@ -123,6 +123,7 @@ import {
     useTrendsChartBase
 } from '@/components/base/TrendsChartBase.ts'
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { itemAndIndex } from '@/core/base.ts';
@@ -130,13 +131,11 @@ import {
     type UnixTimeRange,
     DateRangeScene
 } from '@/core/datetime.ts';
-import type { ColorStyleValue } from '@/core/color.ts';
+import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import {
     ChartDataAggregationType,
     ChartDateAggregationType
 } from '@/core/statistics.ts';
-
-import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 import type { SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 
@@ -211,6 +210,7 @@ const {
 
 const { allDateRanges, getItemName } = useTrendsChartBase(props);
 
+const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 
 const allDisplayDataItemsVersion = ref<number>(0);
@@ -221,6 +221,7 @@ const virtualDataItems = ref<TrendsBarChartVirtualListData>({
     topPosition: 0
 });
 
+const chartColors = computed<ColorValue[]>(() => settingsStore.chartColorList);
 const useVirtualList = computed<boolean>(() => allDisplayDataItems.value.legends.length <= 1 || props.stacked);
 
 const allDisplayDataItems = computed<TrendsBarChartData>(() => {
@@ -237,7 +238,7 @@ const allDisplayDataItems = computed<TrendsBarChartData>(() => {
         const legend: TrendsBarChartLegend = {
             id: id,
             name: (props.nameField && item[props.nameField]) ? getItemName(item[props.nameField] as string) : id,
-            color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : DEFAULT_CHART_COLORS[index % DEFAULT_CHART_COLORS.length]),
+            color: getDisplayColor(props.colorField && item[props.colorField] ? item[props.colorField] as string : chartColors.value[index % chartColors.value.length]),
             displayOrders: (props.displayOrdersField && item[props.displayOrdersField]) ? item[props.displayOrdersField] as number[] : [0]
         };
 

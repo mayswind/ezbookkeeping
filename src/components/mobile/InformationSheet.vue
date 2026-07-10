@@ -4,7 +4,14 @@
         <div class="swipe-handler"></div>
         <f7-page-content class="margin-top no-padding-top">
             <div class="display-flex padding justify-content-space-between align-items-center">
-                <div class="ebk-sheet-title" v-if="title"><b>{{ title }}</b></div>
+                <div class="ebk-sheet-title" v-if="title">
+                    <b>{{ title }}</b>
+                    <f7-link class="margin-inline-start-half icon-after-text"
+                             icon-only icon-f7="doc_on_doc"
+                             @click="copyBackupCodes"
+                             v-if="!hint && enableCopy"
+                    ></f7-link>
+                </div>
             </div>
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin-top margin-bottom-half" v-if="hint">

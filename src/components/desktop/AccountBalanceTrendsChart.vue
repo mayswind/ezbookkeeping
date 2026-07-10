@@ -14,14 +14,14 @@ import {
     useAccountBalanceTrendsChartBase
 } from '@/components/base/AccountBalanceTrendsChartBase.ts'
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
-import type { ColorStyleValue } from '@/core/color.ts';
+import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
-import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 import { isArray } from '@/lib/common.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
@@ -66,17 +66,19 @@ const {
     allDisplayDateRanges
 } = useAccountBalanceTrendsChartBase(props);
 
+const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const chartColors = computed<ColorValue[]>(() => settingsStore.chartColorList);
 
 const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
     const series: AccountBalanceTrendsChartDataItem = {
         id: 'accountBalance',
         name: props.legendName,
         itemStyle: {
-            color: `#${DEFAULT_CHART_COLORS[0]}`
+            color: `#${chartColors.value[0]}`
         },
         selected: true,
         type: 'line',
@@ -258,7 +260,7 @@ const chartOptions = computed<object>(() => {
 
                 for (const [displayItem, index] of itemAndIndex(displayItems)) {
                     const displayValue = formatAmountToLocalizedNumeralsWithCurrency(displayItem.value, props.account.currency);
-                    tooltip += `<tr><td><span class="chart-pointer" style="background-color: #${DEFAULT_CHART_COLORS[index]}"></span>`
+                    tooltip += `<tr><td><span class="chart-pointer" style="background-color: #${chartColors.value[index]}"></span>`
                         + `<span>${displayItem.name}</span></td><td><span class="ms-5" style="float: inline-end">${displayValue}</span></td>`;
 
                     if (yearOverYearDataItemDisplayItems && yearOverYearDataItemDisplayItems.length && yearOverYearDataItemDisplayItems[index]) {

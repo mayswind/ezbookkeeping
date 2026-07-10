@@ -74,6 +74,15 @@ export function isTextualUUID(val: unknown): val is string {
     return true;
 }
 
+export function isHextualColor(val: unknown): val is string {
+    if (!isString(val)) {
+        return false;
+    }
+
+    const hexColorRegex = /^[0-9a-fA-F]{6}$/;
+    return hexColorRegex.test(val);
+}
+
 export function isYearMonth(val: unknown): val is string {
     if (!isString(val)) {
         return false;

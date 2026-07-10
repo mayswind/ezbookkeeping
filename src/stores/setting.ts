@@ -15,13 +15,16 @@ import {
     ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES
 } from '@/core/setting.ts';
 
-
+import type { ColorValue } from '@/core/color.ts';
 import { AccountCategory } from '@/core/account.ts';
+
+import { DEFAULT_CHART_COLORS } from '@/consts/color.ts';
 
 import {
     isObject,
     isString,
     isBoolean,
+    isHextualColor,
     getObjectOwnFieldCount,
     arrayItemToObjectField
 } from '@/lib/common.ts';
@@ -43,6 +46,17 @@ export const useSettingsStore = defineStore('settings', () => {
     const localeDefaultSettings = ref<LocaleDefaultSettings>(getLocaleDefaultSettings());
 
     const enableApplicationCloudSync = computed<boolean>(() => getObjectOwnFieldCount(syncedAppSettings.value) > 0);
+
+    const chartColorList = computed<ColorValue[]>(() => {
+        const chartColors = appSettings.value.chartColors;
+
+        if (!chartColors) {
+            return [...DEFAULT_CHART_COLORS];
+        }
+
+        const colors = chartColors.split(',').map(c => c.trim().toLowerCase()).filter(c => isHextualColor(c));
+        return colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS];
+    });
 
     const accountCategoryDisplayOrders = computed<Record<number, number>>(() => AccountCategory.allDisplayOrders(appSettings.value.accountCategoryOrders));
 
@@ -180,6 +194,13 @@ export const useSettingsStore = defineStore('settings', () => {
     function setEnableApplicationLockWebAuthn(value: boolean): void {
         updateApplicationSettingsValue('applicationLockWebAuthn', value);
         appSettings.value.applicationLockWebAuthn = value;
+    }
+
+    // General Settings
+    function setChartColors(value: string): void {
+        updateApplicationSettingsValue('chartColors', value);
+        appSettings.value.chartColors = value;
+        updateUserApplicationCloudSettingValue('chartColors', value);
     }
 
     // Navigation Bar
@@ -563,6 +584,7 @@ export const useSettingsStore = defineStore('settings', () => {
         // computed states
         enableApplicationCloudSync,
         accountCategoryDisplayOrders,
+        chartColorList,
         // functions
         // -- Basic Settings
         setTheme,
@@ -575,6 +597,8 @@ export const useSettingsStore = defineStore('settings', () => {
         // -- Application Lock
         setEnableApplicationLock,
         setEnableApplicationLockWebAuthn,
+        // -- General Settings
+        setChartColors,
         // -- Navigation Bar
         setShowAddTransactionButtonInDesktopNavbar,
         // -- Overview Page

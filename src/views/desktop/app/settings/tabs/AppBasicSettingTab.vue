@@ -61,6 +61,28 @@
         </v-col>
 
         <v-col cols="12">
+            <v-card :title="tt('General Settings')">
+                <v-form>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    class="always-cursor-pointer"
+                                    persistent-placeholder
+                                    :readonly="true"
+                                    :label="tt('Chart Color Scheme')"
+                                    :placeholder="tt('Chart Color Scheme')"
+                                    :model-value="chartColorSchemeContent"
+                                    @click="chartColorSchemeDialog?.open().catch(()=>{})"
+                                />
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-form>
+            </v-card>
+        </v-col>
+
+        <v-col cols="12">
             <v-card :title="tt('Navigation Bar')">
                 <v-form>
                     <v-card-text>
@@ -376,7 +398,7 @@
                                     :label="tt('Account Category Order')"
                                     :placeholder="tt('Account Category Order')"
                                     :model-value="accountCategorysDisplayOrderContent"
-                                    @click="accountCategorysDisplayOrderDialog?.open()"
+                                    @click="accountCategorysDisplayOrderDialog?.open().catch(()=>{})"
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
@@ -445,6 +467,7 @@
                                       @settings:change="showAccountsIncludedInTotalDialog = false" />
     </v-dialog>
 
+    <chart-color-scheme-dialog ref="chartColorSchemeDialog" />
     <account-category-display-order-dialog ref="accountCategorysDisplayOrderDialog" />
 
     <snack-bar ref="snackbar" />
@@ -454,6 +477,7 @@
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
 import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
+import ChartColorSchemeDialog from '@/views/desktop/app/settings/dialogs/ChartColorSchemeDialog.vue';
 import AccountCategoryDisplayOrderDialog from '@/views/desktop/app/settings/dialogs/AccountCategoryDisplayOrderDialog.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
@@ -475,6 +499,7 @@ import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP } from '@/core/s
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
+type ChartColorSchemeDialogType = InstanceType<typeof ChartColorSchemeDialog>;
 type AccountCategoryDisplayOrderDialogType = InstanceType<typeof AccountCategoryDisplayOrderDialog>;
 
 const theme = useTheme();
@@ -509,6 +534,7 @@ const {
     isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission,
     isAutoUploadTransactionPictureForAIRecognition,
     currencySortByInExchangeRatesPage,
+    chartColorSchemeContent,
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,
     accountCategorysDisplayOrderContent,
@@ -521,6 +547,7 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const chartColorSchemeDialog = useTemplateRef<ChartColorSchemeDialogType>('chartColorSchemeDialog');
 const accountCategorysDisplayOrderDialog = useTemplateRef<AccountCategoryDisplayOrderDialogType>('accountCategorysDisplayOrderDialog');
 
 const showAccountsIncludedInHomePageOverviewDialog = ref<boolean>(false);

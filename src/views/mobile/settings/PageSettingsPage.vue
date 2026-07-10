@@ -2,7 +2,23 @@
     <f7-page>
         <f7-navbar :title="tt('Page Settings')" :back-link="tt('Back')"></f7-navbar>
 
-        <f7-block-title class="margin-top">{{ tt('Overview Page') }}</f7-block-title>
+        <f7-block-title class="margin-top">{{ tt('General Settings') }}</f7-block-title>
+        <f7-list strong inset dividers class="settings-list">
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="/settings/chart_color_scheme">
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Chart Color Scheme') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>{{ chartColorSchemeContent }}</div>
+                </template>
+            </f7-list-item>
+        </f7-list>
+
+        <f7-block-title>{{ tt('Overview Page') }}</f7-block-title>
         <f7-list strong inset dividers class="settings-list">
             <f7-list-item>
                 <template #after-title>
@@ -396,6 +412,7 @@ const {
     isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission,
     isAutoUploadTransactionPictureForAIRecognition,
     currencySortByInExchangeRatesPage,
+    chartColorSchemeContent,
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,
     accountCategorysDisplayOrderContent,

@@ -1252,7 +1252,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 	dataSource := getConfigItemStringValue(configFile, sectionName, "data_source")
 
 	if dataSource == CentralBankOfArgentinaDataSource ||
-	    dataSource == BankOfCanadaDataSource ||
+		dataSource == BankOfCanadaDataSource ||
 		dataSource == CzechNationalBankDataSource ||
 		dataSource == DanmarksNationalbankDataSource ||
 		dataSource == EuroCentralBankDataSource ||

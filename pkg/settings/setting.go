@@ -143,6 +143,7 @@ const (
 
 // Exchange rates data source types
 const (
+	CentralBankOfArgentinaDataSource   string = "central_bank_of_argentina"
 	BankOfCanadaDataSource             string = "bank_of_canada"
 	CzechNationalBankDataSource        string = "czech_national_bank"
 	DanmarksNationalbankDataSource     string = "danmarks_national_bank"
@@ -1250,7 +1251,8 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	dataSource := getConfigItemStringValue(configFile, sectionName, "data_source")
 
-	if dataSource == BankOfCanadaDataSource ||
+	if dataSource == CentralBankOfArgentinaDataSource ||
+	    dataSource == BankOfCanadaDataSource ||
 		dataSource == CzechNationalBankDataSource ||
 		dataSource == DanmarksNationalbankDataSource ||
 		dataSource == EuroCentralBankDataSource ||

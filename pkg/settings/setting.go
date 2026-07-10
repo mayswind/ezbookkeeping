@@ -143,24 +143,24 @@ const (
 
 // Exchange rates data source types
 const (
-	BankOfCanadaDataSource                          string = "bank_of_canada"
-	CzechNationalBankDataSource                     string = "czech_national_bank"
-	DanmarksNationalbankDataSource                  string = "danmarks_national_bank"
-	EuroCentralBankDataSource                       string = "euro_central_bank"
-	NationalBankOfGeorgiaDataSource                 string = "national_bank_of_georgia"
-	CentralBankOfHungaryDataSource                  string = "central_bank_of_hungary"
-	CentralBankOfTheArgentineRepublicDataSource     string = "central_bank_of_the_argentine_republic"
-	BankOfIsraelDataSource                          string = "bank_of_israel"
-	NationalBankOfKazakhstanDataSource              string = "national_bank_of_kazakhstan"
-	CentralBankOfMyanmarDataSource                  string = "central_bank_of_myanmar"
-	NorgesBankDataSource                            string = "norges_bank"
-	NationalBankOfPolandDataSource                  string = "national_bank_of_poland"
-	NationalBankOfRomaniaDataSource                 string = "national_bank_of_romania"
-	BankOfRussiaDataSource                          string = "bank_of_russia"
-	SwissNationalBankDataSource                     string = "swiss_national_bank"
-	NationalBankOfUkraineDataSource                 string = "national_bank_of_ukraine"
-	CentralBankOfUzbekistanDataSource               string = "central_bank_of_uzbekistan"
-	UserCustomExchangeRatesDataSource               string = "user_custom"
+	CentralBankOfArgentinaDataSource   string = "central_bank_of_argentina"
+	BankOfCanadaDataSource             string = "bank_of_canada"
+	CzechNationalBankDataSource        string = "czech_national_bank"
+	DanmarksNationalbankDataSource     string = "danmarks_national_bank"
+	EuroCentralBankDataSource          string = "euro_central_bank"
+	NationalBankOfGeorgiaDataSource    string = "national_bank_of_georgia"
+	CentralBankOfHungaryDataSource     string = "central_bank_of_hungary"
+	BankOfIsraelDataSource             string = "bank_of_israel"
+	NationalBankOfKazakhstanDataSource string = "national_bank_of_kazakhstan"
+	CentralBankOfMyanmarDataSource     string = "central_bank_of_myanmar"
+	NorgesBankDataSource               string = "norges_bank"
+	NationalBankOfPolandDataSource     string = "national_bank_of_poland"
+	NationalBankOfRomaniaDataSource    string = "national_bank_of_romania"
+	BankOfRussiaDataSource             string = "bank_of_russia"
+	SwissNationalBankDataSource        string = "swiss_national_bank"
+	NationalBankOfUkraineDataSource    string = "national_bank_of_ukraine"
+	CentralBankOfUzbekistanDataSource  string = "central_bank_of_uzbekistan"
+	UserCustomExchangeRatesDataSource  string = "user_custom"
 )
 
 const (
@@ -1251,13 +1251,13 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	dataSource := getConfigItemStringValue(configFile, sectionName, "data_source")
 
-	if dataSource == BankOfCanadaDataSource ||
+	if dataSource == CentralBankOfArgentinaDataSource ||
+	    dataSource == BankOfCanadaDataSource ||
 		dataSource == CzechNationalBankDataSource ||
 		dataSource == DanmarksNationalbankDataSource ||
 		dataSource == EuroCentralBankDataSource ||
 		dataSource == NationalBankOfGeorgiaDataSource ||
 		dataSource == CentralBankOfHungaryDataSource ||
-		dataSource == CentralBankOfTheArgentineRepublicDataSource ||
 		dataSource == BankOfIsraelDataSource ||
 		dataSource == NationalBankOfKazakhstanDataSource ||
 		dataSource == CentralBankOfMyanmarDataSource ||

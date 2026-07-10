@@ -142,7 +142,7 @@ function onToolbarClick(): void {
 .clipboard-text-recognition-sheet-content {
     font-size: var(--f7-input-font-size);
 
-    .clipboard-text {
+    .clipboard-text textarea {
         height: 200px;
 
         @media (min-height: 630px) {

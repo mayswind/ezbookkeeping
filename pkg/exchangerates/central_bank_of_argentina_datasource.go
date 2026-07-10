@@ -16,7 +16,7 @@ import (
 
 const centralBankOfArgentinaExchangeRateUrl = "https://api.bcra.gob.ar/estadisticascambiarias/v1.0/Cotizaciones"
 const centralBankOfArgentinaExchangeRateReferenceUrl = "https://www.bcra.gob.ar/en/central-bank-api-catalog/"
-const centralBankOfArgentinaDataSource = "Central Bank of Argentina"
+const centralBankOfArgentinaDataSource = "Banco Central de la República Argentina"
 const centralBankOfArgentinaBaseCurrency = "ARS"
 const centralBankOfArgentinaDataUpdateDateFormat = "2006-01-02"
 const centralBankOfArgentinaUpdateDateTimezone = "America/Buenos_Aires"

@@ -1,8 +1,4 @@
 /** Global style **/
-html, body {
-    position: fixed;
-}
-
 body {
     -ms-user-select: none;
     -webkit-user-select: none;
@@ -100,7 +96,6 @@ input[type=number] {
     --f7-fab-extended-text-font-weight: inherit;
     --f7-fab-extended-text-transform: inherit;
     --f7-glass-shadow-fab: var(--f7-glass-shadow);
-    --f7-popup-push-offset: 5px;
     --f7-color-gray: #8e8e93;
     --f7-color-gray-rgb: 142, 142, 147;
     --f7-color-gray-shade: #79797f;

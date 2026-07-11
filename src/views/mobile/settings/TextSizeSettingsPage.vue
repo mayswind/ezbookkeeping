@@ -9,7 +9,7 @@
         </f7-navbar>
 
         <f7-block class="no-padding no-margin readonly" :class="fontSizePreviewClassName">
-            <f7-block class="combination-list-wrapper margin-vertical">
+            <f7-block class="combination-list-wrapper margin-vertical-half">
                 <f7-accordion-item>
                     <f7-block-title>
                         <f7-accordion-toggle>

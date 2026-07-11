@@ -34,7 +34,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-list strong inset dividers class="tag-item-list margin-top skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="tag-item-list margin-top-half skeleton-text" v-if="loading">
             <f7-list-item :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                 <template #media>
                     <f7-icon class="transaction-tag-icon" f7="number"></f7-icon>
@@ -47,11 +47,11 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="tag-item-list margin-top" v-if="!loading && noAvailableTag && !newTag">
+        <f7-list strong inset dividers class="tag-item-list margin-top-half" v-if="!loading && noAvailableTag && !newTag">
             <f7-list-item :title="tt('No available tag')"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers sortable class="tag-item-list margin-top"
+        <f7-list strong inset dividers sortable class="tag-item-list margin-top-half"
                  :sortable-enabled="sortable" @sortable:sort="onSort"
                  v-if="!loading">
             <f7-list-item swipeout

@@ -8,7 +8,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading && isSupportedFileCache">
+        <f7-list strong inset dividers class="margin-vertical-half skeleton-text" v-if="loading && isSupportedFileCache">
             <f7-list-item group-title :sortable="false">
                 <small>{{ tt('File Cache') }}</small>
             </f7-list-item>
@@ -19,7 +19,7 @@
             <f7-list-item title="Others" after="Count"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+        <f7-list strong inset dividers :class="{ 'margin-vertical': isSupportedFileCache, 'margin-vertical-half': !isSupportedFileCache, 'skeleton-text': true }" v-if="loading">
             <f7-list-item group-title :sortable="false">
                 <small>{{ tt('Exchange Rates Data') }}</small>
             </f7-list-item>
@@ -34,7 +34,7 @@
             <f7-list-item title="Exchange Rates Data" after="Disable Cache"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-vertical" v-if="!loading && isSupportedFileCache">
+        <f7-list strong inset dividers class="margin-vertical-half" v-if="!loading && isSupportedFileCache">
             <f7-list-item group-title :sortable="false">
                 <small>{{ tt('File Cache') }}</small>
             </f7-list-item>
@@ -45,7 +45,7 @@
             <f7-list-item :title="tt('Others')" :after="fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.othersCacheSize, 2) : '-'"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-vertical" v-if="!loading">
+        <f7-list strong inset dividers :class="{ 'margin-vertical': isSupportedFileCache, 'margin-vertical-half': !isSupportedFileCache }" v-if="!loading">
             <f7-list-item group-title :sortable="false">
                 <small>{{ tt('Exchange Rates Data') }}</small>
             </f7-list-item>

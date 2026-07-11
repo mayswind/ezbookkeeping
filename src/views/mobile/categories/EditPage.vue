@@ -8,7 +8,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="margin-top-half skeleton-text" v-if="loading">
             <f7-list-input label="Category Name" placeholder="Your category name"></f7-list-input>
             <f7-list-item class="list-item-with-header-and-title" header="Primary Category" title="Primary Category"></f7-list-item>
             <f7-list-item class="list-item-with-header-and-title list-item-with-multi-item">
@@ -53,7 +53,7 @@
             <f7-list-input label="Description" type="textarea" placeholder="Your category description (optional)"></f7-list-input>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-top" v-else-if="!loading">
+        <f7-list form strong inset dividers class="margin-top-half" v-else-if="!loading">
             <f7-list-input
                 type="text"
                 clear-button

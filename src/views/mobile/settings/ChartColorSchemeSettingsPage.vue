@@ -9,7 +9,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list ref="colorSchemeList" strong inset dividers sortable sortable-enabled class="margin-top chart-color-list"
+        <f7-list ref="colorSchemeList" strong inset dividers sortable sortable-enabled class="margin-top-half chart-color-list"
                  @sortable:sort="onSort">
             <f7-list-item :id="getColorIndexDomId(index)"
                           :key="index"

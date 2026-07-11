@@ -10,7 +10,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card
+        <f7-card class="margin-top-half"
             :title="tt('Are you sure you want to move all transactions?')"
             :content="tt('format.misc.moveTransactionsInAccountTip', { fromAccount: fromAccount?.name, toAccount: displayToAccountName })">
         </f7-card>

@@ -117,6 +117,24 @@ input[type=number] {
     --f7-theme-color-tint: var(--f7-color-gray-tint);
 }
 
+:root {
+    --f7-navbar-height: 60px;
+}
+
+.ios .navbar-inner {
+    padding-top: calc(8px + var(--f7-safe-area-top));
+    padding-bottom: 8px;
+}
+
+.ios .subnavbar {
+    padding-top: calc(var(--f7-typography-margin) / 2);
+}
+
+.ios .subnav-segmented-bar {
+    margin-top: 0;
+    margin-bottom: calc(var(--f7-typography-margin) / 2);
+}
+
 .ios .dark, .ios.dark {
     --f7-list-item-header-text-color: inherit !important;
 }

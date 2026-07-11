@@ -37,7 +37,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-list form strong inset dividers class="margin-vertical" v-if="!finishQuery">
+        <f7-list form strong inset dividers class="margin-vertical-half" v-if="!finishQuery">
             <f7-list-item group-title>
                 <small>{{ tt('Date Range') }}</small>
             </f7-list-item>
@@ -60,11 +60,11 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && !startTime && !endTime">
+        <f7-list strong inset dividers class="margin-vertical-half" v-if="finishQuery && !startTime && !endTime">
             <f7-list-item :title="tt('Date Range')" :after="tt('All')"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-vertical" v-if="finishQuery && (startTime || endTime)">
+        <f7-list strong inset dividers class="margin-vertical-half" v-if="finishQuery && (startTime || endTime)">
             <f7-list-item :title="tt('Start Time')" :after="displayStartDateTime"></f7-list-item>
             <f7-list-item :title="tt('End Time')" :after="displayEndDateTime"></f7-list-item>
         </f7-list>

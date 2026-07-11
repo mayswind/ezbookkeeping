@@ -9,7 +9,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="margin-vertical-half skeleton-text" v-if="loading">
             <f7-list-input label="Password" placeholder="Your password"></f7-list-input>
             <f7-list-input label="Confirm Password" placeholder="Re-enter the password"></f7-list-input>
             <f7-list-input label="E-mail" placeholder="Your email address"></f7-list-input>
@@ -55,7 +55,7 @@
             <f7-list-item class="list-item-with-header-and-title list-item-no-item-after" header="Income Amount Color" title="Amount Color" link="#"></f7-list-item>
         </f7-list>
 
-        <f7-list form strong inset dividers class="margin-vertical" v-if="!loading">
+        <f7-list form strong inset dividers class="margin-vertical-half" v-if="!loading">
             <f7-list-input
                 type="password"
                 autocomplete="new-password"

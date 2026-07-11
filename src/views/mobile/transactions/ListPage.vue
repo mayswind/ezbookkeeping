@@ -69,7 +69,8 @@
             </f7-link>
         </f7-toolbar>
 
-        <f7-block class="transaction-calendar-container margin-vertical" v-if="pageType === TransactionListPageType.Calendar.type">
+        <f7-block class="transaction-calendar-container" :class="{ 'margin-vertical': showSearchbar, 'margin-vertical-half': !showSearchbar }"
+                  v-if="pageType === TransactionListPageType.Calendar.type">
             <transaction-calendar calendar-class="justify-content-center" week-day-name-type="short"
                                   :readonly="loading" :is-dark-mode="isDarkMode"
                                   :default-currency="false"
@@ -80,7 +81,8 @@
         </f7-block>
 
         <div class="skeleton-text" v-if="loading">
-            <f7-block class="combination-list-wrapper margin-vertical" :class="{ 'no-accordion-toggle': pageType !== TransactionListPageType.List.type && pageType !== TransactionListPageType.Gallery.type }"
+            <f7-block class="combination-list-wrapper"
+                      :class="{ 'margin-vertical': blockIdx > 1 || pageType === TransactionListPageType.Calendar.type || showSearchbar, 'margin-vertical-half': blockIdx === 1 && pageType !== TransactionListPageType.Calendar.type && !showSearchbar, 'no-accordion-toggle': pageType !== TransactionListPageType.List.type && pageType !== TransactionListPageType.Gallery.type }"
                       :key="blockIdx" v-for="blockIdx in (pageType === TransactionListPageType.List.type ? [ 1, 2 ] : [ 1 ])">
                 <f7-accordion-item>
                     <f7-block-title v-if="pageType === TransactionListPageType.List.type || pageType === TransactionListPageType.Gallery.type">
@@ -168,12 +170,14 @@
             </f7-block>
         </div>
 
-        <f7-list strong inset dividers class="margin-vertical" v-if="!loading && noTransaction">
+        <f7-list strong inset dividers :class="{ 'margin-vertical': pageType === TransactionListPageType.Calendar.type || showSearchbar, 'margin-vertical-half': pageType !== TransactionListPageType.Calendar.type && !showSearchbar }"
+                 v-if="!loading && noTransaction">
             <f7-list-item :title="tt('No transaction data')"></f7-list-item>
         </f7-list>
 
-        <f7-block class="combination-list-wrapper margin-vertical" :class="{ 'no-accordion-toggle': pageType !== TransactionListPageType.List.type && pageType !== TransactionListPageType.Gallery.type }"
-                  :key="transactionMonthList.yearDashMonth" v-for="(transactionMonthList) in transactions">
+        <f7-block class="combination-list-wrapper"
+                  :class="{ 'margin-vertical': index > 0 || pageType === TransactionListPageType.Calendar.type || showSearchbar, 'margin-vertical-half': index === 0 && pageType !== TransactionListPageType.Calendar.type && !showSearchbar, 'no-accordion-toggle': pageType !== TransactionListPageType.List.type && pageType !== TransactionListPageType.Gallery.type }"
+                  :key="transactionMonthList.yearDashMonth" v-for="(transactionMonthList, index) in transactions">
             <f7-accordion-item :opened="transactionMonthList.opened"
                                @accordion:open="collapseTransactionMonthList(transactionMonthList, false)"
                                @accordion:opened="onTransactionMonthListCollapseStateChanged"

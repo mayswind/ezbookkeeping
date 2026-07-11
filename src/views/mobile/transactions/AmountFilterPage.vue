@@ -8,7 +8,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list form strong inset dividers class="margin-vertical">
+        <f7-list form strong inset dividers class="margin-vertical-half">
             <f7-list-item
                 class="ebk-small-amount"
                 link="#" no-chevron

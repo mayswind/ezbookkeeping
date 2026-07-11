@@ -13,7 +13,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="margin-top-half skeleton-text" v-if="loading">
             <f7-list-item title="Category Name"
                           :link="hasSubCategories ? '#' : null"
                           :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
@@ -23,14 +23,14 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableCategory">
+        <f7-list strong inset dividers class="margin-top-half" v-if="!loading && noAvailableCategory">
             <f7-list-item :title="tt('No available category')"></f7-list-item>
             <f7-list-button v-if="hasSubCategories && noCategory"
                             :title="tt('Add Default Categories')"
                             :href="'/category/preset?type=' + categoryType"></f7-list-button>
         </f7-list>
 
-        <f7-list strong inset dividers sortable class="margin-top category-list"
+        <f7-list strong inset dividers sortable class="margin-top-half category-list"
                  :sortable-enabled="sortable"
                  v-if="!loading"
                  @sortable:sort="onSort">

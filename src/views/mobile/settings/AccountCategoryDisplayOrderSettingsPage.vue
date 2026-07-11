@@ -9,7 +9,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers sortable sortable-enabled class="margin-top"
+        <f7-list strong inset dividers sortable sortable-enabled class="margin-top-half"
                  @sortable:sort="onSort">
             <f7-list-item :id="getAccountCategoryDomId(accountCategory)"
                           :key="accountCategory.type"

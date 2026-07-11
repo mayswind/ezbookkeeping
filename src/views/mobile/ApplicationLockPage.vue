@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt('Application Lock')"></f7-nav-title>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-top">
+        <f7-list strong inset dividers class="margin-top-half">
             <f7-list-item :title="tt('Status')" :after="tt(isEnableApplicationLock ? 'Enabled' : 'Disabled')"></f7-list-item>
             <f7-list-item v-if="isEnableApplicationLock">
                 <template #after-title>

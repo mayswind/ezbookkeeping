@@ -13,7 +13,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-top skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="margin-top-half skeleton-text" v-if="loading">
             <f7-list-item title="Template Name"
                           :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                 <template #media>
@@ -22,7 +22,7 @@
             </f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-top" v-if="!loading && noAvailableTemplate">
+        <f7-list strong inset dividers class="margin-top-half" v-if="!loading && noAvailableTemplate">
             <f7-list-item :title="tt('No available template')"
                           :footer="tt('Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction')"
                           v-if="templateType === TemplateType.Normal.type"></f7-list-item>
@@ -30,7 +30,7 @@
             <f7-list-item :title="tt('No available template')" v-else></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers sortable class="margin-top template-list"
+        <f7-list strong inset dividers sortable class="margin-top-half template-list"
                  :sortable-enabled="sortable"
                  v-if="!loading"
                  @sortable:sort="onSort">

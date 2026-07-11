@@ -10,7 +10,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list form strong inset dividers class="margin-vertical">
+        <f7-list form strong inset dividers class="margin-vertical-half">
             <template #list>
                 <list-number-input
                     :disabled="submitting"

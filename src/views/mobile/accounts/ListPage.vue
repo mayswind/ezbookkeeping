@@ -13,7 +13,7 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="account-overview-card" :class="{ 'skeleton-text': loading }">
+        <f7-card class="account-overview-card margin-top-half" :class="{ 'skeleton-text': loading }">
             <f7-card-header class="display-block" style="padding-top: 120px;">
                 <p class="no-margin">
                     <small class="card-header-content" v-if="loading">Net assets</small>

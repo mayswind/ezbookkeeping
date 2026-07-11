@@ -308,13 +308,17 @@ init();
 </script>
 
 <style>
-.license-popup .license-title {
-    margin-top: 26px;
-    font-size: var(--ebk-license-popup-title-font-size);
-}
+.license-popup {
+    --f7-navbar-height: 72px;
 
-.license-content {
-    font-size: var(--ebk-license-content-font-size);
+    .license-title {
+        margin-top: 26px;
+        font-size: var(--ebk-license-popup-title-font-size);
+    }
+
+    .license-content {
+        font-size: var(--ebk-license-content-font-size);
+    }
 }
 
 .document-iframe {

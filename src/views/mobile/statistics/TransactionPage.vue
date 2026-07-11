@@ -58,7 +58,7 @@
             </f7-list>
         </f7-popover>
 
-        <f7-card v-if="analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Pie.type">
+        <f7-card class="margin-vertical-half" v-if="analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Pie.type">
             <f7-card-header class="no-border display-block">
                 <div :class="{ 'statistics-chart-header': true, 'full-line': true, 'text-align-right': textDirection === TextDirection.LTR, 'text-align-left': textDirection === TextDirection.RTL}">
                     <span style="margin-inline-end: 4px;">{{ tt('Sort by') }}</span>
@@ -108,7 +108,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Bar.type">
+        <f7-card class="margin-vertical-half" v-else-if="analysisType === StatisticsAnalysisType.CategoricalAnalysis && query.categoricalChartType === CategoricalChartType.Bar.type">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div>
@@ -202,7 +202,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="analysisType === StatisticsAnalysisType.TrendAnalysis">
+        <f7-card class="margin-vertical-half" v-else-if="analysisType === StatisticsAnalysisType.TrendAnalysis">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div></div>
@@ -238,7 +238,7 @@
             </f7-card-content>
         </f7-card>
 
-        <f7-card v-else-if="analysisType === StatisticsAnalysisType.AssetTrends">
+        <f7-card class="margin-vertical-half" v-else-if="analysisType === StatisticsAnalysisType.AssetTrends">
             <f7-card-header class="no-border display-block">
                 <div class="statistics-chart-header display-flex full-line justify-content-space-between">
                     <div></div>

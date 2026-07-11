@@ -8,11 +8,11 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list strong inset dividers class="margin-vertical skeleton-text" v-if="loading">
+        <f7-list strong inset dividers class="margin-vertical-half skeleton-text" v-if="loading">
             <f7-list-item title="Status" after="Unknown"></f7-list-item>
         </f7-list>
 
-        <f7-list strong inset dividers class="margin-vertical" v-else-if="!loading">
+        <f7-list strong inset dividers class="margin-vertical-half" v-else-if="!loading">
             <f7-list-item :title="tt('Status')" :after="tt(isEnableCloudSync ? 'Enabled' : 'Disabled')"></f7-list-item>
         </f7-list>
 

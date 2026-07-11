@@ -3,6 +3,10 @@ function getServerSetting(key: string): string | number | boolean | Record<strin
     return settings[key];
 }
 
+export function getStringifiedServerSetting(): string {
+    return JSON.stringify(window.EZBOOKKEEPING_SERVER_SETTINGS, null, 2);
+}
+
 export function isInternalAuthEnabled(): boolean {
     return getServerSetting('a') !== 0;
 }

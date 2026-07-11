@@ -2724,6 +2724,8 @@
     "Are you sure you want to switch to desktop version?": "デスクトップバージョンに切り替えますか？",
     "About": "アプリについて",
     "Refresh Browser Cache": "ブラウザキャッシュを更新",
+    "Show Diagnosis Information": "Show Diagnosis Information",
+    "Diagnosis Information": "Diagnosis Information",
     "Frontend Version": "フロントエンドバージョン",
     "Backend Version": "バックエンドバージョン",
     "Build Time": "ビルドタイム",

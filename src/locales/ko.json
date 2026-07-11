@@ -2724,6 +2724,8 @@
     "Are you sure you want to switch to desktop version?": "데스크톱 버전으로 전환하시겠습니까?",
     "About": "정보",
     "Refresh Browser Cache": "브라우저 캐시 새로 고침",
+    "Show Diagnosis Information": "Show Diagnosis Information",
+    "Diagnosis Information": "Diagnosis Information",
     "Frontend Version": "프론트엔드 버전",
     "Backend Version": "백엔드 버전",
     "Build Time": "빌드 시간",

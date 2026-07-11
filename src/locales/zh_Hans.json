@@ -2724,6 +2724,8 @@
     "Are you sure you want to switch to desktop version?": "您确定要切换到桌面版？",
     "About": "关于",
     "Refresh Browser Cache": "刷新浏览器缓存",
+    "Show Diagnosis Information": "显示诊断信息",
+    "Diagnosis Information": "诊断信息",
     "Frontend Version": "前端版本",
     "Backend Version": "后端版本",
     "Build Time": "编译时间",

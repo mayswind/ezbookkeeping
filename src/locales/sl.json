@@ -2724,6 +2724,8 @@
     "Are you sure you want to switch to desktop version?": "Ali ste prepričani, da želite preklopiti na namizno različico?",
     "About": "O aplikaciji",
     "Refresh Browser Cache": "Osveži predpomnilnik brskalnika",
+    "Show Diagnosis Information": "Show Diagnosis Information",
+    "Diagnosis Information": "Diagnosis Information",
     "Frontend Version": "Različica ospredja",
     "Backend Version": "Različica ozadja",
     "Build Time": "Čas gradnje",

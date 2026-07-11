@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt('About')"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-hidden-icon': clientVersionMatchServerVersion && !forceShowRefreshBrowserCacheMenu }">
                 <f7-link icon-f7="" v-if="clientVersionMatchServerVersion && !forceShowRefreshBrowserCacheMenu"/>
-                <f7-link icon-f7="ellipsis" @click="showRefreshBrowserCacheSheet = true"
+                <f7-link icon-f7="ellipsis" @click="showDiagnosisActionSheet = true"
                          v-else-if="!clientVersionMatchServerVersion || forceShowRefreshBrowserCacheMenu"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -135,14 +135,25 @@
             </f7-page>
         </f7-popup>
 
-        <f7-actions close-by-outside-click close-on-escape :opened="showRefreshBrowserCacheSheet" @actions:closed="showRefreshBrowserCacheSheet = false">
+        <f7-actions close-by-outside-click close-on-escape :opened="showDiagnosisActionSheet" @actions:closed="showDiagnosisActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button @click="refreshBrowserCache">{{ tt('Refresh Browser Cache') }}</f7-actions-button>
+            </f7-actions-group>
+            <f7-actions-group>
+                <f7-actions-button @click="showDiagnosisInformation">{{ tt('Show Diagnosis Information') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
             </f7-actions-group>
         </f7-actions>
+
+        <information-sheet :title="tt('Diagnosis Information')"
+                           :information="diagnosisInformation"
+                           :row-count="15"
+                           :enable-copy="true"
+                           v-model:show="showDiagnosisInformationSheet"
+                           @info:copied="onDiagnosisInformationCopied">
+        </information-sheet>
     </f7-page>
 </template>
 
@@ -151,11 +162,14 @@ import { ref, computed, useTemplateRef, onMounted } from 'vue';
 
 import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
-import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
+import { useI18nUIComponents, isiOSHomeScreenMode, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
+import { isWebAuthnCompletelySupported } from '@/lib/webauthn.ts';
+import { getStringifiedServerSetting } from '@/lib/server_settings.ts';
+
 const { tt, getCurrentLanguageTag, getAllLanguageOptions } = useI18n();
-const { showAlert, openExternalUrl } = useI18nUIComponents();
+const { showAlert, showToast, openExternalUrl } = useI18nUIComponents();
 const {
     clientVersion,
     clientVersionMatchServerVersion,
@@ -174,9 +188,11 @@ const {
 
 const documentIframe = useTemplateRef<HTMLIFrameElement>('documentIframe');
 
-const showRefreshBrowserCacheSheet = ref<boolean>(false);
+const showDiagnosisActionSheet = ref<boolean>(false);
 const versionClickCount = ref<number>(0);
 const documentLoading = ref<boolean>(true);
+const diagnosisInformation = ref<string>('');
+const showDiagnosisInformationSheet = ref<boolean>(false);
 
 const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 const forceShowRefreshBrowserCacheMenu = computed<boolean>(() => versionClickCount.value >= 5);
@@ -188,6 +204,69 @@ const documentUrl = computed<string>(() => {
         return 'https://ezbookkeeping.mayswind.net/faq/';
     }
 });
+
+function updateDiagnosisInformation(supportsWebAuthn: boolean, hasClipboardPermission: boolean, hasGeolocationPermission: boolean): void {
+    diagnosisInformation.value =
+        `ezBookkeeping Frontend Version: ${clientVersion}\n` +
+        `ezBookkeeping Backend Version: ${serverDisplayVersion.value}\n` +
+        `User Agent: ${navigator.userAgent}\n` +
+        `Security Context: ${window.isSecureContext}\n` +
+        `Standalone: ${isiOSHomeScreenMode()}\n` +
+        `Service Worker Supported: ${!!navigator.serviceWorker}\n` +
+        `Service Worker Active: ${!!navigator.serviceWorker && !!navigator.serviceWorker.controller ? 'Yes' : 'No'}\n` +
+        `Service Worker State: ${!!navigator.serviceWorker && !!navigator.serviceWorker.controller ? navigator.serviceWorker.controller.state : 'N/A'}\n` +
+        `Storage API Supported: ${!!navigator.storage}\n` +
+        `WebAuthn API Supported: ${supportsWebAuthn}\n` +
+        `Clipboard API Supported: ${!!navigator.clipboard}\n` +
+        `Clipboard Permission Granted: ${hasClipboardPermission}\n` +
+        `Geolocation API Supported: ${!!navigator.geolocation}\n` +
+        `Geolocation Permission Granted: ${hasGeolocationPermission}\n` +
+        `ezBookkeeping Server Settings:\n${getStringifiedServerSetting()}`;
+}
+
+function showDiagnosisInformation(): void {
+    let loading: boolean = false;
+    let supportsWebAuthn: boolean = false;
+    let hasClipboardPermission: boolean = false;
+    let hasGeolocationPermission: boolean = false;
+
+    const promises: Promise<void>[] = [];
+
+    promises.push(isWebAuthnCompletelySupported().then(() => {
+        supportsWebAuthn = true;
+    }).catch(() => {
+        supportsWebAuthn = false;
+    }));
+
+    if (navigator.permissions && navigator.permissions.query) {
+        loading = true;
+        showLoading(() => loading);
+
+        promises.push(navigator.permissions.query({ name: 'clipboard-read' as PermissionName }).then(result => {
+            hasClipboardPermission = result.state === 'granted';
+        }).catch(() => {
+            hasClipboardPermission = false;
+        }));
+
+        promises.push(navigator.permissions.query({ name: 'geolocation' as PermissionName }).then(result => {
+            hasGeolocationPermission = result.state === 'granted';
+        }).catch(() => {
+            hasGeolocationPermission = false;
+        }));
+    }
+
+    if (promises.length > 0) {
+        Promise.all(promises).finally(() => {
+            loading = false;
+            hideLoading();
+            updateDiagnosisInformation(supportsWebAuthn, hasClipboardPermission, hasGeolocationPermission);
+            showDiagnosisInformationSheet.value = true;
+        });
+    } else {
+        updateDiagnosisInformation(supportsWebAuthn, hasClipboardPermission, hasGeolocationPermission);
+        showDiagnosisInformationSheet.value = true;
+    }
+}
 
 function showVersion(): void {
     let versionMessage = `${tt('Frontend Version')}: ${clientVersion}`;
@@ -210,6 +289,11 @@ function onDocumentPopupOpen(): void {
         documentIframe.value.src = documentUrl.value;
     }
 }
+
+function onDiagnosisInformationCopied(): void {
+    showToast('Data copied');
+}
+
 
 onMounted(() => {
     if (documentIframe.value) {

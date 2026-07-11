@@ -2724,6 +2724,8 @@
     "Are you sure you want to switch to desktop version?": "¿Seguro que quieres cambiar a la versión de escritorio?",
     "About": "Acerca de",
     "Refresh Browser Cache": "Refresh Browser Cache",
+    "Show Diagnosis Information": "Show Diagnosis Information",
+    "Diagnosis Information": "Diagnosis Information",
     "Frontend Version": "Versión del Frontend",
     "Backend Version": "Versión del Backend",
     "Build Time": "Tiempo de Compilación",

@@ -2724,6 +2724,8 @@
     "Are you sure you want to switch to desktop version?": "คุณแน่ใจหรือว่าต้องการสลับไปเวอร์ชันเดสก์ท็อป?",
     "About": "เกี่ยวกับ",
     "Refresh Browser Cache": "รีเฟรชแคชเบราว์เซอร์",
+    "Show Diagnosis Information": "Show Diagnosis Information",
+    "Diagnosis Information": "Diagnosis Information",
     "Frontend Version": "เวอร์ชันหน้าเว็บ",
     "Backend Version": "เวอร์ชันเซิร์ฟเวอร์",
     "Build Time": "เวลาสร้าง",

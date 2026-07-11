@@ -165,11 +165,16 @@
                 <span>{{ getTransactionDisplayAmount(item) }}</span>
                 <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
                 <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
+                <v-tooltip activator="parent" v-if="(item.type !== TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency) || (item.type === TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency && getTransactionDestinationAccountCurrency(item) !== defaultCurrency)">
+                    <span>{{ getTransactionDisplaySourceAmountInDefaultCurrency(item) }}</span>
+                    <v-icon class="ms-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount"></v-icon>
+                    <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount">{{ getTransactionDisplayDestinationAmountInDefaultCurrency(item) }}</span>
+                </v-tooltip>
             </div>
             <div class="d-flex align-center" :style="`width: ${item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId ? 250 : 100}px`" v-if="editingTransaction === item">
                 <amount-input density="compact" variant="plain"
                               persistent-placeholder
-                              :currency="item.originalSourceAccountCurrency || defaultCurrency"
+                              :currency="getTransactionSourceAccountCurrency(item)"
                               :show-currency="true"
                               :disabled="!!disabled"
                               :placeholder="tt('Amount')"
@@ -177,7 +182,7 @@
                 <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
                 <amount-input density="compact" variant="plain"
                               persistent-placeholder
-                              :currency="item.originalDestinationAccountCurrency || defaultCurrency"
+                              :currency="getTransactionDestinationAccountCurrency(item)"
                               :show-currency="true"
                               :disabled="!!disabled"
                               :placeholder="tt('Transfer In Amount')"
@@ -414,6 +419,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { type NameValue, type NameNumeralValue, itemAndIndex, reversed, keys } from '@/core/base.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
@@ -524,6 +530,7 @@ const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
+const exchangeRatesStore = useExchangeRatesStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchReplaceDialog = useTemplateRef<BatchReplaceDialogType>('batchReplaceDialog');
@@ -1363,18 +1370,29 @@ function getDisplayTransactionType(transaction: ImportTransaction): string {
     }
 }
 
-function getDisplayCurrency(value: number, currencyCode: string): string {
-    return formatAmountToLocalizedNumeralsWithCurrency(value, currencyCode);
-}
-
-function getTransactionDisplayAmount(transaction: ImportTransaction): string {
+function getTransactionSourceAccountCurrency(transaction: ImportTransaction): string {
     let currency = transaction.originalSourceAccountCurrency || defaultCurrency.value;
 
     if (transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId]) {
         currency = allAccountsMap.value[transaction.sourceAccountId]!.currency;
     }
 
-    return getDisplayCurrency(transaction.sourceAmount, currency);
+    return currency;
+}
+
+function getTransactionDestinationAccountCurrency(transaction: ImportTransaction): string {
+    let currency = transaction.originalDestinationAccountCurrency || defaultCurrency.value;
+
+    if (transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId]) {
+        currency = allAccountsMap.value[transaction.destinationAccountId]!.currency;
+    }
+
+    return currency;
+}
+
+function getTransactionDisplayAmount(transaction: ImportTransaction): string {
+    const currency = getTransactionSourceAccountCurrency(transaction);
+    return formatAmountToLocalizedNumeralsWithCurrency(transaction.sourceAmount, currency);
 }
 
 function getTransactionDisplayDestinationAmount(transaction: ImportTransaction): string {
@@ -1382,13 +1400,30 @@ function getTransactionDisplayDestinationAmount(transaction: ImportTransaction):
         return '-';
     }
 
-    let currency = transaction.originalDestinationAccountCurrency || defaultCurrency.value;
+    const currency = getTransactionDestinationAccountCurrency(transaction);
+    return formatAmountToLocalizedNumeralsWithCurrency(transaction.destinationAmount, currency);
+}
 
-    if (transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId]) {
-        currency = allAccountsMap.value[transaction.destinationAccountId]!.currency;
+function getTransactionDisplaySourceAmountInDefaultCurrency(transaction: ImportTransaction): string {
+    const currency = getTransactionSourceAccountCurrency(transaction);
+
+    if (!currency || currency === defaultCurrency.value) {
+        return getTransactionDisplayAmount(transaction);
     }
 
-    return getDisplayCurrency(transaction.destinationAmount, currency);
+    const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, currency, defaultCurrency.value);
+    return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getTransactionDisplayAmount(transaction);
+}
+
+function getTransactionDisplayDestinationAmountInDefaultCurrency(transaction: ImportTransaction): string {
+    const currency = getTransactionDestinationAccountCurrency(transaction);
+
+    if (!currency || currency === defaultCurrency.value) {
+        return getTransactionDisplayDestinationAmount(transaction);
+    }
+
+    const amount = exchangeRatesStore.getExchangedAmount(transaction.destinationAmount, currency, defaultCurrency.value);
+    return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getTransactionDisplayDestinationAmount(transaction);
 }
 
 function getSourceAccountTitle(transaction: ImportTransaction): string {

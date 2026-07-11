@@ -5,6 +5,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
@@ -22,7 +23,7 @@ import type {
     TransactionReconciliationStatementResponseWithInfo
 } from '@/models/transaction.ts';
 
-import { replaceAll } from '@/lib/common.ts';
+import { isNumber, replaceAll } from '@/lib/common.ts';
 
 import {
     getUtcOffsetByUtcOffsetMinutes,
@@ -50,6 +51,7 @@ export function useReconciliationStatementPageBase() {
     const userStore = useUserStore();
     const accountsStore = useAccountsStore();
     const transactionCategoriesStore = useTransactionCategoriesStore();
+    const exchangeRatesStore = useExchangeRatesStore();
 
     const accountId = ref<string>('');
     const startTime = ref<number>(0);
@@ -231,6 +233,24 @@ export function useReconciliationStatementPageBase() {
         return formatAmountToLocalizedNumeralsWithCurrency(transaction.destinationAmount, currency);
     }
 
+    function getDisplaySourceAmountInDefaultCurrency(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
+        if (!transaction.sourceAccount?.currency || transaction.sourceAccount?.currency === defaultCurrency.value) {
+            return getDisplaySourceAmount(transaction);
+        }
+
+        const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency.value);
+        return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getDisplaySourceAmount(transaction);
+    }
+
+    function getDisplayDestinationAmountInDefaultCurrency(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
+        if (!transaction.destinationAccount?.currency || transaction.destinationAccount?.currency === defaultCurrency.value) {
+            return getDisplayDestinationAmount(transaction);
+        }
+
+        const amount = exchangeRatesStore.getExchangedAmount(transaction.destinationAmount, transaction.destinationAccount.currency, defaultCurrency.value);
+        return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getDisplayDestinationAmount(transaction);
+    }
+
     function getDisplayAccountBalance(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
         let currency = defaultCurrency.value;
         let isLiabilityAccount = false;
@@ -357,6 +377,8 @@ export function useReconciliationStatementPageBase() {
         getDisplayTimeInDefaultTimezone,
         getDisplaySourceAmount,
         getDisplayDestinationAmount,
+        getDisplaySourceAmountInDefaultCurrency,
+        getDisplayDestinationAmountInDefaultCurrency,
         getDisplayAccountBalance,
         getExportedData
     };

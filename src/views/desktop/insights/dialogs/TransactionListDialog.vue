@@ -67,6 +67,11 @@
                         <span :class="{ 'text-expense': item.type === TransactionType.Expense, 'text-income': item.type === TransactionType.Income }">{{ getDisplaySourceAmount(item) }}</span>
                         <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccount?.id !== item.destinationAccount?.id && getDisplaySourceAmount(item) !== getDisplayDestinationAmount(item)"></v-icon>
                         <span v-if="item.type === TransactionType.Transfer && item.sourceAccount?.id !== item.destinationAccount?.id && getDisplaySourceAmount(item) !== getDisplayDestinationAmount(item)">{{ getDisplayDestinationAmount(item) }}</span>
+                        <v-tooltip activator="parent" v-if="(item.type !== TransactionType.Transfer && item.sourceAccount?.currency !== defaultCurrency) || (item.type === TransactionType.Transfer && item.sourceAccount?.currency !== defaultCurrency && item.destinationAccount?.currency !== defaultCurrency)">
+                            <span>{{ getDisplaySourceAmountInDefaultCurrency(item) }}</span>
+                            <v-icon class="ms-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccount?.id !== item.destinationAccount?.id && item.sourceAccount?.currency !== item.destinationAccount?.currency && item.sourceAmount !== item.destinationAmount"></v-icon>
+                            <span v-if="item.type === TransactionType.Transfer && item.sourceAccount?.id !== item.destinationAccount?.id && item.sourceAccount?.currency !== item.destinationAccount?.currency && item.sourceAmount !== item.destinationAmount">{{ getDisplayDestinationAmountInDefaultCurrency(item) }}</span>
+                        </v-tooltip>
                     </template>
                     <template #item.sourceAccountName="{ item }">
                         <div class="d-flex align-center">
@@ -132,6 +137,7 @@ import {
 const { tt } = useI18n();
 
 const {
+    defaultCurrency,
     allPageCounts,
     dataTableHeaders,
     getDisplayDateTime,
@@ -141,7 +147,9 @@ const {
     getDisplayTransactionType,
     getTransactionTypeColor,
     getDisplaySourceAmount,
-    getDisplayDestinationAmount
+    getDisplayDestinationAmount,
+    getDisplaySourceAmountInDefaultCurrency,
+    getDisplayDestinationAmountInDefaultCurrency
 } = useExplorerDataTablePageBase();
 
 const explorersStore = useExplorersStore();

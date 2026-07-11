@@ -195,10 +195,10 @@
                                     </small>
                                     <small class="transaction-amount-statistics" v-if="showTotalAmountInTransactionListPage && transactionMonthList.totalAmount">
                                         <span class="text-income">
-                                            {{ getDisplayMonthTotalAmount(transactionMonthList.totalAmount.income, defaultCurrency, '+', transactionMonthList.totalAmount.incompleteIncome) }}
+                                            {{ getDisplayMonthTotalAmount(transactionMonthList.totalAmount.income, selectedAccountDefaultCurrency, '+', transactionMonthList.totalAmount.incompleteIncome) }}
                                         </span>
                                         <span class="text-expense">
-                                            {{ getDisplayMonthTotalAmount(transactionMonthList.totalAmount.expense, defaultCurrency, '-', transactionMonthList.totalAmount.incompleteExpense) }}
+                                            {{ getDisplayMonthTotalAmount(transactionMonthList.totalAmount.expense, selectedAccountDefaultCurrency, '-', transactionMonthList.totalAmount.incompleteExpense) }}
                                         </span>
                                     </small>
                                     <f7-icon class="combination-list-chevron-icon" :f7="transactionMonthList.opened ? 'chevron_up' : 'chevron_down'"></f7-icon>
@@ -726,7 +726,7 @@ const {
     currentCalendarDate,
     firstDayOfWeek,
     fiscalYearStart,
-    defaultCurrency,
+    selectedAccountDefaultCurrency,
     showTotalAmountInTransactionListPage,
     showTagInTransactionListPage,
     allDateRanges,
@@ -1027,7 +1027,7 @@ function reload(done?: () => void): void {
                 mustHavePictures: isGalleryMode,
                 withPictures: isGalleryMode,
                 autoExpand: true,
-                defaultCurrency: defaultCurrency.value
+                defaultCurrency: selectedAccountDefaultCurrency.value
             });
         } else {
             return transactionsStore.loadTransactions({
@@ -1035,7 +1035,7 @@ function reload(done?: () => void): void {
                 mustHavePictures: isGalleryMode,
                 withPictures: isGalleryMode,
                 autoExpand: true,
-                defaultCurrency: defaultCurrency.value
+                defaultCurrency: selectedAccountDefaultCurrency.value
             });
         }
     }).then(() => {
@@ -1082,7 +1082,7 @@ function loadMore(autoExpand: boolean): void {
         mustHavePictures: isGalleryMode,
         withPictures: isGalleryMode,
         autoExpand: autoExpand,
-        defaultCurrency: defaultCurrency.value
+        defaultCurrency: selectedAccountDefaultCurrency.value
     }).then(() => {
         loadingMore.value = false;
         setTransactionMonthListHeights(false);
@@ -1478,7 +1478,7 @@ function remove(transaction: Transaction | null, confirm: boolean): void {
 
     transactionsStore.deleteTransaction({
         transaction: transaction,
-        defaultCurrency: defaultCurrency.value,
+        defaultCurrency: selectedAccountDefaultCurrency.value,
         beforeResolve: (done) => {
             onSwipeoutDeleted(getTransactionDomId(transaction), done);
         }

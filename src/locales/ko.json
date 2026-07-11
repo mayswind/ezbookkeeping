@@ -1464,6 +1464,16 @@
             "fieldGeoLocationDescription": "[선택] 지리적 위치, 형식: '경도 위도', 예: '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[선택] 쉼표로 구분된 태그 이름, 예: 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[선택] 설명"
+        },
+        "importInsightsExplorerQueries": {
+            "queryIdDescription": "[optional] Unique UUID for the query. Must be a valid UUID and unique within the same exploration. If omitted, a UUID is generated automatically.",
+            "queryNameDescription": "[required] Query name",
+            "conditionDescription": "[optional] Omit this field when relation is \")\", otherwise it is required",
+            "conditionFieldDescription": "[required] Query field name",
+            "conditionOperatorDescription": "[required] Match type",
+            "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
+            "conditionRelationDescription": "[required] Logical relationship with the previous condition",
+            "additionalQueryDescription": "Additional query conditions"
         }
     },
     "OK": "확인",

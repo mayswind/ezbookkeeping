@@ -1464,6 +1464,16 @@
             "fieldGeoLocationDescription": "[可選] 地理位置，格式：'經度 緯度'，例如：'116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[可選] 以分號分隔的標籤名稱，例如：'標籤1;標籤2;標籤3'",
             "fieldCommentDescription": "[可選] 描述"
+        },
+        "importInsightsExplorerQueries": {
+            "queryIdDescription": "[可選] 每個查詢的唯一 UUID 標識，必須為 UUID 格式，並且在同一個探索中必須唯一。如果不填寫，系統會自動生成一個 UUID",
+            "queryNameDescription": "[必填] 查詢名稱",
+            "conditionDescription": "[可選] 當 relation 欄位為 \") 時，condition 欄位不填寫，其他情況必須填寫",
+            "conditionFieldDescription": "[必填] 查詢欄位名稱",
+            "conditionOperatorDescription": "[必填] 匹配類型",
+            "conditionValueDescription": "[必填] 匹配內容（根據匹配類型可能為 字串、字串陣列或數字陣列）",
+            "conditionRelationDescription": "[必填] 與上一個查詢條件的邏輯關係",
+            "additionalQueryDescription": "其他查詢條件"
         }
     },
     "OK": "確定",

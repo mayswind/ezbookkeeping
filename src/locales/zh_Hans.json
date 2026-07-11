@@ -1464,6 +1464,16 @@
             "fieldGeoLocationDescription": "[可选] 地理位置，格式：'经度 纬度'，例如：'116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[可选] 以分号分隔的标签名称，例如：'标签1;标签2;标签3'",
             "fieldCommentDescription": "[可选] 描述"
+        },
+        "importInsightsExplorerQueries": {
+            "queryIdDescription": "[可选] 每个查询的唯一 UUID 标识，必须为 UUID 格式，并且在同一个探索中必须唯一。如果不填写，系统会自动生成一个 UUID",
+            "queryNameDescription": "[必填] 查询名称",
+            "conditionDescription": "[可选] relation 字段为 \")\" 时，condition 字段不填，其他情况必须填写",
+            "conditionFieldDescription": "[必填] 查询字段名",
+            "conditionOperatorDescription": "[必填] 匹配类型",
+            "conditionValueDescription": "[必填] 匹配内容（根据匹配类型可能为 字符串、字符串数组或数字数组）",
+            "conditionRelationDescription": "[必填] 与上一个查询条件的逻辑关系",
+            "additionalQueryDescription": "其他查询条件"
         }
     },
     "OK": "确定",

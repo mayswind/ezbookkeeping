@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="1000" :persistent="!!queriesJson" v-model="showState">
+    <v-dialog width="1000" :persistent="!!queriesJson && queriesJson !== sampleJson" v-model="showState">
         <v-card class="pa-sm-1 pa-md-2">
             <template #title>
                 <h4 class="text-h4">{{ tt('Import Queries') }}</h4>
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef} from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -40,16 +40,34 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const { tt } = useI18n();
 
+let resolveFunc: ((queries: TransactionExplorerQuery[]) => void) | null = null;
+let rejectFunc: (() => void) | null = null;
+
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 const queriesJson = ref<string>('');
 
-let resolveFunc: ((queries: TransactionExplorerQuery[]) => void) | null = null;
-let rejectFunc: (() => void) | null = null;
+const sampleJson = computed<string>(() => `[
+    {
+        "id": "", // ${tt('sample.importInsightsExplorerQueries.queryIdDescription')}
+        "name": "", // ${tt('sample.importInsightsExplorerQueries.queryNameDescription')}
+        "conditions": [
+            {
+                "condition": { // ${tt('sample.importInsightsExplorerQueries.conditionDescription')}
+                    "field": "", // ${tt('sample.importInsightsExplorerQueries.conditionFieldDescription')}
+                    "operator": "", // ${tt('sample.importInsightsExplorerQueries.conditionOperatorDescription')}
+                    "value": "" // ${tt('sample.importInsightsExplorerQueries.conditionValueDescription')}
+                },
+                "relation": "" // ${tt('sample.importInsightsExplorerQueries.conditionRelationDescription')}
+            }
+            // ${tt('sample.importInsightsExplorerQueries.additionalQueryDescription')}
+        ]
+    }
+]`);
 
 function open(): Promise<TransactionExplorerQuery[]> {
-    queriesJson.value = '';
+    queriesJson.value = sampleJson.value;
     showState.value = true;
 
     return new Promise((resolve, reject) => {

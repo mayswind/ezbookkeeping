@@ -1464,6 +1464,16 @@
             "fieldGeoLocationDescription": "[optional] Geolocation, format: 'longitude latitude', e.g. '116.3912972 39.9057136'",
             "fieldTagNamesDescription": "[optional] Comma separated tag names, e.g. 'tag1;tag2;tag3'",
             "fieldCommentDescription": "[optional] Description"
+        },
+        "importInsightsExplorerQueries": {
+            "queryIdDescription": "[optional] Unique UUID for the query. Must be a valid UUID and unique within the same exploration. If omitted, a UUID is generated automatically.",
+            "queryNameDescription": "[required] Query name",
+            "conditionDescription": "[optional] Omit this field when relation is \")\", otherwise it is required",
+            "conditionFieldDescription": "[required] Query field name",
+            "conditionOperatorDescription": "[required] Match type",
+            "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
+            "conditionRelationDescription": "[required] Logical relationship with the previous condition",
+            "additionalQueryDescription": "Additional query conditions"
         }
     },
     "OK": "OK",

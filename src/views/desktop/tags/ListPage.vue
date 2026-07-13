@@ -141,7 +141,7 @@
                                                         v-model="tags"
                                                         @change="onMove">
                                             <template #item="{ element }">
-                                                <tr class="transaction-tags-table-row-tag text-sm" v-if="showHidden || !element.hidden"
+                                                <tr class="transaction-tags-table-row-tag" v-if="showHidden || !element.hidden"
                                                     @mouseenter="hoveredTagId = element.id" @mouseleave="hoveredTagId = ''">
                                                     <td>
                                                         <div class="d-flex align-center">
@@ -259,7 +259,7 @@
                                         </draggable-list>
 
                                         <tbody ref="newTagRow" v-if="newTag">
-                                        <tr class="text-sm" :class="{ 'even-row': (availableTagCount & 1) === 1}">
+                                        <tr :class="{ 'even-row': (availableTagCount & 1) === 1}">
                                             <td>
                                                 <div class="d-flex align-center">
                                                     <v-text-field class="w-100 me-2" type="text" color="primary"
@@ -317,7 +317,7 @@
             <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
                 <v-table hover density="comfortable" class="w-100 table-striped">
                     <tbody>
-                    <tr class="text-sm cursor-pointer" :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault" v-show="activeTagGroupId !== tagGroup.id">
+                    <tr class="cursor-pointer" :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault" v-show="activeTagGroupId !== tagGroup.id">
                         <td @click="moveTagToGroup(currentMovingTag, tagGroup.id)">
                             <span>{{ tagGroup.name }}</span>
                         </td>
@@ -783,13 +783,8 @@ watch(() => display.mdAndUp.value, (newValue) => {
 }
 
 .transaction-tags-table .v-text-field .v-field__input {
-    font-size: 0.875rem;
     padding-top: 0;
     color: rgba(var(--v-theme-on-surface));
-}
-
-.transaction-tags-table .transaction-tag-name {
-    font-size: 0.875rem;
 }
 
 .transaction-tags-table tr .v-text-field .v-field__input {

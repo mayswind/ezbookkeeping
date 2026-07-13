@@ -545,7 +545,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr class="transaction-table-row-data text-sm cursor-pointer"
+                                            <tr class="transaction-table-row-data cursor-pointer"
                                                 @click="show(transaction)">
                                                 <td class="transaction-table-column-time">
                                                     <div class="d-flex flex-column">

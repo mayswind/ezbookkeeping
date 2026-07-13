@@ -98,13 +98,13 @@
 
                     <tr :key="thirdPartyLogin.externalAuthType"
                         v-for="thirdPartyLogin in thirdPartyLoginList">
-                        <td class="text-sm">
+                        <td>
                             <v-icon start :icon="thirdPartyLogin.icon"/>
                             {{ thirdPartyLogin.displayName }}
                         </td>
-                        <td class="text-sm">{{ thirdPartyLogin.externalUsername }}</td>
-                        <td class="text-sm">{{ thirdPartyLogin.createdAt }}</td>
-                        <td class="text-sm text-right">
+                        <td>{{ thirdPartyLogin.externalUsername }}</td>
+                        <td>{{ thirdPartyLogin.createdAt }}</td>
+                        <td class=" text-right">
                             <v-btn density="comfortable" variant="tonal"
                                    :disabled="loggingInByOAuth2"
                                    :href="oauth2LinkUrl"
@@ -169,13 +169,13 @@
 
                     <tr :key="session.tokenId"
                         v-for="session in sessions">
-                        <td class="text-sm">
+                        <td>
                             <v-icon start :icon="session.icon"/>
                             {{ tt(session.deviceName) }}
                         </td>
-                        <td class="text-sm">{{ session.deviceInfo }}</td>
-                        <td class="text-sm">{{ session.lastSeenDateTime }}</td>
-                        <td class="text-sm text-right">
+                        <td>{{ session.deviceInfo }}</td>
+                        <td>{{ session.lastSeenDateTime }}</td>
+                        <td class="text-right">
                             <v-btn density="comfortable" color="error" variant="tonal"
                                    :disabled="session.isCurrent || loadingSession"
                                    @click="revokeSession(session)">

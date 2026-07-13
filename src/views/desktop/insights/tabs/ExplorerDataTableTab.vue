@@ -125,7 +125,7 @@
         fixed-footer
         multi-sort
         item-value="index"
-        :class="{ 'insights-explorer-table': true, 'text-sm': true, 'disabled': loading || disabled, 'loading-skeleton': loading }"
+        :class="{ 'insights-explorer-table': true, 'disabled': loading || disabled, 'loading-skeleton': loading }"
         :headers="dataTableHeaders"
         :items="filteredTransactions"
         :hover="true"

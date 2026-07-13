@@ -1,3 +1,15 @@
 :root {
     --ebk-icon-font-size: 28px;
 }
+
+.v-table {
+    font-size: 0.875rem;
+
+    .v-text-field .v-field__input {
+        font-size: 0.875rem;
+    }
+
+    .v-btn {
+        font-size: 0.875rem;
+    }
+}

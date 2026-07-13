@@ -59,7 +59,7 @@
                                     v-model="allExplorations"
                                     @change="onMove">
                         <template #item="{ element }">
-                            <tr class="explorers-table-row text-sm" v-if="showHidden || !element.hidden"
+                            <tr class="explorers-table-row" v-if="showHidden || !element.hidden"
                                 @mouseenter="hoveredExplorationId = element.id" @mouseleave="hoveredExplorationId = ''">
                                 <td>
                                     <div class="d-flex align-center">

@@ -110,7 +110,7 @@
                                             @mouseenter="hoveredCurrency = exchangeRate.currencyCode" @mouseleave="hoveredCurrency = ''">
                                             <td>
                                                 <div class="d-flex align-center">
-                                                    <span class="text-sm">{{ exchangeRate.currencyDisplayName }}</span>
+                                                    <span>{{ exchangeRate.currencyDisplayName }}</span>
                                                     <span class="text-caption ms-1">{{ exchangeRate.currencyCode }}</span>
 
                                                     <v-spacer/>
@@ -136,7 +136,7 @@
                                                         </v-btn>
                                                     </template>
 
-                                                    <span class="ms-3">{{ getFinalConvertedAmount(exchangeRate, true) }}</span>
+                                                    <span class="text-subtitle-1 ms-3">{{ getFinalConvertedAmount(exchangeRate, true) }}</span>
                                                 </div>
                                             </td>
                                         </tr>

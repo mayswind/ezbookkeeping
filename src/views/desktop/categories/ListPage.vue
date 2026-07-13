@@ -115,7 +115,7 @@
                                                         v-model="categories"
                                                         @change="onMove">
                                             <template #item="{ element }">
-                                                <tr class="transaction-category-table-row text-sm" v-if="showHidden || !element.hidden"
+                                                <tr class="transaction-category-table-row" v-if="showHidden || !element.hidden"
                                                     @mouseenter="hoveredCategoryId = element.id" @mouseleave="hoveredCategoryId = ''">
                                                     <td>
                                                         <div class="d-flex align-center">

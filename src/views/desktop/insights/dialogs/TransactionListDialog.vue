@@ -30,7 +30,7 @@
                     multi-sort
                     density="compact"
                     item-value="index"
-                    :class="{ 'insights-explorer-transactions-dialog-table': true, 'text-sm': true }"
+                    :class="{ 'insights-explorer-transactions-dialog-table': true }"
                     :headers="dataTableHeaders"
                     :items="transactions"
                     :hover="true"

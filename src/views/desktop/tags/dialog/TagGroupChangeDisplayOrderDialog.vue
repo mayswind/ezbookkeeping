@@ -45,7 +45,7 @@
                                     v-model="allTagGroups"
                                     @change="onMove">
                         <template #item="{ element }">
-                            <tr class="text-sm">
+                            <tr>
                                 <td>
                                     <div class="d-flex align-center">
                                         <div class="d-flex align-center">

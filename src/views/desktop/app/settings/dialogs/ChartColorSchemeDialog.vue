@@ -38,7 +38,7 @@
                                     ghost-class="dragging-item"
                                     v-model="chartColors">
                         <template #item="{ element, index }">
-                            <tr class="text-sm" @mouseenter="hoveredIndex = index" @mouseleave="hoveredIndex = ''">
+                            <tr @mouseenter="hoveredIndex = index" @mouseleave="hoveredIndex = ''">
                                 <td>
                                     <div class="d-flex align-center">
                                         <div class="d-flex align-center">

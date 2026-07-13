@@ -74,7 +74,7 @@
                                     v-model="templates"
                                     @change="onMove">
                         <template #item="{ element }">
-                            <tr class="transaction-templates-table-row text-sm" v-if="showHidden || !element.hidden"
+                            <tr class="transaction-templates-table-row" v-if="showHidden || !element.hidden"
                                 @mouseenter="hoveredTemplateId = element.id" @mouseleave="hoveredTemplateId = ''">
                                 <td>
                                     <div class="d-flex align-center">
@@ -394,13 +394,8 @@ init();
 }
 
 .transaction-templates-table .v-text-field .v-field__input {
-    font-size: 0.875rem;
     padding-top: 0;
     color: rgba(var(--v-theme-on-surface));
-}
-
-.transaction-templates-table .transaction-template-name {
-    font-size: 0.875rem;
 }
 
 .transaction-templates-table tr .v-text-field .v-field__input {

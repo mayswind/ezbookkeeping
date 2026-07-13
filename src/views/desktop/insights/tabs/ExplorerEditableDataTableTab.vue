@@ -40,7 +40,7 @@
         fixed-footer
         multi-sort
         item-value="index"
-        :class="{ 'insights-editable-explorer-table': true, 'text-sm': true, 'disabled': loading || disabled, 'loading-skeleton': loading }"
+        :class="{ 'insights-editable-explorer-table': true, 'disabled': loading || disabled, 'loading-skeleton': loading }"
         :headers="editableDataTableHeaders"
         :items="filteredTransactions"
         :hover="true"

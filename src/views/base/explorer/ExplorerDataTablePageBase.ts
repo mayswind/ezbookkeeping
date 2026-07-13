@@ -10,6 +10,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 import { type NameValue, type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import type { NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
 import type { InsightsExplorer } from '@/models/explorer.ts';
@@ -119,6 +120,19 @@ export function useExplorerDataTablePageBase() {
         return headers;
     });
 
+    function formatAmount(amount: number, hideAmount: boolean, currencyCode: string, inDefaultCurrency?: boolean): string {
+        if (hideAmount) {
+            return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, currencyCode);
+        }
+
+        if (!inDefaultCurrency || currencyCode === defaultCurrency.value) {
+            return formatAmountToLocalizedNumeralsWithCurrency(amount, currencyCode);
+        } else {
+            const exchangedAmount = exchangeRatesStore.getExchangedAmount(amount, currencyCode, defaultCurrency.value);
+            return isNumber(exchangedAmount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(exchangedAmount), defaultCurrency.value) : formatAmountToLocalizedNumeralsWithCurrency(amount, currencyCode);
+        }
+    }
+
     function getDisplayDateTime(transaction: TransactionInsightDataItem): string {
         const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
         return formatDateTimeToLongDateTime(dateTime);
@@ -167,30 +181,12 @@ export function useExplorerDataTablePageBase() {
         }
     }
 
-    function getDisplaySourceAmount(transaction: TransactionInsightDataItem): string {
-        return formatAmountToLocalizedNumeralsWithCurrency(transaction.sourceAmount, transaction.sourceAccount?.currency ?? defaultCurrency.value);
+    function getDisplaySourceAmount(transaction: TransactionInsightDataItem, inDefaultCurrency?: boolean): string {
+        return formatAmount(transaction.sourceAmount, transaction.hideAmount, transaction.sourceAccount?.currency ?? defaultCurrency.value, inDefaultCurrency);
     }
 
-    function getDisplayDestinationAmount(transaction: TransactionInsightDataItem): string {
-        return formatAmountToLocalizedNumeralsWithCurrency(transaction.destinationAmount, transaction.destinationAccount?.currency ?? defaultCurrency.value);
-    }
-
-    function getDisplaySourceAmountInDefaultCurrency(transaction: TransactionInsightDataItem): string {
-        if (!transaction.sourceAccount?.currency || transaction.sourceAccount?.currency === defaultCurrency.value) {
-            return getDisplaySourceAmount(transaction);
-        }
-
-        const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency.value);
-        return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getDisplaySourceAmount(transaction);
-    }
-
-    function getDisplayDestinationAmountInDefaultCurrency(transaction: TransactionInsightDataItem): string {
-        if (!transaction.destinationAccount?.currency || transaction.destinationAccount?.currency === defaultCurrency.value) {
-            return getDisplayDestinationAmount(transaction);
-        }
-
-        const amount = exchangeRatesStore.getExchangedAmount(transaction.destinationAmount, transaction.destinationAccount.currency, defaultCurrency.value);
-        return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getDisplayDestinationAmount(transaction);
+    function getDisplayDestinationAmount(transaction: TransactionInsightDataItem, inDefaultCurrency?: boolean): string {
+        return formatAmount(transaction.destinationAmount, transaction.hideAmount, transaction.destinationAccount?.currency ?? defaultCurrency.value, inDefaultCurrency);
     }
 
     return {
@@ -213,8 +209,6 @@ export function useExplorerDataTablePageBase() {
         getDisplayTransactionType,
         getTransactionTypeColor,
         getDisplaySourceAmount,
-        getDisplayDestinationAmount,
-        getDisplaySourceAmountInDefaultCurrency,
-        getDisplayDestinationAmountInDefaultCurrency
+        getDisplayDestinationAmount
     };
 }

@@ -14,6 +14,7 @@ import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { StatisticsAnalysisType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
+import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
 import type { Account } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -175,6 +176,19 @@ export function useReconciliationStatementPageBase() {
         reconciliationStatements.value = responseWithInfo;
     }
 
+    function formatAmount(amount: number, hideAmount: boolean, currencyCode: string, inDefaultCurrency?: boolean): string {
+        if (hideAmount) {
+            return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, currencyCode);
+        }
+
+        if (!inDefaultCurrency || currencyCode === defaultCurrency.value) {
+            return formatAmountToLocalizedNumeralsWithCurrency(amount, currencyCode);
+        } else {
+            const exchangedAmount = exchangeRatesStore.getExchangedAmount(amount, currencyCode, defaultCurrency.value);
+            return isNumber(exchangedAmount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(exchangedAmount), defaultCurrency.value) : formatAmountToLocalizedNumeralsWithCurrency(amount, currencyCode);
+        }
+    }
+
     function getDisplayTransactionType(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
         if (transaction.type === TransactionType.ModifyBalance) {
             return tt('Modify Balance');
@@ -223,32 +237,12 @@ export function useReconciliationStatementPageBase() {
         return `${formatDateTimeToLongDateTime(dateTime)} (UTC${utcOffset})`;
     }
 
-    function getDisplaySourceAmount(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
-        const currency = transaction.sourceAccount?.currency ?? defaultCurrency.value;
-        return formatAmountToLocalizedNumeralsWithCurrency(transaction.sourceAmount, currency);
+    function getDisplaySourceAmount(transaction: TransactionReconciliationStatementResponseItemWithInfo, inDefaultCurrency?: boolean): string {
+        return formatAmount(transaction.sourceAmount, transaction.hideAmount, transaction.sourceAccount?.currency ?? defaultCurrency.value, inDefaultCurrency);
     }
 
-    function getDisplayDestinationAmount(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
-        const currency = transaction.destinationAccount?.currency ?? defaultCurrency.value;
-        return formatAmountToLocalizedNumeralsWithCurrency(transaction.destinationAmount, currency);
-    }
-
-    function getDisplaySourceAmountInDefaultCurrency(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
-        if (!transaction.sourceAccount?.currency || transaction.sourceAccount?.currency === defaultCurrency.value) {
-            return getDisplaySourceAmount(transaction);
-        }
-
-        const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency.value);
-        return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getDisplaySourceAmount(transaction);
-    }
-
-    function getDisplayDestinationAmountInDefaultCurrency(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
-        if (!transaction.destinationAccount?.currency || transaction.destinationAccount?.currency === defaultCurrency.value) {
-            return getDisplayDestinationAmount(transaction);
-        }
-
-        const amount = exchangeRatesStore.getExchangedAmount(transaction.destinationAmount, transaction.destinationAccount.currency, defaultCurrency.value);
-        return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getDisplayDestinationAmount(transaction);
+    function getDisplayDestinationAmount(transaction: TransactionReconciliationStatementResponseItemWithInfo, inDefaultCurrency?: boolean): string {
+        return formatAmount(transaction.destinationAmount, transaction.hideAmount, transaction.destinationAccount?.currency ?? defaultCurrency.value, inDefaultCurrency);
     }
 
     function getDisplayAccountBalance(transaction: TransactionReconciliationStatementResponseItemWithInfo): string {
@@ -377,8 +371,6 @@ export function useReconciliationStatementPageBase() {
         getDisplayTimeInDefaultTimezone,
         getDisplaySourceAmount,
         getDisplayDestinationAmount,
-        getDisplaySourceAmountInDefaultCurrency,
-        getDisplayDestinationAmountInDefaultCurrency,
         getDisplayAccountBalance,
         getExportedData
     };

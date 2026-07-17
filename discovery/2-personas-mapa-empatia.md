@@ -23,3 +23,8 @@ O que escuta? Colegas da faculdade combinando saídas; membros da EJ animados co
 O que vê? Planilhas complexas de precificação de projetos; a tela inicial do ezBookkeeping mostrando apenas um saldo global, sem separar o dinheiro livre do dinheiro comprometido.
 
 O que fala e faz? Faz cálculos mentais frequentes. Tenta anotar as metas de economia no bloco de notas do celular, o que acaba ficando desorganizado. Trabalha duro nos projetos de infraestrutura web para garantir uma remuneração melhor no mês.
+
+Quais as dores? Não consegue visualizar quanto do saldo já está comprometido, tem medo de gastar dinheiro reservado, precisa controlar tudo manualmente.
+
+Quais seriam os ganhos com isso? Conseguiria visualizar a evolução da meta, sentir segurança financeira, saber exatamente quanto ainda falta guardar.
+

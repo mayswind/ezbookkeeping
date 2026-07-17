@@ -9,3 +9,4 @@ Prompt 2: "Com base na Persona 1, construa um Mapa de Empatia estruturado (Pensa
 Por que usamos a IA? A IA foi utilizada como ferramenta de brainstorming para acelerar a tangibilização do usuário final. Ela ajudou a transformar uma dor abstrata ("falta de gestão de metas") em cenários altamente empáticos e fáceis de visualizar.
 
 Reflexão Crítica: As saídas iniciais da IA poderiam ser genéricas (ex: "comprar um carro"), mas foram refinadas iterativamente para se adequar estritamente ao contexto de estudantes universitários brasileiros (como o uso de recursos para Empresas Juniores e provas). A decisão final de manter o escopo nestas personas garante que o MVP a ser desenvolvido (módulo de Metas) seja focado, viável e resolva um Job To Be Done extremamente específico e real.
+

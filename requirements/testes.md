@@ -1,20 +1,28 @@
 # Cenários de Teste do MVP
 
-## [US01] Cadastrar nova meta financeira
-*   **Cenário 1 (Sucesso):** Dados válidos (Nome: "Congresso ENEJ", Valor: 800) -> A meta é salva com sucesso e aparece na listagem.
-*   **Cenário 2 (Erro):** Campo nome vazio -> O sistema exibe erro de validação e não salva.
-*   **Cenário 3 (Erro):** Valor alvo negativo ou zero -> O sistema exibe alerta informando que a meta precisa de um valor positivo.
+## \[US01] Cadastrar nova meta financeira
 
-## [US02] Alocar saldo para a meta
-*   **Cenário 1 (Sucesso):** Saldo suficiente na conta -> O aporte é registrado, a meta soma o valor e a conta subtrai o valor.
-*   **Cenário 2 (Erro):** Valor do aporte maior que o saldo disponível na conta -> A transação é bloqueada por fundos insuficientes.
+* **Cenário 1 (Sucesso):** Dados válidos (Nome: "Congresso ENEJ", Valor: 800) -> A meta é salva com sucesso e aparece na listagem.
+* **Cenário 2 (Erro):** Campo nome vazio -> O sistema exibe erro de validação e não salva.
+* **Cenário 3 (Erro):** Valor alvo negativo ou zero -> O sistema exibe alerta informando que a meta precisa de um valor positivo.
 
-## [US03] Visualizar progresso da meta
-*   **Cenário 1 (Sucesso):** Meta com aporte realizado -> A barra de progresso exibe o percentual correto (Ex: Meta de 100, aporte de 50 = 50%).
+## \[US02] Alocar saldo para a meta
 
-## [US04] Editar detalhes da meta
-*   **Cenário 1 (Sucesso):** Alteração de dados válidos -> As informações são atualizadas instantaneamente na interface.
-*   **Cenário 2 (Erro):** Reduzir valor alvo para um montante menor que o saldo já guardado na meta -> O sistema bloqueia a edição ou sugere estornar a diferença antes.
+* **Cenário 1 (Sucesso):** Saldo suficiente na conta -> O aporte é registrado, a meta soma o valor e a conta subtrai o valor.
+* **Cenário 2 (Erro):** Valor do aporte maior que o saldo disponível na conta -> A transação é bloqueada por fundos insuficientes.
 
-## [US05] Excluir meta
-*   **Cenário 1 (Sucesso):** Exclusão confirmada -> A meta é apagada e o valor acumulado é devolvido à conta origem.
+## \[US03] Visualizar progresso da meta
+
+* **Cenário 1 (Sucesso):** Meta com aporte realizado -> A barra de progresso exibe o percentual correto (Ex: Meta de 100, aporte de 50 = 50%).
+* Cenário 2 (Validação): Meta recém-criada sem nenhum aporte → A barra de progresso deve exibir 0%.
+
+## \[US04] Editar detalhes da meta
+
+* **Cenário 1 (Sucesso):** Alteração de dados válidos -> As informações são atualizadas instantaneamente na interface.
+* **Cenário 2 (Erro):** Reduzir valor alvo para um montante menor que o saldo já guardado na meta -> O sistema bloqueia a edição ou sugere estornar a diferença antes.
+
+## \[US05] Excluir meta
+
+* **Cenário 1 (Sucesso):** Exclusão confirmada -> A meta é apagada e o valor acumulado é devolvido à conta origem.
+* Cenário 2 (Erro): Usuário cancela a exclusão → A meta permanece cadastrada.
+

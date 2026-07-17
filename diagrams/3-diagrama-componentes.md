@@ -1,25 +1,25 @@
 # Diagrama de Componentes - Arquitetura de Metas
 
 ```mermaid
-componentDiagram
-    package "ezBookkeeping (Cliente)" {
-        [Navegador / PWA] as Frontend
-        [Módulo de Metas (UI)] as GoalsUI
-        Frontend ..> GoalsUI : renderiza
-    }
+flowchart TD
+    subgraph Cliente ["ezBookkeeping (Cliente)"]
+        Frontend["Navegador / PWA"]
+        GoalsUI["Módulo de Metas (UI)"]
+        Frontend -.->|renderiza| GoalsUI
+    end
 
-    package "ezBookkeeping (Servidor)" {
-        [API REST] as API
-        [Controlador de Metas] as GoalsController
-        [Validador de Regras] as Validator
+    subgraph Servidor ["ezBookkeeping (Servidor)"]
+        API["API REST"]
+        GoalsController["Controlador de Metas"]
+        Validator["Validador de Regras"]
         
-        API --> GoalsController : roteia requisições
-        GoalsController --> Validator : checa dados
-    }
+        API -->|roteia requisições| GoalsController
+        GoalsController -->|checa dados| Validator
+    end
 
-    database "Armazenamento" {
-        [SQLite / MySQL] as Database
-    }
+    subgraph Armazenamento ["Armazenamento"]
+        Database[("SQLite / MySQL")]
+    end
 
-    GoalsUI --> API : requisições HTTP (JSON)
-    GoalsController --> Database : leitura/escrita
+    GoalsUI -->|requisições HTTP JSON| API
+    GoalsController -->|leitura e escrita| Database

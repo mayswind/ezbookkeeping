@@ -1,0 +1,25 @@
+. Personas
+Persona 1: Lucas, o Membro de Empresa Júnior
+
+Perfil: 21 anos, estudante universitário. Atua na Empresa Júnior Visão, gerenciando campanhas de marketing digital e estruturando orçamentos de Google Ads para clientes reais.
+
+Comportamento Financeiro: Recebe uma remuneração variável dependendo dos projetos de site e marketing que fecha na EJ. Tem facilidade com tecnologia e usa o ezBookkeeping para registrar o que ganha.
+
+Dor/Necessidade (JTBD): Lucas quer muito ir ao ENEJ (Encontro Nacional de Empresas Juniores) no final do ano. Como sua renda oscila, ele tem dificuldade de saber quanto do saldo atual da sua conta pode ser gasto no dia a dia e quanto deve ser "congelado" para pagar a viagem. Ele precisa de uma funcionalidade para definir essa meta e separar esse dinheiro virtualmente.
+
+Persona 2: Mariana, a Concurseira
+
+Perfil: 24 anos, estudante na reta final do curso. Divide seu tempo entre o estágio e uma rotina intensa de estudos para concursos públicos na área de administração e educação (focando em leis como LDB e PNE).
+
+Comportamento Financeiro: Tem uma bolsa de estágio com valor fixo e baixo. É super organizada e gosta de resolver provas anteriores (frequentemente simulando testes de 50 questões) para medir seu desempenho.
+
+Dor/Necessidade (JTBD): Mariana precisa viajar para outras cidades para realizar as provas dos concursos e também precisa pagar as taxas de inscrição, que costumam ser caras. Ela precisa de um sistema que a ajude a poupar aos poucos (ex: R$ 50 todo mês) para criar um fundo específico para essas provas, garantindo que não falte dinheiro perto da data dos exames.
+
+2. Mapa de Empatia (Foco no Lucas)
+O que pensa e sente? Sente-se orgulhoso do trabalho na Empresa Júnior, mas preocupado em não conseguir juntar o dinheiro a tempo para a viagem. Pensa: "Será que posso gastar com essa pizza hoje ou vai faltar para o meu fundo de viagem?".
+
+O que escuta? Colegas da faculdade combinando saídas; membros da EJ animados com a programação do evento nacional.
+
+O que vê? Planilhas complexas de precificação de projetos; a tela inicial do ezBookkeeping mostrando apenas um saldo global, sem separar o dinheiro livre do dinheiro comprometido.
+
+O que fala e faz? Faz cálculos mentais frequentes. Tenta anotar as metas de economia no bloco de notas do celular, o que acaba ficando desorganizado. Trabalha duro nos projetos de infraestrutura web para garantir uma remuneração melhor no mês.

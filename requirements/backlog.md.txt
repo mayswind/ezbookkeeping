@@ -1,0 +1,47 @@
+# Backlog e Definição do MVP
+
+## 1. Definição do MVP
+**Solução Proposta:** Um módulo de "Metas Financeiras" (*Saving Goals*).
+**Valor:** Permite que o estudante separe virtualmente uma parte do seu saldo para um objetivo futuro (como viagens acadêmicas ou taxas de provas), resolvendo a dor de não saber o quanto do dinheiro na conta está realmente livre.
+**Viabilidade:** É viável para o prazo do trabalho, pois envolve a criação de uma nova entidade no banco de dados vinculada ao usuário, com operações básicas de CRUD (Criar, Ler, Atualizar, Deletar) na interface já existente.
+
+## 2. Backlog de Histórias de Usuário
+
+**[US01] Cadastrar nova meta financeira (IMPLEMENTADA NO PR)**
+*   **História:** Como estudante, quero cadastrar uma meta financeira com nome e valor alvo, para que eu possa iniciar o planejamento do meu objetivo.
+*   **Critérios de Aceite:**
+    *   Dado que acesso a área de Metas
+    *   Quando preencho o nome, valor alvo e clico em salvar
+    *   Então a meta é registrada com zero de saldo acumulado.
+
+**[US02] Alocar saldo para a meta**
+*   **História:** Como estudante, quero transferir um valor do meu saldo geral para uma meta específica, para que eu possa guardar dinheiro aos poucos.
+*   **Critérios de Aceite:**
+    *   Dado que possuo saldo na conta e uma meta criada
+    *   Quando insiro um valor de aporte e confirmo
+    *   Então o saldo da meta aumenta e o saldo disponível na conta diminui.
+
+**[US03] Visualizar progresso da meta**
+*   **História:** Como estudante, quero ver uma barra de progresso da minha meta, para que eu saiba o quão perto estou de atingir o valor alvo.
+*   **Critérios de Aceite:**
+    *   Dado que abro a lista de metas
+    *   Quando visualizo o card da meta
+    *   Então vejo a porcentagem concluída em relação ao valor alvo.
+
+**[US04] Editar detalhes da meta**
+*   **História:** Como estudante, quero editar o nome e o valor alvo de uma meta, para que eu possa ajustar meu planejamento caso os custos mudem.
+*   **Critérios de Aceite:**
+    *   Dado que clico em editar em uma meta existente
+    *   Quando altero o valor alvo e salvo
+    *   Então a meta passa a exibir as novas informações.
+
+**[US05] Excluir meta concluída ou cancelada**
+*   **História:** Como estudante, quero excluir uma meta da minha lista, para que meu painel não fique poluído com objetivos antigos.
+*   **Critérios de Aceite:**
+    *   Dado que seleciono a opção excluir em uma meta
+    *   Quando confirmo a ação
+    *   Então a meta some da lista e o saldo retido volta para a conta principal.
+
+## 3. Priorização do MVP
+A dupla decidiu priorizar a história **[US01] Cadastrar nova meta financeira** para a implementação do Pull Request (PR).
+**Justificativa:** É a funcionalidade base. Sem a capacidade de criar a entidade "Meta" no sistema, nenhuma das outras histórias (alocar dinheiro, visualizar progresso ou editar) pode existir.

@@ -350,6 +350,7 @@
                                         type="text"
                                         persistent-placeholder
                                         rows="3"
+					maxlength = "1024"
                                         :readonly="mode === TransactionEditPageMode.View"
                                         :disabled="loading || submitting || recognizing"
                                         :label="transactionDescriptionTitle"

@@ -567,8 +567,10 @@
                               v-for="filterType in AmountFilterType.values()"
                               @click="changeAmountFilter(filterType.type)">
                     <template #after>
-                        <span class="margin-inline-end-half" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)">{{ queryAmount }}</span>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)"></f7-icon>
+                    </template>
+                    <template #footer>
+                        <span class="margin-inline-end-half" v-if="query.amountFilter && query.amountFilter.startsWith(`${filterType.type}:`)">{{ queryAmount }}</span>
                     </template>
                 </f7-list-item>
 

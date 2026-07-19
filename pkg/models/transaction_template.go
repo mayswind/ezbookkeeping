@@ -76,8 +76,8 @@ type TransactionTemplateCreateRequest struct {
 	CategoryId                 int64                             `json:"categoryId,string" binding:"required,min=1"`
 	SourceAccountId            int64                             `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId       int64                             `json:"destinationAccountId,string" binding:"min=0"`
-	SourceAmount               int64                             `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
-	DestinationAmount          int64                             `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	SourceAmount               int64                             `json:"sourceAmount" binding:"min=-9999999999999,max=9999999999999"`
+	DestinationAmount          int64                             `json:"destinationAmount" binding:"min=-9999999999999,max=9999999999999"`
 	HideAmount                 bool                              `json:"hideAmount"`
 	TagIds                     []string                          `json:"tagIds"`
 	Comment                    string                            `json:"comment" binding:"max=255"`
@@ -103,8 +103,8 @@ type TransactionTemplateModifyRequest struct {
 	CategoryId                 int64                             `json:"categoryId,string" binding:"required,min=1"`
 	SourceAccountId            int64                             `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId       int64                             `json:"destinationAccountId,string" binding:"min=0"`
-	SourceAmount               int64                             `json:"sourceAmount" binding:"min=-99999999999,max=99999999999"`
-	DestinationAmount          int64                             `json:"destinationAmount" binding:"min=-99999999999,max=99999999999"`
+	SourceAmount               int64                             `json:"sourceAmount" binding:"min=-9999999999999,max=9999999999999"`
+	DestinationAmount          int64                             `json:"destinationAmount" binding:"min=-9999999999999,max=9999999999999"`
 	HideAmount                 bool                              `json:"hideAmount"`
 	TagIds                     []string                          `json:"tagIds"`
 	Comment                    string                            `json:"comment" binding:"max=255"`

@@ -211,6 +211,10 @@ i.icon.la, i.icon.las, i.icon.lab {
     --f7-toolbar-height: 48px;
 }
 
+.ebk-extra-small-amount {
+    --f7-list-item-title-font-size: var(--ebk-amount-extra-small-font-size) !important;
+}
+
 .ebk-small-amount {
     --f7-list-item-title-font-size: var(--ebk-amount-small-font-size) !important;
 }

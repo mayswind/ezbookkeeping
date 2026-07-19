@@ -908,7 +908,9 @@ function getPageTypeNameMode(): { type: TransactionEditPageType, mode: Transacti
 }
 
 function getFontClassByAmount(amount: number): string {
-    if (amount >= 100000000 || amount <= -100000000) {
+    if (amount >= 10000000000 || amount <= -10000000000) {
+        return 'ebk-extra-small-amount';
+    } if (amount >= 100000000 || amount <= -100000000) {
         return 'ebk-small-amount';
     } else if (amount >= 1000000 || amount <= -1000000) {
         return 'ebk-normal-amount';

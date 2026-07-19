@@ -163,7 +163,9 @@ const currentDisplay = computed<string>(() => {
 });
 
 const currentDisplayNumClass = computed<string>(() => {
-    if (currentDisplay.value && currentDisplay.value.length >= 24) {
+    if (currentDisplay.value && currentDisplay.value.length >= 28) {
+        return 'numpad-value-extra-small';
+    } else if (currentDisplay.value && currentDisplay.value.length >= 22) {
         return 'numpad-value-small';
     } else if (currentDisplay.value && currentDisplay.value.length >= 16) {
         return 'numpad-value-normal';
@@ -481,6 +483,10 @@ watch(() => props.flipNegative, (newValue) => {
     align-items: center;
     box-sizing: border-box;
     user-select: none;
+}
+
+.numpad-value-extra-small {
+    font-size: var(--ebk-numpad-value-extra-small-font-size);
 }
 
 .numpad-value-small {

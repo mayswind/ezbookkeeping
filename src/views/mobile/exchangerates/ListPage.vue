@@ -189,7 +189,9 @@ const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirect
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 const displayBaseAmount = computed<string>(() => formatAmountToLocalizedNumerals(baseAmount.value, baseCurrency.value));
 const baseAmountFontSizeClass = computed<string>(() => {
-    if (baseAmount.value >= 100000000 || baseAmount.value <= -100000000) {
+    if (baseAmount.value >= 10000000000 || baseAmount.value <= -10000000000) {
+        return 'ebk-extra-small-amount';
+    } else if (baseAmount.value >= 100000000 || baseAmount.value <= -100000000) {
         return 'ebk-small-amount';
     } else if (baseAmount.value >= 1000000 || baseAmount.value <= -1000000) {
         return 'ebk-normal-amount';

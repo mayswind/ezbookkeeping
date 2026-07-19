@@ -10,8 +10,9 @@
 
         <f7-list form strong inset dividers class="margin-vertical-half">
             <f7-list-item
-                class="ebk-small-amount"
+                class="amount-filter-amount"
                 link="#" no-chevron
+                :class="amountFontSizeClass"
                 :header="amount1Header"
                 :title="formatAmountToLocalizedNumeralsWithCurrency(amount1)"
                 @click="showAmount1Sheet = true"
@@ -24,8 +25,9 @@
             </f7-list-item>
 
             <f7-list-item
-                class="ebk-small-amount"
+                class="amount-filter-amount"
                 link="#" no-chevron
+                :class="amountFontSizeClass"
                 :header="amount2Header"
                 :title="formatAmountToLocalizedNumeralsWithCurrency(amount2)"
                 @click="showAmount2Sheet = true"
@@ -82,6 +84,14 @@ const { showToast } = useI18nUIComponents();
 const transactionsStore = useTransactionsStore();
 
 const amountCount = computed<number>(() => getAmountFilterParameterCount(type.value));
+
+const amountFontSizeClass = computed<string>(() => {
+    if (amount1.value >= 10000000000 || amount1.value <= -10000000000 || amount2.value >= 10000000000 || amount2.value <= -10000000000) {
+        return 'ebk-extra-small-amount';
+    } else {
+        return 'ebk-small-amount';
+    }
+});
 
 const amount1Header = computed<string>(() => {
     if (type.value === AmountFilterType.GreaterThan.type
@@ -167,3 +177,9 @@ function confirm(): void {
 
 init();
 </script>
+
+<style>
+.amount-filter-amount {
+    line-height: 46px;
+}
+</style>

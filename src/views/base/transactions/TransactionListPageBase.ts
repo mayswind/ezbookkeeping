@@ -424,8 +424,8 @@ export function useTransactionListPageBase() {
         return userDefaultCurrency.value;
     }
 
-    function getDisplayMonthTotalAmount(amount: number, currency: string | false, symbol: string, incomplete: boolean): string {
-        const displayAmount = formatAmountToLocalizedNumeralsWithCurrency(amount, currency);
+    function getDisplayMonthTotalAmount(amount: number, currency: string, symbol: string, incomplete: boolean, inDefaultCurrency?: boolean): string {
+        const displayAmount = formatAmount(amount, false, currency, inDefaultCurrency);
         return symbol + displayAmount + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
     }
 

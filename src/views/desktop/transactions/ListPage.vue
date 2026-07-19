@@ -165,6 +165,9 @@
                                                 </span>
                                                 <span class="text-income ms-2" v-else-if="!loading">
                                                     {{ currentMonthTotalAmount.income }}
+                                                    <v-tooltip activator="parent" v-if="!currentMonthTotalAmount.incomeIsZero && currentMonthTotalAmount.incomeInDefaultCurrency !== currentMonthTotalAmount.income">
+                                                        <span>{{ currentMonthTotalAmount.incomeInDefaultCurrency }}</span>
+                                                    </v-tooltip>
                                                 </span>
                                                 <span class="text-subtitle-1 ms-3">{{ queryAllFilterAccountIdsCount ? tt('Total Outflows') : tt('Total Expense') }}</span>
                                                 <span class="text-expense ms-2" v-if="loading">
@@ -172,6 +175,9 @@
                                                 </span>
                                                 <span class="text-expense ms-2" v-else-if="!loading">
                                                     {{ currentMonthTotalAmount.expense }}
+                                                    <v-tooltip activator="parent" v-if="!currentMonthTotalAmount.expenseIsZero && currentMonthTotalAmount.expenseInDefaultCurrency !== currentMonthTotalAmount.expense">
+                                                        <span>{{ currentMonthTotalAmount.expenseInDefaultCurrency }}</span>
+                                                    </v-tooltip>
                                                 </span>
                                             </div>
                                         </div>
@@ -828,8 +834,12 @@ type AIImageRecognitionDialogType = InstanceType<typeof AIImageRecognitionDialog
 type ImportDialogType = InstanceType<typeof ImportDialog>;
 
 interface TransactionListDisplayTotalAmount {
+    incomeIsZero: boolean;
+    expenseIsZero: boolean;
     income: string;
     expense: string;
+    incomeInDefaultCurrency: string;
+    expenseInDefaultCurrency: string;
 }
 
 const router = useRouter();
@@ -1137,10 +1147,16 @@ const currentMonthTotalAmount = computed<TransactionListDisplayTotalAmount | nul
             return null;
         }
 
-        return {
+        const displayMonthlyTotalAmount: TransactionListDisplayTotalAmount = {
+            incomeIsZero: transactionData.totalAmount.income === 0,
+            expenseIsZero: transactionData.totalAmount.expense === 0,
             income: getDisplayMonthTotalAmount(transactionData.totalAmount.income, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteIncome),
-            expense: getDisplayMonthTotalAmount(transactionData.totalAmount.expense, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteExpense)
+            expense: getDisplayMonthTotalAmount(transactionData.totalAmount.expense, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteExpense),
+            incomeInDefaultCurrency: getDisplayMonthTotalAmount(transactionData.totalAmount.income, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteIncome, true),
+            expenseInDefaultCurrency: getDisplayMonthTotalAmount(transactionData.totalAmount.expense, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteExpense, true)
         };
+
+        return displayMonthlyTotalAmount;
     } else {
         return null;
     }

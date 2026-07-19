@@ -109,6 +109,9 @@
                         </span>
                         <span class="text-primary ms-2" v-else-if="!loading">
                             {{ displayOpeningBalance }}
+                            <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
+                                <span>{{ displayOpeningBalanceInDefaultCurrency }}</span>
+                            </v-tooltip>
                         </span>
                         <span class="ms-3">{{ tt('Closing Balance') }}</span>
                         <span class="text-primary" v-if="loading">
@@ -116,6 +119,9 @@
                         </span>
                         <span class="text-primary ms-2" v-else-if="!loading">
                             {{ displayClosingBalance }}
+                            <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
+                                <span>{{ displayClosingBalanceInDefaultCurrency }}</span>
+                            </v-tooltip>
                         </span>
                     </div>
                     <v-spacer/>
@@ -126,6 +132,9 @@
                         </span>
                         <span class="text-income ms-2" v-else-if="!loading">
                             {{ displayTotalInflows }}
+                            <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
+                                <span>{{ displayTotalInflowsInDefaultCurrency }}</span>
+                            </v-tooltip>
                         </span>
                         <span class="ms-3">{{ tt('Total Outflows') }}</span>
                         <span class="text-expense" v-if="loading">
@@ -133,6 +142,9 @@
                         </span>
                         <span class="text-expense ms-2" v-else-if="!loading">
                             {{ displayTotalOutflows }}
+                            <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
+                                <span>{{ displayTotalOutflowsInDefaultCurrency }}</span>
+                            </v-tooltip>
                         </span>
                         <span class="ms-3">{{ tt('Net Cash Flow') }}</span>
                         <span class="text-primary" v-if="loading">
@@ -140,6 +152,9 @@
                         </span>
                         <span class="text-primary ms-2" v-else-if="!loading">
                             {{ displayTotalBalance }}
+                            <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
+                                <span>{{ displayTotalBalanceInDefaultCurrency }}</span>
+                            </v-tooltip>
                         </span>
                     </div>
                 </div>
@@ -205,6 +220,9 @@
                     </template>
                     <template #item.accountBalance="{ item }">
                         <span>{{ getDisplayAccountBalance(item) }}</span>
+                        <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
+                            <span>{{ getDisplayAccountBalance(item, true) }}</span>
+                        </v-tooltip>
                     </template>
                     <template #item.operation="{ item }">
                         <v-btn density="compact" variant="text" color="default" :disabled="loading || updatingLastReconciledTime || item.type === TransactionType.ModifyBalance"
@@ -378,10 +396,15 @@ const {
     displayStartDateTime,
     displayEndDateTime,
     displayTotalInflows,
+    displayTotalInflowsInDefaultCurrency,
     displayTotalOutflows,
+    displayTotalOutflowsInDefaultCurrency,
     displayTotalBalance,
+    displayTotalBalanceInDefaultCurrency,
     displayOpeningBalance,
+    displayOpeningBalanceInDefaultCurrency,
     displayClosingBalance,
+    displayClosingBalanceInDefaultCurrency,
     updatePageOpenTime,
     setReconciliationStatements,
     getDisplayTransactionType,

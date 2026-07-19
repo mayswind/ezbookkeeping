@@ -109,7 +109,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
             return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
         }
 
-        return formatNumberToLocalizedNumerals(value, 2);
+        return formatNumberToLocalizedNumerals(value, 4);
     }
 
     watch(() => props.items, () => {

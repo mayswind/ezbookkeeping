@@ -11,7 +11,18 @@
                 <v-row>
                     <v-col cols="12" md="12">
                         <div class="w-100 d-flex justify-center">
-                            <img alt="qrcode" class="img-url-qrcode" :src="mobileUrlQrCodePath" />
+                            <v-img alt="qrcode" class="img-url-qrcode" :src="mobileUrlQrCodePath">
+                                <template #placeholder>
+                                    <div class="d-flex align-center justify-center fill-height">
+                                        <v-progress-circular color="grey-500" indeterminate size="48"></v-progress-circular>
+                                    </div>
+                                </template>
+                                <template #error>
+                                    <div class="d-flex align-center justify-center fill-height">
+                                        <span class="text-body-1">{{ tt('Failed to load QR code') }}</span>
+                                    </div>
+                                </template>
+                            </v-img>
                         </div>
                     </v-col>
                 </v-row>

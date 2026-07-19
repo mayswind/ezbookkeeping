@@ -2729,6 +2729,7 @@
     "Unable to delete this user custom exchange rate": "このユーザー定義為替レートを削除できません",
     "Use on Mobile Device": "モバイルデバイスで使う",
     "You can scan the QR code below on your mobile device.": "以下のQRコードをモバイルデバイスでスキャンできます。",
+    "Failed to load QR code": "Failed to load QR code",
     "Switch to Mobile Version": "モバイルバージョンに切り替え",
     "Switch to Desktop Version": "デスクトップバージョンに切り替え",
     "Are you sure you want to switch to desktop version?": "デスクトップバージョンに切り替えますか？",

@@ -2729,6 +2729,7 @@
     "Unable to delete this user custom exchange rate": "無法刪除此使用者自訂匯率",
     "Use on Mobile Device": "在行動裝置使用",
     "You can scan the QR code below on your mobile device.": "您可以在您的行動裝置上掃描下方的 QR Code。",
+    "Failed to load QR code": "載入 QR Code 失敗",
     "Switch to Mobile Version": "切換到行動版",
     "Switch to Desktop Version": "切換到桌面版",
     "Are you sure you want to switch to desktop version?": "您確定要切換到桌面版？",

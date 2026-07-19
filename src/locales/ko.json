@@ -2729,6 +2729,7 @@
     "Unable to delete this user custom exchange rate": "이 사용자 정의 환율을 삭제할 수 없습니다.",
     "Use on Mobile Device": "모바일 장치에서 사용",
     "You can scan the QR code below on your mobile device.": "아래의 QR 코드를 모바일 장치에서 스캔할 수 있습니다.",
+    "Failed to load QR code": "Failed to load QR code",
     "Switch to Mobile Version": "모바일 버전으로 전환",
     "Switch to Desktop Version": "데스크톱 버전으로 전환",
     "Are you sure you want to switch to desktop version?": "데스크톱 버전으로 전환하시겠습니까?",

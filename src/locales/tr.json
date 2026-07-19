@@ -2729,6 +2729,7 @@
     "Unable to delete this user custom exchange rate": "Bu kullanıcı özel döviz kuru silinemedi",
     "Use on Mobile Device": "Mobil Cihazda Kullan",
     "You can scan the QR code below on your mobile device.": "Aşağıdaki QR kodunu mobil cihazınızda tarayabilirsiniz.",
+    "Failed to load QR code": "Failed to load QR code",
     "Switch to Mobile Version": "Mobil Sürüme Geç",
     "Switch to Desktop Version": "Masaüstü Sürüme Geç",
     "Are you sure you want to switch to desktop version?": "Masaüstü sürüme geçmek istediğinize emin misiniz?",

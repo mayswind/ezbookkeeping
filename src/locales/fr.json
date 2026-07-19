@@ -2729,6 +2729,7 @@
     "Unable to delete this user custom exchange rate": "Impossible de supprimer ce taux de change personnalisé utilisateur",
     "Use on Mobile Device": "Utiliser sur appareil mobile",
     "You can scan the QR code below on your mobile device.": "Vous pouvez scanner le code QR ci-dessous sur votre appareil mobile.",
+    "Failed to load QR code": "Failed to load QR code",
     "Switch to Mobile Version": "Passer à la version mobile",
     "Switch to Desktop Version": "Passer à la version bureau",
     "Are you sure you want to switch to desktop version?": "Êtes-vous sûr de vouloir passer à la version bureau ?",

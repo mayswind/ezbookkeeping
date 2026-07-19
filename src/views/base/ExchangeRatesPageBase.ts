@@ -5,6 +5,8 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+
 import type {
     LatestExchangeRate,
     LatestExchangeRateResponse,
@@ -55,6 +57,12 @@ export function useExchangeRatesPageBase() {
     function setAsBaseline(currency: string, amount: string): void {
         baseCurrency.value = currency;
         baseAmount.value = parseAmountFromWesternArabicNumerals(amount);
+
+        if (baseAmount.value < TRANSACTION_MIN_AMOUNT) {
+            baseAmount.value = TRANSACTION_MIN_AMOUNT;
+        } else if (baseAmount.value > TRANSACTION_MAX_AMOUNT) {
+            baseAmount.value = TRANSACTION_MAX_AMOUNT;
+        }
     }
 
     return {

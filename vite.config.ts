@@ -181,6 +181,7 @@ export default defineConfig(() => {
                 'firefox91',
                 'safari15.4'
             ],
+            minify: 'terser',
             outDir: BUILD_DIR,
             sourcemap: false,
             assetsInlineLimit: 0,

@@ -1,8 +1,10 @@
 package _default
 
 import (
+	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/assert"
 
@@ -466,6 +468,29 @@ func TestDefaultTransactionDataCSVFileConverterParseImportedData_ParseDescriptio
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "foo    bar\t#test", allNewTransactions[0].Comment)
+}
+
+func TestDefaultTransactionDataCSVFileConverterParseImportedData_TruncateLongDescription(t *testing.T) {
+	importer := DefaultTransactionDataCSVFileConverter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	// A description longer than the database comment limit. A multi-byte rune is used
+	// to ensure the truncation counts characters (runes), not bytes, and that a single
+	// overly long value does not abort the whole import with an opaque database error.
+	longDescription := strings.Repeat("ä", models.MaximumCommentLengthOfTransaction+45)
+
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte("Time,Type,Sub Category,Account,Amount,Account2,Account2 Amount,Description\n"+
+		"2024-09-01 12:34:56,Expense,Test Category,Test Account,123.45,,,"+longDescription), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, models.MaximumCommentLengthOfTransaction, utf8.RuneCountInString(allNewTransactions[0].Comment))
+	assert.Equal(t, strings.Repeat("ä", models.MaximumCommentLengthOfTransaction), allNewTransactions[0].Comment)
 }
 
 func TestDefaultTransactionDataCSVFileConverterParseImportedData_MissingFileHeader(t *testing.T) {

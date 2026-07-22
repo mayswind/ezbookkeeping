@@ -368,6 +368,12 @@ func (c *DataTableTransactionDataImporter) ParseImportedData(ctx core.Context, u
 			description = dataRow.GetData(datatable.TRANSACTION_DATA_TABLE_PAYEE)
 		}
 
+		// The comment column in the database has a fixed maximum length. Truncate an
+		// overly long description here so that a single long value (common in imported
+		// bank statement memos) does not make the whole import fail with an opaque
+		// database error.
+		description = utils.SubString(description, 0, models.MaximumCommentLengthOfTransaction)
+
 		transaction := &models.ImportTransaction{
 			Transaction: &models.Transaction{
 				Uid:                  user.Uid,

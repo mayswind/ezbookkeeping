@@ -13,6 +13,9 @@ import (
 const MaximumTagsCountOfTransaction = 10
 const MaximumPicturesCountOfTransaction = 10
 
+// MaximumCommentLengthOfTransaction represents the maximum length of transaction comment stored in database
+const MaximumCommentLengthOfTransaction = 255
+
 // TransactionType represents transaction type
 type TransactionType byte
 

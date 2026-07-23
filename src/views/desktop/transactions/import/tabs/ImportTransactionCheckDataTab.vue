@@ -302,12 +302,20 @@
             </div>
         </template>
         <template #item.comment="{ item }">
-            <span v-if="editingTransaction !== item">{{ item.comment || '' }}</span>
+            <template v-if="editingTransaction !== item">
+                <span v-if="!item.comment || item.comment.length <= TRANSACTION_MAX_COMMENT_LENGTH">{{ item.comment || '' }}</span>
+                <div class="text-error font-italic" v-else>
+                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
+                    <span>{{ item.comment }}</span>
+                </div>
+            </template>
             <div v-if="editingTransaction === item">
                 <v-text-field style="width: 200px" type="text"
                               density="compact" variant="plain"
                               persistent-placeholder
                               :placeholder="tt('Description')"
+                              :counter="TRANSACTION_MAX_COMMENT_LENGTH"
+                              :rules="[checkImportCommentLength]"
                               :disabled="!!disabled"
                               v-model="item.comment" />
             </div>
@@ -427,6 +435,8 @@ import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { ImportTransactionColumnType } from '@/core/import_transaction.ts';
+
+import { TRANSACTION_MAX_COMMENT_LENGTH } from '@/consts/transaction.ts';
 
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -1341,6 +1351,16 @@ function isTagValid(tagIds: string[], tagIndex: number): boolean {
 
     const tagId = tagIds[tagIndex];
     return !!allTagsMap.value[tagId];
+}
+
+function checkImportCommentLength(comment: string): boolean | string {
+    if (comment && comment.length > TRANSACTION_MAX_COMMENT_LENGTH) {
+        return tt('format.misc.charactersOverLimit', {
+            count: formatNumberToLocalizedNumerals(comment.length - TRANSACTION_MAX_COMMENT_LENGTH)
+        });
+    }
+
+    return true;
 }
 
 function getDisplayDateTime(transaction: ImportTransaction): string {

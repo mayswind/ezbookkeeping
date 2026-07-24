@@ -304,7 +304,8 @@
         <template #item.comment="{ item }">
             <template v-if="editingTransaction !== item">
                 <span v-if="!item.comment || item.comment.length <= TRANSACTION_MAX_COMMENT_LENGTH">{{ item.comment || '' }}</span>
-                <div class="text-error font-italic" v-else>
+                <div class="text-error font-italic" v-else-if="item.comment && item.comment.length > TRANSACTION_MAX_COMMENT_LENGTH">
+                    <v-tooltip activator="parent">{{ getTransactionDescriptionTooltip(item) }}</v-tooltip>
                     <v-icon class="me-1" :icon="mdiAlertOutline"/>
                     <span>{{ item.comment }}</span>
                 </div>
@@ -314,10 +315,12 @@
                               density="compact" variant="plain"
                               persistent-placeholder
                               :placeholder="tt('Description')"
-                              :counter="TRANSACTION_MAX_COMMENT_LENGTH"
-                              :rules="[checkImportCommentLength]"
                               :disabled="!!disabled"
-                              v-model="item.comment" />
+                              v-model="item.comment">
+                    <v-tooltip activator="parent" v-if="item.comment && item.comment.length > TRANSACTION_MAX_COMMENT_LENGTH">
+                        {{ getTransactionDescriptionTooltip(item) }}
+                    </v-tooltip>
+                </v-text-field>
             </div>
         </template>
         <template #bottom>
@@ -1353,16 +1356,6 @@ function isTagValid(tagIds: string[], tagIndex: number): boolean {
     return !!allTagsMap.value[tagId];
 }
 
-function checkImportCommentLength(comment: string): boolean | string {
-    if (comment && comment.length > TRANSACTION_MAX_COMMENT_LENGTH) {
-        return tt('format.misc.charactersOverLimit', {
-            count: formatNumberToLocalizedNumerals(comment.length - TRANSACTION_MAX_COMMENT_LENGTH)
-        });
-    }
-
-    return true;
-}
-
 function getDisplayDateTime(transaction: ImportTransaction): string {
     const dateTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset)
     return formatDateTimeToLongDateTime(dateTime);
@@ -1563,6 +1556,16 @@ function getCurrentInvalidTagNames(): NameValue[] {
     }
 
     return invalidTags;
+}
+
+function getTransactionDescriptionTooltip(transaction: ImportTransaction): string {
+    if (transaction.comment && transaction.comment.length > TRANSACTION_MAX_COMMENT_LENGTH) {
+        return tt('format.misc.charactersOverLimit', {
+            count: formatNumberToLocalizedNumerals(transaction.comment.length - TRANSACTION_MAX_COMMENT_LENGTH)
+        });
+    } else {
+        return '';
+    }
 }
 
 function getAllOriginalTagNames(): NameValue[] {

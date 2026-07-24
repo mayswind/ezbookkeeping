@@ -311,7 +311,7 @@
                 </div>
             </template>
             <div v-if="editingTransaction === item">
-                <v-text-field style="width: 200px" type="text"
+                <v-text-field style="width: calc(max(300px, 100%))" type="text"
                               density="compact" variant="plain"
                               persistent-placeholder
                               :placeholder="tt('Description')"
@@ -2351,10 +2351,23 @@ defineExpose({
     }
 }
 
-.import-transaction-table .v-autocomplete.v-input.v-input--density-compact:not(.v-textarea) .v-field__input,
-.import-transaction-table .v-select.v-input.v-input--density-compact:not(.v-textarea) .v-field__input {
-    min-height: inherit;
-    padding-top: 4px;
+.import-transaction-table .v-text-field.v-input.v-input--density-compact:not(.v-textarea),
+.import-transaction-table .v-autocomplete.v-input.v-input--density-compact:not(.v-textarea),
+.import-transaction-table .v-select.v-input.v-input--density-compact:not(.v-textarea) {
+    .v-field__input {
+        min-height: inherit;
+        padding-top: 4px;
+    }
+}
+
+.import-transaction-table .amount-input.v-input.v-input--density-compact {
+    .v-field__prepend-inner {
+        padding-top: 3px;
+    }
+
+    .v-field__input {
+        padding-inline-start: 0.2rem;
+    }
 }
 
 .import-transaction-table .v-chip.transaction-tag {

@@ -1,5 +1,5 @@
 <template>
-    <v-text-field type="text" class="text-field-with-colored-label" :class="extraClass"
+    <v-text-field type="text" class="amount-input text-field-with-colored-label" :class="extraClass"
                   :color="color" :base-color="color"
                   :density="density" :variant="variant" :autofocus="autofocus"
                   :readonly="!!readonly" :disabled="!!disabled"

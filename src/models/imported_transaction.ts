@@ -1,4 +1,5 @@
 import { TransactionType } from '@/core/transaction.ts';
+import { TRANSACTION_MAX_COMMENT_LENGTH } from '@/consts/transaction.ts';
 
 import type { TransactionCreateRequest, TransactionGeoLocationResponse } from './transaction.ts';
 
@@ -93,6 +94,10 @@ export class ImportTransaction implements ImportTransactionResponse {
                     return false;
                 }
             }
+        }
+
+        if (this.comment && this.comment.length > TRANSACTION_MAX_COMMENT_LENGTH) {
+            return false;
         }
 
         return true;

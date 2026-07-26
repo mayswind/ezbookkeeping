@@ -1,5 +1,40 @@
 import type { TypeAndName, TypeAndDisplayName } from '@/core/base.ts';
 
+export interface BigDecimal {
+    isZero(): boolean;
+    isFinite(): boolean;
+    isPositive(): boolean;
+    isNegative(): boolean;
+    isPositiveOrZero(): boolean;
+    isNegativeOrZero(): boolean;
+    isPositiveInfinity(): boolean;
+    isNegativeInfinity(): boolean;
+    isNaN(): boolean;
+    equals(other: BigDecimal | number | undefined): boolean;
+    notEquals(other: BigDecimal | number | undefined): boolean;
+    compareTo(other: BigDecimal | number): number;
+    greaterThan(other: BigDecimal | number): boolean;
+    greaterThanOrEqual(other: BigDecimal | number): boolean;
+    lessThan(other: BigDecimal | number): boolean;
+    lessThanOrEqual(other: BigDecimal | number): boolean;
+    between(min: BigDecimal | number, max: BigDecimal | number): boolean;
+    add(other: BigDecimal | number): BigDecimal;
+    subtract(other: BigDecimal | number): BigDecimal;
+    multiply(other: BigDecimal | number): BigDecimal;
+    divide(other: BigDecimal | number): BigDecimal;
+    negate(): BigDecimal;
+    sign(): BigDecimal;
+    pow(exponent: BigDecimal | number): BigDecimal;
+    sqrt(): BigDecimal;
+    log(): BigDecimal;
+    exp(): BigDecimal;
+    abs(): BigDecimal;
+    truncate(): BigDecimal;
+    toSafeIntegerNumber(): number;
+    toDoubleNumber(): number;
+    toString(): string;
+}
+
 export type HiddenAmount = '***';
 
 export interface NumberFormatOptions {
@@ -11,8 +46,8 @@ export interface NumberFormatOptions {
     readonly trimTailZero?: boolean;
 }
 
-export interface NumberWithSuffix {
-    readonly value: number;
+export interface BigDecimalWithSuffix {
+    readonly value: BigDecimal;
     readonly suffix: string;
 }
 
@@ -126,6 +161,22 @@ export class NumeralSystem implements TypeAndName {
         }
 
         return this.replaceWesternArabicDigitsToLocalizedDigits(value.toString(10));
+    }
+
+    public formatBigDecimal(value: BigDecimal): string {
+        if (!value) {
+            return '';
+        }
+
+        if (this.type === NumeralSystem.WesternArabicNumerals.type) {
+            return value.toString();
+        }
+
+        if (value.isZero()) {
+            return this.digitZero;
+        }
+
+        return this.replaceWesternArabicDigitsToLocalizedDigits(value.toString());
     }
 
     public replaceWesternArabicDigitsToLocalizedDigits(value: string): string {

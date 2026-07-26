@@ -10,14 +10,15 @@ import { useTheme } from 'vuetify';
 import type { ECElementEvent } from 'echarts/core';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 
-import { useI18n } from '@/locales/helpers.ts';
 import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase } from '@/components/base/PieChartBase.ts'
 
 import { itemAndIndex } from '@/core/base.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 
 import { getObjectOwnFieldCount } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 
 interface DesktopPieChartDataItem extends CommonPieChartDataItem {
     itemStyle: {
@@ -34,30 +35,11 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
-const { selectedIndex, validItems } = usePieChartBase(props);
+const { selectedIndex, validItems, allItemsMap } = usePieChartBase(props);
 
 const selectedLegends = ref<Record<string, boolean>>({});
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-
-const itemsMap = computed<Record<string, Record<string, unknown>>>(() => {
-    const map: Record<string, Record<string, unknown>> = {};
-
-    for (const item of props.items) {
-        let id = '';
-
-        if (props.idField && item[props.idField]) {
-            id = item[props.idField] as string;
-        } else {
-            id = item[props.nameField] as string;
-        }
-
-        map[id] = item;
-    }
-
-    return map;
-});
 
 const seriesData = computed<DesktopPieChartDataItem[]>(() => {
     const ret: DesktopPieChartDataItem[] = [];
@@ -86,9 +68,9 @@ const hasUnselectedItem = computed<boolean>(() => {
 });
 
 const firstItemAndHalfCurrentItemTotalPercent = computed<number>(() => {
-    let totalValue = 0;
-    let firstValue = null;
-    let firstToCurrentTotalValue = 0;
+    let totalValue: BigDecimal = BIG_DECIMAL_ZERO;
+    let firstValue: string | null = null;
+    let firstToCurrentTotalValue: BigDecimal = BIG_DECIMAL_ZERO;
 
     for (const [item, index] of itemAndIndex(validItems.value)) {
         if (getObjectOwnFieldCount(selectedLegends.value) && !selectedLegends.value[item.id]) {
@@ -101,17 +83,17 @@ const firstItemAndHalfCurrentItemTotalPercent = computed<number>(() => {
 
         if (firstValue !== null) {
             if (index < selectedIndex.value) {
-                firstToCurrentTotalValue += item.value;
+                firstToCurrentTotalValue = firstToCurrentTotalValue.add(parseBigDecimal(item.value));
             } else if (index === selectedIndex.value) {
-                firstToCurrentTotalValue += item.value / 2;
+                firstToCurrentTotalValue = firstToCurrentTotalValue.add(parseBigDecimal(item.value).divide(2));
             }
         }
 
-        totalValue += item.value;
+        totalValue = totalValue.add(parseBigDecimal(item.value));
     }
 
-    if (firstToCurrentTotalValue && totalValue > 0) {
-        return firstToCurrentTotalValue / totalValue;
+    if (firstToCurrentTotalValue && totalValue.isPositive()) {
+        return firstToCurrentTotalValue.divide(totalValue).toDoubleNumber();
     } else {
         return 0;
     }
@@ -128,9 +110,7 @@ const chartOptions = computed<object>(() => {
             },
             formatter: (params: CallbackDataParams) => {
                 const dataItem = params.data as DesktopPieChartDataItem;
-                const name = dataItem ? dataItem.displayName : '';
-                const value = dataItem ? dataItem.displayValue : formatAmountToLocalizedNumeralsWithCurrency(params.value as number);
-                let percent = dataItem ? dataItem.displayPercent : (params.percent + '%');
+                let percent = dataItem.displayPercent;
 
                 if (hasUnselectedItem.value) {
                     percent = params.percent + '%';
@@ -138,17 +118,17 @@ const chartOptions = computed<object>(() => {
 
                 let tooltip = `<div><span class="chart-pointer" style="background-color: ${params.color}"></span>`;
 
-                if (name) {
-                    tooltip += `<div class="d-inline-flex">${name}</div><br/>`;
+                if (dataItem.displayName) {
+                    tooltip += `<div class="d-inline-flex">${dataItem.displayName}</div><br/>`;
                 }
 
                 const showValue = props.showValue;
-                const showPercent = props.showPercent && params.value && (params.value as number) > 0;
+                const showPercent = props.showPercent && dataItem.originalValuePositive;
 
                 if (showValue && showPercent) {
-                    tooltip += `<div class="d-inline-flex"><span>${value}</span><span class="ms-1">(${percent})</span></div>`;
+                    tooltip += `<div class="d-inline-flex"><span>${dataItem.displayValue}</span><span class="ms-1">(${percent})</span></div>`;
                 } else if (showValue && !showPercent) {
-                    tooltip += `<div class="d-inline-flex">${value}</div>`;
+                    tooltip += `<div class="d-inline-flex">${dataItem.displayValue}</div>`;
                 } else if (!showValue && showPercent) {
                     tooltip += `<div class="d-inline-flex">${percent}</div>`;
                 }
@@ -167,10 +147,7 @@ const chartOptions = computed<object>(() => {
             textStyle: {
                 color: isDarkMode.value ? '#eee' : '#333'
             },
-            formatter: (id: string) => {
-                const item = itemsMap.value[id];
-                return item && props.nameField && item[props.nameField] ? item[props.nameField] as string : id;
-            }
+            formatter: (id: string) => allItemsMap.value[id]?.name ?? id
         },
         series: [
             {

@@ -66,7 +66,8 @@
                                              @click="addTransaction()"></v-list-item>
                                 <v-list-item :prepend-icon="mdiInvoiceTextEditOutline"
                                              :title="tt('Update Closing Balance')"
-                                             @click="updateClosingBalance()"></v-list-item>
+                                             @click="updateClosingBalance()"
+                                             v-if="canUpdateAccountCloseBalance"></v-list-item>
                                 <v-divider class="my-2"/>
                                 <v-list-item :prepend-icon="mdiComma"
                                              :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
@@ -327,13 +328,15 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import type { NameNumeralValue } from '@/core/base.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts'
 import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
-import { isEquals } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
@@ -391,6 +394,7 @@ const {
     currentAccountCurrency,
     currentAccountStatementDate,
     isCurrentLiabilityAccount,
+    canUpdateAccountCloseBalance,
     newLastReconciledTime,
     exportFileName,
     displayStartDateTime,
@@ -406,6 +410,7 @@ const {
     displayClosingBalance,
     displayClosingBalanceInDefaultCurrency,
     updatePageOpenTime,
+    isReconciliationStatementsResponseEquals,
     setReconciliationStatements,
     getDisplayTransactionType,
     getDisplayDateTime,
@@ -578,7 +583,7 @@ function reload(force: boolean): void {
         endTime: endTime.value
     }).then(result => {
         if (force) {
-            if (isEquals(reconciliationStatements.value, result)) {
+            if (isReconciliationStatementsResponseEquals(result)) {
                 snackbar.value?.showMessage('Data is up to date');
             } else {
                 snackbar.value?.showMessage('Data has been updated');
@@ -613,10 +618,15 @@ function addTransaction(): void {
 }
 
 function updateClosingBalance(): void {
-    let currentClosingBalance = reconciliationStatements.value?.closingBalance ?? 0;
+    let currentClosingBalance: BigDecimal = reconciliationStatements.value?.closingBalance ?? BIG_DECIMAL_ZERO;
 
     if (isCurrentLiabilityAccount.value) {
-        currentClosingBalance = -currentClosingBalance;
+        currentClosingBalance = currentClosingBalance.negate();
+    }
+
+    if (!currentClosingBalance.between(TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT)) {
+        snackbar.value?.showError('Numeric Overflow');
+        return;
     }
 
     amountInputDialog.value?.open({
@@ -624,7 +634,7 @@ function updateClosingBalance(): void {
         inputLabel: 'Closing Balance',
         inputPlaceholder: 'Closing Balance',
         currency: currentAccountCurrency.value,
-        initAmount: currentClosingBalance
+        initAmount: currentClosingBalance.toSafeIntegerNumber()
     }).then(newClosingBalance => {
         if (!newClosingBalance) {
             return;
@@ -640,17 +650,22 @@ function updateClosingBalance(): void {
         }
 
         let newTransactionType: TransactionType = isCurrentLiabilityAccount.value ? TransactionType.Expense : TransactionType.Income;
-        let newTransactionAmount: number = newClosingBalance - currentClosingBalance;
+        let newTransactionAmount: BigDecimal = parseBigDecimal(newClosingBalance).subtract(currentClosingBalance);
 
-        if (newTransactionAmount < 0) {
+        if (newTransactionAmount.isNegative()) {
             newTransactionType = isCurrentLiabilityAccount.value ? TransactionType.Income : TransactionType.Expense;
-            newTransactionAmount = -newTransactionAmount;
+            newTransactionAmount = newTransactionAmount.negate();
+        }
+
+        if (!newTransactionAmount.between(TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT)) {
+            snackbar.value?.showError('Numeric Overflow');
+            return;
         }
 
         editDialog.value?.open({
             time: newTransactionTime,
             type: newTransactionType,
-            amount: newTransactionAmount,
+            amount: newTransactionAmount.toSafeIntegerNumber(),
             accountId: accountId.value,
             noTransactionDraft: true
         }).then(result => {

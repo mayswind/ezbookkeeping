@@ -1,8 +1,12 @@
 import { keys, keysIfValueEquals, values } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
+
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
+
 import { type AccountBalance, type CategorizedAccount, Account } from '@/models/account.ts';
+
+import { parseBigDecimal } from '@/lib/numeral.ts';
 
 export function getCategorizedAccountsMap(allAccounts: Account[]): Record<number, CategorizedAccount> {
     const ret: Record<number, CategorizedAccount> = {};
@@ -153,7 +157,7 @@ export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number
 
             if (account.type === AccountType.SingleAccount.type) {
                 ret.push({
-                    balance: account.balance,
+                    balance: parseBigDecimal(account.balance),
                     isAsset: !!account.isAsset,
                     isLiability: !!account.isLiability,
                     currency: account.currency
@@ -165,7 +169,7 @@ export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number
                     }
 
                     ret.push({
-                        balance: subAccount.balance,
+                        balance: parseBigDecimal(subAccount.balance),
                         isAsset: !!subAccount.isAsset,
                         isLiability: !!subAccount.isLiability,
                         currency: subAccount.currency

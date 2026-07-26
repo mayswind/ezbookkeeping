@@ -1,5 +1,6 @@
 import { type NameValue } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
+import { ChartValueType } from '@/core/chart.ts';
 import { ChartSortingType } from '@/core/statistics.ts';
 
 export enum TransactionExplorerConditionRelation {
@@ -22,7 +23,6 @@ export const TransactionExplorerConditionRelationPriority: Record<TransactionExp
     [TransactionExplorerConditionRelation.OrSub]: 0,
     [TransactionExplorerConditionRelation.SubEnd]: 0
 };
-
 
 export enum TransactionExplorerConditionFieldType {
     Undefined = 'undefined',
@@ -320,57 +320,55 @@ export class TransactionExplorerValueMetric implements NameValue {
     private static readonly allInstances: TransactionExplorerValueMetric[] = [];
     private static readonly allInstancesByValue: Record<string, TransactionExplorerValueMetric> = {};
 
-    public static readonly TransactionCount = new TransactionExplorerValueMetric('Transaction Count', TransactionExplorerValueMetricType.TransactionCount, false, false, true);
-    public static readonly ActiveTransactionDays = new TransactionExplorerValueMetric('Active Transaction Days', TransactionExplorerValueMetricType.ActiveTransactionDays, false, false, true);
-    public static readonly TransactionsPerDay = new TransactionExplorerValueMetric('Transactions per Active Day', TransactionExplorerValueMetricType.TransactionsPerActiveDay, false, false, true);
-    public static readonly SourceAmountSum = new TransactionExplorerValueMetric('Total Amount', TransactionExplorerValueMetricType.SourceAmountSum, true, false, true);
-    public static readonly SourceIncomeAmountSum = new TransactionExplorerValueMetric('Total Income', TransactionExplorerValueMetricType.SourceIncomeAmountSum, true, false, true);
-    public static readonly SourceExpenseAmountSum = new TransactionExplorerValueMetric('Total Expense', TransactionExplorerValueMetricType.SourceExpenseAmountSum, true, false, true);
-    public static readonly SourceNetIncomeAmountSum = new TransactionExplorerValueMetric('Net Income', TransactionExplorerValueMetricType.SourceNetIncomeAmountSum, true, false, true);
-    public static readonly SrouceAmountExpenseIncomeRatio = new TransactionExplorerValueMetric('Expense / Income Ratio', TransactionExplorerValueMetricType.SrouceAmountExpenseIncomeRatio, false, true, false);
-    public static readonly SourceAmountSavingsRate = new TransactionExplorerValueMetric('Savings Rate', TransactionExplorerValueMetricType.SourceAmountSavingsRate, false, true, false);
-    public static readonly SourceAmountAverage = new TransactionExplorerValueMetric('Average Amount', TransactionExplorerValueMetricType.SourceAmountAverage, true, false, true);
-    public static readonly SourceAmountMedian = new TransactionExplorerValueMetric('Median Amount', TransactionExplorerValueMetricType.SourceAmountMedian, true, false, true);
-    public static readonly SourceAmountMinimum = new TransactionExplorerValueMetric('Minimum Amount', TransactionExplorerValueMetricType.SourceAmountMinimum, true, false, true);
-    public static readonly SourceAmountMaximum = new TransactionExplorerValueMetric('Maximum Amount', TransactionExplorerValueMetricType.SourceAmountMaximum, true, false, true);
-    public static readonly SourceAmountQ1Amount = new TransactionExplorerValueMetric('Q1 Amount (First Quartile)', TransactionExplorerValueMetricType.SourceAmountQ1Amount, true, false, true);
-    public static readonly SourceAmountQ3Amount = new TransactionExplorerValueMetric('Q3 Amount (Third Quartile)', TransactionExplorerValueMetricType.SourceAmountQ3Amount, true, false, true);
-    public static readonly SourceAmount10thPercentile = new TransactionExplorerValueMetric('10th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount10thPercentile, true, false, true);
-    public static readonly SourceAmount90thPercentile = new TransactionExplorerValueMetric('90th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount90thPercentile, true, false, true);
-    public static readonly SourceAmount95thPercentile = new TransactionExplorerValueMetric('95th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount95thPercentile, true, false, true);
-    public static readonly SourceAmount99thPercentile = new TransactionExplorerValueMetric('99th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount99thPercentile, true, false, true);
-    public static readonly SourceAmountRange = new TransactionExplorerValueMetric('Range (Max - Min)', TransactionExplorerValueMetricType.SourceAmountRange, true, false, true);
-    public static readonly SourceAmountInterquartileRange = new TransactionExplorerValueMetric('Interquartile Range (Q3 - Q1)', TransactionExplorerValueMetricType.SourceAmountInterquartileRange, true, false, true);
-    public static readonly SourceAmountMeanAbsoluteDeviation = new TransactionExplorerValueMetric('Mean Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMeanAbsoluteDeviation, true, false, false);
-    public static readonly SourceAmountMedianAbsoluteDeviation = new TransactionExplorerValueMetric('Median Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMedianAbsoluteDeviation, true, false, false);
-    public static readonly SourceAmountMedianToMeanRatio = new TransactionExplorerValueMetric('Median-to-Mean Ratio', TransactionExplorerValueMetricType.SourceAmountMedianToMeanRatio, false, false, false);
-    public static readonly SourceMaximumAmountShare = new TransactionExplorerValueMetric('Maximum Amount Share', TransactionExplorerValueMetricType.SourceMaximumAmountShare, false, true, false);
-    public static readonly SourceTop5AmountSum = new TransactionExplorerValueMetric('Top 5 Amount Sum', TransactionExplorerValueMetricType.SourceTop5AmountSum, true, false, true);
-    public static readonly SourceTop5AmountShare = new TransactionExplorerValueMetric('Top 5 Amount Share', TransactionExplorerValueMetricType.SourceTop5AmountShare, false, true, false);
-    public static readonly TransactionsForEightyPercentOfSourceAmount = new TransactionExplorerValueMetric('Transactions for 80% of Amount', TransactionExplorerValueMetricType.TransactionsForEightyPercentOfSourceAmount, false, true, false);
-    public static readonly SourceAmountOutlierCount = new TransactionExplorerValueMetric('Outlier Count', TransactionExplorerValueMetricType.SourceAmountOutlierCount, false, false, true);
-    public static readonly SourceAmountOutlierRatio = new TransactionExplorerValueMetric('Outlier Ratio', TransactionExplorerValueMetricType.SourceAmountOutlierRatio, false, true, false);
-    public static readonly SourceAmountVariance = new TransactionExplorerValueMetric('Variance', TransactionExplorerValueMetricType.SourceAmountVariance, false, false, false);
-    public static readonly SourceAmountStandardDeviation = new TransactionExplorerValueMetric('Standard Deviation', TransactionExplorerValueMetricType.SourceAmountStandardDeviation, false, false, false);
-    public static readonly SourceAmountCoefficientOfVariation = new TransactionExplorerValueMetric('Coefficient of Variation', TransactionExplorerValueMetricType.SourceAmountCoefficientOfVariation, false, false, false);
-    public static readonly SourceAmountSkewness = new TransactionExplorerValueMetric('Skewness', TransactionExplorerValueMetricType.SourceAmountSkewness, false, false, false);
-    public static readonly SourceAmountKurtosis = new TransactionExplorerValueMetric('Kurtosis', TransactionExplorerValueMetricType.SourceAmountKurtosis, false, false, false);
-    public static readonly SourceAmountGiniCoefficient = new TransactionExplorerValueMetric('Gini Coefficient', TransactionExplorerValueMetricType.SourceAmountGiniCoefficient, false, false, false);
-    public static readonly SourceAmountHerfindahlHirschmanIndex = new TransactionExplorerValueMetric('Herfindahl-Hirschman Index', TransactionExplorerValueMetricType.SourceAmountHerfindahlHirschmanIndex, false, false, false);
+    public static readonly TransactionCount = new TransactionExplorerValueMetric('Transaction Count', TransactionExplorerValueMetricType.TransactionCount, ChartValueType.Number, true);
+    public static readonly ActiveTransactionDays = new TransactionExplorerValueMetric('Active Transaction Days', TransactionExplorerValueMetricType.ActiveTransactionDays, ChartValueType.Number, true);
+    public static readonly TransactionsPerDay = new TransactionExplorerValueMetric('Transactions per Active Day', TransactionExplorerValueMetricType.TransactionsPerActiveDay, ChartValueType.Number, true);
+    public static readonly SourceAmountSum = new TransactionExplorerValueMetric('Total Amount', TransactionExplorerValueMetricType.SourceAmountSum, ChartValueType.Amount, true);
+    public static readonly SourceIncomeAmountSum = new TransactionExplorerValueMetric('Total Income', TransactionExplorerValueMetricType.SourceIncomeAmountSum, ChartValueType.Amount, true);
+    public static readonly SourceExpenseAmountSum = new TransactionExplorerValueMetric('Total Expense', TransactionExplorerValueMetricType.SourceExpenseAmountSum, ChartValueType.Amount, true);
+    public static readonly SourceNetIncomeAmountSum = new TransactionExplorerValueMetric('Net Income', TransactionExplorerValueMetricType.SourceNetIncomeAmountSum, ChartValueType.Amount, true);
+    public static readonly SrouceAmountExpenseIncomeRatio = new TransactionExplorerValueMetric('Expense / Income Ratio', TransactionExplorerValueMetricType.SrouceAmountExpenseIncomeRatio, ChartValueType.Percent, false);
+    public static readonly SourceAmountSavingsRate = new TransactionExplorerValueMetric('Savings Rate', TransactionExplorerValueMetricType.SourceAmountSavingsRate, ChartValueType.Percent, false);
+    public static readonly SourceAmountAverage = new TransactionExplorerValueMetric('Average Amount', TransactionExplorerValueMetricType.SourceAmountAverage, ChartValueType.Amount, true);
+    public static readonly SourceAmountMedian = new TransactionExplorerValueMetric('Median Amount', TransactionExplorerValueMetricType.SourceAmountMedian, ChartValueType.Amount, true);
+    public static readonly SourceAmountMinimum = new TransactionExplorerValueMetric('Minimum Amount', TransactionExplorerValueMetricType.SourceAmountMinimum, ChartValueType.Amount, true);
+    public static readonly SourceAmountMaximum = new TransactionExplorerValueMetric('Maximum Amount', TransactionExplorerValueMetricType.SourceAmountMaximum, ChartValueType.Amount, true);
+    public static readonly SourceAmountQ1Amount = new TransactionExplorerValueMetric('Q1 Amount (First Quartile)', TransactionExplorerValueMetricType.SourceAmountQ1Amount, ChartValueType.Amount, true);
+    public static readonly SourceAmountQ3Amount = new TransactionExplorerValueMetric('Q3 Amount (Third Quartile)', TransactionExplorerValueMetricType.SourceAmountQ3Amount, ChartValueType.Amount, true);
+    public static readonly SourceAmount10thPercentile = new TransactionExplorerValueMetric('10th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount10thPercentile, ChartValueType.Amount, true);
+    public static readonly SourceAmount90thPercentile = new TransactionExplorerValueMetric('90th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount90thPercentile, ChartValueType.Amount, true);
+    public static readonly SourceAmount95thPercentile = new TransactionExplorerValueMetric('95th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount95thPercentile, ChartValueType.Amount, true);
+    public static readonly SourceAmount99thPercentile = new TransactionExplorerValueMetric('99th Percentile Amount', TransactionExplorerValueMetricType.SourceAmount99thPercentile, ChartValueType.Amount, true);
+    public static readonly SourceAmountRange = new TransactionExplorerValueMetric('Range (Max - Min)', TransactionExplorerValueMetricType.SourceAmountRange, ChartValueType.Amount, true);
+    public static readonly SourceAmountInterquartileRange = new TransactionExplorerValueMetric('Interquartile Range (Q3 - Q1)', TransactionExplorerValueMetricType.SourceAmountInterquartileRange, ChartValueType.Amount, true);
+    public static readonly SourceAmountMeanAbsoluteDeviation = new TransactionExplorerValueMetric('Mean Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMeanAbsoluteDeviation, ChartValueType.Amount, false);
+    public static readonly SourceAmountMedianAbsoluteDeviation = new TransactionExplorerValueMetric('Median Absolute Deviation', TransactionExplorerValueMetricType.SourceAmountMedianAbsoluteDeviation, ChartValueType.Amount, false);
+    public static readonly SourceAmountMedianToMeanRatio = new TransactionExplorerValueMetric('Median-to-Mean Ratio', TransactionExplorerValueMetricType.SourceAmountMedianToMeanRatio, ChartValueType.Number, false);
+    public static readonly SourceMaximumAmountShare = new TransactionExplorerValueMetric('Maximum Amount Share', TransactionExplorerValueMetricType.SourceMaximumAmountShare, ChartValueType.Percent, false);
+    public static readonly SourceTop5AmountSum = new TransactionExplorerValueMetric('Top 5 Amount Sum', TransactionExplorerValueMetricType.SourceTop5AmountSum, ChartValueType.Amount, true);
+    public static readonly SourceTop5AmountShare = new TransactionExplorerValueMetric('Top 5 Amount Share', TransactionExplorerValueMetricType.SourceTop5AmountShare, ChartValueType.Percent, false);
+    public static readonly TransactionsForEightyPercentOfSourceAmount = new TransactionExplorerValueMetric('Transactions for 80% of Amount', TransactionExplorerValueMetricType.TransactionsForEightyPercentOfSourceAmount, ChartValueType.Percent, false);
+    public static readonly SourceAmountOutlierCount = new TransactionExplorerValueMetric('Outlier Count', TransactionExplorerValueMetricType.SourceAmountOutlierCount, ChartValueType.Number, true);
+    public static readonly SourceAmountOutlierRatio = new TransactionExplorerValueMetric('Outlier Ratio', TransactionExplorerValueMetricType.SourceAmountOutlierRatio, ChartValueType.Percent, false);
+    public static readonly SourceAmountVariance = new TransactionExplorerValueMetric('Variance', TransactionExplorerValueMetricType.SourceAmountVariance, ChartValueType.Number, false);
+    public static readonly SourceAmountStandardDeviation = new TransactionExplorerValueMetric('Standard Deviation', TransactionExplorerValueMetricType.SourceAmountStandardDeviation, ChartValueType.Number, false);
+    public static readonly SourceAmountCoefficientOfVariation = new TransactionExplorerValueMetric('Coefficient of Variation', TransactionExplorerValueMetricType.SourceAmountCoefficientOfVariation, ChartValueType.Number, false);
+    public static readonly SourceAmountSkewness = new TransactionExplorerValueMetric('Skewness', TransactionExplorerValueMetricType.SourceAmountSkewness, ChartValueType.Number, false);
+    public static readonly SourceAmountKurtosis = new TransactionExplorerValueMetric('Kurtosis', TransactionExplorerValueMetricType.SourceAmountKurtosis, ChartValueType.Number, false);
+    public static readonly SourceAmountGiniCoefficient = new TransactionExplorerValueMetric('Gini Coefficient', TransactionExplorerValueMetricType.SourceAmountGiniCoefficient, ChartValueType.Number, false);
+    public static readonly SourceAmountHerfindahlHirschmanIndex = new TransactionExplorerValueMetric('Herfindahl-Hirschman Index', TransactionExplorerValueMetricType.SourceAmountHerfindahlHirschmanIndex, ChartValueType.Number, false);
 
     public static readonly Default = TransactionExplorerValueMetric.SourceAmountSum;
 
     public readonly name: string;
     public readonly value: TransactionExplorerValueMetricType;
-    public readonly isAmount: boolean;
-    public readonly isPercent: boolean;
+    public readonly valueType: ChartValueType;
     public readonly supportSum: boolean;
 
-    private constructor(name: string, value: TransactionExplorerValueMetricType, isAmount: boolean, isPercent: boolean, supportSum: boolean) {
+    private constructor(name: string, value: TransactionExplorerValueMetricType, valueType: ChartValueType, supportSum: boolean) {
         this.name = name;
         this.value = value;
-        this.isAmount = isAmount;
-        this.isPercent = isPercent;
+        this.valueType = valueType;
         this.supportSum = supportSum;
 
         TransactionExplorerValueMetric.allInstances.push(this);

@@ -318,6 +318,13 @@
         "licenseUrl": "https://github.com/axios/axios/blob/v1.17.0/LICENSE"
     },
     {
+        "name": "decimal.js",
+        "copyright": "Copyright (c) 2025 Michael Mclaughlin",
+        "url": "https://github.com/MikeMcl/decimal.js",
+        "license": "MIT License",
+        "licenseUrl": "https://github.com/MikeMcl/decimal.js/blob/v10.6.0/LICENCE.md"
+    },
+    {
         "name": "Moment.js",
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",

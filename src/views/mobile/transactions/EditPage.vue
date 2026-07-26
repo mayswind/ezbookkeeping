@@ -70,7 +70,7 @@
                 link="#" no-chevron
                 :class="sourceAmountClass"
                 :header="sourceAmountTitle"
-                :title="getDisplayAmount(transaction.sourceAmount, transaction.hideAmount, sourceAccountCurrency)"
+                :title="getDisplayAmount(parseBigDecimal(transaction.sourceAmount), transaction.hideAmount, sourceAccountCurrency)"
                 @click="showSourceAmountSheet = true"
             >
                 <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
@@ -86,7 +86,7 @@
                 link="#" no-chevron
                 :class="destinationAmountClass"
                 :header="transferInAmountTitle"
-                :title="getDisplayAmount(transaction.destinationAmount, transaction.hideAmount, destinationAccountCurrency)"
+                :title="getDisplayAmount(parseBigDecimal(transaction.destinationAmount), transaction.hideAmount, destinationAccountCurrency)"
                 @click="showDestinationAmountSheet = true"
                 v-if="transaction.type === TransactionType.Transfer"
             >
@@ -558,6 +558,7 @@ import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_p
 import { Transaction } from '@/models/transaction.ts';
 
 import { isDefined } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import {
     getTimezoneOffset,
     getTimezoneOffsetMinutes,

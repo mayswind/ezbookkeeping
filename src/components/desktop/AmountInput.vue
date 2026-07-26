@@ -85,6 +85,7 @@ import { DEFAULT_DECIMAL_NUMBER_COUNT, AMOUNT_FACTOR } from '@/consts/numeral.ts
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 
 import { isNumber, replaceAll } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import { evaluateExpressionToAmount } from '@/lib/evaluator.ts';
 import type { ComponentDensity, InputVariant } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
@@ -290,7 +291,7 @@ function getInitedFormattedValue(value: number, flipNegative?: boolean): string 
 
 function getFormattedValue(value: number): string {
     if (!Number.isNaN(value) && Number.isFinite(value)) {
-        return formatAmountToLocalizedNumeralsWithoutDigitGrouping(value, props.currency);
+        return formatAmountToLocalizedNumeralsWithoutDigitGrouping(parseBigDecimal(value), props.currency);
     }
 
     return numeralSystem.value.digitZero;

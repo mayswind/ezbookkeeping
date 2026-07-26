@@ -35,12 +35,13 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { TextDirection } from '@/core/text.ts';
-import type { HiddenAmount } from '@/core/numeral.ts';
+import type { BigDecimal, HiddenAmount } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
 import { type TransactionMonthlyIncomeAndExpenseData } from '@/models/transaction.ts';
 
+import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
@@ -80,7 +81,7 @@ const hasAnyData = computed<boolean>(() => {
     }
 
     for (const item of props.data) {
-        if (item.incomeAmount > 0 || item.incomeAmount < 0 || item.expenseAmount > 0 || item.expenseAmount < 0) {
+        if (!item.incomeAmount.isZero() || !item.expenseAmount.isZero()) {
             return true;
         }
     }
@@ -90,10 +91,10 @@ const hasAnyData = computed<boolean>(() => {
 
 const chartOptions = computed<object>(() => {
     const monthNames: string[] = [];
-    const incomeAmounts: number[] = [];
-    const expenseAmounts: number[] = [];
-    let minAmount = 0;
-    let maxAmount = 0;
+    const incomeAmounts: string[] = [];
+    const expenseAmounts: string[] = [];
+    let minAmount: BigDecimal = BIG_DECIMAL_ZERO;
+    let maxAmount: BigDecimal = BIG_DECIMAL_ZERO;
 
     const expenseIncomeAmountColor = getExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor, props.isDarkMode);
 
@@ -103,28 +104,28 @@ const chartOptions = computed<object>(() => {
             const monthShortName = formatDateTimeToGregorianLikeShortMonth(monthStartDateTime);
 
             monthNames.push(monthShortName);
-            incomeAmounts.push(item.incomeAmount);
-            expenseAmounts.push(-item.expenseAmount);
+            incomeAmounts.push(item.incomeAmount.toString());
+            expenseAmounts.push(item.expenseAmount.negate().toString());
 
-            if (item.incomeAmount > maxAmount) {
+            if (item.incomeAmount.greaterThan(maxAmount)) {
                 maxAmount = item.incomeAmount;
             }
 
-            if (-item.expenseAmount > maxAmount) {
-                maxAmount = -item.expenseAmount;
+            if (item.expenseAmount.negate().greaterThan(maxAmount)) {
+                maxAmount = item.expenseAmount.negate();
             }
 
-            if (item.incomeAmount < minAmount) {
+            if (item.incomeAmount.lessThan(minAmount)) {
                 minAmount = item.incomeAmount;
             }
 
-            if (-item.expenseAmount < minAmount) {
-                minAmount = -item.expenseAmount;
+            if (item.expenseAmount.negate().lessThan(minAmount)) {
+                minAmount = item.expenseAmount.negate();
             }
         }
     }
 
-    const amountGap = maxAmount - minAmount;
+    const amountGap = maxAmount.subtract(minAmount);
 
     return {
         tooltip: {
@@ -164,17 +165,17 @@ const chartOptions = computed<object>(() => {
                     `<tbody>` +
                     (
                         incomeAmount !== null ?
-                        `<tr>` +
-                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-income me-1"></span><span class="me-4">${tt('Income')}</span></td>` +
-                        `<td><strong>${incomeAmount}</strong></td>` +
-                        `</tr>` : ''
+                            `<tr>` +
+                            `<td><span class="overview-monthly-chart-tooltip-indicator bg-income me-1"></span><span class="me-4">${tt('Income')}</span></td>` +
+                            `<td><strong>${incomeAmount}</strong></td>` +
+                            `</tr>` : ''
                     )+
                     (
                         expenseAmount !== null ?
-                        `<tr>` +
-                        `<td><span class="overview-monthly-chart-tooltip-indicator bg-expense me-1"></span><span class="me-4">${tt('Expense')}</span></td>` +
-                        `<td><strong>${expenseAmount}</strong></td>` +
-                        `</tr>` : ''
+                            `<tr>` +
+                            `<td><span class="overview-monthly-chart-tooltip-indicator bg-expense me-1"></span><span class="me-4">${tt('Expense')}</span></td>` +
+                            `<td><strong>${expenseAmount}</strong></td>` +
+                            `</tr>` : ''
                     ) +
                     `</tbody>` +
                     `</table>`;
@@ -215,8 +216,8 @@ const chartOptions = computed<object>(() => {
         yAxis: [
             {
                 type: 'value',
-                min: minAmount - amountGap / 20,
-                max: maxAmount,
+                min: minAmount.subtract(amountGap.divide(20)).toDoubleNumber(),
+                max: maxAmount.toDoubleNumber(),
                 splitNumber: 10,
                 axisLabel: {
                     show: false
@@ -227,8 +228,8 @@ const chartOptions = computed<object>(() => {
             },
             {
                 type: 'value',
-                min: minAmount,
-                max: maxAmount + amountGap / 20,
+                min: minAmount.toDoubleNumber(),
+                max: maxAmount.add(amountGap.divide(20)).toDoubleNumber(),
                 splitNumber: 10,
                 axisLabel: {
                     show: false
@@ -281,11 +282,11 @@ const chartOptions = computed<object>(() => {
     };
 });
 
-function getDisplayCurrency(value: number | HiddenAmount, currencyCode: string): string {
+function getDisplayCurrency(value: BigDecimal | HiddenAmount, currencyCode: string): string {
     return formatAmountToLocalizedNumeralsWithCurrency(value, currencyCode);
 }
 
-function getDisplayAmount(amount: number, incomplete: boolean): string {
+function getDisplayAmount(amount: BigDecimal, incomplete: boolean): string {
     if (!showAmountInHomePage.value) {
         return getDisplayCurrency(DISPLAY_HIDDEN_AMOUNT, defaultCurrency.value);
     }

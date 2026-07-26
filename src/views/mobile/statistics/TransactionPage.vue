@@ -67,31 +67,30 @@
             </f7-card-header>
             <f7-card-content class="pie-chart-container" style="margin-top: -6px" :padding="false">
                 <pie-chart
-                    :items="[{value: 60, color: '7c7c7f'}, {value: 20, color: 'a5a5aa'}, {value: 20, color: 'c5c5c9'}]"
+                    :items="[
+                        { name: '---', value: parseBigDecimal(60), color: '7c7c7f' },
+                        { name: '---', value: parseBigDecimal(20), color: 'a5a5aa' },
+                        { name: '---', value: parseBigDecimal(20), color: 'c5c5c9' }
+                    ]"
+                    :value-type="ChartValueType.Amount"
                     :skeleton="true"
                     :show-center-text="true"
                     :show-selected-item-info="true"
+                    :use-custom-color="true"
                     class="statistics-pie-chart"
-                    name-field="name"
-                    value-field="value"
-                    color-field="color"
                     center-text-background="#cccccc"
                     v-if="loading"
                 ></pie-chart>
                 <pie-chart
                     :items="categoricalAnalysisData.items"
+                    :value-type="ChartValueType.Amount"
                     :show-value="showAmountInChart"
                     :show-percent="showPercentInCategoricalChart"
                     :show-center-text="true"
                     :show-selected-item-info="true"
                     :enable-click-item="true"
-                    :amount-value="true"
                     :default-currency="defaultCurrency"
                     class="statistics-pie-chart"
-                    name-field="name"
-                    value-field="totalAmount"
-                    percent-field="percent"
-                    hidden-field="hidden"
                     v-else-if="!loading"
                     @click="onClickPieChartItem"
                 >
@@ -99,7 +98,7 @@
                         {{ totalAmountName }}
                     </text>
                     <text class="statistics-pie-chart-total-amount-value" v-if="categoricalAnalysisData.items && categoricalAnalysisData.items.length">
-                        {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency, 16) }}
+                        {{ getDisplayAmount(categoricalAnalysisData.value, defaultCurrency, 16) }}
                     </text>
                     <text class="statistics-pie-chart-total-no-data" cy="50%" v-if="!categoricalAnalysisData.items || !categoricalAnalysisData.items.length">
                         {{ tt('No data') }}
@@ -122,7 +121,7 @@
                 <div class="display-flex full-line">
                     <div :class="{ 'statistics-list-item-overview-amount': true, 'text-expense': query.chartDataType === ChartDataType.OutflowsByAccount.type || query.chartDataType === ChartDataType.ExpenseByAccount.type || query.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type || query.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type, 'text-income': query.chartDataType === ChartDataType.InflowsByAccount.type || query.chartDataType === ChartDataType.IncomeByAccount.type || query.chartDataType === ChartDataType.IncomeByPrimaryCategory.type || query.chartDataType === ChartDataType.IncomeBySecondaryCategory.type }">
                         <span v-if="!loading && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
-                            {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency) }}
+                            {{ getDisplayAmount(categoricalAnalysisData.value, defaultCurrency) }}
                         </span>
                         <span :class="{ 'skeleton-text': loading }" v-else-if="loading || !categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length">
                             {{ loading ? '***.**' : '---' }}
@@ -182,12 +181,12 @@
                         <template #title>
                             <div class="statistics-list-item-text">
                                 <span>{{ item.name }}</span>
-                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.totalAmount >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
+                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.value.isPositiveOrZero()">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
                             </div>
                         </template>
 
                         <template #after>
-                            <span>{{ getDisplayAmount(item.totalAmount, defaultCurrency) }}</span>
+                            <span>{{ getDisplayAmount(item.value, defaultCurrency) }}</span>
                         </template>
 
                         <template #inner-end>
@@ -225,14 +224,10 @@
                     :date-aggregation-type="trendDateAggregationType"
                     :fiscal-year-start="fiscalYearStart"
                     :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
+                    :value-type="ChartValueType.Amount"
                     :stacked="showStackedInTrendsChart"
                     :translate-name="translateNameInTrendsChart"
                     :default-currency="defaultCurrency"
-                    id-field="id"
-                    name-field="name"
-                    value-field="totalAmount"
-                    hidden-field="hidden"
-                    display-orders-field="displayOrders"
                     @click="onClickTrendChartItem"
                 />
             </f7-card-content>
@@ -261,14 +256,10 @@
                     :date-aggregation-type="assetTrendsDateAggregationType"
                     :fiscal-year-start="fiscalYearStart"
                     :items="assetTrendsData && assetTrendsData.items && assetTrendsData.items.length ? assetTrendsData.items : []"
+                    :value-type="ChartValueType.Amount"
                     :stacked="showStackedInTrendsChart"
                     :translate-name="translateNameInTrendsChart"
                     :default-currency="defaultCurrency"
-                    id-field="id"
-                    name-field="name"
-                    value-field="totalAmount"
-                    hidden-field="hidden"
-                    display-orders-field="displayOrders"
                     @click="onClickTrendChartItem"
                 />
             </f7-card-content>
@@ -413,6 +404,7 @@ import { useStatisticsStore } from '@/stores/statistics.ts';
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
 import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
+import { type CategoricalChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
 import {
     ChartDataAggregationType,
     StatisticsAnalysisType,
@@ -423,6 +415,7 @@ import {
 } from '@/core/statistics.ts';
 
 import { isString, isNumber } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import {
     getGregorianCalendarYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
@@ -882,8 +875,10 @@ function scrollPopoverToSelectedItem(event: { $el: Framework7Dom }): void {
     scrollToSelectedItem(event.$el[0], '.popover-inner', '.popover-inner', 'li.list-item-selected');
 }
 
-function onClickPieChartItem(item: Record<string, unknown>): void {
-    props.f7router.navigate(getTransactionItemLinkUrl(item['id'] as string));
+function onClickPieChartItem(item: CategoricalChartSourceDataItem): void {
+    if (item.id) {
+        props.f7router.navigate(getTransactionItemLinkUrl(item.id));
+    }
 }
 
 function onClickTrendChartItem(item: { itemId: string, dateRange: TimeRangeAndDateType }): void {

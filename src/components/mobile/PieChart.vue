@@ -13,7 +13,7 @@
                         :stroke-dasharray="getItemStrokeDash(item)"
                         :stroke-dashoffset="getItemDashOffset(item, validItems, itemCommonDashOffset)"
                         @click="switchSelectedIndex(idx)"
-                        v-if="item.actualValue > 0 && item.paintPercent > minPaintPercent">
+                        v-if="item.originalValuePositive && item.paintPercent > minPaintPercent">
                 </circle>
             </template>
 
@@ -45,7 +45,7 @@
                 </f7-link>
 
                 <div class="pie-chart-toolbox-info">
-                    <p v-if="showPercent && selectedItem && selectedItem.actualValue >= 0">
+                    <p v-if="showPercent && selectedItem && selectedItem.originalValuePositiveOrZero">
                         <f7-chip class="chip-placeholder" outline v-if="skeleton">
                             <span class="skeleton-text">Percent</span>
                         </f7-chip>
@@ -54,7 +54,7 @@
                                  :style="getColorStyle(selectedItem?.color, '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
-                    <p v-else-if="showPercent && (!validItems || !validItems.length || !selectedItem || selectedItem.actualValue < 0)">
+                    <p v-else-if="showPercent && (!validItems || !validItems.length || !selectedItem || !selectedItem.originalValuePositiveOrZero)">
                         <f7-chip outline text="---"></f7-chip>
                     </p>
                     <f7-link class="pie-chart-selected-item-info" :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
@@ -83,7 +83,11 @@ import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonPieChartDataItem, type CommonPieChartProps, usePieChartBase } from '@/components/base/PieChartBase.ts'
 
+import type { BigDecimal } from '@/core/numeral.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
+import type { CategoricalChartSourceDataItem } from '@/core/chart.ts';
+
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 
 interface MobilePieChartProps extends CommonPieChartProps {
     showCenterText?: boolean;
@@ -94,7 +98,7 @@ interface MobilePieChartProps extends CommonPieChartProps {
 const props = defineProps<MobilePieChartProps>();
 
 const emit = defineEmits<{
-    (e: 'click', value: Record<string, unknown>): void;
+    (e: 'click', value: CategoricalChartSourceDataItem): void;
 }>();
 
 const { tt } = useI18n();
@@ -104,12 +108,12 @@ const minPaintPercent = 0.0001; // 0.01%
 const diameter: number = 100;
 const circumference: number = diameter * Math.PI;
 
-const totalValidValue = computed<number>(() => {
-    let totalValidValue = 0;
+const totalValidValue = computed<BigDecimal>(() => {
+    let totalValidValue: BigDecimal = BIG_DECIMAL_ZERO;
 
     for (const item of validItems.value) {
-        if (item.actualValue > 0 && item.paintPercent > minPaintPercent) {
-            totalValidValue += item.value;
+        if (item.originalValuePositive && item.paintPercent > minPaintPercent) {
+            totalValidValue = totalValidValue.add(parseBigDecimal(item.value));
         }
     }
 
@@ -117,7 +121,7 @@ const totalValidValue = computed<number>(() => {
 });
 
 const itemCommonDashOffset = computed<number>(() => {
-    if (totalValidValue.value <= 0) {
+    if (totalValidValue.value.isNegativeOrZero()) {
         return 0;
     }
 
@@ -126,7 +130,7 @@ const itemCommonDashOffset = computed<number>(() => {
     for (let i = 0; i < Math.min(selectedIndex.value + 1, validItems.value.length); i++) {
         const item = validItems.value[i] as CommonPieChartDataItem;
 
-        if (item.actualValue > 0 && item.paintPercent > minPaintPercent) {
+        if (item.originalValuePositive && item.paintPercent > minPaintPercent) {
             if (i === selectedIndex.value) {
                 offset += -circumference * (1 - item.paintPercent) / 2;
             } else {

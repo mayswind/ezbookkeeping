@@ -2,6 +2,7 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import type { BigDecimal } from '@/core/numeral.ts';
 import {
     type DateTime,
     type UnixTimeRange,
@@ -17,6 +18,7 @@ import type { AccountInfoResponse } from '@/models/account.ts';
 import type { TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
 import { isArray } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import {
     mean,
     median,
@@ -41,9 +43,9 @@ import {
 } from '@/lib/statistics.ts';
 
 export interface AccountBalanceUnixTimeAndBalanceRange extends UnixTimeRange {
-    minUnixTimeOpeningBalance: number;
-    minUnixTimeClosingBalance: number;
-    maxUnixTimeClosingBalance: number;
+    minUnixTimeOpeningBalance: BigDecimal;
+    minUnixTimeClosingBalance: BigDecimal;
+    maxUnixTimeClosingBalance: BigDecimal;
 }
 
 export interface AccountBalanceTrendsChartItem {
@@ -51,14 +53,14 @@ export interface AccountBalanceTrendsChartItem {
     lastYearDateRangeKey: string;
     displayDate: string;
     alternativeDisplayDate: string;
-    openingBalance: number;
-    closingBalance: number;
-    minimumBalance: number;
-    maximumBalance: number;
-    medianBalance: number;
-    averageBalance: number;
-    q1Balance: number;
-    q3Balance: number;
+    openingBalance: BigDecimal;
+    closingBalance: BigDecimal;
+    minimumBalance: BigDecimal;
+    maximumBalance: BigDecimal;
+    medianBalance: BigDecimal;
+    averageBalance: BigDecimal;
+    q1Balance: BigDecimal;
+    q3Balance: BigDecimal;
 }
 
 export interface CommonAccountBalanceTrendsChartProps {
@@ -89,20 +91,20 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
         }
 
         let minUnixTime = Number.MAX_SAFE_INTEGER, maxUnixTime = 0;
-        let minUnixTimeOpeningBalance = 0;
-        let minUnixTimeClosingBalance = 0;
-        let maxUnixTimeClosingBalance = 0;
+        let minUnixTimeOpeningBalance: BigDecimal = BIG_DECIMAL_ZERO;
+        let minUnixTimeClosingBalance: BigDecimal = BIG_DECIMAL_ZERO;
+        let maxUnixTimeClosingBalance: BigDecimal = BIG_DECIMAL_ZERO;
 
         for (const item of props.items) {
             if (item.time < minUnixTime) {
                 minUnixTime = item.time;
-                minUnixTimeOpeningBalance = item.accountOpeningBalance;
-                minUnixTimeClosingBalance = item.accountClosingBalance;
+                minUnixTimeOpeningBalance = parseBigDecimal(item.accountOpeningBalance);
+                minUnixTimeClosingBalance = parseBigDecimal(item.accountClosingBalance);
             }
 
             if (item.time > maxUnixTime) {
                 maxUnixTime = item.time;
-                maxUnixTimeClosingBalance = item.accountClosingBalance;
+                maxUnixTimeClosingBalance = parseBigDecimal(item.accountClosingBalance);
             }
         }
 
@@ -181,14 +183,14 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
             dayDataItemsMap[displayDate] = dataItems;
         }
 
-        let lastOpeningBalance = dataDateRange.value.minUnixTimeOpeningBalance;
-        let lastClosingBalance = dataDateRange.value.minUnixTimeClosingBalance;
-        let lastMinimumBalance = lastClosingBalance;
-        let lastMaximumBalance = lastClosingBalance;
-        let lastMedianBalance = lastClosingBalance;
-        let lastAverageBalance = lastClosingBalance;
-        let lastQ1Balance = lastClosingBalance;
-        let lastQ3Balance = lastClosingBalance;
+        let lastOpeningBalance: BigDecimal = dataDateRange.value.minUnixTimeOpeningBalance;
+        let lastClosingBalance: BigDecimal = dataDateRange.value.minUnixTimeClosingBalance;
+        let lastMinimumBalance: BigDecimal = lastClosingBalance;
+        let lastMaximumBalance: BigDecimal = lastClosingBalance;
+        let lastMedianBalance: BigDecimal = lastClosingBalance;
+        let lastAverageBalance: BigDecimal = lastClosingBalance;
+        let lastQ1Balance: BigDecimal = lastClosingBalance;
+        let lastQ3Balance: BigDecimal = lastClosingBalance;
 
         for (const dateRange of allDateRanges.value) {
             const minDateTime = parseDateTimeFromUnixTime(dateRange.minUnixTime);
@@ -227,20 +229,17 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                     return data1.time - data2.time;
                 });
 
-                const allDataItemsSortedByClosingBalance = Array.from(dataItems)
-                    .sort(function (data1: TransactionReconciliationStatementResponseItem, data2: TransactionReconciliationStatementResponseItem) {
-                        return data1.accountClosingBalance - data2.accountClosingBalance;
-                    }
-                );
+                const allSortedClosingBalances: BigDecimal[] = dataItems.map(item => parseBigDecimal(item.accountClosingBalance))
+                    .sort((a: BigDecimal, b: BigDecimal) => a.compareTo(b));
 
-                const openingBalance = dataItems[0]!.accountOpeningBalance;
-                const closingBalance = dataItems[dataItems.length - 1]!.accountClosingBalance;
-                const minimumBalance = allDataItemsSortedByClosingBalance[0]!.accountClosingBalance;
-                const maximumBalance = allDataItemsSortedByClosingBalance[allDataItemsSortedByClosingBalance.length - 1]!.accountClosingBalance;
-                const medianBalance = Math.trunc(median(allDataItemsSortedByClosingBalance, item => item.accountClosingBalance));
-                const averageBalance = Math.trunc(mean(dataItems, item => item.accountClosingBalance));
-                const q1Balance = Math.trunc(percentile(allDataItemsSortedByClosingBalance, 0.25, item => item.accountClosingBalance));
-                const q3Balance = Math.trunc(percentile(allDataItemsSortedByClosingBalance, 0.75, item => item.accountClosingBalance));
+                const openingBalance = parseBigDecimal(dataItems[0]!.accountOpeningBalance);
+                const closingBalance = parseBigDecimal(dataItems[dataItems.length - 1]!.accountClosingBalance);
+                const minimumBalance = allSortedClosingBalances[0]!;
+                const maximumBalance = allSortedClosingBalances[allSortedClosingBalances.length - 1]!;
+                const medianBalance = median(allSortedClosingBalances, item => item).truncate();
+                const averageBalance = mean(allSortedClosingBalances, item => item).truncate();
+                const q1Balance = percentile(allSortedClosingBalances, 0.25, item => item).truncate();
+                const q3Balance = percentile(allSortedClosingBalances, 0.75, item => item).truncate();
 
                 if (props.account.isAsset) {
                     lastOpeningBalance = openingBalance;
@@ -252,14 +251,14 @@ export function useAccountBalanceTrendsChartBase(props: CommonAccountBalanceTren
                     lastQ1Balance = q1Balance;
                     lastQ3Balance = q3Balance;
                 } else if (props.account.isLiability) {
-                    lastOpeningBalance = -openingBalance;
-                    lastClosingBalance = -closingBalance;
-                    lastMinimumBalance = -minimumBalance;
-                    lastMaximumBalance = -maximumBalance;
-                    lastMedianBalance = -medianBalance;
-                    lastAverageBalance = -averageBalance;
-                    lastQ1Balance = -q1Balance;
-                    lastQ3Balance = -q3Balance;
+                    lastOpeningBalance = openingBalance.negate();
+                    lastClosingBalance = closingBalance.negate();
+                    lastMinimumBalance = minimumBalance.negate();
+                    lastMaximumBalance = maximumBalance.negate();
+                    lastMedianBalance = medianBalance.negate();
+                    lastAverageBalance = averageBalance.negate();
+                    lastQ1Balance = q1Balance.negate();
+                    lastQ3Balance = q3Balance.negate();
                 } else {
                     lastOpeningBalance = openingBalance;
                     lastClosingBalance = closingBalance;

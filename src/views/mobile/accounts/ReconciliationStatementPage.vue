@@ -333,7 +333,7 @@
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
                 <f7-actions-button :class="{ 'disabled': loading || updatingLastReconciledTime }" @click="addTransaction()">{{ tt('Add Transaction') }}</f7-actions-button>
-                <f7-actions-button :class="{ 'disabled': loading || updatingLastReconciledTime }" @click="updateClosingBalance(undefined)">{{ tt('Update Closing Balance') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': loading || updatingLastReconciledTime }" @click="updateClosingBalance(undefined)" v-if="canUpdateAccountCloseBalance">{{ tt('Update Closing Balance') }}</f7-actions-button>
                 <f7-actions-button :class="{ 'disabled': loading || updatingLastReconciledTime }" @click="updateLastReconciledTime()" v-if="newLastReconciledTime">{{ tt('Mark as Reconciled') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -371,6 +371,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { TextDirection } from '@/core/text.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
 import { type TimeRangeAndDateType, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -378,7 +379,8 @@ import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE } from '@/core/st
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { type TransactionReconciliationStatementResponseItemWithInfo } from '@/models/transaction.ts';
 
-import { isDefined, isEquals, findDisplayNameByType } from '@/lib/common.ts';
+import { isDefined, findDisplayNameByType } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import {
     getCurrentUnixTime,
     getDateTypeByDateRange,
@@ -428,6 +430,7 @@ const {
     allDateAggregationTypes,
     allTimezoneTypesUsedForDateRange,
     isCurrentLiabilityAccount,
+    canUpdateAccountCloseBalance,
     newLastReconciledTime,
     currentAccount,
     currentAccountCurrency,
@@ -441,6 +444,7 @@ const {
     displayOpeningBalance,
     displayClosingBalance,
     updatePageOpenTime,
+    isReconciliationStatementsResponseEquals,
     setReconciliationStatements,
     getDisplayDate,
     getDisplayTime,
@@ -616,7 +620,7 @@ function reload(force: boolean): void {
         endTime: endTime.value
     }).then(result => {
         if (force) {
-            if (isEquals(reconciliationStatements.value, result)) {
+            if (isReconciliationStatementsResponseEquals(result)) {
                 showToast('Data is up to date');
             } else {
                 showToast('Data has been updated');
@@ -647,14 +651,19 @@ function editTransaction(transaction: TransactionReconciliationStatementResponse
 }
 
 function updateClosingBalance(balance?: number): void {
-    let currentClosingBalance = reconciliationStatements.value?.closingBalance ?? 0;
+    let currentClosingBalance: BigDecimal = reconciliationStatements.value?.closingBalance ?? BIG_DECIMAL_ZERO;
 
     if (isCurrentLiabilityAccount.value) {
-        currentClosingBalance = -currentClosingBalance;
+        currentClosingBalance = currentClosingBalance.negate();
     }
 
     if (!isDefined(balance)) {
-        newClosingBalance.value = currentClosingBalance;
+        if (!currentClosingBalance.between(TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT)) {
+            showToast('Numeric Overflow');
+            return;
+        }
+
+        newClosingBalance.value = currentClosingBalance.toSafeIntegerNumber();
         showNewClosingBalanceSheet.value = true;
         return;
     }
@@ -672,11 +681,16 @@ function updateClosingBalance(balance?: number): void {
     }
 
     let newTransactionType: TransactionType = isCurrentLiabilityAccount.value ? TransactionType.Expense : TransactionType.Income;
-    let newTransactionAmount: number = balance - currentClosingBalance;
+    let newTransactionAmount: BigDecimal = parseBigDecimal(balance).subtract(currentClosingBalance);
 
-    if (newTransactionAmount < 0) {
+    if (newTransactionAmount.isNegative()) {
         newTransactionType = isCurrentLiabilityAccount.value ? TransactionType.Income : TransactionType.Expense;
-        newTransactionAmount = -newTransactionAmount;
+        newTransactionAmount = newTransactionAmount.negate();
+    }
+
+    if (!newTransactionAmount.between(TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT)) {
+        showToast('Numeric Overflow');
+        return;
     }
 
     const params: string[] = [];
@@ -686,7 +700,7 @@ function updateClosingBalance(balance?: number): void {
     }
 
     params.push(`type=${newTransactionType}`);
-    params.push(`amount=${newTransactionAmount}`);
+    params.push(`amount=${newTransactionAmount.toSafeIntegerNumber()}`);
     params.push(`accountId=${accountId.value}`);
     params.push(`noTransactionDraft=true`);
 

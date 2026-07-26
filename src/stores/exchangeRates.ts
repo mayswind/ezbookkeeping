@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import { useSettingsStore } from './setting.ts';
 
 import { type BeforeResolveFunction, itemAndIndex } from '@/core/base.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
 
 import type {
     UserCustomExchangeRateUpdateResponse,
@@ -300,9 +301,9 @@ export const useExchangeRatesStore = defineStore('exchangeRates', () => {
         });
     }
 
-    function getExchangedAmount(amount: number, fromCurrency: string, toCurrency: string): number | null {
-        if (amount === 0) {
-            return 0;
+    function getExchangedAmount(amount: BigDecimal, fromCurrency: string, toCurrency: string): BigDecimal | null {
+        if (amount.isZero()) {
+            return amount;
         }
 
         if (!latestExchangeRates.value || !latestExchangeRates.value.data || !latestExchangeRates.value.data.exchangeRates) {

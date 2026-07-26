@@ -14,17 +14,28 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 
 import { itemAndIndex } from '@/core/base.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
 import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { type AxisChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
 
 import { isArray, isString, isNumber } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal, isBigDecimal } from '@/lib/numeral.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 
 export type HierarchyChartDisplayType = 'treemap' | 'sunburst';
 
+interface HierarchyData {
+    data: HierarchyDataItem[];
+    totalAmount: BigDecimal;
+}
+
 interface HierarchyDataItem {
     name: string;
-    value: number;
+    value: number; // only used for echarts calculation, the actual value is originalValue
+    originalValue: string;
+    parentName?: string;
+    parentOrginalValue?: string;
     categoryIndex?: number;
     seriesIndex?: number;
     children?: HierarchyDataItem[];
@@ -41,14 +52,10 @@ const props = defineProps<{
     enableClickItem?: boolean;
     categoryTypeName: string;
     allCategoryNames: string[];
-    items: Record<string, unknown>[];
-    nameField: string;
-    valuesField: string;
-    colorField?: string;
-    hiddenField?: string;
+    items: AxisChartSourceDataItem[];
+    valueType: ChartValueType;
     translateName?: boolean;
-    amountValue?: boolean;
-    percentValue?: boolean;
+    useCustomColor?: boolean;
     defaultCurrency?: string;
 }>();
 
@@ -60,11 +67,10 @@ const theme = useTheme();
 
 const {
     tt,
-    formatAmountToLocalizedNumeralsWithCurrency,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
-    formatNumberToLocalizedNumerals,
-    formatNumberToWesternArabicNumeralsWithoutDigitGrouping,
-    formatPercentToLocalizedNumerals
+    formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping,
+    formatPercentToLocalizedNumerals,
+    formatChartValueToLocalizedNumerals
 } = useI18n();
 
 const settingsStore = useSettingsStore();
@@ -88,36 +94,40 @@ const finalClass = computed<string>(() => {
     return finalClass;
 });
 
-const hierarchyData = computed<HierarchyDataItem[]>(() => {
+const hierarchyData = computed<HierarchyData>(() => {
     const ret: HierarchyDataItem[] = [];
+    let totalAmount: BigDecimal = BIG_DECIMAL_ZERO;
 
     for (const [item, seriesIndex] of itemAndIndex(props.items)) {
-        if (props.hiddenField && item[props.hiddenField]) {
+        if (item.hidden) {
             continue;
         }
 
-        if (!isArray(item[props.valuesField])) {
+        if (!isArray(item.values)) {
             continue;
         }
 
-        const color: ColorStyleValue = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : chartColors.value[seriesIndex % chartColors.value.length]);
+        const color: ColorStyleValue = getDisplayColor(props.useCustomColor && item.color ? item.color : chartColors.value[seriesIndex % chartColors.value.length]);
 
         const hierarchyItem: HierarchyDataItem = {
-            name: getItemName(item[props.nameField] as string),
+            name: props.translateName ? tt(item.name) : item.name,
             value: 0,
+            originalValue: '0',
             children: [],
             itemStyle: {
                 color: color
             }
         };
 
-        const allAmounts: number[] = item[props.valuesField] as number[];
+        const allAmounts: BigDecimal[] = item.values;
+        let childrenTotalAmount: BigDecimal = BIG_DECIMAL_ZERO;
 
         for (const [amount, categoryIndex] of itemAndIndex(allAmounts)) {
-            hierarchyItem.value += amount;
+            childrenTotalAmount = childrenTotalAmount.add(amount);
             hierarchyItem.children?.push({
                 name: props.allCategoryNames[categoryIndex] ?? '',
-                value: amount,
+                value: amount.toDoubleNumber(),
+                originalValue: amount.toString(),
                 categoryIndex: categoryIndex,
                 seriesIndex: seriesIndex,
                 itemStyle: {
@@ -126,10 +136,28 @@ const hierarchyData = computed<HierarchyDataItem[]>(() => {
             });
         }
 
+        hierarchyItem.value = childrenTotalAmount.toDoubleNumber();
+        hierarchyItem.originalValue = childrenTotalAmount.toString();
+
+        for (const child of hierarchyItem.children ?? []) {
+            child.parentName = hierarchyItem.name;
+            child.parentOrginalValue = hierarchyItem.originalValue;
+        }
+
+        totalAmount = totalAmount.add(childrenTotalAmount);
         ret.push(hierarchyItem);
     }
 
-    return ret;
+    for (const item of ret) {
+        item.parentOrginalValue = totalAmount.toString();
+    }
+
+    const hierarchyData: HierarchyData = {
+        data: ret,
+        totalAmount: totalAmount
+    };
+
+    return hierarchyData;
 });
 
 const chartOptions = computed<object>(() => {
@@ -140,7 +168,7 @@ const chartOptions = computed<object>(() => {
         right: 20,
         top: 0,
         bottom: 20,
-        data: hierarchyData.value,
+        data: hierarchyData.value.data,
         levels: [
             {
                 itemStyle: {
@@ -176,31 +204,31 @@ const chartOptions = computed<object>(() => {
             textStyle: {
                 color: isDarkMode.value ? '#eee' : '#333'
             },
-            formatter: (params: CallbackDataParams & { treePathInfo: { name: string, value: number }[] }) => {
+            formatter: (params: CallbackDataParams) => {
                 if (!props.showValue || !params.name) {
                     return '';
                 }
 
-                const rootValue = params.treePathInfo.length > 0 ? params.treePathInfo[0]?.value : 0;
-                const parentName = params.treePathInfo.length > 1 ? params.treePathInfo[params.treePathInfo.length - 2]?.name : undefined;
-                const parentValue = params.treePathInfo.length > 1 ? params.treePathInfo[params.treePathInfo.length - 2]?.value : undefined;
-                const parentDisplayValue = isNumber(parentValue) ? getDisplayValue(parentValue) : undefined;
-                const parentPercent = isNumber(parentValue) && isNumber(rootValue) && rootValue > 0 ? formatPercentToLocalizedNumerals(100.0 * parentValue / rootValue, 2, '<0.01') : undefined;
+                const dataItem = params.data as HierarchyDataItem;
+                const rootValue: BigDecimal = hierarchyData.value.totalAmount;
+                const parentName: string | undefined = dataItem.parentName;
+                const parentValue: BigDecimal | undefined = isString(dataItem.parentOrginalValue) ? parseBigDecimal(dataItem.parentOrginalValue) : undefined;
+                const parentDisplayValue: string | undefined = isBigDecimal(parentValue) ? formatChartValueToLocalizedNumerals(parentValue, props.valueType, props.defaultCurrency) : undefined;
+                const parentDisplayPercent: string | undefined = isBigDecimal(parentValue) && isBigDecimal(rootValue) && rootValue.isPositive() ? formatPercentToLocalizedNumerals(parentValue.divide(rootValue).multiply(100).toDoubleNumber(), 2, '<0.01') : undefined;
 
                 const name = params.name;
-                const displayValue = isNumber(params.value) ? getDisplayValue(params.value) : '';
-                const percent = isNumber(params.value) && isNumber(parentValue) && parentValue > 0 ? formatPercentToLocalizedNumerals(100.0 * params.value / parentValue, 2, '<0.01') : undefined;
-
+                const displayValue = isString(dataItem.originalValue) ? formatChartValueToLocalizedNumerals(parseBigDecimal(dataItem.originalValue), props.valueType, props.defaultCurrency) : '';
+                const displayPercent = isString(dataItem.originalValue) && isBigDecimal(parentValue) && parentValue.isPositive() ? formatPercentToLocalizedNumerals(parseBigDecimal(dataItem.originalValue).divide(parentValue).multiply(100).toDoubleNumber(), 2, '<0.01') : undefined;
 
                 let tooltip = `<tr><td><span class="chart-pointer" style="background-color: ${params.color}"></span><span>${name}</span></td>`
                     + `<td><span class="ms-5">${displayValue}</span>`
-                    + (isString(percent) ? `<span class="ms-1">(${percent})</span>` : '')
+                    + (isString(displayPercent) ? `<span class="ms-1">(${displayPercent})</span>` : '')
                     + `</td></tr>`;
 
-                if (isString(parentName) && isString(parentDisplayValue) && parentValue !== rootValue) {
+                if (isString(parentName) && isString(parentDisplayValue) && parentValue?.notEquals(rootValue)) {
                     tooltip = `<tr><td><span class="chart-pointer" style="background-color: ${params.color}"></span><span>${parentName}</span></td>`
                         + `<td><span class="ms-5">${parentDisplayValue}</span>`
-                        + (isString(parentPercent) ? `<span class="ms-1">(${parentPercent})</span>` : '')
+                        + (isString(parentDisplayPercent) ? `<span class="ms-1">(${parentDisplayPercent})</span>` : '')
                         + `</td></tr>`
                         + tooltip;
                 }
@@ -212,22 +240,6 @@ const chartOptions = computed<object>(() => {
         series: [ seriesOptions ]
     };
 });
-
-function getItemName(name: string): string {
-    return props.translateName ? tt(name) : name;
-}
-
-function getDisplayValue(value: number): string {
-    if (props.percentValue) {
-        return formatPercentToLocalizedNumerals(value, 2, '<0.01');
-    }
-
-    if (props.amountValue) {
-        return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
-    }
-
-    return formatNumberToLocalizedNumerals(value, 4);
-}
 
 function clickItem(e: ECElementEvent): void {
     if (!props.enableClickItem || e.componentType !== 'series' || !e.data) {
@@ -251,15 +263,15 @@ function exportData(): { headers: string[], data: string[][] } {
         headers.push(categoryName);
     }
 
-    for (const item of hierarchyData.value) {
+    for (const item of hierarchyData.value.data) {
         const row: string[] = [];
         row.push(item.name);
 
         for (const child of item.children ?? []) {
-            if (props.amountValue) {
-                row.push(formatAmountToWesternArabicNumeralsWithoutDigitGrouping(child.value, props.defaultCurrency));
+            if (props.valueType === ChartValueType.Amount) {
+                row.push(formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(child.value), props.defaultCurrency));
             } else {
-                row.push(formatNumberToWesternArabicNumeralsWithoutDigitGrouping(child.value));
+                row.push(formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(child.value)));
             }
         }
 

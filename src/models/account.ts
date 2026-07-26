@@ -1,4 +1,4 @@
-import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
+import type { BigDecimal, HiddenAmount, BigDecimalWithSuffix } from '@/core/numeral.ts';
 import type { ColorValue } from '@/core/color.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
@@ -658,14 +658,14 @@ export interface AccountDeleteRequest {
 }
 
 export interface AccountBalance {
-    readonly balance: number;
+    readonly balance: BigDecimal;
     readonly isAsset: boolean;
     readonly isLiability: boolean;
     readonly currency: string;
 }
 
 export interface AccountDisplayBalance {
-    readonly balance: number | HiddenAmount | NumberWithSuffix;
+    readonly balance: BigDecimal | HiddenAmount | BigDecimalWithSuffix;
     readonly currency: string;
 }
 

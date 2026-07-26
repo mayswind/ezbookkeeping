@@ -19,8 +19,8 @@
                                     <template #title>
                                         <small>{{ currentLongYearMonth }}</small>
                                         <small class="transaction-amount-statistics">
-                                            <span class="text-income">{{ `+${formatAmountToLocalizedNumeralsWithCurrency(12345)}` }}</span>
-                                            <span class="text-expense">{{ `-${formatAmountToLocalizedNumeralsWithCurrency(67890)}` }}</span>
+                                            <span class="text-income">{{ `+${formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(12345))}` }}</span>
+                                            <span class="text-expense">{{ `-${formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(67890))}` }}</span>
                                         </small>
                                         <f7-icon class="combination-list-chevron-icon" f7="chevron_up"></f7-icon>
                                     </template>
@@ -53,7 +53,7 @@
                                                 </div>
                                                 <div class="item-after">
                                                     <div class="transaction-amount">
-                                                        <span>{{ formatAmountToLocalizedNumeralsWithCurrency(12345) }}</span>
+                                                        <span>{{ formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(12345)) }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -126,6 +126,8 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { TextDirection } from '@/core/text.ts';
 import { type DateTime } from '@/core/datetime.ts';
 import { FontSize } from '@/core/font.ts';
+
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentDateTime } from '@/lib/datetime.ts';
 import { setAppFontSize, getFontSizePreviewClassName } from '@/lib/ui/mobile.ts';
 

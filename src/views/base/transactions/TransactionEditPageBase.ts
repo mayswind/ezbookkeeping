@@ -10,7 +10,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
-import type { NumeralSystem } from '@/core/numeral.ts';
+import type { BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
 import { ImageUploadQualityType } from '@/core/image.ts';
@@ -33,6 +33,7 @@ import {
 } from '@/lib/common.ts';
 
 import {
+    parseBigDecimal,
     getExchangedAmountByRate
 } from '@/lib/numeral.ts';
 
@@ -231,13 +232,13 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             return amountName;
         }
 
-        let amountInDefaultCurrency = getExchangedAmountByRate(transaction.value.sourceAmount, fromExchangeRate.rate, toExchangeRate.rate);
+        let amountInDefaultCurrency = getExchangedAmountByRate(parseBigDecimal(transaction.value.sourceAmount), fromExchangeRate.rate, toExchangeRate.rate);
 
         if (!amountInDefaultCurrency) {
             return amountName;
         }
 
-        amountInDefaultCurrency = Math.trunc(amountInDefaultCurrency);
+        amountInDefaultCurrency = amountInDefaultCurrency.truncate();
 
         const displayAmountInDefaultCurrency = getDisplayAmount(amountInDefaultCurrency, transaction.value.hideAmount, defaultCurrency.value);
         return amountName + ` (${displayAmountInDefaultCurrency})`;
@@ -496,7 +497,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         }
     }
 
-    function getDisplayAmount(amount: number, hideAmount: boolean, currencyCode: string): string {
+    function getDisplayAmount(amount: BigDecimal, hideAmount: boolean, currencyCode: string): string {
         if (hideAmount) {
             return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, currencyCode);
         }

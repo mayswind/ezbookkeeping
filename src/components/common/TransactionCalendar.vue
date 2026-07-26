@@ -38,6 +38,7 @@ import type { CalendarAlternateDate, TextualYearMonthDay, WeekDayValue } from '@
 import { INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
 import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import { getYearMonthDayDateTime } from '@/lib/datetime.ts';
 
 const props = defineProps<{
@@ -102,7 +103,7 @@ function noTransactionInMonthDay(date: Date): boolean {
 }
 
 function getDisplayMonthTotalAmount(amount: number, currency: string | false, symbol: string, incomplete: boolean): string {
-    const displayAmount = formatAmountToLocalizedNumeralsWithCurrency(amount, currency);
+    const displayAmount = formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(amount), currency);
     return symbol + displayAmount + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
 }
 

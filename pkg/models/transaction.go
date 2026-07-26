@@ -166,8 +166,8 @@ type TransactionCreateRequest struct {
 	UtcOffset            int16                          `json:"utcOffset" binding:"min=-720,max=840"`
 	SourceAccountId      int64                          `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId int64                          `json:"destinationAccountId,string" binding:"min=0"`
-	SourceAmount         int64                          `json:"sourceAmount" binding:"min=-9999999999999,max=9999999999999"`
-	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-9999999999999,max=9999999999999"`
+	SourceAmount         int64                          `json:"sourceAmount" binding:"min=-999999999999999,max=999999999999999"`
+	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-999999999999999,max=999999999999999"`
 	HideAmount           bool                           `json:"hideAmount"`
 	TagIds               []string                       `json:"tagIds"`
 	PictureIds           []string                       `json:"pictureIds"`
@@ -185,8 +185,8 @@ type TransactionModifyRequest struct {
 	UtcOffset            int16                          `json:"utcOffset" binding:"min=-720,max=840"`
 	SourceAccountId      int64                          `json:"sourceAccountId,string" binding:"required,min=1"`
 	DestinationAccountId int64                          `json:"destinationAccountId,string" binding:"min=0"`
-	SourceAmount         int64                          `json:"sourceAmount" binding:"min=-9999999999999,max=9999999999999"`
-	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-9999999999999,max=9999999999999"`
+	SourceAmount         int64                          `json:"sourceAmount" binding:"min=-999999999999999,max=999999999999999"`
+	DestinationAmount    int64                          `json:"destinationAmount" binding:"min=-999999999999999,max=999999999999999"`
 	HideAmount           bool                           `json:"hideAmount"`
 	TagIds               []string                       `json:"tagIds"`
 	PictureIds           []string                       `json:"pictureIds"`
@@ -441,17 +441,17 @@ type TransactionInfoPageWrapperResponse2 struct {
 // TransactionReconciliationStatementResponseItem represents a transaction reconciliation statement response
 type TransactionReconciliationStatementResponseItem struct {
 	*TransactionInfoResponse
-	AccountOpeningBalance int64 `json:"accountOpeningBalance"`
-	AccountClosingBalance int64 `json:"accountClosingBalance"`
+	AccountOpeningBalance int64 `json:"accountOpeningBalance,string"`
+	AccountClosingBalance int64 `json:"accountClosingBalance,string"`
 }
 
 // TransactionReconciliationStatementResponse represents the response of all transaction reconciliation statement response
 type TransactionReconciliationStatementResponse struct {
 	Transactions   []*TransactionReconciliationStatementResponseItem `json:"transactions"`
-	TotalInflows   int64                                             `json:"totalInflows"`
-	TotalOutflows  int64                                             `json:"totalOutflows"`
-	OpeningBalance int64                                             `json:"openingBalance"`
-	ClosingBalance int64                                             `json:"closingBalance"`
+	TotalInflows   int64                                             `json:"totalInflows,string"`
+	TotalOutflows  int64                                             `json:"totalOutflows,string"`
+	OpeningBalance int64                                             `json:"openingBalance,string"`
+	ClosingBalance int64                                             `json:"closingBalance,string"`
 }
 
 // TransactionStatisticResponse represents transaction statistic response
@@ -467,7 +467,7 @@ type TransactionStatisticResponseItem struct {
 	AccountId          int64                         `json:"accountId,string"`
 	RelatedAccountId   int64                         `json:"relatedAccountId,string,omitempty"`
 	RelatedAccountType TransactionRelatedAccountType `json:"relatedAccountType,omitempty"`
-	TotalAmount        int64                         `json:"amount"`
+	TotalAmount        int64                         `json:"amount,string"`
 }
 
 // TransactionStatisticTrendsResponseItem represents the data within each statistic interval
@@ -488,8 +488,8 @@ type TransactionStatisticAssetTrendsResponseItem struct {
 // TransactionStatisticAssetTrendsResponseDataItem represents an asset trends data item
 type TransactionStatisticAssetTrendsResponseDataItem struct {
 	AccountId             int64 `json:"accountId,string"`
-	AccountOpeningBalance int64 `json:"accountOpeningBalance"`
-	AccountClosingBalance int64 `json:"accountClosingBalance"`
+	AccountOpeningBalance int64 `json:"accountOpeningBalance,string"`
+	AccountClosingBalance int64 `json:"accountClosingBalance,string"`
 }
 
 // TransactionAmountsResponseItem represents an item of transaction amounts
@@ -509,8 +509,8 @@ type TransactionMonthAmountsResponseItem struct {
 // TransactionAmountsResponseItemAmountInfo represents amount info for a response item
 type TransactionAmountsResponseItemAmountInfo struct {
 	Currency      string `json:"currency"`
-	IncomeAmount  int64  `json:"incomeAmount"`
-	ExpenseAmount int64  `json:"expenseAmount"`
+	IncomeAmount  int64  `json:"incomeAmount,string"`
+	ExpenseAmount int64  `json:"expenseAmount,string"`
 }
 
 // ParseTransactionTagFilter parses transaction tag filter from string

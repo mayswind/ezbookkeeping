@@ -15,7 +15,7 @@ import type {
     TransactionAmountsRequestType,
     TransactionAmountsRequestParams,
     TransactionAmountsResponse,
-    TransactionOverviewResponse
+    TransactionOverviewData
 } from '@/models/transaction.ts';
 import { ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE } from '@/models/transaction.ts';
 
@@ -26,6 +26,10 @@ import {
     isObjectEmpty,
     objectFieldWithValueToArrayItem
 } from '@/lib/common.ts';
+import {
+    BIG_DECIMAL_ZERO,
+    parseBigDecimal
+} from '@/lib/numeral.ts';
 import {
     getUnixTimeBeforeUnixTime,
     getTodayFirstUnixTime,
@@ -125,22 +129,22 @@ export const useOverviewStore = defineStore('overview', () => {
     const transactionOverviewData = ref<TransactionAmountsResponse>({});
     const transactionOverviewStateInvalid = ref<boolean>(true);
 
-    const transactionOverview = computed<TransactionOverviewResponse>(() => {
+    const transactionOverview = computed<TransactionOverviewData>(() => {
         const overviewData = transactionOverviewData.value;
 
         if (!overviewData || !overviewData.thisMonth) {
             return {
                 thisMonth: {
                     valid: false,
-                    incomeAmount: 0,
-                    expenseAmount: 0,
+                    incomeAmount: BIG_DECIMAL_ZERO,
+                    expenseAmount: BIG_DECIMAL_ZERO,
                     incompleteIncomeAmount: false,
                     incompleteExpenseAmount: false
                 }
-            } as TransactionOverviewResponse;
+            } as TransactionOverviewData;
         }
 
-        const finalOverviewData: TransactionOverviewResponse = {};
+        const finalOverviewData: TransactionOverviewData = {};
         const defaultCurrency = userStore.currentUserDefaultCurrency;
 
         ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE.forEach(field => {
@@ -150,31 +154,31 @@ export const useOverviewStore = defineStore('overview', () => {
                 return;
             }
 
-            let totalIncomeAmount = 0;
-            let totalExpenseAmount = 0;
+            let totalIncomeAmount = BIG_DECIMAL_ZERO;
+            let totalExpenseAmount = BIG_DECIMAL_ZERO;
             let hasUnCalculatedTotalIncome = false;
             let hasUnCalculatedTotalExpense = false;
 
             if (item.amounts) {
                 for (const amount of item.amounts) {
                     if (amount.currency !== defaultCurrency) {
-                        const incomeAmount = exchangeRatesStore.getExchangedAmount(amount.incomeAmount, amount.currency, defaultCurrency);
-                        const expenseAmount = exchangeRatesStore.getExchangedAmount(amount.expenseAmount, amount.currency, defaultCurrency);
+                        const incomeAmount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(amount.incomeAmount), amount.currency, defaultCurrency);
+                        const expenseAmount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(amount.expenseAmount), amount.currency, defaultCurrency);
 
-                        if (isNumber(incomeAmount)) {
-                            totalIncomeAmount += Math.trunc(incomeAmount);
+                        if (incomeAmount) {
+                            totalIncomeAmount = totalIncomeAmount.add(incomeAmount.truncate());
                         } else {
                             hasUnCalculatedTotalIncome = true;
                         }
 
-                        if (isNumber(expenseAmount)) {
-                            totalExpenseAmount += Math.trunc(expenseAmount);
+                        if (expenseAmount) {
+                            totalExpenseAmount = totalExpenseAmount.add(expenseAmount.truncate());
                         } else {
                             hasUnCalculatedTotalExpense = true;
                         }
                     } else {
-                        totalIncomeAmount += amount.incomeAmount;
-                        totalExpenseAmount += amount.expenseAmount;
+                        totalIncomeAmount = totalIncomeAmount.add(parseBigDecimal(amount.incomeAmount));
+                        totalExpenseAmount = totalExpenseAmount.add(parseBigDecimal(amount.expenseAmount));
                     }
                 }
             }

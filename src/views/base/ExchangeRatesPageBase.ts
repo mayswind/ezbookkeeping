@@ -5,6 +5,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import type { BigDecimal } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 
 import type {
@@ -13,7 +14,12 @@ import type {
     LocalizedLatestExchangeRate
 } from '@/models/exchange_rate.ts';
 
-import { getExchangedAmountByRate } from '@/lib/numeral.ts';
+import {
+    BIG_DECIMAL_ZERO,
+    parseBigDecimal,
+    getExchangedAmountByRate
+} from '@/lib/numeral.ts';
+
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 
 export function useExchangeRatesPageBase() {
@@ -42,16 +48,16 @@ export function useExchangeRatesPageBase() {
         return getAllDisplayExchangeRates(exchangeRatesData.value);
     });
 
-    function getConvertedAmount(baseAmount: number | '', fromExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate, toExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate): number | '' | null {
+    function getConvertedAmount(baseAmount: number | '', fromExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate, toExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate): BigDecimal | '' | null {
         if (!fromExchangeRate || !toExchangeRate) {
             return '';
         }
 
         if (baseAmount === '') {
-            return 0;
+            return BIG_DECIMAL_ZERO;
         }
 
-        return getExchangedAmountByRate(baseAmount as number, fromExchangeRate.rate, toExchangeRate.rate);
+        return getExchangedAmountByRate(parseBigDecimal(baseAmount as number), fromExchangeRate.rate, toExchangeRate.rate);
     }
 
     function setAsBaseline(currency: string, amount: string): void {

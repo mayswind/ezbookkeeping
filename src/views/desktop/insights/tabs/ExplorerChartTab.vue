@@ -89,28 +89,22 @@
     <v-card-text :class="{ 'readonly': loading }" v-if="currentExploration.chartType === TransactionExplorerChartType.Pie.value">
         <pie-chart
             :items="[
-                {id: '1', name: '---', value: 60, color: '7c7c7f'},
-                {id: '2', name: '---', value: 20, color: 'a5a5aa'},
-                {id: '3', name: '---', value: 20, color: 'c5c5c9'}
+                { id: '1', name: '---', value: parseBigDecimal(60), color: '7c7c7f' },
+                { id: '2', name: '---', value: parseBigDecimal(20), color: 'a5a5aa' },
+                { id: '3', name: '---', value: parseBigDecimal(20), color: 'c5c5c9' }
             ]"
+            :value-type="ChartValueType.Amount"
             :skeleton="true"
-            id-field="id"
-            name-field="name"
-            value-field="value"
-            color-field="color"
+            :use-custom-color="true"
             v-if="loading"
         />
         <pie-chart
             :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
+            :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
             :show-value="true"
             :show-percent="true"
             :enable-click-item="true"
-            :amount-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isAmount"
-            :percent-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isPercent"
             :default-currency="defaultCurrency"
-            id-field="id"
-            name-field="name"
-            value-field="totalAmount"
             v-else-if="!loading"
             @click="onClickPieChartItem"
         />
@@ -118,27 +112,23 @@
     <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExploration.chartType === TransactionExplorerChartType.Radar.value">
         <radar-chart
             :items="[
-                {name: '---', value: 10},
-                {name: '---', value: 10},
-                {name: '---', value: 10},
-                {name: '---', value: 10},
-                {name: '---', value: 10},
-                {name: '---', value: 10}
+                { name: '---', value: 10 },
+                { name: '---', value: 10 },
+                { name: '---', value: 10 },
+                { name: '---', value: 10 },
+                { name: '---', value: 10 },
+                { name: '---', value: 10 }
             ]"
+            :value-type="ChartValueType.Amount"
             :skeleton="true"
-            name-field="name"
-            value-field="value"
             v-if="loading"
         />
         <radar-chart
             :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
+            :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
             :show-value="true"
             :show-percent="true"
-            :amount-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isAmount"
-            :percent-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isPercent"
             :default-currency="defaultCurrency"
-            name-field="name"
-            value-field="totalAmount"
             v-else-if="!loading"
         />
     </v-card-text>
@@ -149,9 +139,8 @@
             :sorting-type="currentExploration.chartSortingType"
             :all-category-names="[]"
             :items="[]"
+            :value-type="ChartValueType.Amount"
             category-type-name=""
-            name-field="name"
-            values-field="values"
             v-if="loading"
         />
         <axis-chart
@@ -166,17 +155,12 @@
             :category-type-name="currentTransactionExplorerCategoryDimensionName"
             :all-category-names="categoriedNamesSortedByDisplayOrder"
             :items="seriesDimensionTransactionExplorerData"
-            :amount-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isAmount"
-            :percent-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isPercent"
+            :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
             :default-currency="defaultCurrency"
             :enable-click-item="true"
             :tooltip-extra-column-names="axisChartTooltipExtraColumnNames"
             :tooltip-extra-column-total-values="axisChartShowYearOverYear || axisChartShowPeriodOverPeriod ? getAxisChartTooltipExtraColumnTotalValues : undefined"
             :tooltip-extra-column-values="axisChartShowYearOverYear || axisChartShowPeriodOverPeriod ? getAxisChartTooltipExtraColumnValues : undefined"
-            id-field="id"
-            name-field="name"
-            values-field="categoryValues"
-            display-orders-field="displayOrders"
             @click="onClickTrendChartItem"
             v-else-if="!loading"
         />
@@ -187,9 +171,8 @@
             :type="hierarchyChartDisplayType"
             :all-category-names="[]"
             :items="[]"
+            :value-type="ChartValueType.Amount"
             category-type-name=""
-            name-field="name"
-            values-field="values"
             v-if="loading"
         />
         <hierarchy-chart
@@ -200,11 +183,8 @@
             :category-type-name="currentTransactionExplorerCategoryDimensionName"
             :all-category-names="categoriedNamesSortedByDisplayOrder"
             :items="seriesDimensionTransactionExplorerData"
-            :amount-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isAmount"
-            :percent-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isPercent"
+            :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
             :default-currency="defaultCurrency"
-            name-field="name"
-            values-field="categoryValues"
             v-else-if="!loading"
             @click="onClickHierarchyChartItem"
         />
@@ -214,10 +194,9 @@
             :skeleton="true"
             :all-category-names="[]"
             :items="[]"
+            :value-type="ChartValueType.Amount"
             :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.name ?? 'Value')"
             category-type-name=""
-            name-field="name"
-            values-field="values"
             v-if="loading"
         />
         <heat-map-chart
@@ -227,12 +206,9 @@
             :category-type-name="currentTransactionExplorerCategoryDimensionName"
             :all-category-names="categoriedNamesSortedByDisplayOrder"
             :items="seriesDimensionTransactionExplorerData"
+            :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
             :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.name ?? 'Value')"
-            :amount-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isAmount"
-            :percent-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isPercent"
             :default-currency="defaultCurrency"
-            name-field="name"
-            values-field="categoryValues"
             v-else-if="!loading"
             @click="onClickHeatmapChartItem"
         />
@@ -241,21 +217,17 @@
         <calendar-heat-map-chart
             :skeleton="true"
             :items="[]"
+            :value-type="ChartValueType.Amount"
             :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.name ?? 'Value')"
-            id-field="id"
-            value-field="totalAmount"
             v-if="loading"
         />
         <calendar-heat-map-chart
             :show-value="true"
             :enable-click-item="true"
             :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
+            :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
             :value-type-name="tt(TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.name ?? 'Value')"
-            :amount-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isAmount"
-            :percent-value="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.isPercent"
             :default-currency="defaultCurrency"
-            id-field="id"
-            value-field="totalAmount"
             v-else-if="!loading"
             @click="onClickCalendarHeatmapChartItem"
         />
@@ -278,15 +250,16 @@ import { useUserStore } from '@/stores/user.ts';
 import {
     type CategoriedInfo,
     type CategoriedTransactionExplorerData,
-    type SeriesInfo,
     type CategoriedTransactionExplorerDataItem,
+    type SeriesInfo,
     TransactionExplorerDimensionType,
     useExplorersStore
 } from '@/stores/explorer.ts';
 
 import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, entries } from '@/core/base.ts';
-import { NumeralSystem } from '@/core/numeral.ts';
+import { type BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
+import { type AxisChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
 import { ChartSortingType, ExportMermaidChartType } from '@/core/statistics.ts';
 import {
     TransactionExplorerDataDimensionType,
@@ -300,6 +273,7 @@ import type { SortableTransactionStatisticDataItem, TransactionInsightDataItem }
 import type { InsightsExplorer } from '@/models/explorer.ts';
 
 import { isDefined, isNumber, findNameByValue } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
@@ -318,23 +292,23 @@ interface CategoryDimensionData extends SortableTransactionStatisticDataItem {
     dimension: TransactionExplorerDimensionType;
     name: string;
     displayOrders: number[];
-    totalAmount: number;
+    value: BigDecimal;
 }
 
 interface SortableCategoriedTransactionExplorerDataItem extends SortableTransactionStatisticDataItem {
     name: string;
     displayOrders: number[];
-    totalAmount: number;
+    value: BigDecimal;
     originalItem: CategoriedTransactionExplorerData;
 }
 
-interface SeriesDimensionData extends SortableTransactionStatisticDataItem, Record<string, unknown> {
+interface SeriesDimensionData extends SortableTransactionStatisticDataItem, AxisChartSourceDataItem, Record<string, unknown> {
     id: string;
     dimension: TransactionExplorerDimensionType;
     name: string;
     displayOrders: number[];
-    categoryValues: number[];
-    totalAmount: number;
+    values: BigDecimal[];
+    value: BigDecimal;
 }
 
 defineProps<InsightsExplorerDataTableTabProps>();
@@ -364,8 +338,8 @@ const {
     formatGregorianYearToGregorianLikeFiscalYear,
     formatAmountToLocalizedNumerals,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping,
     formatNumberToLocalizedNumerals,
-    formatNumberToWesternArabicNumeralsWithoutDigitGrouping,
     formatPercentToLocalizedNumerals
 } = useI18n();
 
@@ -425,7 +399,7 @@ const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[
             dimension: categoriedData.categoryIdType,
             name: displayName,
             displayOrders: categoriedData.categoryDisplayOrders,
-            totalAmount: data.value
+            value: data.value
         });
     }
 
@@ -445,7 +419,7 @@ const categoriedDataSortedByDisplayOrder = computed<SortableCategoriedTransactio
         result.push({
             name: getCategoriedDataDisplayName(categoriedData),
             displayOrders: categoriedData.categoryDisplayOrders,
-            totalAmount: 0,
+            value: BIG_DECIMAL_ZERO,
             originalItem: categoriedData
         });
     }
@@ -492,8 +466,8 @@ const seriesDimensionTransactionExplorerData = computed<SeriesDimensionData[]>((
                     dimension: seriesData.seriesIdType,
                     name: displayName,
                     displayOrders: seriesData.seriesDisplayOrders,
-                    categoryValues: [],
-                    totalAmount: 0
+                    values: [],
+                    value: BIG_DECIMAL_ZERO
                 };
 
                 seriesDimensionDataMap[seriesData.seriesId] = seriesDimensionData;
@@ -513,10 +487,10 @@ const seriesDimensionTransactionExplorerData = computed<SeriesDimensionData[]>((
             const seriesData = seriesDataMap[seriesDimensionData.id];
 
             if (isDefined(seriesData)) {
-                seriesDimensionData.categoryValues.push(seriesData.value);
-                seriesDimensionData.totalAmount += seriesData.value;
+                seriesDimensionData.values.push(seriesData.value);
+                seriesDimensionData.value = seriesDimensionData.value.add(seriesData.value);
             } else {
-                seriesDimensionData.categoryValues.push(0);
+                seriesDimensionData.values.push(BIG_DECIMAL_ZERO);
             }
         }
     }
@@ -756,7 +730,7 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
     if (dimession === TransactionExplorerDataDimension.SourceAmount
         || dimession === TransactionExplorerDataDimension.DestinationAmount) {
         if (name !== '' && name !== 'none' && Number.isFinite(parseInt(name))) {
-            displayName = formatAmountToLocalizedNumerals(parseInt(name), defaultCurrency.value);
+            displayName = formatAmountToLocalizedNumerals(parseBigDecimal(name), defaultCurrency.value);
         }
     }
 
@@ -764,8 +738,8 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
         const rangeParts = name.split('|');
 
         if (rangeParts && rangeParts.length === 2 && Number.isFinite(parseInt(rangeParts[0] as string)) && Number.isFinite(parseInt(rangeParts[1] as string))) {
-            const from = formatAmountToLocalizedNumerals(parseInt(rangeParts[0] as string), defaultCurrency.value);
-            const to = formatAmountToLocalizedNumerals(parseInt(rangeParts[1] as string), defaultCurrency.value);
+            const from = formatAmountToLocalizedNumerals(parseBigDecimal(rangeParts[0] as string), defaultCurrency.value);
+            const to = formatAmountToLocalizedNumerals(parseBigDecimal(rangeParts[1] as string), defaultCurrency.value);
             displayName = formatRange(from, to);
         }
     }
@@ -773,20 +747,20 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
     return displayName;
 }
 
-function formatDisplayChangeRate(current: number, reference: number): string {
-    if (reference === 0 && current === 0) {
+function formatDisplayChangeRate(current: BigDecimal, reference: BigDecimal): string {
+    if (reference.isZero() && current.isZero()) {
         return formatPercentToLocalizedNumerals(0, 2, '<0.01');
     }
 
-    if (reference === 0) {
+    if (reference.isZero()) {
         return '-';
     }
 
-    const rate = (current - reference) / reference * 100;
+    const rate = current.subtract(reference).divide(reference).multiply(100).toDoubleNumber();
     return formatPercentToLocalizedNumerals(rate, 2, '<0.01');
 }
 
-function getAxisChartTooltipExtraColumnTotalValues(categoryIndex: number, totalValue: number, visibleSeriesIds: string[]): string[] {
+function getAxisChartTooltipExtraColumnTotalValues(categoryIndex: number, totalValue: BigDecimal, visibleSeriesIds: string[]): string[] {
     const extraColumnValues: string[] = [];
 
     if (!axisChartShowYearOverYear.value && !axisChartShowPeriodOverPeriod.value) {
@@ -798,13 +772,13 @@ function getAxisChartTooltipExtraColumnTotalValues(categoryIndex: number, totalV
         let displayChangeRate = '-';
 
         if (isNumber(yoyReferenceIndex)) {
-            let referenceTotalValue = 0;
+            let referenceTotalValue: BigDecimal = BIG_DECIMAL_ZERO;
 
             for (const seriesId of visibleSeriesIds) {
                 const seriesDimensionData = seriesDimensionTransactionExplorerDataMap.value[seriesId];
 
-                if (seriesDimensionData && seriesDimensionData.categoryValues) {
-                    referenceTotalValue += seriesDimensionData.categoryValues[yoyReferenceIndex] ?? 0;
+                if (seriesDimensionData && seriesDimensionData.values) {
+                    referenceTotalValue = referenceTotalValue.add(seriesDimensionData.values[yoyReferenceIndex] ?? BIG_DECIMAL_ZERO);
                 }
             }
 
@@ -819,13 +793,13 @@ function getAxisChartTooltipExtraColumnTotalValues(categoryIndex: number, totalV
         let displayChangeRate = '-';
 
         if (popReferenceIndex >= 0) {
-            let referenceTotalValue = 0;
+            let referenceTotalValue: BigDecimal = BIG_DECIMAL_ZERO;
 
             for (const seriesId of visibleSeriesIds) {
                 const seriesDimensionData = seriesDimensionTransactionExplorerDataMap.value[seriesId];
 
-                if (seriesDimensionData && seriesDimensionData.categoryValues) {
-                    referenceTotalValue += seriesDimensionData.categoryValues[popReferenceIndex] ?? 0;
+                if (seriesDimensionData && seriesDimensionData.values) {
+                    referenceTotalValue = referenceTotalValue.add(seriesDimensionData.values[popReferenceIndex] ?? BIG_DECIMAL_ZERO);
                 }
             }
 
@@ -838,7 +812,7 @@ function getAxisChartTooltipExtraColumnTotalValues(categoryIndex: number, totalV
     return extraColumnValues;
 }
 
-function getAxisChartTooltipExtraColumnValues(seriesId: string, categoryIndex: number, currentValue: number): string[] {
+function getAxisChartTooltipExtraColumnValues(seriesId: string, categoryIndex: number, currentValue: BigDecimal): string[] {
     const extraColumnValues: string[] = [];
 
     if (!axisChartShowYearOverYear.value && !axisChartShowPeriodOverPeriod.value) {
@@ -847,18 +821,18 @@ function getAxisChartTooltipExtraColumnValues(seriesId: string, categoryIndex: n
 
     const seriesDimensionData = seriesDimensionTransactionExplorerDataMap.value[seriesId];
 
-    if (!seriesDimensionData || !seriesDimensionData.categoryValues) {
+    if (!seriesDimensionData || !seriesDimensionData.values) {
         return extraColumnValues;
     }
 
-    const values = seriesDimensionData.categoryValues;
+    const values = seriesDimensionData.values;
 
     if (axisChartShowYearOverYear.value) {
         const yoyReferenceIndex = axisChartCategoryIndexYoYMap.value[categoryIndex];
         let displayChangeRate = '-';
 
         if (isNumber(yoyReferenceIndex) && yoyReferenceIndex >= 0 && yoyReferenceIndex < values.length) {
-            displayChangeRate = formatDisplayChangeRate(currentValue, values[yoyReferenceIndex] ?? 0);
+            displayChangeRate = formatDisplayChangeRate(currentValue, values[yoyReferenceIndex] ?? BIG_DECIMAL_ZERO);
         }
 
         extraColumnValues.push(displayChangeRate);
@@ -869,7 +843,7 @@ function getAxisChartTooltipExtraColumnValues(seriesId: string, categoryIndex: n
         let displayChangeRate = '-';
 
         if (popReferenceIndex >= 0 && popReferenceIndex < values.length) {
-            displayChangeRate = formatDisplayChangeRate(currentValue, values[popReferenceIndex] ?? 0);
+            displayChangeRate = formatDisplayChangeRate(currentValue, values[popReferenceIndex] ?? BIG_DECIMAL_ZERO);
         }
 
         extraColumnValues.push(displayChangeRate);
@@ -1010,7 +984,7 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
             ],
             data: categoryDimensionTransactionExplorerData.value.map(data => [
                 data.name,
-                valueMetric?.isAmount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.totalAmount, defaultCurrency.value) : formatNumberToWesternArabicNumeralsWithoutDigitGrouping(data.totalAmount)
+                valueMetric?.valueType === ChartValueType.Amount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.value, defaultCurrency.value) : formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(data.value)
             ]),
             supportedMermaidCharts: supportedMermaidCharts
         };

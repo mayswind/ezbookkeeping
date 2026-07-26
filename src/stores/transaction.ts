@@ -11,6 +11,7 @@ import { useExplorersStore } from '@/stores/explorer.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, entries, keys } from '@/core/base.ts';
+import { type BigDecimal } from '@/core/numeral.ts';
 import { type TextualYearMonth, DateRange } from '@/core/datetime.ts';
 import { KeywordMatchMode } from '@/core/text.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -56,7 +57,7 @@ import {
     countSplitItems
 } from '@/lib/common.ts';
 import { parseDateTimeFromUnixTimeWithTimezoneOffset } from '@/lib/datetime.ts';
-import { getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
+import { parseBigDecimal, getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
 import { getCurrencyFraction } from '@/lib/currency.ts';
 import { getFirstVisibleCategoryId } from '@/lib/category.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
@@ -383,9 +384,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
             }
 
             if (account.currency !== defaultCurrency) {
-                const balance = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
+                const balance = exchangeRatesStore.getExchangedAmount(parseBigDecimal(amount), account.currency, defaultCurrency);
 
-                if (!isNumber(balance)) {
+                if (!balance) {
                     if (transaction.type === TransactionType.Expense) {
                         hasUnCalculatedTotalExpense = true;
                         dailyTotalAmount.incompleteExpense = true;
@@ -397,7 +398,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     continue;
                 }
 
-                amount = balance;
+                amount = balance.toDoubleNumber(); // TODO: xxx
             }
 
             if (transaction.type === TransactionType.Expense) {
@@ -574,34 +575,34 @@ export const useTransactionsStore = defineStore('transactions', () => {
             const oldSourceAccount = oldSourceAccountId ? accountsStore.allAccountsMap[oldSourceAccountId] : sourceAccount;
             const oldDestinationAccount = oldDestinationAccountId ? accountsStore.allAccountsMap[oldDestinationAccountId] : destinationAccount;
 
-            let oldValueToCompare = oldSourceAmount;
-            let newValueToSet = newSourceAmount;
+            let oldValueToCompare: BigDecimal = parseBigDecimal(oldSourceAmount);
+            let newValueToSet: BigDecimal = parseBigDecimal(newSourceAmount);
 
             if (oldSourceAccount && oldDestinationAccount && oldSourceAccount.currency !== oldDestinationAccount.currency) {
                 const decimalNumberCount = getCurrencyFraction(oldDestinationAccount.currency);
-                const exchangedOldValue = exchangeRatesStore.getExchangedAmount(oldSourceAmount, oldSourceAccount.currency, oldDestinationAccount.currency);
+                const exchangedOldValue = exchangeRatesStore.getExchangedAmount(parseBigDecimal(oldSourceAmount), oldSourceAccount.currency, oldDestinationAccount.currency);
 
-                if (isNumber(decimalNumberCount) && isNumber(exchangedOldValue)) {
-                    oldValueToCompare = Math.trunc(exchangedOldValue);
+                if (isNumber(decimalNumberCount) && exchangedOldValue) {
+                    oldValueToCompare = exchangedOldValue.truncate();
                     oldValueToCompare = getAmountWithDecimalNumberCount(oldValueToCompare, decimalNumberCount);
                 }
             }
 
             if (sourceAccount.currency !== destinationAccount.currency) {
                 const decimalNumberCount = getCurrencyFraction(destinationAccount.currency);
-                const exchangedNewValue = exchangeRatesStore.getExchangedAmount(newSourceAmount, sourceAccount.currency, destinationAccount.currency);
+                const exchangedNewValue = exchangeRatesStore.getExchangedAmount(parseBigDecimal(newSourceAmount), sourceAccount.currency, destinationAccount.currency);
 
-                if (isNumber(decimalNumberCount) && isNumber(exchangedNewValue)) {
-                    newValueToSet = Math.trunc(exchangedNewValue);
+                if (isNumber(decimalNumberCount) && exchangedNewValue) {
+                    newValueToSet = exchangedNewValue.truncate();
                     newValueToSet = getAmountWithDecimalNumberCount(newValueToSet, decimalNumberCount);
                 } else {
                     return;
                 }
             }
 
-            if ((transaction.destinationAmount === oldValueToCompare || transaction.destinationAmount === 0) &&
-                (TRANSACTION_MIN_AMOUNT <= newValueToSet && newValueToSet <= TRANSACTION_MAX_AMOUNT)) {
-                transaction.destinationAmount = newValueToSet;
+            if ((oldValueToCompare.equals(transaction.destinationAmount) || transaction.destinationAmount === 0) &&
+                newValueToSet.between(TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT)) {
+                transaction.destinationAmount = newValueToSet.toSafeIntegerNumber();
             }
         }
     }

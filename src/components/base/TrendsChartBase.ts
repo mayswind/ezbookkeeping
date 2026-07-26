@@ -13,6 +13,7 @@ import type {
     YearMonthDayUnixTime
 } from '@/core/datetime.ts';
 import type { FiscalYearUnixTime } from '@/core/fiscalyear.ts';
+import { type TrendsChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
 import { ChartDataAggregationType, ChartDateAggregationType } from '@/core/statistics.ts';
 import type { YearMonthItems, YearMonthDayItems } from '@/models/transaction.ts';
 
@@ -28,14 +29,18 @@ import {
 
 export type TrendsChartDateType = 'daily' | 'monthly';
 
+export type TrendsChartYearMonthDayItem = TrendsChartSourceDataItem & YearMonthDayItems<YearMonthDay>;
+export type TrendsChartYearMonthItem = TrendsChartSourceDataItem & YearMonthItems<Year1BasedMonth>;
+export type TrendsChartItem = TrendsChartYearMonthDayItem | TrendsChartYearMonthItem;
+
 interface TrendsChartTypes {
     daily: {
-        ItemsType: YearMonthDayItems<YearMonthDay>;
+        ItemsType: TrendsChartYearMonthDayItem;
         DateTimeRangeType: number;
         MonthRangeType: undefined;
     };
     monthly: {
-        ItemsType: YearMonthItems<Year1BasedMonth>;
+        ItemsType: TrendsChartYearMonthItem;
         DateTimeRangeType: undefined;
         MonthRangeType: TextualYearMonth | '';
     };
@@ -44,6 +49,7 @@ interface TrendsChartTypes {
 export interface CommonTrendsChartProps<T extends TrendsChartDateType> {
     chartMode: T;
     items: TrendsChartTypes[T]['ItemsType'][];
+    valueType: ChartValueType;
     stacked?: boolean;
     startTime: TrendsChartTypes[T]['DateTimeRangeType'];
     endTime: TrendsChartTypes[T]['DateTimeRangeType'];
@@ -53,14 +59,9 @@ export interface CommonTrendsChartProps<T extends TrendsChartDateType> {
     sortingType: number;
     dataAggregationType: ChartDataAggregationType;
     dateAggregationType: number;
-    idField?: string;
-    nameField: string;
-    valueField: string;
-    colorField?: string;
-    hiddenField?: string;
-    displayOrdersField?: string;
     translateName?: boolean;
     defaultCurrency?: string;
+    useCustomColor?: boolean;
     enableClickItem?: boolean;
 }
 

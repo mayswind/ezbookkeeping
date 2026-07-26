@@ -452,6 +452,7 @@ import {
     replaceAll,
     objectFieldToArrayItem
 } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
@@ -1405,7 +1406,7 @@ function getTransactionDestinationAccountCurrency(transaction: ImportTransaction
 
 function getTransactionDisplayAmount(transaction: ImportTransaction): string {
     const currency = getTransactionSourceAccountCurrency(transaction);
-    return formatAmountToLocalizedNumeralsWithCurrency(transaction.sourceAmount, currency);
+    return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(transaction.sourceAmount), currency);
 }
 
 function getTransactionDisplayDestinationAmount(transaction: ImportTransaction): string {
@@ -1414,7 +1415,7 @@ function getTransactionDisplayDestinationAmount(transaction: ImportTransaction):
     }
 
     const currency = getTransactionDestinationAccountCurrency(transaction);
-    return formatAmountToLocalizedNumeralsWithCurrency(transaction.destinationAmount, currency);
+    return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(transaction.destinationAmount), currency);
 }
 
 function getTransactionDisplaySourceAmountInDefaultCurrency(transaction: ImportTransaction): string {
@@ -1424,8 +1425,8 @@ function getTransactionDisplaySourceAmountInDefaultCurrency(transaction: ImportT
         return getTransactionDisplayAmount(transaction);
     }
 
-    const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, currency, defaultCurrency.value);
-    return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getTransactionDisplayAmount(transaction);
+    const amount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(transaction.sourceAmount), currency, defaultCurrency.value);
+    return amount ? formatAmountToLocalizedNumeralsWithCurrency(amount.truncate(), defaultCurrency.value) : getTransactionDisplayAmount(transaction);
 }
 
 function getTransactionDisplayDestinationAmountInDefaultCurrency(transaction: ImportTransaction): string {
@@ -1435,8 +1436,8 @@ function getTransactionDisplayDestinationAmountInDefaultCurrency(transaction: Im
         return getTransactionDisplayDestinationAmount(transaction);
     }
 
-    const amount = exchangeRatesStore.getExchangedAmount(transaction.destinationAmount, currency, defaultCurrency.value);
-    return isNumber(amount) ? formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(amount), defaultCurrency.value) : getTransactionDisplayDestinationAmount(transaction);
+    const amount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(transaction.destinationAmount), currency, defaultCurrency.value);
+    return amount ? formatAmountToLocalizedNumeralsWithCurrency(amount.truncate(), defaultCurrency.value) : getTransactionDisplayDestinationAmount(transaction);
 }
 
 function getSourceAccountTitle(transaction: ImportTransaction): string {
@@ -2249,7 +2250,7 @@ function exportData(fileType: KnownFileType): void {
         const type = getDisplayTransactionType(transaction);
         const accountName = transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId] ? (allAccountsMap.value[transaction.sourceAccountId]?.name ?? transaction.originalSourceAccountName) : transaction.originalSourceAccountName;
         const amountCurrency = transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId] ? (allAccountsMap.value[transaction.sourceAccountId]?.currency ?? transaction.originalSourceAccountCurrency) : transaction.originalSourceAccountCurrency;
-        const amount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount, amountCurrency);
+        const amount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(transaction.sourceAmount), amountCurrency);
         const geographicLocation = transaction.geoLocation ? `${transaction.geoLocation.longitude} ${transaction.geoLocation.latitude}` : '';
         let categoryName = transaction.categoryId && transaction.categoryId !== '0' && allCategoriesMap.value[transaction.categoryId] ? (allCategoriesMap.value[transaction.categoryId]?.name ?? transaction.originalCategoryName) : transaction.originalCategoryName;
         let relatedAccountName: string | undefined = undefined;
@@ -2261,7 +2262,7 @@ function exportData(fileType: KnownFileType): void {
         } else if (transaction.type === TransactionType.Transfer) {
             relatedAccountName = transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId] ? (allAccountsMap.value[transaction.destinationAccountId]?.name ?? transaction.originalDestinationAccountName) : transaction.originalDestinationAccountName;
             relatedAccountCurrency = transaction.destinationAccountId && transaction.destinationAccountId !== '0' && allAccountsMap.value[transaction.destinationAccountId] ? (allAccountsMap.value[transaction.destinationAccountId]?.currency ?? transaction.originalDestinationAccountCurrency) : transaction.originalDestinationAccountCurrency;
-            relatedAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount, relatedAccountCurrency);
+            relatedAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(transaction.destinationAmount), relatedAccountCurrency);
         }
 
         const tagNames: string[] = [];

@@ -6,12 +6,13 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
-import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
+import type { BigDecimal, HiddenAmount, BigDecimalWithSuffix } from '@/core/numeral.ts';
 import type { WeekDayValue } from '@/core/datetime.ts';
 import { AccountCategory, AccountType } from '@/core/account.ts';
 import type { Account, CategorizedAccount } from '@/models/account.ts';
 
-import { isObject, isNumber, isString } from '@/lib/common.ts';
+import { isObject, isString } from '@/lib/common.ts';
+import { isBigDecimal } from '@/lib/numeral.ts';
 
 export function useAccountListPageBase() {
     const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
@@ -43,17 +44,17 @@ export function useAccountListPageBase() {
     const maxCategoryAccountCount = computed<number>(() => accountsStore.maxCategoryAccountCount);
 
     const netAssets = computed<string>(() => {
-        const netAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getNetAssets(showAccountBalance.value);
+        const netAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getNetAssets(showAccountBalance.value);
         return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
     });
 
     const totalAssets = computed<string>(() => {
-        const totalAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalAssets(showAccountBalance.value);
+        const totalAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalAssets(showAccountBalance.value);
         return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
     });
 
     const totalLiabilities = computed<string>(() => {
-        const totalLiabilities: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalLiabilities(showAccountBalance.value);
+        const totalLiabilities: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalLiabilities(showAccountBalance.value);
         return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
     });
 
@@ -62,19 +63,19 @@ export function useAccountListPageBase() {
             return '';
         }
 
-        const totalBalance: number | HiddenAmount | NumberWithSuffix = accountsStore.getAccountCategoryTotalBalance(showAccountBalance.value, accountCategory);
+        const totalBalance: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getAccountCategoryTotalBalance(showAccountBalance.value, accountCategory);
         return formatAmountToLocalizedNumeralsWithCurrency(totalBalance, defaultCurrency.value);
     }
 
     function accountBalance(account: Account, currentSubAccountId?: string): string | null {
         if (account.type === AccountType.SingleAccount.type) {
-            const balance: number| HiddenAmount | null = accountsStore.getAccountBalance(showAccountBalance.value, account);
+            const balance: BigDecimal | HiddenAmount | null = accountsStore.getAccountBalance(showAccountBalance.value, account);
 
-            if (!isNumber(balance) && !isString(balance)) {
+            if (isBigDecimal(balance) || isString(balance)) {
+                return formatAmountToLocalizedNumeralsWithCurrency(balance, account.currency);
+            } else {
                 return '';
             }
-
-            return formatAmountToLocalizedNumeralsWithCurrency(balance, account.currency);
         } else if (account.type === AccountType.MultiSubAccounts.type) {
             const balanceResult = accountsStore.getAccountSubAccountBalance(showAccountBalance.value, showHidden.value, account, currentSubAccountId);
 

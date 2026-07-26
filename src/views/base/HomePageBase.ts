@@ -7,14 +7,14 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
-import type { HiddenAmount, NumberWithSuffix } from '@/core/numeral.ts';
+import type { BigDecimal, HiddenAmount, BigDecimalWithSuffix } from '@/core/numeral.ts';
 import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
 import { Account } from '@/models/account.ts';
 import type {
-    TransactionOverviewResponse,
+    TransactionOverviewData,
     TransactionOverviewDisplayTime,
-    TransactionOverviewResponseItem
+    TransactionOverviewDataItem
 } from '@/models/transaction.ts';
 
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
@@ -42,17 +42,17 @@ export function useHomePageBase() {
     const allAccounts = computed<Account[]>(() => accountsStore.allAccounts);
 
     const netAssets = computed<string>(() => {
-        const netAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getNetAssets(showAmountInHomePage.value);
+        const netAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getNetAssets(showAmountInHomePage.value);
         return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
     });
 
     const totalAssets = computed<string>(() => {
-        const totalAssets: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalAssets(showAmountInHomePage.value);
+        const totalAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalAssets(showAmountInHomePage.value);
         return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
     });
 
     const totalLiabilities = computed<string>(() => {
-        const totalLiabilities: number | HiddenAmount | NumberWithSuffix = accountsStore.getTotalLiabilities(showAmountInHomePage.value);
+        const totalLiabilities: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalLiabilities(showAmountInHomePage.value);
         return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
     });
 
@@ -76,9 +76,9 @@ export function useHomePageBase() {
         };
     });
 
-    const transactionOverview = computed<TransactionOverviewResponse>(() => overviewStore.transactionOverview);
+    const transactionOverview = computed<TransactionOverviewData>(() => overviewStore.transactionOverview);
 
-    function getDisplayAmount(amount: number, incomplete: boolean): string {
+    function getDisplayAmount(amount: BigDecimal, incomplete: boolean): string {
         if (!showAmountInHomePage.value) {
             return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, defaultCurrency.value);
         }
@@ -86,11 +86,11 @@ export function useHomePageBase() {
         return formatAmountToLocalizedNumeralsWithCurrency(amount, defaultCurrency.value) + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
     }
 
-    function getDisplayIncomeAmount(category: TransactionOverviewResponseItem): string {
+    function getDisplayIncomeAmount(category: TransactionOverviewDataItem): string {
         return getDisplayAmount(category.incomeAmount, category.incompleteIncomeAmount);
     }
 
-    function getDisplayExpenseAmount(category: TransactionOverviewResponseItem): string {
+    function getDisplayExpenseAmount(category: TransactionOverviewDataItem): string {
         return getDisplayAmount(category.expenseAmount, category.incompleteExpenseAmount);
     }
 

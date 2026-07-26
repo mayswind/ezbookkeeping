@@ -209,6 +209,7 @@ import {
     LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES
 } from '@/models/transaction.ts';
 
+import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
 import { getUnixTimeBeforeUnixTime, getUnixTimeAfterUnixTime } from '@/lib/datetime.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
@@ -287,8 +288,8 @@ const monthlyIncomeAndExpenseData = computed<TransactionMonthlyIncomeAndExpenseD
 
         data.push({
             monthStartTime: dateRange.startTime,
-            incomeAmount: item?.incomeAmount || 0,
-            expenseAmount: item?.expenseAmount || 0,
+            incomeAmount: item?.incomeAmount || BIG_DECIMAL_ZERO,
+            expenseAmount: item?.expenseAmount || BIG_DECIMAL_ZERO,
             incompleteIncomeAmount: item ? item.incompleteIncomeAmount : true,
             incompleteExpenseAmount: item ? item.incompleteExpenseAmount : true
         });

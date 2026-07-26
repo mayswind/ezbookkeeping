@@ -17,13 +17,15 @@ import {
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 
-import { type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
+import { type NameBigDecimalValue, itemAndIndex } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
 import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 
 import { isArray } from '@/lib/common.ts';
+import { BIG_DECIMAL_POSITIVE_INFINITY, BIG_DECIMAL_NEGATIVE_INFINITY, parseBigDecimal } from '@/lib/numeral.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 interface DesktopAccountBalanceTrendsChartProps extends CommonAccountBalanceTrendsChartProps {
@@ -46,7 +48,7 @@ interface AccountBalanceTrendsChartDataItem {
     areaStyle?: object;
     stack: string;
     animation: boolean;
-    data: (number | number[])[];
+    data: (string | string[])[];
 }
 
 const props = defineProps<DesktopAccountBalanceTrendsChartProps>();
@@ -106,21 +108,21 @@ const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
     for (const item of allDataItems.value) {
         if (props.type === AccountBalanceTrendChartType.Boxplot.type) {
             series.data.push([
-                item.minimumBalance,
-                item.q1Balance,
-                item.medianBalance,
-                item.q3Balance,
-                item.maximumBalance
+                item.minimumBalance.toString(),
+                item.q1Balance.toString(),
+                item.medianBalance.toString(),
+                item.q3Balance.toString(),
+                item.maximumBalance.toString()
             ]);
         } else if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
             series.data.push([
-                item.openingBalance,
-                item.closingBalance,
-                item.minimumBalance,
-                item.maximumBalance
+                item.openingBalance.toString(),
+                item.closingBalance.toString(),
+                item.minimumBalance.toString(),
+                item.maximumBalance.toString()
             ]);
         } else {
-            series.data.push(item.closingBalance);
+            series.data.push(item.closingBalance.toString());
         }
     }
 
@@ -128,8 +130,8 @@ const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
 });
 
 const yAxisWidth = computed<number>(() => {
-    let maxValue = Number.MIN_SAFE_INTEGER;
-    let minValue = Number.MAX_SAFE_INTEGER;
+    let maxValue: BigDecimal = BIG_DECIMAL_NEGATIVE_INFINITY;
+    let minValue: BigDecimal = BIG_DECIMAL_POSITIVE_INFINITY;
     let width = 90;
 
     if (!allSeries.value || !allSeries.value.length) {
@@ -138,25 +140,25 @@ const yAxisWidth = computed<number>(() => {
 
     for (const series of allSeries.value) {
         for (const data of series.data) {
-            let currentMinValue: number;
-            let currentMaxValue: number;
+            let currentMinValue: BigDecimal;
+            let currentMaxValue: BigDecimal;
 
             if (isArray(data) && props.type === AccountBalanceTrendChartType.Boxplot.type) {
-                currentMinValue = data[0] as number;
-                currentMaxValue = data[4] as number;
+                currentMinValue = parseBigDecimal(data[0] as string);
+                currentMaxValue = parseBigDecimal(data[4] as string);
             } else if (isArray(data) && props.type === AccountBalanceTrendChartType.Candlestick.type) {
-                currentMinValue = data[2] as number;
-                currentMaxValue = data[3] as number;
+                currentMinValue = parseBigDecimal(data[2] as string);
+                currentMaxValue = parseBigDecimal(data[3] as string);
             } else {
-                currentMinValue = data as number;
-                currentMaxValue = data as number;
+                currentMinValue = parseBigDecimal(data as string);
+                currentMaxValue = parseBigDecimal(data as string);
             }
 
-            if (currentMaxValue > maxValue) {
+            if (currentMaxValue.greaterThan(maxValue)) {
                 maxValue = currentMaxValue;
             }
 
-            if (currentMinValue < minValue) {
+            if (currentMinValue.lessThan(minValue)) {
                 minValue = currentMinValue;
             }
         }
@@ -208,9 +210,9 @@ const chartOptions = computed<object>(() => {
                 const periodOverPeriodDataItem: AccountBalanceTrendsChartItem | undefined = showPeriodOverPeriodOnTooltip.value ? allDataItems.value[dataIndex - 1] : undefined;
 
                 let header: string = params[0]!.name;
-                let displayItems: NameNumeralValue[] = [];
-                let yearOverYearDataItemDisplayItems: NameNumeralValue[] | undefined = undefined;
-                let periodOverPeriodDataItemDisplayItems: NameNumeralValue[] | undefined = undefined;
+                let displayItems: NameBigDecimalValue[] = [];
+                let yearOverYearDataItemDisplayItems: NameBigDecimalValue[] | undefined = undefined;
+                let periodOverPeriodDataItemDisplayItems: NameBigDecimalValue[] | undefined = undefined;
                 let separatorLineIndex: number | undefined = undefined;
 
                 if (dataItem.alternativeDisplayDate) {
@@ -308,13 +310,13 @@ const chartOptions = computed<object>(() => {
                 axisLabel: {
                     color: isDarkMode.value ? '#888' : '#666',
                     formatter: (value: string) => {
-                        return formatAmountToLocalizedNumeralsWithCurrency(parseInt(value), props.account.currency);
+                        return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(value), props.account.currency);
                     }
                 },
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return formatAmountToLocalizedNumeralsWithCurrency(Math.trunc(params.value as number), props.account.currency);
+                            return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(params.value as string).truncate(), props.account.currency);
                         }
                     }
                 },
@@ -329,7 +331,7 @@ const chartOptions = computed<object>(() => {
     };
 });
 
-function getBoxplotChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNumeralValue[] {
+function getBoxplotChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameBigDecimalValue[] {
     return [
         {
             name: tt('Minimum Balance'),
@@ -362,7 +364,7 @@ function getBoxplotChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNu
     ];
 }
 
-function getCandlestickChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNumeralValue[] {
+function getCandlestickChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameBigDecimalValue[] {
     return [
         {
             name: tt('Opening Balance'),
@@ -391,7 +393,7 @@ function getCandlestickChartTooltip(dataItem: AccountBalanceTrendsChartItem): Na
     ];
 }
 
-function getDefaultChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNumeralValue[] {
+function getDefaultChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameBigDecimalValue[] {
     return [
         {
             name: props.legendName,
@@ -401,16 +403,16 @@ function getDefaultChartTooltip(dataItem: AccountBalanceTrendsChartItem): NameNu
 }
 
 
-function formatDisplayChangeRate(current: number, reference: number): string {
-    if (reference === 0 && current === 0) {
+function formatDisplayChangeRate(current: BigDecimal, reference: BigDecimal): string {
+    if (reference.isZero() && current.isZero()) {
         return formatPercentToLocalizedNumerals(0, 2, '<0.01');
     }
 
-    if (reference === 0) {
+    if (reference.isZero()) {
         return '-';
     }
 
-    const rate = (current - reference) / reference * 100;
+    const rate = (current.subtract(reference)).divide(reference).multiply(100).toDoubleNumber();
     return formatPercentToLocalizedNumerals(rate, 2, '<0.01');
 }
 </script>

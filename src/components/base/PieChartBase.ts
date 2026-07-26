@@ -4,47 +4,45 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 
+import type { BigDecimal } from '@/core/numeral.ts';
 import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
+import { ChartValueType, type CategoricalChartSourceDataItem } from '@/core/chart.ts';
 
 import { isNumber } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, isBigDecimal } from '@/lib/numeral.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 
 export interface CommonPieChartDataItem {
     id: string;
     name: string;
     displayName: string;
-    value: number;
-    actualValue: number;
+    value: string;
+    originalValue: string;
+    originalValuePositive: boolean;
+    originalValuePositiveOrZero: boolean;
+    displayValue: string;
     percent: number;
     paintPercent: number;
+    displayPercent: string;
     color: ColorStyleValue;
-    sourceItem: Record<string, unknown>;
-    displayPercent?: string;
-    displayValue?: string;
+    sourceItem: CategoricalChartSourceDataItem;
 }
 
 export interface CommonPieChartProps {
     skeleton?: boolean;
-    items: Record<string, unknown>[];
-    idField?: string;
-    nameField: string;
-    valueField: string;
-    percentField?: string;
-    colorField?: string;
-    hiddenField?: string;
-    amountValue?: boolean;
-    percentValue?: boolean;
+    items: CategoricalChartSourceDataItem[];
+    valueType: ChartValueType;
     defaultCurrency?: string;
     showValue?: boolean;
     showPercent?: boolean;
+    useCustomColor?: boolean;
     enableClickItem?: boolean;
 }
 
 export function usePieChartBase(props: CommonPieChartProps) {
     const {
-        formatAmountToLocalizedNumeralsWithCurrency,
-        formatNumberToLocalizedNumerals,
-        formatPercentToLocalizedNumerals
+        formatPercentToLocalizedNumerals,
+        formatChartValueToLocalizedNumerals
     } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -54,13 +52,11 @@ export function usePieChartBase(props: CommonPieChartProps) {
     const chartColors = computed<ColorValue[]>(() => settingsStore.chartColorList);
 
     const validItems = computed<CommonPieChartDataItem[]>(() => {
-        let totalValidValue = 0;
+        let totalValidValue: BigDecimal = BIG_DECIMAL_ZERO;
 
         for (const item of props.items) {
-            const value = item[props.valueField];
-
-            if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
-                totalValidValue += value;
+            if (isBigDecimal(item.value) && item.value.isPositive() && !item.hidden) {
+                totalValidValue = totalValidValue.add(item.value);
             }
         }
 
@@ -68,27 +64,34 @@ export function usePieChartBase(props: CommonPieChartProps) {
         let accumulatedPaintPercent: number = 0;
 
         for (const item of props.items) {
-            const value = item[props.valueField];
-            const percent = props.percentField ? item[props.percentField] : -1;
+            if (isBigDecimal(item.value) && !item.hidden) {
+                let percent: number = isNumber(item.percent) ? item.percent : -1;
 
-            if (isNumber(value) &&
-                (!props.hiddenField || !item[props.hiddenField])) {
+                if (percent < 0) {
+                    if (item.value.isPositive()) {
+                        percent = item.value.divide(totalValidValue).multiply(100).toDoubleNumber();
+                    } else {
+                        percent = 0;
+                    }
+                }
+
                 const finalItem: CommonPieChartDataItem = {
-                    id: (props.idField && item[props.idField]) ? item[props.idField] as string : item[props.nameField] as string,
-                    name: (props.idField && item[props.idField]) ? item[props.idField] as string : item[props.nameField] as string,
-                    displayName: item[props.nameField] as string,
-                    value: value > 0 ? value : 0,
-                    actualValue: value,
-                    percent: (isNumber(percent) && percent >= 0) ? percent : (value > 0 ? value / totalValidValue * 100 : 0),
-                    paintPercent: value > 0 ? value / totalValidValue : 0,
-                    color: getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : chartColors.value[validItems.length % chartColors.value.length]),
+                    id: item.id ?? item.name,
+                    name: item.id ?? item.name,
+                    displayName: item.name,
+                    value: item.value.isPositive() ? item.value.toString() : '0',
+                    originalValue: item.value.toString(),
+                    originalValuePositive: item.value.isPositive(),
+                    originalValuePositiveOrZero: item.value.isPositiveOrZero(),
+                    displayValue: formatChartValueToLocalizedNumerals(item.value, props.valueType, props.defaultCurrency),
+                    percent: percent,
+                    paintPercent: item.value.isPositive() ? item.value.divide(totalValidValue).toDoubleNumber() : 0,
+                    displayPercent: formatPercentToLocalizedNumerals(percent, 2, '<0.01'),
+                    color: getDisplayColor(props.useCustomColor && item.color ? item.color : chartColors.value[validItems.length % chartColors.value.length]),
                     sourceItem: item
                 };
 
                 accumulatedPaintPercent += finalItem.paintPercent;
-                finalItem.displayPercent = formatPercentToLocalizedNumerals(finalItem.percent, 2, '<0.01');
-                finalItem.displayValue = getDisplayValue(value);
-
                 validItems.push(finalItem);
             }
         }
@@ -100,17 +103,15 @@ export function usePieChartBase(props: CommonPieChartProps) {
         return validItems;
     });
 
-    function getDisplayValue(value: number): string {
-        if (props.percentValue) {
-            return formatPercentToLocalizedNumerals(value, 2, '<0.01');
+    const allItemsMap = computed<Record<string, CategoricalChartSourceDataItem>>(() => {
+        const map: Record<string, CategoricalChartSourceDataItem> = {};
+
+        for (const item of props.items) {
+            map[item.id ?? item.name] = item;
         }
 
-        if (props.amountValue) {
-            return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
-        }
-
-        return formatNumberToLocalizedNumerals(value, 4);
-    }
+        return map;
+    });
 
     watch(() => props.items, () => {
         selectedIndex.value = 0;
@@ -120,6 +121,7 @@ export function usePieChartBase(props: CommonPieChartProps) {
         // states
         selectedIndex,
         // computed states
-        validItems
+        validItems,
+        allItemsMap
     };
 }

@@ -10,47 +10,45 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 
-import type { ColorValue } from '@/core/color.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
+import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { ChartValueType, type CategoricalChartSourceDataItem } from '@/core/chart.ts';
 
 import { isNumber } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, isBigDecimal } from '@/lib/numeral.ts';
+import { max } from '@/lib/math.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 
 interface RadarChartData {
-    totalValidValue: number;
-    maxValue: number;
+    totalValidValue: BigDecimal;
+    maxValue: BigDecimal;
     indicators: RadarChartDataItem[];
-    values: number[];
+    values: number[]; // only used for echarts calculation
     tooltip: string;
 }
 
 interface RadarChartDataItem {
     name: string;
-    max: number;
-    color: string;
+    max: number; // only used for echarts calculation
+    color: ColorStyleValue;
 }
 
 const props = defineProps<{
     skeleton?: boolean;
-    items: Record<string, unknown>[];
-    nameField: string;
-    valueField: string;
-    percentField?: string;
-    colorField?: string;
-    hiddenField?: string;
-    amountValue?: boolean;
-    percentValue?: boolean;
+    items: CategoricalChartSourceDataItem[];
+    valueType: ChartValueType;
     defaultCurrency?: string;
     showValue?: boolean;
     showPercent?: boolean;
+    useCustomColor?: boolean;
 }>();
 
 const theme = useTheme();
 
 const {
-    formatAmountToLocalizedNumeralsWithCurrency,
-    formatNumberToLocalizedNumerals,
-    formatPercentToLocalizedNumerals
+    formatPercentToLocalizedNumerals,
+    formatChartValueToLocalizedNumerals
 } = useI18n();
 
 const settingsStore = useSettingsStore();
@@ -59,51 +57,52 @@ const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType
 const chartColors = computed<ColorValue[]>(() => settingsStore.chartColorList);
 
 const radarData = computed<RadarChartData>(() => {
-    let totalValidValue = 0;
-    let maxValue = 0;
+    let totalValidValue: BigDecimal = BIG_DECIMAL_ZERO;
+    let maxValue: BigDecimal = BIG_DECIMAL_ZERO;
     const indicators: RadarChartDataItem[] = [];
     const values: number[] = [];
     let tooltip = '';
 
     if (props.items.length) {
         for (const item of props.items) {
-            const value = item[props.valueField];
+            if (isBigDecimal(item.value) && item.value.isPositive() && !item.hidden) {
+                totalValidValue = totalValidValue.add(item.value);
 
-            if (isNumber(value) && value > 0 && (!props.hiddenField || !item[props.hiddenField])) {
-                totalValidValue += value;
-
-                if (value > maxValue) {
-                    maxValue = value;
+                if (item.value.greaterThan(maxValue)) {
+                    maxValue = item.value;
                 }
             }
         }
 
         for (const item of props.items) {
-            const value = item[props.valueField];
-            const percent = props.percentField ? item[props.percentField] : -1;
+            if (isBigDecimal(item.value) && !item.hidden) {
+                let percent: number = isNumber(item.percent) ? item.percent : -1;
 
-            if (isNumber(value) &&
-                (!props.hiddenField || !item[props.hiddenField])) {
-                const name = item[props.nameField] as string;
-                const color = getDisplayColor((props.colorField && item[props.colorField]) ? item[props.colorField] as ColorValue : chartColors.value[indicators.length % chartColors.value.length]);
+                if (percent < 0) {
+                    if (item.value.isPositive()) {
+                        percent = item.value.divide(totalValidValue).multiply(100).toDoubleNumber();
+                    } else {
+                        percent = 0;
+                    }
+                }
 
-                const finalPercent = (isNumber(percent) && percent >= 0) ? percent : (value > 0 ? value / totalValidValue * 100 : 0);
-                const displayPercent = formatPercentToLocalizedNumerals(finalPercent, 2, '<0.01');
-                const displayValue = getDisplayValue(value);
+                const color = getDisplayColor(props.useCustomColor && item.color ? item.color : chartColors.value[indicators.length % chartColors.value.length]);
+                const displayValue = formatChartValueToLocalizedNumerals(item.value, props.valueType, props.defaultCurrency);
+                const displayPercent = formatPercentToLocalizedNumerals(percent, 2, '<0.01');
 
                 indicators.push({
-                    name: name,
-                    max: maxValue,
+                    name: item.name,
+                    max: maxValue.toDoubleNumber(),
                     color: isDarkMode.value ? '#ccc' : '#333'
                 });
 
-                values.push(value > 0 ? value : 0);
+                values.push(max(item.value, BIG_DECIMAL_ZERO).toDoubleNumber());
 
                 tooltip += '<div><span class="chart-pointer" style="background-color: ' + color + '"></span>';
-                tooltip += `<span>${name}</span>`;
+                tooltip += `<span>${item.name}</span>`;
 
                 const showValue = props.showValue;
-                const showPercent = props.showPercent && value > 0;
+                const showPercent = props.showPercent && item.value.isPositive();
 
                 if (showValue && showPercent) {
                     tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span><span class="ms-5" style="float: inline-end">${displayValue}</span>`;
@@ -194,18 +193,6 @@ const chartOptions = computed<object>(() => {
         ] : []
     };
 });
-
-function getDisplayValue(value: number): string {
-    if (props.percentValue) {
-        return formatPercentToLocalizedNumerals(value, 2, '<0.01');
-    }
-
-    if (props.amountValue) {
-        return formatAmountToLocalizedNumeralsWithCurrency(value, props.defaultCurrency);
-    }
-
-    return formatNumberToLocalizedNumerals(value, 4);
-}
 </script>
 
 <style scoped>

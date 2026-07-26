@@ -89,6 +89,7 @@ import { NumeralSystem } from '@/core/numeral.ts';
 import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { isNumber } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import logger from '@/lib/logger.ts';
 
 const props = defineProps<{
@@ -195,7 +196,7 @@ function getStringValue(value: number, hideZero: boolean): string {
         return '';
     }
 
-    const textualNumber = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(value, props.currency);
+    const textualNumber = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(value), props.currency);
 
     const decimalSeparator = getCurrentDecimalSeparator();
     const decimalSeparatorPos = textualNumber.indexOf(decimalSeparator);

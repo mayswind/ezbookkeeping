@@ -143,9 +143,8 @@ import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transac
 
 import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
-import {
-    getCurrentUnixTime
-} from '@/lib/datetime.ts';
+import { parseBigDecimal} from '@/lib/numeral.ts';
+import { getCurrentUnixTime } from '@/lib/datetime.ts';
 
 const props = defineProps<{
     f7router: Router.Router;
@@ -187,7 +186,7 @@ const showDeleteActionSheet = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
-const displayBaseAmount = computed<string>(() => formatAmountToLocalizedNumerals(baseAmount.value, baseCurrency.value));
+const displayBaseAmount = computed<string>(() => formatAmountToLocalizedNumerals(parseBigDecimal(baseAmount.value), baseCurrency.value));
 const baseAmountFontSizeClass = computed<string>(() => {
     if (baseAmount.value >= 10000000000 || baseAmount.value <= -10000000000) {
         return 'ebk-extra-small-amount';

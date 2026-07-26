@@ -14,7 +14,7 @@
                 link="#" no-chevron
                 :class="amountFontSizeClass"
                 :header="amount1Header"
-                :title="formatAmountToLocalizedNumeralsWithCurrency(amount1)"
+                :title="formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(amount1))"
                 @click="showAmount1Sheet = true"
             >
                 <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
@@ -29,7 +29,7 @@
                 link="#" no-chevron
                 :class="amountFontSizeClass"
                 :header="amount2Header"
-                :title="formatAmountToLocalizedNumeralsWithCurrency(amount2)"
+                :title="formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(amount2))"
                 @click="showAmount2Sheet = true"
                 v-if="amountCount === 2"
             >
@@ -65,6 +65,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { isString } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import logger from '@/lib/logger.ts';
 
 const props = defineProps<{

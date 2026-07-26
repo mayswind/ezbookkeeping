@@ -10,7 +10,7 @@ import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, keys, values } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
-import { NumeralSystem } from '@/core/numeral.ts';
+import { type BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import { type DateTime, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { AccountCategory } from '@/core/account.ts';
@@ -47,6 +47,14 @@ import {
     getObjectOwnFieldCount
 } from '@/lib/common.ts';
 import {
+    BIG_DECIMAL_ZERO,
+    BIG_DECIMAL_POSITIVE_INFINITY,
+    BIG_DECIMAL_NEGATIVE_INFINITY,
+    parseBigDecimal
+} from '@/lib/numeral.ts';
+import {
+    min,
+    max,
     mean,
     median,
     percentile,
@@ -128,14 +136,14 @@ export interface SeriesTransactions extends SeriesInfo {
 }
 
 export interface CategoriedTransactionExplorerDataItem extends SeriesInfo {
-    value: number;
+    value: BigDecimal;
 }
 
 export interface AmountRanges {
-    categorySourceAmountRanges?: number[];
-    categoryDestinationAmountRanges?: number[];
-    seriesSourceAmountRanges?: number[];
-    seriesDestinationAmountRanges?: number[];
+    categorySourceAmountRanges?: BigDecimal[];
+    categoryDestinationAmountRanges?: BigDecimal[];
+    seriesSourceAmountRanges?: BigDecimal[];
+    seriesDestinationAmountRanges?: BigDecimal[];
 }
 
 export interface TransactionInsightDataItemInQuery {
@@ -146,23 +154,23 @@ export interface TransactionInsightDataItemInQuery {
 
 export interface InsightsExplorerTransactionStatisticData {
     totalCount: number;
-    totalAmount: number;
-    totalIncome: number;
-    totalExpense: number;
-    netIncome: number;
-    averageAmount: number;
-    medianAmount: number;
-    minimumAmount: number;
-    maximumAmount: number;
-    p90Amount: number;
-    range: number;
-    interquartileRange: number;
-    medianToMeanRatio?: number;
-    top5AmountShare?: number;
-    transactionsFor80PercentAmount?: number;
-    variance?: number;
-    standardDeviation?: number;
-    coefficientOfVariation?: number;
+    totalAmount: BigDecimal;
+    totalIncome: BigDecimal;
+    totalExpense: BigDecimal;
+    netIncome: BigDecimal;
+    averageAmount: BigDecimal;
+    medianAmount: BigDecimal;
+    minimumAmount: BigDecimal;
+    maximumAmount: BigDecimal;
+    p90Amount: BigDecimal;
+    range: BigDecimal;
+    interquartileRange: BigDecimal;
+    medianToMeanRatio?: BigDecimal;
+    top5AmountShare?: BigDecimal;
+    transactionsFor80PercentAmount?: BigDecimal;
+    variance?: BigDecimal;
+    standardDeviation?: BigDecimal;
+    coefficientOfVariation?: BigDecimal;
 }
 
 export const useExplorersStore = defineStore('explorers', () => {
@@ -212,22 +220,22 @@ export const useExplorersStore = defineStore('explorers', () => {
         };
     }
 
-    function calculateAmountRanges(sortedAmounts: number[], dimension: TransactionExplorerDataDimension, rangeCount: number): number[] {
-        const result: number[] = [];
+    function calculateAmountRanges(sortedAmounts: BigDecimal[], dimension: TransactionExplorerDataDimension, rangeCount: number): BigDecimal[] {
+        const result: BigDecimal[] = [];
 
         if (sortedAmounts.length < 1 || rangeCount <= 0) {
             return result;
         }
 
-        const minAmount = sortedAmounts[0] as number;
-        const maxAmount = sortedAmounts[sortedAmounts.length - 1] as number;
+        const minAmount = sortedAmounts[0] as BigDecimal;
+        const maxAmount = sortedAmounts[sortedAmounts.length - 1] as BigDecimal;
         rangeCount = Math.min(rangeCount, sortedAmounts.length);
 
         // [min1, max1), [min2, max2), ..., [minN, maxN]
         if (dimension === TransactionExplorerDataDimension.SourceAmountRangeEqualFrequency
             || dimension === TransactionExplorerDataDimension.DestinationAmountRangeEqualFrequency) {
             for (let i = 0; i < rangeCount; i++) {
-                result.push(sortedAmounts[Math.floor(i * (sortedAmounts.length - 1) / rangeCount)] as number);
+                result.push(sortedAmounts[Math.floor(i * (sortedAmounts.length - 1) / rangeCount)] as BigDecimal);
             }
             result.push(maxAmount);
         } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeEqualWidth
@@ -236,46 +244,46 @@ export const useExplorersStore = defineStore('explorers', () => {
                 return [minAmount, maxAmount];
             }
 
-            const width: number = (maxAmount - minAmount) / rangeCount;
+            const width: BigDecimal = maxAmount.subtract(minAmount).divide(rangeCount); // (maxAmount - minAmount) / rangeCount
 
             for (let i = 0; i < rangeCount; i++) {
-                result.push(minAmount + i * width);
+                result.push(minAmount.add(width.multiply(i))); // minAmount + i * width
             }
             result.push(maxAmount);
         } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeLogScale
             || dimension === TransactionExplorerDataDimension.DestinationAmountRangeLogScale) {
             const epsilon: number = 1e-9;
 
-            const transform = (x: number): number => {
-                if (x === 0) {
-                    return 0;
+            const transform = (x: BigDecimal): BigDecimal => {
+                if (x.isZero()) {
+                    return x;
                 }
 
-                return Math.sign(x) * Math.log(Math.abs(x) + epsilon);
+                return x.sign().multiply(x.abs().add(epsilon).log()); // sign(x) * log(abs(x) + epsilon)
             };
 
-            const inverse = (y: number): number => {
-                if (y === 0) {
-                    return 0;
+            const inverse = (y: BigDecimal): BigDecimal => {
+                if (y.isZero()) {
+                    return y;
                 }
 
-                return Math.sign(y) * (Math.exp(Math.abs(y)) - epsilon);
+                return y.sign().multiply(y.abs().exp().subtract(epsilon)); // sign(y) * (exp(abs(y)) - epsilon)
             };
 
-            const transformed = sortedAmounts.map(transform).sort((a, b) => a - b);
+            const transformed: BigDecimal[] = sortedAmounts.map(transform).sort((a, b) => a.compareTo(b));
 
-            const tMin: number = transformed[0] as number;
-            const tMax: number = transformed[transformed.length - 1] as number;
+            const tMin: BigDecimal = transformed[0] as BigDecimal;
+            const tMax: BigDecimal = transformed[transformed.length - 1] as BigDecimal;
 
             if (tMin === tMax) {
                 return [minAmount, maxAmount];
             }
 
-            const width: number = (tMax - tMin) / rangeCount;
+            const width: BigDecimal = tMax.subtract(tMin).divide(rangeCount); // (tMax - tMin) / rangeCount
 
             result.push(minAmount);
             for (let i = 1; i < rangeCount; i++) {
-                result.push(inverse(tMin + i * width));
+                result.push(inverse(tMin.add(width.multiply(i)))); // inverse(tMin + i * width)
             }
             result.push(maxAmount);
         } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeStandardDeviation
@@ -284,31 +292,31 @@ export const useExplorersStore = defineStore('explorers', () => {
                 return [minAmount, maxAmount];
             }
 
-            const averageAmountForVarianceCalculation: number = mean(sortedAmounts, item => item) / AMOUNT_FACTOR;
-            const { standardDeviation } = varianceAndStandardDeviation(sortedAmounts, averageAmountForVarianceCalculation, item => item / AMOUNT_FACTOR);
+            const averageAmountForVarianceCalculation: BigDecimal = mean(sortedAmounts, item => item).divide(AMOUNT_FACTOR);
+            const { standardDeviation } = varianceAndStandardDeviation(sortedAmounts, averageAmountForVarianceCalculation, item => item.divide(AMOUNT_FACTOR));
 
-            if (standardDeviation === 0) {
+            if (standardDeviation.isZero()) {
                 return [minAmount, maxAmount];
             }
 
-            const rawBreaks: number[] = [];
+            const rawBreaks: BigDecimal[] = [];
             const halfCount = Math.floor(rangeCount / 2);
 
             if (rangeCount % 2 === 1) {
                 for (let i = -halfCount; i <= halfCount; i++) {
-                    rawBreaks.push((averageAmountForVarianceCalculation + i * standardDeviation) * AMOUNT_FACTOR);
+                    rawBreaks.push(averageAmountForVarianceCalculation.add(standardDeviation.multiply(i)).multiply(AMOUNT_FACTOR));
                 }
             } else {
                 for (let i = -halfCount; i <= halfCount; i++) {
                     if (i === 0) {
                         continue;
                     }
-                    rawBreaks.push((averageAmountForVarianceCalculation + (i - 0.5) * standardDeviation) * AMOUNT_FACTOR);
+                    rawBreaks.push(averageAmountForVarianceCalculation.add(standardDeviation.multiply(i - 0.5)).multiply(AMOUNT_FACTOR));
                 }
-                rawBreaks.sort((a, b) => a - b);
+                rawBreaks.sort((a, b) => a.compareTo(b));
             }
 
-            const clipped = rawBreaks.map((v) => Math.max(minAmount, Math.min(maxAmount, v)))
+            const clipped = rawBreaks.map((v) => max(minAmount, min(maxAmount, v)))
                 .filter((v, i, arr) => i === 0 || v !== arr[i - 1]);
 
             clipped[0] = minAmount;
@@ -328,35 +336,36 @@ export const useExplorersStore = defineStore('explorers', () => {
             const k = Math.min(rangeCount, n);
 
             const lowerClassLimits: number[][] = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(0));
-            const varianceCombinations: number[][] = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(Infinity));
+            const varianceCombinations: BigDecimal[][] = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(BIG_DECIMAL_POSITIVE_INFINITY));
 
             for (let i = 1; i <= k; i++) {
                 lowerClassLimits[1]![i] = 1;
-                varianceCombinations[1]![i] = 0;
+                varianceCombinations[1]![i] = BIG_DECIMAL_ZERO;
             }
 
             for (let l = 2; l <= n; l++) {
-                let sumZ = 0;
-                let sumZ2 = 0;
+                let sumZ: BigDecimal = BIG_DECIMAL_ZERO;
+                let sumZ2: BigDecimal = BIG_DECIMAL_ZERO;
 
                 for (let m = 1; m <= l; m++) {
-                    const val = sortedAmounts[l - m] as number;
-                    sumZ += val;
-                    sumZ2 += val * val;
+                    const val = sortedAmounts[l - m] as BigDecimal;
+                    sumZ = sumZ.add(val);
+                    sumZ2 = sumZ2.add(val.pow(2));
 
-                    const variance = sumZ2 - (sumZ * sumZ) / m;
+                    const variance = sumZ2.subtract(sumZ.pow(2).divide(m));
+
 
                     if (m === l) {
                         for (let j = 1; j <= k; j++) {
-                            if (variance < varianceCombinations[l]![j]!) {
+                            if (variance.lessThan(varianceCombinations[l]![j]!)) {
                                 lowerClassLimits[l]![j] = 1;
                                 varianceCombinations[l]![j] = variance;
                             }
                         }
                     } else {
                         for (let j = 2; j <= k; j++) {
-                            const combined = varianceCombinations[l - m]![j - 1]! + variance;
-                            if (combined < varianceCombinations[l]![j]!) {
+                            const combined = varianceCombinations[l - m]![j - 1]!.add(variance);
+                            if (combined.lessThan(varianceCombinations[l]![j]!)) {
                                 lowerClassLimits[l]![j] = l - m + 1;
                                 varianceCombinations[l]![j] = combined;
                             }
@@ -365,7 +374,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                 }
             }
 
-            const breaks: number[] = new Array(k + 1);
+            const breaks: BigDecimal[] = new Array(k + 1);
             breaks[k] = maxAmount;
 
             let currentK = k;
@@ -373,7 +382,7 @@ export const useExplorersStore = defineStore('explorers', () => {
 
             while (currentK >= 2) {
                 const lowerIdx = lowerClassLimits[currentIdx]![currentK]!;
-                breaks[currentK - 1] = sortedAmounts[lowerIdx - 1] as number;
+                breaks[currentK - 1] = sortedAmounts[lowerIdx - 1] as BigDecimal;
                 currentIdx = lowerIdx - 1;
                 currentK--;
             }
@@ -385,7 +394,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         return result;
     }
 
-    function getDataCategoryInfo(timezoneUsedForDateRange: number, dimension: TransactionExplorerDataDimension, sourceAmountRanges: number[] | undefined, destinationAmountRanges: number[] | undefined, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
+    function getDataCategoryInfo(timezoneUsedForDateRange: number, dimension: TransactionExplorerDataDimension, sourceAmountRanges: BigDecimal[] | undefined, destinationAmountRanges: BigDecimal[] | undefined, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): CategoriedInfo {
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         let transactionTimeUtfOffset: number | undefined = undefined;
 
@@ -637,9 +646,9 @@ export const useExplorersStore = defineStore('explorers', () => {
                 };
             }
 
-            const amount = dimension === TransactionExplorerDataDimension.SourceAmount ? transaction.sourceAmount : transaction.destinationAmount;
+            const amount: BigDecimal = dimension === TransactionExplorerDataDimension.SourceAmount ? parseBigDecimal(transaction.sourceAmount) : parseBigDecimal(transaction.destinationAmount);
             const account = dimension === TransactionExplorerDataDimension.SourceAmount ? transaction.sourceAccount : transaction.destinationAccount;
-            let amountInDefaultCurrency: number = amount;
+            let amountInDefaultCurrency: BigDecimal = amount;
 
             if (!account) {
                 return {
@@ -654,8 +663,8 @@ export const useExplorersStore = defineStore('explorers', () => {
             if (account.currency !== defaultCurrency) {
                 const exchangedAmount = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
 
-                if (isNumber(exchangedAmount)) {
-                    amountInDefaultCurrency = Math.trunc(exchangedAmount);
+                if (exchangedAmount) {
+                    amountInDefaultCurrency = exchangedAmount.truncate();
                 } else {
                     return {
                         categoryName: 'Unknown',
@@ -668,10 +677,10 @@ export const useExplorersStore = defineStore('explorers', () => {
             }
 
             return {
-                categoryName: amountInDefaultCurrency.toString(10),
-                categoryId: amountInDefaultCurrency.toString(10),
+                categoryName: amountInDefaultCurrency.toString(),
+                categoryId: amountInDefaultCurrency.toString(),
                 categoryIdType: TransactionExplorerDimensionType.Amount,
-                categoryDisplayOrders: [amountInDefaultCurrency]
+                categoryDisplayOrders: [amountInDefaultCurrency.toDoubleNumber()]
             };
         } else if (dimension.isSourceAmountRange || dimension.isDestinationAmountRange) {
             const isSourceAmount = dimension.isSourceAmountRange;
@@ -686,9 +695,9 @@ export const useExplorersStore = defineStore('explorers', () => {
                 };
             }
 
-            const amount = dimension.isSourceAmountRange ? transaction.sourceAmount : transaction.destinationAmount;
+            const amount: BigDecimal = dimension.isSourceAmountRange ? parseBigDecimal(transaction.sourceAmount) : parseBigDecimal(transaction.destinationAmount);
             const account = dimension.isSourceAmountRange ? transaction.sourceAccount : transaction.destinationAccount;
-            let amountInDefaultCurrency: number = amount;
+            let amountInDefaultCurrency: BigDecimal = amount;
 
             if (!account) {
                 return {
@@ -703,8 +712,8 @@ export const useExplorersStore = defineStore('explorers', () => {
             if (account.currency !== defaultCurrency) {
                 const exchangedAmount = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
 
-                if (isNumber(exchangedAmount)) {
-                    amountInDefaultCurrency = Math.trunc(exchangedAmount);
+                if (exchangedAmount) {
+                    amountInDefaultCurrency = exchangedAmount.truncate();
                 } else {
                     return {
                         categoryName: 'Unknown',
@@ -716,24 +725,24 @@ export const useExplorersStore = defineStore('explorers', () => {
                 }
             }
 
-            const amountRanges: number[] = isSourceAmount ? (sourceAmountRanges ?? []) : (destinationAmountRanges ?? []);
-            let matchAmountRangeMin: number | undefined = undefined;
-            let matchAmountRangeMax: number | undefined = undefined;
+            const amountRanges: BigDecimal[] = isSourceAmount ? (sourceAmountRanges ?? []) : (destinationAmountRanges ?? []);
+            let matchAmountRangeMin: BigDecimal | undefined = undefined;
+            let matchAmountRangeMax: BigDecimal | undefined = undefined;
             let matchAmountRangeIndex: number | undefined = undefined;
 
             for (let i = 1; i < amountRanges.length; i++) {
-                const amountRangeMin = amountRanges[i - 1] as number;
-                const amountRangeMax = amountRanges[i] as number;
+                const amountRangeMin = amountRanges[i - 1] as BigDecimal;
+                const amountRangeMax = amountRanges[i] as BigDecimal;
 
-                if (amountInDefaultCurrency < amountRangeMin) {
+                if (amountInDefaultCurrency.lessThan(amountRangeMin)) {
                     continue;
                 }
 
-                if (amountInDefaultCurrency > amountRangeMax) {
+                if (amountInDefaultCurrency.greaterThan(amountRangeMax)) {
                     continue;
                 }
 
-                if (i < amountRanges.length - 1 && amountInDefaultCurrency === amountRangeMax) {
+                if (i < amountRanges.length - 1 && amountInDefaultCurrency.equals(amountRangeMax)) {
                     continue;
                 }
 
@@ -742,9 +751,9 @@ export const useExplorersStore = defineStore('explorers', () => {
                 matchAmountRangeIndex = i - 1;
             }
 
-            if (isNumber(matchAmountRangeMin) && isNumber(matchAmountRangeMax) && isNumber(matchAmountRangeIndex)) {
+            if (matchAmountRangeMin && matchAmountRangeMax && isNumber(matchAmountRangeIndex)) {
                 return {
-                    categoryName: `${matchAmountRangeMin.toString(10)}|${matchAmountRangeMax.toString(10)}`,
+                    categoryName: `${matchAmountRangeMin.toString()}|${matchAmountRangeMax.toString()}`,
                     categoryId: matchAmountRangeIndex.toString(10),
                     categoryIdType: TransactionExplorerDimensionType.Other,
                     categoryDisplayOrders: [matchAmountRangeIndex]
@@ -768,31 +777,31 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
     }
 
-    function addTransactionToFilteredList(filteredTransactions: TransactionInsightDataItemInQuery[], filteredTransactionSourceAmountsInDefaultCurrency: number[], filteredTransactionDestinationAmountsInDefaultCurrency: number[], defaultCurrency: string, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
+    function addTransactionToFilteredList(filteredTransactions: TransactionInsightDataItemInQuery[], filteredTransactionSourceAmountsInDefaultCurrency: BigDecimal[], filteredTransactionDestinationAmountsInDefaultCurrency: BigDecimal[], defaultCurrency: string, queryName: string, queryIndex: number, transaction: TransactionInsightDataItem): void {
         filteredTransactions.push({
             queryIndex: queryIndex,
             queryName: queryName,
             transaction: transaction
         });
 
-        let sourceAmountInDefaultCurrency: number | undefined = transaction.sourceAmount;
-        let destinationAmountInDefaultCurrency: number | undefined = transaction.type === TransactionType.Transfer && transaction.destinationAccount ? transaction.destinationAmount : undefined;
+        let sourceAmountInDefaultCurrency: BigDecimal | undefined = parseBigDecimal(transaction.sourceAmount);
+        let destinationAmountInDefaultCurrency: BigDecimal | undefined = transaction.type === TransactionType.Transfer && transaction.destinationAccount ? parseBigDecimal(transaction.destinationAmount) : undefined;
 
         if (transaction.sourceAccount.currency !== defaultCurrency) {
-            const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency);
-            sourceAmountInDefaultCurrency = isNumber(amount) ? Math.trunc(amount) : undefined;
+            const amount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(transaction.sourceAmount), transaction.sourceAccount.currency, defaultCurrency);
+            sourceAmountInDefaultCurrency = amount?.truncate();
         }
 
         if (transaction.type === TransactionType.Transfer && transaction.destinationAccount && transaction.destinationAccount.currency !== defaultCurrency) {
-            const amount = exchangeRatesStore.getExchangedAmount(transaction.destinationAmount, transaction.destinationAccount.currency, defaultCurrency);
-            destinationAmountInDefaultCurrency = isNumber(amount) ? Math.trunc(amount) : undefined;
+            const amount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(transaction.destinationAmount), transaction.destinationAccount.currency, defaultCurrency);
+            destinationAmountInDefaultCurrency = amount?.truncate();
         }
 
-        if (isNumber(sourceAmountInDefaultCurrency)) {
+        if (sourceAmountInDefaultCurrency) {
             filteredTransactionSourceAmountsInDefaultCurrency.push(sourceAmountInDefaultCurrency);
         }
 
-        if (isNumber(destinationAmountInDefaultCurrency)) {
+        if (destinationAmountInDefaultCurrency) {
             filteredTransactionDestinationAmountsInDefaultCurrency.push(destinationAmountInDefaultCurrency);
         }
     }
@@ -833,12 +842,12 @@ export const useExplorersStore = defineStore('explorers', () => {
         seriesData.trasactions.push(transaction);
     }
 
-    function buildAllAmountRanges(categoryDimension: TransactionExplorerDataDimension, seriesDimension: TransactionExplorerDataDimension, filteredTransactionSourceAmountsInDefaultCurrency: number[], filteredTransactionDestinationAmountsInDefaultCurrency: number[], rangeCount: number): AmountRanges {
+    function buildAllAmountRanges(categoryDimension: TransactionExplorerDataDimension, seriesDimension: TransactionExplorerDataDimension, filteredTransactionSourceAmountsInDefaultCurrency: BigDecimal[], filteredTransactionDestinationAmountsInDefaultCurrency: BigDecimal[], rangeCount: number): AmountRanges {
         const allAmountRanges: AmountRanges = {};
 
         if (categoryDimension.isSourceAmountRange || seriesDimension.isSourceAmountRange) {
-            filteredTransactionSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-            const sorteUniqueAmounts = filteredTransactionSourceAmountsInDefaultCurrency.filter((v, i, a) => i === 0 || v !== a[i - 1]);
+            filteredTransactionSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
+            const sorteUniqueAmounts = filteredTransactionSourceAmountsInDefaultCurrency.filter((v, i, a) => i === 0 || v.notEquals(a[i - 1]));
 
             if (categoryDimension.isSourceAmountRange) {
                 allAmountRanges.categorySourceAmountRanges = calculateAmountRanges(sorteUniqueAmounts, categoryDimension, rangeCount);
@@ -850,8 +859,8 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
 
         if (categoryDimension.isDestinationAmountRange || seriesDimension.isDestinationAmountRange) {
-            filteredTransactionDestinationAmountsInDefaultCurrency.sort((a, b) => a - b);
-            const sorteUniqueAmounts = filteredTransactionDestinationAmountsInDefaultCurrency.filter((v, i, a) => i === 0 || v !== a[i - 1]);
+            filteredTransactionDestinationAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
+            const sorteUniqueAmounts = filteredTransactionDestinationAmountsInDefaultCurrency.filter((v, i, a) => i === 0 || v.notEquals(a[i - 1]));
             if (categoryDimension.isDestinationAmountRange) {
                 allAmountRanges.categoryDestinationAmountRanges = calculateAmountRanges(sorteUniqueAmounts, categoryDimension, rangeCount);
             }
@@ -1042,17 +1051,17 @@ export const useExplorersStore = defineStore('explorers', () => {
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         const statisticData: InsightsExplorerTransactionStatisticData = {
             totalCount: 0,
-            totalAmount: 0,
-            totalIncome: 0,
-            totalExpense: 0,
-            netIncome: 0,
-            averageAmount: 0,
-            medianAmount: 0,
-            minimumAmount: Number.MAX_SAFE_INTEGER,
-            maximumAmount: Number.MIN_SAFE_INTEGER,
-            p90Amount: 0,
-            range: 0,
-            interquartileRange: 0,
+            totalAmount: BIG_DECIMAL_ZERO,
+            totalIncome: BIG_DECIMAL_ZERO,
+            totalExpense: BIG_DECIMAL_ZERO,
+            netIncome: BIG_DECIMAL_ZERO,
+            averageAmount: BIG_DECIMAL_ZERO,
+            medianAmount: BIG_DECIMAL_ZERO,
+            minimumAmount: BIG_DECIMAL_POSITIVE_INFINITY,
+            maximumAmount: BIG_DECIMAL_NEGATIVE_INFINITY,
+            p90Amount: BIG_DECIMAL_ZERO,
+            range: BIG_DECIMAL_ZERO,
+            interquartileRange: BIG_DECIMAL_ZERO,
             medianToMeanRatio: undefined,
             top5AmountShare: undefined,
             transactionsFor80PercentAmount: undefined,
@@ -1061,71 +1070,71 @@ export const useExplorersStore = defineStore('explorers', () => {
             coefficientOfVariation: undefined
         };
 
-        const sourceAmounts: number[] = [];
+        const sourceAmounts: BigDecimal[] = [];
 
         for (const transaction of filteredTransactionsInDataTable.value) {
             statisticData.totalCount++;
 
-            let amountInDefaultCurrency: number = transaction.sourceAmount;
+            let amountInDefaultCurrency: BigDecimal = parseBigDecimal(transaction.sourceAmount);
 
             if (transaction.sourceAccount.currency !== defaultCurrency) {
-                const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency);
+                const amount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(transaction.sourceAmount), transaction.sourceAccount.currency, defaultCurrency);
 
-                if (isNumber(amount)) {
-                    amountInDefaultCurrency = Math.trunc(amount);
+                if (amount) {
+                    amountInDefaultCurrency = amount.truncate();
                 } else {
                     continue;
                 }
             }
 
-            statisticData.totalAmount += amountInDefaultCurrency;
+            statisticData.totalAmount = statisticData.totalAmount.add(amountInDefaultCurrency);
             sourceAmounts.push(amountInDefaultCurrency);
 
             if (transaction.type === TransactionType.Income) {
-                statisticData.totalIncome += amountInDefaultCurrency;
+                statisticData.totalIncome = statisticData.totalIncome.add(amountInDefaultCurrency);
             } else if (transaction.type === TransactionType.Expense) {
-                statisticData.totalExpense += amountInDefaultCurrency;
+                statisticData.totalExpense = statisticData.totalExpense.add(amountInDefaultCurrency);
             }
 
-            if (amountInDefaultCurrency >= 0 && amountInDefaultCurrency < statisticData.minimumAmount) {
+            if (amountInDefaultCurrency.isPositiveOrZero() && amountInDefaultCurrency.lessThan(statisticData.minimumAmount)) {
                 statisticData.minimumAmount = amountInDefaultCurrency;
             }
 
-            if (amountInDefaultCurrency > statisticData.maximumAmount) {
+            if (amountInDefaultCurrency.greaterThan(statisticData.maximumAmount)) {
                 statisticData.maximumAmount = amountInDefaultCurrency;
             }
         }
 
-        statisticData.netIncome = statisticData.totalIncome - statisticData.totalExpense;
+        statisticData.netIncome = statisticData.totalIncome.subtract(statisticData.totalExpense);
 
-        if (statisticData.minimumAmount === Number.MAX_SAFE_INTEGER) {
-            statisticData.minimumAmount = 0;
+        if (statisticData.minimumAmount.isPositiveInfinity()) {
+            statisticData.minimumAmount = BIG_DECIMAL_ZERO;
         }
 
-        if (statisticData.maximumAmount === Number.MIN_SAFE_INTEGER) {
-            statisticData.maximumAmount = 0;
+        if (statisticData.maximumAmount.isNegativeInfinity()) {
+            statisticData.maximumAmount = BIG_DECIMAL_ZERO;
         }
 
         if (sourceAmounts.length > 0) {
-            statisticData.averageAmount = Math.trunc(statisticData.totalAmount / sourceAmounts.length);
+            statisticData.averageAmount = statisticData.totalAmount.divide(sourceAmounts.length).truncate();
         }
 
-        statisticData.range = statisticData.maximumAmount - statisticData.minimumAmount;
+        statisticData.range = statisticData.maximumAmount.subtract(statisticData.minimumAmount);
 
         if (sourceAmounts.length > 0) {
-            sourceAmounts.sort((a, b) => a - b);
-            statisticData.medianAmount = Math.trunc(median(sourceAmounts, item => item));
-            statisticData.p90Amount = Math.trunc(percentile(sourceAmounts, 0.9, item => item));
+            sourceAmounts.sort((a, b) => a.compareTo(b));
+            statisticData.medianAmount = median(sourceAmounts, item => item).truncate();
+            statisticData.p90Amount = percentile(sourceAmounts, 0.9, item => item).truncate();
 
             const q1 = percentile(sourceAmounts, 0.25, item => item);
             const q3 = percentile(sourceAmounts, 0.75, item => item);
-            statisticData.interquartileRange = Math.trunc(q3 - q1);
-            statisticData.medianToMeanRatio = statisticData.averageAmount !== 0 ? statisticData.medianAmount / statisticData.averageAmount : undefined;
+            statisticData.interquartileRange = q3.subtract(q1).truncate();
+            statisticData.medianToMeanRatio = !statisticData.averageAmount.isZero() ? statisticData.medianAmount.divide(statisticData.averageAmount) : undefined;
         }
 
         if (sourceAmounts.length > 5) {
             const top5AmountSum = sumMaxN(sourceAmounts, 5, item => item);
-            statisticData.top5AmountShare = statisticData.totalAmount > 0 ? 100.0 * top5AmountSum / statisticData.totalAmount : 0;
+            statisticData.top5AmountShare = statisticData.totalAmount.isPositive() ? top5AmountSum.divide(statisticData.totalAmount).multiply(100) : BIG_DECIMAL_ZERO;
         }
 
         if (sourceAmounts.length > 0) {
@@ -1133,8 +1142,8 @@ export const useExplorersStore = defineStore('explorers', () => {
         }
 
         if (sourceAmounts.length > 0) {
-            const averageAmountForVarianceCalculation: number = statisticData.totalAmount / sourceAmounts.length / AMOUNT_FACTOR;
-            const { variance, standardDeviation } = varianceAndStandardDeviation(sourceAmounts, averageAmountForVarianceCalculation, item => item / AMOUNT_FACTOR);
+            const averageAmountForVarianceCalculation: BigDecimal = statisticData.totalAmount.divide(sourceAmounts.length).divide(AMOUNT_FACTOR);
+            const { variance, standardDeviation } = varianceAndStandardDeviation(sourceAmounts, averageAmountForVarianceCalculation, item => item.divide(AMOUNT_FACTOR));
             statisticData.variance = variance;
             statisticData.standardDeviation = standardDeviation;
             statisticData.coefficientOfVariation = coefficientOfVariation(standardDeviation, averageAmountForVarianceCalculation);
@@ -1158,8 +1167,8 @@ export const useExplorersStore = defineStore('explorers', () => {
 
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         const filteredTransactions: TransactionInsightDataItemInQuery[] = [];
-        const filteredTransactionSourceAmountsInDefaultCurrency: number[] = [];
-        const filteredTransactionDestinationAmountsInDefaultCurrency: number[] = [];
+        const filteredTransactionSourceAmountsInDefaultCurrency: BigDecimal[] = [];
+        const filteredTransactionDestinationAmountsInDefaultCurrency: BigDecimal[] = [];
 
         for (const transaction of allTransactions.value) {
             if (!currentExploration.value.queries || currentExploration.value.queries.length < 1) {
@@ -1237,21 +1246,21 @@ export const useExplorersStore = defineStore('explorers', () => {
 
             for (const seriesTransactions of values(allSeriesTransactions)) {
                 const transactionDateMapCount: Record<string, number> = {};
-                const allSourceAmountsInDefaultCurrency: number[] = [];
-                let totalSourceAmountSumInDefaultCurrency: number = 0;
-                let totalSourceIncomeAmountSumInDefaultCurrency: number = 0;
-                let totalSourceExpenseAmountSumInDefaultCurrency: number = 0;
-                let minimumSourceAmountInDefaultCurrency: number = Number.MAX_SAFE_INTEGER;
-                let maximumSourceAmountInDefaultCurrency: number = Number.MIN_SAFE_INTEGER;
+                const allSourceAmountsInDefaultCurrency: BigDecimal[] = [];
+                let totalSourceAmountSumInDefaultCurrency: BigDecimal = BIG_DECIMAL_ZERO;
+                let totalSourceIncomeAmountSumInDefaultCurrency: BigDecimal = BIG_DECIMAL_ZERO;
+                let totalSourceExpenseAmountSumInDefaultCurrency: BigDecimal = BIG_DECIMAL_ZERO;
+                let minimumSourceAmountInDefaultCurrency: BigDecimal = BIG_DECIMAL_POSITIVE_INFINITY;
+                let maximumSourceAmountInDefaultCurrency: BigDecimal = BIG_DECIMAL_NEGATIVE_INFINITY;
 
                 for (const transaction of seriesTransactions.trasactions) {
-                    let amountInDefaultCurrency: number = transaction.sourceAmount;
+                    let amountInDefaultCurrency: BigDecimal = parseBigDecimal(transaction.sourceAmount);
 
                     if (transaction.sourceAccount.currency !== defaultCurrency) {
-                        const amount = exchangeRatesStore.getExchangedAmount(transaction.sourceAmount, transaction.sourceAccount.currency, defaultCurrency);
+                        const amount = exchangeRatesStore.getExchangedAmount(parseBigDecimal(transaction.sourceAmount), transaction.sourceAccount.currency, defaultCurrency);
 
-                        if (isNumber(amount)) {
-                            amountInDefaultCurrency = Math.trunc(amount);
+                        if (amount) {
+                            amountInDefaultCurrency = amount.truncate();
                         } else {
                             continue;
                         }
@@ -1275,57 +1284,57 @@ export const useExplorersStore = defineStore('explorers', () => {
                     }
 
                     allSourceAmountsInDefaultCurrency.push(amountInDefaultCurrency);
-                    totalSourceAmountSumInDefaultCurrency += amountInDefaultCurrency;
+                    totalSourceAmountSumInDefaultCurrency = totalSourceAmountSumInDefaultCurrency.add(amountInDefaultCurrency);
 
                     if (transaction.type === TransactionType.Income) {
-                        totalSourceIncomeAmountSumInDefaultCurrency += amountInDefaultCurrency;
+                        totalSourceIncomeAmountSumInDefaultCurrency = totalSourceIncomeAmountSumInDefaultCurrency.add(amountInDefaultCurrency);
                     } else if (transaction.type === TransactionType.Expense) {
-                        totalSourceExpenseAmountSumInDefaultCurrency += amountInDefaultCurrency;
+                        totalSourceExpenseAmountSumInDefaultCurrency = totalSourceExpenseAmountSumInDefaultCurrency.add(amountInDefaultCurrency);
                     }
 
-                    if (amountInDefaultCurrency >= 0 && amountInDefaultCurrency < minimumSourceAmountInDefaultCurrency) {
+                    if (amountInDefaultCurrency.isPositiveOrZero() && amountInDefaultCurrency.lessThan(minimumSourceAmountInDefaultCurrency)) {
                         minimumSourceAmountInDefaultCurrency = amountInDefaultCurrency;
                     }
 
-                    if (amountInDefaultCurrency > maximumSourceAmountInDefaultCurrency) {
+                    if (amountInDefaultCurrency.greaterThan(maximumSourceAmountInDefaultCurrency)) {
                         maximumSourceAmountInDefaultCurrency = amountInDefaultCurrency;
                     }
                 }
 
-                let value: number = 0;
+                let value: BigDecimal = BIG_DECIMAL_ZERO;
 
                 if (valueMetric === TransactionExplorerValueMetric.TransactionCount) {
-                    value = allSourceAmountsInDefaultCurrency.length;
+                    value = parseBigDecimal(allSourceAmountsInDefaultCurrency.length);
                 } else if (valueMetric === TransactionExplorerValueMetric.ActiveTransactionDays) {
-                    value = getObjectOwnFieldCount(transactionDateMapCount);
+                    value = parseBigDecimal(getObjectOwnFieldCount(transactionDateMapCount));
                 } else if (valueMetric === TransactionExplorerValueMetric.TransactionsPerDay) {
                     const activeDays = getObjectOwnFieldCount(transactionDateMapCount);
-                    value = activeDays > 0 ? allSourceAmountsInDefaultCurrency.length / activeDays : 0;
+                    value = activeDays > 0 ? parseBigDecimal(allSourceAmountsInDefaultCurrency.length).divide(activeDays) : BIG_DECIMAL_ZERO;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceIncomeAmountSum) {
                     value = totalSourceIncomeAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceExpenseAmountSum) {
                     value = totalSourceExpenseAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceNetIncomeAmountSum) {
-                    value = totalSourceIncomeAmountSumInDefaultCurrency - totalSourceExpenseAmountSumInDefaultCurrency;
+                    value = totalSourceIncomeAmountSumInDefaultCurrency.subtract(totalSourceExpenseAmountSumInDefaultCurrency);
                 } else if (valueMetric === TransactionExplorerValueMetric.SrouceAmountExpenseIncomeRatio) {
-                    value = totalSourceIncomeAmountSumInDefaultCurrency !== 0 ? 100.0 * totalSourceExpenseAmountSumInDefaultCurrency / totalSourceIncomeAmountSumInDefaultCurrency : 0;
+                    value = !totalSourceIncomeAmountSumInDefaultCurrency.isZero() ? totalSourceExpenseAmountSumInDefaultCurrency.divide(totalSourceIncomeAmountSumInDefaultCurrency).multiply(100) : BIG_DECIMAL_ZERO;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSavingsRate) {
-                    value = totalSourceIncomeAmountSumInDefaultCurrency !== 0 ? 100.0 * (totalSourceIncomeAmountSumInDefaultCurrency - totalSourceExpenseAmountSumInDefaultCurrency) / totalSourceIncomeAmountSumInDefaultCurrency : 0;
+                    value = !totalSourceIncomeAmountSumInDefaultCurrency.isZero() ? totalSourceIncomeAmountSumInDefaultCurrency.subtract(totalSourceExpenseAmountSumInDefaultCurrency).divide(totalSourceIncomeAmountSumInDefaultCurrency).multiply(100) : BIG_DECIMAL_ZERO;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSum) {
                     value = totalSourceAmountSumInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountAverage) {
-                    value = allSourceAmountsInDefaultCurrency.length > 0 ? Math.trunc(totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length) : 0;
+                    value = allSourceAmountsInDefaultCurrency.length > 0 ? totalSourceAmountSumInDefaultCurrency.divide(allSourceAmountsInDefaultCurrency.length).truncate() : BIG_DECIMAL_ZERO;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedian) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
-                        value = Math.trunc(median(allSourceAmountsInDefaultCurrency, item => item));
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
+                        value = median(allSourceAmountsInDefaultCurrency, item => item).truncate();
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMinimum) {
-                    value = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
+                    value = minimumSourceAmountInDefaultCurrency.isPositiveInfinity() ? BIG_DECIMAL_ZERO : minimumSourceAmountInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMaximum) {
-                    value = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
+                    value = maximumSourceAmountInDefaultCurrency.isNegativeInfinity() ? BIG_DECIMAL_ZERO : maximumSourceAmountInDefaultCurrency;
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ1Amount
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountQ3Amount
                     || valueMetric === TransactionExplorerValueMetric.SourceAmount10thPercentile
@@ -1333,113 +1342,113 @@ export const useExplorersStore = defineStore('explorers', () => {
                     || valueMetric === TransactionExplorerValueMetric.SourceAmount95thPercentile
                     || valueMetric === TransactionExplorerValueMetric.SourceAmount99thPercentile) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
 
                         if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ1Amount) {
-                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item));
+                            value = percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item).truncate();
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountQ3Amount) {
-                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item));
+                            value = percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item).truncate();
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount10thPercentile) {
-                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.1, item => item));
+                            value = percentile(allSourceAmountsInDefaultCurrency, 0.1, item => item).truncate();
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount90thPercentile) {
-                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.9, item => item));
+                            value = percentile(allSourceAmountsInDefaultCurrency, 0.9, item => item).truncate();
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount95thPercentile) {
-                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.95, item => item));
+                            value = percentile(allSourceAmountsInDefaultCurrency, 0.95, item => item).truncate();
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmount99thPercentile) {
-                            value = Math.trunc(percentile(allSourceAmountsInDefaultCurrency, 0.99, item => item));
+                            value = percentile(allSourceAmountsInDefaultCurrency, 0.99, item => item).truncate();
                         }
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountRange) {
-                    const finalMinimumSourceAmountInDefaultCurrency = minimumSourceAmountInDefaultCurrency === Number.MAX_SAFE_INTEGER ? 0 : minimumSourceAmountInDefaultCurrency;
-                    const finalMaximumSourceAmountInDefaultCurrency = maximumSourceAmountInDefaultCurrency === Number.MIN_SAFE_INTEGER ? 0 : maximumSourceAmountInDefaultCurrency;
-                    value = finalMaximumSourceAmountInDefaultCurrency - finalMinimumSourceAmountInDefaultCurrency;
+                    const finalMinimumSourceAmountInDefaultCurrency = minimumSourceAmountInDefaultCurrency.isPositiveInfinity() ? BIG_DECIMAL_ZERO : minimumSourceAmountInDefaultCurrency;
+                    const finalMaximumSourceAmountInDefaultCurrency = maximumSourceAmountInDefaultCurrency.isNegativeInfinity() ? BIG_DECIMAL_ZERO : maximumSourceAmountInDefaultCurrency;
+                    value = finalMaximumSourceAmountInDefaultCurrency.subtract(finalMinimumSourceAmountInDefaultCurrency);
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountInterquartileRange) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         const q1 = percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item);
                         const q3 = percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item);
-                        value = Math.trunc(q3 - q1);
+                        value = q3.subtract(q1).truncate();
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMeanAbsoluteDeviation) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length;
-                        value = Math.trunc(meanAbsoluteDeviation(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, item => item));
+                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency.divide(allSourceAmountsInDefaultCurrency.length);
+                        value = meanAbsoluteDeviation(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, item => item).truncate();
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedianAbsoluteDeviation) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         const medianSourceAmountInDefaultCurrency = median(allSourceAmountsInDefaultCurrency, item => item);
-                        value = Math.trunc(medianAbsoluteDeviation(allSourceAmountsInDefaultCurrency, medianSourceAmountInDefaultCurrency, item => item));
+                        value = medianAbsoluteDeviation(allSourceAmountsInDefaultCurrency, medianSourceAmountInDefaultCurrency, item => item).truncate();
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountMedianToMeanRatio) {
-                    if (allSourceAmountsInDefaultCurrency.length > 0 && totalSourceAmountSumInDefaultCurrency !== 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                    if (allSourceAmountsInDefaultCurrency.length > 0 && !totalSourceAmountSumInDefaultCurrency.isZero()) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         const medianSourceAmountInDefaultCurrency = median(allSourceAmountsInDefaultCurrency, item => item);
-                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length;
-                        value = averageSourceAmountInDefaultCurrency !== 0 ? medianSourceAmountInDefaultCurrency / averageSourceAmountInDefaultCurrency : 0;
+                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency.divide(allSourceAmountsInDefaultCurrency.length);
+                        value = !averageSourceAmountInDefaultCurrency.isZero() ? medianSourceAmountInDefaultCurrency.divide(averageSourceAmountInDefaultCurrency) : BIG_DECIMAL_ZERO;
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceMaximumAmountShare) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        value = maximumSourceAmountInDefaultCurrency !== Number.MIN_SAFE_INTEGER ? 100.0 * maximumSourceAmountInDefaultCurrency / totalSourceAmountSumInDefaultCurrency : 0;
+                        value = !maximumSourceAmountInDefaultCurrency.isNegativeInfinity() ? maximumSourceAmountInDefaultCurrency.divide(totalSourceAmountSumInDefaultCurrency).multiply(100) : BIG_DECIMAL_ZERO;
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountSum) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         value = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceTop5AmountShare) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         const top5AmountSum = sumMaxN(allSourceAmountsInDefaultCurrency, 5, item => item);
-                        value = totalSourceAmountSumInDefaultCurrency > 0 ? 100.0 * top5AmountSum / totalSourceAmountSumInDefaultCurrency : 0;
+                        value = totalSourceAmountSumInDefaultCurrency.isPositive() ? top5AmountSum.divide(totalSourceAmountSumInDefaultCurrency).multiply(100) : BIG_DECIMAL_ZERO;
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.TransactionsForEightyPercentOfSourceAmount) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         value = cumulativePercentage(allSourceAmountsInDefaultCurrency, 0.8, totalSourceAmountSumInDefaultCurrency, item => item);
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountOutlierCount
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountOutlierRatio) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         const q1 = percentile(allSourceAmountsInDefaultCurrency, 0.25, item => item);
                         const q3 = percentile(allSourceAmountsInDefaultCurrency, 0.75, item => item);
-                        const iqr = q3 - q1;
-                        const lowerBound = q1 - 1.5 * iqr;
-                        const upperBound = q3 + 1.5 * iqr;
+                        const iqr = q3.subtract(q1);
+                        const lowerBound = q1.subtract(iqr.multiply(1.5));
+                        const upperBound = q3.add(iqr.multiply(1.5));
 
                         let outlierCount = 0;
                         for (const amount of allSourceAmountsInDefaultCurrency) {
-                            if (amount < lowerBound || amount > upperBound) {
+                            if (amount.lessThan(lowerBound) || amount.greaterThan(upperBound)) {
                                 outlierCount++;
                             }
                         }
 
                         if (valueMetric === TransactionExplorerValueMetric.SourceAmountOutlierCount) {
-                            value = outlierCount;
+                            value = parseBigDecimal(outlierCount);
                         } else {
-                            value = allSourceAmountsInDefaultCurrency.length > 0 ? 100.0 * outlierCount / allSourceAmountsInDefaultCurrency.length : 0;
+                            value = allSourceAmountsInDefaultCurrency.length > 0 ? parseBigDecimal(outlierCount).divide(allSourceAmountsInDefaultCurrency.length).multiply(100) : BIG_DECIMAL_ZERO;
                         }
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation
@@ -1447,35 +1456,35 @@ export const useExplorersStore = defineStore('explorers', () => {
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountSkewness
                     || valueMetric === TransactionExplorerValueMetric.SourceAmountKurtosis) {
                     if (allSourceAmountsInDefaultCurrency.length > 0) {
-                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency / allSourceAmountsInDefaultCurrency.length / AMOUNT_FACTOR;
-                        const { variance, standardDeviation } = varianceAndStandardDeviation(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, item => item / AMOUNT_FACTOR);
+                        const averageSourceAmountInDefaultCurrency = totalSourceAmountSumInDefaultCurrency.divide(allSourceAmountsInDefaultCurrency.length).divide(AMOUNT_FACTOR);
+                        const { variance, standardDeviation } = varianceAndStandardDeviation(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, item => item.divide(AMOUNT_FACTOR));
 
                         if (valueMetric === TransactionExplorerValueMetric.SourceAmountVariance) {
                             value = variance;
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountStandardDeviation) {
                             value = standardDeviation;
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountCoefficientOfVariation) {
-                            value = coefficientOfVariation(standardDeviation, averageSourceAmountInDefaultCurrency) ?? 0;
+                            value = coefficientOfVariation(standardDeviation, averageSourceAmountInDefaultCurrency) ?? BIG_DECIMAL_ZERO;
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountSkewness) {
-                            value = skewness(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, standardDeviation, item => item / AMOUNT_FACTOR);
+                            value = skewness(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, standardDeviation, item => item.divide(AMOUNT_FACTOR));
                         } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountKurtosis) {
-                            value = kurtosis(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, variance, item => item / AMOUNT_FACTOR);
+                            value = kurtosis(allSourceAmountsInDefaultCurrency, averageSourceAmountInDefaultCurrency, variance, item => item.divide(AMOUNT_FACTOR));
                         }
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountGiniCoefficient) {
-                    if (allSourceAmountsInDefaultCurrency.length > 0 && totalSourceAmountSumInDefaultCurrency !== 0) {
-                        allSourceAmountsInDefaultCurrency.sort((a, b) => a - b);
+                    if (allSourceAmountsInDefaultCurrency.length > 0 && !totalSourceAmountSumInDefaultCurrency.isZero()) {
+                        allSourceAmountsInDefaultCurrency.sort((a, b) => a.compareTo(b));
                         value = giniCoefficient(allSourceAmountsInDefaultCurrency, totalSourceAmountSumInDefaultCurrency, item => item);
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 } else if (valueMetric === TransactionExplorerValueMetric.SourceAmountHerfindahlHirschmanIndex) {
-                    if (allSourceAmountsInDefaultCurrency.length > 0 && totalSourceAmountSumInDefaultCurrency !== 0) {
+                    if (allSourceAmountsInDefaultCurrency.length > 0 && !totalSourceAmountSumInDefaultCurrency.isZero()) {
                         value = herfindahlHirschmanIndex(allSourceAmountsInDefaultCurrency, totalSourceAmountSumInDefaultCurrency, item => item);
                     } else {
-                        value = 0;
+                        value = BIG_DECIMAL_ZERO;
                     }
                 }
 

@@ -214,7 +214,7 @@
                                         <span class="statistics-overview-amount ms-3"
                                               :class="statisticsTextColor"
                                               v-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
-                                            {{ getDisplayAmount(categoricalAnalysisData.totalAmount, defaultCurrency) }}
+                                            {{ getDisplayAmount(categoricalAnalysisData.value, defaultCurrency) }}
                                         </span>
                                         <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
                                                            width="120px" type="text" :loading="true"
@@ -250,29 +250,22 @@
                                     <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Pie.type">
                                         <pie-chart
                                             :items="[
-                                                {id: '1', name: '---', value: 60, color: '7c7c7f'},
-                                                {id: '2', name: '---', value: 20, color: 'a5a5aa'},
-                                                {id: '3', name: '---', value: 20, color: 'c5c5c9'}
+                                                { id: '1', name: '---', value: parseBigDecimal(60), color: '7c7c7f' },
+                                                { id: '2', name: '---', value: parseBigDecimal(20), color: 'a5a5aa' },
+                                                { id: '3', name: '---', value: parseBigDecimal(20), color: 'c5c5c9' }
                                             ]"
+                                            :value-type="ChartValueType.Amount"
                                             :skeleton="true"
-                                            id-field="id"
-                                            name-field="name"
-                                            value-field="value"
-                                            color-field="color"
+                                            :use-custom-color="true"
                                             v-if="initing"
                                         />
                                         <pie-chart
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
+                                            :value-type="ChartValueType.Amount"
                                             :show-value="showAmountInChart"
                                             :show-percent="showPercentInCategoricalChart"
                                             :enable-click-item="true"
-                                            :amount-value="true"
                                             :default-currency="defaultCurrency"
-                                            id-field="id"
-                                            name-field="name"
-                                            value-field="totalAmount"
-                                            percent-field="percent"
-                                            hidden-field="hidden"
                                             v-else-if="!initing"
                                             @click="onClickPieChartItem"
                                         />
@@ -315,9 +308,9 @@
                                                         <div class="d-flex flex-column ms-2">
                                                             <div class="d-flex">
                                                                 <span>{{ item.name }}</span>
-                                                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.totalAmount >= 0">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
+                                                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.value.isPositiveOrZero()">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
                                                                 <v-spacer/>
-                                                                <span class="statistics-amount">{{ getDisplayAmount(item.totalAmount, defaultCurrency) }}</span>
+                                                                <span class="statistics-amount">{{ getDisplayAmount(item.value, defaultCurrency) }}</span>
                                                             </div>
                                                             <div>
                                                                 <v-progress-linear :color="item.color ? getTransactionCategoricalAnalysisDataItemDisplayColor(item) : 'primary'"
@@ -343,21 +336,16 @@
                                                 {name: '---', value: 10},
                                                 {name: '---', value: 10}
                                             ]"
+                                            :value-type="ChartValueType.Amount"
                                             :skeleton="true"
-                                            name-field="name"
-                                            value-field="value"
                                             v-if="initing"
                                         />
                                         <radar-chart
                                             :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
+                                            :value-type="ChartValueType.Amount"
                                             :show-value="showAmountInChart"
                                             :show-percent="showPercentInCategoricalChart"
-                                            :amount-value="true"
                                             :default-currency="defaultCurrency"
-                                            name-field="name"
-                                            value-field="totalAmount"
-                                            percent-field="percent"
-                                            hidden-field="hidden"
                                             v-else-if="!initing"
                                         />
                                     </v-card-text>
@@ -375,11 +363,8 @@
                                             :date-aggregation-type="trendDateAggregationType"
                                             :fiscal-year-start="fiscalYearStart"
                                             :items="[]"
+                                            :value-type="ChartValueType.Amount"
                                             :skeleton="true"
-                                            id-field="id"
-                                            name-field="name"
-                                            value-field="value"
-                                            color-field="color"
                                             v-if="initing"
                                         />
                                         <trends-chart
@@ -394,6 +379,7 @@
                                             :date-aggregation-type="trendDateAggregationType"
                                             :fiscal-year-start="fiscalYearStart"
                                             :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
+                                            :value-type="ChartValueType.Amount"
                                             :translate-name="translateNameInTrendsChart"
                                             :show-value="showAmountInChart"
                                             :enable-click-item="true"
@@ -403,11 +389,6 @@
                                             :show-year-over-year="true"
                                             :show-period-over-period="trendDateAggregationType === ChartDateAggregationType.Month.type || trendDateAggregationType === ChartDateAggregationType.Quarter.type"
                                             ref="monthlyTrendsChart"
-                                            id-field="id"
-                                            name-field="name"
-                                            value-field="totalAmount"
-                                            hidden-field="hidden"
-                                            display-orders-field="displayOrders"
                                             v-else-if="!initing && trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length"
                                             @click="onClickTrendChartItem"
                                         />
@@ -426,11 +407,8 @@
                                             :date-aggregation-type="assetTrendsDateAggregationType"
                                             :fiscal-year-start="fiscalYearStart"
                                             :items="[]"
+                                            :value-type="ChartValueType.Amount"
                                             :skeleton="true"
-                                            id-field="id"
-                                            name-field="name"
-                                            value-field="value"
-                                            color-field="color"
                                             v-if="initing"
                                         />
                                         <trends-chart
@@ -445,6 +423,7 @@
                                             :date-aggregation-type="assetTrendsDateAggregationType"
                                             :fiscal-year-start="fiscalYearStart"
                                             :items="assetTrendsData && assetTrendsData.items && assetTrendsData.items.length ? assetTrendsData.items : []"
+                                            :value-type="ChartValueType.Amount"
                                             :translate-name="translateNameInTrendsChart"
                                             :show-value="showAmountInChart"
                                             :enable-click-item="true"
@@ -454,11 +433,6 @@
                                             :show-year-over-year="true"
                                             :show-period-over-period="assetTrendsDateAggregationType === ChartDateAggregationType.Day.type || assetTrendsDateAggregationType === ChartDateAggregationType.Month.type || assetTrendsDateAggregationType === ChartDateAggregationType.Quarter.type"
                                             ref="dailyTrendsChart"
-                                            id-field="id"
-                                            name-field="name"
-                                            value-field="totalAmount"
-                                            hidden-field="hidden"
-                                            display-orders-field="displayOrders"
                                             v-else-if="!initing && assetTrendsData && assetTrendsData.items && assetTrendsData.items.length"
                                             @click="onClickTrendChartItem"
                                         />
@@ -528,6 +502,7 @@ import { type TransactionStatisticsPartialFilter, useStatisticsStore } from '@/s
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
+import { ChartValueType } from '@/core/chart.ts';
 import {
     ChartDataAggregationType,
     StatisticsAnalysisType,
@@ -545,6 +520,9 @@ import {
     isNumber,
     arrayItemToObjectField
 } from '@/lib/common.ts';
+import {
+    parseBigDecimal
+} from '@/lib/numeral.ts';
 import {
     getGregorianCalendarYearAndMonthFromUnixTime,
     getYearMonthFirstUnixTime,
@@ -1267,7 +1245,7 @@ function exportResults(): void {
                 .filter(item => !item.hidden)
                 .map(item => [
                     item.name,
-                    formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.totalAmount, defaultCurrency.value),
+                    formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.value, defaultCurrency.value),
                     item.percent.toFixed(4)
                 ]),
             supportedMermaidCharts: supportedMermaidCharts

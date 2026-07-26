@@ -90,27 +90,27 @@
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Median-to-Mean Ratio') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.medianToMeanRatio) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.medianToMeanRatio, 2) : '-' }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.medianToMeanRatio) ? formatBigDecimalToLocalizedNumerals(filteredTransactionsStatistic.medianToMeanRatio, 2) : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Top 5 Amount Share') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.top5AmountShare) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare, 2, '<0.01') : '-' }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.top5AmountShare) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.top5AmountShare.toDoubleNumber(), 2, '<0.01') : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Transactions for 80% of Amount') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.transactionsFor80PercentAmount) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.transactionsFor80PercentAmount, 2, '<0.01') : '-' }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.transactionsFor80PercentAmount) ? formatPercentToLocalizedNumerals(filteredTransactionsStatistic.transactionsFor80PercentAmount.toDoubleNumber(), 2, '<0.01') : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Variance') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.variance) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.variance, 2) : '-' }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.variance) ? formatBigDecimalToLocalizedNumerals(filteredTransactionsStatistic.variance, 2) : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Standard Deviation') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.standardDeviation) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.standardDeviation, 2) : '-' }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.standardDeviation) ? formatBigDecimalToLocalizedNumerals(filteredTransactionsStatistic.standardDeviation, 2) : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td>{{ tt('Coefficient of Variation') }}</td>
-                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.coefficientOfVariation) ? formatNumberToLocalizedNumerals(filteredTransactionsStatistic.coefficientOfVariation, 2) : '-' }}</td>
+                                    <td class="text-end">{{ isDefined(filteredTransactionsStatistic.coefficientOfVariation) ? formatBigDecimalToLocalizedNumerals(filteredTransactionsStatistic.coefficientOfVariation, 2) : '-' }}</td>
                                 </tr>
                                 </tbody>
                             </v-table>
@@ -230,6 +230,10 @@ import type { TransactionInsightDataItem } from '@/models/transaction.ts';
 import { isDefined, replaceAll } from '@/lib/common.ts';
 
 import {
+    parseBigDecimal
+} from '@/lib/numeral.ts';
+
+import {
     parseDateTimeFromUnixTimeWithTimezoneOffset
 } from '@/lib/datetime.ts';
 
@@ -255,6 +259,7 @@ const {
     formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency,
+    formatBigDecimalToLocalizedNumerals,
     formatNumberToLocalizedNumerals,
     formatPercentToLocalizedNumerals
 } = useI18n();
@@ -317,13 +322,13 @@ function buildExportResults(): { headers: string[], data: string[][] } | undefin
                 const type = getDisplayTransactionType(transaction);
 
                 let categoryName = transaction.secondaryCategoryName;
-                let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.sourceAmount, transaction.sourceAccount?.currency);
+                let displayAmount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(transaction.sourceAmount), transaction.sourceAccount?.currency);
                 let displayAccountName = transaction.sourceAccountName;
 
                 if (transaction.type === TransactionType.ModifyBalance) {
                     categoryName = tt('Modify Balance');
                 } else if (transaction.type === TransactionType.Transfer && transaction.sourceAccount?.id !== transaction.destinationAccount?.id && getDisplaySourceAmount(transaction) !== getDisplayDestinationAmount(transaction)) {
-                    displayAmount = displayAmount + ' → ' + formatAmountToWesternArabicNumeralsWithoutDigitGrouping(transaction.destinationAmount, transaction.destinationAccount?.currency);
+                    displayAmount = displayAmount + ' → ' + formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(transaction.destinationAmount), transaction.destinationAccount?.currency);
                 }
 
                 if (transaction.type === TransactionType.Transfer && transaction.destinationAccount) {

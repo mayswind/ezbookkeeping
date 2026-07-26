@@ -597,6 +597,7 @@ import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transac
 import type { Account } from '@/models/account.ts';
 
 import { isDefined, findDisplayNameByType } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import {
     getTimezoneOffsetMinutes,
@@ -683,7 +684,7 @@ const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies()
 
 function formatAccountDisplayBalance(selectedAccount: Account): string {
     const balance = account.value.isLiability ? -selectedAccount.balance : selectedAccount.balance;
-    return formatAmountToLocalizedNumeralsWithCurrency(balance, selectedAccount.currency);
+    return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(balance), selectedAccount.currency);
 }
 
 function formatDate(unixTime?: number): string {

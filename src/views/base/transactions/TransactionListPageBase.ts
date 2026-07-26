@@ -81,6 +81,7 @@ export class TransactionListPageType implements TypeAndName {
 export function useTransactionListPageBase() {
     const {
         tt,
+        formatRange,
         getAllDateRanges,
         getCurrentNumeralSystemType,
         formatDateTimeToLongDateTime,
@@ -252,7 +253,13 @@ export function useTransactionListPageBase() {
             displayAmount.push(formatAmountToLocalizedNumeralsWithCurrency(parseInt(amountFilterItems[i] as string), false));
         }
 
-        return displayAmount.join(' ~ ');
+        if (displayAmount.length === 1) {
+            return displayAmount[0]!;
+        } else if (displayAmount.length === 2) {
+            return formatRange(displayAmount[0]!, displayAmount[1]!);
+        } else {
+            return '';
+        }
     });
 
     const transactionCalendarMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTime(query.value.minTime)).getUnixTime()));

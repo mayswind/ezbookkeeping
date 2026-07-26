@@ -119,6 +119,7 @@
             "nHours": "{n}時間",
             "nDay": "{n}日",
             "nDays": "{n}日",
+            "startEndRange": "{start} ~ {end}",
             "multiTextJoinSeparator": "、",
             "charactersRemaining": "残り{count}文字",
             "charactersOverLimit": "{count}文字超過",

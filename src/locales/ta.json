@@ -119,6 +119,7 @@
             "nHours": "{n} மணி நேரங்கள்",
             "nDay": "{n} நாள்",
             "nDays": "{n} நாட்கள்",
+            "startEndRange": "{start} ~ {end}",
             "multiTextJoinSeparator": ", ",
             "charactersRemaining": "{count} remaining",
             "charactersOverLimit": "{count} over",

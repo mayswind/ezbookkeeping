@@ -944,6 +944,10 @@ export function useI18n() {
         return textArray.join(separator);
     }
 
+    function formatRange(start: string, end: string): string {
+        return t('format.misc.startEndRange', { start: start, end: end });
+    }
+
     function getServerMultiLanguageConfigContent(multiLanguageConfig: Record<string, string>): string {
         if (!multiLanguageConfig) {
             return '';
@@ -2051,7 +2055,7 @@ export function useI18n() {
             const displayStartTime = formatUnixTime(startTime, format, gregorianLikeDateTimeFormatOptions);
             const displayEndTime = formatUnixTime(endTime, format, gregorianLikeDateTimeFormatOptions);
 
-            return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
+            return displayStartTime !== displayEndTime ? formatRange(displayStartTime, displayEndTime) : displayStartTime;
         }
 
         if (isDateRangeMatchFullMonths(startTime, endTime)) {
@@ -2059,7 +2063,7 @@ export function useI18n() {
             const displayStartTime = formatUnixTime(startTime, format, gregorianLikeDateTimeFormatOptions);
             const displayEndTime = formatUnixTime(endTime, format, gregorianLikeDateTimeFormatOptions);
 
-            return displayStartTime !== displayEndTime ? `${displayStartTime} ~ ${displayEndTime}` : displayStartTime;
+            return displayStartTime !== displayEndTime ? formatRange(displayStartTime, displayEndTime) : displayStartTime;
         }
 
         const startTimeYear = parseDateTimeFromUnixTime(startTime).getLocalizedCalendarYear(gregorianLikeDateTimeFormatOptions);
@@ -2073,10 +2077,10 @@ export function useI18n() {
             return displayStartTime;
         } else if (startTimeYear === endTimeYear) {
             const displayShortEndTime = formatUnixTime(endTime, getLocalizedShortMonthDayFormat(), gregorianLikeDateTimeFormatOptions);
-            return `${displayStartTime} ~ ${displayShortEndTime}`;
+            return formatRange(displayStartTime, displayShortEndTime);
         }
 
-        return `${displayStartTime} ~ ${displayEndTime}`;
+        return formatRange(displayStartTime, displayEndTime);
     }
 
     function getTimezoneDifferenceDisplayText(unixTime: number, utcOffset: number): string {
@@ -2540,6 +2544,7 @@ export function useI18n() {
         ti: translateIf,
         te: translateError,
         joinMultiText,
+        formatRange,
         getServerMultiLanguageConfigContent,
         // get current language info
         getCurrentLanguageTag,

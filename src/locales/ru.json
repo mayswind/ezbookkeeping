@@ -119,6 +119,7 @@
             "nHours": "{n} часов",
             "nDay": "{n} день",
             "nDays": "{n} дней",
+            "startEndRange": "{start} ~ {end}",
             "multiTextJoinSeparator": ", ",
             "charactersRemaining": "{count} remaining",
             "charactersOverLimit": "{count} over",

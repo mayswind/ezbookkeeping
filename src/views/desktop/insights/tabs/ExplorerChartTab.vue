@@ -345,6 +345,7 @@ const emit = defineEmits<{
 
 const {
     tt,
+    formatRange,
     getAllStatisticsSortingTypes,
     getAllTransactionExplorerDataDimensions,
     getAllTransactionExplorerValueMetrics,
@@ -765,7 +766,7 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
         if (rangeParts && rangeParts.length === 2 && Number.isFinite(parseInt(rangeParts[0] as string)) && Number.isFinite(parseInt(rangeParts[1] as string))) {
             const from = formatAmountToLocalizedNumerals(parseInt(rangeParts[0] as string), defaultCurrency.value);
             const to = formatAmountToLocalizedNumerals(parseInt(rangeParts[1] as string), defaultCurrency.value);
-            displayName = `${from} ~ ${to}`;
+            displayName = formatRange(from, to);
         }
     }
 

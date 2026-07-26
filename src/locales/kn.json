@@ -119,6 +119,7 @@
             "nHours": "{n} ಗಂಟೆಗಳು",
             "nDay": "{n} ದಿನ",
             "nDays": "{n} ದಿನಗಳು",
+            "startEndRange": "{start} ~ {end}",
             "multiTextJoinSeparator": ", ",
             "charactersRemaining": "{count} remaining",
             "charactersOverLimit": "{count} over",

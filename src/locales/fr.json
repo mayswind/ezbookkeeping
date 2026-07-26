@@ -119,6 +119,7 @@
             "nHours": "{n} Hours",
             "nDay": "{n} Day",
             "nDays": "{n} Days",
+            "startEndRange": "{start} ~ {end}",
             "multiTextJoinSeparator": ", ",
             "charactersRemaining": "{count} remaining",
             "charactersOverLimit": "{count} over",

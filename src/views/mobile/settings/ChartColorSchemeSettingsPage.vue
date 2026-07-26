@@ -142,8 +142,6 @@ function addNewColor(): void {
     addChartColor();
 
     nextTick(() => {
-        console.log(colorSchemeList.value?.$el)
-
         colorSchemeList.value?.$el?.querySelector('ul > li:last-child')?.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest'

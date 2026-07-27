@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize :class="finalClass" :style="finalStyle" :option="chartOptions"
+    <v-chart autoresize :class="finalClass" :style="finalStyle"
+             :option="chartOptions" :update-options="{ notMerge: true }"
              @click="clickItem" />
 </template>
 
@@ -22,8 +23,8 @@ import { BIG_DECIMAL_ZERO, BIG_DECIMAL_POSITIVE_INFINITY, parseBigDecimal } from
 
 interface HeatMapData {
     allSeriesNames: string[];
-    allDataMap: Record<string, BigDecimal>;
-    data: [number, number, number][]; // third value used for echarts calculation, the actual value is in allDataMap
+    allOriginalDataMap: Record<string, BigDecimal>;
+    data: [number, number, number][]; // third value only used for echarts rendering, the actual value is in allOriginalDataMap
     minValue: BigDecimal;
     maxValue: BigDecimal;
 }
@@ -85,7 +86,7 @@ const finalStyle = computed<Record<string, string>>(() => {
 
 const heatMapData = computed<HeatMapData>(() => {
     const allData: [number, number, number][] = [];
-    const allDataMap: Record<string, BigDecimal> = {};
+    const allOriginalDataMap: Record<string, BigDecimal> = {};
     const allSeriesNames: string[] = [];
     let minValue: BigDecimal = BIG_DECIMAL_POSITIVE_INFINITY;
     let maxValue: BigDecimal = BIG_DECIMAL_ZERO;
@@ -110,14 +111,14 @@ const heatMapData = computed<HeatMapData>(() => {
                 minValue = amount;
             }
 
-            allDataMap[`${categoryIndex}-${seriesIndex}`] = amount;
+            allOriginalDataMap[`${categoryIndex}-${seriesIndex}`] = amount;
             allData.push([categoryIndex, seriesIndex, amount.toDoubleNumber()]);
         }
     }
 
     const ret: HeatMapData = {
         allSeriesNames: allSeriesNames,
-        allDataMap: allDataMap,
+        allOriginalDataMap: allOriginalDataMap,
         data: allData,
         minValue: minValue.isPositiveInfinity() ? BIG_DECIMAL_ZERO : minValue,
         maxValue: maxValue
@@ -196,12 +197,20 @@ const chartOptions = computed<object>(() => {
                 textStyle: {
                     color: isDarkMode.value ? '#888' : '#666'
                 },
-                formatter: (value: string) => {
+                formatter: (value: number) => {
                     if (!props.showValue) {
                         return '';
                     }
 
-                    return formatChartValueToLocalizedNumerals(parseBigDecimal(value), props.valueType, props.defaultCurrency);
+                    let actualValue: BigDecimal = parseBigDecimal(value);
+
+                    if (value === heatMapData.value.minValue.toDoubleNumber()) {
+                        actualValue = heatMapData.value.minValue;
+                    } else if (value === heatMapData.value.maxValue.toDoubleNumber()) {
+                        actualValue = heatMapData.value.maxValue;
+                    }
+
+                    return formatChartValueToLocalizedNumerals(actualValue, props.valueType, props.defaultCurrency);
                 }
             }
         ],
@@ -261,7 +270,7 @@ const chartOptions = computed<object>(() => {
 function formatDataItemDisplayValue(dataItem: [number, number, number]): string {
     const categoryIndex = dataItem[0];
     const seriesIndex = dataItem[1];
-    const value: BigDecimal | undefined = heatMapData.value.allDataMap[`${categoryIndex}-${seriesIndex}`];
+    const value: BigDecimal | undefined = heatMapData.value.allOriginalDataMap[`${categoryIndex}-${seriesIndex}`];
     return value ? formatChartValueToLocalizedNumerals(value, props.valueType, props.defaultCurrency) : '0';
 }
 
@@ -295,7 +304,7 @@ function exportData(): { headers: string[], data: string[][] } {
         const row: string[] = [];
         row.push(seriesName);
         for (let categoryIndex = 0; categoryIndex < props.allCategoryNames.length; categoryIndex++) {
-            const value: BigDecimal = heatMapData.value.allDataMap[`${categoryIndex}-${seriesIndex}`] ?? BIG_DECIMAL_ZERO;
+            const value: BigDecimal = heatMapData.value.allOriginalDataMap[`${categoryIndex}-${seriesIndex}`] ?? BIG_DECIMAL_ZERO;
 
             if (props.valueType === ChartValueType.Amount) {
                 row.push(formatAmountToWesternArabicNumeralsWithoutDigitGrouping(value, props.defaultCurrency));

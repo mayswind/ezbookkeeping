@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize :class="finalClass" :option="chartOptions"
+    <v-chart autoresize :class="finalClass"
+             :option="chartOptions" :update-options="{ notMerge: true }"
              @click="clickItem" />
 </template>
 
@@ -32,7 +33,7 @@ interface HierarchyData {
 
 interface HierarchyDataItem {
     name: string;
-    value: number; // only used for echarts calculation, the actual value is originalValue
+    value: number; // only used for echarts rendering, the actual value is originalValue
     originalValue: string;
     parentName?: string;
     parentOrginalValue?: string;
@@ -269,9 +270,9 @@ function exportData(): { headers: string[], data: string[][] } {
 
         for (const child of item.children ?? []) {
             if (props.valueType === ChartValueType.Amount) {
-                row.push(formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(child.value), props.defaultCurrency));
+                row.push(formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(child.originalValue), props.defaultCurrency));
             } else {
-                row.push(formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(child.value)));
+                row.push(formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(child.originalValue)));
             }
         }
 

@@ -16,10 +16,8 @@ export interface CommonPieChartDataItem {
     id: string;
     name: string;
     displayName: string;
-    value: string;
+    value: number; // only used for echarts rendering, the actual value is in originalValue
     originalValue: string;
-    originalValuePositive: boolean;
-    originalValuePositiveOrZero: boolean;
     displayValue: string;
     percent: number;
     paintPercent: number;
@@ -79,10 +77,8 @@ export function usePieChartBase(props: CommonPieChartProps) {
                     id: item.id ?? item.name,
                     name: item.id ?? item.name,
                     displayName: item.name,
-                    value: item.value.isPositive() ? item.value.toString() : '0',
+                    value: item.value.isPositive() ? item.value.toDoubleNumber() : 0,
                     originalValue: item.value.toString(),
-                    originalValuePositive: item.value.isPositive(),
-                    originalValuePositiveOrZero: item.value.isPositiveOrZero(),
                     displayValue: formatChartValueToLocalizedNumerals(item.value, props.valueType, props.defaultCurrency),
                     percent: percent,
                     paintPercent: item.value.isPositive() ? item.value.divide(totalValidValue).toDoubleNumber() : 0,

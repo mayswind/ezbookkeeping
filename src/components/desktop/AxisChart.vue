@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize :class="finalClass" :option="chartOptions"
+    <v-chart autoresize :class="finalClass"
+             :option="chartOptions" :update-options="{ notMerge: true }"
              @click="clickItem" @legendselectchanged="onLegendSelectChanged" />
 </template>
 
@@ -22,12 +23,17 @@ import { type AxisChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
 
 import type { SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 
-import { isArray } from '@/lib/common.ts';
+import { isArray, isNumber } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, BIG_DECIMAL_NEGATIVE_INFINITY, BIG_DECIMAL_POSITIVE_INFINITY, parseBigDecimal } from '@/lib/numeral.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 export type AxisChartDisplayType = 'line' | 'area' | 'column' | 'bubble';
+
+interface AxisChartData {
+    allSeries: AxisChartDataItem[];
+    allOriginalData: BigDecimal[][];
+}
 
 interface AxisChartDataItem {
     id: string;
@@ -41,7 +47,7 @@ interface AxisChartDataItem {
     stack?: string;
     symbolSize?: (data: number) => number;
     animation: boolean;
-    data: string[];
+    data: number[];  // only used for echarts rendering, the actual value is in allOriginalData
 }
 
 interface AxisChartTooltipItem extends SortableTransactionStatisticDataItem {
@@ -123,8 +129,9 @@ const allItemsMap = computed<Record<string, AxisChartSourceDataItem>>(() => {
     return map;
 });
 
-const allSeries = computed<AxisChartDataItem[]>(() => {
+const axisChartData = computed<AxisChartData>(() => {
     const allSeries: AxisChartDataItem[] = [];
+    const allOriginalData: BigDecimal[][] = [];
     const categoryTotalAmount: Record<number, BigDecimal> = {};
     let maxAmountOfAllData: BigDecimal = BIG_DECIMAL_ZERO;
 
@@ -177,7 +184,7 @@ const allSeries = computed<AxisChartDataItem[]>(() => {
             selected: true,
             type: 'line',
             animation: !props.skeleton,
-            data: allAmounts.map(amount => amount.toString())
+            data: allAmounts.map(amount => amount.toDoubleNumber())
         };
 
         if (props.stacked) {
@@ -200,9 +207,13 @@ const allSeries = computed<AxisChartDataItem[]>(() => {
         }
 
         allSeries.push(finalItem);
+        allOriginalData.push(allAmounts);
     }
 
-    return allSeries;
+    return {
+        allSeries: allSeries,
+        allOriginalData: allOriginalData
+    };
 });
 
 const yAxisWidth = computed<number>(() => {
@@ -210,20 +221,18 @@ const yAxisWidth = computed<number>(() => {
     let minValue: BigDecimal = BIG_DECIMAL_POSITIVE_INFINITY;
     let width = 90;
 
-    if (!allSeries.value || !allSeries.value.length) {
+    if (!axisChartData.value || !axisChartData.value.allOriginalData || !axisChartData.value.allOriginalData.length) {
         return width;
     }
 
-    for (const series of allSeries.value) {
-        for (const value of series.data) {
-            const bigDecimalValue = parseBigDecimal(value);
-
-            if (bigDecimalValue.greaterThan(maxValue)) {
-                maxValue = bigDecimalValue;
+    for (const seriesData of axisChartData.value.allOriginalData) {
+        for (const value of seriesData) {
+            if (value.greaterThan(maxValue)) {
+                maxValue = value;
             }
 
-            if (bigDecimalValue.lessThan(minValue)) {
-                minValue = bigDecimalValue;
+            if (value.lessThan(minValue)) {
+                minValue = value;
             }
         }
     }
@@ -276,21 +285,32 @@ const chartOptions = computed<object>(() => {
                 const visibleSeriesIds: string[] = [];
 
                 for (const param of params) {
-                    const id = param.seriesId as string;
-                    const name = allItemsMap.value[id] ? getItemName(allItemsMap.value[id].name) : id;
-                    const color = param.color;
-                    const displayOrders = allItemsMap.value[id]?.displayOrders ?? [0];
-                    const amount: BigDecimal = parseBigDecimal(param.data as string);
+                    if (!isNumber(param.seriesIndex)) {
+                        continue;
+                    }
+
+                    const seriesIndex = param.seriesIndex;
+                    const seriesData = axisChartData.value.allSeries[seriesIndex];
+
+                    if (!seriesData) {
+                        continue;
+                    }
+
+                    const seriesId = seriesData.id;
+                    const name = allItemsMap.value[seriesId] ? getItemName(allItemsMap.value[seriesId].name) : seriesId;
+                    const color = seriesData.itemStyle.color;
+                    const displayOrders = allItemsMap.value[seriesId]?.displayOrders ?? [0];
+                    const amount: BigDecimal = axisChartData.value.allOriginalData[seriesIndex]?.[categoryIndex] ?? BIG_DECIMAL_ZERO;
 
                     displayItems.push({
-                        id: id,
+                        id: seriesId,
                         name: name,
                         color: color,
                         displayOrders: displayOrders,
                         value: amount
                     });
 
-                    visibleSeriesIds.push(id);
+                    visibleSeriesIds.push(seriesId);
                     totalAmount = totalAmount.add(amount);
                 }
 
@@ -397,7 +417,7 @@ const chartOptions = computed<object>(() => {
             orient: 'horizontal',
             type: 'scroll',
             top: 0,
-            data: allSeries.value.map(item => item.name),
+            data: axisChartData.value.allSeries.map(item => item.name),
             selected: selectedLegends.value,
             textStyle: {
                 color: isDarkMode.value ? '#eee' : '#333'
@@ -426,14 +446,14 @@ const chartOptions = computed<object>(() => {
                 max: props.oneHundredPercentStacked ? 100 : undefined,
                 axisLabel: {
                     color: isDarkMode.value ? '#888' : '#666',
-                    formatter: (value: string) => {
+                    formatter: (value: number) => {
                         return getDisplayValue(parseBigDecimal(value));
                     }
                 },
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return getDisplayValue(parseBigDecimal(params.value as string).truncate());
+                            return getDisplayValue(parseBigDecimal(params.value as number).truncate());
                         }
                     }
                 },
@@ -444,7 +464,7 @@ const chartOptions = computed<object>(() => {
                 }
             }
         ],
-        series: allSeries.value
+        series: axisChartData.value.allSeries
     };
 });
 
@@ -483,7 +503,7 @@ function exportData(): { headers: string[], data: string[][] } {
 
     headers.push(props.categoryTypeName);
 
-    for (const series of allSeries.value) {
+    for (const series of axisChartData.value.allSeries) {
         const id = series.id;
         const name = allItemsMap.value[id] ? getItemName(allItemsMap.value[id].name) : id;
         headers.push(name);
@@ -492,13 +512,13 @@ function exportData(): { headers: string[], data: string[][] } {
     for (const [categoryName, index] of itemAndIndex(props.allCategoryNames)) {
         const row: string[] = [];
         row.push(categoryName);
-        row.push(...allSeries.value.map(item => {
+        row.push(...axisChartData.value.allOriginalData.map(item => {
             if (props.oneHundredPercentStacked) {
-                return formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ? parseBigDecimal(item.data[index]) : BIG_DECIMAL_ZERO);
+                return formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(item[index] ?? BIG_DECIMAL_ZERO);
             } else if (props.valueType === ChartValueType.Amount) {
-                return formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(item.data[index] ?? 0), props.defaultCurrency);
+                return formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item[index] ?? BIG_DECIMAL_ZERO, props.defaultCurrency);
             } else {
-                return formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(item.data[index] ? parseBigDecimal(item.data[index]) : BIG_DECIMAL_ZERO);
+                return formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(item[index] ?? BIG_DECIMAL_ZERO);
             }
         }));
         data.push(row);

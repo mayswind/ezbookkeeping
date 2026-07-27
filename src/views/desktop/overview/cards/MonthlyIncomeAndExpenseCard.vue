@@ -19,8 +19,9 @@
             </div>
         </v-card-text>
 
-        <v-chart autoresize class="overview-monthly-chart-container"
-                 :class="{ 'readonly': !hasAnyData }" :option="chartOptions" @click="clickItem"/>
+        <v-chart autoresize class="overview-monthly-chart-container" :class="{ 'readonly': !hasAnyData }"
+                 :option="chartOptions" :update-options="{ notMerge: true }"
+                 @click="clickItem"/>
     </v-card>
 </template>
 
@@ -91,8 +92,8 @@ const hasAnyData = computed<boolean>(() => {
 
 const chartOptions = computed<object>(() => {
     const monthNames: string[] = [];
-    const incomeAmounts: string[] = [];
-    const expenseAmounts: string[] = [];
+    const incomeAmounts: number[] = []; // only used for echarts rendering, the actual value is in props.data
+    const expenseAmounts: number[] = []; // only used for echarts rendering, the actual value is in props.data
     let minAmount: BigDecimal = BIG_DECIMAL_ZERO;
     let maxAmount: BigDecimal = BIG_DECIMAL_ZERO;
 
@@ -104,8 +105,8 @@ const chartOptions = computed<object>(() => {
             const monthShortName = formatDateTimeToGregorianLikeShortMonth(monthStartDateTime);
 
             monthNames.push(monthShortName);
-            incomeAmounts.push(item.incomeAmount.toString());
-            expenseAmounts.push(item.expenseAmount.negate().toString());
+            incomeAmounts.push(item.incomeAmount.toDoubleNumber());
+            expenseAmounts.push(item.expenseAmount.negate().toDoubleNumber());
 
             if (item.incomeAmount.greaterThan(maxAmount)) {
                 maxAmount = item.incomeAmount;

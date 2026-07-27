@@ -13,7 +13,7 @@
                         :stroke-dasharray="getItemStrokeDash(item)"
                         :stroke-dashoffset="getItemDashOffset(item, validItems, itemCommonDashOffset)"
                         @click="switchSelectedIndex(idx)"
-                        v-if="item.originalValuePositive && item.paintPercent > minPaintPercent">
+                        v-if="item.value > 0 && item.paintPercent > minPaintPercent">
                 </circle>
             </template>
 
@@ -45,7 +45,7 @@
                 </f7-link>
 
                 <div class="pie-chart-toolbox-info">
-                    <p v-if="showPercent && selectedItem && selectedItem.originalValuePositiveOrZero">
+                    <p v-if="showPercent && selectedItem && selectedItem.value >= 0">
                         <f7-chip class="chip-placeholder" outline v-if="skeleton">
                             <span class="skeleton-text">Percent</span>
                         </f7-chip>
@@ -54,7 +54,7 @@
                                  :style="getColorStyle(selectedItem?.color, '--f7-chip-outline-border-color')"
                                  v-else-if="!skeleton"></f7-chip>
                     </p>
-                    <p v-else-if="showPercent && (!validItems || !validItems.length || !selectedItem || !selectedItem.originalValuePositiveOrZero)">
+                    <p v-else-if="showPercent && (!validItems || !validItems.length || !selectedItem || selectedItem.value < 0)">
                         <f7-chip outline text="---"></f7-chip>
                     </p>
                     <f7-link class="pie-chart-selected-item-info" :no-link-class="!enableClickItem" v-if="selectedItem" @click="clickItem(selectedItem)">
@@ -112,8 +112,8 @@ const totalValidValue = computed<BigDecimal>(() => {
     let totalValidValue: BigDecimal = BIG_DECIMAL_ZERO;
 
     for (const item of validItems.value) {
-        if (item.originalValuePositive && item.paintPercent > minPaintPercent) {
-            totalValidValue = totalValidValue.add(parseBigDecimal(item.value));
+        if (item.value > 0 && item.paintPercent > minPaintPercent) {
+            totalValidValue = totalValidValue.add(parseBigDecimal(item.originalValue));
         }
     }
 
@@ -130,7 +130,7 @@ const itemCommonDashOffset = computed<number>(() => {
     for (let i = 0; i < Math.min(selectedIndex.value + 1, validItems.value.length); i++) {
         const item = validItems.value[i] as CommonPieChartDataItem;
 
-        if (item.originalValuePositive && item.paintPercent > minPaintPercent) {
+        if (item.value > 0 && item.paintPercent > minPaintPercent) {
             if (i === selectedIndex.value) {
                 offset += -circumference * (1 - item.paintPercent) / 2;
             } else {

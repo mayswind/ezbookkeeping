@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize class="account-balance-trends-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"/>
+    <v-chart autoresize class="account-balance-trends-chart-container" :class="{ 'transition-in': skeleton }"
+             :option="chartOptions" :update-options="{ notMerge: true }" />
 </template>
 
 <script setup lang="ts">
@@ -34,6 +35,11 @@ interface DesktopAccountBalanceTrendsChartProps extends CommonAccountBalanceTren
     type?: number;
 }
 
+interface AccountBalanceTrendsChartData {
+    allSeries: AccountBalanceTrendsChartDataItem[];
+    seriesOriginalData: (BigDecimal | BigDecimal[])[];
+}
+
 interface AccountBalanceTrendsChartDataItem {
     id: string;
     name: string;
@@ -48,7 +54,7 @@ interface AccountBalanceTrendsChartDataItem {
     areaStyle?: object;
     stack: string;
     animation: boolean;
-    data: (string | string[])[];
+    data: (string | string[])[]; // only used for echarts rendering, the actual value is in seriesOriginalData
 }
 
 const props = defineProps<DesktopAccountBalanceTrendsChartProps>();
@@ -75,7 +81,7 @@ const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirect
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const chartColors = computed<ColorValue[]>(() => settingsStore.chartColorList);
 
-const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
+const trendsChartData = computed<AccountBalanceTrendsChartData>(() => {
     const series: AccountBalanceTrendsChartDataItem = {
         id: 'accountBalance',
         name: props.legendName,
@@ -88,6 +94,7 @@ const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
         animation: !props.skeleton,
         data: []
     };
+    const originalData: (BigDecimal | BigDecimal[])[] = [];
 
     if (props.type === AccountBalanceTrendChartType.Area.type) {
         series.areaStyle = {};
@@ -114,6 +121,13 @@ const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
                 item.q3Balance.toString(),
                 item.maximumBalance.toString()
             ]);
+            originalData.push([
+                item.minimumBalance,
+                item.q1Balance,
+                item.medianBalance,
+                item.q3Balance,
+                item.maximumBalance
+            ]);
         } else if (props.type === AccountBalanceTrendChartType.Candlestick.type) {
             series.data.push([
                 item.openingBalance.toString(),
@@ -121,12 +135,22 @@ const allSeries = computed<AccountBalanceTrendsChartDataItem[]>(() => {
                 item.minimumBalance.toString(),
                 item.maximumBalance.toString()
             ]);
+            originalData.push([
+                item.openingBalance,
+                item.closingBalance,
+                item.minimumBalance,
+                item.maximumBalance
+            ]);
         } else {
             series.data.push(item.closingBalance.toString());
+            originalData.push(item.closingBalance);
         }
     }
 
-    return [series];
+    return {
+        allSeries: [series],
+        seriesOriginalData: originalData
+    };
 });
 
 const yAxisWidth = computed<number>(() => {
@@ -134,33 +158,31 @@ const yAxisWidth = computed<number>(() => {
     let minValue: BigDecimal = BIG_DECIMAL_POSITIVE_INFINITY;
     let width = 90;
 
-    if (!allSeries.value || !allSeries.value.length) {
+    if (!trendsChartData.value || !trendsChartData.value.seriesOriginalData || !trendsChartData.value.seriesOriginalData.length) {
         return width;
     }
 
-    for (const series of allSeries.value) {
-        for (const data of series.data) {
-            let currentMinValue: BigDecimal;
-            let currentMaxValue: BigDecimal;
+    for (const data of trendsChartData.value.seriesOriginalData) {
+        let currentMinValue: BigDecimal;
+        let currentMaxValue: BigDecimal;
 
-            if (isArray(data) && props.type === AccountBalanceTrendChartType.Boxplot.type) {
-                currentMinValue = parseBigDecimal(data[0] as string);
-                currentMaxValue = parseBigDecimal(data[4] as string);
-            } else if (isArray(data) && props.type === AccountBalanceTrendChartType.Candlestick.type) {
-                currentMinValue = parseBigDecimal(data[2] as string);
-                currentMaxValue = parseBigDecimal(data[3] as string);
-            } else {
-                currentMinValue = parseBigDecimal(data as string);
-                currentMaxValue = parseBigDecimal(data as string);
-            }
+        if (isArray(data) && props.type === AccountBalanceTrendChartType.Boxplot.type) {
+            currentMinValue = data[0]!;
+            currentMaxValue = data[4]!;
+        } else if (isArray(data) && props.type === AccountBalanceTrendChartType.Candlestick.type) {
+            currentMinValue = data[2]!;
+            currentMaxValue = data[3]!;
+        } else {
+            currentMinValue = data as BigDecimal;
+            currentMaxValue = data as BigDecimal;
+        }
 
-            if (currentMaxValue.greaterThan(maxValue)) {
-                maxValue = currentMaxValue;
-            }
+        if (currentMaxValue.greaterThan(maxValue)) {
+            maxValue = currentMaxValue;
+        }
 
-            if (currentMinValue.lessThan(minValue)) {
-                minValue = currentMinValue;
-            }
+        if (currentMinValue.lessThan(minValue)) {
+            minValue = currentMinValue;
         }
     }
 
@@ -309,14 +331,14 @@ const chartOptions = computed<object>(() => {
                 type: 'value',
                 axisLabel: {
                     color: isDarkMode.value ? '#888' : '#666',
-                    formatter: (value: string) => {
+                    formatter: (value: number) => {
                         return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(value), props.account.currency);
                     }
                 },
                 axisPointer: {
                     label: {
                         formatter: (params: CallbackDataParams) => {
-                            return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(params.value as string).truncate(), props.account.currency);
+                            return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(params.value as number).truncate(), props.account.currency);
                         }
                     }
                 },
@@ -327,7 +349,7 @@ const chartOptions = computed<object>(() => {
                 }
             }
         ],
-        series: allSeries.value
+        series: trendsChartData.value.allSeries
     };
 });
 

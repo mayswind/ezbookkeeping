@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize class="account-category-sankey-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"
+    <v-chart autoresize class="account-category-sankey-chart-container" :class="{ 'transition-in': skeleton }"
+             :option="chartOptions" :update-options="{ notMerge: true }"
              @click="clickItem" />
 </template>
 
@@ -54,7 +55,7 @@ interface SankeyChartNodeItem {
     itemId: string;
     name: string;
     displayName: string;
-    value: number; // only used for echarts calculation, the actual value is displayValue
+    value: number; // only used for echarts rendering, the actual value is displayValue
     displayValue: string;
     displayAccountNetCashFlow?: string;
     percent?: number;
@@ -74,7 +75,7 @@ interface SankeyChartLinkItem {
     targetItemId: string;
     target: string;
     targetDisplayName: string;
-    value: number; // only used for echarts calculation, the actual value is displayValue
+    value: number; // only used for echarts rendering, the actual value is displayValue
     displayValue: string;
 }
 

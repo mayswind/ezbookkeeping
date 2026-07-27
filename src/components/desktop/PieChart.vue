@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize class="pie-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions"
+    <v-chart autoresize class="pie-chart-container" :class="{ 'transition-in': skeleton }"
+             :option="chartOptions" :update-options="{ notMerge: true }"
              @click="clickItem" @legendselectchanged="onLegendSelectChanged" />
 </template>
 
@@ -78,18 +79,24 @@ const firstItemAndHalfCurrentItemTotalPercent = computed<number>(() => {
         }
 
         if (firstValue === null) {
-            firstValue = item.value;
+            firstValue = item.originalValue;
+        }
+
+        let positiveValue: BigDecimal = parseBigDecimal(item.value);
+
+        if (positiveValue.isNegative()) {
+            positiveValue = BIG_DECIMAL_ZERO;
         }
 
         if (firstValue !== null) {
             if (index < selectedIndex.value) {
-                firstToCurrentTotalValue = firstToCurrentTotalValue.add(parseBigDecimal(item.value));
+                firstToCurrentTotalValue = firstToCurrentTotalValue.add(positiveValue);
             } else if (index === selectedIndex.value) {
-                firstToCurrentTotalValue = firstToCurrentTotalValue.add(parseBigDecimal(item.value).divide(2));
+                firstToCurrentTotalValue = firstToCurrentTotalValue.add(positiveValue.divide(2));
             }
         }
 
-        totalValue = totalValue.add(parseBigDecimal(item.value));
+        totalValue = totalValue.add(positiveValue);
     }
 
     if (firstToCurrentTotalValue && totalValue.isPositive()) {
@@ -123,7 +130,7 @@ const chartOptions = computed<object>(() => {
                 }
 
                 const showValue = props.showValue;
-                const showPercent = props.showPercent && dataItem.originalValuePositive;
+                const showPercent = props.showPercent && dataItem.value > 0;
 
                 if (showValue && showPercent) {
                     tooltip += `<div class="d-inline-flex"><span>${dataItem.displayValue}</span><span class="ms-1">(${percent})</span></div>`;

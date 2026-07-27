@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize :class="finalClass" :style="finalStyle" :option="chartOptions"
+    <v-chart autoresize :class="finalClass" :style="finalStyle"
+             :option="chartOptions" :update-options="{ notMerge: true }"
              @click="clickItem" />
 </template>
 
@@ -31,7 +32,7 @@ import {
 import { parseDateTimeFromKnownDateTimeFormat } from '@/lib/datetime.ts';
 
 interface HeatMapData {
-    allDataMap: Record<string, BigDecimal>;
+    allOriginalDataMap: Record<string, BigDecimal>;
     data: Record<number, YearlyHeatmapData>;
     minValue: BigDecimal;
     maxValue: BigDecimal;
@@ -40,7 +41,7 @@ interface HeatMapData {
 interface YearlyHeatmapData {
     gregorianYear: number;
     displayYear: string;
-    data: [string, number][]; // second value used for echarts calculation, the actual value is in allDataMap of HeatMapData
+    data: [string, number][]; // second value only used for echarts rendering, the actual value is in allOriginalDataMap of HeatMapData
 }
 
 const props = defineProps<{
@@ -108,7 +109,7 @@ const finalStyle = computed<Record<string, string>>(() => {
 });
 
 const heatMapData = computed<HeatMapData>(() => {
-    const allDataMap: Record<string, BigDecimal> = {};
+    const allOriginalDataMap: Record<string, BigDecimal> = {};
     const allData: Record<number, YearlyHeatmapData> = {};
     let minValue: BigDecimal = BIG_DECIMAL_POSITIVE_INFINITY;
     let maxValue: BigDecimal = BIG_DECIMAL_ZERO;
@@ -138,13 +139,13 @@ const heatMapData = computed<HeatMapData>(() => {
                 allData[year] = data;
             }
 
-            allDataMap[dateTime.getGregorianCalendarYearDashMonthDashDay()] = item.value;
+            allOriginalDataMap[dateTime.getGregorianCalendarYearDashMonthDashDay()] = item.value;
             data.data.push([dateTime.getGregorianCalendarYearDashMonthDashDay(), item.value.toDoubleNumber()]);
         }
     }
 
     const ret: HeatMapData = {
-        allDataMap: allDataMap,
+        allOriginalDataMap: allOriginalDataMap,
         data: allData,
         minValue: minValue.isPositiveInfinity() ? BIG_DECIMAL_ZERO : minValue,
         maxValue: maxValue
@@ -169,7 +170,7 @@ const chartOptions = computed<object>(() => {
                 const dataItem = params.data as [string, number];
                 const dateTime = dataItem && dataItem[0] ? parseDateTimeFromKnownDateTimeFormat(dataItem[0], KnownDateTimeFormat.DefaultDate) : '';
                 const name = props.valueTypeName;
-                const value: BigDecimal | undefined = dataItem && dataItem[0] ? heatMapData.value.allDataMap[dataItem[0]] : undefined;
+                const value: BigDecimal | undefined = dataItem && dataItem[0] ? heatMapData.value.allOriginalDataMap[dataItem[0]] : undefined;
                 const displayValue: string = value ? formatChartValueToLocalizedNumerals(value, props.valueType, props.defaultCurrency) : '';
 
                 return (dateTime ? `<div class="d-inline-flex">${formatDateTimeToLongDate(dateTime)}</div><br/>` : '')
@@ -195,12 +196,20 @@ const chartOptions = computed<object>(() => {
                 textStyle: {
                     color: isDarkMode.value ? '#888' : '#666'
                 },
-                formatter: (value: string) => {
+                formatter: (value: number) => {
                     if (!props.showValue) {
                         return '';
                     }
 
-                    return formatChartValueToLocalizedNumerals(parseBigDecimal(value), props.valueType, props.defaultCurrency);
+                    let actualValue: BigDecimal = parseBigDecimal(value);
+
+                    if (value === heatMapData.value.minValue.toDoubleNumber()) {
+                        actualValue = heatMapData.value.minValue;
+                    } else if (value === heatMapData.value.maxValue.toDoubleNumber()) {
+                        actualValue = heatMapData.value.maxValue;
+                    }
+
+                    return formatChartValueToLocalizedNumerals(actualValue, props.valueType, props.defaultCurrency);
                 }
             }
         ],
@@ -273,7 +282,7 @@ function clickItem(e: ECElementEvent): void {
     const date = dataItem[0];
     const dateTime = parseDateTimeFromKnownDateTimeFormat(date, KnownDateTimeFormat.DefaultDate);
     const displayDate = dateTime ? formatDateTimeToLongDate(dateTime) : '';
-    const value: BigDecimal = dataItem && dataItem[0] ? (heatMapData.value.allDataMap[dataItem[0]] ?? BIG_DECIMAL_ZERO) : BIG_DECIMAL_ZERO;
+    const value: BigDecimal = dataItem && dataItem[0] ? (heatMapData.value.allOriginalDataMap[dataItem[0]] ?? BIG_DECIMAL_ZERO) : BIG_DECIMAL_ZERO;
     emit('click', date, displayDate, value);
 }
 </script>

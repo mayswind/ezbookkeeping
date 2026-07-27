@@ -1,5 +1,6 @@
 <template>
-    <v-chart autoresize class="radar-chart-container" :class="{ 'transition-in': skeleton }" :option="chartOptions" />
+    <v-chart autoresize class="radar-chart-container" :class="{ 'transition-in': skeleton }"
+             :option="chartOptions" :update-options="{ notMerge: true }" />
 </template>
 
 <script setup lang="ts">
@@ -24,13 +25,13 @@ interface RadarChartData {
     totalValidValue: BigDecimal;
     maxValue: BigDecimal;
     indicators: RadarChartDataItem[];
-    values: number[]; // only used for echarts calculation
+    values: number[]; // only used for echarts rendering
     tooltip: string;
 }
 
 interface RadarChartDataItem {
     name: string;
-    max: number; // only used for echarts calculation
+    max: number; // only used for echarts rendering
     color: ColorStyleValue;
 }
 

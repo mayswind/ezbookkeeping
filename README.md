@@ -5,6 +5,7 @@
 [![Latest Docker Image Size](https://img.shields.io/docker/image-size/mayswind/ezbookkeeping.svg?style=flat)](https://hub.docker.com/r/mayswind/ezbookkeeping)
 [![Docker Pulls](https://img.shields.io/docker/pulls/mayswind/ezbookkeeping)](https://hub.docker.com/r/mayswind/ezbookkeeping)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mayswind/ezbookkeeping)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmayswind%2Fezbookkeeping.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmayswind%2Fezbookkeeping?ref=badge_shield)
 
 [![Recommend By HelloGitHub](https://api.hellogithub.com/v1/widgets/recommend.svg?rid=ded5af09da574ec1811ddb154f1b2093&claim_uid=LT7EZxeBukCnh0K)](https://hellogithub.com/en/repository/mayswind/ezbookkeeping)
 [![Trending](https://trendshift.io/api/badge/repositories/12917)](https://trendshift.io/repositories/12917)
@@ -157,3 +158,6 @@ Currently available translations:
 
 ## License
 [MIT](https://github.com/mayswind/ezbookkeeping/blob/master/LICENSE)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmayswind%2Fezbookkeeping.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmayswind%2Fezbookkeeping?ref=badge_large)

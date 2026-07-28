@@ -684,6 +684,7 @@ import {
     isNumber,
     objectFieldWithValueToArrayItem
 } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
 import {
     getCurrentUnixTime,
     parseDateTimeFromUnixTime,
@@ -823,8 +824,8 @@ const transactions = computed<TransactionMonthList[]>(() => {
                 opened: true,
                 items: transactions,
                 totalAmount: {
-                    income: 0,
-                    expense: 0,
+                    income: BIG_DECIMAL_ZERO,
+                    expense: BIG_DECIMAL_ZERO,
                     incompleteIncome: false,
                     incompleteExpense: false
                 },

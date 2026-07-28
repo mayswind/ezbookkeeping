@@ -57,7 +57,7 @@ import {
     countSplitItems
 } from '@/lib/common.ts';
 import { parseDateTimeFromUnixTimeWithTimezoneOffset } from '@/lib/datetime.ts';
-import { parseBigDecimal, getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal, getAmountWithDecimalNumberCount } from '@/lib/numeral.ts';
 import { getCurrencyFraction } from '@/lib/currency.ts';
 import { getFirstVisibleCategoryId } from '@/lib/category.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
@@ -90,9 +90,9 @@ export interface TransactionListFilter extends TransactionListPartialFilter {
 }
 
 export interface TransactionTotalAmount {
-    expense: number;
+    expense: BigDecimal;
     incompleteExpense: boolean;
-    income: number;
+    income: BigDecimal;
     incompleteIncome: boolean;
 }
 
@@ -236,9 +236,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
                         opened: autoExpand,
                         items: [],
                         totalAmount: {
-                            expense: 0,
+                            expense: BIG_DECIMAL_ZERO,
                             incompleteExpense: true,
-                            income: 0,
+                            income: BIG_DECIMAL_ZERO,
                             incompleteIncome: true
                         },
                         dailyTotalAmounts: {}
@@ -335,8 +335,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
             return;
         }
 
-        let totalExpense = 0;
-        let totalIncome = 0;
+        let totalExpense: BigDecimal = BIG_DECIMAL_ZERO;
+        let totalIncome: BigDecimal = BIG_DECIMAL_ZERO;
         let hasUnCalculatedTotalExpense = false;
         let hasUnCalculatedTotalIncome = false;
         const dailyTotalAmounts: Record<string, TransactionTotalAmount> = {};
@@ -361,21 +361,21 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
             if (!dailyTotalAmount) {
                 dailyTotalAmount = {
-                    expense: 0,
+                    expense: BIG_DECIMAL_ZERO,
                     incompleteExpense: false,
-                    income: 0,
+                    income: BIG_DECIMAL_ZERO,
                     incompleteIncome: false
                 };
                 dailyTotalAmounts[transactionDay] = dailyTotalAmount;
             }
 
-            let amount = transaction.sourceAmount;
+            let amount: BigDecimal = parseBigDecimal(transaction.sourceAmount);
             let account = transaction.sourceAccount;
 
             if (totalAccountIdsCount > 0 && transaction.destinationAccount
                 && (!allAccountIdsMap[transaction.sourceAccount?.id || ''] && !allAccountIdsMap[transaction.sourceAccount?.parentId || ''])
                 && (allAccountIdsMap[transaction.destinationAccount.id] || allAccountIdsMap[transaction.destinationAccount.parentId])) {
-                amount = transaction.destinationAmount;
+                amount = parseBigDecimal(transaction.destinationAmount);
                 account = transaction.destinationAccount;
             }
 
@@ -384,7 +384,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
             }
 
             if (account.currency !== defaultCurrency) {
-                const balance = exchangeRatesStore.getExchangedAmount(parseBigDecimal(amount), account.currency, defaultCurrency);
+                const balance = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
 
                 if (!balance) {
                     if (transaction.type === TransactionType.Expense) {
@@ -398,15 +398,15 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     continue;
                 }
 
-                amount = balance.toDoubleNumber(); // TODO: xxx
+                amount = balance;
             }
 
             if (transaction.type === TransactionType.Expense) {
-                totalExpense += amount;
-                dailyTotalAmount.expense += amount;
+                totalExpense = totalExpense.add(amount);
+                dailyTotalAmount.expense = dailyTotalAmount.expense.add(amount);
             } else if (transaction.type === TransactionType.Income) {
-                totalIncome += amount;
-                dailyTotalAmount.income += amount;
+                totalIncome = totalIncome.add(amount);
+                dailyTotalAmount.income = dailyTotalAmount.income.add(amount);
             } else if (transaction.type === TransactionType.Transfer && totalAccountIdsCount > 0) {
                 if (allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccountId]) {
                     // Do Nothing
@@ -417,18 +417,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 } else if (transaction.destinationAccount && allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccount.parentId]) {
                     // Do Nothing
                 } else if (allAccountIdsMap[transaction.sourceAccountId] || (transaction.sourceAccount && allAccountIdsMap[transaction.sourceAccount.parentId])) {
-                    totalExpense += amount;
-                    dailyTotalAmount.expense += amount;
+                    totalExpense = totalExpense.add(amount);
+                    dailyTotalAmount.expense = dailyTotalAmount.expense.add(amount);
                 } else if (allAccountIdsMap[transaction.destinationAccountId] || (transaction.destinationAccount && allAccountIdsMap[transaction.destinationAccount.parentId])) {
-                    totalIncome += amount;
-                    dailyTotalAmount.income += amount;
+                    totalIncome = totalIncome.add(amount);
+                    dailyTotalAmount.income = dailyTotalAmount.income.add(amount);
                 }
             }
         }
 
-        transactionMonthList.totalAmount.expense = Math.trunc(totalExpense);
+        transactionMonthList.totalAmount.expense = totalExpense.truncate();
         transactionMonthList.totalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalExpense;
-        transactionMonthList.totalAmount.income = Math.trunc(totalIncome);
+        transactionMonthList.totalAmount.income = totalIncome.truncate();
         transactionMonthList.totalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalIncome;
 
         for (const day of keys(transactionMonthList.dailyTotalAmounts)) {
@@ -437,9 +437,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         for (const [day, dailyTotalAmount] of entries(dailyTotalAmounts)) {
             transactionMonthList.dailyTotalAmounts[day] = {
-                expense: Math.trunc(dailyTotalAmount.expense),
+                expense: dailyTotalAmount.expense.truncate(),
                 incompleteExpense: incomplete || dailyTotalAmount.incompleteExpense,
-                income: Math.trunc(dailyTotalAmount.income),
+                income: dailyTotalAmount.income.truncate(),
                 incompleteIncome: incomplete || dailyTotalAmount.incompleteIncome
             };
         }

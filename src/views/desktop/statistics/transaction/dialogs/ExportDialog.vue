@@ -107,10 +107,12 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
+import type { BigDecimal } from '@/core/numeral.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { ExportMermaidChartType } from '@/core/statistics.ts';
 
 import { replaceAll, arrayItemToObjectField } from '@/lib/common.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -224,8 +226,8 @@ const exportedData = computed<string>(() => {
         const lengendNames: string[] = [];
         const xAxisLabels: string[] = [];
         const yAxisValues: Record<number, string[]> = {};
-        let minValue: number = 0;
-        let maxValue: number = 0;
+        let minValue: BigDecimal = BIG_DECIMAL_ZERO;
+        let maxValue: BigDecimal = BIG_DECIMAL_ZERO;
 
         for (const [header, index] of itemAndIndex(headers.value)) {
             if (index > 0) {
@@ -246,11 +248,11 @@ const exportedData = computed<string>(() => {
                     }
 
                     try {
-                        const value: number = parseFloat(item);
+                        const value: BigDecimal = parseBigDecimal(item);
 
-                        if (value > maxValue) {
+                        if (value.greaterThan(maxValue)) {
                             maxValue = value;
-                        } else if (value < minValue) {
+                        } else if (value.lessThan(minValue)) {
                             minValue = value;
                         }
                     } catch (ex) {
@@ -264,7 +266,7 @@ const exportedData = computed<string>(() => {
 
         ret += `\n    x-axis [${xAxisLabels.join(', ')}]`;
 
-        if (minValue < 0 || maxValue > 0) {
+        if (minValue.isNegative() || maxValue.isPositive()) {
             ret += `\n    y-axis ${minValue} --> ${maxValue}`;
         }
 

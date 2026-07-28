@@ -16,7 +16,6 @@ import type {
 
 import {
     BIG_DECIMAL_ZERO,
-    parseBigDecimal,
     getExchangedAmountByRate
 } from '@/lib/numeral.ts';
 
@@ -48,16 +47,16 @@ export function useExchangeRatesPageBase() {
         return getAllDisplayExchangeRates(exchangeRatesData.value);
     });
 
-    function getConvertedAmount(baseAmount: number | '', fromExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate, toExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate): BigDecimal | '' | null {
+    function getConvertedAmount(baseAmount: BigDecimal, fromExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate, toExchangeRate?: LatestExchangeRate | LocalizedLatestExchangeRate): BigDecimal | '' | null {
         if (!fromExchangeRate || !toExchangeRate) {
             return '';
         }
 
-        if (baseAmount === '') {
+        if (!baseAmount) {
             return BIG_DECIMAL_ZERO;
         }
 
-        return getExchangedAmountByRate(parseBigDecimal(baseAmount as number), fromExchangeRate.rate, toExchangeRate.rate);
+        return getExchangedAmountByRate(baseAmount, fromExchangeRate.rate, toExchangeRate.rate);
     }
 
     function setAsBaseline(currency: string, amount: string): void {

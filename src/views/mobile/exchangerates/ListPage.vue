@@ -279,7 +279,7 @@ function remove(customExchangeRate: LocalizedLatestExchangeRate | null, confirm:
 
 function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, displayLocalizedDigits: boolean): string {
     const fromExchangeRate = exchangeRatesStore.latestExchangeRateMap[baseCurrency.value];
-    const exchangeRateAmount = getConvertedAmount(baseAmount.value / AMOUNT_FACTOR, fromExchangeRate, toExchangeRate);
+    const exchangeRateAmount = getConvertedAmount(parseBigDecimal(baseAmount.value).divide(AMOUNT_FACTOR), fromExchangeRate, toExchangeRate);
 
     if (!exchangeRateAmount) {
         if (displayLocalizedDigits) {

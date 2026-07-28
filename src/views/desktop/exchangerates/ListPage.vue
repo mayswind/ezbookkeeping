@@ -175,7 +175,7 @@ import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 
 import type { LocalizedLatestExchangeRate } from '@/models/exchange_rate.ts';
 
-import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import logger from '@/lib/logger.ts';
 
 import {
@@ -304,7 +304,7 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, di
     let exchangeRateAmount: BigDecimal | '' | null = BIG_DECIMAL_ZERO;
 
     try {
-        exchangeRateAmount = getConvertedAmount(baseAmount.value / AMOUNT_FACTOR, fromExchangeRate, toExchangeRate);
+        exchangeRateAmount = getConvertedAmount(parseBigDecimal(baseAmount.value).divide(AMOUNT_FACTOR), fromExchangeRate, toExchangeRate);
     } catch (ex) {
         exchangeRateAmount = BIG_DECIMAL_ZERO;
         logger.warn('failed to convert amount by exchange rates, original base amount is ' + baseAmount.value, ex)

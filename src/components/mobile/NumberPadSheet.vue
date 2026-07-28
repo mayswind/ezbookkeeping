@@ -85,11 +85,11 @@ import { ref, computed, watch } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, isiOS } from '@/lib/ui/mobile.ts';
 
-import { NumeralSystem } from '@/core/numeral.ts';
+import { type BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { ALL_CURRENCIES } from '@/consts/currency.ts';
 import { isNumber } from '@/lib/common.ts';
-import { parseBigDecimal } from '@/lib/numeral.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal, isBigDecimal } from '@/lib/numeral.ts';
 import logger from '@/lib/logger.ts';
 
 const props = defineProps<{
@@ -188,15 +188,15 @@ function getInitedStringValue(value: number, flipNegative?: boolean): string {
         value = -value;
     }
 
-    return getStringValue(value, true);
+    return getStringValue(parseBigDecimal(value), true);
 }
 
-function getStringValue(value: number, hideZero: boolean): string {
-    if (!isNumber(value)) {
+function getStringValue(value: BigDecimal, hideZero: boolean): string {
+    if (!isBigDecimal(value)) {
         return '';
     }
 
-    const textualNumber = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(value), props.currency);
+    const textualNumber = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(value, props.currency);
 
     const decimalSeparator = getCurrentDecimalSeparator();
     const decimalSeparatorPos = textualNumber.indexOf(decimalSeparator);
@@ -368,7 +368,7 @@ function paste(): void {
             }
         }
 
-        currentValue.value = getStringValue(parsedAmount, false);
+        currentValue.value = getStringValue(parseBigDecimal(parsedAmount), false);
     }).catch(error => {
         // Do not set pastingAmount to false here
         // In iOS, system will show the paste context menu, if user click outside, the paste action should not be triggered again
@@ -378,33 +378,33 @@ function paste(): void {
 
 function confirm(): boolean {
     if (currentSymbol.value && currentValue.value.length >= 1) {
-        const previous = parseAmountFromWesternArabicNumerals(previousValue.value);
-        const current = parseAmountFromWesternArabicNumerals(currentValue.value);
-        let finalValue = 0;
+        const previous: BigDecimal = parseBigDecimal(parseAmountFromWesternArabicNumerals(previousValue.value));
+        const current: BigDecimal = parseBigDecimal(parseAmountFromWesternArabicNumerals(currentValue.value));
+        let finalValue: BigDecimal = BIG_DECIMAL_ZERO;
 
         switch (currentSymbol.value) {
             case '+':
-                finalValue = previous + current;
+                finalValue = previous.add(current);
                 break;
             case '−':
-                finalValue = previous - current;
+                finalValue = previous.subtract(current);
                 break;
             case '×':
-                finalValue = Math.trunc(previous * current / AMOUNT_FACTOR);
+                finalValue = previous.multiply(current).divide(AMOUNT_FACTOR).truncate();
                 break;
             default:
                 finalValue = previous;
         }
 
         if (isNumber(props.minValue)) {
-            if (finalValue < (props.minValue)) {
+            if (finalValue.lessThan(props.minValue)) {
                 showToast('Numeric Overflow');
                 return false;
             }
         }
 
         if (isNumber(props.maxValue)) {
-            if (finalValue > (props.maxValue)) {
+            if (finalValue.greaterThan(props.maxValue)) {
                 showToast('Numeric Overflow');
                 return false;
             }

@@ -169,6 +169,10 @@ class DecimalJSBigDecimal implements BigDecimal {
     }
 
     public sign(): BigDecimal {
+        if (this.value.isZero()) {
+            return DecimalJSBigDecimal.ZERO;
+        }
+
         if (this.value.isPositive()) {
             return DecimalJSBigDecimal.ONE;
         } else if (this.value.isNegative()) {

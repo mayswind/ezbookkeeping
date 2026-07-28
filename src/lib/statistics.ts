@@ -55,6 +55,12 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
                 return compareValue;
             }
 
+            for (let i = 0; i < Math.min(data1.displayOrders.length, data2.displayOrders.length); i++) {
+                if (data1.displayOrders[i] !== data2.displayOrders[i]) {
+                    return (data1.displayOrders[i] as number) - (data2.displayOrders[i] as number); // asc
+                }
+            }
+
             return data1.name.localeCompare(data2.name, undefined, { // asc
                 numeric: true,
                 sensitivity: 'base'

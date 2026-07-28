@@ -1,17 +1,17 @@
+import type { BigDecimal } from '@/core/numeral.ts';
 import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '../consts/transaction.ts';
 
 import { replaceAll } from './common.ts';
+import { parseBigDecimal } from './numeral.ts';
 
 import logger from './logger.ts';
 
 type Operator = '+' | '-' | '*' | '/';
 type OperatorAndParenthesis = Operator | '(' | ')';
 
-const maxAllowedDecimalCount = 6;
-const normalizeFactor: number = 1000000;
-const normalizedDecimalsMaxZeroString: string = '000000';
-const normalizedNumberToAmountFactor: number = normalizeFactor / AMOUNT_FACTOR;
+const minAllowedAmount: BigDecimal = parseBigDecimal(TRANSACTION_MIN_AMOUNT).divide(AMOUNT_FACTOR);
+const maxAllowedAmount: BigDecimal = parseBigDecimal(TRANSACTION_MAX_AMOUNT).divide(AMOUNT_FACTOR);
 
 const operatorPriority: Record<Operator, number> = {
     '+': 1,
@@ -20,34 +20,14 @@ const operatorPriority: Record<Operator, number> = {
     '/': 2,
 };
 
-function normalizeNumber(textualNumber: string): number {
-    const decimalSeparatorPos = textualNumber.indexOf('.');
+function parseNumber(textualNumber: string): BigDecimal {
+    const result: BigDecimal = parseBigDecimal(textualNumber);
 
-    if (decimalSeparatorPos < 0) {
-        return parseInt(textualNumber + normalizedDecimalsMaxZeroString);
-    }
-
-    const integer = textualNumber.substring(0, decimalSeparatorPos);
-    const decimals = textualNumber.substring(decimalSeparatorPos + 1);
-
-    if (decimals.length > maxAllowedDecimalCount) {
+    if (!result.between(minAllowedAmount, maxAllowedAmount)) {
         throw new Error('Numeric Overflow');
     }
 
-    const paddedDecimals = (decimals + normalizedDecimalsMaxZeroString).substring(0, maxAllowedDecimalCount);
-    return parseInt(integer + paddedDecimals);
-}
-
-function denormalizeNumberToAmount(num: number): number {
-    return Math.trunc(num / normalizedNumberToAmountFactor);
-}
-
-function checkNumberRange(num: number): void {
-    const amount = denormalizeNumberToAmount(num);
-
-    if (amount > TRANSACTION_MAX_AMOUNT || amount < TRANSACTION_MIN_AMOUNT) {
-        throw new Error('Numeric Overflow');
-    }
+    return result;
 }
 
 function toPostfixExprTokens(expr: string): string[] | null {
@@ -156,8 +136,8 @@ function toPostfixExprTokens(expr: string): string[] | null {
     return finalTokens;
 }
 
-function evaluatePostfixExpr(tokens: string[]): number | null {
-    const stack: number[] = [];
+function evaluatePostfixExpr(tokens: string[]): BigDecimal | null {
+    const stack: BigDecimal[] = [];
 
     for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i] as string;
@@ -173,41 +153,38 @@ function evaluatePostfixExpr(tokens: string[]): number | null {
                 }
 
                 // pop the top two operands
-                const b = stack.pop() as number;
-                const a = stack.pop() as number;
+                const b = stack.pop() as BigDecimal;
+                const a = stack.pop() as BigDecimal;
 
                 // evaluate the operation
-                let result: number;
+                let result: BigDecimal;
                 switch (token) {
                     case '+':
-                        result = a + b;
+                        result = a.add(b);
                         break;
                     case '-':
-                        result = a - b;
+                        result = a.subtract(b);
                         break;
                     case '*':
-                        result = Math.trunc(a * b / normalizeFactor);
+                        result = a.multiply(b);
                         break;
                     case '/':
-                        if (b === 0) {
+                        if (b.isZero()) {
                             logger.warn(`cannot evaluate expression "${tokens.join(' ')}", because division by zero`);
                             return null;
                         }
-                        result = Math.trunc(a * normalizeFactor / b);
+                        result = a.divide(b);
                         break;
                     default:
                         return null;
                 }
 
-                checkNumberRange(result);
-
                 // push the result back to the stack
                 stack.push(result);
                 break;
             default: // operands
-                const normalizedNum = normalizeNumber(token);
-                checkNumberRange(normalizedNum);
-                stack.push(normalizedNum);
+                const num = parseNumber(token);
+                stack.push(num);
                 break;
         }
     }
@@ -217,9 +194,9 @@ function evaluatePostfixExpr(tokens: string[]): number | null {
         return null;
     }
 
-    return stack[0] as number;
+    return stack[0] as BigDecimal;
 }
-export function evaluateExpressionToAmount(expr: string): number | undefined {
+export function evaluateExpressionToAmount(expr: string): BigDecimal | undefined {
     if (!expr) {
         return undefined;
     }
@@ -236,5 +213,9 @@ export function evaluateExpressionToAmount(expr: string): number | undefined {
         return undefined;
     }
 
-    return denormalizeNumberToAmount(result);
+    if (!result.between(minAllowedAmount, maxAllowedAmount)) {
+        throw new Error('Numeric Overflow');
+    }
+
+    return result.multiply(AMOUNT_FACTOR).truncate();
 }

@@ -225,7 +225,7 @@ function calculateFormula(): void {
     finalFormula = numeralSystem.value.replaceLocalizedDigitsToWesternArabicDigits(finalFormula);
 
     try {
-        const calculatedAmount = evaluateExpressionToAmount(finalFormula);
+        const calculatedAmount: number | undefined = evaluateExpressionToAmount(finalFormula)?.toSafeIntegerNumber();
 
         if (isNumber(calculatedAmount)) {
             const textualValue = getFormattedValue(calculatedAmount);

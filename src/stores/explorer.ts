@@ -240,7 +240,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             result.push(maxAmount);
         } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeEqualWidth
             || dimension === TransactionExplorerDataDimension.DestinationAmountRangeEqualWidth) {
-            if (minAmount === maxAmount) {
+            if (minAmount.equals(maxAmount)) {
                 return [minAmount, maxAmount];
             }
 
@@ -275,7 +275,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             const tMin: BigDecimal = transformed[0] as BigDecimal;
             const tMax: BigDecimal = transformed[transformed.length - 1] as BigDecimal;
 
-            if (tMin === tMax) {
+            if (tMin.equals(tMax)) {
                 return [minAmount, maxAmount];
             }
 
@@ -288,7 +288,7 @@ export const useExplorersStore = defineStore('explorers', () => {
             result.push(maxAmount);
         } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeStandardDeviation
             || dimension === TransactionExplorerDataDimension.DestinationAmountRangeStandardDeviation) {
-            if (minAmount === maxAmount) {
+            if (minAmount.equals(maxAmount)) {
                 return [minAmount, maxAmount];
             }
 
@@ -317,18 +317,18 @@ export const useExplorersStore = defineStore('explorers', () => {
             }
 
             const clipped = rawBreaks.map((v) => max(minAmount, min(maxAmount, v)))
-                .filter((v, i, arr) => i === 0 || v !== arr[i - 1]);
+                .filter((v, i, arr) => i === 0 || v.notEquals(arr[i - 1]));
 
             clipped[0] = minAmount;
 
-            if (clipped[clipped.length - 1] !== maxAmount) {
+            if (clipped[clipped.length - 1]?.notEquals(maxAmount)) {
                 clipped.push(maxAmount);
             }
 
             return clipped;
         } else if (dimension === TransactionExplorerDataDimension.SourceAmountRangeNaturalBreaks
             || dimension === TransactionExplorerDataDimension.DestinationAmountRangeNaturalBreaks) {
-            if (minAmount === maxAmount) {
+            if (minAmount.equals(maxAmount)) {
                 return [minAmount, maxAmount];
             }
 

@@ -49,8 +49,10 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
         });
     } else {
         items.sort(function (data1, data2) {
-            if (data1.value !== data2.value) {
-                return data2.value.compareTo(data1.value); // desc
+            const compareValue = data2.value.compareTo(data1.value); // desc
+
+            if (compareValue !== 0) {
+                return compareValue;
             }
 
             return data1.name.localeCompare(data2.name, undefined, { // asc

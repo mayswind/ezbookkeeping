@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "업로드된 파일 크기가 허용된 최대 크기를 초과합니다.",
         "failure count exceeded maximum limit": "실패 횟수가 최대 한도를 초과했습니다. 잠시 후 다시 시도해 주십시오.",
         "repeated request": "반복된 요청",
-        "ip address is forbidden to access this resource": "IP 주소가 이 리소스에 대한 액세스가 금지되어 있습니다."
+        "ip address is forbidden to access this resource": "IP 주소가 이 리소스에 대한 액세스가 금지되어 있습니다.",
+        "numeric overflow": "숫자 오버플로우"
     },
     "parameter": {
         "id": "ID",

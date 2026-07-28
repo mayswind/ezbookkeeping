@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "アップロードされたファイルが最大許容サイズを超えています",
         "failure count exceeded maximum limit": "失敗回数が上限を超えました。しばらくしてから再度お試しください",
         "repeated request": "リクエストが重複しています",
-        "ip address is forbidden to access this resource": "この IP アドレスからのリソースへのアクセスは禁止されています"
+        "ip address is forbidden to access this resource": "この IP アドレスからのリソースへのアクセスは禁止されています",
+        "numeric overflow": "数値オーバーフロー"
     },
     "parameter": {
         "id": "ID",

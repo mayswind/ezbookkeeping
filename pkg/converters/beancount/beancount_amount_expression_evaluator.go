@@ -1,63 +1,52 @@
 package beancount
 
 import (
+	"errors"
 	"math/big"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-const maxAllowedDecimalCount = 6
-const normalizeFactor = int64(1000000)
-const normalizedDecimalsMaxZeroString = "000000"
-const normalizedNumberToAmountFactor = int64(10000) // 1000000 / 100
+var (
+	minAllowedAmount = big.NewRat(models.MinimumTransactionAmount, 100)
+	maxAllowedAmount = big.NewRat(models.MaximumTransactionAmount, 100)
 
-var operatorPriority = map[rune]int{
-	'+': 1,
-	'-': 1,
-	'*': 2,
-	'/': 2,
-}
-
-func normalizeNumber(textualNumber string) (*big.Int, error) {
-	decimalSeparatorPos := strings.Index(textualNumber, ".")
-
-	if decimalSeparatorPos < 0 {
-		result := big.NewInt(0)
-		_, ok := result.SetString(textualNumber+normalizedDecimalsMaxZeroString, 10)
-
-		if !ok {
-			return nil, errs.ErrAmountInvalid
-		}
-
-		return result, nil
+	operatorPriority = map[rune]int{
+		'+': 1,
+		'-': 1,
+		'*': 2,
+		'/': 2,
 	}
+)
 
-	integer := utils.SubString(textualNumber, 0, decimalSeparatorPos)
-	decimals := utils.SubString(textualNumber, decimalSeparatorPos+1, len(textualNumber))
-
-	if len(decimals) > maxAllowedDecimalCount {
-		return nil, errs.ErrAmountInvalid
-	}
-
-	paddedDecimals := utils.SubString(decimals+normalizedDecimalsMaxZeroString, 0, maxAllowedDecimalCount)
-	result := big.NewInt(0)
-	_, ok := result.SetString(integer+paddedDecimals, 10)
+func parseNumber(textualNumber string) (*big.Rat, error) {
+	result := new(big.Rat)
+	_, ok := result.SetString(textualNumber)
 
 	if !ok {
 		return nil, errs.ErrAmountInvalid
 	}
 
+	if result.Cmp(minAllowedAmount) < 0 || result.Cmp(maxAllowedAmount) > 0 {
+		return nil, errs.ErrNumericOverflow
+	}
+
 	return result, nil
 }
 
-func denormalizeNumberToTextualAmount(num *big.Int) string {
-	result := big.NewInt(0).Add(num, big.NewInt(0)) // make a copy of num
-	result = result.Div(result, big.NewInt(normalizedNumberToAmountFactor))
-	return utils.FormatAmount(result.Int64())
+func numberToTextualAmount(num *big.Rat) (string, error) {
+	if num.Cmp(minAllowedAmount) < 0 || num.Cmp(maxAllowedAmount) > 0 {
+		return "", errs.ErrNumericOverflow
+	}
+
+	amount := new(big.Rat).Mul(num, big.NewRat(100, 1))
+	truncatedAmount := new(big.Int).Quo(amount.Num(), amount.Denom())
+	return utils.FormatAmount(truncatedAmount.Int64()), nil
 }
 
 func toPostfixExprTokens(ctx core.Context, expr string) ([]string, error) {
@@ -160,8 +149,8 @@ func toPostfixExprTokens(ctx core.Context, expr string) ([]string, error) {
 	return finalTokens, nil
 }
 
-func evaluatePostfixExpr(ctx core.Context, tokens []string) (*big.Int, error) {
-	stack := make([]*big.Int, 0)
+func evaluatePostfixExpr(ctx core.Context, tokens []string) (*big.Rat, error) {
+	stack := make([]*big.Rat, 0)
 
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
@@ -181,7 +170,7 @@ func evaluatePostfixExpr(ctx core.Context, tokens []string) (*big.Int, error) {
 			stack = stack[:len(stack)-1]
 
 			// evaluate the operation
-			result := big.NewInt(0)
+			result := new(big.Rat)
 			switch token {
 			case "+":
 				result.Add(a, b)
@@ -189,27 +178,28 @@ func evaluatePostfixExpr(ctx core.Context, tokens []string) (*big.Int, error) {
 				result.Sub(a, b)
 			case "*":
 				result.Mul(a, b)
-				result.Div(result, big.NewInt(normalizeFactor))
 			case "/":
-				if b.Int64() == 0 {
+				if b.Sign() == 0 {
 					log.Warnf(ctx, "[beancount_amount_expression_evaluator.evaluatePostfixExpr] cannot evaluate expression \"%s\", because division by zero", strings.Join(tokens, " "))
 					return nil, errs.ErrInvalidAmountExpression
 				}
-				result.Mul(a, big.NewInt(normalizeFactor))
-				result.Div(result, b)
+				result.Quo(a, b)
 			}
 
 			// push the result back to the stack
 			stack = append(stack, result)
 		default: // operands
-			normalizedNum, err := normalizeNumber(token)
+			num, err := parseNumber(token)
 
-			if err != nil {
+			if errors.Is(err, errs.ErrNumericOverflow) {
+				log.Warnf(ctx, "[beancount_amount_expression_evaluator.evaluatePostfixExpr] cannot evaluate expression \"%s\", because numeric overflow", strings.Join(tokens, " "))
+				return nil, err
+			} else if err != nil {
 				log.Warnf(ctx, "[beancount_amount_expression_evaluator.evaluatePostfixExpr] cannot evaluate expression \"%s\", because containing invalid number", strings.Join(tokens, " "))
 				return nil, errs.ErrInvalidAmountExpression
 			}
 
-			stack = append(stack, normalizedNum)
+			stack = append(stack, num)
 		}
 	}
 
@@ -238,5 +228,5 @@ func evaluateBeancountAmountExpression(ctx core.Context, expr string) (string, e
 		return "", err
 	}
 
-	return denormalizeNumberToTextualAmount(result), nil
+	return numberToTextualAmount(result)
 }

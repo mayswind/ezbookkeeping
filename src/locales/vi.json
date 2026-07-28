@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "Kích thước tệp đã tải lên vượt quá kích thước tối đa cho phép",
         "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time",
         "repeated request": "Repeated Request",
-        "ip address is forbidden to access this resource": "IP address is forbidden to access this resource"
+        "ip address is forbidden to access this resource": "IP address is forbidden to access this resource",
+        "numeric overflow": "Tràn số"
     },
     "parameter": {
         "id": "ID",

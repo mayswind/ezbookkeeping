@@ -10,6 +10,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const MinimumTransactionAmount = -999999999999999
+const MaximumTransactionAmount = 999999999999999
 const MaximumTagsCountOfTransaction = 10
 const MaximumPicturesCountOfTransaction = 10
 

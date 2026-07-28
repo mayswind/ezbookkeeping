@@ -98,23 +98,23 @@ func TestEvaluatePostfixExpr_ValidExpression(t *testing.T) {
 
 	result, err := evaluatePostfixExpr(context, []string{"1", "2", "+"})
 	assert.Nil(t, err)
-	assert.Equal(t, big.NewInt(3000000), result)
+	assert.Equal(t, big.NewRat(3, 1), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"5", "3", "-"})
 	assert.Nil(t, err)
-	assert.Equal(t, big.NewInt(2000000), result)
+	assert.Equal(t, big.NewRat(2, 1), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"4", "3", "*"})
 	assert.Nil(t, err)
-	assert.Equal(t, big.NewInt(12000000), result)
+	assert.Equal(t, big.NewRat(12, 1), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"6", "2", "/"})
 	assert.Nil(t, err)
-	assert.Equal(t, big.NewInt(3000000), result)
+	assert.Equal(t, big.NewRat(3, 1), result)
 
 	result, err = evaluatePostfixExpr(context, []string{"1", "2", "3", "*", "+", "4", "2", "/", "-"})
 	assert.Nil(t, err)
-	assert.Equal(t, big.NewInt(5000000), result)
+	assert.Equal(t, big.NewRat(5, 1), result)
 }
 
 func TestEvaluatePostfixExpr_InvalidExpression(t *testing.T) {
@@ -192,6 +192,26 @@ func TestEvaluateBeancountAmountExpression_ValidExpression(t *testing.T) {
 	result, err = evaluateBeancountAmountExpression(context, "3.555+0.111")
 	assert.Nil(t, err)
 	assert.Equal(t, "3.66", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "0.1234567+1")
+	assert.Nil(t, err)
+	assert.Equal(t, "1.12", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "9999999999999.99-9999999999999.98")
+	assert.Nil(t, err)
+	assert.Equal(t, "0.01", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "9999999999999.99/9999999999999.99")
+	assert.Nil(t, err)
+	assert.Equal(t, "1.00", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "9999999999999.99*9223-9999999999999.99*9222")
+	assert.Nil(t, err)
+	assert.Equal(t, "9999999999999.99", result)
+
+	result, err = evaluateBeancountAmountExpression(context, "-9999999999999.99*9223+9999999999999.99*9222")
+	assert.Nil(t, err)
+	assert.Equal(t, "-9999999999999.99", result)
 }
 
 func TestEvaluateBeancountAmountExpression_InvalidExpression(t *testing.T) {
@@ -230,6 +250,15 @@ func TestEvaluateBeancountAmountExpression_InvalidExpression(t *testing.T) {
 	_, err = evaluateBeancountAmountExpression(context, "0.abcd+1")
 	assert.Equal(t, errs.ErrInvalidAmountExpression, err)
 
-	_, err = evaluateBeancountAmountExpression(context, "0.1234567+1")
-	assert.Equal(t, errs.ErrInvalidAmountExpression, err)
+	_, err = evaluateBeancountAmountExpression(context, "10000000000000")
+	assert.Equal(t, errs.ErrNumericOverflow, err)
+
+	_, err = evaluateBeancountAmountExpression(context, "-10000000000000")
+	assert.Equal(t, errs.ErrNumericOverflow, err)
+
+	_, err = evaluateBeancountAmountExpression(context, "9999999999999.99+0.01")
+	assert.Equal(t, errs.ErrNumericOverflow, err)
+
+	_, err = evaluateBeancountAmountExpression(context, "-9999999999999.99-0.01")
+	assert.Equal(t, errs.ErrNumericOverflow, err)
 }

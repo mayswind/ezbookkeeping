@@ -383,12 +383,12 @@ func TestBeancountDataReaderReadTransactionPostingLine_AmountExpression(t *testi
 	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
 	assert.Equal(t, "Income:TestCategory", actualData.Transactions[0].Postings[0].Account)
 	assert.Equal(t, "(1.2-3.4) * 5.6 / 7.8", actualData.Transactions[0].Postings[0].OriginalAmount)
-	assert.Equal(t, "-1.58", actualData.Transactions[0].Postings[0].Amount)
+	assert.Equal(t, "-1.57", actualData.Transactions[0].Postings[0].Amount)
 	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[0].Commodity)
 
 	assert.Equal(t, "Assets:TestAccount", actualData.Transactions[0].Postings[1].Account)
 	assert.Equal(t, "1.2 * 3.4/-5.6 - 7.8", actualData.Transactions[0].Postings[1].OriginalAmount)
-	assert.Equal(t, "-8.53", actualData.Transactions[0].Postings[1].Amount)
+	assert.Equal(t, "-8.52", actualData.Transactions[0].Postings[1].Amount)
 	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[1].Commodity)
 }
 
@@ -409,6 +409,14 @@ func TestBeancountDataReaderReadTransactionPostingLine_InvalidAmountExpression(t
 
 	_, err = reader.read(context)
 	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
+
+	reader, err = createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 *\n"+
+		"  Assets:TestAccount 9999999999999.99*2 CNY\n"))
+	assert.Nil(t, err)
+
+	_, err = reader.read(context)
+	assert.EqualError(t, err, errs.ErrNumericOverflow.Message)
 }
 
 func TestBeancountDataReaderReadTransactionPostingLine_InvalidAccountType(t *testing.T) {

@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "ขนาดไฟล์ที่อัปโหลดเกินขนาดสูงสุดที่อนุญาต",
         "failure count exceeded maximum limit": "จำนวนความล้มเหลวเกินขีดจำกัดสูงสุด โปรดลองใหม่ภายหลัง",
         "repeated request": "คำขอซ้ำ",
-        "ip address is forbidden to access this resource": "IP address ถูกห้ามเข้าถึงทรัพยากรนี้"
+        "ip address is forbidden to access this resource": "IP address ถูกห้ามเข้าถึงทรัพยากรนี้",
+        "numeric overflow": "ตัวเลขล้น"
     },
     "parameter": {
         "id": "ID",

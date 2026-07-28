@@ -223,6 +223,45 @@ func TestBeancountTransactionDataFileParseImportedData_ParseValidCurrency(t *tes
 	assert.Equal(t, "CNY", allNewAccounts[1].Currency)
 }
 
+func TestBeancountTransactionDataFileParseImportedData_ParseAmountExpression(t *testing.T) {
+	importer := BeancountTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 *\n"+
+			"  Assets:TestAccount -1*(1.2+3.4)*5 CNY\n"+
+			"  Expenses:TestCategory (1.2+3.4)*5 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_EXPENSE, allNewTransactions[0].Type)
+	assert.Equal(t, int64(2300), allNewTransactions[0].Amount)
+	assert.Equal(t, "Assets:TestAccount", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "Expenses:TestCategory", allNewTransactions[0].OriginalCategoryName)
+}
+
+func TestBeancountTransactionDataFileParseImportedData_ParseInvalidAmountExpression(t *testing.T) {
+	importer := BeancountTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 *\n"+
+			"  Assets:TestAccount -1*(1.2+3.4 CNY\n"+
+			"  Expenses:TestCategory (1.2+3.4 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.EqualError(t, err, errs.ErrAmountInvalid.Message)
+}
+
 func TestBeancountTransactionDataFileParseImportedData_ParseInvalidAmount(t *testing.T) {
 	importer := BeancountTransactionDataImporter
 	context := core.NewNullContext()

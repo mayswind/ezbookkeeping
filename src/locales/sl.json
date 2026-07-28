@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "Velikost naložene datoteke presega največjo dovoljeno velikost",
         "failure count exceeded maximum limit": "Število neuspelih poskusov je preseglo omejitev; poskusite znova čez nekaj časa",
         "repeated request": "Ponovljena zahteva",
-        "ip address is forbidden to access this resource": "IP-naslov nima dovoljenja za dostop do tega vira"
+        "ip address is forbidden to access this resource": "IP-naslov nima dovoljenja za dostop do tega vira",
+        "numeric overflow": "Številčni preliv (Overflow)"
     },
     "parameter": {
         "id": "ID",

@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "上傳的檔案大小超出了允許的最大大小",
         "failure count exceeded maximum limit": "失敗次數超出最大限制，請稍後重試",
         "repeated request": "重複的請求",
-        "ip address is forbidden to access this resource": "IP 地址被禁止訪問此資源"
+        "ip address is forbidden to access this resource": "IP 地址被禁止訪問此資源",
+        "numeric overflow": "數值溢位"
     },
     "parameter": {
         "id": "ID",

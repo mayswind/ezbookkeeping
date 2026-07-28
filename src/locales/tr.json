@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "Yüklenen dosya boyutu izin verilen maksimum sınırı aşıyor",
         "failure count exceeded maximum limit": "Başarısızlık sayısı sınırı aştı, lütfen bir süre sonra tekrar deneyin",
         "repeated request": "Tekrarlanan İstek",
-        "ip address is forbidden to access this resource": "IP adresinin bu kaynağa erişimi yasaklandı"
+        "ip address is forbidden to access this resource": "IP adresinin bu kaynağa erişimi yasaklandı",
+        "numeric overflow": "Sayısal Taşma"
     },
     "parameter": {
         "id": "ID",

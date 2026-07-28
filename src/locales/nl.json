@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "Bestandsgrootte overschrijdt de maximaal toegestane limiet",
         "failure count exceeded maximum limit": "Aantal mislukkingen overschreed de limiet; probeer het later opnieuw",
         "repeated request": "Herhaald verzoek",
-        "ip address is forbidden to access this resource": "IP-adres heeft geen toegang tot deze resource"
+        "ip address is forbidden to access this resource": "IP-adres heeft geen toegang tot deze resource",
+        "numeric overflow": "Numerieke overloop"
     },
     "parameter": {
         "id": "ID",

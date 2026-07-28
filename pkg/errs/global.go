@@ -28,6 +28,7 @@ var (
 	ErrFailureCountLimitReached        = NewNormalError(NormalSubcategoryGlobal, 18, http.StatusBadRequest, "failure count exceeded maximum limit")
 	ErrRepeatedRequest                 = NewNormalError(NormalSubcategoryGlobal, 19, http.StatusBadRequest, "repeated request")
 	ErrIPForbidden                     = NewNormalError(NormalSubcategoryGlobal, 20, http.StatusBadRequest, "ip address is forbidden to access this resource")
+	ErrNumericOverflow                 = NewNormalError(NormalSubcategoryGlobal, 21, http.StatusBadRequest, "numeric overflow")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

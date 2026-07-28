@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "பதிவேற்று செய்யப்பட்ட கோப்பு அளவு அதிகபட்ச வரம்பை மீறியது",
         "failure count exceeded maximum limit": "தோல்வி எண்ணிக்கை அதிகபட்ச வரம்பை மீறியது, சிறிது நேரம் பின்பு மீண்டும் முயற்சிக்கவும்",
         "repeated request": "மீண்டும் மீண்டும் கோரிக்கை",
-        "ip address is forbidden to access this resource": "இந்த ஆதாரம்மூலவை நுழைய IP முகவரிக்கு அனுமதி இல்லை"
+        "ip address is forbidden to access this resource": "இந்த ஆதாரம்மூலவை நுழைய IP முகவரிக்கு அனுமதி இல்லை",
+        "numeric overflow": "எண் வழிதல்"
     },
     "parameter": {
         "id": "ஐடி",

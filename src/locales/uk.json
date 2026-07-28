@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "Розмір завантаженого файлу перевищує максимально допустимий",
         "failure count exceeded maximum limit": "Кількість невдали спроб перевищила допустимий ліміт, спробуйте пізніше",
         "repeated request": "Повторний запит",
-        "ip address is forbidden to access this resource": "Цій IP-адресі заборонено доступ до ресурсу"
+        "ip address is forbidden to access this resource": "Цій IP-адресі заборонено доступ до ресурсу",
+        "numeric overflow": "Числове переповнення"
     },
     "parameter": {
         "id": "ID",

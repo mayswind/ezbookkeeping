@@ -3,6 +3,7 @@ package beancount
 import (
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"io"
 	"strings"
 
@@ -424,7 +425,10 @@ func (r *beancountDataReader) readTransactionPostingLine(ctx core.Context, lineI
 
 	finalAmount, err := evaluateBeancountAmountExpression(ctx, transactionPositing.OriginalAmount)
 
-	if err != nil {
+	if errors.Is(err, errs.ErrNumericOverflow) {
+		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot evaluate amount expression in line#%d \"%s\", because %s", lineIndex, strings.Join(items, " "), err.Error())
+		return nil, err
+	} else if err != nil {
 		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot evaluate amount expression in line#%d \"%s\", because %s", lineIndex, strings.Join(items, " "), err.Error())
 		return nil, errs.ErrAmountInvalid
 	} else {

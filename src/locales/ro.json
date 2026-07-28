@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "Dimensiunea fișierului încărcat depășește limita maximă permisă",
         "failure count exceeded maximum limit": "Numărul de erori a depășit limita maximă, te rugăm să încerci din nou peste puțin timp",
         "repeated request": "Cerere repetată",
-        "ip address is forbidden to access this resource": "Adresa IP are accesul interzis la această resursă"
+        "ip address is forbidden to access this resource": "Adresa IP are accesul interzis la această resursă",
+        "numeric overflow": "Depășire numerică (Overflow)"
     },
     "parameter": {
         "id": "ID",

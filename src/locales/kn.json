@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾದ ಕಡತದ ಗಾತ್ರ ಗರಿಷ್ಠ ಮಿತಿಯನ್ನು ಮೀರಿದೆ",
         "failure count exceeded maximum limit": "ವಿಫಲ ಗಣನೆ ಗರಿಷ್ಠ ಮಿತಿಯನ್ನು ಮೀರಿದೆ, ಕೆಲವು ಸಮಯ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
         "repeated request": "ಮರುಮರು ವಿನಂತಿ",
-        "ip address is forbidden to access this resource": "ಈ ಸಂಪನ್ಮೂಲವನ್ನು ಪ್ರವೇಶಿಸಲು IP ವಿಳಾಸಕ್ಕೆ ಅನುಮತಿಯಿಲ್ಲ"
+        "ip address is forbidden to access this resource": "ಈ ಸಂಪನ್ಮೂಲವನ್ನು ಪ್ರವೇಶಿಸಲು IP ವಿಳಾಸಕ್ಕೆ ಅನುಮತಿಯಿಲ್ಲ",
+        "numeric overflow": "ಸಂಖ್ಯಾ ಓವರ್‌ಫ್ಲೋ"
     },
     "parameter": {
         "id": "ಐಡಿ",

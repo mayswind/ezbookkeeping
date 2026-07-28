@@ -1327,7 +1327,8 @@
         "uploaded file size exceeds the maximum allowed size": "La taille du fichier téléchargé dépasse la taille maximale autorisée",
         "failure count exceeded maximum limit": "Le nombre d'échecs a dépassé la limite maximale, veuillez réessayer après un certain temps",
         "repeated request": "Requête répétée",
-        "ip address is forbidden to access this resource": "L'adresse IP est interdite d'accès à cette ressource"
+        "ip address is forbidden to access this resource": "L'adresse IP est interdite d'accès à cette ressource",
+        "numeric overflow": "Dépassement numérique"
     },
     "parameter": {
         "id": "ID",

@@ -11,8 +11,8 @@
 
         <f7-list ref="colorSchemeList" strong inset dividers sortable sortable-enabled class="margin-top-half chart-color-list"
                  @sortable:sort="onSort">
-            <f7-list-item :id="getColorIndexDomId(index)"
-                          :key="index"
+            <f7-list-item :id="getColorDomId(color)"
+                          :key="`${color}_${index}`"
                           :title="'#' + color.toLowerCase()"
                           v-for="(color, index) in chartColors">
                 <template #media>
@@ -122,11 +122,11 @@ const showImportSheet = ref<boolean>(false);
 const showExportSheet = ref<boolean>(false);
 const importText = ref<string>('');
 
-function getColorIndexDomId(index: number): string {
-    return 'chart_color_' + index;
+function getColorDomId(color: ColorValue): string {
+    return 'chart_color_' + color;
 }
 
-function parseColorIndexFromDomId(domId: string): string | null {
+function parseColorFromDomId(domId: string): string | null {
     if (!domId || domId.indexOf('chart_color_') !== 0) {
         return null;
     }
@@ -180,16 +180,23 @@ function onSort(event: { el: { id: string }, from: number, to: number }): void {
         return;
     }
 
-    const indexStr = parseColorIndexFromDomId(event.el.id);
+    const colorStr = parseColorFromDomId(event.el.id);
 
-    if (!indexStr) {
+    if (!colorStr) {
         showToast('Unable to move color');
         return;
     }
 
-    const fromIndex = parseInt(indexStr);
+    let currentColor: ColorValue | null = null;
 
-    if (isNaN(fromIndex) || fromIndex < 0 || fromIndex >= chartColors.value.length) {
+    for (const color of chartColors.value) {
+        if (color === colorStr) {
+            currentColor = color;
+            break;
+        }
+    }
+
+    if (!currentColor || !chartColors.value[event.to]) {
         showToast('Unable to move color');
         return;
     }

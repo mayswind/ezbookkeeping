@@ -95,6 +95,7 @@ import '@/styles/mobile/font-size-xx-large.scss';
 import '@/styles/mobile/font-size-xxx-large.scss';
 import '@/styles/mobile/font-size-xxxx-large.scss';
 import '@/styles/mobile/amount-color.scss';
+import '@/styles/mobile/common/login-page.scss';
 
 import App from '@/MobileApp.vue';
 

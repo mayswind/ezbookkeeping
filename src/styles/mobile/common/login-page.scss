@@ -86,6 +86,12 @@
 
     .login-page-primary-action > .list-button,
     .login-page-secondary-action > .list-button {
+        box-sizing: border-box;
+        min-height: var(--f7-list-item-min-height);
+        padding-block: 8px;
+        line-height: 1.25;
+        white-space: normal;
+        text-wrap: balance;
         border-radius: 14px;
         font-weight: 600;
         transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;

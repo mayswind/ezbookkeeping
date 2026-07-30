@@ -1,5 +1,5 @@
 <template>
-    <f7-page no-navbar no-swipeback login-screen hide-toolbar-on-scroll class="login-page">
+    <f7-page no-navbar no-swipeback login-screen hide-toolbar-on-scroll class="login-page unlock-page">
         <f7-login-screen-title>
             <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
             <f7-block class="login-page-tile margin-vertical-half">{{ tt('global.app.title') }}</f7-block>

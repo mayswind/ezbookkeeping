@@ -203,35 +203,35 @@
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.38/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.40/LICENSE"
     },
     {
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/v3.0.4/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/v4.0.2/LICENSE"
     },
     {
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v5.1.0/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v5.2.0/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.4.5/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.4.8/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.12.7/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.13.0/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -245,14 +245,14 @@
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.5/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.1.2/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.0.5/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.1.2/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -315,7 +315,7 @@
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.17.0/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.19.0/LICENSE"
     },
     {
         "name": "decimal.js",
@@ -336,7 +336,7 @@
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.6.2/LICENSE"
+        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.6.3/LICENSE"
     },
     {
         "name": "Leaflet",
@@ -350,7 +350,7 @@
         "copyright": "Copyright (C) 2024 Dmitry Shirokov",
         "url": "https://github.com/runk/node-chardet",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/runk/node-chardet/blob/v2.1.1/LICENSE"
+        "licenseUrl": "https://github.com/runk/node-chardet/blob/v2.2.0/LICENSE"
     },
     {
         "name": "crypto-js",

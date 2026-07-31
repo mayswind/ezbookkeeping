@@ -86,6 +86,7 @@ export const CHARDET_ENCODING_NAME_MAPPING: Record<string, string> = {
     'ISO-8859-7': 'iso-8859-7',
     'ISO-8859-8': 'iso-8859-8',
     'ISO-8859-9': 'iso-8859-9',
+    'windows-874': 'windows-874',
     'windows-1250': 'windows-1250',
     'windows-1251': 'windows-1251',
     'windows-1252': 'windows-1252',
@@ -93,6 +94,8 @@ export const CHARDET_ENCODING_NAME_MAPPING: Record<string, string> = {
     'windows-1254': 'windows-1254',
     'windows-1255': 'windows-1255',
     'windows-1256': 'windows-1256',
+    'windows-1257': 'windows-1257',
+    'windows-1258': 'windows-1258',
     'KOI8-R':'koi8r'
 };
 

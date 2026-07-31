@@ -25,7 +25,7 @@
         "copyright": "Copyright (c) 2013 - 2015 The Xorm Authors",
         "url": "https://xorm.io/xorm",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.3.11/LICENSE"
+        "licenseUrl": "https://gitea.com/xorm/xorm/src/tag/v1.4.1/LICENSE"
     },
     {
         "name": "SQL builder",
@@ -46,7 +46,7 @@
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.9.1/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.10.1/LICENSE"
     },
     {
         "name": "INI",
@@ -93,28 +93,28 @@
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.45/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.49/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.53.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.54.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.56.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.57.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.38.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.40.0:LICENSE"
     },
     {
         "name": "Go OAuth2",
@@ -128,7 +128,7 @@
         "copyright": "Copyright 2014 CoreOS, Inc",
         "url": "https://github.com/coreos/go-oidc",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/coreos/go-oidc/blob/v3.18.0/LICENSE"
+        "licenseUrl": "https://github.com/coreos/go-oidc/blob/v3.20.0/LICENSE"
     },
     {
         "name": "Gomail",
@@ -142,14 +142,14 @@
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.2.0/LICENSE"
+        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.2.1/LICENSE"
     },
     {
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.21.2/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.22.0/LICENSE"
     },
     {
         "name": "barcode",
@@ -160,10 +160,10 @@
     },
     {
         "name": "Excelize",
-        "copyright": "Copyright (c) 2016-2025 The excelize Authors. Copyright (c) 2011-2017 Geoffrey J. Teale",
+        "copyright": "Copyright (c) 2016-2026 The excelize Authors. Copyright (c) 2011-2017 Geoffrey J. Teale",
         "url": "https://github.com/qax-os/excelize",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.10.1/LICENSE"
+        "licenseUrl": "https://github.com/qax-os/excelize/blob/v2.11.0/LICENSE"
     },
     {
         "name": "xls",

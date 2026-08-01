@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "ಖಾತೆ ಬ್ಯಾಲೆನ್ಸ್ ಸಮಯ ಬದಲಾವಣೆ ಬೆಂಬಲಿಸಲಾಗುವುದಿಲ್ಲ",
         "parent account cannot set last reconciled time": "Parent account cannot set last reconciled time",
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "ವಹಿವಾಟು ID ಅಮಾನ್ಯವಾಗಿದೆ",
         "transaction not found": "ವಹಿವಾಟು ಸಿಕ್ಕಿಲ್ಲ",
         "transaction type is invalid": "ವಹಿವಾಟಿನ ಪ್ರಕಾರ ಅಮಾನ್ಯವಾಗಿದೆ",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "ಪೋಷಕ ಖಾತೆಯಿಂದ ಅಥವಾ ಖಾತೆಗೆ ವಹಿವಾಟು ಸ್ಥಳಾಂತರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
         "cannot move transaction between accounts with different currencies": "ವಿವಿಧ ಕರೆನ್ಸಿಗಳ ಖಾತೆಗಳ ನಡುವೆ ವಹಿವಾಟು ಸ್ಥಳಾಂತರ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ",
         "cannot add tags to too many transactions one time": "You cannot add tags to too many transactions one time",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "ವಹಿವಾಟು ವರ್ಗ ID ಅಮಾನ್ಯವಾಗಿದೆ",
         "transaction category not found": "ವಹಿವಾಟು ವರ್ಗ ಸಿಕ್ಕಿಲ್ಲ",
         "transaction category type is invalid": "ವಹಿವಾಟು ವರ್ಗದ ಪ್ರಕಾರ ಅಮಾನ್ಯವಾಗಿದೆ",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter} ಫಾರ್ಮ್ಯಾಟ್ ಅಮಾನ್ಯವಾಗಿದೆ",
         "parameter invalid color": "{parameter} ಫಾರ್ಮ್ಯಾಟ್ ಅಮಾನ್ಯವಾಗಿದೆ",
         "parameter invalid amount filter": "{parameter} ಫಾರ್ಮ್ಯಾಟ್ ಅಮಾನ್ಯವಾಗಿದೆ",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter} ಫಾರ್ಮ್ಯಾಟ್ ಅಮಾನ್ಯವಾಗಿದೆ"
     },
     "encoding": {

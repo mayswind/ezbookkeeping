@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "Not supported to modify account balance time",
         "parent account cannot set last reconciled time": "Parent account cannot set last reconciled time",
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "ID transazione non valido",
         "transaction not found": "Transazione non trovata",
         "transaction type is invalid": "Tipo di transazione non valido",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "Cannot move transaction from or to parent account",
         "cannot move transaction between accounts with different currencies": "Cannot move transaction between accounts with different currencies",
         "cannot add tags to too many transactions one time": "You cannot add tags to too many transactions one time",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "ID categoria transazione non valido",
         "transaction category not found": "Categoria transazione non trovata",
         "transaction category type is invalid": "Tipo di categoria transazione non valido",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter} ha un formato non valido",
         "parameter invalid color": "{parameter} ha un formato non valido",
         "parameter invalid amount filter": "{parameter} ha un formato non valido",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter} ha un formato non valido"
     },
     "encoding": {

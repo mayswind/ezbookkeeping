@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math/big"
 	"strconv"
 	"strings"
 
@@ -102,31 +103,12 @@ func StringToFloat64(str string) (float64, error) {
 
 // FormatAmount returns a textual representation of amount
 func FormatAmount(value int64) string {
-	displayAmount := Int64ToString(value)
-	negative := displayAmount[0] == '-'
+	return formatAmount(Int64ToString(value))
+}
 
-	if negative {
-		displayAmount = displayAmount[1:]
-	}
-
-	integer := SubString(displayAmount, 0, len(displayAmount)-2)
-	decimals := SubString(displayAmount, -2, 2)
-
-	if integer == "" {
-		integer = "0"
-	}
-
-	if len(decimals) == 0 {
-		decimals = "00"
-	} else if len(decimals) == 1 {
-		decimals = "0" + decimals
-	}
-
-	if negative {
-		return "-" + integer + "." + decimals
-	}
-
-	return integer + "." + decimals
+// FormatBigIntAmount returns a textual representation of an arbitrary precision amount.
+func FormatBigIntAmount(value *big.Int) string {
+	return formatAmount(value.String())
 }
 
 // ParseAmount parses a textual representation of amount
@@ -192,4 +174,31 @@ func ParseAmount(amount string) (int64, error) {
 	}
 
 	return sign*integer*100 + sign*decimals, nil
+}
+
+func formatAmount(displayAmount string) string {
+	negative := displayAmount[0] == '-'
+
+	if negative {
+		displayAmount = displayAmount[1:]
+	}
+
+	integer := SubString(displayAmount, 0, len(displayAmount)-2)
+	decimals := SubString(displayAmount, -2, 2)
+
+	if integer == "" {
+		integer = "0"
+	}
+
+	if len(decimals) == 0 {
+		decimals = "00"
+	} else if len(decimals) == 1 {
+		decimals = "0" + decimals
+	}
+
+	if negative {
+		return "-" + integer + "." + decimals
+	}
+
+	return integer + "." + decimals
 }

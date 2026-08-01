@@ -46,4 +46,5 @@ var (
 	ErrCannotMoveTransactionFromOrToParentAccount                  = NewNormalError(NormalSubcategoryTransaction, 39, http.StatusBadRequest, "cannot move transaction from or to parent account")
 	ErrCannotMoveTransactionBetweenAccountsWithDifferentCurrencies = NewNormalError(NormalSubcategoryTransaction, 40, http.StatusBadRequest, "cannot move transaction between accounts with different currencies")
 	ErrCannotAddTagsToTooManyTransactionsOneTime                   = NewNormalError(NormalSubcategoryTransaction, 41, http.StatusBadRequest, "cannot add tags to too many transactions one time")
+	ErrMergedBalanceModificationTransactionAmountOverflow          = NewNormalError(NormalSubcategoryTransaction, 42, http.StatusBadRequest, "merged balance modification transaction amount overflow")
 )

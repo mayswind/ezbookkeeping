@@ -28,4 +28,5 @@ var (
 	ErrNotSupportedChangeBalanceTime            = NewNormalError(NormalSubcategoryAccount, 22, http.StatusBadRequest, "not supported to modify account balance time")
 	ErrParentAccountCannotSetLastReconciledTime = NewNormalError(NormalSubcategoryAccount, 23, http.StatusBadRequest, "parent account cannot set last reconciled time")
 	ErrCannotSetLastReconciledTimeBeforeCurrent = NewNormalError(NormalSubcategoryAccount, 24, http.StatusBadRequest, "cannot set last reconciled time before current value")
+	ErrAccountBalanceOverflow                   = NewNormalError(NormalSubcategoryAccount, 25, http.StatusBadRequest, "account balance overflow")
 )

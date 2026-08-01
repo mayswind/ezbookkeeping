@@ -1,11 +1,22 @@
 package models
 
 import (
+	"math"
 	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestAccountToAccountInfoResponseBalance(t *testing.T) {
+	account := &Account{Balance: math.MaxInt64}
+	response := account.ToAccountInfoResponse()
+	assert.Equal(t, "9223372036854775807", response.Balance)
+
+	account.Balance = math.MinInt64
+	response = account.ToAccountInfoResponse()
+	assert.Equal(t, "-9223372036854775808", response.Balance)
+}
 
 func TestAccountInfoResponseSliceLess(t *testing.T) {
 	var accountRespSlice AccountInfoResponseSlice

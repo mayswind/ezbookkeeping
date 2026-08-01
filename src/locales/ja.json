@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "口座残高の時刻の変更はサポートされていません",
         "parent account cannot set last reconciled time": "親口座には最終照合日時を設定できません",
         "cannot set last reconciled time before current value": "最終照合日時を現在の値より前に設定することはできません",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "取引IDは無効です",
         "transaction not found": "取引が見つかりません",
         "transaction type is invalid": "取引タイプは無効です",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "親口座との間で取引を移動することはできません",
         "cannot move transaction between accounts with different currencies": "通貨が異なる口座間で取引を移動することはできません",
         "cannot add tags to too many transactions one time": "一度に多すぎる取引にタグを追加することはできません",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "取引カテゴリIDは無効です",
         "transaction category not found": "取引カテゴリは見つかりません",
         "transaction category type is invalid": "取引カテゴリタイプは無効です",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter}は無効な形式です",
         "parameter invalid color": "{parameter}は無効な形式です",
         "parameter invalid amount filter": "{parameter}は無効な形式です",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter}は無効な形式です"
     },
     "encoding": {

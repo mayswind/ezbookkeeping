@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "Изменение времени баланса счёта не поддерживается",
         "parent account cannot set last reconciled time": "Parent account cannot set last reconciled time",
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "ID транзакции недействителен",
         "transaction not found": "Транзакция не найдена",
         "transaction type is invalid": "Тип транзакции недействителен",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "Нельзя переместить транзакцию из/в родительский счёт",
         "cannot move transaction between accounts with different currencies": "Нельзя переместить транзакцию между счетами с разными валютами",
         "cannot add tags to too many transactions one time": "You cannot add tags to too many transactions one time",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "ID категории транзакции недействителен",
         "transaction category not found": "Категория транзакции не найдена",
         "transaction category type is invalid": "Тип категории транзакции недействителен",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter} имеет неверный формат",
         "parameter invalid color": "{parameter} имеет неверный формат",
         "parameter invalid amount filter": "{parameter} имеет неверный формат",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter} имеет неверный формат"
     },
     "encoding": {

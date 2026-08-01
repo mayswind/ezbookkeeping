@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "Hesap bakiye zamanını değiştirmek desteklenmiyor",
         "parent account cannot set last reconciled time": "Üst hesapta son mutabakat tarihi belirlenemez",
         "cannot set last reconciled time before current value": "Son mutabakat tarihi mevcut değerden önceki bir zamana ayarlanamaz",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "İşlem ID geçersiz",
         "transaction not found": "İşlem bulunamadı",
         "transaction type is invalid": "İşlem türü geçersiz",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "Ana hesaptan veya ana hesaba işlem taşınamaz",
         "cannot move transaction between accounts with different currencies": "Farklı para birimlerine sahip hesaplar arasında işlem taşınamaz",
         "cannot add tags to too many transactions one time": "Aynı anda bu kadar çok işleme etiket eklenemez",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "İşlem kategori ID geçersiz",
         "transaction category not found": "İşlem kategorisi bulunamadı",
         "transaction category type is invalid": "İşlem kategori türü geçersiz",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter} formatı geçersiz",
         "parameter invalid color": "{parameter} formatı geçersiz",
         "parameter invalid amount filter": "{parameter} formatı geçersiz",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter} formatı geçersiz"
     },
     "encoding": {

@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"encoding/json"
+	"math/big"
 	"reflect"
 	"time"
 
@@ -223,14 +224,32 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		newAccounts[sourceAccount.AccountId] = sourceAccount
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE || transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-			sourceAccount.Balance -= transaction.Amount
+			newBalance, err := h.getAccountBalanceAfterUpdate(sourceAccount.Balance, -transaction.Amount)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			sourceAccount.Balance = newBalance
 		} else if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
-			sourceAccount.Balance += transaction.Amount
+			newBalance, err := h.getAccountBalanceAfterUpdate(sourceAccount.Balance, transaction.Amount)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			sourceAccount.Balance = newBalance
 		}
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT && destinationAccount != nil {
 			newAccounts[destinationAccount.AccountId] = destinationAccount
-			destinationAccount.Balance += transaction.RelatedAccountAmount
+			newBalance, err := h.getAccountBalanceAfterUpdate(destinationAccount.Balance, transaction.RelatedAccountAmount)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			destinationAccount.Balance = newBalance
 		}
 
 		structuredResponse, response, err := h.createNewMCPAddTransactionResponse(c, transaction, newAccounts, true)
@@ -241,6 +260,16 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 
 		return structuredResponse, response, nil
 	}
+}
+
+func (h *mcpAddTransactionToolHandler) getAccountBalanceAfterUpdate(balance int64, delta int64) (int64, error) {
+	newBalance, ok := utils.AddInt64(balance, delta)
+
+	if !ok {
+		return 0, errs.ErrAccountBalanceOverflow
+	}
+
+	return newBalance, nil
 }
 
 func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addTransactionRequest *MCPAddTransactionRequest, categoryId int64, sourceAccountId int64, destinationAccountId int64, clientIp string) (*models.Transaction, error) {
@@ -297,16 +326,21 @@ func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addT
 }
 
 func (h *mcpAddTransactionToolHandler) createNewMCPAddTransactionResponse(c *core.WebContext, transaction *models.Transaction, accountsMap map[int64]*models.Account, dryRun bool) (any, []*MCPTextContent, error) {
+	var sourceAccount *models.Account
 	var sourceAccountInfo *models.AccountInfoResponse
+
+	var destinationAccount *models.Account
 	var destinationAccountInfo *models.AccountInfoResponse
 
-	if sourceAccount, exists := accountsMap[transaction.AccountId]; exists {
-		sourceAccountInfo = sourceAccount.ToAccountInfoResponse()
+	if account, exists := accountsMap[transaction.AccountId]; exists {
+		sourceAccount = account
+		sourceAccountInfo = account.ToAccountInfoResponse()
 	}
 
 	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT {
-		if destinationAccount, exists := accountsMap[transaction.RelatedAccountId]; exists {
-			destinationAccountInfo = destinationAccount.ToAccountInfoResponse()
+		if account, exists := accountsMap[transaction.RelatedAccountId]; exists {
+			destinationAccount = account
+			destinationAccountInfo = account.ToAccountInfoResponse()
 		}
 	}
 
@@ -315,19 +349,19 @@ func (h *mcpAddTransactionToolHandler) createNewMCPAddTransactionResponse(c *cor
 		DryRun:  dryRun,
 	}
 
-	if sourceAccountInfo != nil {
+	if sourceAccount != nil && sourceAccountInfo != nil {
 		if sourceAccountInfo.IsAsset {
-			response.AccountBalance = utils.FormatAmount(sourceAccountInfo.Balance)
+			response.AccountBalance = utils.FormatAmount(sourceAccount.Balance)
 		} else if sourceAccountInfo.IsLiability {
-			response.AccountBalance = utils.FormatAmount(-sourceAccountInfo.Balance)
+			response.AccountBalance = utils.FormatBigIntAmount(new(big.Int).Neg(big.NewInt(sourceAccount.Balance)))
 		}
 	}
 
-	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT && destinationAccountInfo != nil {
+	if transaction.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT && destinationAccount != nil && destinationAccountInfo != nil {
 		if destinationAccountInfo.IsAsset {
-			response.DestinationAccountBalance = utils.FormatAmount(destinationAccountInfo.Balance)
+			response.DestinationAccountBalance = utils.FormatAmount(destinationAccount.Balance)
 		} else if destinationAccountInfo.IsLiability {
-			response.DestinationAccountBalance = utils.FormatAmount(-destinationAccountInfo.Balance)
+			response.DestinationAccountBalance = utils.FormatBigIntAmount(new(big.Int).Neg(big.NewInt(destinationAccount.Balance)))
 		}
 	}
 

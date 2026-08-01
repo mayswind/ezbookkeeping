@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "கணக்கு இருப்பு நேரம் மாற்றம் ஆதரிக்கப்படவில்லை",
         "parent account cannot set last reconciled time": "Parent account cannot set last reconciled time",
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "பரிவர்த்தனை ID தவறானது உள்ளது",
         "transaction not found": "பரிவர்த்தனை கிடைக்கவில்லை",
         "transaction type is invalid": "பரிவர்த்தனையின் வகை தவறானது உள்ளது",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "பெற்றோர் கணக்கிலிருந்து அல்லது கணக்கிற்கு பரிவர்த்தனை நகர்த்த முடியாது",
         "cannot move transaction between accounts with different currencies": "பல்வேறு நாணயம்களின் கணக்குகளின் இடையே பரிவர்த்தனை இடம்மாற்றம் செய்ய முடியாது",
         "cannot add tags to too many transactions one time": "You cannot add tags to too many transactions one time",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "பரிவர்த்தனை வகை ID தவறானது உள்ளது",
         "transaction category not found": "பரிவர்த்தனை வகை கிடைக்கவில்லை",
         "transaction category type is invalid": "பரிவர்த்தனை வகையின் வகை தவறானது உள்ளது",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter} வடிவம் தவறானது உள்ளது",
         "parameter invalid color": "{parameter} வடிவம் தவறானது உள்ளது",
         "parameter invalid amount filter": "{parameter} வடிவம் தவறானது உள்ளது",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter} வடிவம் தவறானது உள்ளது"
     },
     "encoding": {

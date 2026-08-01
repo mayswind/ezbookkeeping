@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "Modificarea datei soldului contului nu este suportată",
         "parent account cannot set last reconciled time": "Contul părinte nu poate seta ultima dată a reconcilierii",
         "cannot set last reconciled time before current value": "Nu se poate seta ultima dată a reconcilierii înainte de valoarea curentă",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "ID-ul tranzacției este nevalid",
         "transaction not found": "Tranzacția nu a fost găsită",
         "transaction type is invalid": "Tipul tranzacției este nevalid",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "Nu se poate muta tranzacția din sau într-un cont părinte",
         "cannot move transaction between accounts with different currencies": "Nu se pot muta tranzacții între conturi cu monede diferite",
         "cannot add tags to too many transactions one time": "Nu se pot adăuga etichete la prea multe tranzacții deodată",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "ID-ul categoriei tranzacției este nevalid",
         "transaction category not found": "Categoria tranzacției nu a fost găsită",
         "transaction category type is invalid": "Tipul categoriei tranzacției este nevalid",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter} are un format nevalid",
         "parameter invalid color": "{parameter} are un format nevalid",
         "parameter invalid amount filter": "{parameter} are un format nevalid",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter} are un format nevalid"
     },
     "encoding": {

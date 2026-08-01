@@ -1,6 +1,10 @@
 package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
+)
 
 // LevelOneAccountParentId represents the parent id of level-one account
 const LevelOneAccountParentId = 0
@@ -102,7 +106,7 @@ type AccountCreateRequest struct {
 	Icon                    int64                   `json:"icon,string" binding:"required,min=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency                string                  `json:"currency" binding:"required,len=3,validCurrency"`
-	Balance                 int64                   `json:"balance"`
+	Balance                 string                  `json:"balance" binding:"required,validTransactionAmount"`
 	BalanceTime             int64                   `json:"balanceTime"`
 	Comment                 string                  `json:"comment" binding:"max=255"`
 	CreditCardStatementDate int                     `json:"creditCardStatementDate" binding:"min=0,max=28"`
@@ -118,7 +122,7 @@ type AccountModifyRequest struct {
 	Icon                    int64                   `json:"icon,string" binding:"min=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency                *string                 `json:"currency" binding:"omitempty,len=3,validCurrency"`
-	Balance                 *int64                  `json:"balance" binding:"omitempty"`
+	Balance                 *string                 `json:"balance" binding:"omitempty,validTransactionAmount"`
 	BalanceTime             *int64                  `json:"balanceTime" binding:"omitempty"`
 	LastReconciledTime      *int64                  `json:"lastReconciledTime" binding:"omitempty"`
 	Comment                 string                  `json:"comment" binding:"max=255"`
@@ -176,7 +180,7 @@ type AccountInfoResponse struct {
 	Icon                    int64                    `json:"icon,string"`
 	Color                   string                   `json:"color"`
 	Currency                string                   `json:"currency"`
-	Balance                 int64                    `json:"balance"`
+	Balance                 string                   `json:"balance"`
 	LastReconciledTime      *int64                   `json:"lastReconciledTime,omitempty"`
 	Comment                 string                   `json:"comment"`
 	CreditCardStatementDate *int                     `json:"creditCardStatementDate,omitempty"`
@@ -222,7 +226,7 @@ func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 		Icon:                    a.Icon,
 		Color:                   a.Color,
 		Currency:                a.Currency,
-		Balance:                 a.Balance,
+		Balance:                 utils.Int64ToString(a.Balance),
 		Comment:                 a.Comment,
 		LastReconciledTime:      lastReconciledTime,
 		CreditCardStatementDate: creditCardStatementDate,

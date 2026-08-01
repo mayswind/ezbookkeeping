@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "不支援修改帳戶餘額時間",
         "parent account cannot set last reconciled time": "父帳戶不能設定最後對帳時間",
         "cannot set last reconciled time before current value": "不能將最後對帳時間設定為早於目前值的時間",
+        "account balance overflow": "帳戶餘額將超出支援範圍",
         "transaction id is invalid": "交易ID無效",
         "transaction not found": "交易不存在",
         "transaction type is invalid": "交易類型無效",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "不能從父帳戶移動交易或移動交易到父帳戶",
         "cannot move transaction between accounts with different currencies": "不能在不同幣別的帳戶之間移動交易",
         "cannot add tags to too many transactions one time": "一次不能將標籤添加到太多交易",
+        "merged balance modification transaction amount overflow": "合併後的修改餘額交易金額超出了支援範圍",
         "transaction category id is invalid": "交易分類ID無效",
         "transaction category not found": "交易分類不存在",
         "transaction category type is invalid": "交易分類類型無效",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter}格式錯誤",
         "parameter invalid color": "{parameter}格式錯誤",
         "parameter invalid amount filter": "{parameter}格式錯誤",
+        "parameter invalid transaction amount": "{parameter}不是有效的交易金額",
         "parameter invalid tag filter": "{parameter}格式錯誤"
     },
     "encoding": {

@@ -700,11 +700,11 @@ export const useAccountsStore = defineStore('accounts', () => {
 
             if (subAccount.currency === resultCurrency) {
                 if (subAccount.isAsset) {
-                    totalBalance = totalBalance.add(subAccount.balance);
+                    totalBalance = totalBalance.add(parseBigDecimal(subAccount.balance));
                 } else if (subAccount.isLiability) {
-                    totalBalance = totalBalance.subtract(subAccount.balance);
+                    totalBalance = totalBalance.subtract(parseBigDecimal(subAccount.balance));
                 } else {
-                    totalBalance = totalBalance.add(subAccount.balance);
+                    totalBalance = totalBalance.add(parseBigDecimal(subAccount.balance));
                 }
             } else {
                 const balance = exchangeRatesStore.getExchangedAmount(parseBigDecimal(subAccount.balance), subAccount.currency, resultCurrency);

@@ -22,6 +22,28 @@ func IsStringOnlyContainsDigits(str string) bool {
 	return true
 }
 
+// AddInt64 returns the sum of two int64 values if the result is within the int64 range.
+func AddInt64(left int64, right int64) (int64, bool) {
+	result := new(big.Int).Add(big.NewInt(left), big.NewInt(right))
+
+	if !result.IsInt64() {
+		return 0, false
+	}
+
+	return result.Int64(), true
+}
+
+// SubtractInt64 returns the difference of two int64 values if the result is within the int64 range.
+func SubtractInt64(left int64, right int64) (int64, bool) {
+	result := new(big.Int).Sub(big.NewInt(left), big.NewInt(right))
+
+	if !result.IsInt64() {
+		return 0, false
+	}
+
+	return result.Int64(), true
+}
+
 // GetRandomInteger returns a random number, the max parameter represents upper limit
 func GetRandomInteger(max int) (int, error) {
 	result, err := rand.Int(rand.Reader, big.NewInt(int64(max)))

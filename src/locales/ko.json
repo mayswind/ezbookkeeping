@@ -1176,6 +1176,7 @@
         "not supported to modify account balance time": "계좌 잔액 시간을 수정하는 것은 지원되지 않습니다",
         "parent account cannot set last reconciled time": "Parent account cannot set last reconciled time",
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
+        "account balance overflow": "Account balance would exceed the supported range",
         "transaction id is invalid": "거래 ID가 유효하지 않습니다",
         "transaction not found": "거래를 찾을 수 없습니다",
         "transaction type is invalid": "거래 유형이 유효하지 않습니다",
@@ -1218,6 +1219,7 @@
         "cannot move transaction from or to parent account": "상위 계좌에서 또는 상위 계좌로 거래를 이동할 수 없습니다.",
         "cannot move transaction between accounts with different currencies": "다른 통화를 사용하는 계좌 간에 거래를 이동할 수 없습니다.",
         "cannot add tags to too many transactions one time": "You cannot add tags to too many transactions one time",
+        "merged balance modification transaction amount overflow": "The amount of merged balance modification transaction exceeds the supported range",
         "transaction category id is invalid": "거래 카테고리 ID가 유효하지 않습니다.",
         "transaction category not found": "거래 카테고리를 찾을 수 없습니다.",
         "transaction category type is invalid": "거래 카테고리 유형이 유효하지 않습니다.",
@@ -1383,6 +1385,7 @@
         "parameter invalid currency": "{parameter}는 유효하지 않은 형식입니다",
         "parameter invalid color": "{parameter}는 유효하지 않은 형식입니다",
         "parameter invalid amount filter": "{parameter}는 유효하지 않은 형식입니다",
+        "parameter invalid transaction amount": "{parameter} is invalid transaction amount",
         "parameter invalid tag filter": "{parameter}는 유효하지 않은 형식입니다"
     },
     "encoding": {

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -171,6 +172,17 @@ func TestFormatAmount(t *testing.T) {
 	expectedValue = "-12.34"
 	actualValue = FormatAmount(-1234)
 	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestFormatBigIntAmount(t *testing.T) {
+	actualValue := FormatBigIntAmount(new(big.Int).Neg(new(big.Int).Lsh(big.NewInt(1), 63)))
+	assert.Equal(t, "-92233720368547758.08", actualValue)
+
+	actualValue = FormatBigIntAmount(new(big.Int).Lsh(big.NewInt(1), 63))
+	assert.Equal(t, "92233720368547758.08", actualValue)
+
+	actualValue = FormatBigIntAmount(new(big.Int).SetUint64(^uint64(0)))
+	assert.Equal(t, "184467440737095516.15", actualValue)
 }
 
 func TestParseAmount(t *testing.T) {

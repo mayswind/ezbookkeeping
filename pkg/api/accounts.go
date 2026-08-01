@@ -159,6 +159,14 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
+	mainAccountBalance, err := utils.StringToInt64(accountCreateReq.Balance)
+
+	if err != nil {
+		return nil, errs.ErrIncompleteOrIncorrectSubmission
+	}
+
+	subAccountBalances := make([]int64, len(accountCreateReq.SubAccounts))
+
 	if accountCreateReq.Category < models.ACCOUNT_CATEGORY_CASH || accountCreateReq.Category > models.ACCOUNT_CATEGORY_CERTIFICATE_OF_DEPOSIT {
 		log.Warnf(c, "[accounts.AccountCreateHandler] account category invalid, category is %d", accountCreateReq.Category)
 		return nil, errs.ErrAccountCategoryInvalid
@@ -180,7 +188,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 			return nil, errs.ErrAccountCurrencyInvalid
 		}
 
-		if accountCreateReq.Balance != 0 && accountCreateReq.BalanceTime <= 0 {
+		if mainAccountBalance != 0 && accountCreateReq.BalanceTime <= 0 {
 			log.Warnf(c, "[accounts.AccountCreateHandler] account balance time is not set")
 			return nil, errs.ErrAccountBalanceTimeNotSet
 		}
@@ -195,13 +203,20 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 			return nil, errs.ErrParentAccountCannotSetCurrency
 		}
 
-		if accountCreateReq.Balance != 0 {
+		if mainAccountBalance != 0 {
 			log.Warnf(c, "[accounts.AccountCreateHandler] parent account cannot set balance")
 			return nil, errs.ErrParentAccountCannotSetBalance
 		}
 
 		for i := 0; i < len(accountCreateReq.SubAccounts); i++ {
 			subAccount := accountCreateReq.SubAccounts[i]
+			subAccountBalance, err := utils.StringToInt64(subAccount.Balance)
+
+			if err != nil {
+				return nil, errs.ErrIncompleteOrIncorrectSubmission
+			}
+
+			subAccountBalances[i] = subAccountBalance
 
 			if subAccount.Category != accountCreateReq.Category {
 				log.Warnf(c, "[accounts.AccountCreateHandler] category of sub-account#%d not equals to parent", i)
@@ -218,7 +233,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 				return nil, errs.ErrAccountCurrencyInvalid
 			}
 
-			if subAccount.Balance != 0 && subAccount.BalanceTime <= 0 {
+			if subAccountBalance != 0 && subAccount.BalanceTime <= 0 {
 				log.Warnf(c, "[accounts.AccountCreateHandler] sub-account#%d balance time is not set", i)
 				return nil, errs.ErrAccountBalanceTimeNotSet
 			}
@@ -241,8 +256,8 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, false, maxOrderId+1)
-	childrenAccounts, childrenAccountBalanceTimes := a.createSubAccountModels(uid, &accountCreateReq)
+	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, mainAccountBalance, false, maxOrderId+1)
+	childrenAccounts, childrenAccountBalanceTimes := a.createSubAccountModels(uid, &accountCreateReq, subAccountBalances)
 
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
@@ -354,6 +369,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 
 	accountMap := a.accounts.GetAccountMapByList(accountAndSubAccounts)
 	mainAccount, exists := accountMap[accountModifyReq.Id]
+	subAccountBalances := make([]int64, len(accountModifyReq.SubAccounts))
 
 	if !exists {
 		return nil, errs.ErrAccountNotFound
@@ -384,6 +400,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 
 		for i := 0; i < len(accountModifyReq.SubAccounts); i++ {
 			subAccountReq := accountModifyReq.SubAccounts[i]
+			subAccountBalances[i] = 0
 
 			if subAccountReq.Category != accountModifyReq.Category {
 				log.Warnf(c, "[accounts.AccountModifyHandler] category of sub-account#%d not equals to parent", i)
@@ -400,16 +417,24 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 				}
 
 				if subAccountReq.Balance == nil {
-					defaultBalance := int64(0)
+					defaultBalance := "0"
 					subAccountReq.Balance = &defaultBalance
 				}
 
-				if *subAccountReq.Balance == 0 {
+				subAccountBalance, err := utils.StringToInt64(*subAccountReq.Balance)
+
+				if err != nil {
+					return nil, errs.ErrIncompleteOrIncorrectSubmission
+				}
+
+				subAccountBalances[i] = subAccountBalance
+
+				if subAccountBalance == 0 {
 					defaultBalanceTime := int64(0)
 					subAccountReq.BalanceTime = &defaultBalanceTime
 				}
 
-				if *subAccountReq.Balance != 0 && (subAccountReq.BalanceTime == nil || *subAccountReq.BalanceTime <= 0) {
+				if subAccountBalance != 0 && (subAccountReq.BalanceTime == nil || *subAccountReq.BalanceTime <= 0) {
 					log.Warnf(c, "[accounts.AccountModifyHandler] sub-account#%d balance time is not set", i)
 					return nil, errs.ErrAccountBalanceTimeNotSet
 				}
@@ -490,7 +515,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 		if _, exists := accountMap[subAccountReq.Id]; !exists {
 			anythingUpdate = true
 			maxOrderId = maxOrderId + 1
-			newSubAccount := a.createNewSubAccountModelForModify(uid, mainAccount.Type, subAccountReq, maxOrderId)
+			newSubAccount := a.createNewSubAccountModelForModify(uid, mainAccount.Type, subAccountReq, subAccountBalances[i], maxOrderId)
 			toAddAccounts = append(toAddAccounts, newSubAccount)
 
 			if subAccountReq.BalanceTime != nil {
@@ -791,7 +816,7 @@ func (a *AccountsApi) SubAccountDeleteHandler(c *core.WebContext) (any, *errs.Er
 	return true, nil
 }
 
-func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, isSubAccount bool, order int32) *models.Account {
+func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.AccountCreateRequest, balance int64, isSubAccount bool, order int32) *models.Account {
 	accountExtend := &models.AccountExtend{}
 
 	if !isSubAccount && accountCreateReq.Category == models.ACCOUNT_CATEGORY_CREDIT_CARD {
@@ -807,13 +832,13 @@ func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.
 		Icon:         accountCreateReq.Icon,
 		Color:        accountCreateReq.Color,
 		Currency:     accountCreateReq.Currency,
-		Balance:      accountCreateReq.Balance,
+		Balance:      balance,
 		Comment:      accountCreateReq.Comment,
 		Extend:       accountExtend,
 	}
 }
 
-func (a *AccountsApi) createNewSubAccountModelForModify(uid int64, accountType models.AccountType, accountModifyReq *models.AccountModifyRequest, order int32) *models.Account {
+func (a *AccountsApi) createNewSubAccountModelForModify(uid int64, accountType models.AccountType, accountModifyReq *models.AccountModifyRequest, balance int64, order int32) *models.Account {
 	accountExtend := &models.AccountExtend{}
 
 	return &models.Account{
@@ -825,13 +850,13 @@ func (a *AccountsApi) createNewSubAccountModelForModify(uid int64, accountType m
 		Icon:         accountModifyReq.Icon,
 		Color:        accountModifyReq.Color,
 		Currency:     *accountModifyReq.Currency,
-		Balance:      *accountModifyReq.Balance,
+		Balance:      balance,
 		Comment:      accountModifyReq.Comment,
 		Extend:       accountExtend,
 	}
 }
 
-func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models.AccountCreateRequest) ([]*models.Account, []int64) {
+func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models.AccountCreateRequest, balances []int64) ([]*models.Account, []int64) {
 	if len(accountCreateReq.SubAccounts) <= 0 {
 		return nil, nil
 	}
@@ -840,7 +865,7 @@ func (a *AccountsApi) createSubAccountModels(uid int64, accountCreateReq *models
 	childrenAccountBalanceTimes := make([]int64, len(accountCreateReq.SubAccounts))
 
 	for i := int32(0); i < int32(len(accountCreateReq.SubAccounts)); i++ {
-		childrenAccounts[i] = a.createNewAccountModel(uid, accountCreateReq.SubAccounts[i], true, i+1)
+		childrenAccounts[i] = a.createNewAccountModel(uid, accountCreateReq.SubAccounts[i], balances[i], true, i+1)
 		childrenAccountBalanceTimes[i] = accountCreateReq.SubAccounts[i].BalanceTime
 	}
 

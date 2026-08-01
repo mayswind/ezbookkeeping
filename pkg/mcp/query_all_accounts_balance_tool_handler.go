@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"encoding/json"
+	"math/big"
 	"reflect"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -164,10 +165,10 @@ func (h *mcpQueryAllAccountsBalanceToolHandler) createNewMCPAccountBalanceInfo(a
 
 	if accountResp.IsAsset {
 		balanceInfo.Type = "asset"
-		balanceInfo.Balance = utils.FormatAmount(accountResp.Balance)
+		balanceInfo.Balance = utils.FormatAmount(account.Balance)
 	} else if accountResp.IsLiability {
 		balanceInfo.Type = "liability"
-		balanceInfo.OutstandingBalance = utils.FormatAmount(-accountResp.Balance)
+		balanceInfo.OutstandingBalance = utils.FormatBigIntAmount(new(big.Int).Neg(big.NewInt(account.Balance)))
 	}
 
 	return balanceInfo

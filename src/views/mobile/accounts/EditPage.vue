@@ -214,14 +214,14 @@
                                   :currency="account.currency"
                                   :flip-negative="account.isLiability"
                                   v-model:show="accountContext.showBalanceSheet"
-                                  v-model="account.balance"
+                                  v-model="account.numericBalance"
                 ></number-pad-sheet>
             </f7-list-item>
 
             <f7-list-item
                 class="account-edit-datetime list-item-with-header-and-title"
                 link="#" no-chevron
-                v-show="account.balance"
+                v-show="account.numericBalance"
                 v-if="!editAccountId"
             >
                 <template #header>
@@ -488,14 +488,14 @@
                                       :currency="subAccount.currency"
                                       :flip-negative="account.isLiability"
                                       v-model:show="subAccountContexts[idx]!.showBalanceSheet"
-                                      v-model="subAccount.balance"
+                                      v-model="subAccount.numericBalance"
                     ></number-pad-sheet>
                 </f7-list-item>
 
                 <f7-list-item
                     class="account-edit-datetime list-item-with-header-and-title"
                     link="#" no-chevron
-                    v-show="subAccount.balance"
+                    v-show="subAccount.numericBalance"
                     v-if="!editAccountId || isNewAccount(subAccount)"
                 >
                     <template #header>
@@ -683,8 +683,8 @@ const showDeleteActionSheet = ref<boolean>(false);
 const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 
 function formatAccountDisplayBalance(selectedAccount: Account): string {
-    const balance = account.value.isLiability ? -selectedAccount.balance : selectedAccount.balance;
-    return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(balance), selectedAccount.currency);
+    const balance = parseBigDecimal(selectedAccount.balance);
+    return formatAmountToLocalizedNumeralsWithCurrency(account.value.isLiability ? balance.negate() : balance, selectedAccount.currency);
 }
 
 function formatDate(unixTime?: number): string {

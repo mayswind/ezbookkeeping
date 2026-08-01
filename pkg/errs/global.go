@@ -96,6 +96,11 @@ func GetParameterInvalidAmountFilterMessage(field string) string {
 	return fmt.Sprintf("parameter \"%s\" is invalid amount filter", field)
 }
 
+// GetParameterInvalidTransactionAmountMessage returns specific error message for invalid transaction amount parameter error
+func GetParameterInvalidTransactionAmountMessage(field string) string {
+	return fmt.Sprintf("parameter \"%s\" is invalid transaction amount", field)
+}
+
 // GetParameterInvalidTagFilterMessage returns specific error message for invalid tag filter parameter error
 func GetParameterInvalidTagFilterMessage(field string) string {
 	return fmt.Sprintf("parameter \"%s\" is invalid tag filter", field)

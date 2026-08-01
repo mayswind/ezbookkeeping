@@ -1111,7 +1111,7 @@ func (s *TransactionService) ModifyTransaction(c core.Context, transaction *mode
 			minTransactionTime := utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 			maxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime))
 
-			has, err = sess.Where("uid=? AND deleted=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, false, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+			has, err = sess.Where("uid=? AND transaction_time>=? AND transaction_time<=?", transaction.Uid, minTransactionTime, maxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
 
 			if err != nil {
 				log.Errorf(c, "[transactions.ModifyTransaction] failed to get trasaction time, because %s", err.Error())
@@ -1884,7 +1884,26 @@ func (s *TransactionService) MoveAllTransactionsBetweenAccounts(c core.Context, 
 				return err
 			} else if has && balanceModificationTransactions[0].TransactionTime > earliestTransaction.TransactionTime {
 				balanceModificationTransaction := balanceModificationTransactions[0]
-				balanceModificationTransaction.TransactionTime = utils.GetMinTransactionTimeFromUnixTime(utils.GetUnixTimeFromTransactionTime(earliestTransaction.TransactionTime) - 1)
+				earliestTransactionUnixTime := utils.GetUnixTimeFromTransactionTime(earliestTransaction.TransactionTime)
+
+				newBalanceModificationMinTransactionTime := utils.GetMinTransactionTimeFromUnixTime(earliestTransactionUnixTime - 1)
+				newBalanceModificationMaxTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(earliestTransactionUnixTime - 1)
+				balanceModificationTransaction.TransactionTime = newBalanceModificationMinTransactionTime
+
+				sameSecondLatestTransaction := &models.Transaction{}
+				has, err = sess.Where("uid=? AND transaction_time>=? AND transaction_time<=?", balanceModificationTransaction.Uid, newBalanceModificationMinTransactionTime, newBalanceModificationMaxTransactionTime).OrderBy("transaction_time desc").Limit(1).Get(sameSecondLatestTransaction)
+
+				if err != nil {
+					log.Errorf(c, "[transactions.MoveAllTransactionsBetweenAccounts] failed to get trasaction time, because %s", err.Error())
+					return err
+				}
+
+				if has && sameSecondLatestTransaction.TransactionTime < newBalanceModificationMaxTransactionTime-1 {
+					balanceModificationTransaction.TransactionTime = sameSecondLatestTransaction.TransactionTime + 1
+				} else if has && sameSecondLatestTransaction.TransactionTime == newBalanceModificationMaxTransactionTime-1 {
+					return errs.ErrTooMuchTransactionInOneSecond
+				}
+
 				balanceModificationTransaction.UpdatedUnixTime = time.Now().Unix()
 
 				if balanceModificationTransaction.TransactionTime < 0 {

@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"math/big"
 	"strings"
 	"time"
 
@@ -150,8 +151,8 @@ type Transaction struct {
 // TransactionWithAccountBalance represents a transaction item with account balance
 type TransactionWithAccountBalance struct {
 	*Transaction
-	AccountOpeningBalance int64
-	AccountClosingBalance int64
+	AccountOpeningBalance *big.Int
+	AccountClosingBalance *big.Int
 }
 
 // TransactionGeoLocationRequest represents all parameters of transaction geographic location info update request
@@ -443,17 +444,17 @@ type TransactionInfoPageWrapperResponse2 struct {
 // TransactionReconciliationStatementResponseItem represents a transaction reconciliation statement response
 type TransactionReconciliationStatementResponseItem struct {
 	*TransactionInfoResponse
-	AccountOpeningBalance int64 `json:"accountOpeningBalance,string"`
-	AccountClosingBalance int64 `json:"accountClosingBalance,string"`
+	AccountOpeningBalance string `json:"accountOpeningBalance"`
+	AccountClosingBalance string `json:"accountClosingBalance"`
 }
 
 // TransactionReconciliationStatementResponse represents the response of all transaction reconciliation statement response
 type TransactionReconciliationStatementResponse struct {
 	Transactions   []*TransactionReconciliationStatementResponseItem `json:"transactions"`
-	TotalInflows   int64                                             `json:"totalInflows,string"`
-	TotalOutflows  int64                                             `json:"totalOutflows,string"`
-	OpeningBalance int64                                             `json:"openingBalance,string"`
-	ClosingBalance int64                                             `json:"closingBalance,string"`
+	TotalInflows   string                                            `json:"totalInflows"`
+	TotalOutflows  string                                            `json:"totalOutflows"`
+	OpeningBalance string                                            `json:"openingBalance"`
+	ClosingBalance string                                            `json:"closingBalance"`
 }
 
 // TransactionStatisticResponse represents transaction statistic response
@@ -469,7 +470,7 @@ type TransactionStatisticResponseItem struct {
 	AccountId          int64                         `json:"accountId,string"`
 	RelatedAccountId   int64                         `json:"relatedAccountId,string,omitempty"`
 	RelatedAccountType TransactionRelatedAccountType `json:"relatedAccountType,omitempty"`
-	TotalAmount        int64                         `json:"amount,string"`
+	TotalAmount        string                        `json:"amount"`
 }
 
 // TransactionStatisticTrendsResponseItem represents the data within each statistic interval
@@ -489,9 +490,9 @@ type TransactionStatisticAssetTrendsResponseItem struct {
 
 // TransactionStatisticAssetTrendsResponseDataItem represents an asset trends data item
 type TransactionStatisticAssetTrendsResponseDataItem struct {
-	AccountId             int64 `json:"accountId,string"`
-	AccountOpeningBalance int64 `json:"accountOpeningBalance,string"`
-	AccountClosingBalance int64 `json:"accountClosingBalance,string"`
+	AccountId             int64  `json:"accountId,string"`
+	AccountOpeningBalance string `json:"accountOpeningBalance"`
+	AccountClosingBalance string `json:"accountClosingBalance"`
 }
 
 // TransactionAmountsResponseItem represents an item of transaction amounts
@@ -511,8 +512,24 @@ type TransactionMonthAmountsResponseItem struct {
 // TransactionAmountsResponseItemAmountInfo represents amount info for a response item
 type TransactionAmountsResponseItemAmountInfo struct {
 	Currency      string `json:"currency"`
-	IncomeAmount  int64  `json:"incomeAmount,string"`
-	ExpenseAmount int64  `json:"expenseAmount,string"`
+	IncomeAmount  string `json:"incomeAmount"`
+	ExpenseAmount string `json:"expenseAmount"`
+}
+
+// TransactionTotalAmount represents an aggregated transaction amount
+type TransactionTotalAmount struct {
+	Type             TransactionDbType
+	CategoryId       int64
+	AccountId        int64
+	RelatedAccountId int64
+	Amount           *big.Int
+}
+
+// TransactionAmountsAndCurrency represents income and expense amounts with currency
+type TransactionAmountsAndCurrency struct {
+	Currency      string
+	IncomeAmount  *big.Int
+	ExpenseAmount *big.Int
 }
 
 // ParseTransactionTagFilter parses transaction tag filter from string

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/big"
 	"sort"
 	"strings"
 	"time"
@@ -504,8 +505,8 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 
 	for i := 0; i < len(transactionResult); i++ {
 		transactionResult := transactionResult[i]
-		accountOpeningBalance := int64(0)
-		accountClosingBalance := int64(0)
+		accountOpeningBalance := big.NewInt(0)
+		accountClosingBalance := big.NewInt(0)
 
 		if transactionWithBalance, exists := transactionAccountBalanceMap[transactionResult.Id]; exists {
 			accountOpeningBalance = transactionWithBalance.AccountOpeningBalance
@@ -516,17 +517,17 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 
 		responseItems[i] = &models.TransactionReconciliationStatementResponseItem{
 			TransactionInfoResponse: transactionResult,
-			AccountOpeningBalance:   accountOpeningBalance,
-			AccountClosingBalance:   accountClosingBalance,
+			AccountOpeningBalance:   accountOpeningBalance.String(),
+			AccountClosingBalance:   accountClosingBalance.String(),
 		}
 	}
 
 	reconciliationStatementResp := &models.TransactionReconciliationStatementResponse{
 		Transactions:   responseItems,
-		TotalInflows:   totalInflows,
-		TotalOutflows:  totalOutflows,
-		OpeningBalance: openingBalance,
-		ClosingBalance: closingBalance,
+		TotalInflows:   totalInflows.String(),
+		TotalOutflows:  totalOutflows.String(),
+		OpeningBalance: openingBalance.String(),
+		ClosingBalance: closingBalance.String(),
 	}
 
 	return reconciliationStatementResp, nil
@@ -581,7 +582,7 @@ func (a *TransactionsApi) TransactionStatisticsHandler(c *core.WebContext) (any,
 		statisticResp.Items[i] = &models.TransactionStatisticResponseItem{
 			CategoryId:  totalAmountItem.CategoryId,
 			AccountId:   totalAmountItem.AccountId,
-			TotalAmount: totalAmountItem.Amount,
+			TotalAmount: totalAmountItem.Amount.String(),
 		}
 
 		if totalAmountItem.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || totalAmountItem.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
@@ -651,7 +652,7 @@ func (a *TransactionsApi) TransactionStatisticsTrendsHandler(c *core.WebContext)
 			monthlyStatisticResp.Items[i] = &models.TransactionStatisticResponseItem{
 				CategoryId:  totalAmountItem.CategoryId,
 				AccountId:   totalAmountItem.AccountId,
-				TotalAmount: totalAmountItem.Amount,
+				TotalAmount: totalAmountItem.Amount.String(),
 			}
 
 			if totalAmountItem.Type == models.TRANSACTION_DB_TYPE_TRANSFER_OUT || totalAmountItem.Type == models.TRANSACTION_DB_TYPE_TRANSFER_IN {
@@ -720,8 +721,8 @@ func (a *TransactionsApi) TransactionStatisticsAssetTrendsHandler(c *core.WebCon
 			accountBalance := dailyAccountBalances[i]
 			dailyStatisticResp.Items[i] = &models.TransactionStatisticAssetTrendsResponseDataItem{
 				AccountId:             accountBalance.AccountId,
-				AccountOpeningBalance: accountBalance.AccountOpeningBalance,
-				AccountClosingBalance: accountBalance.AccountClosingBalance,
+				AccountOpeningBalance: accountBalance.AccountOpeningBalance.String(),
+				AccountClosingBalance: accountBalance.AccountClosingBalance.String(),
 			}
 		}
 
@@ -808,7 +809,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
-		amountsMap := make(map[string]*models.TransactionAmountsResponseItemAmountInfo)
+		amountsMap := make(map[string]*models.TransactionAmountsAndCurrency)
 
 		for accountId, incomeAmount := range incomeAmounts {
 			account, exists := accountMap[accountId]
@@ -821,14 +822,14 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 			totalAmounts, exists := amountsMap[account.Currency]
 
 			if !exists {
-				totalAmounts = &models.TransactionAmountsResponseItemAmountInfo{
+				totalAmounts = &models.TransactionAmountsAndCurrency{
 					Currency:      account.Currency,
-					IncomeAmount:  0,
-					ExpenseAmount: 0,
+					IncomeAmount:  big.NewInt(0),
+					ExpenseAmount: big.NewInt(0),
 				}
 			}
 
-			totalAmounts.IncomeAmount += incomeAmount
+			totalAmounts.IncomeAmount.Add(totalAmounts.IncomeAmount, incomeAmount)
 			amountsMap[account.Currency] = totalAmounts
 		}
 
@@ -843,21 +844,25 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 			totalAmounts, exists := amountsMap[account.Currency]
 
 			if !exists {
-				totalAmounts = &models.TransactionAmountsResponseItemAmountInfo{
+				totalAmounts = &models.TransactionAmountsAndCurrency{
 					Currency:      account.Currency,
-					IncomeAmount:  0,
-					ExpenseAmount: 0,
+					IncomeAmount:  big.NewInt(0),
+					ExpenseAmount: big.NewInt(0),
 				}
 			}
 
-			totalAmounts.ExpenseAmount += expenseAmount
+			totalAmounts.ExpenseAmount.Add(totalAmounts.ExpenseAmount, expenseAmount)
 			amountsMap[account.Currency] = totalAmounts
 		}
 
 		allTotalAmounts := make(models.TransactionAmountsResponseItemAmountInfoSlice, 0)
 
 		for _, totalAmounts := range amountsMap {
-			allTotalAmounts = append(allTotalAmounts, totalAmounts)
+			allTotalAmounts = append(allTotalAmounts, &models.TransactionAmountsResponseItemAmountInfo{
+				Currency:      totalAmounts.Currency,
+				IncomeAmount:  totalAmounts.IncomeAmount.String(),
+				ExpenseAmount: totalAmounts.ExpenseAmount.String(),
+			})
 		}
 
 		sort.Sort(allTotalAmounts)

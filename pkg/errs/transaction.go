@@ -47,4 +47,8 @@ var (
 	ErrCannotMoveTransactionBetweenAccountsWithDifferentCurrencies = NewNormalError(NormalSubcategoryTransaction, 40, http.StatusBadRequest, "cannot move transaction between accounts with different currencies")
 	ErrCannotAddTagsToTooManyTransactionsOneTime                   = NewNormalError(NormalSubcategoryTransaction, 41, http.StatusBadRequest, "cannot add tags to too many transactions one time")
 	ErrMergedBalanceModificationTransactionAmountOverflow          = NewNormalError(NormalSubcategoryTransaction, 42, http.StatusBadRequest, "merged balance modification transaction amount overflow")
+	ErrTransactionTimeInvalid                                      = NewNormalError(NormalSubcategoryTransaction, 43, http.StatusBadRequest, "transaction time is invalid")
+	ErrTransactionTimeZoneInvalid                                  = NewNormalError(NormalSubcategoryTransaction, 44, http.StatusBadRequest, "transaction time zone is invalid")
+	ErrAmountInvalid                                               = NewNormalError(NormalSubcategoryTransaction, 45, http.StatusBadRequest, "transaction amount is invalid")
+	ErrGeographicLocationInvalid                                   = NewNormalError(NormalSubcategoryTransaction, 46, http.StatusBadRequest, "geographic location is invalid")
 )

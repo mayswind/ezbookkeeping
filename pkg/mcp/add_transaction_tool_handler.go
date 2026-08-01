@@ -178,7 +178,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		}
 	}
 
-	transaction, err := h.createNewTransactionModel(uid, &addTransactionRequest, transactionCategory.CategoryId, sourceAccount.AccountId, destinationAccountId, c.ClientIP())
+	transaction, err := h.createNewTransactionModel(c, uid, &addTransactionRequest, transactionCategory.CategoryId, sourceAccount.AccountId, destinationAccountId, c.ClientIP())
 
 	if err != nil {
 		return nil, nil, err
@@ -272,7 +272,7 @@ func (h *mcpAddTransactionToolHandler) getAccountBalanceAfterUpdate(balance int6
 	return newBalance, nil
 }
 
-func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addTransactionRequest *MCPAddTransactionRequest, categoryId int64, sourceAccountId int64, destinationAccountId int64, clientIp string) (*models.Transaction, error) {
+func (h *mcpAddTransactionToolHandler) createNewTransactionModel(c *core.WebContext, uid int64, addTransactionRequest *MCPAddTransactionRequest, categoryId int64, sourceAccountId int64, destinationAccountId int64, clientIp string) (*models.Transaction, error) {
 	var transactionDbType models.TransactionDbType
 
 	if addTransactionRequest.Type == transactionTypeExpense {
@@ -288,13 +288,20 @@ func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addT
 	transactionTime, err := utils.ParseFromLongDateTimeWithTimezoneRFC3339Format(addTransactionRequest.Time)
 
 	if err != nil {
-		return nil, err
+		log.Warnf(c, "[add_transaction_tool_handler.createNewTransactionModel] parse transaction time \"%s\" error, because %s", addTransactionRequest.Time, err.Error())
+		return nil, errs.ErrTransactionTimeInvalid
 	}
 
 	amount, err := utils.ParseAmount(addTransactionRequest.Amount)
 
 	if err != nil {
-		return nil, err
+		log.Warnf(c, "[add_transaction_tool_handler.createNewTransactionModel] parse transaction amount \"%s\" error, because %s", addTransactionRequest.Amount, err.Error())
+		return nil, errs.ErrAmountInvalid
+	}
+
+	if amount < models.MinimumTransactionAmount || amount > models.MaximumTransactionAmount {
+		log.Warnf(c, "[add_transaction_tool_handler.createNewTransactionModel] transaction amount \"%s\" is out of range", addTransactionRequest.Amount)
+		return nil, errs.ErrAmountInvalid
 	}
 
 	transaction := &models.Transaction{
@@ -316,7 +323,13 @@ func (h *mcpAddTransactionToolHandler) createNewTransactionModel(uid int64, addT
 		destinationAmount, err := utils.ParseAmount(addTransactionRequest.DestinationAmount)
 
 		if err != nil {
-			return nil, err
+			log.Warnf(c, "[add_transaction_tool_handler.createNewTransactionModel] parse transaction destination amount \"%s\" error, because %s", addTransactionRequest.DestinationAmount, err.Error())
+			return nil, errs.ErrAmountInvalid
+		}
+
+		if destinationAmount < models.MinimumTransactionAmount || destinationAmount > models.MaximumTransactionAmount {
+			log.Warnf(c, "[add_transaction_tool_handler.createNewTransactionModel] transaction destination amount \"%s\" is out of range", addTransactionRequest.DestinationAmount)
+			return nil, errs.ErrAmountInvalid
 		}
 
 		transaction.RelatedAccountAmount = destinationAmount

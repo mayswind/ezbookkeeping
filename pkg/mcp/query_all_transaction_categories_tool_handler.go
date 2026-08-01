@@ -47,7 +47,7 @@ func (h *mcpQueryAllTransactionCategoriesToolHandler) Handle(c *core.WebContext,
 	categories, err := services.GetTransactionCategoryService().GetAllCategoriesByUid(c, uid, 0, -1)
 
 	if err != nil {
-		log.Errorf(c, "[query_all_transaction_categories.Handle] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
+		log.Errorf(c, "[query_all_transaction_categories_tool_handler.Handle] failed to get categories for user \"uid:%d\", because %s", uid, err.Error())
 		return nil, nil, err
 	}
 
@@ -87,7 +87,7 @@ func (h *mcpQueryAllTransactionCategoriesToolHandler) createNewMCPQueryAllTransa
 		parentCategory, exists := categoriesMap[category.ParentCategoryId]
 
 		if !exists || parentCategory == nil {
-			log.Warnf(c, "[query_all_transaction_categories.createNewMCPQueryAllTransactionCategoriesResponse] category \"id:%d\" has no parent category", category.CategoryId)
+			log.Warnf(c, "[query_all_transaction_categories_tool_handler.createNewMCPQueryAllTransactionCategoriesResponse] category \"id:%d\" has no parent category", category.CategoryId)
 			continue
 		}
 

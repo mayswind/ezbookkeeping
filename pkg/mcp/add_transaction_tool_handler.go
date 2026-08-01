@@ -95,7 +95,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 	allAccounts, err := services.GetAccountService().GetAllAccountsByUid(c, uid)
 
 	if err != nil {
-		log.Warnf(c, "[add_transaction.Handle] get account error, because %s", err.Error())
+		log.Warnf(c, "[add_transaction_tool_handler.Handle] get account error, because %s", err.Error())
 		return nil, nil, err
 	}
 
@@ -103,7 +103,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 	sourceAccount, exists := accountsMap[addTransactionRequest.AccountName]
 
 	if !exists {
-		log.Warnf(c, "[add_transaction.Handle] source account \"%s\" not found for user \"uid:%d\"", addTransactionRequest.AccountName, uid)
+		log.Warnf(c, "[add_transaction_tool_handler.Handle] source account \"%s\" not found for user \"uid:%d\"", addTransactionRequest.AccountName, uid)
 		return nil, nil, errs.ErrSourceAccountNotFound
 	}
 
@@ -114,7 +114,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		destinationAccount, exists = accountsMap[addTransactionRequest.DestinationAccountName]
 
 		if !exists {
-			log.Warnf(c, "[add_transaction.Handle] destination account \"%s\" not found for user \"uid:%d\"", addTransactionRequest.DestinationAccountName, uid)
+			log.Warnf(c, "[add_transaction_tool_handler.Handle] destination account \"%s\" not found for user \"uid:%d\"", addTransactionRequest.DestinationAccountName, uid)
 			return nil, nil, errs.ErrDestinationAccountNotFound
 		}
 
@@ -124,7 +124,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 	allCategories, err := services.GetTransactionCategoryService().GetAllCategoriesByUid(c, uid, 0, -1)
 
 	if err != nil {
-		log.Warnf(c, "[add_transaction.Handle] get transaction category error, because %s", err.Error())
+		log.Warnf(c, "[add_transaction_tool_handler.Handle] get transaction category error, because %s", err.Error())
 		return nil, nil, err
 	}
 
@@ -152,7 +152,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 	}
 
 	if transactionCategory == nil {
-		log.Warnf(c, "[add_transaction.Handle] secondary category \"%s\" not found for user \"uid:%d\"", addTransactionRequest.SecondaryCategoryName, uid)
+		log.Warnf(c, "[add_transaction_tool_handler.Handle] secondary category \"%s\" not found for user \"uid:%d\"", addTransactionRequest.SecondaryCategoryName, uid)
 		return nil, nil, errs.ErrTransactionCategoryNotFound
 	}
 
@@ -162,7 +162,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		allTags, err := services.GetTransactionTagService().GetAllTagsByUid(c, uid)
 
 		if err != nil {
-			log.Warnf(c, "[add_transaction.Handle] get transaction tag ids error, because %s", err.Error())
+			log.Warnf(c, "[add_transaction_tool_handler.Handle] get transaction tag ids error, because %s", err.Error())
 			return nil, nil, err
 		}
 
@@ -173,7 +173,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 			if tag, exists := tagMaps[tagName]; exists {
 				tagIds = append(tagIds, tag.TagId)
 			} else {
-				log.Warnf(c, "[add_transaction.Handle] transaction tag \"%s\" not found for user \"uid:%d\"", tagName, uid)
+				log.Warnf(c, "[add_transaction_tool_handler.Handle] transaction tag \"%s\" not found for user \"uid:%d\"", tagName, uid)
 			}
 		}
 	}
@@ -194,11 +194,11 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		err = services.GetTransactionService().CreateTransaction(c, transaction, tagIds, nil)
 
 		if err != nil {
-			log.Errorf(c, "[add_transaction.Handle] failed to create transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
+			log.Errorf(c, "[add_transaction_tool_handler.Handle] failed to create transaction \"id:%d\" for user \"uid:%d\", because %s", transaction.TransactionId, uid, err.Error())
 			return nil, nil, err
 		}
 
-		log.Infof(c, "[add_transaction.Handle] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
+		log.Infof(c, "[add_transaction_tool_handler.Handle] user \"uid:%d\" has created a new transaction \"id:%d\" successfully", uid, transaction.TransactionId)
 
 		accountIds := []int64{sourceAccount.AccountId}
 
@@ -209,7 +209,7 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		newAccounts, err := services.GetAccountService().GetAccountsByAccountIds(c, uid, accountIds)
 
 		if err != nil {
-			log.Warnf(c, "[add_transaction.Handle] failed to get latest accounts info after transaction created, because %s", err.Error())
+			log.Warnf(c, "[add_transaction_tool_handler.Handle] failed to get latest accounts info after transaction created, because %s", err.Error())
 		}
 
 		structuredResponse, response, err := h.createNewMCPAddTransactionResponse(c, transaction, newAccounts, false)

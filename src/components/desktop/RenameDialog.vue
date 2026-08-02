@@ -1,28 +1,23 @@
 <template>
-    <v-dialog max-width="500" :persistent="oldName !== newName" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4 text-wrap">{{ dialogTitle || defaultTitle }}</h4>
-            </template>
-            <v-card-text class="w-100 d-flex justify-center">
-                <v-text-field persistent-placeholder
-                              :autofocus="true"
-                              :label="label"
-                              :placeholder="placeholder"
-                              v-model="newName"
-                              @keyup.enter="save" />
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="primary" :disabled="!newName || oldName === newName" @click="save">
-                        {{ tt('Save') }}
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">
-                        {{ tt('Cancel') }}
-                    </v-btn>
+    <v-dialog width="500" :persistent="oldName !== newName" v-model="showState">
+        <one-column-dialog-layout :title="dialogTitle || defaultTitle" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #content>
+                <div class="mt-4">
+                    <v-text-field persistent-placeholder
+                                  :autofocus="true"
+                                  :label="label"
+                                  :placeholder="placeholder"
+                                  v-model="newName"
+                                  @keyup.enter="save" />
                 </div>
-            </v-card-text>
-        </v-card>
+            </template>
+
+            <template #footer>
+                <v-spacer />
+                <v-btn color="primary" :disabled="!newName || oldName === newName" @click="save">{{ tt('Save') }}</v-btn>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 </template>
 

@@ -1,61 +1,60 @@
 <template>
     <v-dialog width="600" :persistent="isDisplayOrderModified()" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex align-center">
-                        <h4 class="text-h4">{{ tt('Account Category Order') }}</h4>
-                    </div>
-                    <v-spacer/>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true">
-                        <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
-                            <v-list>
-                                <v-list-item :prepend-icon="mdiRestore"
-                                             :title="tt('Reset to Default')"
-                                             @click="resetDisplayOrderToDefault"></v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
-                </div>
+        <one-column-dialog-layout content-class="pa-0"
+                                  :title="tt('Account Category Order')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #after-title>
+                <v-btn density="compact" color="primary" variant="text" class="ms-2" :icon="true"
+                       :disabled="!isDisplayOrderModified()" @click="saveDisplayOrder">
+                    <v-icon :icon="mdiCheck" size="22" />
+                    <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
+                </v-btn>
             </template>
 
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
-                <v-table hover density="comfortable" class="w-100 table-striped">
-                    <draggable-list tag="tbody"
-                                    item-key="id"
-                                    handle=".drag-handle"
-                                    ghost-class="dragging-item"
-                                    v-model="accountCategories">
-                        <template #item="{ element }">
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-center">
+            <template #toolbar>
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true">
+                    <v-icon :icon="mdiDotsVertical" size="22" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item :prepend-icon="mdiRestore"
+                                         :title="tt('Reset to Default')"
+                                         @click="resetDisplayOrderToDefault"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+            </template>
+
+            <template #content>
+                <div class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
+                    <v-table hover density="comfortable" class="w-100 table-striped">
+                        <draggable-list tag="tbody"
+                                        item-key="id"
+                                        handle=".drag-handle"
+                                        ghost-class="dragging-item"
+                                        v-model="accountCategories">
+                            <template #item="{ element }">
+                                <tr>
+                                    <td>
                                         <div class="d-flex align-center">
-                                            <span>{{ tt(element.name) }}</span>
-                                        </div>
+                                            <div class="d-flex align-center">
+                                                <span>{{ tt(element.name) }}</span>
+                                            </div>
 
-                                        <v-spacer/>
+                                            <v-spacer/>
 
-                                        <span class="ms-2">
+                                            <span class="ms-2">
                                             <v-icon class="drag-handle" :icon="mdiDrag"/>
                                             <v-tooltip activator="parent">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </template>
-                    </draggable-list>
-                </v-table>
-            </v-card-text>
-
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :disabled="!isDisplayOrderModified()" @click="saveDisplayOrder">{{ tt('Save') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </draggable-list>
+                    </v-table>
                 </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 </template>
 
@@ -66,6 +65,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useAccountCategoryDisplayOrderSettingsPageBase } from '@/views/base/settings/AccountCategoryDisplayOrderSettingsPageBase.ts';
 
 import {
+    mdiCheck,
     mdiDotsVertical,
     mdiRestore,
     mdiDrag

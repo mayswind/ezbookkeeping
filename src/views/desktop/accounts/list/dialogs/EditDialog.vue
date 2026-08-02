@@ -1,28 +1,24 @@
 <template>
     <v-dialog :width="account.type === AccountType.MultiSubAccounts.type ? 1000 : 800" :persistent="isAccountModified" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex align-center">
-                        <h4 class="text-h4">{{ tt(title) }}</h4>
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
-                    </div>
-                    <v-spacer/>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true"
-                           :disabled="loading || submitting || account.type !== AccountType.MultiSubAccounts.type">
-                        <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
-                            <v-list>
-                                <v-list-item :prepend-icon="mdiCreditCardPlusOutline"
-                                             :title="tt('Add Sub-account')"
-                                             @click="addSubAccount"></v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
-                </div>
+        <two-column-dialog-layout :disabled="loading || submitting" :loading="loading"
+                                  :title="tt(title)" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #toolbar>
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                       :disabled="loading || submitting || account.type !== AccountType.MultiSubAccounts.type">
+                    <v-icon :icon="mdiDotsVertical" size="22" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item :prepend-icon="mdiCreditCardPlusOutline"
+                                         :title="tt('Add Sub-account')"
+                                         @click="addSubAccount"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
             </template>
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
-                <div class="mb-4" v-if="account.type === AccountType.MultiSubAccounts.type">
+
+            <template #content-left-column v-if="account.type === AccountType.MultiSubAccounts.type">
+                <div class="px-4">
                     <v-tabs direction="vertical" :disabled="loading || submitting" v-model="currentAccountIndex">
                         <v-tab :value="-1">
                             <span>{{ tt('Main Account') }}</span>
@@ -37,12 +33,13 @@
                         </template>
                     </v-tabs>
                 </div>
+            </template>
 
+            <template #content-right-column>
                 <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container"
-                          :class="{ 'ms-md-5': account.type === AccountType.MultiSubAccounts.type }"
                           v-model="activeTab">
                     <v-window-item value="account">
-                        <v-form class="mt-2">
+                        <v-form class="my-4">
                             <v-row>
                                 <v-col cols="12" md="12" v-if="account.type === AccountType.SingleAccount.type || currentAccountIndex < 0">
                                     <v-select
@@ -180,24 +177,22 @@
                         </v-form>
                     </v-window-item>
                 </v-window>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
-                        <template v-slot:activator="{ props }">
-                            <div v-bind="props" class="d-inline-block">
-                                <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
-                                    {{ tt(saveButtonTitle) }}
-                                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                                </v-btn>
-                            </div>
-                        </template>
-                    </v-tooltip>
-                    <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+
+            <template #footer>
+                <v-spacer/>
+                <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
+                    <template v-slot:activator="{ props }">
+                        <div v-bind="props" class="d-inline-block">
+                            <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
+                                {{ tt(saveButtonTitle) }}
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                            </v-btn>
+                        </div>
+                    </template>
+                </v-tooltip>
+            </template>
+        </two-column-dialog-layout>
     </v-dialog>
 
     <confirm-dialog ref="confirmDialog"/>

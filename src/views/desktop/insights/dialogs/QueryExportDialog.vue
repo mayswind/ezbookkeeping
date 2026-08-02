@@ -1,33 +1,32 @@
 <template>
     <v-dialog width="1000" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4">{{ tt('Export Queries') }}</h4>
+        <one-column-dialog-layout content-class="pa-0" content-style="height: 500px"
+                                  :title="tt('Export Queries')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #after-title>
+                <div ref="buttonContainer">
+                    <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                           :disabled="!queriesJson" @click="copy">
+                        <v-icon :icon="mdiContentCopy" size="20" />
+                        <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
+                    </v-btn>
+                    <v-btn density="compact" color="default" variant="text" class="ms-1" :icon="true"
+                           :disabled="!queriesJson" @click="save()">
+                        <v-icon :icon="mdiContentSaveOutline" size="22" />
+                        <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
+                    </v-btn>
+                </div>
             </template>
 
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 485px">
+            <template #content>
                 <div class="w-100 h-100 code-container">
-                    <v-textarea class="w-100 h-100 always-cursor-text" :readonly="true" :value="queriesJson"></v-textarea>
+                    <v-textarea no-resize class="w-100 h-100 ps-4 always-cursor-text"
+                                density="compact" variant="plain"
+                                :readonly="true" :rounded="false"
+                                :value="queriesJson"></v-textarea>
                 </div>
-            </v-card-text>
-
-            <v-card-text>
-                <div ref="buttonContainer" class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn-group variant="tonal" density="comfortable">
-                        <v-btn color="primary" :disabled="!queriesJson" @click="copy">{{ tt('Copy') }}</v-btn>
-                        <v-btn density="compact" color="primary" :disabled="!queriesJson" :icon="true">
-                            <v-icon :icon="mdiMenuDown" size="24" />
-                            <v-menu activator="parent">
-                                <v-list>
-                                    <v-list-item :title="tt('Save')" @click="save()"></v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </v-btn>
-                    </v-btn-group>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />
@@ -47,7 +46,8 @@ import { KnownFileType } from '@/core/file.ts';
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
-    mdiMenuDown
+    mdiContentCopy,
+    mdiContentSaveOutline
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;

@@ -1,14 +1,10 @@
 <template>
     <v-dialog width="800" :persistent="isCategoryModified" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center">
-                    <h4 class="text-h4">{{ tt(title) }}</h4>
-                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
-                </div>
-            </template>
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
-                <v-form class="w-100 mt-2">
+        <one-column-dialog-layout :disabled="loading || submitting" :loading="loading"
+                                  :title="tt(title)" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #content>
+                <v-form class="mt-5">
                     <v-row>
                         <v-col cols="12" md="12">
                             <v-text-field
@@ -48,16 +44,16 @@
                         <v-col cols="12" md="6">
                             <icon-select icon-type="category"
                                          :all-icon-infos="ALL_CATEGORY_ICONS"
-                                          :label="tt('Category Icon')"
-                                          :color="category.color"
-                                          :disabled="loading || submitting"
-                                          v-model="category.icon" />
+                                         :label="tt('Category Icon')"
+                                         :color="category.color"
+                                         :disabled="loading || submitting"
+                                         v-model="category.icon" />
                         </v-col>
                         <v-col cols="12" md="6">
                             <color-select :all-color-infos="ALL_CATEGORY_COLORS"
-                                         :label="tt('Category Color')"
-                                         :disabled="loading || submitting"
-                                         v-model="category.color" />
+                                          :label="tt('Category Color')"
+                                          :disabled="loading || submitting"
+                                          v-model="category.color" />
                         </v-col>
                         <v-col cols="12" md="12">
                             <v-textarea
@@ -76,24 +72,22 @@
                         </v-col>
                     </v-row>
                 </v-form>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
-                        <template v-slot:activator="{ props }">
-                            <div v-bind="props" class="d-inline-block">
-                                <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
-                                    {{ tt(saveButtonTitle) }}
-                                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                                </v-btn>
-                            </div>
-                        </template>
-                    </v-tooltip>
-                    <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+
+            <template #footer>
+                <v-spacer/>
+                <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
+                    <template v-slot:activator="{ props }">
+                        <div v-bind="props" class="d-inline-block">
+                            <v-btn :disabled="inputIsEmpty || loading || submitting" @click="save">
+                                {{ tt(saveButtonTitle) }}
+                                <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                            </v-btn>
+                        </div>
+                    </template>
+                </v-tooltip>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />

@@ -1,22 +1,25 @@
 <template>
     <v-dialog class="month-range-selection-dialog" width="640" :persistent="!!persistent" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4">{{ title }}</h4>
+        <one-column-dialog-layout :title="title" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #toolbar>
+                <v-btn class="me-2" density="comfortable" variant="outlined"
+                       :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ tt('OK') }}</v-btn>
             </template>
-            <template #subtitle>
-                <div class="text-body-1 text-wrap mt-2">
-                    <p v-if="hint">{{ hint }}</p>
-                    <span v-if="beginDateTime && endDateTime">
-                        <span>{{ beginDateTime }}</span>
-                        <span> - </span>
-                        <span>{{ endDateTime }}</span>
-                    </span>
+
+            <template #content>
+                <div class="text-body-1 mt-3" v-if="beginDateTime && endDateTime">
+                    <span>{{ beginDateTime }}</span>
+                    <span> - </span>
+                    <span>{{ endDateTime }}</span>
+                </div>
+
+                <div class="text-body-1 text-wrap mt-2" v-if="hint">
+                    <span>{{ hint }}</span>
                     <slot></slot>
                 </div>
-            </template>
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
-                <v-row class="match-height">
+
+                <v-row class="mt-1">
                     <v-col cols="12" md="6">
                         <month-picker :is-dark-mode="isDarkMode" v-model="dateRange[0]"></month-picker>
                     </v-col>
@@ -24,14 +27,8 @@
                         <month-picker :is-dark-mode="isDarkMode" v-model="dateRange[1]"></month-picker>
                     </v-col>
                 </v-row>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center mt-2 gap-4">
-                    <v-btn :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ tt('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 </template>
 

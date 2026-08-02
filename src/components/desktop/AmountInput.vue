@@ -27,7 +27,7 @@
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
                   v-model="currentFormula" v-if="!hide && formulaMode"
-                  @keydown.enter="calculateFormula" @click="onClick">
+                  @keydown.enter.prevent @keyup.enter.stop.prevent="calculateFormula" @click="onClick">
         <template #prepend-inner v-if="currency && prependText">
             <div>{{ prependText }}</div>
         </template>

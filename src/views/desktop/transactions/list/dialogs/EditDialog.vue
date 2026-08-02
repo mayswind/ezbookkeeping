@@ -1,66 +1,72 @@
 <template>
     <v-dialog width="1000" :persistent="isTransactionModified || recognizing" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex align-center">
-                        <h4 class="text-h4">{{ tt(title) }}</h4>
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="loading"></v-progress-circular>
-                    </div>
-                    <v-spacer/>
-                    <small class="ms-2 text-truncate" v-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</small>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true"
-                           :disabled="loading || submitting || recognizing"
-                           v-if="mode !== TransactionEditPageMode.View && type === TransactionEditPageType.Transaction && activeTab === 'basicInfo' && isTransactionFromAITextRecognitionEnabled()"
-                           @click="recognizeFromClipboard">
-                        <v-icon :icon="mdiMagicStaff" size="22" v-if="!recognizing"/>
-                        <v-tooltip activator="parent">{{ tt('AI Clipboard Text Recognition') }}</v-tooltip>
-                        <v-progress-circular indeterminate size="22" v-if="recognizing"></v-progress-circular>
-                    </v-btn>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true"
-                           :disabled="loading || submitting || recognizing" v-if="mode !== TransactionEditPageMode.View && (activeTab === 'basicInfo' || (activeTab === 'map' && isSupportGetGeoLocationByClick()))">
-                        <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
-                            <v-list v-if="activeTab === 'basicInfo'">
-                                <v-list-item :prepend-icon="mdiSwapHorizontal"
-                                             :title="tt('Swap Account')"
-                                             v-if="transaction.type === TransactionType.Transfer"
-                                             @click="swapTransactionData(true, false)"></v-list-item>
-                                <v-list-item :prepend-icon="mdiSwapHorizontal"
-                                             :title="tt('Swap Amount')"
-                                             v-if="transaction.type === TransactionType.Transfer"
-                                             @click="swapTransactionData(false, true)"></v-list-item>
-                                <v-list-item :prepend-icon="mdiSwapHorizontal"
-                                             :title="tt('Swap Account and Amount')"
-                                             v-if="transaction.type === TransactionType.Transfer"
-                                             @click="swapTransactionData(true, true)"></v-list-item>
-                                <v-divider v-if="transaction.type === TransactionType.Transfer" />
-                                <v-list-item :prepend-icon="mdiEyeOutline"
-                                             :title="tt('Show Amount')"
-                                             v-if="transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
-                                <v-list-item :prepend-icon="mdiEyeOffOutline"
-                                             :title="tt('Hide Amount')"
-                                             v-if="!transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
-                            </v-list>
-                            <v-list v-if="activeTab === 'map'">
-                                <v-list-item key="setGeoLocationByClickMap" value="setGeoLocationByClickMap"
-                                             :prepend-icon="mdiMapMarkerOutline"
-                                             :disabled="!transaction.geoLocation" v-if="isSupportGetGeoLocationByClick()">
-                                    <v-list-item-title class="cursor-pointer" @click="setGeoLocationByClickMap = !setGeoLocationByClickMap; geoMenuState = false">
-                                        <div class="d-flex align-center">
-                                            <span>{{ tt('Click on Map to Set Geographic Location') }}</span>
-                                            <v-spacer/>
-                                            <v-icon :icon="mdiCheck" v-if="setGeoLocationByClickMap" />
-                                        </div>
-                                    </v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
-                </div>
+        <two-column-dialog-layout :disabled="loading || submitting || recognizing" :loading="loading"
+                                  :title="tt(title)" :cancel-button-title="tt(cancelButtonTitle)"
+                                  @cancel="cancel">
+            <template #after-title>
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                       :disabled="loading || submitting || recognizing"
+                       v-if="mode === TransactionEditPageMode.View && originalTransactionEditable"
+                       @click="edit">
+                    <v-icon :icon="mdiPencilOutline" size="22"/>
+                    <v-tooltip activator="parent">{{ tt('Edit') }}</v-tooltip>
+                </v-btn>
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                       :disabled="loading || submitting || recognizing"
+                       v-if="mode !== TransactionEditPageMode.View && type === TransactionEditPageType.Transaction && activeTab === 'basicInfo' && isTransactionFromAITextRecognitionEnabled()"
+                       @click="recognizeFromClipboard">
+                    <v-icon :icon="mdiMagicStaff" size="22" v-if="!recognizing"/>
+                    <v-tooltip activator="parent">{{ tt('AI Clipboard Text Recognition') }}</v-tooltip>
+                    <v-progress-circular indeterminate size="22" v-if="recognizing"></v-progress-circular>
+                </v-btn>
+                <small class="ms-2 text-truncate" v-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</small>
             </template>
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
-                <div class="mb-4">
+
+            <template #toolbar>
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                       :disabled="loading || submitting || recognizing" v-if="mode !== TransactionEditPageMode.View && (activeTab === 'basicInfo' || (activeTab === 'map' && isSupportGetGeoLocationByClick()))">
+                    <v-icon :icon="mdiDotsVertical" size="22" />
+                    <v-menu activator="parent">
+                        <v-list v-if="activeTab === 'basicInfo'">
+                            <v-list-item :prepend-icon="mdiSwapHorizontal"
+                                         :title="tt('Swap Account')"
+                                         v-if="transaction.type === TransactionType.Transfer"
+                                         @click="swapTransactionData(true, false)"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSwapHorizontal"
+                                         :title="tt('Swap Amount')"
+                                         v-if="transaction.type === TransactionType.Transfer"
+                                         @click="swapTransactionData(false, true)"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSwapHorizontal"
+                                         :title="tt('Swap Account and Amount')"
+                                         v-if="transaction.type === TransactionType.Transfer"
+                                         @click="swapTransactionData(true, true)"></v-list-item>
+                            <v-divider v-if="transaction.type === TransactionType.Transfer" />
+                            <v-list-item :prepend-icon="mdiEyeOutline"
+                                         :title="tt('Show Amount')"
+                                         v-if="transaction.hideAmount" @click="transaction.hideAmount = false"></v-list-item>
+                            <v-list-item :prepend-icon="mdiEyeOffOutline"
+                                         :title="tt('Hide Amount')"
+                                         v-if="!transaction.hideAmount" @click="transaction.hideAmount = true"></v-list-item>
+                        </v-list>
+                        <v-list v-if="activeTab === 'map'">
+                            <v-list-item key="setGeoLocationByClickMap" value="setGeoLocationByClickMap"
+                                         :prepend-icon="mdiMapMarkerOutline"
+                                         :disabled="!transaction.geoLocation" v-if="isSupportGetGeoLocationByClick()">
+                                <v-list-item-title class="cursor-pointer" @click="setGeoLocationByClickMap = !setGeoLocationByClickMap; geoMenuState = false">
+                                    <div class="d-flex align-center">
+                                        <span>{{ tt('Click on Map to Set Geographic Location') }}</span>
+                                        <v-spacer/>
+                                        <v-icon :icon="mdiCheck" v-if="setGeoLocationByClickMap" />
+                                    </div>
+                                </v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+            </template>
+
+            <template #content-left-column>
+                <div class="px-4">
                     <v-tabs class="v-tabs-pill" direction="vertical" :class="{ 'readonly': type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit }"
                             :disabled="loading || submitting || recognizing" v-model="transaction.type">
                         <v-tab :value="TransactionType.Expense" :disabled="type === TransactionEditPageType.Transaction && mode !== TransactionEditPageMode.Add && mode !== TransactionEditPageMode.Edit && transaction.type !== TransactionType.Expense" v-if="transaction.type !== TransactionType.ModifyBalance">
@@ -76,8 +82,10 @@
                             <span>{{ tt('Modify Balance') }}</span>
                         </v-tab>
                     </v-tabs>
-                    <v-divider class="my-2"/>
-                    <v-tabs direction="vertical" :disabled="loading || submitting || recognizing" v-model="activeTab">
+                </div>
+                <v-divider class="my-2"/>
+                <div class="px-4">
+                    <v-tabs  direction="vertical" :disabled="loading || submitting || recognizing" v-model="activeTab">
                         <v-tab value="basicInfo">
                             <span>{{ tt('Basic Information') }}</span>
                         </v-tab>
@@ -89,11 +97,13 @@
                         </v-tab>
                     </v-tabs>
                 </div>
+            </template>
 
-                <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container ms-md-5"
+            <template #content-right-column>
+                <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container"
                           v-model="activeTab">
                     <v-window-item value="basicInfo">
-                        <v-form class="mt-2">
+                        <v-form class="my-4">
                             <v-row>
                                 <v-col cols="12" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate">
                                     <v-text-field
@@ -289,9 +299,9 @@
                                         @update:model-value="updateTransactionTimezone"
                                     >
                                         <template #selection="{ item }">
-                                            <span class="text-truncate" v-if="transaction.timeZone || transaction.timeZone === ''">
-                                                {{ item.title }}
-                                            </span>
+                                                <span class="text-truncate" v-if="transaction.timeZone || transaction.timeZone === ''">
+                                                    {{ item.title }}
+                                                </span>
                                         </template>
                                     </v-autocomplete>
                                 </v-col>
@@ -361,26 +371,22 @@
                         </v-form>
                     </v-window-item>
                     <v-window-item value="map">
-                        <v-row>
-                            <v-col cols="12" md="12">
-                                <map-view ref="map" map-class="transaction-edit-map-view"
-                                          :enable-zoom-control="true" :geo-location="transaction.geoLocation"
-                                          @click="updateSpecifiedGeoLocation">
-                                    <template #error-title="{ mapSupported, mapDependencyLoaded }">
-                                        <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></span>
-                                        <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></span>
-                                    </template>
-                                    <template #error-content>
-                                        <p class="text-body-1">
-                                            {{ tt('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}
-                                        </p>
-                                    </template>
-                                </map-view>
-                            </v-col>
-                        </v-row>
+                        <map-view ref="map" map-class="transaction-edit-map-view mb-3 mb-sm-0"
+                                  :enable-zoom-control="true" :geo-location="transaction.geoLocation"
+                                  @click="updateSpecifiedGeoLocation">
+                            <template #error-title="{ mapSupported, mapDependencyLoaded }">
+                                <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></span>
+                                <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></span>
+                            </template>
+                            <template #error-content>
+                                <p class="text-body-1">
+                                    {{ tt('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}
+                                </p>
+                            </template>
+                        </map-view>
                     </v-window-item>
                     <v-window-item value="pictures">
-                        <v-row class="transaction-pictures align-content-start" :class="{ 'readonly': submitting || uploadingPicture || removingPictureId }">
+                        <v-row class="transaction-pictures align-content-start ma-0 pa-0 ms-n3" :class="{ 'readonly': submitting || uploadingPicture || removingPictureId }">
                             <v-col :key="picIdx" cols="6" md="3" v-for="(pictureInfo, picIdx) in transaction.pictures">
                                 <v-avatar rounded="lg" variant="tonal" size="160"
                                           class="cursor-pointer transaction-picture"
@@ -417,93 +423,83 @@
                         </v-row>
                     </v-window-item>
                 </v-window>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
-                        <template v-slot:activator="{ props }">
-                            <div v-bind="props" class="d-inline-block">
-                                <v-btn-group density="comfortable" v-if="mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit">
-                                    <v-btn color="primary" :disabled="inputIsEmpty || loading || submitting || recognizing" @click="save(AfterSaveAction.GoBack)">
-                                        {{ tt(saveButtonTitle) }}
-                                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                                    </v-btn>
-                                    <v-btn color="primary" density="compact"
-                                           :disabled="inputIsEmpty || loading || submitting || recognizing" :icon="true"
-                                           v-if="type === TransactionEditPageType.Transaction && mode === TransactionEditPageMode.Add">
-                                        <v-icon :icon="mdiMenuDown" size="24" />
-                                        <v-menu activator="parent">
-                                            <v-list>
-                                                <v-list-item :title="tt(TransactionQuickAddButtonActionType.SaveAndAddNewTransaction.name)"
-                                                             @click="save(AfterSaveAction.StayWithNewTransaction)"></v-list-item>
-                                                <v-list-item :title="tt(TransactionQuickAddButtonActionType.SaveAndKeepCurrentData.name)"
-                                                             @click="save(AfterSaveAction.StayWithCurrentTransaction)"></v-list-item>
-                                            </v-list>
-                                        </v-menu>
-                                    </v-btn>
-                                </v-btn-group>
-                            </div>
-                        </template>
-                    </v-tooltip>
-                    <v-btn-group variant="tonal" density="comfortable"
-                                 v-if="mode === TransactionEditPageMode.View && transaction.type !== TransactionType.ModifyBalance">
-                        <v-btn :disabled="loading || submitting || recognizing"
-                               @click="duplicate(false, false)">{{ tt('Duplicate') }}</v-btn>
-                        <v-btn density="compact" :disabled="loading || submitting || recognizing" :icon="true">
-                            <v-icon :icon="mdiMenuDown" size="24" />
-                            <v-menu activator="parent">
-                                <v-list>
-                                    <v-list-item :title="tt('Duplicate (With Time)')"
-                                                 @click="duplicate(true, false)"></v-list-item>
-                                    <v-list-item :title="tt('Duplicate (With Geographic Location)')"
-                                                 @click="duplicate(false, true)"
-                                                 v-if="transaction.geoLocation"></v-list-item>
-                                    <v-list-item :title="tt('Duplicate (With Time and Geographic Location)')"
-                                                 @click="duplicate(true, true)"
-                                                 v-if="transaction.geoLocation"></v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </v-btn>
-                    </v-btn-group>
-                    <v-btn color="warning" variant="tonal" :disabled="loading || submitting || recognizing"
-                           v-if="mode === TransactionEditPageMode.View && originalTransactionEditable"
-                           @click="edit">{{ tt('Edit') }}</v-btn>
-                    <v-btn color="error" variant="tonal" :disabled="loading || submitting || recognizing"
-                           v-if="mode === TransactionEditPageMode.View && originalTransactionEditable" @click="remove">
-                        {{ tt('Delete') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+            </template>
+
+            <template #footer>
+                <v-btn color="error" variant="tonal" :disabled="loading || submitting || recognizing"
+                       v-if="mode === TransactionEditPageMode.View && originalTransactionEditable" @click="remove">
+                    {{ tt('Delete') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                </v-btn>
+                <v-spacer/>
+                <v-tooltip :disabled="!inputIsEmpty" :text="inputEmptyProblemMessage ? tt(inputEmptyProblemMessage) : ''">
+                    <template v-slot:activator="{ props }">
+                        <div v-bind="props" class="d-inline-block">
+                            <v-btn-group density="comfortable" v-if="mode === TransactionEditPageMode.Add || mode === TransactionEditPageMode.Edit">
+                                <v-btn color="primary" :disabled="inputIsEmpty || loading || submitting || recognizing" @click="save(AfterSaveAction.GoBack)">
+                                    {{ tt(saveButtonTitle) }}
+                                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                                </v-btn>
+                                <v-btn color="primary" density="compact"
+                                       :disabled="inputIsEmpty || loading || submitting || recognizing" :icon="true"
+                                       v-if="type === TransactionEditPageType.Transaction && mode === TransactionEditPageMode.Add">
+                                    <v-icon :icon="mdiMenuDown" size="24" />
+                                    <v-menu activator="parent">
+                                        <v-list>
+                                            <v-list-item :title="tt(TransactionQuickAddButtonActionType.SaveAndAddNewTransaction.name)"
+                                                         @click="save(AfterSaveAction.StayWithNewTransaction)"></v-list-item>
+                                            <v-list-item :title="tt(TransactionQuickAddButtonActionType.SaveAndKeepCurrentData.name)"
+                                                         @click="save(AfterSaveAction.StayWithCurrentTransaction)"></v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-btn>
+                            </v-btn-group>
+                        </div>
+                    </template>
+                </v-tooltip>
+                <v-btn-group variant="tonal" density="comfortable"
+                             v-if="mode === TransactionEditPageMode.View && transaction.type !== TransactionType.ModifyBalance">
+                    <v-btn :disabled="loading || submitting || recognizing"
+                           @click="duplicate(false, false)">{{ tt('Duplicate') }}</v-btn>
+                    <v-btn density="compact" :disabled="loading || submitting || recognizing" :icon="true">
+                        <v-icon :icon="mdiMenuDown" size="24" />
+                        <v-menu activator="parent">
+                            <v-list>
+                                <v-list-item :title="tt('Duplicate (With Time)')"
+                                             @click="duplicate(true, false)"></v-list-item>
+                                <v-list-item :title="tt('Duplicate (With Geographic Location)')"
+                                             @click="duplicate(false, true)"
+                                             v-if="transaction.geoLocation"></v-list-item>
+                                <v-list-item :title="tt('Duplicate (With Time and Geographic Location)')"
+                                             @click="duplicate(true, true)"
+                                             v-if="transaction.geoLocation"></v-list-item>
+                            </v-list>
+                        </v-menu>
                     </v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="loading || submitting || recognizing"
-                           @click="cancel">{{ tt(cancelButtonTitle) }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+                </v-btn-group>
+            </template>
+        </two-column-dialog-layout>
     </v-dialog>
 
     <v-dialog width="600" v-model="showPasteTextDialog">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4 text-wrap">{{ tt('AI Clipboard Text Recognition') }}</h4>
+        <one-column-dialog-layout content-class="pa-0" :disabled="recognizing"
+                                  :title="tt('AI Clipboard Text Recognition')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="showPasteTextDialog = false; pastedText = '';">
+            <template #toolbar>
+                <v-btn class="me-2" density="comfortable" variant="outlined"
+                       :disabled="!pastedText || !pastedText.trim() || recognizing"
+                       @click="showPasteTextDialog = false; recognizeText(pastedText);">{{ tt('Recognize') }}</v-btn>
             </template>
-            <v-card-text class="w-100 d-flex justify-center">
-                <v-textarea
-                    type="text"
-                    persistent-placeholder
-                    rows="8"
-                    :disabled="recognizing"
-                    :placeholder="tt('Click here to paste a transaction description')"
-                    v-model="pastedText"
-                />
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="primary" :disabled="!pastedText || !pastedText.trim() || recognizing" @click="showPasteTextDialog = false; recognizeText(pastedText);">
-                        {{ tt('Recognize') }}
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="recognizing" @click="showPasteTextDialog = false; pastedText = '';">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+
+            <template #content>
+                <v-textarea no-resize persistent-placeholder
+                            class="w-100 h-100 ps-4 always-cursor-text"
+                            rows="10" density="compact" variant="plain" :rounded="false"
+                            :disabled="recognizing"
+                            :placeholder="tt('Click here to paste a transaction description')"
+                            v-model="pastedText"></v-textarea>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <confirm-dialog ref="confirmDialog"/>
@@ -574,6 +570,7 @@ import logger from '@/lib/logger.ts';
 import {
     mdiMagicStaff,
     mdiDotsVertical,
+    mdiPencilOutline,
     mdiEyeOffOutline,
     mdiEyeOutline,
     mdiSwapHorizontal,
@@ -1295,36 +1292,36 @@ defineExpose({
 }
 
 .transaction-edit-map-view {
-    height: 220px;
+    height: 275px;
 }
 
 @media (min-height: 630px) {
     .transaction-edit-map-view {
-        height: 390px;
+        height: 415px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 414px;
+            min-height: 415px;
         }
     }
 }
 
 @media (min-height: 700px) {
     .transaction-edit-map-view {
-        height: 460px;
+        height: 485px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 484px;
+            min-height: 485px;
         }
     }
 }
 
 @media (min-height: 780px) {
     .transaction-edit-map-view {
-        height: 537px;
+        height: 561px;
     }
 
     @media (min-width: 960px) {

@@ -1,29 +1,27 @@
 <template>
     <v-dialog width="1200" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex flex-wrap align-center justify-center">
-                    <h4 class="text-h4">{{ title }}</h4>
-                    <v-spacer/>
-                    <div class="title-and-toolbar d-flex align-center justify-center text-no-wrap">
-                        <span class="text-body-1" v-if="transactions.length > 10">{{ tt('Transactions Per Page') }}</span>
-                        <v-select class="ms-2" density="compact" max-width="100"
-                                  item-title="name"
-                                  item-value="value"
-                                  :items="allPageCounts"
-                                  v-model="countPerPage"
-                                  v-if="transactions.length > 10"
-                        />
-                        <pagination-buttons density="compact"
-                                            :totalPageCount="totalPageCount"
-                                            v-model="currentPage"
-                                            v-if="transactions.length > 10">
-                        </pagination-buttons>
-                    </div>
+        <one-column-dialog-layout content-class="pa-0 d-flex flex-column insights-explorer-transactions-dialog"
+                                  :title="title" :cancel-button-title="tt('Close')"
+                                  @cancel="cancel">
+            <template #toolbar>
+                <div class="title-and-toolbar d-flex align-center justify-center text-no-wrap">
+                    <span class="text-body-1" v-if="transactions.length > 10">{{ tt('Transactions Per Page') }}</span>
+                    <v-select class="ms-2" density="compact" max-width="100"
+                              item-title="name"
+                              item-value="value"
+                              :items="allPageCounts"
+                              v-model="countPerPage"
+                              v-if="transactions.length > 10"
+                    />
+                    <pagination-buttons density="compact"
+                                        :totalPageCount="totalPageCount"
+                                        v-model="currentPage"
+                                        v-if="transactions.length > 10">
+                    </pagination-buttons>
                 </div>
             </template>
 
-            <v-card-text>
+            <template #content>
                 <v-data-table
                     fixed-header
                     fixed-footer
@@ -102,14 +100,8 @@
                     </template>
                     <template #bottom></template>
                 </v-data-table>
-            </v-card-text>
-
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Close') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 </template>
 
@@ -213,29 +205,38 @@ defineExpose({
 </script>
 
 <style>
-.v-table.insights-explorer-transactions-dialog-table > .v-table__wrapper > table {
-    th:not(:nth-last-child(2)),
-    td:not(:nth-last-child(2)) {
-        width: auto !important;
-        white-space: nowrap;
+.insights-explorer-transactions-dialog {
+    min-height: 0;
+    overflow-y: hidden !important;
+
+    .v-table.insights-explorer-transactions-dialog-table {
+        min-height: 0;
+
+        > .v-table__wrapper > table {
+            th:not(:nth-last-child(2)),
+            td:not(:nth-last-child(2)) {
+                width: auto !important;
+                white-space: nowrap;
+            }
+
+            th:nth-last-child(2),
+            td:nth-last-child(2) {
+                width: 100% !important;
+            }
+        }
+
+        .v-chip.transaction-tag {
+            margin-inline-end: 4px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+
+            > .v-chip__content {
+                display: block;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
     }
-
-    th:nth-last-child(2),
-    td:nth-last-child(2) {
-        width: 100% !important;
-    }
-}
-
-.v-table.insights-explorer-transactions-dialog-table .v-chip.transaction-tag {
-    margin-inline-end: 4px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-}
-
-.v-table.insights-explorer-transactions-dialog-table .v-chip.transaction-tag > .v-chip__content {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 </style>

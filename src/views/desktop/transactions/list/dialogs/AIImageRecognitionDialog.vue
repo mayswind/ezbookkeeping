@@ -1,11 +1,21 @@
 <template>
     <v-dialog width="800" :persistent="loading || recognizing || !!imageFile" v-model="showState" @paste="onPaste">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4">{{ tt('AI Image Recognition') }}</h4>
+        <one-column-dialog-layout content-class="pa-0" content-style="height: 500px"
+                                  :disabled="loading || recognizing" :loading="loading || recognizing"
+                                  :title="tt('AI Image Recognition')"
+                                  :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #toolbar>
+                <v-btn class="me-2" density="comfortable" variant="outlined"
+                       :disabled="loading || recognizing || !imageFile" @click="recognize"
+                       v-if="!recognizing">{{ tt('Recognize') }}
+                </v-btn>
+                <v-btn class="me-2" density="comfortable" variant="outlined"
+                       :disabled="loading"
+                       @click="cancelRecognize" v-if="recognizing && cancelRecognizingUuid">{{ tt('Cancel Recognition') }}</v-btn>
             </template>
 
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 480px">
+            <template #content>
                 <div class="w-100 h-100 border position-relative"
                      @dragenter.prevent="onDragEnter"
                      @dragover.prevent
@@ -28,21 +38,9 @@
                         </template>
                     </v-img>
                 </div>
-            </v-card-text>
+            </template>
 
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :disabled="loading || recognizing || !imageFile" @click="recognize">
-                        {{ tt('Recognize') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="recognizing"></v-progress-circular>
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="loading"
-                           @click="cancelRecognize" v-if="recognizing && cancelRecognizingUuid">{{ tt('Cancel Recognition') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="loading || recognizing"
-                           @click="cancel" v-if="!recognizing || !cancelRecognizingUuid">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />

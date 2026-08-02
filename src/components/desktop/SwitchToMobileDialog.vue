@@ -1,39 +1,30 @@
 <template>
     <v-dialog width="420" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4">{{ tt('Use on Mobile Device') }}</h4>
-            </template>
-            <template #subtitle>
-                <div class="text-body-1 text-wrap mt-4">{{ tt('You can scan the QR code below on your mobile device.') }}</div>
-            </template>
-            <v-card-text>
-                <v-row>
-                    <v-col cols="12" md="12">
-                        <div class="w-100 d-flex justify-center">
-                            <v-img alt="qrcode" class="img-url-qrcode" :src="mobileUrlQrCodePath">
-                                <template #placeholder>
-                                    <div class="d-flex align-center justify-center fill-height">
-                                        <v-progress-circular color="grey-500" indeterminate size="48"></v-progress-circular>
-                                    </div>
-                                </template>
-                                <template #error>
-                                    <div class="d-flex align-center justify-center fill-height">
-                                        <span class="text-body-1">{{ tt('Failed to load QR code') }}</span>
-                                    </div>
-                                </template>
-                            </v-img>
-                        </div>
-                    </v-col>
-                </v-row>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :href="mobileVersionPath">{{ tt('Switch to Mobile Version') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="showState = false">{{ tt('Close') }}</v-btn>
+        <one-column-dialog-layout :title="tt('Use on Mobile Device')" :cancel-button-title="tt('Close')"
+                                  @cancel="showState = false">
+            <template #content>
+                <div class="text-body-1 text-wrap my-4">{{ tt('You can scan the QR code below on your mobile device.') }}</div>
+                <div class="d-flex justify-center w-100">
+                    <v-img alt="qrcode" class="img-url-qrcode" :src="mobileUrlQrCodePath">
+                        <template #placeholder>
+                            <div class="d-flex align-center justify-center fill-height">
+                                <v-progress-circular color="grey-500" indeterminate size="48"></v-progress-circular>
+                            </div>
+                        </template>
+                        <template #error>
+                            <div class="d-flex align-center justify-center fill-height">
+                                <span class="text-body-1">{{ tt('Failed to load QR code') }}</span>
+                            </div>
+                        </template>
+                    </v-img>
                 </div>
-            </v-card-text>
-        </v-card>
+            </template>
+
+            <template #footer>
+                <v-spacer />
+                <v-btn :href="mobileVersionPath">{{ tt('Switch to Mobile Version') }}</v-btn>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 </template>
 

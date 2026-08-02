@@ -308,13 +308,10 @@
     </v-row>
 
     <v-dialog width="640" v-model="showTagMoveToDialog">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center">
-                    <h4 class="text-h4">{{ tt('Move to...') }}</h4>
-                </div>
-            </template>
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
+        <one-column-dialog-layout content-class="pa-0" :disabled="loading || updating"
+                                  :title="tt('Move to...')" :cancel-button-title="tt('Close')"
+                                  @cancel="showTagMoveToDialog = false">
+            <template #content>
                 <v-table hover density="comfortable" class="w-100 table-striped">
                     <tbody>
                     <tr class="cursor-pointer" :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault" v-show="activeTagGroupId !== tagGroup.id">
@@ -324,13 +321,8 @@
                     </tr>
                     </tbody>
                 </v-table>
-            </v-card-text>
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="secondary" variant="tonal" :disabled="loading || updating" @click="showTagMoveToDialog = false">{{ tt('Close') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <tag-group-change-display-order-dialog ref="tagGroupChangeDisplayOrderDialog" />

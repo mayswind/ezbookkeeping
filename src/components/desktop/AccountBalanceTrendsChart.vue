@@ -442,7 +442,7 @@ function formatDisplayChangeRate(current: BigDecimal, reference: BigDecimal): st
 <style scoped>
 .account-balance-trends-chart-container {
     width: 100%;
-    height: 418px;
+    height: 404px;
     margin-top: 10px;
 }
 </style>

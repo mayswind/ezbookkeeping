@@ -94,7 +94,10 @@ import DateTimePicker from '@/components/common/DateTimePicker.vue';
 import MonthPicker from '@/components/common/MonthPicker.vue';
 import TransactionCalendar from '@/components/common/TransactionCalendar.vue';
 
+import OneColumnDialogLayout from '@/components/desktop/OneColumnDialogLayout.vue';
+import TwoColumnDialogLayout from '@/components/desktop/TwoColumnDialogLayout.vue';
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
+import ToggleButton from '@/components/desktop/ToggleButton.vue';
 import BtnVerticalGroup from '@/components/desktop/BtnVerticalGroup.vue';
 import NumberInput from '@/components/desktop/NumberInput.vue';
 import AmountInput from '@/components/desktop/AmountInput.vue';
@@ -550,7 +553,10 @@ app.component('DateTimePicker', DateTimePicker);
 app.component('MonthPicker', MonthPicker);
 app.component('TransactionCalendar', TransactionCalendar);
 
+app.component('OneColumnDialogLayout', OneColumnDialogLayout);
+app.component('TwoColumnDialogLayout', TwoColumnDialogLayout);
 app.component('ItemIcon', ItemIcon);
+app.component('ToggleButton', ToggleButton);
 app.component('BtnVerticalGroup', BtnVerticalGroup);
 app.component('NumberInput', NumberInput);
 app.component('AmountInput', AmountInput);

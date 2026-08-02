@@ -1,42 +1,43 @@
 <template>
     <v-dialog width="800" :persistent="displayOrderModified" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex align-center">
-                        <h4 class="text-h4">{{ tt('Change Exploration Display Order') }}</h4>
-                        <v-btn class="ms-3" color="primary" variant="tonal"
-                               :disabled="loading || updating" @click="saveDisplayOrder"
-                               v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
-                        <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ms-2" :icon="true" :disabled="loading || updating"
-                               :loading="loading" @click="reload">
-                            <template #loader>
-                                <v-progress-circular indeterminate size="20"/>
-                            </template>
-                            <v-icon :icon="mdiRefresh" size="24" />
-                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
-                        </v-btn>
-                    </div>
-                    <v-spacer/>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                           :disabled="loading || updating" :icon="true">
-                        <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
-                            <v-list>
-                                <v-list-item :prepend-icon="mdiEyeOutline"
-                                             :title="tt('Show Hidden Explorations')"
-                                             v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                                <v-list-item :prepend-icon="mdiEyeOffOutline"
-                                             :title="tt('Hide Hidden Explorations')"
-                                             v-if="showHidden" @click="showHidden = false"></v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
-                </div>
+        <one-column-dialog-layout content-class="pa-0" :disabled="loading || updating"
+                                  :title="tt('Change Exploration Display Order')" :cancel-button-title="tt('Close')"
+                                  @cancel="close">
+            <template #after-title>
+                <v-btn density="compact" color="default" variant="text" size="22"
+                       class="ms-2" :icon="true" :disabled="loading || updating"
+                       :loading="loading" @click="reload">
+                    <template #loader>
+                        <v-progress-circular indeterminate size="20"/>
+                    </template>
+                    <v-icon :icon="mdiRefresh" size="22" />
+                    <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                </v-btn>
+                <v-btn density="compact" color="primary" variant="text" class="ms-1" :icon="true"
+                       :disabled="loading || updating || !displayOrderModified" @click="saveDisplayOrder">
+                    <v-icon :icon="mdiCheck" size="22" />
+                    <v-tooltip activator="parent">{{ tt('Save Display Order') }}</v-tooltip>
+                </v-btn>
             </template>
 
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
+            <template #toolbar>
+                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
+                       :disabled="loading || updating" :icon="true">
+                    <v-icon :icon="mdiDotsVertical" size="22" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item :prepend-icon="mdiEyeOutline"
+                                         :title="tt('Show Hidden Explorations')"
+                                         v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                            <v-list-item :prepend-icon="mdiEyeOffOutline"
+                                         :title="tt('Hide Hidden Explorations')"
+                                         v-if="showHidden" @click="showHidden = false"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+            </template>
+
+            <template #content>
                 <v-table hover density="comfortable" class="explorers-table w-100 table-striped">
                     <tbody v-if="loading && noAvailableExploration">
                     <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6 ]">
@@ -94,15 +95,8 @@
                         </template>
                     </draggable-list>
                 </v-table>
-            </v-card-text>
-
-            <v-card-text class="overflow-y-visible">
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || updating" @click="close">{{ tt('Close') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />
@@ -120,8 +114,9 @@ import { useExplorersStore } from '@/stores/explorer.ts';
 import { type InsightsExplorerBasicInfo } from '@/models/explorer.ts';
 
 import {
-    mdiDotsVertical,
     mdiRefresh,
+    mdiCheck,
+    mdiDotsVertical,
     mdiEyeOutline,
     mdiEyeOffOutline,
     mdiDrag

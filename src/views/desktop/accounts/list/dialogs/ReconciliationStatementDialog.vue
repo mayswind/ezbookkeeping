@@ -1,165 +1,169 @@
 <template>
     <v-dialog :persistent="loading || updatingLastReconciledTime" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center justify-center">
-                    <div class="d-flex flex-wrap w-100 align-center">
-                        <h4 class="text-h4">{{ tt('Reconciliation Statement') }}</h4>
-                        <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ms-2" :icon="true" :disabled="updatingLastReconciledTime"
-                               :loading="loading" @click="reload(true)">
-                            <template #loader>
-                                <v-progress-circular indeterminate size="20"/>
-                            </template>
-                            <v-icon :icon="mdiRefresh" size="24" />
-                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
-                        </v-btn>
-                        <v-switch class="bidirectional-switch ms-2 pt-1" color="secondary"
-                                  :disabled="loading || updatingLastReconciledTime"
-                                  :label="tt('Account Balance Trends')"
-                                  v-model="showAccountBalanceTrendsCharts"
-                                  @click="showAccountBalanceTrendsCharts = !showAccountBalanceTrendsCharts">
-                            <template #prepend>
-                                <span>{{ tt('Transaction List') }}</span>
-                            </template>
-                        </v-switch>
-                    </div>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                           :icon="true" :disabled="loading || updatingLastReconciledTime"
-                           v-if="showAccountBalanceTrendsCharts">
-                        <v-icon :icon="mdiTuneVertical" />
-                        <v-menu activator="parent">
-                            <v-list>
-                                <v-list-subheader :title="tt('Chart Type')"/>
-                                <v-list-item :key="type.type"
-                                             :prepend-icon="chartTypeIconMap[type.type]"
-                                             :append-icon="chartType === type.type ? mdiCheck : undefined"
-                                             :title="type.displayName"
-                                             @click="chartType = type.type"
-                                             v-for="type in allChartTypes"></v-list-item>
-                                <v-divider class="my-2"/>
-                                <v-list-subheader :title="tt('Time Granularity')"/>
-                                <v-list-item :key="dateAggregationType.type"
-                                             :prepend-icon="chartDataDateAggregationTypeIconMap[dateAggregationType.type]"
-                                             :append-icon="chartDataDateAggregationType === dateAggregationType.type ? mdiCheck : undefined"
-                                             :title="dateAggregationType.displayName"
-                                             @click="chartDataDateAggregationType = dateAggregationType.type"
-                                             v-for="dateAggregationType in allDateAggregationTypes"></v-list-item>
-                                <v-divider class="my-2"/>
-                                <v-list-subheader :title="tt('Timezone Used for Date Range')"/>
-                                <v-list-item :key="timezoneType.type" :value="timezoneType.type"
-                                             :prepend-icon="timezoneTypeIconMap[timezoneType.type]"
-                                             :append-icon="timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined"
-                                             :title="timezoneType.displayName"
-                                             v-for="timezoneType in allTimezoneTypesUsedForDateRange"
-                                             @click="timezoneUsedForDateRange = timezoneType.type"></v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                           :icon="true" :disabled="loading || updatingLastReconciledTime">
-                        <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
-                            <v-list>
-                                <v-list-item :prepend-icon="mdiInvoiceTextPlusOutline"
-                                             :title="tt('Add Transaction')"
-                                             @click="addTransaction()"></v-list-item>
-                                <v-list-item :prepend-icon="mdiInvoiceTextEditOutline"
-                                             :title="tt('Update Closing Balance')"
-                                             @click="updateClosingBalance()"
-                                             v-if="canUpdateAccountCloseBalance"></v-list-item>
-                                <v-divider class="my-2"/>
-                                <v-list-item :prepend-icon="mdiComma"
-                                             :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
-                                             @click="exportReconciliationStatements(KnownFileType.CSV)">
-                                    <v-list-item-title>{{ tt('Export to CSV (Comma-separated values) File') }}</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item :prepend-icon="mdiKeyboardTab"
-                                             :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
-                                             @click="exportReconciliationStatements(KnownFileType.TSV)">
-                                    <v-list-item-title>{{ tt('Export to TSV (Tab-separated values) File') }}</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item :prepend-icon="extendMdiSemicolon"
-                                             :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
-                                             @click="exportReconciliationStatements(KnownFileType.SSV)">
-                                    <v-list-item-title>{{ tt('Export to SSV (Semicolon-separated values) File') }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
-                </div>
+        <one-column-dialog-layout content-class="pa-0" :disabled="loading || updatingLastReconciledTime"
+                                  :title="tt('Reconciliation Statement')" :cancel-button-title="tt('Close')"
+                                  @cancel="close">
+            <template #after-title>
+                <v-btn density="compact" color="default" variant="text" size="22"
+                       class="ms-2" :icon="true" :disabled="updatingLastReconciledTime"
+                       :loading="loading" @click="reload(true)">
+                    <template #loader>
+                        <v-progress-circular indeterminate size="20"/>
+                    </template>
+                    <v-icon :icon="mdiRefresh" size="22" />
+                    <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                </v-btn>
+
+                <v-btn density="compact" color="primary" variant="outlined" class="ms-2"
+                       :disabled="loading || updatingLastReconciledTime" @click="updateLastReconciledTime"
+                       v-if="newLastReconciledTime">
+                    {{ tt('Mark as Reconciled') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="updatingLastReconciledTime"></v-progress-circular>
+                </v-btn>
+            </template>
+
+            <template #toolbar>
+                <toggle-button class="ms-2" :disabled="loading || updatingLastReconciledTime"
+                               :false-name="tt('Transaction List')" :true-name="tt('Account Balance Trends')"
+                               v-model="showAccountBalanceTrendsCharts"/>
+
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :icon="true" :disabled="loading || updatingLastReconciledTime || !showAccountBalanceTrendsCharts">
+                    <v-icon :icon="mdiTuneVertical" size="22" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-subheader :title="tt('Chart Type')"/>
+                            <v-list-item :key="type.type"
+                                         :prepend-icon="chartTypeIconMap[type.type]"
+                                         :append-icon="chartType === type.type ? mdiCheck : undefined"
+                                         :title="type.displayName"
+                                         @click="chartType = type.type"
+                                         v-for="type in allChartTypes"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-subheader :title="tt('Time Granularity')"/>
+                            <v-list-item :key="dateAggregationType.type"
+                                         :prepend-icon="chartDataDateAggregationTypeIconMap[dateAggregationType.type]"
+                                         :append-icon="chartDataDateAggregationType === dateAggregationType.type ? mdiCheck : undefined"
+                                         :title="dateAggregationType.displayName"
+                                         @click="chartDataDateAggregationType = dateAggregationType.type"
+                                         v-for="dateAggregationType in allDateAggregationTypes"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-subheader :title="tt('Timezone Used for Date Range')"/>
+                            <v-list-item :key="timezoneType.type" :value="timezoneType.type"
+                                         :prepend-icon="timezoneTypeIconMap[timezoneType.type]"
+                                         :append-icon="timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined"
+                                         :title="timezoneType.displayName"
+                                         v-for="timezoneType in allTimezoneTypesUsedForDateRange"
+                                         @click="timezoneUsedForDateRange = timezoneType.type"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+                <v-btn density="compact" color="default" variant="text" class="ms-1"
+                       :icon="true" :disabled="loading || updatingLastReconciledTime">
+                    <v-icon :icon="mdiDotsVertical" size="22" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item :prepend-icon="mdiInvoiceTextPlusOutline"
+                                         :title="tt('Add Transaction')"
+                                         @click="addTransaction()"></v-list-item>
+                            <v-list-item :prepend-icon="mdiInvoiceTextEditOutline"
+                                         :title="tt('Update Closing Balance')"
+                                         @click="updateClosingBalance()"
+                                         v-if="canUpdateAccountCloseBalance"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="mdiComma"
+                                         :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
+                                         @click="exportReconciliationStatements(KnownFileType.CSV)">
+                                <v-list-item-title>{{ tt('Export to CSV (Comma-separated values) File') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item :prepend-icon="mdiKeyboardTab"
+                                         :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
+                                         @click="exportReconciliationStatements(KnownFileType.TSV)">
+                                <v-list-item-title>{{ tt('Export to TSV (Tab-separated values) File') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item :prepend-icon="extendMdiSemicolon"
+                                         :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
+                                         @click="exportReconciliationStatements(KnownFileType.SSV)">
+                                <v-list-item-title>{{ tt('Export to SSV (Semicolon-separated values) File') }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
             </template>
 
             <template #subtitle>
-                <div class="text-body-1 text-wrap mt-2" v-if="!startTime && !endTime">
-                    <span>{{ tt('All') }}</span>
-                </div>
-                <div class="text-body-1 text-wrap mt-2" v-if="startTime || endTime">
-                    <span>{{ displayStartDateTime }}</span>
-                    <span> - </span>
-                    <span>{{ displayEndDateTime }}</span>
-                </div>
-            </template>
+                <v-divider class="mt-2"/>
+                <div class="mt-2 mx-5">
+                    <div class="text-body-1 text-wrap" v-if="!startTime && !endTime">
+                        <span>{{ tt('All') }}</span>
+                    </div>
+                    <div class="text-body-1 text-wrap" v-if="startTime || endTime">
+                        <span>{{ displayStartDateTime }}</span>
+                        <span> - </span>
+                        <span>{{ displayEndDateTime }}</span>
+                    </div>
 
-            <v-card-text>
-                <div class="d-flex align-center mb-4">
-                    <div class="d-flex align-center text-body-1">
-                        <span>{{ tt('Opening Balance') }}</span>
-                        <span class="text-primary" v-if="loading">
-                            <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                    <div class="d-flex align-center mt-1 overflow-x-auto">
+                        <div class="d-flex align-center text-body-1">
+                            <span>{{ tt('Opening Balance') }}</span>
+                            <span class="text-primary" v-if="loading">
+                            <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-primary ms-2" v-else-if="!loading">
+                            <span class="text-primary ms-2" v-else-if="!loading">
                             {{ displayOpeningBalance }}
                             <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
                                 <span>{{ displayOpeningBalanceInDefaultCurrency }}</span>
                             </v-tooltip>
                         </span>
-                        <span class="ms-3">{{ tt('Closing Balance') }}</span>
-                        <span class="text-primary" v-if="loading">
-                            <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                            <span class="ms-3">{{ tt('Closing Balance') }}</span>
+                            <span class="text-primary" v-if="loading">
+                            <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-primary ms-2" v-else-if="!loading">
+                            <span class="text-primary ms-2" v-else-if="!loading">
                             {{ displayClosingBalance }}
                             <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
                                 <span>{{ displayClosingBalanceInDefaultCurrency }}</span>
                             </v-tooltip>
                         </span>
-                    </div>
-                    <v-spacer/>
-                    <div class="d-flex align-center text-body-1">
-                        <span class="ms-2">{{ tt('Total Inflows') }}</span>
-                        <span class="text-income" v-if="loading">
-                            <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                        </div>
+                        <v-spacer/>
+                        <div class="d-flex align-center text-body-1">
+                            <span class="ms-2">{{ tt('Total Inflows') }}</span>
+                            <span class="text-income" v-if="loading">
+                            <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-income ms-2" v-else-if="!loading">
+                            <span class="text-income ms-2" v-else-if="!loading">
                             {{ displayTotalInflows }}
                             <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
                                 <span>{{ displayTotalInflowsInDefaultCurrency }}</span>
                             </v-tooltip>
                         </span>
-                        <span class="ms-3">{{ tt('Total Outflows') }}</span>
-                        <span class="text-expense" v-if="loading">
-                            <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                            <span class="ms-3">{{ tt('Total Outflows') }}</span>
+                            <span class="text-expense" v-if="loading">
+                            <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-expense ms-2" v-else-if="!loading">
+                            <span class="text-expense ms-2" v-else-if="!loading">
                             {{ displayTotalOutflows }}
                             <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
                                 <span>{{ displayTotalOutflowsInDefaultCurrency }}</span>
                             </v-tooltip>
                         </span>
-                        <span class="ms-3">{{ tt('Net Cash Flow') }}</span>
-                        <span class="text-primary" v-if="loading">
-                            <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                            <span class="ms-3">{{ tt('Net Cash Flow') }}</span>
+                            <span class="text-primary" v-if="loading">
+                            <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-primary ms-2" v-else-if="!loading">
+                            <span class="text-primary ms-2" v-else-if="!loading">
                             {{ displayTotalBalance }}
                             <v-tooltip activator="parent" v-if="currentAccountCurrency !== defaultCurrency">
                                 <span>{{ displayTotalBalanceInDefaultCurrency }}</span>
                             </v-tooltip>
                         </span>
+                        </div>
                     </div>
                 </div>
+            </template>
 
+            <template #content>
                 <v-data-table
                     fixed-header
                     fixed-footer
@@ -231,38 +235,10 @@
                             {{ tt('View') }}
                         </v-btn>
                     </template>
-                    <template #bottom>
-                        <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="loading || (reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length)">
-                            <span class="ms-2">{{ tt('Total Transactions') }}</span>
-                            <span v-if="loading">
-                                <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
-                            </span>
-                            <span class="ms-2" v-else-if="!loading">
-                                {{ formatNumberToLocalizedNumerals(reconciliationStatements?.transactions.length ?? 0) }}
-                            </span>
-                            <v-spacer/>
-                            <span v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
-                                {{ tt('Transactions Per Page') }}
-                            </span>
-                            <v-select class="ms-2" density="compact" max-width="100"
-                                      item-title="name"
-                                      item-value="value"
-                                      :disabled="loading"
-                                      :items="reconciliationStatementsTablePageOptions"
-                                      v-model="countPerPage"
-                                      v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10"
-                            />
-                            <pagination-buttons density="compact"
-                                                :disabled="loading"
-                                                :totalPageCount="totalPageCount"
-                                                v-model="currentPage"
-                                                v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
-                            </pagination-buttons>
-                        </div>
-                    </template>
+                    <template #bottom></template>
                 </v-data-table>
 
-                <div class="d-flex">
+                <div class="d-flex pa-4" v-if="showAccountBalanceTrendsCharts">
                     <account-balance-trends-chart
                         :type="chartType"
                         :date-aggregation-type="chartDataDateAggregationType"
@@ -288,21 +264,38 @@
                         v-if="showAccountBalanceTrendsCharts && !loading"
                     />
                 </div>
-            </v-card-text>
+            </template>
 
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="primary" variant="tonal"
-                           :disabled="loading || updatingLastReconciledTime" @click="updateLastReconciledTime"
-                           v-if="newLastReconciledTime">
-                        {{ tt('Mark as Reconciled') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="updatingLastReconciledTime"></v-progress-circular>
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || updatingLastReconciledTime" @click="close">{{ tt('Close') }}</v-btn>
+            <template #footer v-if="!showAccountBalanceTrendsCharts && (loading || (reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length))">
+                <div class="title-and-toolbar d-flex w-100 align-center text-no-wrap">
+                    <span>{{ tt('Total Transactions') }}</span>
+                    <span v-if="loading">
+                        <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
+                    </span>
+                    <span class="ms-2" v-else-if="!loading">
+                        {{ formatNumberToLocalizedNumerals(reconciliationStatements?.transactions.length ?? 0) }}
+                    </span>
+                    <v-spacer/>
+                    <span v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
+                        {{ tt('Transactions Per Page') }}
+                    </span>
+                    <v-select class="ms-2" density="compact" max-width="100"
+                              item-title="name"
+                              item-value="value"
+                              :disabled="loading"
+                              :items="reconciliationStatementsTablePageOptions"
+                              v-model="countPerPage"
+                              v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10"
+                    />
+                    <pagination-buttons density="compact"
+                                        :disabled="loading"
+                                        :totalPageCount="totalPageCount"
+                                        v-model="currentPage"
+                                        v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10">
+                    </pagination-buttons>
                 </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <amount-input-dialog ref="amountInputDialog" />

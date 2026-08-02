@@ -1,54 +1,54 @@
 <template>
     <v-dialog width="640" :persistent="true" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4 text-wrap">{{ tt('Are you sure you want to move all transactions?') }}</h4>
-            </template>
-            <v-card-text>{{ tt('format.misc.moveTransactionsInAccountTip', { fromAccount: fromAccount?.name, toAccount: displayToAccountName }) }}</v-card-text>
-            <v-card-text class="w-100 d-flex justify-center">
-                <v-row>
-                    <v-col cols="12" md="12">
-                        <two-column-select primary-key-field="id" primary-value-field="category"
-                                           primary-title-field="name" primary-footer-field="displayBalance"
-                                           primary-icon-field="icon" primary-icon-type="account"
-                                           primary-sub-items-field="accounts"
-                                           :primary-title-i18n="true"
-                                           secondary-key-field="id" secondary-value-field="id"
-                                           secondary-title-field="name" secondary-footer-field="displayBalance"
-                                           secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                           :disabled="loading || moving || !allVisibleAccounts.length"
-                                           :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
-                                           :label="tt('Target Account')"
-                                           :placeholder="tt('Target Account')"
-                                           :items="allVisibleCategorizedAccounts"
-                                           :no-item-text="Account.findAccountNameById(allAccounts, toAccountId, tt('Unspecified'))"
-                                           v-model="toAccountId">
-                        </two-column-select>
-                    </v-col>
+        <one-column-dialog-layout :disabled="moving"
+                                  :title="tt('Are you sure you want to move all transactions?')"
+                                  :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #content>
+                <div class="mt-3">{{ tt('format.misc.moveTransactionsInAccountTip', { fromAccount: fromAccount?.name, toAccount: displayToAccountName }) }}</div>
+                <div class="w-100 d-flex justify-center mt-6">
+                    <v-row>
+                        <v-col cols="12" md="12">
+                            <two-column-select primary-key-field="id" primary-value-field="category"
+                                               primary-title-field="name" primary-footer-field="displayBalance"
+                                               primary-icon-field="icon" primary-icon-type="account"
+                                               primary-sub-items-field="accounts"
+                                               :primary-title-i18n="true"
+                                               secondary-key-field="id" secondary-value-field="id"
+                                               secondary-title-field="name" secondary-footer-field="displayBalance"
+                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                               :disabled="loading || moving || !allVisibleAccounts.length"
+                                               :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
+                                               :label="tt('Target Account')"
+                                               :placeholder="tt('Target Account')"
+                                               :items="allVisibleCategorizedAccounts"
+                                               :no-item-text="Account.findAccountNameById(allAccounts, toAccountId, tt('Unspecified'))"
+                                               v-model="toAccountId">
+                            </two-column-select>
+                        </v-col>
 
-                    <v-col cols="12" md="12">
-                        <v-text-field type="text"
-                                      persistent-placeholder
-                                      :disabled="moving"
-                                      :label="tt('Confirm Target Account Name')"
-                                      :placeholder="tt('Please re-enter the target account name to confirm')"
-                                      v-model="toAccountName"
-                        />
-                    </v-col>
-                </v-row>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :disabled="!fromAccount || !toAccountId || fromAccount?.id === toAccountId || !toAccountName || !isToAccountNameValid || moving" @click="confirm">
-                        {{ tt('Confirm') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="moving"></v-progress-circular>
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="moving" @click="cancel">
-                        {{ tt('Cancel') }}
-                    </v-btn>
+                        <v-col cols="12" md="12">
+                            <v-text-field type="text"
+                                          persistent-placeholder
+                                          :disabled="moving"
+                                          :label="tt('Confirm Target Account Name')"
+                                          :placeholder="tt('Please re-enter the target account name to confirm')"
+                                          v-model="toAccountName"
+                            />
+                        </v-col>
+                    </v-row>
                 </div>
-            </v-card-text>
-        </v-card>
+            </template>
+
+            <template #footer>
+                <v-btn color="secondary" variant="tonal" :disabled="moving" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                <v-spacer/>
+                <v-btn :disabled="!fromAccount || !toAccountId || fromAccount?.id === toAccountId || !toAccountName || !isToAccountNameValid || moving" @click="confirm">
+                    {{ tt('Confirm') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="moving"></v-progress-circular>
+                </v-btn>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />

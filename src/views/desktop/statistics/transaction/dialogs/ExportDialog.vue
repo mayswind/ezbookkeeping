@@ -1,97 +1,93 @@
 <template>
     <v-dialog width="1000" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex flex-wrap align-center justify-center">
-                    <h4 class="text-h4">{{ tt('Export Results') }}</h4>
-                    <v-spacer/>
-                    <v-switch class="bidirectional-switch ms-2 pt-1" color="secondary"
-                              :label="tt('Raw Data')"
-                              v-model="showRawData"
-                              @click="showRawData = !showRawData">
-                        <template #prepend>
-                            <span>{{ tt('Table') }}</span>
-                        </template>
-                    </v-switch>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2" :icon="true">
-                        <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
-                            <v-list>
-                                <v-list-subheader :title="tt('File Format')"/>
-                                <v-list-item :prepend-icon="mdiComma"
-                                             :append-icon="fileFormat === KnownFileType.CSV.extension ? mdiCheck : undefined"
-                                             :title="tt('CSV (Comma-separated values) File')"
-                                             @click="fileFormat = KnownFileType.CSV.extension"></v-list-item>
-                                <v-list-item :prepend-icon="mdiKeyboardTab"
-                                             :append-icon="fileFormat === KnownFileType.TSV.extension ? mdiCheck : undefined"
-                                             :title="tt('TSV (Tab-separated values) File')"
-                                             @click="fileFormat = KnownFileType.TSV.extension"></v-list-item>
-                                <v-list-item :prepend-icon="extendMdiSemicolon"
-                                             :append-icon="fileFormat === KnownFileType.SSV.extension ? mdiCheck : undefined"
-                                             :title="tt('SSV (Semicolon-separated values) File')"
-                                             @click="fileFormat = KnownFileType.SSV.extension"></v-list-item>
-                                <v-list-item :prepend-icon="mdiLanguageMarkdownOutline"
-                                             :append-icon="fileFormat === KnownFileType.MARKDOWN.extension ? mdiCheck : undefined"
-                                             :title="tt('Markdown File')"
-                                             @click="fileFormat = KnownFileType.MARKDOWN.extension"></v-list-item>
-                                <v-list-item :prepend-icon="mdiCodeTags"
-                                             :append-icon="fileFormat === KnownFileType.MERMAID.extension && mermaidChartType === ExportMermaidChartType.PieChart ? mdiCheck : undefined"
-                                             :title="tt('Mermaid (Pie Chart)')"
-                                             @click="fileFormat = KnownFileType.MERMAID.extension; mermaidChartType = ExportMermaidChartType.PieChart"
-                                             v-if="supportedMermaidChartTypes[ExportMermaidChartType.PieChart]"></v-list-item>
-                                <v-list-item :prepend-icon="mdiCodeTags"
-                                             :append-icon="fileFormat === KnownFileType.MERMAID.extension && mermaidChartType === ExportMermaidChartType.XYChartBar ? mdiCheck : undefined"
-                                             :title="tt('Mermaid (XY Chart)')"
-                                             @click="fileFormat = KnownFileType.MERMAID.extension; mermaidChartType = ExportMermaidChartType.XYChartBar"
-                                             v-if="supportedMermaidChartTypes[ExportMermaidChartType.XYChartBar]"></v-list-item>
-                                <v-list-item :prepend-icon="mdiCodeTags"
-                                             :append-icon="fileFormat === KnownFileType.MERMAID.extension && mermaidChartType === ExportMermaidChartType.XYChartLine ? mdiCheck : undefined"
-                                             :title="tt('Mermaid (XY Chart)')"
-                                             @click="fileFormat = KnownFileType.MERMAID.extension; mermaidChartType = ExportMermaidChartType.XYChartLine"
-                                             v-if="supportedMermaidChartTypes[ExportMermaidChartType.XYChartLine]"></v-list-item>
-                            </v-list>
-                        </v-menu>
+        <one-column-dialog-layout content-class="pa-0"
+                                  :title="tt('Export Results')"
+                                  :cancel-button-title="tt('Close')"
+                                  @cancel="cancel">
+            <template #after-title>
+                <div ref="buttonContainer">
+                    <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                           :disabled="!exportedData" @click="copy">
+                        <v-icon :icon="mdiContentCopy" size="20" />
+                        <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
+                    </v-btn>
+                    <v-btn density="compact" color="default" variant="text" class="ms-1" :icon="true"
+                           @click="save()">
+                        <v-icon :icon="mdiContentSaveOutline" size="22" />
+                        <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
                     </v-btn>
                 </div>
             </template>
 
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 485px">
-                <v-data-table
-                    fixed-header
-                    fixed-footer
-                    multi-sort
-                    density="compact"
-                    :headers="dataTableHeaders"
-                    :items="dataTableItems"
-                    :hover="true"
-                    :hide-default-footer="true"
-                    :items-per-page="dataTableItems.length"
-                    :no-data-text="tt('No data')"
-                    v-if="!showRawData"
-                ></v-data-table>
-                <div class="w-100 h-100 code-container" v-if="showRawData">
-                    <v-textarea class="w-100 h-100 always-cursor-text" :readonly="true"
-                                :value="exportedData"></v-textarea>
-                </div>
-            </v-card-text>
+            <template #toolbar>
+                <toggle-button class="ms-2" :false-name="tt('Table')" :true-name="tt('Raw Data')"
+                               v-model="showRawData"/>
 
-            <v-card-text>
-                <div ref="buttonContainer" class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn-group variant="tonal" density="comfortable">
-                        <v-btn color="primary" :disabled="!exportedData" @click="copy">{{ tt('Copy') }}</v-btn>
-                        <v-btn density="compact" color="primary" :disabled="!exportedData" :icon="true">
-                            <v-icon :icon="mdiMenuDown" size="24" />
-                            <v-menu activator="parent">
-                                <v-list>
-                                    <v-list-item :title="tt('Save')" @click="save()"></v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </v-btn>
-                    </v-btn-group>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true">
+                    <v-icon :icon="mdiDotsVertical" size="22" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-subheader :title="tt('File Format')"/>
+                            <v-list-item :prepend-icon="mdiComma"
+                                         :append-icon="fileFormat === KnownFileType.CSV.extension ? mdiCheck : undefined"
+                                         :title="tt('CSV (Comma-separated values) File')"
+                                         @click="fileFormat = KnownFileType.CSV.extension"></v-list-item>
+                            <v-list-item :prepend-icon="mdiKeyboardTab"
+                                         :append-icon="fileFormat === KnownFileType.TSV.extension ? mdiCheck : undefined"
+                                         :title="tt('TSV (Tab-separated values) File')"
+                                         @click="fileFormat = KnownFileType.TSV.extension"></v-list-item>
+                            <v-list-item :prepend-icon="extendMdiSemicolon"
+                                         :append-icon="fileFormat === KnownFileType.SSV.extension ? mdiCheck : undefined"
+                                         :title="tt('SSV (Semicolon-separated values) File')"
+                                         @click="fileFormat = KnownFileType.SSV.extension"></v-list-item>
+                            <v-list-item :prepend-icon="mdiLanguageMarkdownOutline"
+                                         :append-icon="fileFormat === KnownFileType.MARKDOWN.extension ? mdiCheck : undefined"
+                                         :title="tt('Markdown File')"
+                                         @click="fileFormat = KnownFileType.MARKDOWN.extension"></v-list-item>
+                            <v-list-item :prepend-icon="mdiCodeTags"
+                                         :append-icon="fileFormat === KnownFileType.MERMAID.extension && mermaidChartType === ExportMermaidChartType.PieChart ? mdiCheck : undefined"
+                                         :title="tt('Mermaid (Pie Chart)')"
+                                         @click="fileFormat = KnownFileType.MERMAID.extension; mermaidChartType = ExportMermaidChartType.PieChart"
+                                         v-if="supportedMermaidChartTypes[ExportMermaidChartType.PieChart]"></v-list-item>
+                            <v-list-item :prepend-icon="mdiCodeTags"
+                                         :append-icon="fileFormat === KnownFileType.MERMAID.extension && mermaidChartType === ExportMermaidChartType.XYChartBar ? mdiCheck : undefined"
+                                         :title="tt('Mermaid (XY Chart)')"
+                                         @click="fileFormat = KnownFileType.MERMAID.extension; mermaidChartType = ExportMermaidChartType.XYChartBar"
+                                         v-if="supportedMermaidChartTypes[ExportMermaidChartType.XYChartBar]"></v-list-item>
+                            <v-list-item :prepend-icon="mdiCodeTags"
+                                         :append-icon="fileFormat === KnownFileType.MERMAID.extension && mermaidChartType === ExportMermaidChartType.XYChartLine ? mdiCheck : undefined"
+                                         :title="tt('Mermaid (XY Chart)')"
+                                         @click="fileFormat = KnownFileType.MERMAID.extension; mermaidChartType = ExportMermaidChartType.XYChartLine"
+                                         v-if="supportedMermaidChartTypes[ExportMermaidChartType.XYChartLine]"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+            </template>
+
+            <template #content>
+                <div class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 530px">
+                    <v-data-table
+                        fixed-header
+                        fixed-footer
+                        multi-sort
+                        density="compact"
+                        :headers="dataTableHeaders"
+                        :items="dataTableItems"
+                        :hover="true"
+                        :hide-default-footer="true"
+                        :items-per-page="dataTableItems.length"
+                        :no-data-text="tt('No data')"
+                        v-if="!showRawData"
+                    ></v-data-table>
+                    <div class="w-100 h-100 code-container" v-if="showRawData">
+                        <v-textarea no-resize class="w-100 h-100 ps-4 always-cursor-text"
+                                    density="compact" variant="plain"
+                                    :readonly="true" :rounded="false"
+                                    :value="exportedData"></v-textarea>
+                    </div>
                 </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />
@@ -126,7 +122,8 @@ import {
     mdiKeyboardTab,
     mdiLanguageMarkdownOutline,
     mdiCodeTags,
-    mdiMenuDown
+    mdiContentCopy,
+    mdiContentSaveOutline
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;

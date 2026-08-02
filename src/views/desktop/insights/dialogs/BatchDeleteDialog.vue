@@ -1,33 +1,34 @@
 <template>
     <v-dialog width="600" :persistent="true" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4 text-error text-wrap">{{ tt('Delete Transactions') }}</h4>
+        <one-column-dialog-layout :disabled="deleting"
+                                  :title="tt('Delete Transactions')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #content>
+                <div class="mt-3 text-error">{{ tt('format.misc.deleteTransactionsTip', { count: formatNumberToLocalizedNumerals(deleteIds?.length ?? 0) }) }}</div>
+                <div class="w-100 d-flex justify-center mt-1">
+                    <div class="w-100">
+                        <v-text-field
+                            autocomplete="current-password"
+                            type="password"
+                            variant="underlined"
+                            color="error"
+                            :disabled="deleting"
+                            :placeholder="tt('Current Password')"
+                            v-model="currentPassword"
+                        />
+                    </div>
+                </div>
             </template>
-            <v-card-text class="pb-2 text-error">{{ tt('format.misc.deleteTransactionsTip', { count: formatNumberToLocalizedNumerals(deleteIds?.length ?? 0) }) }}</v-card-text>
-            <v-card-text class="w-100 d-flex justify-center">
-                <div class="w-100">
-                    <v-text-field
-                        autocomplete="current-password"
-                        type="password"
-                        variant="underlined"
-                        color="error"
-                        :disabled="deleting"
-                        :placeholder="tt('Current Password')"
-                        v-model="currentPassword"
-                    />
-                </div>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="error" :disabled="!currentPassword || deleting || deleteIds.length < 1" @click="confirm">
-                        {{ tt('Confirm') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="deleting"></v-progress-circular>
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="deleting" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+
+            <template #footer>
+                <v-btn color="secondary" variant="tonal" :disabled="deleting" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                <v-spacer/>
+                <v-btn color="error" :disabled="!currentPassword || deleting || deleteIds.length < 1" @click="confirm">
+                    {{ tt('Confirm') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="deleting"></v-progress-circular>
+                </v-btn>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />

@@ -1,46 +1,41 @@
 <template>
     <v-dialog width="600" :persistent="true" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex flex-wrap align-center">
-                    <h4 class="text-h4 text-wrap" v-if="type === 'add'">{{ tt('Add Tags to Transactions') }}</h4>
-                    <h4 class="text-h4 text-wrap" v-if="type === 'remove'">{{ tt('Remove Tags from Transactions') }}</h4>
-                    <h4 class="text-h4 text-wrap" v-if="type === 'clear'">{{ tt('Clear All Tags from Transactions') }}</h4>
-                    <v-btn class="ms-2" density="compact" color="default" variant="text" size="24"
-                           :icon="true" :disabled="loading || submitting" :loading="loading"
-                           @click="reload" v-if="type !== 'clear'">
-                        <template #loader>
-                            <v-progress-circular indeterminate size="20"/>
-                        </template>
-                        <v-icon :icon="mdiRefresh" size="24" />
-                        <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
-                    </v-btn>
+        <one-column-dialog-layout :disabled="loading || submitting" :title="title" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #after-title>
+                <v-btn density="compact" color="default" variant="text" size="22"
+                       class="ms-2" :icon="true" :disabled="loading || submitting"
+                       :loading="loading" @click="reload">
+                    <template #loader>
+                        <v-progress-circular indeterminate size="20"/>
+                    </template>
+                    <v-icon :icon="mdiRefresh" size="22" />
+                    <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                </v-btn>
+            </template>
+
+            <template #content>
+                <div class="mt-4" v-if="type === 'clear'">{{ tt('format.misc.clearTransactionsTagsTip', { count: formatNumberToLocalizedNumerals(updateIds?.length ?? 0) }) }}</div>
+                <div class="mt-5" v-if="type !== 'clear'">
+                    <transaction-tag-auto-complete
+                        :disabled="loading || submitting"
+                        :show-label="true"
+                        :allow-add-new-tag="type === 'add'"
+                        v-model="tagIds"
+                        @tag:saving="onSavingTag"
+                    />
                 </div>
             </template>
-            <v-card-text class="pb-4" v-if="type === 'clear'">{{ tt('format.misc.clearTransactionsTagsTip', { count: formatNumberToLocalizedNumerals(updateIds?.length ?? 0) }) }}</v-card-text>
-            <v-card-text class="w-100 d-flex justify-center" v-if="type !== 'clear'">
-                <v-row>
-                    <v-col cols="12">
-                        <transaction-tag-auto-complete
-                            :disabled="loading || submitting"
-                            :show-label="true"
-                            :allow-add-new-tag="type === 'add'"
-                            v-model="tagIds"
-                            @tag:saving="onSavingTag"
-                        />
-                    </v-col>
-                </v-row>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :disabled="loading || submitting || updateIds.length < 1 || (type !== 'clear' && (!tagIds || tagIds.length < 1))" @click="confirm">
-                        {{ tt('OK') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="loading || submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+
+            <template #footer>
+                <v-btn color="secondary" variant="tonal" :disabled="loading || submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                <v-spacer/>
+                <v-btn :disabled="loading || submitting || updateIds.length < 1 || (type !== 'clear' && (!tagIds || tagIds.length < 1))" @click="confirm">
+                    {{ tt('OK') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                </v-btn>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />
@@ -49,7 +44,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, useTemplateRef } from 'vue';
+import {computed, ref, useTemplateRef} from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -83,6 +78,18 @@ const tagIds = ref<string[]>([]);
 
 let resolveFunc: ((response: number) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
+
+const title = computed<string>(() => {
+    if (type.value === 'add') {
+        return tt('Add Tags to Transactions');
+    } else if (type.value === 'remove') {
+        return tt('Remove Tags from Transactions');
+    } else if (type.value === 'clear') {
+        return tt('Clear All Tags from Transactions');
+    }
+
+    return '';
+});
 
 function open(options: { type: BatchUpdateTagsOperationType; updateIds: string[] }): Promise<number> {
     type.value = options.type;

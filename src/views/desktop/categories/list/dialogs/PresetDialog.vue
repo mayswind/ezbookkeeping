@@ -1,55 +1,52 @@
 <template>
     <v-dialog width="800" :persistent="submitting" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center">
-                    <h4 class="text-h4">{{ tt('Default Categories') }}</h4>
+        <one-column-dialog-layout :disabled="submitting"
+                                  :title="tt('Default Categories')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="showState = false">
+            <template #content>
+                <div class="preset-transaction-categories flex-grow-1 mt-1 overflow-y-auto">
+                    <template :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
+                        <div class="d-flex align-center mb-1">
+                            <h4>{{ getCategoryTypeName(parseInt(categoryType)) }}</h4>
+                            <v-spacer/>
+                            <language-select-button :disabled="submitting"
+                                                    :use-model-value="true" v-model="currentLocale" />
+                        </div>
+
+                        <v-expansion-panels class="border rounded mb-2" variant="accordion" multiple :disabled="submitting">
+                            <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
+                                <v-expansion-panel-title class="py-0">
+                                    <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                    <span class="ms-3">{{ category.name }}</span>
+                                </v-expansion-panel-title>
+                                <v-expansion-panel-text v-if="category.subCategories.length">
+                                    <v-list rounded density="comfortable" class="pa-0">
+                                        <template :key="subIdx"
+                                                  v-for="(subCategory, subIdx) in category.subCategories">
+                                            <v-list-item>
+                                                <template #prepend>
+                                                    <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                </template>
+                                                <span class="ms-3">{{ subCategory.name }}</span>
+                                            </v-list-item>
+                                            <v-divider v-if="subIdx !== category.subCategories.length - 1"/>
+                                        </template>
+                                    </v-list>
+                                </v-expansion-panel-text>
+                            </v-expansion-panel>
+                        </v-expansion-panels>
+                    </template>
                 </div>
             </template>
-            <v-card-text class="preset-transaction-categories flex-grow-1 overflow-y-auto">
-                <template :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
-                    <div class="d-flex align-center mb-1">
-                        <h4>{{ getCategoryTypeName(parseInt(categoryType)) }}</h4>
-                        <v-spacer/>
-                        <language-select-button :disabled="submitting"
-                                                :use-model-value="true" v-model="currentLocale" />
-                    </div>
 
-                    <v-expansion-panels class="border rounded mb-2" variant="accordion" multiple :disabled="submitting">
-                        <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
-                            <v-expansion-panel-title class="py-0">
-                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
-                                <span class="ms-3">{{ category.name }}</span>
-                            </v-expansion-panel-title>
-                            <v-expansion-panel-text v-if="category.subCategories.length">
-                                <v-list rounded density="comfortable" class="pa-0">
-                                    <template :key="subIdx"
-                                              v-for="(subCategory, subIdx) in category.subCategories">
-                                        <v-list-item>
-                                            <template #prepend>
-                                                <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
-                                            </template>
-                                            <span class="ms-3">{{ subCategory.name }}</span>
-                                        </v-list-item>
-                                        <v-divider v-if="subIdx !== category.subCategories.length - 1"/>
-                                    </template>
-                                </v-list>
-                            </v-expansion-panel-text>
-                        </v-expansion-panel>
-                    </v-expansion-panels>
-                </template>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :disabled="submitting" @click="save">
-                        {{ tt('Save') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                    </v-btn>
-                    <v-btn color="secondary" density="default" variant="tonal"
-                           :disabled="submitting" @click="showState = false">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            <template #footer>
+                <v-spacer/>
+                <v-btn :disabled="submitting" @click="save">
+                    {{ tt('Save') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                </v-btn>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />

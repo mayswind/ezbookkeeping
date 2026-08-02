@@ -1,23 +1,21 @@
 <template>
     <v-dialog width="1000" :persistent="!!queriesJson && queriesJson !== sampleJson" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <h4 class="text-h4">{{ tt('Import Queries') }}</h4>
+        <one-column-dialog-layout content-class="pa-0" content-style="height: 500px"
+                                  :title="tt('Import Queries')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #toolbar>
+                <v-btn class="me-2" density="comfortable" variant="outlined"
+                       :disabled="!queriesJson" @click="confirm">{{ tt('Import') }}</v-btn>
             </template>
 
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 485px">
+            <template #content>
                 <div class="w-100 h-100">
-                    <v-textarea class="w-100 h-100 always-cursor-text" v-model="queriesJson"></v-textarea>
+                    <v-textarea no-resize class="w-100 h-100 ps-4 always-cursor-text"
+                                density="compact" variant="plain" :rounded="false"
+                                v-model="queriesJson"></v-textarea>
                 </div>
-            </v-card-text>
-
-            <v-card-text>
-                <div ref="buttonContainer" class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn color="primary" :disabled="!queriesJson" @click="confirm">{{ tt('Import') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />

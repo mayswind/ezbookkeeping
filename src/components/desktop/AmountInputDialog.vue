@@ -1,32 +1,34 @@
 <template>
-    <v-dialog persistent min-width="320" width="auto" v-model="showState">
-        <v-card>
-            <v-toolbar :color="finalColor">
-                <v-toolbar-title>{{ titleContent }}</v-toolbar-title>
-            </v-toolbar>
-            <v-card-text v-if="textContent" class="pa-4 pb-6">{{ textContent }}</v-card-text>
-            <v-card-text>
-                <v-form>
-                    <v-row>
-                        <v-col cols="12">
-                            <amount-input :persistent-placeholder="true"
-                                          :autofocus="true"
-                                          :currency="dialogOptions?.currency"
-                                          :show-currency="!!dialogOptions?.currency"
-                                          :label="inputLabelContent"
-                                          :placeholder="inputPlaceholderContent"
-                                          v-model="amount"
-                                          @enter="confirm" />
-                        </v-col>
-                    </v-row>
-                </v-form>
-            </v-card-text>
-            <v-card-actions class="px-4 pb-4">
-                <v-spacer></v-spacer>
-                <v-btn color="gray" @click="cancel">{{ tt('Cancel') }}</v-btn>
+    <v-dialog persistent width="500" v-model="showState">
+        <one-column-dialog-layout :title="titleContent" :cancel-button-title="tt('Cancel')"
+                                  @cancel="cancel">
+            <template #content>
+                <div class="text-body-1 text-wrap my-4" v-if="textContent">{{ textContent }}</div>
+                <div class="d-flex justify-center w-100">
+                    <v-form class="w-100">
+                        <v-row>
+                            <v-col cols="12">
+                                <amount-input :persistent-placeholder="true"
+                                              :autofocus="true"
+                                              :currency="dialogOptions?.currency"
+                                              :show-currency="!!dialogOptions?.currency"
+                                              :enable-formula="true"
+                                              :label="inputLabelContent"
+                                              :placeholder="inputPlaceholderContent"
+                                              v-model="amount"
+                                              @enter="confirm" />
+                            </v-col>
+                        </v-row>
+                    </v-form>
+                </div>
+            </template>
+
+            <template #footer>
+                <v-btn color="secondary" variant="tonal" @click="cancel">{{ tt('Cancel') }}</v-btn>
+                <v-spacer />
                 <v-btn :color="finalColor" @click="confirm">{{ tt('OK') }}</v-btn>
-            </v-card-actions>
-        </v-card>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 </template>
 

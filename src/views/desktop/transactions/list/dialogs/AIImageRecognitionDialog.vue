@@ -6,11 +6,11 @@
                                   :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #toolbar>
-                <v-btn class="me-2" density="comfortable" variant="outlined"
+                <v-btn class="mx-2" density="comfortable" variant="outlined"
                        :disabled="loading || recognizing || !imageFile" @click="recognize"
                        v-if="!recognizing">{{ tt('Recognize') }}
                 </v-btn>
-                <v-btn class="me-2" density="comfortable" variant="outlined"
+                <v-btn class="mx-2" density="comfortable" variant="outlined"
                        :disabled="loading"
                        @click="cancelRecognize" v-if="recognizing && cancelRecognizingUuid">{{ tt('Cancel Recognition') }}</v-btn>
             </template>

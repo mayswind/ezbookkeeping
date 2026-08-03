@@ -3,7 +3,7 @@
         <one-column-dialog-layout :title="title" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #toolbar>
-                <v-btn class="me-2" density="comfortable" variant="outlined"
+                <v-btn class="mx-2" density="comfortable" variant="outlined"
                        :disabled="!monthValue" @click="confirm">{{ tt('OK') }}</v-btn>
             </template>
 

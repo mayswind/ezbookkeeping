@@ -4,7 +4,7 @@
                                   :title="tt('Import Queries')" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #toolbar>
-                <v-btn class="me-2" density="comfortable" variant="outlined"
+                <v-btn class="mx-2" density="comfortable" variant="outlined"
                        :disabled="!queriesJson" @click="confirm">{{ tt('Import') }}</v-btn>
             </template>
 

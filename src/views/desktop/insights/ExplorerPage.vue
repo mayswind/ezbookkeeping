@@ -227,7 +227,7 @@ import QueryImportDialog from '@/views/desktop/insights/dialogs/QueryImportDialo
 import QueryExportDialog from '@/views/desktop/insights/dialogs/QueryExportDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
-import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useDisplay } from 'vuetify';
 
@@ -255,6 +255,7 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.ts';
 
+import { isEquals } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 
 import {
@@ -340,7 +341,7 @@ const loading = ref<boolean>(true);
 const initing = ref<boolean>(true);
 const updating = ref<boolean>(false);
 const clientSessionId = ref<string>('');
-const isCurrentExplorationModified = ref<boolean>(false);
+const initExploration = ref<InsightsExplorer | null>(null);
 const isCurrentDataTableEditable = ref<boolean>(false);
 const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
 const showNav = ref<boolean>(display.mdAndUp.value);
@@ -381,6 +382,14 @@ const canShiftDateRange = computed<boolean>(() => currentFilter.value.dateRangeT
 const displayQueryDateRangeName = computed<string>(() => formatDateRange(currentFilter.value.dateRangeType, currentFilter.value.startTime, currentFilter.value.endTime));
 const displayQueryStartTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(currentFilter.value.startTime)));
 const displayQueryEndTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(currentFilter.value.endTime)));
+
+const isCurrentExplorationModified = computed<boolean>(() => {
+    if (!currentExploration.value.id) { // Add
+        return !!initExploration.value && !isEquals(currentExploration.value.toCreateRequest(clientSessionId.value), initExploration.value.toCreateRequest(clientSessionId.value));
+    } else { // Edit
+        return !!initExploration.value && !isEquals(currentExploration.value.toModifyRequest(), initExploration.value.toModifyRequest());
+    }
+});
 
 const allTabs = computed<{ name: string, value: ExplorerPageTabType }[]>(() => {
     return [
@@ -439,7 +448,7 @@ function init(initProps: InsightsExplorerProps): void {
         }
     } else if (!initProps.initId && !initProps.initActiveTab && !initProps.initDateRangeType && !initProps.initStartTime && !initProps.initEndTime) { // first time open the page
         explorersStore.updateCurrentExploration(InsightsExplorer.createNewExplorer(generateRandomUUID()));
-        isCurrentExplorationModified.value = true;
+        initExploration.value = InsightsExplorer.of(explorersStore.currentExploration);
     }
 
     if (!needReload && !explorersStore.transactionExplorerStateInvalid && !explorersStore.insightsExplorerListStateInvalid) {
@@ -506,7 +515,7 @@ function createNewExploration(): void {
     }
 
     explorersStore.updateCurrentExploration(InsightsExplorer.createNewExplorer(generateRandomUUID()));
-    isCurrentExplorationModified.value = true;
+    initExploration.value = InsightsExplorer.of(explorersStore.currentExploration);
     router.push(getFilterLinkUrl());
 }
 
@@ -523,10 +532,7 @@ function loadExploration(explorationId: string, force?: boolean, init?: boolean)
         explorationId: explorationId
     }).then(exploration => {
         explorersStore.updateCurrentExploration(exploration);
-
-        nextTick(() => {
-            isCurrentExplorationModified.value = false;
-        });
+        initExploration.value = InsightsExplorer.of(exploration);
 
         if (!init) {
             loading.value = false;
@@ -546,6 +552,16 @@ function loadExploration(explorationId: string, force?: boolean, init?: boolean)
 
 function showChangeExplorerDisplayOrderDialog(): void {
     explorerChangeDisplayOrderDialog.value?.open().then(() => {
+        for (const exploration of explorersStore.allExplorationBasicInfos) {
+            if (exploration.id === currentExploration.value.id) {
+                if (initExploration.value) {
+                    initExploration.value.hidden = exploration.hidden;
+                }
+
+                currentExploration.value.hidden = exploration.hidden;
+            }
+        }
+
         if (explorersStore.insightsExplorerListStateInvalid) {
             loading.value = true;
 
@@ -584,10 +600,7 @@ function doSaveExploration(saveAs?: boolean): Promise<unknown> {
         updating.value = false;
         clientSessionId.value = generateRandomUUID();
         explorersStore.updateCurrentExploration(newExploration);
-
-        nextTick(() => {
-            isCurrentExplorationModified.value = false;
-        });
+        initExploration.value = InsightsExplorer.of(newExploration);
 
         if (oldExplorationId !== newExploration.id) {
             router.push(getFilterLinkUrl());
@@ -599,9 +612,7 @@ function doSaveExploration(saveAs?: boolean): Promise<unknown> {
             snackbar.value?.showError(error);
 
             if (error.error && error.error.errorCode === KnownErrorCode.NothingWillBeUpdated) {
-                nextTick(() => {
-                    isCurrentExplorationModified.value = false;
-                });
+                initExploration.value = InsightsExplorer.of(currentExploration.value);
             }
         }
     });
@@ -631,11 +642,12 @@ function hideExploration(hidden: boolean): void {
         hidden: hidden
     }).then(() => {
         updating.value = false;
-        currentExploration.value.hidden = hidden;
 
-        nextTick(() => {
-            isCurrentExplorationModified.value = false;
-        });
+        if (initExploration.value) {
+            initExploration.value.hidden = hidden;
+        }
+
+        currentExploration.value.hidden = hidden;
     }).catch(error => {
         updating.value = false;
 
@@ -677,7 +689,7 @@ function importQueries(): void {
 
             explorersStore.currentExploration.queries.length = 0;
             explorersStore.currentExploration.queries.push(...queries);
-            isCurrentExplorationModified.value = true;
+            initExploration.value = InsightsExplorer.of(currentExploration.value);
         });
     }
 }
@@ -828,16 +840,6 @@ watch(activeTab, () => {
     }
 
     router.push(getFilterLinkUrl());
-});
-
-watch(currentExploration, () => {
-    if (initing.value || loading.value) {
-        return;
-    }
-
-    isCurrentExplorationModified.value = true;
-}, {
-    deep: true
 });
 
 init(props);

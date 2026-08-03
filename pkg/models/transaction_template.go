@@ -207,6 +207,12 @@ func (t *TransactionTemplate) toTransactionInfoResponse(utcOffset int16) *Transa
 		tagIds = strings.Split(t.TagIds, ",")
 	}
 
+	var destinationAmount *int64
+
+	if t.Type == TRANSACTION_TYPE_TRANSFER {
+		destinationAmount = &t.RelatedAccountAmount
+	}
+
 	return &TransactionInfoResponse{
 		Id:                   t.TemplateId,
 		TimeSequenceId:       utils.GetMinTransactionTimeFromUnixTime(t.CreatedUnixTime),
@@ -217,7 +223,7 @@ func (t *TransactionTemplate) toTransactionInfoResponse(utcOffset int16) *Transa
 		SourceAccountId:      t.AccountId,
 		DestinationAccountId: t.RelatedAccountId,
 		SourceAmount:         t.Amount,
-		DestinationAmount:    t.RelatedAccountAmount,
+		DestinationAmount:    destinationAmount,
 		HideAmount:           t.HideAmount,
 		TagIds:               tagIds,
 		Comment:              t.Comment,

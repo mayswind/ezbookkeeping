@@ -206,7 +206,7 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
         }
 
         transaction.hideAmount = transaction2.hideAmount;
-        transaction.tagIds = transaction2.tagIds || [];
+        transaction.tagIds = transaction2.tagIds ? [...transaction2.tagIds] : [];
         transaction.setPictures(TransactionPicture.ofMulti(transaction2.pictures || []));
 
         transaction.comment = transaction2.comment;

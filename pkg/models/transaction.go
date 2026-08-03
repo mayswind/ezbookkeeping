@@ -413,7 +413,7 @@ type TransactionInfoResponse struct {
 	DestinationAccountId int64                                    `json:"destinationAccountId,string,omitempty"`
 	DestinationAccount   *AccountInfoResponse                     `json:"destinationAccount,omitempty"`
 	SourceAmount         int64                                    `json:"sourceAmount"`
-	DestinationAmount    int64                                    `json:"destinationAmount,omitempty"`
+	DestinationAmount    *int64                                   `json:"destinationAmount,omitempty"`
 	HideAmount           bool                                     `json:"hideAmount"`
 	TagIds               []string                                 `json:"tagIds"`
 	Tags                 []*TransactionTagInfoResponse            `json:"tags,omitempty"`
@@ -609,17 +609,17 @@ func (t *Transaction) ToTransactionInfoResponse(tagIds []int64, editable bool) *
 	sourceAmount := t.Amount
 
 	destinationAccountId := int64(0)
-	destinationAmount := int64(0)
+	var destinationAmount *int64
 
 	if t.Type == TRANSACTION_DB_TYPE_TRANSFER_OUT {
 		destinationAccountId = t.RelatedAccountId
-		destinationAmount = t.RelatedAccountAmount
+		destinationAmount = &t.RelatedAccountAmount
 	} else if t.Type == TRANSACTION_DB_TYPE_TRANSFER_IN {
 		sourceAccountId = t.RelatedAccountId
 		sourceAmount = t.RelatedAccountAmount
 
 		destinationAccountId = t.AccountId
-		destinationAmount = t.Amount
+		destinationAmount = &t.Amount
 	}
 
 	geoLocation := &TransactionGeoLocationResponse{}

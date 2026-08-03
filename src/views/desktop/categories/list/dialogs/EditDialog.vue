@@ -109,6 +109,7 @@ import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
 import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 
+import { isEquals } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 
 interface TransactionCategoryEditResponse {
@@ -135,16 +136,17 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-const showState = ref<boolean>(false);
-
 let resolveFunc: ((value: TransactionCategoryEditResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
+const showState = ref<boolean>(false);
+const initCategory = ref<TransactionCategory | null>(null);
+
 const isCategoryModified = computed<boolean>(() => {
     if (!editCategoryId.value) { // Add
-        return !category.value.equals(TransactionCategory.createNewCategory(category.value.type, category.value.parentId));
+        return !!initCategory.value && !isEquals(category.value.toCreateRequest(clientSessionId.value), initCategory.value.toCreateRequest(clientSessionId.value));
     } else { // Edit
-        return true;
+        return !!initCategory.value && !isEquals(category.value.toModifyRequest(), initCategory.value.toModifyRequest());
     }
 });
 
@@ -153,8 +155,8 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
     loading.value = true;
     submitting.value = false;
 
-    const newTransactionCategory = TransactionCategory.createNewCategory();
-    category.value.fillFrom(newTransactionCategory);
+    initCategory.value = TransactionCategory.createNewCategory();
+    category.value.fillFrom(initCategory.value);
 
     if (options.id) {
         if (options.currentCategory) {
@@ -166,6 +168,7 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
             categoryId: editCategoryId.value
         }).then(response => {
             category.value.fillFrom(response);
+            initCategory.value = TransactionCategory.of(response);
             loading.value = false;
         }).catch(error => {
             loading.value = false;
@@ -191,15 +194,20 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
             return Promise.reject('Parameter Invalid');
         }
 
-        category.value.type = categoryType;
-        category.value.parentId = options.parentId;
+        initCategory.value.type = categoryType;
+        initCategory.value.parentId = options.parentId;
+
+        category.value.type = initCategory.value.type;
+        category.value.parentId = initCategory.value.parentId;
 
         if (options.color) {
-            category.value.color = options.color;
+            initCategory.value.color = options.color;
+            category.value.color = initCategory.value.color;
         }
 
         if (options.icon) {
-            category.value.icon = options.icon;
+            initCategory.value.icon = options.icon;
+            category.value.icon = initCategory.value.icon;
         }
 
         clientSessionId.value = generateRandomUUID();

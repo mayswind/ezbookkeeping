@@ -544,7 +544,7 @@ import { TransactionTemplate } from '@/models/transaction_template.ts';
 import type { TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
 import { Transaction } from '@/models/transaction.ts';
 
-import { isDefined } from '@/lib/common.ts';
+import { isDefined, isEquals } from '@/lib/common.ts';
 import {
     getTimezoneOffsetMinutes,
     getCurrentUnixTime
@@ -676,9 +676,14 @@ const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const pictureInput = useTemplateRef<HTMLInputElement>('pictureInput');
 
+let resolveFunc: ((response?: TransactionEditResponse) => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
 const showState = ref<boolean>(false);
 const showPasteTextDialog = ref<boolean>(false);
 const activeTab = ref<string>('basicInfo');
+const initTransaction = ref<Transaction | null>(null);
+const initTemplate = ref<TransactionTemplate | null>(null);
 const originalTransactionEditable = ref<boolean>(false);
 const noTransactionDraft = ref<boolean>(false);
 const geoMenuState = ref<boolean>(false);
@@ -686,9 +691,6 @@ const removingPictureId = ref<string>('');
 const pastedText = ref<string>('');
 
 const initOptions = ref<TransactionEditOptions | undefined>(undefined);
-
-let resolveFunc: ((response?: TransactionEditResponse) => void) | null = null;
-let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const sourceAmountColor = computed<string | undefined>(() => {
     if (transaction.value.type === TransactionType.Expense) {
@@ -704,9 +706,23 @@ const sourceAmountColor = computed<string | undefined>(() => {
 
 const isTransactionModified = computed<boolean>(() => {
     if (mode.value === TransactionEditPageMode.Add) {
-        return transactionsStore.isTransactionDraftModified(transaction.value, initOptions.value?.amount, initOptions.value?.categoryId, initOptions.value?.accountId, initOptions.value?.tagIds, firstVisibleAccountId.value);
+        if (props.type === TransactionEditPageType.Transaction) {
+            return transactionsStore.isTransactionDraftModified(transaction.value, initOptions.value?.amount, initOptions.value?.categoryId, initOptions.value?.accountId, initOptions.value?.tagIds, firstVisibleAccountId.value);
+        } else if (props.type === TransactionEditPageType.Template && transaction.value instanceof TransactionTemplate) {
+            const template = transaction.value as TransactionTemplate;
+            return !!initTemplate.value && !isEquals(template.toTemplateCreateRequest(clientSessionId.value), initTemplate.value.toTemplateCreateRequest(clientSessionId.value));
+        } else {
+            return true;
+        }
     } else if (mode.value === TransactionEditPageMode.Edit) {
-        return true;
+        if (props.type === TransactionEditPageType.Transaction) {
+            return !!initTransaction.value && !isEquals(transaction.value.toModifyRequest(), initTransaction.value.toModifyRequest());
+        } else if (props.type === TransactionEditPageType.Template && transaction.value instanceof TransactionTemplate) {
+            const template = transaction.value as TransactionTemplate;
+            return !!initTemplate.value && !isEquals(template.toTemplateModifyRequest(), initTemplate.value.toTemplateModifyRequest());
+        } else {
+            return true;
+        }
     } else {
         return false;
     }
@@ -729,6 +745,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
     const newTransaction = createNewTransactionModel(options.type);
     setTransactionModel(newTransaction, options, true);
+    initTransaction.value = Transaction.of(transaction.value);
 
     const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
@@ -752,6 +769,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
 
             if (options.template) {
                 setTransactionModel(options.template, options, false);
+                initTransaction.value = Transaction.of(transaction.value);
                 addByTemplateId.value = options.template.id;
             } else if (!options.noTransactionDraft && (settingsStore.appSettings.autoSaveTransactionDraft === 'enabled' || settingsStore.appSettings.autoSaveTransactionDraft === 'confirmation') && transactionsStore.transactionDraft) {
                 setTransactionModel(Transaction.ofDraft(transactionsStore.transactionDraft), options, false);
@@ -763,19 +781,19 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
             }
         }
     } else if (props.type === TransactionEditPageType.Template) {
-        const template = TransactionTemplate.createNewTransactionTemplate(transaction.value);
-        template.name = '';
+        initTemplate.value = TransactionTemplate.createNewTransactionTemplate(transaction.value);
+        initTemplate.value.name = '';
 
         if (options && options.templateType) {
-            template.templateType = options.templateType;
+            initTemplate.value.templateType = options.templateType;
         }
 
-        if (template.templateType === TemplateType.Schedule.type) {
-            template.scheduledFrequencyType = ScheduledTemplateFrequencyType.Disabled.type;
-            template.scheduledFrequency = '';
+        if (initTemplate.value.templateType === TemplateType.Schedule.type) {
+            initTemplate.value.scheduledFrequencyType = ScheduledTemplateFrequencyType.Disabled.type;
+            initTemplate.value.scheduledFrequency = '';
         }
 
-        transaction.value = template;
+        transaction.value = TransactionTemplate.ofTemplate(initTemplate.value);
 
         if (options && options.id) {
             if (options.currentTemplate) {
@@ -821,6 +839,7 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
         if (props.type === TransactionEditPageType.Transaction && options && options.id && responses[3] && responses[3] instanceof Transaction) {
             const transaction: Transaction = responses[3];
             setTransactionModel(transaction, options, true);
+            initTransaction.value = Transaction.of(transaction);
             originalTransactionEditable.value = transaction.editable;
         } else if (props.type === TransactionEditPageType.Template && options && options.id && responses[3] && responses[3] instanceof TransactionTemplate) {
             const template: TransactionTemplate = responses[3];
@@ -831,8 +850,15 @@ function open(options: TransactionEditOptions): Promise<TransactionEditResponse 
             }
 
             (transaction.value as TransactionTemplate).fillFrom(template);
+            initTemplate.value = TransactionTemplate.ofTemplate(template);
         } else {
             setTransactionModel(null, options, true);
+
+            if (props.type === TransactionEditPageType.Transaction) {
+                initTransaction.value = Transaction.of(transaction.value);
+            } else if (props.type === TransactionEditPageType.Template && transaction.value instanceof TransactionTemplate) {
+                initTemplate.value = TransactionTemplate.ofTemplate(transaction.value);
+            }
         }
 
         if (options.autoUploadPicture) {

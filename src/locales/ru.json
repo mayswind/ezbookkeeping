@@ -2017,7 +2017,7 @@
     "All transactions in this account have been moved.": "Все транзакции этого счета были перемещены.",
     "Reconciliation Statement": "Акт сверки",
     "Account Balance Trends": "Тренды баланса счета",
-    "Update Closing Balance": "Обновить закрывающий баланс",
+    "Update Closing Balance": "Обновить итоговый баланс",
     "Please enter the new closing balance for this account": "Пожалуйста, укажите новый итоговый баланс для этого счёта",
     "Transaction": "Транзакция",
     "Transactions": "Транзакции",

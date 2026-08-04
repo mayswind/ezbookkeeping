@@ -460,20 +460,18 @@
                                   @dateRange:change="setCustomDateFilter"
                                   @error="onShowDateRangeError" />
 
-    <v-dialog width="800" v-model="showFilterAccountDialog">
-        <account-filter-settings-card type="statisticsCurrent" :dialog-mode="true"
-            @settings:change="setAccountFilter" />
-    </v-dialog>
+    <account-filter-settings-dialog type="statisticsCurrent"
+                                    v-model:show="showFilterAccountDialog"
+                                    @settings:change="setAccountFilter" />
 
-    <v-dialog width="800" v-model="showFilterCategoryDialog">
-        <category-filter-settings-card type="statisticsCurrent" :dialog-mode="true"
-            @settings:change="setCategoryFilter" />
-    </v-dialog>
 
-    <v-dialog width="800" v-model="showFilterTagDialog">
-        <transaction-tag-filter-settings-card type="statisticsCurrent" :dialog-mode="true"
-                                              @settings:change="setTagFilter" />
-    </v-dialog>
+    <category-filter-settings-dialog type="statisticsCurrent"
+                                     v-model:show="showFilterCategoryDialog"
+                                     @settings:change="setCategoryFilter" />
+
+    <transaction-tag-filter-settings-dialog type="statisticsCurrent"
+                                            v-model:show="showFilterTagDialog"
+                                            @settings:change="setTagFilter" />
 
     <export-dialog ref="exportDialog" />
 
@@ -483,9 +481,9 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import TrendsChart from '@/components/desktop/TrendsChart.vue';
-import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
-import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
-import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
+import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
+import CategoryFilterSettingsDialog from '@/views/desktop/common/dialogs/CategoryFilterSettingsDialog.vue';
+import TransactionTagFilterSettingsDialog from '@/views/desktop/common/dialogs/TransactionTagFilterSettingsDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';

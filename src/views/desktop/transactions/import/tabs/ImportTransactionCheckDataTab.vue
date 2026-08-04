@@ -324,12 +324,13 @@
             </div>
         </template>
         <template #bottom>
-            <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="importTransactions">
+            <v-divider />
+            <div class="title-and-toolbar d-flex align-center text-no-wrap my-1 mx-3" v-if="importTransactions">
                 <span :class="{ 'text-error': selectedInvalidTransactionCount > 0 }">
                     {{ tt('format.misc.selectedCount', { count: formatNumberToLocalizedNumerals(selectedImportTransactionCount), totalCount: formatNumberToLocalizedNumerals(importTransactions.length) }) }}
                 </span>
                 <v-spacer v-if="importTransactions.length > 10"/>
-                <span v-if="importTransactions.length > 10">{{ tt('Transactions Per Page') }}</span>
+                <span class="ms-2" v-if="importTransactions.length > 10">{{ tt('Transactions Per Page') }}</span>
                 <v-select class="ms-2" density="compact" max-width="100"
                           item-title="name"
                           item-value="value"
@@ -348,57 +349,52 @@
     </v-data-table>
 
     <v-dialog width="640" v-model="showCustomAmountFilterDialog">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center">
-                    <h4 class="text-h4">{{ tt('Filter Amount') }}</h4>
+        <one-column-dialog-layout :title="tt('Filter Amount')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="showCustomAmountFilterDialog = false">
+            <template #toolbar>
+                <v-btn class="mx-2" density="comfortable" variant="outlined"
+                       @click="showCustomAmountFilterDialog = false; filters.amount = currentAmountFilterType?.toTextualFilter(currentAmountFilterValue1, currentAmountFilterValue2) ?? null">{{ tt('OK') }}</v-btn>
+            </template>
+
+            <template #content>
+                <div class="w-100 mt-5 d-flex justify-center">
+                    <div class="me-2 d-flex flex-column justify-center" v-if="currentAmountFilterType">
+                        {{ tt(currentAmountFilterType.name) }}
+                    </div>
+                    <amount-input :currency="defaultCurrency"
+                                  v-model="currentAmountFilterValue1"/>
+                    <div class="ms-2 me-2 d-flex flex-column justify-center" v-if="currentAmountFilterType && currentAmountFilterType.paramCount === 2">
+                        ~
+                    </div>
+                    <amount-input :currency="defaultCurrency"
+                                  v-model="currentAmountFilterValue2"
+                                  v-if="currentAmountFilterType && currentAmountFilterType.paramCount === 2"/>
                 </div>
             </template>
-            <v-card-text class="w-100 d-flex justify-center">
-                <div class="me-2 d-flex flex-column justify-center" v-if="currentAmountFilterType">
-                    {{ tt(currentAmountFilterType.name) }}
-                </div>
-                <amount-input :currency="defaultCurrency"
-                              v-model="currentAmountFilterValue1"/>
-                <div class="ms-2 me-2 d-flex flex-column justify-center" v-if="currentAmountFilterType && currentAmountFilterType.paramCount === 2">
-                    ~
-                </div>
-                <amount-input :currency="defaultCurrency"
-                              v-model="currentAmountFilterValue2"
-                              v-if="currentAmountFilterType && currentAmountFilterType.paramCount === 2"/>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn @click="showCustomAmountFilterDialog = false; filters.amount = currentAmountFilterType?.toTextualFilter(currentAmountFilterValue1, currentAmountFilterValue2) ?? null">{{ tt('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="showCustomAmountFilterDialog = false">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <v-dialog width="640" v-model="showCustomDescriptionDialog">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex align-center">
-                    <h4 class="text-h4">{{ tt('Filter Description') }}</h4>
+        <one-column-dialog-layout :title="tt('Filter Description')" :cancel-button-title="tt('Cancel')"
+                                  @cancel="showCustomDescriptionDialog = false; currentDescriptionFilterValue = ''">
+            <template #toolbar>
+                <v-btn class="mx-2" density="comfortable" variant="outlined"
+                       :disabled="!currentDescriptionFilterValue"
+                       @click="showCustomDescriptionDialog = false; filters.description = currentDescriptionFilterValue">{{ tt('OK') }}</v-btn>
+            </template>
+
+            <template #content>
+                <div class="mt-5">
+                    <v-text-field
+                        type="text"
+                        persistent-placeholder
+                        :label="tt('Description')"
+                        :placeholder="tt('Description')"
+                        v-model="currentDescriptionFilterValue"
+                    />
                 </div>
             </template>
-            <v-card-text class="w-100 d-flex justify-center">
-                <v-text-field
-                    type="text"
-                    persistent-placeholder
-                    :label="tt('Description')"
-                    :placeholder="tt('Description')"
-                    v-model="currentDescriptionFilterValue"
-                />
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :disabled="!currentDescriptionFilterValue" @click="showCustomDescriptionDialog = false; filters.description = currentDescriptionFilterValue">{{ tt('OK') }}</v-btn>
-                    <v-btn color="secondary" variant="tonal" @click="showCustomDescriptionDialog = false; currentDescriptionFilterValue = ''">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <date-range-selection-dialog :title="tt('Custom Date Range')"

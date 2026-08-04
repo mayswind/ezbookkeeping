@@ -236,6 +236,40 @@ export function getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsM
     return defaultCurrency;
 }
 
+export function getIncludedAccountsDisplayContent(excludeAccountIds: Record<string, boolean>, allAccounts: Account[], allAccountsMap: Record<string, Account>): string {
+    if (!allAccounts || !allAccounts.length || !allAccountsMap) {
+        return '';
+    }
+
+    let hasExcludeAccount = false;
+
+    for (const accountId of keysIfValueEquals(excludeAccountIds, true)) {
+        if (allAccountsMap[accountId]) {
+            hasExcludeAccount = true;
+            break;
+        }
+    }
+
+    if (!hasExcludeAccount) {
+        return 'All';
+    }
+
+    let allAccountExcluded = true;
+
+    for (const account of allAccounts) {
+        if (!excludeAccountIds[account.id]) {
+            allAccountExcluded = false;
+            break;
+        }
+    }
+
+    if (allAccountExcluded) {
+        return 'None';
+    }
+
+    return 'Partial';
+}
+
 export function selectAccountOrSubAccounts(filterAccountIds: Record<string, boolean>, account: Account, value: boolean): void {
     if (account.type === AccountType.SingleAccount.type) {
         filterAccountIds[account.id] = value;

@@ -1,5 +1,5 @@
 <template>
-    <v-row>
+    <v-row class="ma-0">
         <v-col cols="12" md="6">
             <div class="d-flex w-100 mb-2">
                 <v-btn density="compact" variant="tonal" :prepend-icon="mdiPlay"

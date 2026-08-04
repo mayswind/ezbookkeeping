@@ -39,7 +39,8 @@
             </tr>
         </template>
         <template #bottom>
-            <div class="title-and-toolbar d-flex align-center text-no-wrap mt-2" v-if="parsedFileData">
+            <v-divider />
+            <div class="title-and-toolbar d-flex align-center text-no-wrap my-1 mx-3" v-if="parsedFileData">
                 <v-btn color="secondary" density="compact" variant="outlined"
                        :append-icon="parsedFileDataColumnMapping.includeHeader ? mdiCheck : mdiClose"
                        @click="parsedFileDataColumnMapping.toggleIncludeHeader()">{{ tt('Include Header Line') }}</v-btn>
@@ -201,7 +202,7 @@
                     </v-menu>
                 </v-btn>
                 <v-spacer/>
-                <span>{{ tt('Lines Per Page') }}</span>
+                <span class="ms-2">{{ tt('Lines Per Page') }}</span>
                 <v-select class="ms-2" density="compact" max-width="100"
                           item-title="name"
                           item-value="value"

@@ -1,15 +1,21 @@
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { StatisticsAnalysisType } from '@/core/statistics.ts';
 
+import { getIncludedAccountsDisplayContent } from '@/lib/account.ts';
+import { getIncludedTransactionCategoriesDisplayContent } from '@/lib/category.ts';
+
 export function useStatisticsSettingPageBase() {
     const {
+        tt,
         getAllDateRanges,
         getAllTimezoneTypesUsedForStatistics,
         getAllKeywordMatchModes,
@@ -20,6 +26,11 @@ export function useStatisticsSettingPageBase() {
     } = useI18n();
 
     const settingsStore = useSettingsStore();
+    const accountsStore = useAccountsStore();
+    const transactionCategoriesStore = useTransactionCategoriesStore();
+
+    const loadingAccounts = ref<boolean>(false);
+    const loadingTransactionCategories = ref<boolean>(false);
 
     const allChartDataTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsChartDataTypes(StatisticsAnalysisType.CategoricalAnalysis));
     const allTimezoneTypesUsedForStatistics = computed<TypeAndDisplayName[]>(() => getAllTimezoneTypesUsedForStatistics());
@@ -44,6 +55,26 @@ export function useStatisticsSettingPageBase() {
     const defaultKeywordMatchMode = computed<number>({
         get: () => settingsStore.appSettings.statistics.defaultKeywordMatchMode,
         set: (value: number) => settingsStore.setStatisticsDefaultKeywordMatchMode(value)
+    });
+
+    const defaultAccountFilterDisplayContent = computed<string>(() => {
+        if (loadingAccounts.value) {
+            return '';
+        }
+
+        const excludeAccountIds = settingsStore.appSettings.statistics.defaultAccountFilter;
+        const displayContent = getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allPlainAccounts, accountsStore.allAccountsMap);
+        return displayContent ? tt(displayContent) : displayContent;
+    });
+
+    const defaultTransactionCategoryFilterDisplayContent = computed<string>(() => {
+        if (loadingTransactionCategories.value) {
+            return '';
+        }
+
+        const excludeAccountIds = settingsStore.appSettings.statistics.defaultTransactionCategoryFilter;
+        const displayContent = getIncludedTransactionCategoriesDisplayContent(excludeAccountIds, transactionCategoriesStore.allTransactionCategoriesMap);
+        return displayContent ? tt(displayContent) : displayContent;
     });
 
     const defaultSortingType = computed<number>({
@@ -82,6 +113,9 @@ export function useStatisticsSettingPageBase() {
     });
 
     return {
+        // states,
+        loadingAccounts,
+        loadingTransactionCategories,
         // computed states
         allChartDataTypes,
         allTimezoneTypesUsedForStatistics,
@@ -95,6 +129,8 @@ export function useStatisticsSettingPageBase() {
         defaultChartDataType,
         defaultTimezoneType,
         defaultKeywordMatchMode,
+        defaultAccountFilterDisplayContent,
+        defaultTransactionCategoryFilterDisplayContent,
         defaultSortingType,
         defaultCategoricalChartType,
         defaultCategoricalChartDateRange,

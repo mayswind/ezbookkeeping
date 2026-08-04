@@ -452,20 +452,18 @@
         </v-col>
     </v-row>
 
-    <v-dialog width="800" v-model="showAccountsIncludedInHomePageOverviewDialog">
-        <account-filter-settings-card type="homePageOverview" :dialog-mode="true"
-                                      @settings:change="showAccountsIncludedInHomePageOverviewDialog = false" />
-    </v-dialog>
+    <account-filter-settings-dialog type="homePageOverview"
+                                    v-model:show="showAccountsIncludedInHomePageOverviewDialog"
+                                    @settings:change="showAccountsIncludedInHomePageOverviewDialog = false" />
 
-    <v-dialog width="800" v-model="showTransactionCategoriesIncludedInHomePageOverviewDialog">
-        <category-filter-settings-card type="homePageOverview" :dialog-mode="true" :category-types="`${CategoryType.Income},${CategoryType.Expense}`"
-                                       @settings:change="showTransactionCategoriesIncludedInHomePageOverviewDialog = false" />
-    </v-dialog>
+    <category-filter-settings-dialog type="homePageOverview"
+                                     :category-types="`${CategoryType.Income},${CategoryType.Expense}`"
+                                     v-model:show="showTransactionCategoriesIncludedInHomePageOverviewDialog"
+                                     @settings:change="showTransactionCategoriesIncludedInHomePageOverviewDialog = false" />
 
-    <v-dialog width="800" v-model="showAccountsIncludedInTotalDialog">
-        <account-filter-settings-card type="accountListTotalAmount" :dialog-mode="true"
-                                      @settings:change="showAccountsIncludedInTotalDialog = false" />
-    </v-dialog>
+    <account-filter-settings-dialog type="accountListTotalAmount"
+                                    v-model:show="showAccountsIncludedInTotalDialog"
+                                    @settings:change="showAccountsIncludedInTotalDialog = false" />
 
     <chart-color-scheme-dialog ref="chartColorSchemeDialog" />
     <account-category-display-order-dialog ref="accountCategorysDisplayOrderDialog" />
@@ -475,8 +473,8 @@
 
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
-import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
-import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
+import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
+import CategoryFilterSettingsDialog from '@/views/desktop/common/dialogs/CategoryFilterSettingsDialog.vue';
 import ChartColorSchemeDialog from '@/views/desktop/app/settings/dialogs/ChartColorSchemeDialog.vue';
 import AccountCategoryDisplayOrderDialog from '@/views/desktop/app/settings/dialogs/AccountCategoryDisplayOrderDialog.vue';
 

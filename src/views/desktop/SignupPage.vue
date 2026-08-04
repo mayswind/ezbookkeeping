@@ -23,7 +23,7 @@
                 <v-card variant="flat" class="mt-12 mt-sm-0 pt-sm-12 pt-md-0">
                     <steps-bar min-width="700" :steps="allSteps" :current-step="currentStep" @step:change="switchToTab" />
 
-                    <v-window class="mt-5 disable-tab-transition" style="max-width: 700px" v-model="currentStep">
+                    <v-window class="mt-5 mt-md-6 disable-tab-transition" style="max-width: 700px" v-model="currentStep">
                         <v-form>
                             <v-window-item value="basicSetting">
                                 <h4 class="text-h4 mb-1">{{ tt('Basic Information') }}</h4>

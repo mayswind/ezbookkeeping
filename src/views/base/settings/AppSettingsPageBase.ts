@@ -10,14 +10,14 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import { type NameValue, type TypeAndDisplayName, keysIfValueEquals, values } from '@/core/base.ts';
+import type { NameValue, TypeAndDisplayName } from '@/core/base.ts';
 import { DateRangeScene, DateRange } from '@/core/datetime.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
-import { CategoryType } from '@/core/category.ts';
-import type { Account } from '@/models/account.ts';
 
 import { isObjectEmpty } from '@/lib/common.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
+import { getIncludedAccountsDisplayContent } from '@/lib/account.ts';
+import { getIncludedTransactionCategoriesDisplayContent } from '@/lib/category.ts';
 
 export function useAppSettingPageBase() {
     const {
@@ -174,13 +174,23 @@ export function useAppSettingPageBase() {
     });
 
     const accountsIncludedInHomePageOverviewDisplayContent = computed<string>(() => {
+        if (loadingAccounts.value) {
+            return '';
+        }
+
         const excludeAccountIds = settingsStore.appSettings.overviewAccountFilterInHomePage;
-        return getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allPlainAccounts);
+        const displayContent = getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allPlainAccounts, accountsStore.allAccountsMap);
+        return displayContent ? tt(displayContent) : displayContent;
     });
 
     const accountsIncludedInTotalDisplayContent = computed<string>(() => {
+        if (loadingAccounts.value) {
+            return '';
+        }
+
         const excludeAccountIds = settingsStore.appSettings.totalAmountExcludeAccountIds;
-        return getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allVisiblePlainAccounts);
+        const displayContent = getIncludedAccountsDisplayContent(excludeAccountIds, accountsStore.allVisiblePlainAccounts, accountsStore.allAccountsMap);
+        return displayContent ? tt(displayContent) : displayContent;
     });
 
     const accountCategorysDisplayOrderContent = computed<string>(() => {
@@ -192,81 +202,14 @@ export function useAppSettingPageBase() {
     });
 
     const transactionCategoriesIncludedInHomePageOverviewDisplayContent = computed<string>(() => {
+        if (loadingTransactionCategories.value) {
+            return '';
+        }
+
         const excludeAccountIds = settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage;
-        return getIncludedTransactionCategoriesDisplayContent(excludeAccountIds);
+        const displayContent = getIncludedTransactionCategoriesDisplayContent(excludeAccountIds, transactionCategoriesStore.allTransactionCategoriesMap);
+        return displayContent ? tt(displayContent) : displayContent;
     });
-
-    function getIncludedAccountsDisplayContent(excludeAccountIds: Record<string, boolean>, allAccounts: Account[]): string {
-        if (loadingAccounts.value || !allAccounts || !allAccounts.length) {
-            return '';
-        }
-
-        let hasExcludeAccount = false;
-
-        for (const accountId of keysIfValueEquals(excludeAccountIds, true)) {
-            if (accountsStore.allAccountsMap[accountId]) {
-                hasExcludeAccount = true;
-                break;
-            }
-        }
-
-        if (!hasExcludeAccount) {
-            return tt('All');
-        }
-
-        let allAccountExcluded = true;
-
-        for (const account of allAccounts) {
-            if (!excludeAccountIds[account.id]) {
-                allAccountExcluded = false;
-                break;
-            }
-        }
-
-        if (allAccountExcluded) {
-            return tt('None');
-        }
-
-        return tt('Partial');
-    }
-
-    function getIncludedTransactionCategoriesDisplayContent(excludeTransactionCategoryIds: Record<string, boolean>): string {
-        if (loadingTransactionCategories.value || !transactionCategoriesStore.allTransactionCategoriesMap) {
-            return '';
-        }
-
-        let hasExcludeTransactionCategory = false;
-
-        for (const transactionCategoryId of keysIfValueEquals(excludeTransactionCategoryIds, true)) {
-            if (transactionCategoriesStore.allTransactionCategoriesMap[transactionCategoryId]) {
-                hasExcludeTransactionCategory = true;
-                break;
-            }
-        }
-
-        if (!hasExcludeTransactionCategory) {
-            return tt('All');
-        }
-
-        let allTransactionCategoryExcluded = true;
-
-        for (const transactionCategory of values(transactionCategoriesStore.allTransactionCategoriesMap)) {
-            if (transactionCategory.type !== CategoryType.Income && transactionCategory.type !== CategoryType.Expense) {
-                continue;
-            }
-
-            if (!excludeTransactionCategoryIds[transactionCategory.id]) {
-                allTransactionCategoryExcluded = false;
-                break;
-            }
-        }
-
-        if (allTransactionCategoryExcluded) {
-            return tt('None');
-        }
-
-        return tt('Partial');
-    }
 
     function getValidReconciliationStatementPageDefaultDateRangeType(value: number, defaultValue: number): number {
         if (DateRange.isLastReconciledTimeRange(value) && !userStore.currentUserUseLastReconciledTime) {

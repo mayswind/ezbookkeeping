@@ -685,20 +685,18 @@
     <a-i-image-recognition-dialog ref="aiImageRecognitionDialog" />
     <import-dialog ref="importDialog" :persistent="true" />
 
-    <v-dialog width="800" v-model="showFilterAccountDialog">
-        <account-filter-settings-card type="transactionListCurrent" :dialog-mode="true"
-                                      @settings:change="changeMultipleAccountsFilter" />
-    </v-dialog>
+    <account-filter-settings-dialog type="transactionListCurrent"
+                                    v-model:show="showFilterAccountDialog"
+                                    @settings:change="changeMultipleAccountsFilter" />
 
-    <v-dialog width="800" v-model="showFilterCategoryDialog">
-        <category-filter-settings-card type="transactionListCurrent" :dialog-mode="true" :category-types="allowCategoryTypes"
-                                       @settings:change="changeMultipleCategoriesFilter" />
-    </v-dialog>
+    <category-filter-settings-dialog type="transactionListCurrent"
+                                     :category-types="allowCategoryTypes"
+                                     v-model:show="showFilterCategoryDialog"
+                                     @settings:change="changeMultipleCategoriesFilter" />
 
-    <v-dialog width="800" v-model="showFilterTagDialog">
-        <transaction-tag-filter-settings-card type="transactionListCurrent" :dialog-mode="true"
-                                       @settings:change="changeMultipleTagsFilter" />
-    </v-dialog>
+    <transaction-tag-filter-settings-dialog type="transactionListCurrent"
+                                            v-model:show="showFilterTagDialog"
+                                            @settings:change="changeMultipleTagsFilter" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />
@@ -712,9 +710,9 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 import AIImageRecognitionDialog from './list/dialogs/AIImageRecognitionDialog.vue';
 import ImportDialog from './import/ImportDialog.vue';
-import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
-import CategoryFilterSettingsCard from '@/views/desktop/common/cards/CategoryFilterSettingsCard.vue';
-import TransactionTagFilterSettingsCard from '@/views/desktop/common/cards/TransactionTagFilterSettingsCard.vue';
+import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
+import CategoryFilterSettingsDialog from '@/views/desktop/common/dialogs/CategoryFilterSettingsDialog.vue';
+import TransactionTagFilterSettingsDialog from '@/views/desktop/common/dialogs/TransactionTagFilterSettingsDialog.vue';
 import { TransactionEditPageType } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
 import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';

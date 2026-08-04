@@ -1,64 +1,54 @@
 <template>
     <v-dialog width="600" :persistent="submitting || !!selectedNames.length" v-model="showState">
-        <v-card class="pa-sm-1 pa-md-2">
-            <template #title>
-                <div class="d-flex flex-wrap">
-                    <h4 class="text-h4 text-wrap" v-if="type === 'expenseCategory'">{{ tt('Create Nonexistent Expense Categories') }}</h4>
-                    <h4 class="text-h4 text-wrap" v-if="type === 'incomeCategory'">{{ tt('Create Nonexistent Income Categories') }}</h4>
-                    <h4 class="text-h4 text-wrap" v-if="type === 'transferCategory'">{{ tt('Create Nonexistent Transfer Categories') }}</h4>
-                    <h4 class="text-h4 text-wrap" v-if="type === 'tag'">{{ tt('Create Nonexistent Transaction Tags') }}</h4>
-                    <v-spacer/>
-                    <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                           :disabled="submitting || !invalidItems || !invalidItems.length" :icon="true">
-                        <v-icon :icon="mdiDotsVertical" />
-                        <v-menu activator="parent">
-                            <v-list>
-                                <v-list-item :prepend-icon="mdiSelectAll"
-                                             :title="tt('Select All')"
-                                             :disabled="!invalidItems || !invalidItems.length"
-                                             @click="selectAllItems"></v-list-item>
-                                <v-list-item :prepend-icon="mdiSelect"
-                                             :title="tt('Select None')"
-                                             :disabled="!invalidItems || !invalidItems.length"
-                                             @click="selectNoneItems"></v-list-item>
-                                <v-list-item :prepend-icon="mdiSelectInverse"
-                                             :title="tt('Invert Selection')"
-                                             :disabled="!invalidItems || !invalidItems.length"
-                                             @click="selectInvertItems"></v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
-                </div>
-            </template>
-            <v-card-text class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto">
-                <v-row>
-                    <v-col cols="12" class="px-0">
-                        <v-list class="py-0" density="compact" select-strategy="classic"
-                                :disabled="submitting" v-model:selected="selectedNames">
-                            <v-list-item class="mx-1 px-2 py-0"
-                                         :key="item.value" :value="item.name" :title="item.name"
-                                         v-for="item in invalidItems">
-                                <template #prepend="{ isActive }">
-                                    <v-list-item-action start>
-                                        <v-checkbox-btn :model-value="isActive"
-                                                        @update:model-value="updateSelectedNames(item.name, $event)"></v-checkbox-btn>
-                                    </v-list-item-action>
-                                </template>
-                            </v-list-item>
+        <one-column-dialog-layout content-class="pa-0"
+                                  :title="tt(title)" :cancel-button-title="tt('Cancel')"
+                                  :disabled="submitting"
+                                  @cancel="cancel">
+            <template #toolbar>
+                <v-btn class="ms-2" density="comfortable" variant="outlined"
+                       :disabled="submitting || !selectedNames || !selectedNames.length" @click="confirm">
+                    {{ tt('OK') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
+                </v-btn>
+
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :disabled="submitting || !invalidItems || !invalidItems.length" :icon="true">
+                    <v-icon :icon="mdiDotsVertical" />
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All')"
+                                         :disabled="!invalidItems || !invalidItems.length"
+                                         @click="selectAllItems"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelect"
+                                         :title="tt('Select None')"
+                                         :disabled="!invalidItems || !invalidItems.length"
+                                         @click="selectNoneItems"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectInverse"
+                                         :title="tt('Invert Selection')"
+                                         :disabled="!invalidItems || !invalidItems.length"
+                                         @click="selectInvertItems"></v-list-item>
                         </v-list>
-                    </v-col>
-                </v-row>
-            </v-card-text>
-            <v-card-text>
-                <div class="w-100 d-flex justify-center flex-wrap mt-sm-1 mt-md-2 gap-4">
-                    <v-btn :disabled="submitting || !selectedNames || !selectedNames.length" @click="confirm">
-                        {{ tt('OK') }}
-                        <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
-                    </v-btn>
-                    <v-btn color="secondary" variant="tonal" :disabled="submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
-                </div>
-            </v-card-text>
-        </v-card>
+                    </v-menu>
+                </v-btn>
+            </template>
+
+            <template #content>
+                <v-list class="mx-2" density="comfortable" select-strategy="classic"
+                        :disabled="submitting" v-model:selected="selectedNames">
+                    <v-list-item class="mx-1 px-2 py-0"
+                                 :key="item.value" :value="item.name" :title="item.name"
+                                 v-for="item in invalidItems">
+                        <template #prepend="{ isActive }">
+                            <v-list-item-action start>
+                                <v-checkbox-btn :model-value="isActive"
+                                                @update:model-value="updateSelectedNames(item.name, $event)"></v-checkbox-btn>
+                            </v-list-item-action>
+                        </template>
+                    </v-list-item>
+                </v-list>
+            </template>
+        </one-column-dialog-layout>
     </v-dialog>
 
     <snack-bar ref="snackbar" />
@@ -67,7 +57,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -107,14 +97,28 @@ const transactionTagsStore = useTransactionTagsStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
+let resolveFunc: ((response: BatchCreateDialogResponse) => void) | null = null;
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
 const showState = ref<boolean>(false);
 const submitting = ref<boolean>(false);
 const type = ref<BatchCreateDialogDataType | ''>('');
 const invalidItems = ref<NameValue[] | undefined>([]);
 const selectedNames = ref<string[]>([]);
 
-let resolveFunc: ((response: BatchCreateDialogResponse) => void) | null = null;
-let rejectFunc: ((reason?: unknown) => void) | null = null;
+const title = computed<string>(() => {
+    if (type.value === 'expenseCategory') {
+        return tt('Create Nonexistent Expense Categories');
+    } else if (type.value === 'incomeCategory') {
+        return tt('Create Nonexistent Income Categories');
+    } else if (type.value === 'transferCategory') {
+        return tt('Create Nonexistent Transfer Categories');
+    } else if (type.value === 'tag') {
+        return tt('Create Nonexistent Transaction Tags');
+    }
+
+    return '';
+});
 
 function updateSelectedNames(value: string, selected: boolean | null): void {
     const newSelectedNames: string[] = [];

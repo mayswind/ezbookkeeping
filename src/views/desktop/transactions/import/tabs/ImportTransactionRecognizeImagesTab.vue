@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mx-3 mt-3">
         <div class="text-center">{{ progressText }}</div>
 
         <v-progress-linear class="my-4" rounded color="primary" height="20"

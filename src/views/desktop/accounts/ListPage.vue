@@ -299,10 +299,9 @@
         </v-col>
     </v-row>
 
-    <v-dialog width="800" v-model="showAccountsIncludedInTotalDialog">
-        <account-filter-settings-card type="accountListTotalAmount" :dialog-mode="true"
-                                      @settings:change="showAccountsIncludedInTotalDialog = false" />
-    </v-dialog>
+    <account-filter-settings-dialog type="accountListTotalAmount"
+                                    v-model:show="showAccountsIncludedInTotalDialog"
+                                    @settings:change="showAccountsIncludedInTotalDialog = false" />
 
     <edit-dialog ref="editDialog" />
     <reconciliation-statement-dialog ref="reconciliationStatementDialog"
@@ -326,7 +325,7 @@ import EditDialog from './list/dialogs/EditDialog.vue';
 import ReconciliationStatementDialog from './list/dialogs/ReconciliationStatementDialog.vue';
 import MoveAllTransactionsDialog from '@/views/desktop/accounts/list/dialogs/MoveAllTransactionsDialog.vue';
 import ClearAllTransactionsDialog from '@/views/desktop/accounts/list/dialogs/ClearAllTransactionsDialog.vue';
-import AccountFilterSettingsCard from '@/views/desktop/common/cards/AccountFilterSettingsCard.vue';
+import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useDisplay } from 'vuetify';

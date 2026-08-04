@@ -1,4 +1,4 @@
-import { reversed, keys, values } from '@/core/base.ts';
+import { reversed, keys, keysIfValueEquals, values } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -233,6 +233,44 @@ export function getFinalCategoryIdsByFilteredCategoryIds(allTransactionCategorie
     }
 
     return finalCategoryIds;
+}
+
+export function getIncludedTransactionCategoriesDisplayContent(excludeTransactionCategoryIds: Record<string, boolean>, allTransactionCategoriesMap: Record<string, TransactionCategory>): string {
+    if (!allTransactionCategoriesMap) {
+        return '';
+    }
+
+    let hasExcludeTransactionCategory = false;
+
+    for (const transactionCategoryId of keysIfValueEquals(excludeTransactionCategoryIds, true)) {
+        if (allTransactionCategoriesMap[transactionCategoryId]) {
+            hasExcludeTransactionCategory = true;
+            break;
+        }
+    }
+
+    if (!hasExcludeTransactionCategory) {
+        return 'All';
+    }
+
+    let allTransactionCategoryExcluded = true;
+
+    for (const transactionCategory of values(allTransactionCategoriesMap)) {
+        if (transactionCategory.type !== CategoryType.Income && transactionCategory.type !== CategoryType.Expense) {
+            continue;
+        }
+
+        if (!excludeTransactionCategoryIds[transactionCategory.id]) {
+            allTransactionCategoryExcluded = false;
+            break;
+        }
+    }
+
+    if (allTransactionCategoryExcluded) {
+        return 'None';
+    }
+
+    return 'Partial';
 }
 
 export function isSubCategoryIdAvailable(categories: TransactionCategory[], categoryId: string): boolean {

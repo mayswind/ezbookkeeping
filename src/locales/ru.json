@@ -138,7 +138,7 @@
             "everyMultiDaysOfMonth": "Каждое {days} число месяца",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "youHaveAccounts": "Добавлено счетов: {count}",
+            "youHaveAccounts": "У вас добавлено {count} счетов",
             "addNewTag": "Добавить новый тег \"{tag}\"",
             "clickToSelectedFile": "Нажмите, чтобы выбрать файл для импорта ({extensions})",
             "previewCount": "Количество предварительных просмотров: {count}",

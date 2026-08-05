@@ -458,6 +458,7 @@ const reconciliationStatementPageDefaultDateRangeTypeInMobile = computed<number>
 
 function init(): void {
     loadingAccounts.value = true;
+    loadingTransactionCategories.value = true;
 
     accountsStore.loadAllAccounts({
         force: false

@@ -52,6 +52,8 @@ func initializeLargeLanguageModelProvider(llmConfig *settings.LLMConfig, enableR
 		return openai.NewOpenAILargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.OpenAICompatibleLLMProvider {
 		return openai.NewOpenAICompatibleLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
+	} else if llmConfig.LLMProvider == settings.OpenAIResponsesCompatibleLLMProvider {
+		return openai.NewOpenAIResponsesCompatibleLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.AnthropicLLMProvider {
 		return anthropic.NewAnthropicLargeLanguageModelProvider(llmConfig, enableResponseLog), nil
 	} else if llmConfig.LLMProvider == settings.AnthropicCompatibleLLMProvider {

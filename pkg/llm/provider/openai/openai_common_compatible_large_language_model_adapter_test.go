@@ -2,6 +2,7 @@ package openai
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,8 +14,8 @@ import (
 
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_buildJsonRequestBody_TextualUserPrompt(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{
-			OpenAIModelID: "test",
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{
+			OpenAICompatibleModelID: "test",
 		},
 	}
 
@@ -35,8 +36,8 @@ func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_buildJsonReques
 
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{
-			OpenAIModelID: "test",
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{
+			OpenAICompatibleModelID: "test",
 		},
 	}
 
@@ -59,8 +60,8 @@ func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_buildJsonReques
 
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_buildJsonRequestBody_ThinkingHighReasoningEffort(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{
-			OpenAIModelID: "test",
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{
+			OpenAICompatibleModelID: "test",
 		},
 		ThinkingLevel: settings.LLMThinkingHigh,
 	}
@@ -75,9 +76,38 @@ func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_buildJsonReques
 	assert.Equal(t, "{\"model\":\"test\",\"stream\":false,\"messages\":[{\"role\":\"user\",\"content\":\"Hello, how are you?\"}],\"reasoning\":{\"effort\":\"high\"},\"response_format\":{\"type\":\"json_object\"}}", string(bodyBytes))
 }
 
+func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_buildJsonRequestBody_JsonSchema(t *testing.T) {
+	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{
+			OpenAICompatibleModelID: "test",
+		},
+		ThinkingLevel: settings.LLMThinkingHigh,
+	}
+
+	request := &data.LargeLanguageModelRequest{
+		UserPrompt:             []byte("Hello"),
+		ResponseJsonObjectType: reflect.TypeOf(openAIResponsesTestResponse{}),
+	}
+
+	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
+	assert.Nil(t, err)
+
+	var body map[string]any
+	err = json.Unmarshal(bodyBytes, &body)
+	assert.Nil(t, err)
+
+	responseFormat := body["response_format"].(map[string]any)
+	responseType := responseFormat["type"]
+	jsonScheme := responseFormat["json_schema"].(map[string]any)
+	assert.Equal(t, "json_schema", responseType)
+	assert.Equal(t, "response", jsonScheme["name"])
+	assert.Equal(t, true, jsonScheme["strict"])
+	assert.NotNil(t, jsonScheme["schema"])
+}
+
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualResponse_ValidJsonResponse(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{},
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{},
 	}
 
 	response := `{
@@ -109,7 +139,7 @@ func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualRes
 
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualResponse_EmptyResponse(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{},
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{},
 	}
 
 	response := `{
@@ -134,7 +164,7 @@ func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualRes
 
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualResponse_EmptyChoices(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{},
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{},
 	}
 
 	response := `{
@@ -149,7 +179,7 @@ func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualRes
 
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualResponse_NoChoiceContent(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{},
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{},
 	}
 
 	response := `{
@@ -172,7 +202,7 @@ func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualRes
 
 func TestCommonOpenAIChatCompletionsAPILargeLanguageModelAdapter_ParseTextualResponse_InvalidJson(t *testing.T) {
 	adapter := &CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter{
-		apiProvider: &OpenAIOfficialChatCompletionsAPIProvider{},
+		apiProvider: &OpenAICompatibleChatCompletionsAPIProvider{},
 	}
 
 	response := "error"

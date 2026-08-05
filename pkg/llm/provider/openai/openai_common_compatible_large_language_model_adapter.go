@@ -33,15 +33,6 @@ type CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter struct {
 	ThinkingLevel settings.LLMThinkingLevel
 }
 
-// OpenAIMessageRole defines the role of OpenAI chat completions message
-type OpenAIMessageRole string
-
-// OpenAI Message Roles
-const (
-	OpenAIMessageRoleSystem OpenAIMessageRole = "system"
-	OpenAIMessageRoleUser   OpenAIMessageRole = "user"
-)
-
 // OpenAIChatCompletionsRequestResponseFormatType defines the type of OpenAI chat completions request response format
 type OpenAIChatCompletionsRequestResponseFormatType string
 
@@ -79,8 +70,14 @@ type OpenAIChatCompletionsRequestImageContent struct {
 
 // OpenAIChatCompletionsRequestResponseFormat defines the structure of OpenAI chat completions request response format
 type OpenAIChatCompletionsRequestResponseFormat struct {
-	Type       OpenAIChatCompletionsRequestResponseFormatType `json:"type"`
-	JsonSchema *jsonschema.Schema                             `json:"json_schema,omitempty"`
+	Type       OpenAIChatCompletionsRequestResponseFormatType  `json:"type"`
+	JsonSchema *OpenAIChatCompletionsRequestResponseJsonSchema `json:"json_schema,omitempty"`
+}
+
+type OpenAIChatCompletionsRequestResponseJsonSchema struct {
+	Name   string             `json:"name"`
+	Strict bool               `json:"strict"`
+	Schema *jsonschema.Schema `json:"schema"`
 }
 
 // OpenAIChatCompletionsRequestImageUrl defines the structure of OpenAI image url
@@ -215,8 +212,12 @@ func (p *CommonOpenAIChatCompletionsAPILargeLanguageModelAdapter) buildJsonReque
 			schema.Version = ""
 
 			chatCompletionsRequest.ResponseFormat = &OpenAIChatCompletionsRequestResponseFormat{
-				Type:       OpenAIChatCompletionsRequestResponseFormatTypeJsonSchema,
-				JsonSchema: schema,
+				Type: OpenAIChatCompletionsRequestResponseFormatTypeJsonSchema,
+				JsonSchema: &OpenAIChatCompletionsRequestResponseJsonSchema{
+					Name:   "response",
+					Strict: true,
+					Schema: schema,
+				},
 			}
 		} else {
 			chatCompletionsRequest.ResponseFormat = &OpenAIChatCompletionsRequestResponseFormat{

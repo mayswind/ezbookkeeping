@@ -70,14 +70,15 @@ const (
 )
 
 const (
-	OpenAILLMProvider              string = "openai"
-	OpenAICompatibleLLMProvider    string = "openai_compatible"
-	AnthropicLLMProvider           string = "anthropic"
-	AnthropicCompatibleLLMProvider string = "anthropic_compatible"
-	OpenRouterLLMProvider          string = "openrouter"
-	OllamaLLMProvider              string = "ollama"
-	LMStudioLLMProvider            string = "lm_studio"
-	GoogleAILLMProvider            string = "google_ai"
+	OpenAILLMProvider                    string = "openai"
+	OpenAICompatibleLLMProvider          string = "openai_compatible"
+	OpenAIResponsesCompatibleLLMProvider string = "openai_responses_compatible"
+	AnthropicLLMProvider                 string = "anthropic"
+	AnthropicCompatibleLLMProvider       string = "anthropic_compatible"
+	OpenRouterLLMProvider                string = "openrouter"
+	OllamaLLMProvider                    string = "ollama"
+	LMStudioLLMProvider                  string = "lm_studio"
+	GoogleAILLMProvider                  string = "google_ai"
 )
 
 // LLMThinkingLevel represents the thinking level of a large language model
@@ -894,6 +895,8 @@ func loadLLMConfiguration(configFile *ini.File, sectionName string) (*LLMConfig,
 		llmConfig.LLMProvider = OpenAILLMProvider
 	} else if llmProvider == OpenAICompatibleLLMProvider {
 		llmConfig.LLMProvider = OpenAICompatibleLLMProvider
+	} else if llmProvider == OpenAIResponsesCompatibleLLMProvider {
+		llmConfig.LLMProvider = OpenAIResponsesCompatibleLLMProvider
 	} else if llmProvider == AnthropicLLMProvider {
 		llmConfig.LLMProvider = AnthropicLLMProvider
 	} else if llmProvider == AnthropicCompatibleLLMProvider {

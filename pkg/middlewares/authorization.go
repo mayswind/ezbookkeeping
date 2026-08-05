@@ -21,19 +21,19 @@ const (
 	TOKEN_SOURCE_TYPE_COOKIE   TokenSourceType = 3
 )
 
-// JWTAuthorization verifies whether current request is valid by jwt token in header
-func JWTAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
-	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_HEADER)
+// JWTAuthorizationByHeader verifies whether current request is valid by jwt token in header
+func JWTAuthorizationByHeader(config *settings.Config) core.MiddlewareHandlerFunc {
+	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_HEADER, true)
 }
 
 // JWTAuthorizationByQueryString verifies whether current request is valid by jwt token in query string
 func JWTAuthorizationByQueryString(config *settings.Config) core.MiddlewareHandlerFunc {
-	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_ARGUMENT)
+	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_ARGUMENT, false)
 }
 
 // JWTAuthorizationByCookie verifies whether current request is valid by jwt token in cookie
 func JWTAuthorizationByCookie(config *settings.Config) core.MiddlewareHandlerFunc {
-	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_COOKIE)
+	return jwtAuthorization(config, TOKEN_SOURCE_TYPE_COOKIE, false)
 }
 
 // JWTTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
@@ -146,7 +146,7 @@ func JWTOAuth2CallbackAuthorization(config *settings.Config) core.MiddlewareHand
 	}
 }
 
-func jwtAuthorization(config *settings.Config, source TokenSourceType) core.MiddlewareHandlerFunc {
+func jwtAuthorization(config *settings.Config, source TokenSourceType, allowedAPIToken bool) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
 		claims, tokenContext, err := getTokenClaims(c, source)
 
@@ -163,6 +163,12 @@ func jwtAuthorization(config *settings.Config, source TokenSourceType) core.Midd
 
 		if claims.Type != core.USER_TOKEN_TYPE_NORMAL && claims.Type != core.USER_TOKEN_TYPE_API {
 			log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is invalid", claims.Uid, claims.Type)
+			utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
+			return
+		}
+
+		if claims.Type == core.USER_TOKEN_TYPE_API && !allowedAPIToken {
+			log.Warnf(c, "[authorization.jwtAuthorization] user \"uid:%d\" token type (%d) is not allowed", claims.Uid, claims.Type)
 			utils.PrintJsonErrorResult(c, errs.ErrCurrentInvalidTokenType)
 			return
 		}

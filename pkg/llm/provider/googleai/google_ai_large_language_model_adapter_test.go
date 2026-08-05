@@ -24,7 +24,7 @@ func TestGoogleAILargeLanguageModelAdapter_buildJsonRequestBody_TextualUserPromp
 	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
-	var body map[string]interface{}
+	var body map[string]any
 	err = json.Unmarshal(bodyBytes, &body)
 	assert.Nil(t, err)
 
@@ -46,7 +46,7 @@ func TestGoogleAILargeLanguageModelAdapter_buildJsonRequestBody_ImageUserPrompt(
 	bodyBytes, err := adapter.buildJsonRequestBody(core.NewNullContext(), 0, request, data.LARGE_LANGUAGE_MODEL_RESPONSE_FORMAT_JSON)
 	assert.Nil(t, err)
 
-	var body map[string]interface{}
+	var body map[string]any
 	err = json.Unmarshal(bodyBytes, &body)
 	assert.Nil(t, err)
 

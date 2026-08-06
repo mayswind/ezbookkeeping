@@ -21,6 +21,17 @@ const nationalBankOfUkraineBaseCurrency = "UAH"
 
 const nationalBankOfUkraineUpdateDateFormat = "02.01.2006"
 
+// nationalBankOfUkraineGramsInTroyOunce is used to convert bank metal rates, which National Bank of Ukraine quotes per troy ounce, to rates per gram
+const nationalBankOfUkraineGramsInTroyOunce = 31.1034768
+
+// nationalBankOfUkraineBankMetals represents the bank metal codes quoted per troy ounce by National Bank of Ukraine
+var nationalBankOfUkraineBankMetals = map[string]bool{
+	"XAU": true, // Gold
+	"XAG": true, // Silver
+	"XPT": true, // Platinum
+	"XPD": true, // Palladium
+}
+
 // NationalBankOfUkraineDataSource defines the structure of exchange rates data source of National Bank of Ukraine
 type NationalBankOfUkraineDataSource struct {
 	HttpExchangeRatesDataSource
@@ -91,6 +102,10 @@ func (e *NaionalBankOfUkraineExchangeRate) ToLatestExchangeRate(c core.Context) 
 	}
 
 	finalRate := e.Quantity / e.Rate
+
+	if nationalBankOfUkraineBankMetals[e.Currency] {
+		finalRate = finalRate * nationalBankOfUkraineGramsInTroyOunce
+	}
 
 	if math.IsInf(finalRate, 0) {
 		return nil

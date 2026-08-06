@@ -637,9 +637,12 @@
             "VUV": "Vanuatu Vatu",
             "WST": "Samoan Tala",
             "XAF": "Central African CFA Franc",
+            "XAG": "Silver (Gram)",
+            "XAU": "Gold (Gram)",
             "XCD": "East Caribbean Dollar",
             "XOF": "West African CFA Franc",
             "XPF": "CFP Franc",
+            "XPT": "Platinum (Gram)",
             "XSU": "Ecuadorian Sucre",
             "YER": "Yemeni Rial",
             "ZAR": "South African Rand",
@@ -743,6 +746,10 @@
             "Gourde": {
                 "normal": "Gourde",
                 "plural": "Gourdes"
+            },
+            "Gram": {
+                "normal": "Gram",
+                "plural": "Grams"
             },
             "Guarani": {
                 "normal": "Guaraní",

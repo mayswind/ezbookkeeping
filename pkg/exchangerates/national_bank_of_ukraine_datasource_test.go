@@ -62,6 +62,60 @@ func TestNationalBankOfUkraineDataSource_StandardDataExtractExchangeRates(t *tes
 	})
 }
 
+func TestNationalBankOfUkraineDataSource_BankMetalsRatesConvertedToGrams(t *testing.T) {
+	dataSource := &NationalBankOfUkraineDataSource{}
+	context := core.NewNullContext()
+
+	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte("[\n"+
+		"    {\n"+
+		"        \"StartDate\": \"06.08.2026\",\n"+
+		"        \"TimeSign\": \"0000\",\n"+
+		"        \"CurrencyCode\": \"959\",\n"+
+		"        \"CurrencyCodeL\": \"XAU\",\n"+
+		"        \"Units\": 1,\n"+
+		"        \"Amount\": 187260.18\n"+
+		"    },\n"+
+		"    {\n"+
+		"        \"StartDate\": \"06.08.2026\",\n"+
+		"        \"TimeSign\": \"0000\",\n"+
+		"        \"CurrencyCode\": \"961\",\n"+
+		"        \"CurrencyCodeL\": \"XAG\",\n"+
+		"        \"Units\": 1,\n"+
+		"        \"Amount\": 2769.6\n"+
+		"    },\n"+
+		"    {\n"+
+		"        \"StartDate\": \"06.08.2026\",\n"+
+		"        \"TimeSign\": \"0000\",\n"+
+		"        \"CurrencyCode\": \"962\",\n"+
+		"        \"CurrencyCodeL\": \"XPT\",\n"+
+		"        \"Units\": 1,\n"+
+		"        \"Amount\": 78833.17\n"+
+		"    },\n"+
+		"    {\n"+
+		"        \"StartDate\": \"06.08.2026\",\n"+
+		"        \"TimeSign\": \"0000\",\n"+
+		"        \"CurrencyCode\": \"964\",\n"+
+		"        \"CurrencyCodeL\": \"XPD\",\n"+
+		"        \"Units\": 1,\n"+
+		"        \"Amount\": 61848.48\n"+
+		"    }\n"+
+		"]"))
+	assert.Equal(t, nil, err)
+	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
+		Currency: "XAU",
+		Rate:     "0.00016609765514483644",
+	})
+	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
+		Currency: "XAG",
+		Rate:     "0.0112303136915078",
+	})
+	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
+		Currency: "XPT",
+		Rate:     "0.0003945480918755392",
+	})
+	assert.Len(t, actualLatestExchangeRateResponse.ExchangeRates, 3)
+}
+
 func TestNationalBankOfUkraineDataSource_BlankContent(t *testing.T) {
 	dataSource := &NationalBankOfUkraineDataSource{}
 	context := core.NewNullContext()

@@ -160,9 +160,12 @@ var AllCurrencyNames = map[string]bool{
 	"VUV": true, //Vatu
 	"WST": true, //Tala
 	"XAF": true, //CFA Franc BEAC
+	"XAG": true, //Silver (gram)
+	"XAU": true, //Gold (gram)
 	"XCD": true, //East Caribbean Dollar
 	"XOF": true, //CFA Franc BCEAO
 	"XPF": true, //CFP Franc
+	"XPT": true, //Platinum (gram)
 	"XSU": true, //Sucre
 	"YER": true, //Yemeni Rial
 	"ZAR": true, //Rand

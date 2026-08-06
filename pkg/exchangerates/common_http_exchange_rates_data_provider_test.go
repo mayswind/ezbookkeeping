@@ -238,7 +238,7 @@ func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfRomaniaDataSour
 
 	supportedCurrencyCodes := []string{"AED", "AUD", "BRL", "CAD", "CHF", "CNY", "CZK", "DKK", "EGP",
 		"EUR", "GBP", "HKD", "HUF", "IDR", "ILS", "INR", "ISK", "JPY", "KRW", "MDL", "MXN", "MYR",
-		"NOK", "NZD", "PHP", "PLN", "RSD", "RUB", "SEK", "SGD", "THB", "TRY", "UAH", "USD", "ZAR"}
+		"NOK", "NZD", "PHP", "PLN", "RSD", "RUB", "SEK", "SGD", "THB", "TRY", "UAH", "USD", "XAU", "ZAR"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }
@@ -288,7 +288,8 @@ func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfUkraineDataSour
 		"AED", "AUD", "AZN", "BDT", "CAD", "CHF", "CNY", "CZK", "DKK",
 		"DZD", "EGP", "EUR", "GBP", "GEL", "HKD", "HUF", "IDR", "ILS", "INR",
 		"JPY", "KRW", "KZT", "LBP", "MDL", "MXN", "MYR", "NOK", "NZD", "PLN",
-		"RON", "RSD", "SAR", "SEK", "SGD", "THB", "TND", "TRY", "USD", "VND", "ZAR"}
+		"RON", "RSD", "SAR", "SEK", "SGD", "THB", "TND", "TRY", "USD", "VND",
+		"XAG", "XAU", "XPT", "ZAR"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }

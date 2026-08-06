@@ -1209,6 +1209,22 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
         },
         unit: 'Franc'
     },
+    'XAG': { // Silver (gram)
+        code: 'XAG',
+        fraction: 2,
+        symbol: {
+            normal: 'Ag'
+        },
+        unit: 'Gram'
+    },
+    'XAU': { // Gold (gram)
+        code: 'XAU',
+        fraction: 2,
+        symbol: {
+            normal: 'Au'
+        },
+        unit: 'Gram'
+    },
     'XCD': { // East Caribbean Dollar
         code: 'XCD',
         fraction: 2,
@@ -1232,6 +1248,14 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
             normal: 'F'
         },
         unit: 'Franc'
+    },
+    'XPT': { // Platinum (gram)
+        code: 'XPT',
+        fraction: 2,
+        symbol: {
+            normal: 'Pt'
+        },
+        unit: 'Gram'
     },
     'XSU': { // Sucre
         code: 'XSU',

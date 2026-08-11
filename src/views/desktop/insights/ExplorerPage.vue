@@ -2,15 +2,15 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <v-layout>
-                    <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-6 my-4">
+                <v-layout class="page-with-navigation-drawer">
+                    <v-navigation-drawer class="scrollable-tabs-navigation-drawer" :permanent="alwaysShowNav" v-model="showNav">
+                        <div class="mx-4 my-3">
                             <btn-vertical-group :disabled="loading || updating || isCurrentDataTableEditable" :buttons="allTabs" v-model="activeTab" />
                         </div>
                         <v-divider />
                         <v-tabs show-arrows
                                 class="scrollable-vertical-tabs"
-                                style="max-height: calc(100% - 150px)"
+                                style="max-height: calc(100% - 136px)"
                                 direction="vertical"
                                 :prev-icon="mdiMenuUp" :next-icon="mdiMenuDown"
                                 :key="currentExploration.id" :disabled="loading || updating || isCurrentDataTableEditable"
@@ -34,7 +34,7 @@
                         <v-card variant="flat" min-height="800">
                             <template #title>
                                 <div class="title-and-toolbar d-flex align-center">
-                                    <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
+                                    <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
                                            :ripple="false" :icon="true" @click="showNav = !showNav">
                                         <v-icon :icon="mdiMenu" size="24" />
                                     </v-btn>
@@ -103,7 +103,8 @@
                                         <v-icon :icon="mdiDotsVertical" />
                                         <v-menu activator="parent">
                                             <v-list>
-                                                <v-list-subheader :title="tt('Timezone Used for Date Range')"
+                                                <v-list-subheader class="text-body-small"
+                                                                  :title="tt('Timezone Used for Date Range')"
                                                                   v-if="activeTab === 'query'"/>
                                                 <template v-if="activeTab === 'query'">
                                                     <v-list-item :key="timezoneType.type" :value="timezoneType.type"
@@ -305,7 +306,7 @@ type QueryExportDialogType = InstanceType<typeof QueryExportDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 const router = useRouter();
-const display = useDisplay();
+const { lgAndUp } = useDisplay();
 
 const {
     tt,
@@ -343,8 +344,8 @@ const updating = ref<boolean>(false);
 const clientSessionId = ref<string>('');
 const initExploration = ref<InsightsExplorer | null>(null);
 const isCurrentDataTableEditable = ref<boolean>(false);
-const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
-const showNav = ref<boolean>(display.mdAndUp.value);
+const alwaysShowNav = ref<boolean>(lgAndUp.value);
+const showNav = ref<boolean>(lgAndUp.value);
 const activeTab = ref<ExplorerPageTabType>('query');
 const showCustomDateRangeDialog = ref<boolean>(false);
 
@@ -826,7 +827,7 @@ onBeforeRouteUpdate((to) => {
     }
 });
 
-watch(() => display.mdAndUp.value, (newValue) => {
+watch(lgAndUp, (newValue) => {
     alwaysShowNav.value = newValue;
 
     if (!showNav.value) {

@@ -2,21 +2,21 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <v-layout>
-                    <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-6 my-4">
-                            <span class="text-subtitle-2">{{ tt('Total tags') }}</span>
-                            <p class="transaction-tags-statistic-item-value mt-1">
+                <v-layout class="page-with-navigation-drawer">
+                    <v-navigation-drawer class="scrollable-tabs-navigation-drawer" :permanent="alwaysShowNav" v-model="showNav">
+                        <div class="mx-4 my-3">
+                            <span class="text-body-medium">{{ tt('Total tags') }}</span>
+                            <div class="text-body-large mt-1">
                                 <span v-if="!loading || totalAvailableTagsCount > 0">{{ displayTotalAvailableTagsCount }}</span>
                                 <span v-else-if="loading && totalAvailableTagsCount <= 0">
                                     <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
-                            </p>
+                            </div>
                         </div>
                         <v-divider />
                         <v-tabs show-arrows
                                 class="scrollable-vertical-tabs"
-                                style="max-height: calc(100% - 88px)"
+                                style="max-height: calc(100% - 82px)"
                                 direction="vertical"
                                 :prev-icon="mdiMenuUp" :next-icon="mdiMenuDown"
                                 :disabled="loading || updating" v-model="activeTagGroupId">
@@ -38,7 +38,7 @@
                                 <v-card variant="flat" min-height="780">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
@@ -105,7 +105,8 @@
                                         </div>
                                     </template>
 
-                                    <v-table class="transaction-tags-table table-striped" :hover="!loading">
+                                    <v-table class="transaction-tags-table table-striped"
+                                             density="default" :hover="!loading">
                                         <thead>
                                         <tr>
                                             <th>
@@ -381,7 +382,7 @@ type RenameDialogType = InstanceType<typeof RenameDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const display = useDisplay();
+const { lgAndUp } = useDisplay();
 
 const { tt, formatNumberToLocalizedNumerals } = useI18n();
 
@@ -412,8 +413,8 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const updating = ref<boolean>(false);
 const activeTab = ref<string>('tagListPage');
-const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
-const showNav = ref<boolean>(display.mdAndUp.value);
+const alwaysShowNav = ref<boolean>(lgAndUp.value);
+const showNav = ref<boolean>(lgAndUp.value);
 const hoveredTagId = ref<string>('');
 const tagUpdating = ref<Record<string, boolean>>({});
 const tagHiding = ref<Record<string, boolean>>({});
@@ -735,7 +736,7 @@ transactionTagsStore.loadAllTags({
     }
 });
 
-watch(() => display.mdAndUp.value, (newValue) => {
+watch(lgAndUp, (newValue) => {
     alwaysShowNav.value = newValue;
 
     if (!showNav.value) {
@@ -745,41 +746,41 @@ watch(() => display.mdAndUp.value, (newValue) => {
 </script>
 
 <style>
-.transaction-tags-statistic-item-value {
-    font-size: 1rem;
-}
+.transaction-tags-table {
+    tr:not(:last-child) > td > div,
+    .has-bottom-border tr:last-child > td > div {
+        padding-bottom: 1px;
+    }
 
-.transaction-tags-table tr:not(:last-child) > td > div {
-    padding-bottom: 1px;
-}
+    tr.transaction-tags-table-row-tag {
+        .right-bottom-icon {
+            .v-badge__badge {
+                padding-bottom: 1px;
+            }
+        }
+    }
 
-.transaction-tags-table .has-bottom-border tr:last-child > td > div {
-    padding-bottom: 1px;
-}
+    .v-text-field {
+        .v-input__prepend {
+            margin-inline-end: 0;
 
-.transaction-tags-table tr.transaction-tags-table-row-tag .right-bottom-icon .v-badge__badge {
-    padding-bottom: 1px;
-}
+            > .v-icon {
+                opacity: 1;
+            }
+        }
 
-.transaction-tags-table .v-text-field .v-input__prepend {
-    margin-inline-end: 0;
-    color: rgba(var(--v-theme-on-surface));
-}
+        &.v-input--plain-underlined .v-input__prepend {
+            padding-top: 4px;
+        }
 
-.transaction-tags-table .v-text-field .v-input__prepend .v-badge > .v-badge__wrapper > .v-icon {
-    opacity: var(--v-medium-emphasis-opacity);
-}
+        .v-field {
+            font-size: 0.875rem;
 
-.transaction-tags-table .v-text-field.v-input--plain-underlined .v-input__prepend {
-    padding-top: 10px;
-}
-
-.transaction-tags-table .v-text-field .v-field__input {
-    padding-top: 0;
-    color: rgba(var(--v-theme-on-surface));
-}
-
-.transaction-tags-table tr .v-text-field .v-field__input {
-    padding-bottom: 1px;
+            .v-field__input {
+                padding-top: 0;
+                letter-spacing: normal;
+            }
+        }
+    }
 }
 </style>

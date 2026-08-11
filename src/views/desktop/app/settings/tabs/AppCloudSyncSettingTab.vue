@@ -7,17 +7,17 @@
                     <v-progress-circular indeterminate size="20" class="ms-3" v-if="loading"></v-progress-circular>
                 </template>
 
-                <v-card-text class="pb-0">
-                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <p class="text-body-1" v-if="!loading && !isEnableCloudSync">
+                <v-card-text class="mt-2">
+                    <v-skeleton-loader class="skeleton-no-margin pt-1 pb-2" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
+                    <span class="text-body-large" v-if="!loading && !isEnableCloudSync">
                         {{ tt('Settings sync is not enabled') }}
-                    </p>
-                    <p class="text-body-1" v-if="!loading && isEnableCloudSync">
+                    </span>
+                    <span class="text-body-large" v-if="!loading && isEnableCloudSync">
                         {{ tt('Settings sync has been enabled') }}
-                    </p>
+                    </span>
                 </v-card-text>
 
-                <v-card-text>
+                <v-card-text class="pt-0">
                     <v-expansion-panels class="synchronized-settings" multiple
                                         :readonly="true" :hide-actions="true"
                                         :disabled="loading || enabling || disabling"
@@ -63,7 +63,7 @@
                                                             :indeterminate="hasSettingSelectedButNotAllChecked(categorizedItems)"
                                                             @update:model-value="updateSettingsSelected(categorizedItems, !!$event)">
                                                     <template #label>
-                                                        <span>{{ tt(categorizedItems.categoryName) }}</span>
+                                                        <span class="ms-1">{{ tt(categorizedItems.categoryName) }}</span>
                                                         <span class="mx-2" v-if="categorizedItems.categorySubName">/</span>
                                                         <span v-if="categorizedItems.categorySubName">{{ tt(categorizedItems.categorySubName) }}</span>
                                                     </template>
@@ -84,7 +84,7 @@
                                                                     :model-value="enabledApplicationCloudSettings[settingItem.settingKey]"
                                                                     @update:model-value="updateSettingSelected(settingItem, !!$event)">
                                                             <template #label>
-                                                                <span>{{ tt(settingItem.settingName) }}</span>
+                                                                <span class="ms-1">{{ tt(settingItem.settingName) }}</span>
                                                                 <v-icon class="ms-2 me-0" start size="16" :icon="mdiCellphone" v-if="settingItem.mobile"/>
                                                                 <v-icon class="ms-2 me-0" start size="16" :icon="mdiMonitor" v-if="settingItem.desktop"/>
                                                             </template>
@@ -99,6 +99,8 @@
                         </v-expansion-panel>
                     </v-expansion-panels>
                 </v-card-text>
+
+                <v-divider/>
 
                 <v-card-text>
                     <v-row>

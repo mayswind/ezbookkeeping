@@ -1,20 +1,16 @@
 <template>
-    <div class="layout-wrapper layout-nav-type-vertical layout-navbar-static layout-footer-static layout-content-width-fluid"
-         :class="{ 'layout-overlay-nav': mdAndDown }">
-        <div class="layout-vertical-nav" :class="{'visible': showVerticalOverlayMenu, 'scrolled': isVerticalNavScrolled, 'overlay-nav': mdAndDown}">
+    <div class="layout-wrapper layout-nav-type-vertical"
+         :class="{ 'layout-overlay-nav': lgAndDown }">
+        <div class="layout-vertical-nav" :class="{'visible': showVerticalOverlayMenu, 'overlay-nav': lgAndDown}">
             <div class="nav-header">
-                <router-link to="/" class="app-logo d-flex align-center gap-x-3 app-title-wrapper">
+                <router-link to="/" class="app-logo d-flex align-center gap-x-3">
                     <div class="d-flex">
                         <img alt="logo" class="main-logo" :src="APPLICATION_LOGO_PATH" />
                     </div>
-                    <h1 class="font-weight-medium text-xl">{{ tt('global.app.title') }}</h1>
+                    <h1 class="app-title">{{ tt('global.app.title') }}</h1>
                 </router-link>
             </div>
-            <perfect-scrollbar
-                tag="ul" class="nav-items"
-                :options="{ wheelPropagation: false }"
-                @ps-scroll-y="handleNavScroll"
-            >
+            <ul class="nav-items">
                 <li class="nav-link home-link">
                     <router-link to="/">
                         <v-icon class="nav-item-icon" :icon="mdiHomeOutline"/>
@@ -108,33 +104,33 @@
                         <span class="nav-item-title">{{ tt('About') }}</span>
                     </router-link>
                 </li>
-            </perfect-scrollbar>
+            </ul>
         </div>
 
         <div class="layout-content-wrapper">
             <div class="layout-navbar navbar-blur">
                 <div class="navbar-content-container">
                     <div class="d-flex h-100 align-center">
-                        <v-btn class="ms-n3 me-2 d-lg-none" color="default" variant="text"
+                        <v-btn class="ms-n2 d-lg-none" color="default" variant="text"
                                :icon="true" @click="showVerticalOverlayMenu = true">
                             <v-icon :icon="mdiMenu" size="24" />
                         </v-btn>
-                        <div class="app-logo d-flex align-center gap-x-3 app-title-wrapper" v-if="mdAndDown">
+                        <div class="app-logo d-flex align-center gap-x-3 d-lg-none">
                             <div class="d-flex">
                                 <img alt="logo" class="main-logo" :src="APPLICATION_LOGO_PATH" />
                             </div>
-                            <h1 class="font-weight-medium text-xl">{{ tt('global.app.title') }}</h1>
+                            <h1 class="app-title">{{ tt('global.app.title') }}</h1>
                         </div>
                         <v-spacer />
-                        <v-btn color="primary" variant="text" class="me-2"
+                        <v-btn color="primary" variant="text" density="comfortable"
                                :icon="true" @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
                             <v-icon :icon="(currentTheme === 'light' ? mdiWeatherSunny : (currentTheme === 'dark' ? mdiWeatherNight : mdiThemeLightDark))" size="24" />
                         </v-btn>
-                        <v-avatar class="cursor-pointer" variant="tonal"
+                        <v-avatar class="cursor-pointer ms-3" variant="tonal"
                                   :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                             <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                 <template #placeholder>
-                                    <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                    <div class="d-flex align-center justify-center bg-light-primary">
                                         <v-icon color="primary" :icon="mdiAccount"/>
                                     </div>
                                 </template>
@@ -149,7 +145,7 @@
                                                           :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                                                     <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                                                         <template #placeholder>
-                                                            <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                                            <div class="d-flex align-center justify-center bg-light-primary">
                                                                 <v-icon color="primary" :icon="mdiAccount"/>
                                                             </div>
                                                         </template>
@@ -158,18 +154,18 @@
                                                 </v-avatar>
                                             </v-list-item-action>
                                         </template>
-                                        <v-list-item-title class="ms-2">
+                                        <v-list-item-title class="ms-1">
                                             {{ currentNickName }}
                                         </v-list-item-title>
                                     </v-list-item>
-                                    <v-divider class="my-2"/>
+                                    <v-divider class="my-1"/>
                                     <v-list-item :prepend-icon="mdiAccountCogOutline"
                                                  :title="tt('User Settings')"
                                                  to="/user/settings"></v-list-item>
                                     <v-list-item :prepend-icon="mdiCogOutline"
                                                  :title="tt('Application Settings')"
                                                  to="/app/settings"></v-list-item>
-                                    <v-divider class="my-2"/>
+                                    <v-divider class="my-1"/>
                                     <v-list-item :prepend-icon="mdiLockOutline"
                                                  :title="tt('Lock Application')"
                                                  v-if="isEnableApplicationLock"
@@ -253,7 +249,7 @@ import {
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const display = useDisplay();
+const { lgAndDown } = useDisplay();
 const theme = useTheme();
 const route = useRoute();
 const router = useRouter();
@@ -268,12 +264,10 @@ const desktopPageStore = useDesktopPageStore();
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const logouting = ref<boolean>(false);
-const isVerticalNavScrolled = ref<boolean>(false);
 const showVerticalOverlayMenu = ref<boolean>(false);
 const showLoading = ref<boolean>(false);
 const showMobileQrCode = ref<boolean>(false);
 
-const mdAndDown = computed<boolean>(() => display.mdAndDown.value);
 const currentRoutePath = computed<string>(() => route.path);
 
 const currentNickName = computed<string>(() => userStore.currentUserNickname || tt('User'));
@@ -298,10 +292,6 @@ const currentTheme = computed<string>({
 
 const showAddTransactionButtonInDesktopNavbar = computed<boolean>(() => settingsStore.appSettings.showAddTransactionButtonInDesktopNavbar);
 const isEnableApplicationLock = computed<boolean>(() => settingsStore.appSettings.applicationLock);
-
-function handleNavScroll(e: Event): void {
-    isVerticalNavScrolled.value = (e.target as HTMLElement).scrollTop > 0;
-}
 
 function clearShareImageCache(): void {
     getShareCacheImageBlob().then(blob => {
@@ -349,13 +339,3 @@ function showAddDialogInTransactionListPage(): void {
 clearShareImageCache();
 </script>
 
-<style>
-.main-logo {
-    width: 1.75rem;
-    height: 1.75rem;
-}
-
-.nav-link.home-link > a:not(.router-link-exact-active):hover::before {
-    opacity: calc(var(--v-hover-opacity)* var(--v-theme-overlay-multiplier));
-}
-</style>

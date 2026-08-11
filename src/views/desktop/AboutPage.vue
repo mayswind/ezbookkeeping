@@ -14,49 +14,49 @@
                     </div>
                 </template>
 
-                <v-card-text>
+                <v-card-text class="mt-2">
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Version') }}</span>
+                            <span class="text-body-large">{{ tt('Version') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <span class="text-body-1">{{ clientVersion }}</span>
+                            <span class="text-body-large">{{ clientVersion }}</span>
                         </v-col>
                     </v-row>
                     <v-row no-gutters v-if="clientBuildTime">
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Build Time') }}</span>
+                            <span class="text-body-large">{{ tt('Build Time') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <span class="text-body-1">{{ clientBuildTime }}</span>
+                            <span class="text-body-large">{{ clientBuildTime }}</span>
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Official Website') }}</span>
+                            <span class="text-body-large">{{ tt('Official Website') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping" target="_blank">
+                            <a class="text-body-large link-no-color" href="https://github.com/mayswind/ezbookkeeping" target="_blank">
                                 https://github.com/mayswind/ezbookkeeping
                             </a>
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Report Issue') }}</span>
+                            <span class="text-body-large">{{ tt('Report Issue') }}</span>
                         </v-col>
                         <v-col cols="12" md="10" class="mb-6">
-                            <a class="text-body-1" href="https://github.com/mayswind/ezbookkeeping/issues" target="_blank">
+                            <a class="text-body-large link-no-color" href="https://github.com/mayswind/ezbookkeeping/issues" target="_blank">
                                 https://github.com/mayswind/ezbookkeeping/issues
                             </a>
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Getting help') }}</span>
+                            <span class="text-body-large">{{ tt('Getting help') }}</span>
                         </v-col>
                         <v-col cols="12" md="10">
-                            <a class="text-body-1" href="https://ezbookkeeping.mayswind.net" target="_blank">
+                            <a class="text-body-large link-no-color" href="https://ezbookkeeping.mayswind.net" target="_blank">
                                 https://ezbookkeeping.mayswind.net
                             </a>
                         </v-col>
@@ -67,15 +67,15 @@
 
         <v-col cols="12" v-if="exchangeRatesData && !isUserCustomExchangeRates">
             <v-card :title="tt('Exchange Rates Data')">
-                <v-card-text>
+                <v-card-text class="mt-2">
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Provider') }}</span>
+                            <span class="text-body-large">{{ tt('Provider') }}</span>
                         </v-col>
                         <v-col cols="12" md="10">
-                            <a class="text-body-1" :href="exchangeRatesData.referenceUrl" target="_blank"
+                            <a class="text-body-large link-no-color" :href="exchangeRatesData.referenceUrl" target="_blank"
                                v-if="exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
-                            <span class="text-body-1" v-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
+                            <span class="text-body-large" v-if="!exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -84,15 +84,15 @@
 
         <v-col cols="12" v-if="mapProviderName">
             <v-card :title="tt('Map')">
-                <v-card-text>
+                <v-card-text class="mt-2">
                     <v-row no-gutters>
                         <v-col cols="12" md="2">
-                            <span class="text-body-1">{{ tt('Provider') }}</span>
+                            <span class="text-body-large">{{ tt('Provider') }}</span>
                         </v-col>
                         <v-col cols="12" md="10">
-                            <a class="text-body-1" :href="mapProviderWebsite" target="_blank"
+                            <a class="text-body-large link-no-color" :href="mapProviderWebsite" target="_blank"
                                v-if="mapProviderWebsite">{{ mapProviderName }}</a>
-                            <span class="text-body-1" v-if="!mapProviderWebsite">{{ mapProviderName }}</span>
+                            <span class="text-body-large" v-if="!mapProviderWebsite">{{ mapProviderName }}</span>
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -101,30 +101,30 @@
 
         <v-col cols="12">
             <v-card :title="tt('License')">
-                <v-card-text>
+                <v-card-text class="text-body-medium">
                     <v-row no-gutters>
                         <v-col cols="12">
-                            <p>
+                            <div class="mt-2">
                                 <span :key="num" v-for="(line, num) in licenseLines"
                                       :style="{ 'display': line ? 'initial' : 'block', 'padding' : line ? '0' : '0 0 1em 0' }">
                                     {{ line }}
                                 </span>
-                            </p>
+                            </div>
                             <v-divider/>
                             <br/>
-                            <p>
-                                <span>ezBookkeeping's codebase and localization translation rely on contributions from the community. The following people have contributed to ezBookkeeping:</span>
-                            </p>
                             <div>
+                                <span>ezBookkeeping's codebase and localization translation rely on contributions from the community. The following people have contributed to ezBookkeeping:</span>
+                            </div>
+                            <div class="mt-4">
                                 <strong>Project Maintainer</strong>
                                 <div class="mt-2">
                                     <a target="_blank" href="https://github.com/mayswind">@mayswind</a>
                                 </div>
                             </div>
-                            <p class="mt-4">
+                            <div class="mt-4">
                                 <strong>Code Contributors</strong>
-                            </p>
-                            <table class="contributors-table">
+                            </div>
+                            <table class="contributors-table mt-2">
                                 <thead>
                                 <tr>
                                     <th>Contributor</th>
@@ -140,10 +140,10 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <p class="mt-4">
+                            <div class="mt-4">
                                 <strong>Translation Contributors</strong>
-                            </p>
-                            <table class="contributors-table">
+                            </div>
+                            <table class="contributors-table mt-2">
                                 <thead>
                                 <tr>
                                     <th>Tag</th>
@@ -168,17 +168,18 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <p class="mt-4 mb-4">
+
+                            <div class="my-4">
                                 <span>ezBookkeeping also contains additional third party software and illustration.</span><br/>
                                 <span>All the third party software / illustration included or linked is redistributed under the terms and conditions of their original licenses.</span>
-                            </p>
-                            <p :key="licenseInfo.name" v-for="licenseInfo in thirdPartyLicenses">
+                            </div>
+                            <div class="py-2" :key="licenseInfo.name" v-for="licenseInfo in thirdPartyLicenses">
                                 <strong>{{ licenseInfo.name }}</strong>
                                 <br v-if="licenseInfo.copyright"/><span v-if="licenseInfo.copyright">{{ licenseInfo.copyright }}</span>
                                 <br v-if="licenseInfo.licenseUrl"/><span v-if="licenseInfo.licenseUrl">{{ licenseInfo.license || 'License' }}: </span>
                                 <a target="_blank" :href="licenseInfo.licenseUrl">{{ licenseInfo.licenseUrl }}</a>
                                 <br v-if="licenseInfo.url"/><a target="_blank" :href="licenseInfo.url" v-if="licenseInfo.url">{{ licenseInfo.url }}</a>
-                            </p>
+                            </div>
                         </v-col>
                     </v-row>
                 </v-card-text>

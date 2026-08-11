@@ -90,7 +90,7 @@ export default defineConfig(() => {
             }),
             vuetify({
                 styles: {
-                    configFile: 'styles/desktop/configured-variables/_vuetify.scss'
+                    configFile: 'styles/desktop/settings.scss'
                 }
             }),
             injectFramework7CssFile({
@@ -176,10 +176,10 @@ export default defineConfig(() => {
         ],
         build: {
             target: [
-                'chrome91',
-                'edge91',
-                'firefox91',
-                'safari15.4'
+                'chrome119',
+                'edge119',
+                'firefox128',
+                'safari16.4'
             ],
             minify: 'terser',
             outDir: BUILD_DIR,

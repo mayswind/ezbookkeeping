@@ -7,7 +7,6 @@
         density="compact"
         item-value="index"
         :class="{ 'import-transaction-table': true, 'disabled': !!disabled }"
-        :height="importTransactionsTableHeight"
         :headers="importTransactionHeaders"
         :items="importTransactions"
         :hover="true"
@@ -283,16 +282,16 @@
                     </template>
 
                     <template #subheader="{ props }">
-                        <v-list-subheader>{{ props['title'] }}</v-list-subheader>
+                        <v-list-subheader class="text-body-small">{{ props['title'] }}</v-list-subheader>
                     </template>
 
-                    <template #item="{ props, item }">
-                        <v-list-item :value="item.value" v-bind="props" v-if="item.raw instanceof TransactionTag && !item.raw.hidden">
+                    <template #item="{ props, internalItem }">
+                        <v-list-item :value="internalItem.value" v-bind="props" v-if="internalItem.raw instanceof TransactionTag && !internalItem.raw.hidden">
                             <template #title>
                                 <v-list-item-title>
                                     <div class="d-flex align-center">
                                         <v-icon size="20" start :icon="mdiPound"/>
-                                        <span>{{ item.title }}</span>
+                                        <span>{{ internalItem.title }}</span>
                                     </div>
                                 </v-list-item-title>
                             </template>
@@ -339,7 +338,7 @@
                           v-model="countPerPage"
                           v-if="importTransactions.length > 10"
                 />
-                <pagination-buttons density="compact"
+                <pagination-buttons density="comfortable"
                                     :disabled="!!disabled"
                                     :totalPageCount="totalPageCount"
                                     v-model="currentPage"
@@ -357,7 +356,7 @@
             </template>
 
             <template #content>
-                <div class="w-100 mt-5 d-flex justify-center">
+                <div class="w-100 mt-1 d-flex justify-center">
                     <div class="me-2 d-flex flex-column justify-center" v-if="currentAmountFilterType">
                         {{ tt(currentAmountFilterType.name) }}
                     </div>
@@ -384,7 +383,7 @@
             </template>
 
             <template #content>
-                <div class="mt-5">
+                <div class="mt-2">
                     <v-text-field
                         type="text"
                         persistent-placeholder
@@ -989,14 +988,6 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
         onClick: () => exportData(KnownFileType.SSV)
     }
 ]);
-
-const importTransactionsTableHeight = computed<number | undefined>(() => {
-    if (countPerPage.value <= 10 || !props.importTransactions || props.importTransactions.length <= 10) {
-        return undefined;
-    } else {
-        return 380;
-    }
-});
 
 const importTransactionHeaders = computed<object[]>(() => {
     return [

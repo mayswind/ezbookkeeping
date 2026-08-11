@@ -3,7 +3,7 @@
         <router-link to="/">
             <div class="auth-logo d-flex align-start gap-x-3">
                 <img alt="logo" class="login-page-logo" :src="APPLICATION_LOGO_PATH" />
-                <h1 class="font-weight-medium leading-normal text-2xl">{{ tt('global.app.title') }}</h1>
+                <span class="auth-app-title">{{ tt('global.app.title') }}</span>
             </div>
         </router-link>
         <v-row no-gutters class="auth-wrapper">
@@ -22,10 +22,10 @@
             <v-col cols="12" md="4" class="auth-card d-flex flex-column">
                 <div class="d-flex align-center justify-center h-100">
                     <v-card variant="flat" class="w-100 mt-0 px-4 pt-12" max-width="500">
-                        <v-card-text>
-                            <h4 class="text-h4 mb-2">{{ tt('Unlock Application') }}</h4>
-                            <p class="mb-0" v-if="isWebAuthnAvailable">{{ tt('Please enter your PIN code or use WebAuthn to unlock application') }}</p>
-                            <p class="mb-0" v-else-if="!isWebAuthnAvailable">{{ tt('Please enter your PIN code to unlock application') }}</p>
+                        <v-card-text class="py-0">
+                            <div class="text-headline-small mb-2">{{ tt('Unlock Application') }}</div>
+                            <div class="auth-message text-body-large mb-0" v-if="isWebAuthnAvailable">{{ tt('Please enter your PIN code or use WebAuthn to unlock application') }}</div>
+                            <div class="auth-message text-body-large mb-0" v-else-if="!isWebAuthnAvailable">{{ tt('Please enter your PIN code to unlock application') }}</div>
                         </v-card-text>
 
                         <v-card-text class="pb-0 mb-6">
@@ -52,7 +52,7 @@
                                         </v-btn>
                                     </v-col>
 
-                                    <v-col cols="12" class="text-center">
+                                    <v-col cols="12" class="text-center text-body-large mt-2">
                                         <span class="me-1">{{ tt('Can\'t Unlock?') }}</span>
                                         <a class="text-primary" href="javascript:void(0);" @click="relogin">
                                             {{ tt('Re-login') }}
@@ -65,22 +65,18 @@
                 </div>
                 <v-spacer/>
                 <div class="d-flex align-center justify-center">
-                    <v-card variant="flat" class="w-100 px-4 pb-4" max-width="500">
+                    <v-card variant="flat" class="w-100 px-4 pb-3" max-width="500">
                         <v-card-text class="pt-0">
-                            <v-row>
-                                <v-col cols="12" class="text-center">
-                                    <language-select-button :disabled="verifyingByWebAuthn" />
-                                </v-col>
+                            <div class="text-center">
+                                <language-select-button :disabled="verifyingByWebAuthn" />
+                            </div>
 
-                                <v-col cols="12" class="d-flex align-center pt-0">
-                                    <v-divider />
-                                </v-col>
+                            <v-divider class="mt-2 mb-3" />
 
-                                <v-col cols="12" class="text-center text-sm">
-                                    <span>Powered by </span>
-                                    <a href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</a>&nbsp;<span>{{ version }}</span>
-                                </v-col>
-                            </v-row>
+                            <div class="auth-powered-by text-center">
+                                <span>Powered by </span>
+                                <a href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</a>&nbsp;<span>{{ version }}</span>
+                            </div>
                         </v-card-text>
                     </v-card>
                 </div>

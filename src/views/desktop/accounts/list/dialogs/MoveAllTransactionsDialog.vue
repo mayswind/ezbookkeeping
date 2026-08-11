@@ -5,7 +5,7 @@
                                   :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #content>
-                <div class="mt-3">{{ tt('format.misc.moveTransactionsInAccountTip', { fromAccount: fromAccount?.name, toAccount: displayToAccountName }) }}</div>
+                <div class="text-body-large">{{ tt('format.misc.moveTransactionsInAccountTip', { fromAccount: fromAccount?.name, toAccount: displayToAccountName }) }}</div>
                 <div class="w-100 d-flex justify-center mt-6">
                     <v-row>
                         <v-col cols="12" md="12">

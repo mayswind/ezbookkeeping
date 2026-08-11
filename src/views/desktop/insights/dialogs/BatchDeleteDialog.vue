@@ -4,7 +4,7 @@
                                   :title="tt('Delete Transactions')" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #content>
-                <div class="mt-3 text-error">{{ tt('format.misc.deleteTransactionsTip', { count: formatNumberToLocalizedNumerals(deleteIds?.length ?? 0) }) }}</div>
+                <div class="text-body-large text-error">{{ tt('format.misc.deleteTransactionsTip', { count: formatNumberToLocalizedNumerals(deleteIds?.length ?? 0) }) }}</div>
                 <div class="w-100 d-flex justify-center mt-1">
                     <div class="w-100">
                         <v-text-field

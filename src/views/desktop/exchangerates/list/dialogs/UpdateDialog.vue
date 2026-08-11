@@ -13,7 +13,7 @@
             </template>
 
             <template #content>
-                <v-form class="mt-5">
+                <v-form class="mt-2">
                     <v-row>
                         <v-col cols="12" md="6">
                             <number-input :autofocus="true"

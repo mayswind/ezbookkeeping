@@ -3,7 +3,7 @@
         <one-column-dialog-layout :title="titleContent" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #content>
-                <div class="text-body-1 text-wrap my-4" v-if="textContent">{{ textContent }}</div>
+                <div class="text-body-large text-wrap mb-4" v-if="textContent">{{ textContent }}</div>
                 <div class="d-flex justify-center w-100">
                     <v-form class="w-100">
                         <v-row>

@@ -1,9 +1,10 @@
 <template>
     <v-dialog width="600" :persistent="true" v-model="showState">
-        <one-column-dialog-layout :disabled="loading || submitting" :title="title" :cancel-button-title="tt('Cancel')"
+        <one-column-dialog-layout content-class="pt-0" :disabled="loading || submitting"
+                                  :title="title" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text" size="22"
+                <v-btn density="compact" color="default" variant="text"
                        class="ms-2" :icon="true" :disabled="loading || submitting"
                        :loading="loading" @click="reload">
                     <template #loader>
@@ -15,7 +16,7 @@
             </template>
 
             <template #content>
-                <div class="mt-4" v-if="type === 'clear'">{{ tt('format.misc.clearTransactionsTagsTip', { count: formatNumberToLocalizedNumerals(updateIds?.length ?? 0) }) }}</div>
+                <div class="text-body-large mt-4" v-if="type === 'clear'">{{ tt('format.misc.clearTransactionsTagsTip', { count: formatNumberToLocalizedNumerals(updateIds?.length ?? 0) }) }}</div>
                 <div class="mt-5" v-if="type !== 'clear'">
                     <transaction-tag-auto-complete
                         :disabled="loading || submitting"

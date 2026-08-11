@@ -299,7 +299,7 @@ defineExpose({
 
 @media (min-width: 600px) {
     .hierarchy-chart-container {
-        height: 630px;
+        height: 650px;
     }
 }
 </style>

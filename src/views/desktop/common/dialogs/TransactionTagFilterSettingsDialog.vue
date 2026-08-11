@@ -10,7 +10,7 @@
                               :placeholder="tt('Find tag')"
                               v-model="filterContent"></v-text-field>
 
-                <v-btn class="mx-2" density="comfortable" variant="outlined"
+                <v-btn density="comfortable" variant="outlined"
                        :disabled="!hasAnyAvailableTag" @click="save">{{ tt(applyText) }}</v-btn>
 
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
@@ -49,7 +49,7 @@
                 </div>
 
                 <div v-if="!loading && !hasAnyVisibleTag">
-                    <span class="text-body-1">{{ tt('No available tag') }}</span>
+                    <span class="text-body-large">{{ tt('No available tag') }}</span>
                 </div>
 
                 <div v-else-if="!loading && hasAnyVisibleTag">
@@ -57,9 +57,9 @@
                         <template :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault">
                             <v-expansion-panel class="border" :value="tagGroup.id" v-if="allVisibleTags[tagGroup.id] && allVisibleTags[tagGroup.id]!.length > 0">
                                 <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                                    <span class="ms-3 text-truncate">{{ tagGroup.name }}</span>
+                                    <span class="text-body-large text-truncate">{{ tagGroup.name }}</span>
                                     <v-spacer/>
-                                    <div class="d-flex me-3" v-if="groupTagFilterTypesMap[tagGroup.id] && groupTagFilterStateCountMap[tagGroup.id]">
+                                    <div class="d-flex text-body-medium me-3" v-if="groupTagFilterTypesMap[tagGroup.id] && groupTagFilterStateCountMap[tagGroup.id]">
                                         <v-btn color="secondary" density="compact" variant="outlined"
                                                v-if="groupTagFilterStateCountMap[tagGroup.id]![TransactionTagFilterState.Include] && groupTagFilterStateCountMap[tagGroup.id]![TransactionTagFilterState.Include] > 1">
                                             {{ groupTagFilterTypesMap[tagGroup.id]!.includeType === TransactionTagFilterType.HasAll.type ? tt(TransactionTagFilterType.HasAll.name) : tt(TransactionTagFilterType.HasAny.name) }}
@@ -90,19 +90,19 @@
                                     <v-list rounded density="comfortable" class="pa-0">
                                         <template :key="transactionTag.id"
                                                   v-for="transactionTag in allVisibleTags[tagGroup.id]">
-                                            <v-list-item class="ps-2">
+                                            <v-list-item class="text-body-medium ps-0">
                                                 <template #prepend>
                                                     <v-badge class="right-bottom-icon" color="secondary"
                                                              location="bottom right" offset-x="2" offset-y="2" :icon="mdiEyeOffOutline"
                                                              v-if="transactionTag.hidden">
-                                                        <v-icon size="24" :icon="mdiPound"/>
+                                                        <v-icon size="18" :icon="mdiPound"/>
                                                     </v-badge>
-                                                    <v-icon size="24" :icon="mdiPound" v-else-if="!transactionTag.hidden"/>
-                                                    <span class="ms-3">{{ transactionTag.name }}</span>
+                                                    <v-icon size="18" :icon="mdiPound" v-else-if="!transactionTag.hidden"/>
+                                                    <span class="ms-2">{{ transactionTag.name }}</span>
                                                 </template>
                                                 <template #append>
-                                                    <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
-                                                                  mandatory="force" divided
+                                                    <v-btn-toggle class="toggle-buttons" style="min-height: 30px"
+                                                                  density="compact" variant="outlined" mandatory="force" divided
                                                                   :model-value="tagFilterStateMap[transactionTag.id]"
                                                                   @update:model-value="updateTransactionTagState(transactionTag, $event)">
                                                         <v-btn :value="TransactionTagFilterState.Include">{{ tt('Included') }}</v-btn>

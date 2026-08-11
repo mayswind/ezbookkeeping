@@ -23,6 +23,8 @@
             </v-tab>
         </v-tabs>
 
+        <v-divider/>
+
         <v-window class="mt-4 disable-tab-transition" v-model="activeTab">
             <v-window-item value="basicSetting">
                 <app-basic-setting-tab/>

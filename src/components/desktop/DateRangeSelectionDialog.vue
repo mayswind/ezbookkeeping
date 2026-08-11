@@ -8,18 +8,18 @@
             </template>
 
             <template #content>
-                <div class="text-body-1 mt-3" v-if="beginDateTime && endDateTime">
+                <div class="text-body-large" v-if="beginDateTime && endDateTime">
                     <span>{{ beginDateTime }}</span>
                     <span> - </span>
                     <span>{{ endDateTime }}</span>
                 </div>
 
-                <div class="text-body-1 text-wrap mt-2" v-if="hint">
+                <div class="text-body-large text-wrap mt-3" v-if="hint">
                     <span>{{ hint }}</span>
                     <slot></slot>
                 </div>
 
-                <v-row class="mt-1">
+                <v-row class="mt-3">
                     <v-col>
                         <date-time-picker :is-dark-mode="isDarkMode"
                                           :enable-time-picker="true"

@@ -27,7 +27,7 @@
                     <v-icon :icon="mdiDotsVertical" size="22" />
                     <v-menu activator="parent">
                         <v-list>
-                            <v-list-subheader :title="tt('File Format')"/>
+                            <v-list-subheader class="text-body-small" :title="tt('File Format')"/>
                             <v-list-item :prepend-icon="mdiComma"
                                          :append-icon="fileFormat === KnownFileType.CSV.extension ? mdiCheck : undefined"
                                          :title="tt('CSV (Comma-separated values) File')"
@@ -80,7 +80,7 @@
                         v-if="!showRawData"
                     ></v-data-table>
                     <div class="w-100 h-100 code-container" v-if="showRawData">
-                        <v-textarea no-resize class="w-100 h-100 ps-4 always-cursor-text"
+                        <v-textarea no-resize class="w-100 h-100 ps-3 always-cursor-text"
                                     density="compact" variant="plain"
                                     :readonly="true" :rounded="false"
                                     :value="exportedData"></v-textarea>

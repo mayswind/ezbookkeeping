@@ -1,6 +1,7 @@
 <template>
-    <v-dialog class="month-selection-dialog" width="640" :persistent="!!persistent" v-model="showState">
-        <one-column-dialog-layout :title="title" :cancel-button-title="tt('Cancel')"
+    <v-dialog class="month-selection-dialog" width="480" :persistent="!!persistent" v-model="showState">
+        <one-column-dialog-layout content-class="pa-0"
+                                  :title="title" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #toolbar>
                 <v-btn class="mx-2" density="comfortable" variant="outlined"
@@ -8,11 +9,11 @@
             </template>
 
             <template #content>
-                <div class="text-body-1 text-wrap mt-2" v-if="hint">
+                <div class="text-body-large text-wrap" v-if="hint">
                     <span>{{ hint }}</span>
                     <slot></slot>
                 </div>
-                <v-row class="mt-2">
+                <v-row>
                     <v-col>
                         <month-picker :is-dark-mode="isDarkMode" v-model="monthValue"></month-picker>
                     </v-col>
@@ -86,7 +87,14 @@ watch(() => props.show, (newValue) => {
 </script>
 
 <style>
-.month-selection-dialog .dp--main .dp--instance-calendar .dp--overlay.dp--overlay-relative {
-    width: 100% !important;
+.month-selection-dialog .dp--main {
+    .dp--menu {
+        border: 0;
+        padding-left: 3px;
+    }
+
+    .dp--instance-calendar .dp--overlay.dp--overlay-relative {
+        width: 100% !important;
+    }
 }
 </style>

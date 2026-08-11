@@ -434,7 +434,7 @@ function clickItem(e: ECElementEvent): void {
 
 @media (min-width: 600px) {
     .account-category-sankey-chart-container {
-        height: 660px;
+        height: 675px;
     }
 }
 

@@ -85,7 +85,7 @@
                 </div>
                 <v-divider class="my-2"/>
                 <div class="px-4">
-                    <v-tabs  direction="vertical" :disabled="loading || submitting || recognizing" v-model="activeTab">
+                    <v-tabs direction="vertical" :disabled="loading || submitting || recognizing" v-model="activeTab">
                         <v-tab value="basicInfo">
                             <span>{{ tt('Basic Information') }}</span>
                         </v-tab>
@@ -298,9 +298,9 @@
                                         :model-value="transaction.timeZone"
                                         @update:model-value="updateTransactionTimezone"
                                     >
-                                        <template #selection="{ item }">
+                                        <template #selection="{ internalItem }">
                                                 <span class="text-truncate" v-if="transaction.timeZone || transaction.timeZone === ''">
-                                                    {{ item.title }}
+                                                    {{ internalItem.title }}
                                                 </span>
                                         </template>
                                     </v-autocomplete>
@@ -339,8 +339,8 @@
 
                                         <template #no-data>
                                             <v-list class="py-0">
-                                                <v-list-item v-if="mode !== TransactionEditPageMode.View" @click="updateGeoLocation(true)">{{ tt('Update Geographic Location') }}</v-list-item>
-                                                <v-list-item v-if="mode !== TransactionEditPageMode.View" @click="clearGeoLocation">{{ tt('Clear Geographic Location') }}</v-list-item>
+                                                <v-list-item class="text-body-medium" v-if="mode !== TransactionEditPageMode.View" @click="updateGeoLocation(true)">{{ tt('Update Geographic Location') }}</v-list-item>
+                                                <v-list-item class="text-body-medium" v-if="mode !== TransactionEditPageMode.View" @click="clearGeoLocation">{{ tt('Clear Geographic Location') }}</v-list-item>
                                             </v-list>
                                         </template>
                                     </v-select>
@@ -375,31 +375,31 @@
                                   :enable-zoom-control="true" :geo-location="transaction.geoLocation"
                                   @click="updateSpecifiedGeoLocation">
                             <template #error-title="{ mapSupported, mapDependencyLoaded }">
-                                <span class="text-subtitle-1" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></span>
-                                <span class="text-subtitle-1" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></span>
+                                <span class="text-body-large" v-if="!mapSupported"><b>{{ tt('Unsupported Map Provider') }}</b></span>
+                                <span class="text-body-large" v-else-if="!mapDependencyLoaded"><b>{{ tt('Cannot Initialize Map') }}</b></span>
                             </template>
                             <template #error-content>
-                                <p class="text-body-1">
+                                <span class="text-body-large">
                                     {{ tt('Please refresh the page and try again. If the error persists, ensure that the server\'s map settings are correctly configured.') }}
-                                </p>
+                                </span>
                             </template>
                         </map-view>
                     </v-window-item>
                     <v-window-item value="pictures">
-                        <v-row class="transaction-pictures align-content-start ma-0 pa-0 ms-n3" :class="{ 'readonly': submitting || uploadingPicture || removingPictureId }">
+                        <v-row class="transaction-pictures align-content-start ma-0 pt-3" :class="{ 'readonly': submitting || uploadingPicture || removingPictureId }">
                             <v-col :key="picIdx" cols="6" md="3" v-for="(pictureInfo, picIdx) in transaction.pictures">
                                 <v-avatar rounded="lg" variant="tonal" size="160"
                                           class="cursor-pointer transaction-picture"
                                           color="rgba(0,0,0,0)" @click="viewOrRemovePicture(pictureInfo)">
                                     <v-img :src="getTransactionPictureUrl(pictureInfo)">
                                         <template #placeholder>
-                                            <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                            <div class="d-flex align-center justify-center bg-light-primary">
                                                 <v-progress-circular color="grey-500" indeterminate size="48"></v-progress-circular>
                                             </div>
                                         </template>
                                         <template #error>
-                                            <div class="d-flex align-center justify-center fill-height bg-light-primary">
-                                                <span class="text-body-1">{{ tt('Failed to load image, please check whether the config "domain" and "root_url" are set correctly.') }}</span>
+                                            <div class="d-flex align-center justify-center bg-light-primary">
+                                                <span class="text-body-large">{{ tt('Failed to load image, please check whether the config "domain" and "root_url" are set correctly.') }}</span>
                                             </div>
                                         </template>
                                     </v-img>
@@ -1318,41 +1318,29 @@ defineExpose({
 }
 
 .transaction-edit-map-view {
-    height: 275px;
+    height: 289px;
 }
 
-@media (min-height: 630px) {
+@media (min-height: 620px) {
     .transaction-edit-map-view {
         height: 415px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 415px;
+            min-height: 416px;
         }
     }
 }
 
 @media (min-height: 700px) {
     .transaction-edit-map-view {
-        height: 485px;
+        height: 513px;
     }
 
     @media (min-width: 960px) {
         .transaction-pictures {
-            min-height: 485px;
-        }
-    }
-}
-
-@media (min-height: 780px) {
-    .transaction-edit-map-view {
-        height: 561px;
-    }
-
-    @media (min-width: 960px) {
-        .transaction-pictures {
-            min-height: 561px;
+            min-height: 514px;
         }
     }
 }

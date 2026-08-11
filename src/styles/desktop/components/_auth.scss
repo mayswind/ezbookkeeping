@@ -1,0 +1,56 @@
+.auth-logo {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: 2rem;
+    inset-inline-start: 2rem;
+
+    img {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+.auth-app-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+    align-self: center;
+}
+
+.auth-wrapper {
+    min-height: calc(var(--vh, 1vh) * 100);
+}
+
+.auth-card {
+    border-radius: var(--ebk-radius-xl);
+    background: rgb(var(--v-theme-surface));
+}
+
+.auth-message,
+.auth-links,
+.auth-powered-by {
+    color: rgba(var(--v-theme-on-surface), 0.8);
+    letter-spacing: normal;
+}
+
+.auth-footer {
+    color: rgba(var(--v-theme-on-surface), 0.8);
+    letter-spacing: normal;
+}
+
+.auth-image-background {
+    background: rgb(var(--ebk-auth-background));
+}
+
+.auth-img-footer {
+    position: absolute;
+    min-width: 100%;
+    inset-block-end: 0;
+}
+
+@media (max-width: 959px) and (max-height: 669px) {
+    .auth-card {
+        padding-block-start: var(--ebk-navbar-height) !important;
+    }
+}

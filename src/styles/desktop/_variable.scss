@@ -1,0 +1,72 @@
+:root {
+    --v-font-body: Inter, sans-serif, -apple-system, blinkmacsystemfont, Segoe UI, roboto, Helvetica Neue, arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), 0.04);
+    --v-expand-panel-disabled-title-bg: rgba(var(--v-theme-on-surface), 0.02);
+    --v-card-title-bg: rgba(var(--v-theme-on-surface), 0.04);
+
+    --dp-font-size: 0.9375rem;
+
+    --ebk-icon-font-size: 28px;
+    --ebk-icon-default-color: #000;
+
+    --ebk-primary-color: 198, 126, 72;
+    --ebk-sidebar-width: 16rem;
+    --ebk-navbar-height: 4rem;
+    --ebk-page-gutter: clamp(0.875rem, 0.6vw, 0.6rem);
+
+    --ebk-space-1: 0.25rem;
+    --ebk-space-2: 0.5rem;
+    --ebk-space-3: 0.75rem;
+    --ebk-space-4: 1rem;
+    --ebk-space-5: 1.25rem;
+    --ebk-space-6: 1.5rem;
+
+    --ebk-radius-sm: 0.375rem;
+    --ebk-radius-md: 0.625rem;
+    --ebk-radius-lg: 0.75rem;
+    --ebk-radius-xl: 1rem;
+
+    --ebk-transition-fast: 150ms ease;
+    --ebk-transition-base: 200ms cubic-bezier(0.2, 0, 0, 1);
+
+    --ebk-surface: 255, 255, 255;
+    --ebk-surface-muted: 248, 247, 245;
+    --ebk-surface-raised: 255, 255, 255;
+    --ebk-auth-background: 250, 248, 244;
+    --ebk-border: 54, 47, 42;
+    --ebk-shadow-color: 68, 48, 34;
+    --ebk-shadow-sm: 0 1px 2px rgba(var(--ebk-shadow-color), 0.05), 0 3px 10px rgba(var(--ebk-shadow-color), 0.035);
+    --ebk-shadow-md: 0 7px 24px rgba(var(--ebk-shadow-color), 0.1);
+    --ebk-shadow-lg: 0 16px 44px rgba(var(--ebk-shadow-color), 0.16);
+    --ebk-focus-ring: 0 0 0 3px rgba(var(--ebk-primary-color), 0.16);
+}
+
+.v-theme--dark {
+    --v-expand-panel-title-bg: rgba(var(--v-theme-on-surface), 0.04);
+    --v-expand-panel-disabled-title-bg: rgba(var(--v-theme-on-surface), 0.02);
+    --v-card-title-bg: rgba(var(--v-theme-on-surface), 0.04);
+
+    --ebk-icon-default-color: #fff;
+
+    --ebk-surface: 28, 26, 24;
+    --ebk-surface-muted: 35, 32, 29;
+    --ebk-surface-raised: 39, 36, 33;
+    --ebk-auth-background: 32, 33, 34;
+    --ebk-border: 236, 226, 217;
+    --ebk-shadow-color: 0, 0, 0;
+    --ebk-shadow-sm: 0 1px 2px rgba(var(--ebk-shadow-color), 0.18), 0 4px 14px rgba(var(--ebk-shadow-color), 0.14);
+    --ebk-shadow-md: 0 9px 28px rgba(var(--ebk-shadow-color), 0.28);
+    --ebk-shadow-lg: 0 18px 50px rgba(var(--ebk-shadow-color), 0.42);
+}
+
+.pin-codes-input {
+    --ebk-pin-code-input-height: 56px;
+    --ebk-pin-code-input-gap: 12px;
+    --ebk-pin-code-transition-duration: 0ms;
+}
+
+@media (min-width: 1145px) {
+    .pin-codes-input {
+        --ebk-pin-code-input-gap: 20px;
+    }
+}

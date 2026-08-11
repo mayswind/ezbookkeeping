@@ -1,0 +1,61 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    min-width: 320px;
+    min-height: 100%;
+    background: rgb(var(--v-theme-background, 246, 246, 244));
+    overflow-y: scroll;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100%;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:where(:not(
+  .v-btn,
+  .v-list-item,
+  [class^="bg-"],
+  [class*=" bg-"]
+)) {
+    color: rgb(var(--v-theme-primary));
+}
+
+#app {
+    min-height: calc(var(--vh, 1vh) * 100);
+}
+
+:focus-visible {
+    outline: none;
+}
+
+::selection {
+    background: rgba(var(--ebk-primary-color), 0.22);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+code {
+    padding: 0.15em 0.4em;
+    border-radius: var(--ebk-radius-sm);
+    background: rgba(var(--v-theme-primary), 0.09);
+    color: rgb(var(--v-code-color));
+    font-size: 0.875em;
+}

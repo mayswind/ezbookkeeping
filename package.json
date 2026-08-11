@@ -46,9 +46,8 @@
     "vue-echarts": "8.0.1",
     "vue-i18n": "11.4.8",
     "vue-router": "5.2.0",
-    "vue3-perfect-scrollbar": "2.0.0",
     "vuedraggable": "4.1.0",
-    "vuetify": "3.13.0"
+    "vuetify": "4.1.7"
   },
   "devDependencies": {
     "@jest/globals": "30.4.1",

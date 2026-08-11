@@ -2,33 +2,33 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <v-layout>
+                <v-layout class="page-with-navigation-drawer">
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-6 my-4">
-                            <span class="text-subtitle-2">{{ tt('Net assets') }}</span>
-                            <p class="account-statistic-item-value text-income text-truncate mt-1 mb-3">
+                        <div class="mx-4 my-3">
+                            <span class="text-body-medium">{{ tt('Net assets') }}</span>
+                            <div class="text-body-large text-income text-truncate mt-1 mb-3">
                                 <span v-if="!loading || allAccountCount > 0">{{ netAssets }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin mt-1 mb-2" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
-                            </p>
-                            <span class="text-subtitle-2">{{ tt('Total liabilities') }}</span>
-                            <p class="account-statistic-item-value text-expense text-truncate mt-1 mb-3">
+                            </div>
+                            <span class="text-body-medium">{{ tt('Total liabilities') }}</span>
+                            <div class="text-body-large text-expense text-truncate mt-1 mb-3">
                                 <span v-if="!loading || allAccountCount > 0">{{ totalLiabilities }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin mt-1 mb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
-                            </p>
-                            <span class="text-subtitle-2">{{ tt('Total assets') }}</span>
-                            <p class="account-statistic-item-value mt-1">
+                            </div>
+                            <span class="text-body-medium">{{ tt('Total assets') }}</span>
+                            <div class="text-body-large mt-1">
                                 <span v-if="!loading || allAccountCount > 0">{{ totalAssets }}</span>
                                 <span v-else-if="loading && allAccountCount <= 0">
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin mt-3 mb-2 pb-1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
-                            </p>
+                            </div>
                         </div>
                         <v-divider />
-                        <v-tabs show-arrows class="account-category-tabs my-4" direction="vertical"
+                        <v-tabs show-arrows class="account-category-tabs my-3" direction="vertical"
                                 :disabled="loading" v-model="activeAccountCategoryType">
                             <v-tab class="tab-text-truncate" :key="accountCategory.type" :value="accountCategory.type"
                                    v-for="accountCategory in AccountCategory.values(customAccountCategoryOrder)"
@@ -51,7 +51,7 @@
                                 <v-card variant="flat" min-height="780">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
@@ -103,9 +103,9 @@
                                         </v-btn>
                                     </v-card-text>
 
-                                    <v-row class="ps-6 pe-6 pe-md-8" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
+                                    <v-row class="ps-4 pe-4" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
-                                            <v-card border class="card-title-with-bg account-card mb-8 h-auto">
+                                            <v-card border class="card-title-with-bg account-card mb-4 h-auto">
                                                 <template #title>
                                                     <div class="account-title d-flex align-center">
                                                         <v-icon class="disabled me-0" size="28px" :icon="mdiSquareRounded" />
@@ -137,13 +137,13 @@
                                         </v-col>
                                     </v-row>
 
-                                    <v-row class="ps-5 pe-2 pe-md-4" v-if="!loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
+                                    <v-row class="ps-4 pe-2 pe-md-4" v-if="!loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
                                         <v-col cols="12">
-                                            {{ tt('No available account') }}
+                                            <span class="text-body-medium">{{ tt('No available account') }}</span>
                                         </v-col>
                                     </v-row>
 
-                                    <v-row class="ps-6 pe-6 pe-md-8">
+                                    <v-row class="ps-4 pe-4">
                                         <v-col cols="12">
                                             <draggable-list
                                                 class="list-group"
@@ -157,7 +157,7 @@
                                             >
                                                 <template #item="{ element }">
                                                     <div class="list-group-item">
-                                                        <v-card border class="card-title-with-bg account-card mb-8 h-auto" v-if="showHidden || !element.hidden">
+                                                        <v-card border class="card-title-with-bg account-card mb-4 h-auto" v-if="showHidden || !element.hidden">
                                                             <template #title>
                                                                 <div class="account-title d-flex align-baseline">
                                                                     <ItemIcon size="1.5rem" icon-type="account" :icon-id="element.icon"
@@ -212,7 +212,7 @@
                                                                            :to="`/transaction/list?accountIds=${element.getAccountOrSubAccountId(activeSubAccount[element.id])}`">
                                                                         {{ tt('Transaction List') }}
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="ms-1" density="comfortable" color="default" variant="text"
                                                                            :disabled="loading" :prepend-icon="mdiInvoiceListOutline"
                                                                            @click="showReconciliationStatementDialog(element.getAccountOrSubAccount(activeSubAccount[element.id]))"
                                                                            v-if="element.type === AccountType.SingleAccount.type || element.getSubAccount(activeSubAccount[element.id])">
@@ -221,12 +221,12 @@
                                                                             <v-list>
                                                                                 <template :key="dateRange.type"
                                                                                           v-for="dateRange in accountReconciliationStatementDateRanges(element.getAccountOrSubAccount(activeSubAccount[element.id]))">
-                                                                                    <v-list-item class="text-sm" density="compact"
+                                                                                    <v-list-item class="text-body-medium" density="compact"
                                                                                                  :value="dateRange.type">
                                                                                         <v-list-item-title class="cursor-pointer"
                                                                                                            @click="showReconciliationStatementDialog(element.getAccountOrSubAccount(activeSubAccount[element.id]), dateRange.type)">
                                                                                             <div class="d-flex align-center">
-                                                                                                <span class="text-sm ms-3">{{ dateRange.displayName }}</span>
+                                                                                                <span class="text-body-medium ms-3">{{ dateRange.displayName }}</span>
                                                                                             </div>
                                                                                         </v-list-item-title>
                                                                                     </v-list-item>
@@ -234,7 +234,7 @@
                                                                             </v-list>
                                                                         </v-menu>
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading"
                                                                            :prepend-icon="element.isAccountOrSubAccountHidden(activeSubAccount[element.id]) ? mdiEyeOutline : mdiEyeOffOutline"
@@ -242,38 +242,38 @@
                                                                            @click="hide(element, element.getAccountOrSubAccount(activeSubAccount[element.id]), !element.isAccountOrSubAccountHidden(activeSubAccount[element.id]))">
                                                                         {{ element.isAccountOrSubAccountHidden(activeSubAccount[element.id]) ? tt('Show') : tt('Hide') }}
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiPencilOutline"
                                                                            v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
                                                                            @click="edit(element)">
                                                                         {{ tt('Edit') }}
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiDotsHorizontalCircleOutline"
                                                                            v-if="element.type === AccountType.SingleAccount.type || element.getSubAccount(activeSubAccount[element.id])">
                                                                         {{ tt('More') }}
                                                                         <v-menu activator="parent" :open-on-hover="true">
                                                                             <v-list>
-                                                                                <v-list-item class="text-sm" density="compact"
+                                                                                <v-list-item class="text-body-medium" density="compact"
                                                                                              :title="tt('Mark as Reconciled')"
                                                                                              :prepend-icon="mdiReceiptTextCheckOutline"
                                                                                              @click="updateLastReconciledTime(element.getAccountOrSubAccount(activeSubAccount[element.id]))"
                                                                                              v-if="useLastReconciledTime"></v-list-item>
                                                                                 <v-divider class="my-2" v-if="useLastReconciledTime" />
-                                                                                <v-list-item class="text-sm" density="compact"
+                                                                                <v-list-item class="text-body-medium" density="compact"
                                                                                              :title="tt('Move All Transactions')"
                                                                                              :prepend-icon="mdiSwapHorizontal"
                                                                                              @click="moveAllTransactions(element.getAccountOrSubAccount(activeSubAccount[element.id]))"></v-list-item>
-                                                                                <v-list-item class="text-sm" density="compact"
+                                                                                <v-list-item class="text-body-medium" density="compact"
                                                                                              :title="tt('Clear All Transactions')"
                                                                                              :prepend-icon="mdiEraser"
                                                                                              @click="clearAllTransactions(element.getAccountOrSubAccount(activeSubAccount[element.id]))"></v-list-item>
                                                                             </v-list>
                                                                         </v-menu>
                                                                     </v-btn>
-                                                                    <v-btn class="px-2 ms-1" density="comfortable" color="default" variant="text"
+                                                                    <v-btn class="ms-1" density="comfortable" color="default" variant="text"
                                                                            :class="{ 'd-none': loading, 'hover-display': !loading }"
                                                                            :disabled="loading" :prepend-icon="mdiDeleteOutline"
                                                                            v-if="!activeSubAccount[element.id] || element.getSubAccount(activeSubAccount[element.id])"
@@ -376,7 +376,7 @@ type ReconciliationStatementDialogType = InstanceType<typeof ReconciliationState
 type MoveAllTransactionsDialogType = InstanceType<typeof MoveAllTransactionsDialog>;
 type ClearAllTransactionsDialogType = InstanceType<typeof ClearAllTransactionsDialog>;
 
-const display = useDisplay();
+const { lgAndUp } = useDisplay();
 
 const { tt, getAllDateRanges, getCurrencyName, joinMultiText } = useI18n();
 
@@ -415,8 +415,8 @@ const activeAccountCategoryType = ref<number>(defaultAccountCategory.value.type)
 const activeTab = ref<string>('accountPage');
 const activeSubAccount = ref<Record<string, string>>({});
 const accountToShowReconciliationStatement = ref<Account | null>(null);
-const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
-const showNav = ref<boolean>(display.mdAndUp.value);
+const alwaysShowNav = ref<boolean>(lgAndUp.value);
+const showNav = ref<boolean>(lgAndUp.value);
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 const showCustomDateRangeDialog = ref<boolean>(false);
 
@@ -755,7 +755,7 @@ function onShowDateRangeError(message: string): void {
     snackbar.value?.showError(message);
 }
 
-watch(() => display.mdAndUp.value, (newValue) => {
+watch(lgAndUp, (newValue) => {
     alwaysShowNav.value = newValue;
 
     if (!showNav.value) {
@@ -767,10 +767,6 @@ reload(false);
 </script>
 
 <style>
-.account-statistic-item-value {
-    font-size: 1rem;
-}
-
 .account-category-tabs .v-tab.v-tab.v-btn {
     height: calc(var(--v-tabs-height) * 1.5);
 }
@@ -794,74 +790,75 @@ reload(false);
     line-height: 1.75rem;
 }
 
-.account-card > .v-card-item {
-    padding-top: 0.875rem;
-    padding-bottom: 0.875rem;
-}
+.account-card {
+    > .v-card-item {
+        padding-top: 0.875rem;
+        padding-bottom: 0.875rem;
+    }
 
-.account-card .account-title {
-    font-size: 1rem;
-    line-height: 1.5rem !important;
-}
+    .account-title {
+        font-size: 1rem;
+        line-height: 1.5rem !important;
+    }
 
-.account-card .account-title .account-name {
-    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
-}
+    .account-title .account-name {
+        color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+    }
 
-.account-card .account-currency {
-    font-size: 0.8rem;
-    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
-}
+    .account-currency {
+        font-size: 0.8rem;
+        color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+    }
 
-.account-card .account-subaccounts {
-    overflow-x: auto;
-    white-space: nowrap;
-}
+    .account-subaccounts {
+        overflow-x: auto;
+        white-space: nowrap;
+        min-height: 34px;
 
-.account-card .account-subaccounts.v-btn-toggle {
-    height: auto !important;
-    padding: 0;
-    border: none;
-}
+        &.v-btn-toggle {
+            height: auto !important;
+            padding: 0;
+            border: none;
 
-.account-card .account-subaccounts.v-btn-toggle > .v-btn {
-    border-color: rgba(var(--v-border-color), var(--v-border-opacity));
-}
+            > .v-btn {
+                width: auto !important;
+                border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
 
-.account-card .account-subaccounts.v-btn-toggle > .v-btn:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: none;
-}
+                &:not(:first-child) {
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
+                    border-left: none;
+                }
 
-.account-card .account-subaccounts.v-btn-toggle > .v-btn:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
+                &:not(:last-child) {
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 0;
+                }
+            }
+        }
+    }
 
-.account-card .account-subaccounts.v-btn-toggle > .v-btn {
-    border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
-}
+    .account-toolbar {
+        overflow-x: auto;
+        white-space: nowrap;
 
-.account-card .account-subaccounts.v-btn-toggle button.v-btn {
-    width: auto !important;
-}
+        .v-btn {
+            padding: 0 12px;
+            min-height: 32px;
+        }
 
-.account-card .account-toolbar {
-    overflow-x: auto;
-    white-space: nowrap;
-}
+        .hover-display {
+            display: none;
+        }
 
-.account-card .account-toolbar .hover-display {
-    display: none;
-}
+        &:hover .hover-display {
+            display: inline-flex;
+        }
+    }
 
-.account-card .account-toolbar:hover .hover-display {
-    display: grid;
-}
-
-.account-card .account-balance {
-    font-size: 1.25rem;
-    color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+    .account-balance {
+        font-size: 1.25rem;
+        color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+    }
 }
 </style>

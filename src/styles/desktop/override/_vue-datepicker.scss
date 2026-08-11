@@ -1,0 +1,39 @@
+/** Replacing the default style of @vuepic/vue-datepicker **/
+.dp--theme-light,
+.dp--theme-dark {
+    --dp-primary-color: #c67e48;
+    --dp-text-color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+/** Fix @vuepic/vue-datepicker style issue **/
+.dp--main {
+    &.dp--flex-display {
+        flex-direction: column;
+    }
+
+    .dp--tp-wrap {
+        max-width: 100%;
+    }
+
+    .dp--menu-inner {
+        padding-block: 0;
+    }
+
+    .dp--calendar .dp--calendar-item {
+        flex: 1;
+
+        > .dp--cell-inner {
+            width: 100%;
+        }
+    }
+}
+
+.dp--btn {
+    border: 0;
+    background: none;
+    font: inherit;
+}
+
+[dir='rtl'] .dp--main .dp--btn.dp--arrow-btn-nav {
+    transform: scaleX(-1);
+}

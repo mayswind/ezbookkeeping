@@ -28,13 +28,13 @@
                         :close-on-content-click="false"
                         v-model="showMenus[key]">
                     <v-list>
-                        <v-list-item class="text-sm" :density="density">
+                        <v-list-item class="text-body-small px-1" density="compact">
                             <v-list-item-title class="cursor-pointer">
                                 <v-autocomplete width="110"
+                                                density="compact"
                                                 item-title="name"
                                                 item-value="value"
                                                 auto-select-first
-                                                :density="density"
                                                 :items="allPages"
                                                 :custom-filter="customFilter"
                                                 :no-data-text="tt('No results')"

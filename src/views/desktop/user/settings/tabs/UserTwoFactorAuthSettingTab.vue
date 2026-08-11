@@ -7,22 +7,22 @@
                     <v-progress-circular indeterminate size="20" class="ms-3" v-if="loading"></v-progress-circular>
                 </template>
 
-                <v-card-text class="pb-0">
-                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <p class="text-body-1" v-if="!loading && !new2FAQRCode">
+                <v-card-text class="mt-2">
+                    <v-skeleton-loader class="skeleton-no-margin pt-1" type="text" style="width: 150px" :loading="true" v-if="loading"></v-skeleton-loader>
+                    <span class="text-body-large" v-if="!loading && !new2FAQRCode">
                         {{ status === true ? tt('Two-factor authentication is already enabled.') : tt('Two-factor authentication is not enabled yet.') }}
-                    </p>
-                    <p class="text-body-1" v-if="!loading && new2FAQRCode">
+                    </span>
+                    <span class="text-body-large" v-if="!loading && new2FAQRCode">
                         {{ tt('Please use a two-factor authentication app to scan the qrcode below and enter the current passcode.') }}
-                    </p>
-                    <p class="text-body-1" v-if="!loading && status === true">
+                    </span>
+                    <span class="text-body-large" v-if="!loading && status === true">
                         {{ tt('Your current password is required to disable two-factor authentication or regenerate backup codes for two-factor authentication. If you regenerate backup codes, the previous ones will become invalid.') }}
-                    </p>
+                    </span>
                 </v-card-text>
 
-                <v-card-text v-if="status === false && new2FAQRCode">
+                <v-card-text class="pt-0 pb-4" v-if="status === false && new2FAQRCode">
                     <v-img alt="qrcode" class="img-qrcode" :src="new2FAQRCode" />
-                    <v-row class="mb-3">
+                    <v-row>
                         <v-col cols="12" md="3">
                             <v-text-field
                                 type="number"
@@ -37,8 +37,8 @@
                     </v-row>
                 </v-card-text>
 
-                <v-card-text class="pb-0" v-if="status === true">
-                    <v-row class="mb-3">
+                <v-card-text class="pt-0 pb-4" v-if="status === true">
+                    <v-row>
                         <v-col cols="12" md="6">
                             <v-text-field
                                 autocomplete="current-password"
@@ -52,7 +52,9 @@
                     </v-row>
                 </v-card-text>
 
-                <v-card-text>
+                <v-divider v-if="(status === false && new2FAQRCode) || status === true"/>
+
+                <v-card-text v-if="!loading">
                     <v-row>
                         <v-col cols="12" class="d-flex flex-wrap gap-4">
                             <v-btn :disabled="!currentPassword || loading || disabling " v-if="status === true" @click="disable">
@@ -88,11 +90,11 @@
                     </v-btn>
                 </template>
 
-                <v-card-text>
-                    <p class="text-body-1" v-if="status === true">
+                <v-card-text class="mt-2">
+                    <span class="text-body-large" v-if="status === true">
                         {{ tt('Please copy these backup codes to safe place, the following backup codes will be displayed only once. If these codes were lost, you can regenerate them at any time.') }}
-                    </p>
-                    <v-textarea class="backup-code" :readonly="true" :rows="10" :value="currentBackupCode"/>
+                    </span>
+                    <v-textarea class="backup-code mt-4" :readonly="true" :rows="10" :value="currentBackupCode"/>
                 </v-card-text>
             </v-card>
         </v-col>

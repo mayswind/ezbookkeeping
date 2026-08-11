@@ -1,6 +1,6 @@
 <template>
     <div class="mx-3 mt-3">
-        <div class="text-center">{{ progressText }}</div>
+        <div class="text-body-large text-center">{{ progressText }}</div>
 
         <v-progress-linear class="my-4" rounded color="primary" height="20"
                            :striped="!!submitting" :model-value="processedPercent" :buffer-value="progressingPercent" />

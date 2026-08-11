@@ -1,0 +1,83 @@
+@forward 'vuetify/settings' with (
+    /* Global */
+    $border-radius-root: 6px,
+    $grid-gutter: 16px,
+    $typography: (
+        'title-medium': (
+            'size': 1.125rem,
+            'weight': 400,
+        ),
+        'title-small': (
+            'size': 1rem,
+            'weight': 400,
+        ),
+        'body-large': (
+            'size': 0.9375rem,
+            'weight': 400,
+        ),
+    ),
+
+    /* Dialog */
+    $dialog-card-text-padding: 12px 16px 16px,
+
+    /* Tabs */
+    $tabs-height: 40px,
+
+    /* Expansion Panel */
+    $expansion-panel-title-min-height: 40px,
+    $expansion-panel-active-title-min-height: 42px,
+    $expansion-panel-disabled-opacity: 0.2,
+    $expansion-panel-disabled-overlay: 0,
+
+    /* Card */
+    $card-title-font-size: 1.125rem,
+    $card-subtitle-opacity: 1,
+    $card-text-font-size: 0.8125rem,
+    $card-transition-property: (box-shadow, opacity),
+
+    /* List Item */
+    $list-density: ('default': 0, 'comfortable': -1, 'compact': -3),
+    $list-item-title-font-size: 0.875rem,
+    $list-item-icon-margin-start: 8px,
+
+    /* Table */
+    $table-hover-color: rgba(var(--v-border-color), 0.05),
+    $table-transition-property: (box-shadow, opacity, height),
+
+    /* Button */
+    $button-margin-end: 4px,
+
+    /* Switch */
+    $switch-track-width: 30px,
+    $switch-track-height: 18px,
+    $switch-track-opacity: 1,
+    $switch-thumb-height: 14px,
+    $switch-thumb-width: 14px,
+    $switch-thumb-offset: -2px,
+    $switch-inset-track-height: 18px,
+    $switch-inset-track-width: 30px,
+    $switch-inset-thumb-height: 14px,
+    $switch-inset-thumb-width: 14px,
+    $switch-inset-thumb-off-height: 14px,
+    $switch-inset-thumb-off-width: 14px,
+    $switch-inset-thumb-pressed-scale: 1.285714,
+    $switch-inset-border-width: 1px,
+
+    /* Chip */
+    $chip-font-size: 1rem,
+
+    /* Pagination */
+    $pagination-item-margin: 0.1rem,
+
+    /* Field */
+    $input-density: ('default': 0, 'comfortable': -2, 'compact': -5),
+    $field-font-size: 0.9375rem,
+    $field-label-floating-scale: 0.8,
+    $label-font-size: 0.9375rem,
+
+    /* Skeleton Loader */
+    $skeleton-loader-gutter: 12px,
+
+    /* Tooltip */
+    $tooltip-padding: 4px 12px
+);

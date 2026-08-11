@@ -5,16 +5,16 @@
                                   :loading="currentStep !== 'checkData' && loading"
                                   @cancel="close(currentStep === 'finalResult')">
             <template #after-title>
-                <span class="ms-2 text-body-1 text-truncate" v-if="currentStep === 'uploadFile' && exportFileGuideDocumentUrl">
-                    <a :href="exportFileGuideDocumentUrl" :class="{ 'disabled': submitting }" target="_blank">
+                <div class="ms-2 text-body-large text-truncate" v-if="currentStep === 'uploadFile' && exportFileGuideDocumentUrl">
+                    <a :class="{ 'disabled': submitting }" :href="exportFileGuideDocumentUrl" target="_blank">
                         <v-icon :icon="mdiHelpCircleOutline" size="16" />
-                        <span class="ms-1" v-if="isCustomFileFormat">{{ tt('How to import this file?') }}</span>
-                        <span class="ms-1" v-if="!isCustomFileFormat">{{ tt('How to export this file?') }}</span>
-                        <span class="ms-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
+                        <span class="vertical-align-middle ms-1" v-if="isCustomFileFormat">{{ tt('How to import this file?') }}</span>
+                        <span class="vertical-align-middle ms-1" v-if="!isCustomFileFormat">{{ tt('How to export this file?') }}</span>
+                        <span class="vertical-align-middle ms-1" v-if="exportFileGuideDocumentLanguageName">[{{ exportFileGuideDocumentLanguageName }}]</span>
                     </a>
-                </span>
+                </div>
 
-                <v-btn density="compact" color="default" variant="text" size="22"
+                <v-btn density="compact" color="default" variant="text"
                        class="ms-2" :icon="true" :disabled="loading"
                        :loading="loading"
                        @click="reloadBasisData"
@@ -86,7 +86,7 @@
                         <v-list>
                             <template :key="groupIndex" v-for="(group, groupIndex) in importTransactionCheckDataTab.filterMenus">
                                 <v-divider class="my-2" v-if="groupIndex > 0" />
-                                <v-list-subheader :title="group.title" v-if="group.title" />
+                                <v-list-subheader class="text-body-small" :title="group.title" v-if="group.title" />
                                 <v-list-item :key="`menu_${groupIndex}_${index}`"
                                              :prepend-icon="menu.prependIcon"
                                              :title="menu.title"
@@ -99,7 +99,7 @@
                         </v-list>
                     </v-menu>
                 </v-btn>
-                <v-btn density="compact" color="default" variant="text" class="ms-1"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
                        :icon="true" :disabled="loading || submitting"
                        v-if="currentStep === 'checkData' && importTransactionCheckDataTab?.toolMenus">
                     <v-icon :icon="mdiDotsVertical" />
@@ -252,7 +252,7 @@
                                 </v-col>
 
                                 <v-col cols="12" md="12" v-if="isAIImageImport">
-                                    <div class="text-subtitle-1 mb-2">{{ tt('Image Files') }}</div>
+                                    <div class="text-body-large mb-2">{{ tt('Image Files') }}</div>
                                     <div class="import-transaction-images d-flex gap-2 overflow-x-auto">
                                         <div :key="picIdx" v-for="(imageItem, picIdx) in importImageFiles">
                                             <v-avatar rounded="lg" variant="tonal" size="120"
@@ -309,15 +309,15 @@
                     </v-window-item>
                     <v-window-item value="finalResult">
                         <div class="mx-4 mt-3">
-                            <h4 class="text-h4">{{ tt('Data Import Completed') }}</h4>
-                            <p class="my-5">{{ tt('format.misc.importTransactionResult', { count: formatNumberToLocalizedNumerals(importedCount || 0) }) }}</p>
+                            <span class="text-headline-large">{{ tt('Data Import Completed') }}</span>
+                            <span class="my-5">{{ tt('format.misc.importTransactionResult', { count: formatNumberToLocalizedNumerals(importedCount || 0) }) }}</span>
                         </div>
                     </v-window-item>
                 </v-window>
             </template>
 
             <template #footer v-if="currentStep === 'uploadFile' && (needAITextRecognition || needAIImageRecognition)">
-                <div class="w-100 text-body-1 text-truncate">
+                <div class="w-100 text-body-large text-truncate">
                     <span v-if="needAITextRecognition">
                         {{ tt('Uploaded text and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}
                     </span>

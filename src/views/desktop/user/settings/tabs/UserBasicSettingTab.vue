@@ -7,13 +7,13 @@
                     <v-progress-circular indeterminate size="20" class="ms-3" v-if="loading"></v-progress-circular>
                 </template>
 
-                <v-card-text class="d-flex">
+                <v-card-text class="d-flex mt-2">
                     <v-avatar rounded="lg" variant="tonal" size="100" class="me-4 user-profile-avatar-icon"
                               :class="{ 'cursor-pointer': avatarProvider === 'internal', 'user-profile-avatar-icon-modifiable': avatarProvider === 'internal' }"
                               :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                         <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
                             <template #placeholder>
-                                <div class="d-flex align-center justify-center fill-height bg-light-primary">
+                                <div class="d-flex align-center justify-center bg-light-primary">
                                     <v-icon color="primary" size="48" class="user-profile-avatar-placeholder" :icon="mdiAccount"/>
                                 </div>
                             </template>
@@ -30,12 +30,12 @@
                         </v-menu>
                     </v-avatar>
                     <div class="d-flex flex-column justify-center gap-3">
-                        <div class="d-flex text-body-1">
+                        <div class="d-flex text-body-large">
                             <span class="me-1">{{ tt('Username:') }}</span>
                             <v-skeleton-loader class="skeleton-no-margin" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
                             <span v-if="!loading">{{ oldProfile.username }}</span>
                         </div>
-                        <div class="d-flex text-body-1 align-center" style="height: 40px;">
+                        <div class="d-flex text-body-large align-center" style="height: 40px;">
                             <span v-if="!loading && emailVerified">{{ tt('Email address is verified') }}</span>
                             <span v-if="!loading && !emailVerified">{{ tt('Email address is not verified') }}</span>
                             <v-btn class="ms-2 px-2" size="small" variant="text" :disabled="loading || resending"
@@ -50,8 +50,8 @@
 
                 <v-divider />
 
-                <v-form class="mt-6">
-                    <v-card-text>
+                <v-form>
+                    <v-card-text class="mt-1">
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -107,10 +107,10 @@
                                     :items="enableDisableOptions"
                                     v-model="newProfile.useLastReconciledTime"
                                 >
-                                    <template #item="{ props, item }">
-                                        <v-list-item :disabled="!item.raw.value && (TransactionEditScopeType.valueOf(newProfile.transactionEditScope)?.needLastReconciledTime ?? false)" v-bind="props">
+                                    <template #item="{ props, internalItem }">
+                                        <v-list-item :disabled="!internalItem.raw.value && (TransactionEditScopeType.valueOf(newProfile.transactionEditScope)?.needLastReconciledTime ?? false)" v-bind="props">
                                             <template #title>
-                                                <div class="text-truncate">{{ item.raw.displayName }}</div>
+                                                <div class="text-truncate">{{ internalItem.raw.displayName }}</div>
                                             </template>
                                         </v-list-item>
                                     </template>
@@ -134,7 +134,7 @@
 
                     <v-divider />
 
-                    <v-card-text>
+                    <v-card-text class="mt-1">
                         <v-row>
                             <v-col cols="12" md="6">
                                 <language-select :disabled="loading || saving"
@@ -179,7 +179,7 @@
 
                     <v-divider />
 
-                    <v-card-text>
+                    <v-card-text class="mt-1">
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
@@ -276,7 +276,7 @@
 
                     <v-divider />
 
-                    <v-card-text>
+                    <v-card-text class="mt-1">
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
@@ -347,7 +347,7 @@
 
                     <v-divider />
 
-                    <v-card-text>
+                    <v-card-text class="mt-1">
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
@@ -366,7 +366,7 @@
 
                     <v-divider />
 
-                    <v-card-text>
+                    <v-card-text class="mt-1">
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
@@ -395,6 +395,8 @@
                             </v-col>
                         </v-row>
                     </v-card-text>
+
+                    <v-divider />
 
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="inputIsNotChanged || inputIsInvalid || saving" @click="save">

@@ -2,11 +2,11 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <v-layout>
+                <v-layout class="page-with-navigation-drawer">
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-6 my-4">
-                            <span class="text-subtitle-2">{{ tt('Data source') }}</span>
-                            <p class="text-body-1 mt-1 mb-3">
+                        <div class="mx-4 my-3">
+                            <span class="text-body-medium">{{ tt('Data source') }}</span>
+                            <div class="text-body-large mt-1 mb-3">
                                 <a tabindex="-1" target="_blank" :href="exchangeRatesData.referenceUrl" v-if="!loading && exchangeRatesData && !isUserCustomExchangeRates && exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</a>
                                 <span v-else-if="!loading && exchangeRatesData && !isUserCustomExchangeRates && !exchangeRatesData.referenceUrl">{{ exchangeRatesData.dataSource }}</span>
                                 <span v-else-if="!loading && exchangeRatesData && isUserCustomExchangeRates">{{ tt('User Custom') }}</span>
@@ -14,38 +14,38 @@
                                 <span v-else-if="loading">
                                     <v-skeleton-loader class="skeleton-no-margin mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
-                            </p>
-                            <span class="text-subtitle-2" v-if="exchangeRatesDataUpdateTime || loading">{{ tt('Last Updated') }}</span>
-                            <p class="text-body-1 mt-1" v-if="exchangeRatesDataUpdateTime || loading">
+                            </div>
+                            <span class="text-body-medium" v-if="exchangeRatesDataUpdateTime || loading">{{ tt('Last Updated') }}</span>
+                            <div class="text-body-large mt-1" v-if="exchangeRatesDataUpdateTime || loading">
                                 <span v-if="!loading">{{ exchangeRatesDataUpdateTime }}</span>
                                 <span v-if="loading">
-                                    <v-skeleton-loader class="skeleton-no-margin mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin mt-3 mb-3" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
-                            </p>
+                            </div>
                         </div>
                         <v-divider />
-                        <div class="mx-6 mt-4">
-                            <span class="text-subtitle-2">{{ tt('Base Amount') }}</span>
+                        <div class="mx-4 mt-3">
+                            <span class="text-body-medium">{{ tt('Base Amount') }}</span>
                             <amount-input class="mt-2" density="compact"
                                           :currency="baseCurrency"
                                           :disabled="loading || !exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length"
                                           v-model="baseAmount"/>
                         </div>
-                        <div class="mx-6 mt-4">
-                            <span class="text-subtitle-2">{{ tt('Base Currency') }}</span>
+                        <div class="mx-4 mt-2 mb-1">
+                            <span class="text-body-medium">{{ tt('Base Currency') }}</span>
                         </div>
                         <v-tabs show-arrows class="mb-4" direction="vertical"
                                 :disabled="loading" v-model="baseCurrency"
                                 v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
                             <v-tab class="tab-text-truncate" :key="exchangeRate.currencyCode" :value="exchangeRate.currencyCode"
                                    v-for="exchangeRate in availableExchangeRates">
-                                <div class="d-flex w-100">
+                                <div class="d-flex align-baseline w-100">
                                     <span class="d-block text-truncate">{{ exchangeRate.currencyDisplayName }}</span>
                                     <small class="smaller ms-1">{{ exchangeRate.currencyCode }}</small>
                                 </div>
                             </v-tab>
                         </v-tabs>
-                        <div class="mx-6 mt-2 mb-4"
+                        <div class="mx-4 mt-3 mb-4"
                              v-else-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
                             <span v-if="!loading">{{ tt('None') }}</span>
                             <span v-else-if="loading">
@@ -61,7 +61,7 @@
                                 <v-card variant="flat" min-height="680">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
@@ -80,7 +80,8 @@
                                         </div>
                                     </template>
 
-                                    <v-table class="exchange-rates-table table-striped" :hover="!loading">
+                                    <v-table class="exchange-rates-table table-striped"
+                                             density="default" :hover="!loading">
                                         <thead>
                                         <tr>
                                             <th>
@@ -111,7 +112,7 @@
                                             <td>
                                                 <div class="d-flex align-center">
                                                     <span>{{ exchangeRate.currencyDisplayName }}</span>
-                                                    <span class="text-caption ms-1">{{ exchangeRate.currencyCode }}</span>
+                                                    <span class="text-body-small ms-1">{{ exchangeRate.currencyCode }}</span>
 
                                                     <v-spacer/>
 
@@ -136,7 +137,7 @@
                                                         </v-btn>
                                                     </template>
 
-                                                    <span class="text-subtitle-1 ms-3">{{ getFinalConvertedAmount(exchangeRate, true) }}</span>
+                                                    <span class="text-body-large ms-3">{{ getFinalConvertedAmount(exchangeRate, true) }}</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -188,7 +189,7 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type UpdateDialogType = InstanceType<typeof UpdateDialog>;
 
-const { mdAndUp } = useDisplay();
+const { lgAndUp } = useDisplay();
 
 const { tt, getCurrentNumeralSystemType, formatExchangeRateAmountToWesternArabicNumerals } = useI18n();
 const {
@@ -214,8 +215,8 @@ const loading = ref<boolean>(true);
 const updating = ref<boolean>(false);
 const hoveredCurrency = ref<string>('');
 const customExchangeRateRemoving = ref<Record<string, boolean>>({});
-const alwaysShowNav = ref<boolean>(mdAndUp.value);
-const showNav = ref<boolean>(mdAndUp.value);
+const alwaysShowNav = ref<boolean>(lgAndUp.value);
+const showNav = ref<boolean>(lgAndUp.value);
 
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
 
@@ -327,7 +328,7 @@ function getFinalConvertedAmount(toExchangeRate: LocalizedLatestExchangeRate, di
     return ret;
 }
 
-watch(mdAndUp, (newValue) => {
+watch(lgAndUp, (newValue) => {
     alwaysShowNav.value = newValue;
 
     if (!showNav.value) {

@@ -3,11 +3,13 @@
         <v-col cols="12">
             <v-card :class="{ 'disabled': updatingPassword }" :title="tt('Modify Password')">
                 <v-form>
-                    <v-card-text class="pt-0">
-                        <span class="text-body-1">{{ tt('After changing the password, other devices will be logged out. Please use the new password to log in on other devices.') }}</span>
+                    <v-card-text class="pt-2">
+                        <span class="text-body-large">{{ tt('After changing the password, other devices will be logged out. Please use the new password to log in on other devices.') }}</span>
                     </v-card-text>
 
-                    <v-card-text>
+                    <v-divider/>
+
+                    <v-card-text class="mt-1">
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -52,6 +54,8 @@
                             </v-col>
                         </v-row>
                     </v-card-text>
+
+                    <v-divider/>
 
                     <v-card-text class="d-flex flex-wrap gap-4">
                         <v-btn :disabled="!newPassword || !confirmPassword || updatingPassword" @click="updatePassword">

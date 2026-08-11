@@ -30,7 +30,7 @@
         </template>
 
         <template #no-data>
-            <div class="mx-2 mt-2" v-if="enableFilter">
+            <div class="mx-2 mb-1" v-if="enableFilter">
                 <v-text-field eager ref="filterInput" density="compact"
                               :prepend-inner-icon="mdiMagnify"
                               :placeholder="filterPlaceholder"
@@ -38,7 +38,7 @@
                               @click:control="onInputFocused(filterInput, true)"
                               @update:focused="onInputFocused(filterInput, $event)"></v-text-field>
             </div>
-            <div class="mx-4 my-3" v-show="!filteredItems || !filteredItems.length">
+            <div class="text-body-large mx-4 mt-3 mb-2" v-show="!filteredItems || !filteredItems.length">
                 {{ filterNoItemsText }}
             </div>
             <div ref="dropdownMenu" class="two-column-list-container" v-show="filteredItems && filteredItems.length">
@@ -288,13 +288,13 @@ function onInputFocused(input: VTextField | null | undefined, focused: boolean):
 
 .two-column-select-menu .list-item-with-header > .v-list-item,
 .two-column-select-menu .list-item-with-footer > .v-list-item {
-    min-height: 58px;
+    min-height: 52px;
     padding-top: 6px;
     padding-bottom: 6px;
 }
 
 .two-column-select-menu .list-item-with-header.list-item-with-footer > .v-list-item {
-    min-height: 78px;
+    min-height: 74px;
     padding-top: 8px;
     padding-bottom: 8px;
 }

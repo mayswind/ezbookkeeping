@@ -1,5 +1,5 @@
 <template>
-    <v-card-text class="px-5 py-0 mb-4">
+    <v-card-text class="px-4 py-0 mb-4">
         <v-row>
             <v-col cols="12">
                 <div class="d-flex overflow-x-auto align-center gap-2 pt-2">
@@ -27,7 +27,7 @@
                     />
                     <v-spacer/>
                     <div class="d-flex align-center">
-                        <span class="text-subtitle-1">
+                        <span class="text-body-large">
                             {{ tt('format.misc.selectedCount', { count: formatNumberToLocalizedNumerals(selectedTransactionCount), totalCount: formatNumberToLocalizedNumerals(filteredTransactions.length) }) }}
                         </span>
                     </div>
@@ -198,7 +198,8 @@
         </template>
         <template #bottom>
             <div class="title-and-toolbar d-flex align-center justify-center text-no-wrap mt-2 mb-4">
-                <pagination-buttons :disabled="loading || disabled"
+                <pagination-buttons density="comfortable"
+                                    :disabled="loading || disabled"
                                     :totalPageCount="totalPageCount"
                                     v-model="currentPage">
                 </pagination-buttons>
@@ -466,6 +467,8 @@ watch(() => filteredTransactions.value, newValue => {
     margin-inline-end: 4px;
     margin-top: 2px;
     margin-bottom: 2px;
+    padding-inline: 12px;
+    border-radius: var(--ebk-radius-lg);
 }
 
 .v-table.insights-editable-explorer-table .v-chip.transaction-tag > .v-chip__content {

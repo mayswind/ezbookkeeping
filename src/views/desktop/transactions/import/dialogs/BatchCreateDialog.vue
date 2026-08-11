@@ -34,9 +34,9 @@
             </template>
 
             <template #content>
-                <v-list class="mx-2" density="comfortable" select-strategy="classic"
+                <v-list class="mx-3 d-flex flex-column gap-1" density="comfortable" select-strategy="classic"
                         :disabled="submitting" v-model:selected="selectedNames">
-                    <v-list-item class="mx-1 px-2 py-0"
+                    <v-list-item class="py-0" density="compact"
                                  :key="item.value" :value="item.name" :title="item.name"
                                  v-for="item in invalidItems">
                         <template #prepend="{ isActive }">

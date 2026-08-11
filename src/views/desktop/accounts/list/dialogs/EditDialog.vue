@@ -71,15 +71,15 @@
                                         :no-data-text="tt('No results')"
                                         v-model="selectedAccount.category"
                                     >
-                                        <template #item="{ props, item }">
-                                            <v-list-item :value="item.value" v-bind="props">
+                                        <template #item="{ props, internalItem }">
+                                            <v-list-item :value="internalItem.value" v-bind="props">
                                                 <template #title>
                                                     <v-list-item-title>
                                                         <div class="d-flex align-center">
                                                             <ItemIcon icon-type="account"
-                                                                      :icon-id="item.raw.defaultAccountIconId"
-                                                                      v-if="item.raw" />
-                                                            <span class="ms-2">{{ item.title }}</span>
+                                                                      :icon-id="internalItem.raw.defaultAccountIconId"
+                                                                      v-if="internalItem.raw" />
+                                                            <span class="ms-2">{{ internalItem.title }}</span>
                                                         </div>
                                                     </v-list-item-title>
                                                 </template>
@@ -164,7 +164,7 @@
                                         v-model="selectedAccount.comment"
                                     />
                                 </v-col>
-                                <v-col class="py-0" cols="12" md="12" v-if="editAccountId && !isNewAccount(selectedAccount)">
+                                <v-col class="py-0 my-n2" cols="12" md="12" v-if="editAccountId && !isNewAccount(selectedAccount)">
                                     <v-switch :disabled="loading || submitting"
                                               :label="tt('Visible')" v-model="selectedAccount.visible"/>
                                 </v-col>

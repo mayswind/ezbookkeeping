@@ -1,5 +1,6 @@
 <template>
     <v-select
+        class="color-select"
         density="comfortable"
         item-title="icon"
         item-value="id"
@@ -9,9 +10,9 @@
         v-model="color"
         @update:menu="onMenuStateChanged"
     >
-        <template #selection="{ item }">
+        <template #selection="{ internalItem }">
             <v-label class="cursor-pointer" style="padding-top: 3px">
-                <v-icon size="28" :icon="mdiSquareRounded" :color="getDisplayColor(item.raw)"/>
+                <v-icon size="28" :icon="mdiSquareRounded" :color="getDisplayColor(internalItem.raw)"/>
             </v-label>
         </template>
 
@@ -98,6 +99,11 @@ function onMenuStateChanged(state: boolean): void {
 </script>
 
 <style>
+.color-select:not(.v-input--disabled) .v-field__input,
+.color-select:not(.v-input--disabled) .v-label {
+    opacity: 1;
+}
+
 .color-select-dropdown .color-item {
     display: grid;
 }

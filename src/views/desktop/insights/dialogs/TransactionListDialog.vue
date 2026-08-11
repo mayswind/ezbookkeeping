@@ -5,7 +5,7 @@
                                   @cancel="cancel">
             <template #toolbar>
                 <div class="title-and-toolbar d-flex align-center justify-center text-no-wrap">
-                    <span class="text-body-1" v-if="transactions.length > 10">{{ tt('Transactions Per Page') }}</span>
+                    <span class="text-body-large" v-if="transactions.length > 10">{{ tt('Transactions Per Page') }}</span>
                     <v-select class="ms-2" density="compact" max-width="100"
                               item-title="name"
                               item-value="value"
@@ -13,7 +13,7 @@
                               v-model="countPerPage"
                               v-if="transactions.length > 10"
                     />
-                    <pagination-buttons density="compact"
+                    <pagination-buttons density="comfortable"
                                         :totalPageCount="totalPageCount"
                                         v-model="currentPage"
                                         v-if="transactions.length > 10">

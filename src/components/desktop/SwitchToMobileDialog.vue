@@ -3,17 +3,17 @@
         <one-column-dialog-layout :title="tt('Use on Mobile Device')" :cancel-button-title="tt('Close')"
                                   @cancel="showState = false">
             <template #content>
-                <div class="text-body-1 text-wrap my-4">{{ tt('You can scan the QR code below on your mobile device.') }}</div>
-                <div class="d-flex justify-center w-100">
+                <div class="text-body-large text-wrap">{{ tt('You can scan the QR code below on your mobile device.') }}</div>
+                <div class="d-flex justify-center w-100 mt-4">
                     <v-img alt="qrcode" class="img-url-qrcode" :src="mobileUrlQrCodePath">
                         <template #placeholder>
-                            <div class="d-flex align-center justify-center fill-height">
+                            <div class="d-flex align-center justify-center">
                                 <v-progress-circular color="grey-500" indeterminate size="48"></v-progress-circular>
                             </div>
                         </template>
                         <template #error>
-                            <div class="d-flex align-center justify-center fill-height">
-                                <span class="text-body-1">{{ tt('Failed to load QR code') }}</span>
+                            <div class="d-flex align-center justify-center">
+                                <span class="text-body-large">{{ tt('Failed to load QR code') }}</span>
                             </div>
                         </template>
                     </v-img>

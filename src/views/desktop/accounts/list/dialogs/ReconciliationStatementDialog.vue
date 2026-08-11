@@ -1,10 +1,13 @@
 <template>
     <v-dialog :persistent="loading || updatingLastReconciledTime" v-model="showState">
-        <one-column-dialog-layout content-class="pa-0" :disabled="loading || updatingLastReconciledTime"
+        <one-column-dialog-layout ref="dialogLayout" content-class="pa-0 d-flex flex-column"
+                                  class="reconciliation-statement-dialog-layout d-flex flex-column"
+                                  :style="{ '--reconciliation-statement-dialog-height': preserveDialogHeight ? transactionListDialogHeight + 'px' : undefined }"
+                                  :disabled="loading || updatingLastReconciledTime"
                                   :title="tt('Reconciliation Statement')" :cancel-button-title="tt('Close')"
                                   @cancel="close">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text" size="22"
+                <v-btn density="compact" color="default" variant="text"
                        class="ms-2" :icon="true" :disabled="updatingLastReconciledTime"
                        :loading="loading" @click="reload(true)">
                     <template #loader>
@@ -23,7 +26,7 @@
             </template>
 
             <template #toolbar>
-                <toggle-button class="ms-2" :disabled="loading || updatingLastReconciledTime"
+                <toggle-button class="ms-2" :disabled="loading || updatingLastReconciledTime || !reconciliationStatements?.transactions?.length"
                                :false-name="tt('Transaction List')" :true-name="tt('Account Balance Trends')"
                                v-model="showAccountBalanceTrendsCharts"/>
 
@@ -32,7 +35,7 @@
                     <v-icon :icon="mdiTuneVertical" size="22" />
                     <v-menu activator="parent">
                         <v-list>
-                            <v-list-subheader :title="tt('Chart Type')"/>
+                            <v-list-subheader class="text-body-small" :title="tt('Chart Type')"/>
                             <v-list-item :key="type.type"
                                          :prepend-icon="chartTypeIconMap[type.type]"
                                          :append-icon="chartType === type.type ? mdiCheck : undefined"
@@ -40,7 +43,7 @@
                                          @click="chartType = type.type"
                                          v-for="type in allChartTypes"></v-list-item>
                             <v-divider class="my-2"/>
-                            <v-list-subheader :title="tt('Time Granularity')"/>
+                            <v-list-subheader class="text-body-small" :title="tt('Time Granularity')"/>
                             <v-list-item :key="dateAggregationType.type"
                                          :prepend-icon="chartDataDateAggregationTypeIconMap[dateAggregationType.type]"
                                          :append-icon="chartDataDateAggregationType === dateAggregationType.type ? mdiCheck : undefined"
@@ -48,7 +51,7 @@
                                          @click="chartDataDateAggregationType = dateAggregationType.type"
                                          v-for="dateAggregationType in allDateAggregationTypes"></v-list-item>
                             <v-divider class="my-2"/>
-                            <v-list-subheader :title="tt('Timezone Used for Date Range')"/>
+                            <v-list-subheader class="text-body-small" :title="tt('Timezone Used for Date Range')"/>
                             <v-list-item :key="timezoneType.type" :value="timezoneType.type"
                                          :prepend-icon="timezoneTypeIconMap[timezoneType.type]"
                                          :append-icon="timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined"
@@ -58,7 +61,7 @@
                         </v-list>
                     </v-menu>
                 </v-btn>
-                <v-btn density="compact" color="default" variant="text" class="ms-1"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
                        :icon="true" :disabled="loading || updatingLastReconciledTime">
                     <v-icon :icon="mdiDotsVertical" size="22" />
                     <v-menu activator="parent">
@@ -93,18 +96,18 @@
 
             <template #subtitle>
                 <v-divider class="mt-2"/>
-                <div class="mt-2 mx-5">
-                    <div class="text-body-1 text-wrap" v-if="!startTime && !endTime">
+                <div class="mt-2 mx-4">
+                    <div class="text-body-large text-wrap" v-if="!startTime && !endTime">
                         <span>{{ tt('All') }}</span>
                     </div>
-                    <div class="text-body-1 text-wrap" v-if="startTime || endTime">
+                    <div class="text-body-large text-wrap" v-if="startTime || endTime">
                         <span>{{ displayStartDateTime }}</span>
                         <span> - </span>
                         <span>{{ displayEndDateTime }}</span>
                     </div>
 
                     <div class="d-flex align-center mt-1 overflow-x-auto">
-                        <div class="d-flex align-center text-body-1">
+                        <div class="d-flex align-center text-body-large">
                             <span>{{ tt('Opening Balance') }}</span>
                             <span class="text-primary" v-if="loading">
                             <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
@@ -127,7 +130,7 @@
                         </span>
                         </div>
                         <v-spacer/>
-                        <div class="d-flex align-center text-body-1">
+                        <div class="d-flex align-center text-body-large">
                             <span class="ms-2">{{ tt('Total Inflows') }}</span>
                             <span class="text-income" v-if="loading">
                             <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
@@ -171,7 +174,6 @@
                     density="compact"
                     item-value="index"
                     :class="{ 'reconciliation-statement-table': true, 'disabled': loading }"
-                    :height="dataTableHeight"
                     :headers="dataTableHeaders"
                     :items="reconciliationStatements?.transactions ?? []"
                     :hover="true"
@@ -236,8 +238,8 @@
                         </v-btn>
                     </template>
                     <template #no-data>
-                        <div v-if="loading && (!reconciliationStatements || !reconciliationStatements.transactions || !reconciliationStatements.transactions.length)">
-                            <v-skeleton-loader class="skeleton-no-margin my-5" type="text" :loading="true"
+                        <div class="my-6" v-if="loading && (!reconciliationStatements || !reconciliationStatements.transactions || !reconciliationStatements.transactions.length)">
+                            <v-skeleton-loader class="skeleton-no-margin my-6" type="text" :loading="true"
                                                :key="idx" v-for="idx in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"></v-skeleton-loader>
                         </div>
                         <div class="my-5" v-else>
@@ -247,7 +249,7 @@
                     <template #bottom></template>
                 </v-data-table>
 
-                <div class="d-flex pa-4" v-if="showAccountBalanceTrendsCharts">
+                <div class="reconciliation-statement-chart-container d-flex flex-grow-1 pa-4" v-if="showAccountBalanceTrendsCharts">
                     <account-balance-trends-chart
                         :type="chartType"
                         :date-aggregation-type="chartDataDateAggregationType"
@@ -276,7 +278,7 @@
             </template>
 
             <template #footer v-if="!showAccountBalanceTrendsCharts && (loading || (reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length))">
-                <div class="title-and-toolbar d-flex w-100 align-center text-no-wrap">
+                <div class="title-and-toolbar d-flex w-100 text-body-large align-center text-no-wrap">
                     <span>{{ tt('Total Transactions') }}</span>
                     <span v-if="loading">
                         <v-skeleton-loader class="skeleton-no-margin ms-3" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
@@ -296,7 +298,7 @@
                               v-model="countPerPage"
                               v-if="reconciliationStatements && reconciliationStatements.transactions && reconciliationStatements.transactions.length > 10"
                     />
-                    <pagination-buttons density="compact"
+                    <pagination-buttons density="comfortable"
                                         :disabled="loading"
                                         :totalPageCount="totalPageCount"
                                         v-model="currentPage"
@@ -314,13 +316,14 @@
 </template>
 
 <script setup lang="ts">
+import OneColumnDialogLayout from '@/components/desktop/OneColumnDialogLayout.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import AmountInputDialog from '@/components/desktop/AmountInputDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import { TransactionEditPageType } from '@/views/base/transactions/TransactionEditPageBase.ts';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useReconciliationStatementPageBase } from '@/views/base/accounts/ReconciliationStatementPageBase.ts';
@@ -367,6 +370,7 @@ import {
     mdiPencilBoxOutline
 } from '@mdi/js';
 
+type OneColumnDialogLayoutType = InstanceType<typeof OneColumnDialogLayout>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type AmountInputDialogType = InstanceType<typeof AmountInputDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
@@ -450,6 +454,7 @@ const timezoneTypeIconMap = {
     [TimezoneTypeForStatistics.TransactionTimezone.type]: mdiInvoiceTextClockOutline
 };
 
+const dialogLayout = useTemplateRef<OneColumnDialogLayoutType>('dialogLayout');
 const amountInputDialog = useTemplateRef<AmountInputDialogType>('amountInputDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
@@ -461,10 +466,12 @@ const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
 const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const chartType = ref<number>(AccountBalanceTrendChartType.Default.type);
+const transactionListDialogHeight = ref<number>(0);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const reconciliationStatementsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(reconciliationStatements.value?.transactions.length));
+const preserveDialogHeight = computed<boolean>(() => showAccountBalanceTrendsCharts.value && transactionListDialogHeight.value > 0);
 
 const totalPageCount = computed<number>(() => {
     if (!reconciliationStatements.value || !reconciliationStatements.value.transactions || reconciliationStatements.value.transactions.length < 1) {
@@ -473,14 +480,6 @@ const totalPageCount = computed<number>(() => {
 
     const count = reconciliationStatements.value.transactions.length;
     return Math.ceil(count / countPerPage.value);
-});
-
-const dataTableHeight = computed<number | undefined>(() => {
-    if (countPerPage.value <= 10 || !reconciliationStatements.value?.transactions || reconciliationStatements.value?.transactions?.length <= 10) {
-        return undefined;
-    } else {
-        return 380;
-    }
 });
 
 const dataTableHeaders = computed<object[]>(() => {
@@ -739,22 +738,45 @@ function close(): void {
     showState.value = false;
 }
 
+watch(showAccountBalanceTrendsCharts, (showCharts) => {
+    if (!showCharts) {
+        return;
+    }
+
+    const dialogCard = dialogLayout.value?.$el;
+
+    if (dialogCard instanceof HTMLElement) {
+        transactionListDialogHeight.value = dialogCard.getBoundingClientRect().height;
+    }
+}, { flush: 'sync' });
+
 defineExpose({
     open
 });
 </script>
 
 <style>
-.reconciliation-statement-table > .v-table__wrapper > table {
-    th:not(:nth-last-child(2)),
-    td:not(:nth-last-child(2)) {
-        width: auto !important;
-        white-space: nowrap;
+.reconciliation-statement-dialog-layout {
+    min-height: min(max(var(--reconciliation-statement-dialog-height), 597px), calc(100dvh - 48px));
+
+    .v-table.reconciliation-statement-table > .v-table__wrapper > table {
+        th:not(:nth-last-child(2)),
+        td:not(:nth-last-child(2)) {
+            width: auto !important;
+            white-space: nowrap;
+        }
+
+        th:nth-last-child(2),
+        td:nth-last-child(2) {
+            width: 100% !important;
+        }
     }
 
-    th:nth-last-child(2),
-    td:nth-last-child(2) {
-        width: 100% !important;
+    .reconciliation-statement-chart-container > .account-balance-trends-chart-container {
+        flex: 1 1 auto;
+        height: auto !important;
+        min-height: 438px;
     }
+
 }
 </style>

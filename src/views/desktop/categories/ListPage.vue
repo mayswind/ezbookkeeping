@@ -2,9 +2,9 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <v-layout>
+                <v-layout class="page-with-navigation-drawer">
                     <v-navigation-drawer ref="navbar" :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-6 my-4">
+                        <div class="mx-4 my-3">
                             <btn-vertical-group :disabled="loading" :buttons="[
                                 { name: tt('Expense'), value: CategoryType.Expense },
                                 { name: tt('Income'), value: CategoryType.Income },
@@ -12,7 +12,7 @@
                             ]" v-model="activeCategoryType" @update:model-value="switchAllPrimaryCategories" />
                         </div>
                         <v-divider />
-                        <v-tabs show-arrows class="my-4" direction="vertical"
+                        <v-tabs show-arrows class="my-3" direction="vertical"
                                 :disabled="loading" v-model="primaryCategoryId">
                             <v-tab class="tab-text-truncate" value="0" @click="switchAllPrimaryCategories">
                                 <span class="text-truncate">{{ tt('Primary Categories') }}</span>
@@ -24,7 +24,7 @@
                                 </v-tab>
                             </template>
                             <template v-if="loading && (!primaryCategories || primaryCategories.length < 1)">
-                                <v-skeleton-loader class="skeleton-no-margin mx-5 mt-4 mb-3" type="text"
+                                <v-skeleton-loader class="skeleton-no-margin mx-4 mt-4 mb-3" type="text"
                                                    :key="itemIdx" :loading="true" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"></v-skeleton-loader>
                             </template>
                         </v-tabs>
@@ -35,7 +35,7 @@
                                 <v-card variant="flat" :min-height="cardMinHeight">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
@@ -71,7 +71,8 @@
                                         </div>
                                     </template>
 
-                                    <v-table class="transaction-category-table table-striped" :hover="!loading">
+                                    <v-table class="transaction-category-table table-striped"
+                                             density="default" :hover="!loading">
                                         <thead>
                                         <tr>
                                             <th>
@@ -232,7 +233,7 @@ type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
-const display = useDisplay();
+const { lgAndUp } = useDisplay();
 const { tt } = useI18n();
 const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
 
@@ -251,8 +252,8 @@ const categoryHiding = ref<Record<string, boolean>>({});
 const categoryRemoving = ref<Record<string, boolean>>({});
 const displayOrderModified = ref<boolean>(false);
 const cardMinHeight = ref<number>(680);
-const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
-const showNav = ref<boolean>(display.mdAndUp.value);
+const alwaysShowNav = ref<boolean>(lgAndUp.value);
+const showNav = ref<boolean>(lgAndUp.value);
 const showHidden = ref<boolean>(false);
 const showPresetDialog = ref<boolean>(false);
 
@@ -486,7 +487,7 @@ function onPresetCategorySaved(e: { message: string }): void {
     }
 }
 
-watch(() => display.mdAndUp.value, (newValue) => {
+watch(lgAndUp, (newValue) => {
     alwaysShowNav.value = newValue;
 
     if (!showNav.value) {

@@ -39,6 +39,7 @@ function updateValue(value: boolean): void {
     display: inline-flex;
     padding: 2px;
     border: none;
+    border-radius: var(--ebk-radius-sm);
     overflow-x: auto;
 
     .v-btn--variant-text:not(.v-btn--icon) {
@@ -46,10 +47,11 @@ function updateValue(value: boolean): void {
     }
 
     .v-btn {
-        --v-btn-size: 0.875rem;
         width: auto !important;
         height: 26px !important;
+        min-width: 0;
         min-height: 26px;
+        border-radius: calc(var(--ebk-radius-sm) - 2px) !important;
         color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
     }
 
@@ -61,6 +63,10 @@ function updateValue(value: boolean): void {
         color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
         background: rgb(var(--v-theme-surface));
         box-shadow: 0 1px 3px rgba(var(--v-theme-on-surface), 0.16);
+
+        &.v-btn--disabled {
+            opacity: 0.45;
+        }
     }
 }
 </style>

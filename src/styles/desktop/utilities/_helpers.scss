@@ -1,0 +1,143 @@
+.disabled {
+    opacity: 0.55 !important;
+    pointer-events: none !important;
+    user-select: none !important;
+}
+
+.readonly {
+    pointer-events: none !important;
+}
+
+.vertical-align-middle {
+    vertical-align: middle !important;
+}
+
+.smaller {
+    font-size: 0.75rem;
+}
+
+.gap-x-1 {
+    column-gap: var(--ebk-space-1);
+}
+
+.gap-x-2 {
+    column-gap: var(--ebk-space-2);
+}
+
+.gap-x-3 {
+    column-gap: var(--ebk-space-3);
+}
+
+.gap-x-4 {
+    column-gap: var(--ebk-space-4);
+}
+
+.gap-x-5 {
+    column-gap: var(--ebk-space-5);
+}
+
+.gap-x-6 {
+    column-gap: var(--ebk-space-6);
+}
+
+.gap-1 {
+    gap: var(--ebk-space-1);
+}
+
+.gap-2 {
+    gap: var(--ebk-space-2);
+}
+
+.gap-3 {
+    gap: var(--ebk-space-3);
+}
+
+.gap-4 {
+    gap: var(--ebk-space-4);
+}
+
+.gap-5 {
+    gap: var(--ebk-space-5);
+}
+
+.gap-6 {
+    gap: var(--ebk-space-6);
+}
+
+.drag-handle {
+    cursor: grab;
+}
+
+.dragging-item {
+    background: rgb(var(--ebk-surface-muted));
+    opacity: 0.5;
+}
+
+
+.bg-light-primary {
+    background: rgba(var(--v-theme-primary), 0.11) !important;
+}
+
+.title-and-toolbar {
+    min-height: 2.375rem;
+    flex-wrap: wrap;
+    row-gap: var(--ebk-space-3);
+}
+
+.text-field-append-text {
+    color: rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+}
+
+.text-field-truncate.v-text-field .v-field__input {
+    text-overflow: ellipsis !important;
+}
+
+.link-no-color {
+    color: inherit !important;
+}
+
+.chart-pointer {
+    display: inline-block;
+    width: 0.625rem;
+    height: 0.625rem;
+    margin-inline-end: 0.3125rem;
+    border-radius: 999px;
+}
+
+.bidirectional-switch {
+    cursor: pointer;
+
+    &.v-input--horizontal .v-input__prepend {
+        margin-inline-end: 0.625rem;
+    }
+}
+
+[dir='rtl'] .bidirectional-switch,
+[dir='rtl'] .v-btn.button-icon-with-direction .v-icon__svg,
+[dir='rtl'] .v-icon.icon-with-direction .v-icon__svg,
+[dir='rtl'] .v-img.img-with-direction > img {
+    transform: scaleX(-1);
+}
+
+.code-container {
+    background: rgb(var(--ebk-surface-muted));
+}
+
+.chart-tooltip-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.pin-code-input input {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 1.25rem;
+}
+
+@media (min-width: 600px) {
+    .text-end-sm {
+        text-align: end !important;
+    }
+}

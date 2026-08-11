@@ -1,5 +1,6 @@
 <template>
     <v-select
+        class="icon-select"
         density="comfortable"
         item-title="icon"
         item-value="id"
@@ -97,6 +98,11 @@ function onMenuStateChanged(state: boolean): void {
 </script>
 
 <style>
+.icon-select:not(.v-input--disabled) .v-field__input,
+.icon-select:not(.v-input--disabled) .v-label {
+    opacity: 1;
+}
+
 .icon-select-dropdown .icon-item {
     display: grid;
 }

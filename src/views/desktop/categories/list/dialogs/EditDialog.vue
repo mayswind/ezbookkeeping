@@ -4,7 +4,7 @@
                                   :title="tt(title)" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #content>
-                <v-form class="mt-5">
+                <v-form class="mt-2">
                     <v-row>
                         <v-col cols="12" md="12">
                             <v-text-field
@@ -28,14 +28,14 @@
                                 :no-data-text="tt('No available primary category')"
                                 v-model="category.parentId"
                             >
-                                <template #item="{ props, item }">
+                                <template #item="{ props, internalItem }">
                                     <v-list-item v-bind="props">
                                         <template #prepend>
                                             <ItemIcon class="me-2" icon-type="category"
-                                                      :icon-id="item.raw.icon" :color="item.raw.color"></ItemIcon>
+                                                      :icon-id="internalItem.raw.icon" :color="internalItem.raw.color"></ItemIcon>
                                         </template>
                                         <template #title>
-                                            <div class="text-truncate">{{ item.raw.name }}</div>
+                                            <div class="text-truncate">{{ internalItem.raw.name }}</div>
                                         </template>
                                     </v-list-item>
                                 </template>
@@ -66,7 +66,7 @@
                                 v-model="category.comment"
                             />
                         </v-col>
-                        <v-col class="py-0" cols="12" md="12" v-if="editCategoryId">
+                        <v-col class="py-0 my-n2" cols="12" md="12" v-if="editCategoryId">
                             <v-switch :disabled="loading || submitting"
                                       :label="tt('Visible')" v-model="category.visible"/>
                         </v-col>

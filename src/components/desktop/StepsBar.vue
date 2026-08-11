@@ -10,11 +10,11 @@
                         <div class="d-flex align-center justify-center" style="block-size: 24px; inline-size: 24px;">
                             <div class="slide-group-stepper-indicator"></div>
                         </div>
-                        <h4 class="text-h4 step-number">{{ getDisplayStep(idx + 1) }}</h4>
+                        <span class="text-headline-medium step-number">{{ getDisplayStep(idx + 1) }}</span>
                     </div>
                     <div style="line-height: 0;">
-                        <h6 class="text-sm font-weight-medium step-title">{{ step.title }}</h6>
-                        <span class="text-xs step-subtitle">{{ step.subTitle }}</span>
+                        <div class="text-body-medium font-weight-medium">{{ step.title }}</div>
+                        <div class="text-body-small text-medium-emphasis">{{ step.subTitle }}</div>
                     </div>
                     <div class="slide-group-stepper-link-line" v-if="idx < steps.length - 1"></div>
                 </div>
@@ -31,11 +31,11 @@
                         <div class="d-flex align-center justify-center" style="block-size: 24px; inline-size: 24px;">
                             <div class="slide-group-stepper-indicator"></div>
                         </div>
-                        <h4 class="text-h4 step-number">{{ getDisplayStep(idx + 1) }}</h4>
+                        <span class="text-headline-medium step-number">{{ getDisplayStep(idx + 1) }}</span>
                     </div>
                     <div style="line-height: 0;">
-                        <h6 class="text-sm font-weight-medium step-title">{{ step.title }}</h6>
-                        <span class="text-xs step-subtitle">{{ step.subTitle }}</span>
+                        <div class="text-body-medium font-weight-medium">{{ step.title }}</div>
+                        <div class="text-body-small text-medium-emphasis">{{ step.subTitle }}</div>
                     </div>
                 </div>
             </div>

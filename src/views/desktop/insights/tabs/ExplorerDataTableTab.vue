@@ -1,5 +1,5 @@
 <template>
-    <v-card-text class="px-5 py-0 mb-4">
+    <v-card-text class="px-4 py-0 mb-4">
         <v-row>
             <v-col cols="12">
                 <div class="d-flex overflow-x-auto align-center gap-2 pt-2">
@@ -27,18 +27,18 @@
                     />
                     <v-spacer/>
                     <div class="d-flex align-center">
-                        <span class="text-subtitle-1">{{ tt('Total Transactions') }}</span>
+                        <span class="text-body-large">{{ tt('Total Transactions') }}</span>
                         <span v-if="loading">
                             <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 50px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-subtitle-1 ms-2" v-else-if="!loading">
+                        <span class="text-body-large ms-2" v-else-if="!loading">
                             {{ formatNumberToLocalizedNumerals(filteredTransactions.length) }}
                         </span>
-                        <span class="text-subtitle-1 ms-3" v-if="loading || filteredTransactionsStatistic">{{ tt('Total Amount') }}</span>
+                        <span class="text-body-large ms-3" v-if="loading || filteredTransactionsStatistic">{{ tt('Total Amount') }}</span>
                         <span v-if="loading">
                             <v-skeleton-loader class="skeleton-no-margin ms-2" type="text" style="width: 80px" :loading="true"></v-skeleton-loader>
                         </span>
-                        <span class="text-subtitle-1 ms-2" v-else-if="!loading && filteredTransactionsStatistic">
+                        <span class="text-body-large ms-2" v-else-if="!loading && filteredTransactionsStatistic">
                             {{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalAmount) }}
                         </span>
                         <v-tooltip interactive class="table-tooltip" activator="parent" v-if="!loading && filteredTransactions.length > 0 && filteredTransactionsStatistic">
@@ -204,7 +204,8 @@
         </template>
         <template #bottom>
             <div class="title-and-toolbar d-flex align-center justify-center text-no-wrap mt-2 mb-4">
-                <pagination-buttons :disabled="loading || disabled"
+                <pagination-buttons density="comfortable"
+                                    :disabled="loading || disabled"
                                     :totalPageCount="totalPageCount"
                                     v-model="currentPage">
                 </pagination-buttons>
@@ -385,6 +386,8 @@ defineExpose({
     margin-inline-end: 4px;
     margin-top: 2px;
     margin-bottom: 2px;
+    padding-inline: 12px;
+    border-radius: var(--ebk-radius-lg);
 }
 
 .v-table.insights-explorer-table .v-chip.transaction-tag > .v-chip__content {

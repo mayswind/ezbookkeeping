@@ -16,15 +16,15 @@
             <small class="text-field-append-text smaller">{{ currentCurrencyValue }}</small>
         </template>
 
-        <template #item="{ props, item }">
-            <v-list-item :value="item.value" v-bind="props">
+        <template #item="{ props, internalItem }">
+            <v-list-item :value="internalItem.value" v-bind="props">
                 <template #title>
                     <v-list-item-title>
                         <div class="d-flex align-center">
-                            <span>{{ item.title }}</span>
+                            <span>{{ internalItem.title }}</span>
                             <v-spacer style="min-width: 40px" />
-                            <v-icon :icon="mdiCheck" v-if="currentCurrencyValue === item.raw.currencyCode" />
-                            <small class="text-field-append-text" v-if="currentCurrencyValue !== item.raw.currencyCode">{{ item.raw.currencyCode }}</small>
+                            <v-icon :icon="mdiCheck" v-if="currentCurrencyValue === internalItem.raw.currencyCode" />
+                            <small class="text-field-append-text" v-if="currentCurrencyValue !== internalItem.raw.currencyCode">{{ internalItem.raw.currencyCode }}</small>
                         </div>
                     </v-list-item-title>
                 </template>

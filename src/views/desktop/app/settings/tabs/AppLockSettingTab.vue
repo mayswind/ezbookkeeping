@@ -2,16 +2,16 @@
     <v-row>
         <v-col cols="12">
             <v-card :title="tt('Application Lock')">
-                <v-card-text class="pb-0">
-                    <p class="text-body-1" v-if="!isEnableApplicationLock">
+                <v-card-text class="mt-2">
+                    <span class="text-body-large" v-if="!isEnableApplicationLock">
                         {{ tt('Application lock is not enabled') }}
-                    </p>
-                    <p class="text-body-1" v-if="isEnableApplicationLock">
+                    </span>
+                    <span class="text-body-large" v-if="isEnableApplicationLock">
                         {{ tt('Application lock has been enabled') }}
-                    </p>
+                    </span>
                 </v-card-text>
 
-                <v-card-text v-if="isEnableApplicationLock">
+                <v-card-text class="pt-0" v-if="isEnableApplicationLock">
                     <v-switch :disabled="true"
                               :label="tt('Unlock with PIN Code')"
                               v-model="isEnableApplicationLock"/>
@@ -21,16 +21,16 @@
                               v-if="isSupportedWebAuthn"/>
                 </v-card-text>
 
-                <v-card-text class="pb-0">
-                    <p class="text-body-1" v-if="!isEnableApplicationLock">
+                <v-card-text class="py-0">
+                    <span class="text-body-large" v-if="!isEnableApplicationLock">
                         {{ tt('Please enter a new 6-digit PIN code. The PIN code would encrypt your local data, so you need to enter it every time you open this app. If this PIN code is lost, you will need to log in again.') }}
-                    </p>
-                    <p class="text-body-1" v-if="isEnableApplicationLock">
+                    </span>
+                    <span class="text-body-large" v-if="isEnableApplicationLock">
                         {{ tt('Your current PIN code is required to disable application lock.') }}
-                    </p>
+                    </span>
                 </v-card-text>
 
-                <v-card-text class="pb-0">
+                <v-card-text class="mt-4 py-0">
                     <v-row class="mb-3">
                         <v-col cols="12" md="12">
                             <div style="max-width: 428px">
@@ -39,6 +39,8 @@
                         </v-col>
                     </v-row>
                 </v-card-text>
+
+                <v-divider/>
 
                 <v-card-text>
                     <v-row>

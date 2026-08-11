@@ -9,15 +9,15 @@
         :items="allLanguages"
         v-model="currentLocaleValue"
     >
-        <template #item="{ props, item }">
-            <v-list-item :value="item.value" v-bind="props">
+        <template #item="{ props, internalItem }">
+            <v-list-item :value="internalItem.value" v-bind="props">
                 <template #title>
                     <v-list-item-title>
                         <div class="d-flex align-center">
-                            <span>{{ item.title }}</span>
+                            <span>{{ internalItem.title }}</span>
                             <v-spacer style="min-width: 40px" />
-                            <v-icon :icon="mdiCheck" v-if="isLanguageSelected(item.raw.languageTag)" />
-                            <span class="text-field-append-text" v-if="!isLanguageSelected(item.raw.languageTag)">{{ item.raw.displayName }}</span>
+                            <v-icon :icon="mdiCheck" v-if="isLanguageSelected(internalItem.raw.languageTag)" />
+                            <span class="text-field-append-text" v-if="!isLanguageSelected(internalItem.raw.languageTag)">{{ internalItem.raw.displayName }}</span>
                         </div>
                     </v-list-item-title>
                 </template>

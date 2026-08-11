@@ -1,7 +1,7 @@
 <template>
     <v-card :class="{ 'disabled': disabled }">
         <template #title>
-            <span>{{ tt('Income and Expense Trends') }}</span>
+            <span class="text-title-medium">{{ tt('Income and Expense Trends') }}</span>
         </template>
 
         <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-if="loading && !hasAnyData">
@@ -15,7 +15,7 @@
 
         <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-else-if="!loading && !hasAnyData">
             <div class="d-flex flex-column align-center justify-center w-100 h-100">
-                <h2 style="margin-top: -40px">{{ tt('No data') }}</h2>
+                <span class="text-title-medium mt-n13">{{ tt('No data') }}</span>
             </div>
         </v-card-text>
 

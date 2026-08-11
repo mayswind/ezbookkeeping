@@ -19,31 +19,31 @@
         v-model:search="tagSearchContent"
         @update:modelValue="updateModelValue"
     >
-        <template #chip="{ props, item }">
-            <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
+        <template #chip="{ props, internalItem }">
+            <v-chip :prepend-icon="mdiPound" :text="internalItem.title" v-bind="props"/>
         </template>
 
         <template #subheader="{ props }">
-            <v-list-subheader>{{ props['title'] }}</v-list-subheader>
+            <v-list-subheader class="text-body-small">{{ props['title'] }}</v-list-subheader>
         </template>
 
-        <template #item="{ props, item }">
-            <v-list-item :value="item.value" v-bind="props" v-if="item.raw instanceof TransactionTag && !item.raw.hidden">
+        <template #item="{ props, internalItem }">
+            <v-list-item :value="internalItem.value" v-bind="props" v-if="internalItem.raw instanceof TransactionTag && !internalItem.raw.hidden">
                 <template #title>
                     <v-list-item-title>
                         <div class="d-flex align-center">
-                            <v-icon size="20" start :icon="mdiPound"/>
-                            <span>{{ item.title }}</span>
+                            <v-icon size="18" start :icon="mdiPound"/>
+                            <span class="ms-n1">{{ internalItem.title }}</span>
                         </div>
                     </v-list-item-title>
                 </template>
             </v-list-item>
-            <v-list-item :disabled="true" v-bind="props" v-else-if="item.raw instanceof TransactionTag && item.raw.hidden">
+            <v-list-item :disabled="true" v-bind="props" v-else-if="internalItem.raw instanceof TransactionTag && internalItem.raw.hidden">
                 <template #title>
                     <v-list-item-title>
                         <div class="d-flex align-center">
-                            <v-icon size="20" start :icon="mdiPound"/>
-                            <span>{{ item.title }}</span>
+                            <v-icon size="18" start :icon="mdiPound"/>
+                            <span class="ms-n1">{{ internalItem.title }}</span>
                         </div>
                     </v-list-item-title>
                 </template>

@@ -20,7 +20,7 @@
 
             <template #content>
                 <div class="w-100 h-100 code-container">
-                    <v-textarea no-resize class="w-100 h-100 ps-4 always-cursor-text"
+                    <v-textarea no-resize class="w-100 h-100 ps-3 always-cursor-text"
                                 density="compact" variant="plain"
                                 :readonly="true" :rounded="false"
                                 :value="queriesJson"></v-textarea>

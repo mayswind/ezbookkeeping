@@ -2,7 +2,7 @@ import type { TypeAndName } from './base.ts';
 
 export type ColorValue = string;
 
-export type ColorStyleValue = `#${ColorValue}` | 'var(--default-icon-color)';
+export type ColorStyleValue = `#${ColorValue}` | 'var(--ebk-icon-default-color)';
 
 export interface ColorInfo extends Record<string, unknown> {
     readonly color: ColorValue;

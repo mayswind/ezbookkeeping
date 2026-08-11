@@ -1,6 +1,7 @@
 <template>
     <v-dialog width="800" :persistent="true" v-model="showState">
-        <one-column-dialog-layout :disabled="generating"
+        <one-column-dialog-layout content-class="py-0"
+                                  :disabled="generating"
                                   :title="tt('Generate Token')"
                                   :cancel-button-title="generatedToken ? tt('Close') : tt('Cancel')"
                                   @cancel="generatedToken ? close() : cancel()">
@@ -27,14 +28,14 @@
             </template>
 
             <template #content>
-                <div class="mt-3" v-if="(tokenExpirationTime === 0 || (tokenExpirationTime < 0 && tokenCustomExpirationTime === 0)) || tokenType === 'mcp'">
+                <div class="my-3" v-if="(tokenExpirationTime === 0 || (tokenExpirationTime < 0 && tokenCustomExpirationTime === 0)) || tokenType === 'mcp'">
                     <v-alert type="warning" variant="tonal">
                         <span v-if="tokenExpirationTime === 0 || (tokenExpirationTime < 0 && tokenCustomExpirationTime === 0)">{{ tt('Your token does not expire, please keep it secure.') }}</span>
                         <span v-if="tokenType === 'mcp'">{{ tt('When connecting to third-party apps, be aware that they and any large language models they use can access your private data.') }}</span>
                     </v-alert>
                 </div>
 
-                <div class="mt-6" v-if="!generatedToken">
+                <div class="mt-5 mb-4" v-if="!generatedToken">
                     <v-row>
                         <v-col cols="12" :md="tokenExpirationTime >= 0 ? 12 : 6">
                             <v-select
@@ -85,7 +86,7 @@
                     </v-row>
                 </div>
 
-                <div class="mt-4 flex-grow-1 overflow-y-auto" :style="codeContainerStyle" v-if="generatedToken">
+                <div class="my-3 flex-grow-1 overflow-y-auto" :style="codeContainerStyle" v-if="generatedToken">
                     <div class="w-100 h-100 code-container">
                         <v-textarea class="w-100 h-100 always-cursor-text" :readonly="true"
                                     :value="generatedToken" v-if="(tokenType === 'api' && (!showAPIExample || !serverUrl)) || (tokenType === 'mcp' && (!showMCPConfiguration || !serverUrl))" />

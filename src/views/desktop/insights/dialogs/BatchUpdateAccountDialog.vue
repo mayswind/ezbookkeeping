@@ -1,11 +1,11 @@
 <template>
     <v-dialog width="600" :persistent="true" v-model="showState">
-        <one-column-dialog-layout :disabled="loading || submitting"
+        <one-column-dialog-layout content-class="pt-0" :disabled="loading || submitting"
                                   :title="isDestinationAccount ? tt('Update Destination Accounts for Transactions') : tt('Update Accounts for Transactions')"
                                   :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text" size="22"
+                <v-btn density="compact" color="default" variant="text"
                        class="ms-2" :icon="true" :disabled="loading || submitting"
                        :loading="loading" @click="reload">
                     <template #loader>

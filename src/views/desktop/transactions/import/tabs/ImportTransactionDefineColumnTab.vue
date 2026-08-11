@@ -5,7 +5,6 @@
         density="compact"
         item-value="index"
         :class="{ 'import-transaction-table': true, 'disabled': !!disabled }"
-        :height="parsedFileLinesTableHeight"
         :disable-sort="true"
         :headers="parsedFileLinesHeaders"
         :items="parsedFileLines"
@@ -59,7 +58,7 @@
                                         <td>{{ typeName }}</td>
                                         <td>
                                             <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
-                                                          mandatory="force" divided
+                                                          color="default" mandatory="force" divided
                                                           v-model="parsedFileDataColumnMapping.transactionTypeMapping[typeName]">
                                                 <v-btn :value="undefined">{{ tt('None') }}</v-btn>
                                                 <v-btn :value="TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-btn>
@@ -165,14 +164,15 @@
                                         <td>{{ separator.name }} ({{separator.value}})</td>
                                         <td>
                                             <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
-                                                          mandatory="force" divided
+                                                          color="default" mandatory="force" divided
                                                           v-model="parsedFileDataColumnMapping.geoLocationOrder"
                                                           v-if="parsedFileDataColumnMapping.geoLocationSeparator === separator.value">
                                                 <v-btn value="latlon">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
                                                 <v-btn value="lonlat">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
                                             </v-btn-toggle>
                                             <v-btn-group class="toggle-buttons" density="compact" variant="outlined"
-                                                         divided v-if="parsedFileDataColumnMapping.geoLocationSeparator !== separator.value">
+                                                         color="default" mandatory="force" divided
+                                                         v-if="parsedFileDataColumnMapping.geoLocationSeparator !== separator.value">
                                                 <v-btn @click="parsedFileDataColumnMapping.setGeoLocationFormat(separator.value, 'latlon')">{{ `${tt('Latitude')}${separator.value}${tt('Longitude')}` }}</v-btn>
                                                 <v-btn @click="parsedFileDataColumnMapping.setGeoLocationFormat(separator.value, 'lonlat')">{{ `${tt('Longitude')}${separator.value}${tt('Latitude')}` }}</v-btn>
                                             </v-btn-group>
@@ -210,7 +210,7 @@
                           :items="parsedFileLinesTablePageOptions"
                           v-model="countPerPage"
                 />
-                <pagination-buttons density="compact"
+                <pagination-buttons density="comfortable"
                                     :disabled="!!disabled"
                                     :totalPageCount="Math.ceil((parsedFileLines ? parsedFileLines.length : 0) / countPerPage)"
                                     v-model="currentPage"></pagination-buttons>
@@ -341,14 +341,6 @@ const allSeparators = computed<NameValue[]>(() => {
     ];
 
     return separators;
-});
-
-const parsedFileLinesTableHeight = computed<number | undefined>(() => {
-    if (countPerPage.value <= 10 || !parsedFileLines.value || parsedFileLines.value.length <= 10) {
-        return undefined;
-    } else {
-        return 400;
-    }
 });
 
 const parsedFileLinesHeaders = computed<object[]>(() => {

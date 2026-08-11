@@ -2,9 +2,9 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <v-layout>
+                <v-layout class="page-with-navigation-drawer">
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-6 my-4">
+                        <div class="mx-4 my-3">
                             <btn-vertical-group :disabled="loading" :buttons="[
                                 { name: tt('Categorical Analysis'), value: StatisticsAnalysisType.CategoricalAnalysis },
                                 { name: tt('Trend Analysis'), value: StatisticsAnalysisType.TrendAnalysis },
@@ -12,8 +12,8 @@
                             ]" v-model="queryAnalysisType" />
                         </div>
                         <v-divider />
-                        <div class="mx-6 mt-4">
-                            <span class="text-subtitle-2">{{ tt('Chart Type') }}</span>
+                        <div class="mx-4 mt-3">
+                            <span class="text-body-medium">{{ tt('Chart Type') }}</span>
                             <v-select
                                 item-title="displayName"
                                 item-value="type"
@@ -35,8 +35,8 @@
                                 v-show="isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type"
                             />
                         </div>
-                        <div class="mx-6 mt-4">
-                            <span class="text-subtitle-2">{{ tt('Sort Order') }}</span>
+                        <div class="mx-4 mt-2">
+                            <span class="text-body-medium">{{ tt('Sort Order') }}</span>
                             <v-select
                                 item-title="displayName"
                                 item-value="type"
@@ -47,7 +47,7 @@
                                 v-model="querySortingType"
                             />
                         </div>
-                        <v-tabs show-arrows class="my-4" direction="vertical"
+                        <v-tabs show-arrows class="my-3" direction="vertical"
                                 :disabled="loading" v-model="queryChartDataType">
                             <v-tab class="tab-text-truncate" :key="dataType.type" :value="dataType.type"
                                    v-for="dataType in ChartDataType.values(undefined, true)"
@@ -60,10 +60,10 @@
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                             <v-window-item value="statisticsPage">
-                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis || queryAnalysisType === StatisticsAnalysisType.AssetTrends ? '900' : '800'">
+                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis || queryAnalysisType === StatisticsAnalysisType.AssetTrends ? '860' : '780'">
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="me-3 d-md-none" density="compact" color="default" variant="plain"
+                                            <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
                                                    :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
@@ -231,7 +231,7 @@
                                         <span class="statistics-subtitle statistics-overview-empty-tip">{{ tt('No transaction data') }}</span>
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && queryChartDataType === ChartDataType.Overview.type">
+                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && queryChartDataType === ChartDataType.Overview.type">
                                         <account-and-category-sankey-chart
                                             :items="[]"
                                             :sorting-type="querySortingType"
@@ -247,7 +247,7 @@
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Pie.type">
+                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Pie.type">
                                         <pie-chart
                                             :items="[
                                                 { id: '1', name: '---', value: parseBigDecimal(60), color: '7c7c7f' },
@@ -271,7 +271,7 @@
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Bar.type">
+                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Bar.type">
                                         <v-list rounded lines="two" v-if="initing">
                                             <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
                                                 <v-list-item class="ps-0">
@@ -296,7 +296,7 @@
                                         <v-list class="py-0" rounded lines="two" v-else-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
                                             <template :key="idx"
                                                       v-for="(item, idx) in categoricalAnalysisData.items">
-                                                <v-list-item class="ps-0" v-if="!item.hidden">
+                                                <v-list-item class="ps-0" density="comfortable" v-if="!item.hidden">
                                                     <template #prepend>
                                                         <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
                                                             <ItemIcon :icon-type="queryChartDataCategory" size="34px"
@@ -304,7 +304,7 @@
                                                                       :color="item.color"></ItemIcon>
                                                         </router-link>
                                                     </template>
-                                                    <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
+                                                    <router-link class="statistics-list-item link-no-color" :to="getTransactionItemLinkUrl(item.id)">
                                                         <div class="d-flex flex-column ms-2">
                                                             <div class="d-flex">
                                                                 <span>{{ item.name }}</span>
@@ -312,7 +312,7 @@
                                                                 <v-spacer/>
                                                                 <span class="statistics-amount">{{ getDisplayAmount(item.value, defaultCurrency) }}</span>
                                                             </div>
-                                                            <div>
+                                                            <div class="mt-1">
                                                                 <v-progress-linear :color="item.color ? getTransactionCategoricalAnalysisDataItemDisplayColor(item) : 'primary'"
                                                                                    :bg-color="isDarkMode ? '#444444' : '#f8f8f8'" :bg-opacity="1"
                                                                                    :model-value="item.percent >= 0 ? item.percent : 0"
@@ -326,7 +326,7 @@
                                         </v-list>
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Radar.type">
+                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Radar.type">
                                         <radar-chart
                                             :items="[
                                                 {name: '---', value: 10},
@@ -350,7 +350,7 @@
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
+                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
                                         <trends-chart
                                             chart-mode="monthly"
                                             :type="queryChartType"
@@ -394,7 +394,7 @@
                                         />
                                     </v-card-text>
 
-                                    <v-card-text :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
+                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
                                         <trends-chart
                                             chart-mode="daily"
                                             :type="queryChartType"
@@ -569,7 +569,7 @@ interface TransactionStatisticsProps {
 const props = defineProps<TransactionStatisticsProps>();
 
 const router = useRouter();
-const display = useDisplay();
+const { lgAndUp } = useDisplay();
 const theme = useTheme();
 
 const {
@@ -632,8 +632,8 @@ const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const activeTab = ref<string>('statisticsPage');
 const initing = ref<boolean>(true);
 const filterKeyword = ref<string>('');
-const alwaysShowNav = ref<boolean>(display.mdAndUp.value);
-const showNav = ref<boolean>(display.mdAndUp.value);
+const alwaysShowNav = ref<boolean>(lgAndUp.value);
+const showNav = ref<boolean>(lgAndUp.value);
 const showCustomDateRangeDialog = ref<boolean>(false);
 const showCustomMonthRangeDialog = ref<boolean>(false);
 const showFilterAccountDialog = ref<boolean>(false);
@@ -1333,7 +1333,7 @@ onBeforeRouteUpdate((to) => {
     }
 });
 
-watch(() => display.mdAndUp.value, (newValue) => {
+watch(lgAndUp, (newValue) => {
     alwaysShowNav.value = newValue;
 
     if (!showNav.value) {

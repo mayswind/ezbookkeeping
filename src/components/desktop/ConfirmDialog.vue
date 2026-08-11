@@ -1,10 +1,10 @@
 <template>
     <v-dialog persistent min-width="320" max-width="500" width="auto" v-model="showState">
-        <v-card>
+        <v-card class="dialog-layout-card">
             <v-toolbar :color="finalColor">
                 <v-toolbar-title>{{ titleContent }}</v-toolbar-title>
             </v-toolbar>
-            <v-card-text v-if="textContent" class="pa-4 pb-6">{{ textContent }}</v-card-text>
+            <v-card-text class="text-body-large pa-4" v-if="textContent">{{ textContent }}</v-card-text>
             <v-card-actions class="px-4 pb-4">
                 <v-spacer></v-spacer>
                 <v-btn color="gray" @click="cancel">{{ tt('Cancel') }}</v-btn>

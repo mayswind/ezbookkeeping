@@ -231,7 +231,7 @@
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v3.13.0/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v4.1.7/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -295,13 +295,6 @@
         "url": "https://github.com/ecomfe/vue-echarts",
         "license": "MIT License",
         "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.0.1/LICENSE"
-    },
-    {
-        "name": "vue3-perfect-scrollbar",
-        "copyright": "Copyright (c) 2024 mercs600",
-        "url": "https://github.com/mercs600/vue3-perfect-scrollbar",
-        "license": "MIT License",
-        "licenseUrl": "https://github.com/mercs600/vue3-perfect-scrollbar/blob/master/LICENSE"
     },
     {
         "name": "@vuepic/vue-datepicker",
@@ -393,13 +386,6 @@
         "url": "https://github.com/jalaali/jalaali-js",
         "license": "MIT License",
         "licenseUrl": "https://github.com/jalaali/jalaali-js/blob/v1.2.8/LICENSE"
-    },
-    {
-        "name": "Materio - Vuetify VueJS 3 Free Admin Template",
-        "copyright": "Copyright (c) 2022 ThemeSelection",
-        "url": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free",
-        "license": "MIT License",
-        "licenseUrl": "https://github.com/themeselection/materio-vuetify-vuejs-admin-template-free/blob/v2.3.0/LICENSE"
     },
     {
         "name": "Icons8 Line Awesome",

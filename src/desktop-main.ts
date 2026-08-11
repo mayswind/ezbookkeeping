@@ -76,8 +76,6 @@ import VChart from 'vue-echarts';
 
 import 'line-awesome/dist/line-awesome/css/line-awesome.css';
 
-import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
-
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
@@ -85,7 +83,7 @@ import draggable from 'vuedraggable';
 
 import router from '@/router/desktop.ts';
 
-import { DecimalSeparator } from '@/core/numeral.ts';
+import { DecimalSeparator, DigitGroupingSymbol } from '@/core/numeral.ts';
 import { getI18nOptions, getRtlLocales } from '@/locales/helpers.ts';
 
 import PinCodeInput from '@/components/common/PinCodeInput.vue';
@@ -133,13 +131,7 @@ import SwitchToMobileDialog from '@/components/desktop/SwitchToMobileDialog.vue'
 
 import TextFieldAutoWidth from '@/directives/desktop/textfieldAutoWidth.ts';
 
-import '@/styles/desktop/template/vuetify/index.scss';
-import '@/styles/desktop/template/template/index.scss';
-import '@/styles/desktop/template/layout/index.scss';
-import '@/styles/desktop/template/layout/component/index.scss';
-import '@/styles/desktop/template/layout/_default-layout.scss';
-import '@/styles/desktop/global.scss';
-import '@/styles/desktop/font-size.scss';
+import '@/styles/desktop/index.scss';
 import '@/styles/desktop/amount-color.scss';
 
 import App from './DesktopApp.vue';
@@ -224,6 +216,7 @@ const vuetify = createVuetify({
     },
     defaults: {
         VAlert: {
+            density: 'comfortable',
             VBtn: {
                 color: undefined
             }
@@ -244,24 +237,27 @@ const vuetify = createVuetify({
             color: 'primary'
         },
         VBtn: {
+            variant: 'flat',
             color: 'primary'
         },
         VCheckbox: {
             color: 'primary',
+            density: 'compact',
             hideDetails: 'auto'
         },
         VChip: {
             elevation: 0
         },
         VList: {
-            color: 'primary'
+            color: 'primary',
+            density: 'compact'
         },
         VPagination: {
             density: 'comfortable',
             activeColor: 'primary'
         },
         VRadio: {
-            density: 'comfortable',
+            density: 'compact',
             color: 'primary',
             hideDetails: 'auto'
         },
@@ -277,6 +273,7 @@ const vuetify = createVuetify({
         },
         VSwitch: {
             inset: true,
+            density: 'compact',
             color: 'primary',
             hideDetails: 'auto'
         },
@@ -284,10 +281,12 @@ const vuetify = createVuetify({
             size: 40
         },
         VSnackbar: {
-            timeout: 3000
+            timeout: 3000,
+            zIndex: 9000
         },
         VTable: {
-            hover: true
+            hover: true,
+            density: 'comfortable'
         },
         VTabs: {
             color: 'primary',
@@ -311,10 +310,15 @@ const vuetify = createVuetify({
             color: 'primary'
         },
         VTooltip: {
-            location: 'top'
+            location: 'top',
+            zIndex: 9000
         },
         VWindow: {
             touch: false
+        },
+        VWindowItem: {
+            transition: false,
+            reverseTransition: false
         }
     },
     theme: {
@@ -359,7 +363,6 @@ const vuetify = createVuetify({
                     'grey-700': '#616161',
                     'grey-800': '#424242',
                     'grey-900': '#212121',
-                    'perfect-scrollbar-thumb': '#dedcda',
                     'skin-bordered-background': '#fff',
                     'skin-bordered-surface': '#fff',
                     'expansion-panel-text-custom-bg': '#fafafa'
@@ -369,21 +372,21 @@ const vuetify = createVuetify({
                     'overlay-scrim-background': '#413935',
                     'tooltip-background': '#212121',
                     'tooltip-color': '#ffffff',
-                    'overlay-scrim-opacity': 0.5,
-                    'hover-opacity': 0.04,
+                    'overlay-scrim-opacity': 0.2,
+                    'hover-opacity': 0.08,
                     'focus-opacity': 0.1,
                     'selected-opacity': 0.08,
-                    'activated-opacity': 0.16,
+                    'activated-opacity': 0.08,
                     'pressed-opacity': 0.14,
                     'dragged-opacity': 0.1,
                     'disabled-opacity': 0.4,
                     'border-color': '#413f3b',
                     'border-opacity': 0.12,
-                    'table-header-color': '#fdfcf9',
+                    'table-header-background': '#fdfcf9',
                     'high-emphasis-opacity': 0.9,
                     'medium-emphasis-opacity': 0.7,
 
-                    // 👉 shadows
+                    // shadows
                     'shadow-key-umbra-color': '#413935',
                     'shadow-xs-opacity': '0.16',
                     'shadow-sm-opacity': '0.18',
@@ -431,31 +434,30 @@ const vuetify = createVuetify({
                     'grey-700': '#c6c6c6',
                     'grey-800': '#d8d8d8',
                     'grey-900': '#eaeaea',
-                    'perfect-scrollbar-thumb': '#725b4a',
                     'skin-bordered-background': '#4b3b2d',
                     'skin-bordered-surface': '#4b3b2d',
                     'expansion-panel-text-custom-bg': '#503f33'
                 },
                 variables: {
                     'code-color': '#ff8000',
-                    'overlay-scrim-background': '#1a1a1a',
+                    'overlay-scrim-background': '#615955',
                     'tooltip-background': '#333333',
                     'tooltip-color': '#eeeeee',
-                    'overlay-scrim-opacity': 0.6,
-                    'hover-opacity': 0.04,
+                    'overlay-scrim-opacity': 0.2,
+                    'hover-opacity': 0.12,
                     'focus-opacity': 0.1,
                     'selected-opacity': 0.08,
-                    'activated-opacity': 0.16,
+                    'activated-opacity': 0.08,
                     'pressed-opacity': 0.14,
                     'disabled-opacity': 0.4,
                     'dragged-opacity': 0.1,
                     'border-color': '#edece9',
                     'border-opacity': 0.12,
-                    'table-header-color': '#242322',
+                    'table-header-background': '#23201d',
                     'high-emphasis-opacity': 0.9,
                     'medium-emphasis-opacity': 0.7,
 
-                    // 👉 Shadows
+                    // Shadows
                     'shadow-key-umbra-color': '#383736',
                     'shadow-xs-opacity': '0.20',
                     'shadow-sm-opacity': '0.22',
@@ -472,6 +474,7 @@ const vuetify = createVuetify({
             const instance: LocaleInstance = {
                 name: 'ezBookkeeping i18n',
                 decimalSeparator: ref<string>(DecimalSeparator.Default.symbol), // should never use vuetify to format numbers
+                numericGroupSeparator: ref<string>(DigitGroupingSymbol.Default.symbol), // should never use vuetify to format numbers
                 messages: i18nGlobal.messages,
                 current: i18nGlobal.locale,
                 fallback: i18nGlobal.locale, // no need to let vuetify know what fallback locale is
@@ -543,7 +546,6 @@ app.use(vuetify);
 app.use(router);
 
 app.component('VChart', VChart);
-app.component('PerfectScrollbar', PerfectScrollbar);
 app.component('VueDatePicker', VueDatePicker);
 app.component('DraggableList', draggable);
 

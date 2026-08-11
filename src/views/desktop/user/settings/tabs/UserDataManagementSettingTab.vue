@@ -16,7 +16,7 @@
                     </div>
                 </template>
 
-                <v-card-text>
+                <v-card-text class="mt-2">
                     <v-row>
                         <v-col cols="6" sm="3" :key="idx" v-for="(item, idx) in [
                             {
@@ -76,9 +76,9 @@
                                 </div>
 
                                 <div class="d-flex flex-column">
-                                    <span class="text-caption">{{ tt(item.title) }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
-                                    <span class="text-xl" v-if="!loadingDataStatistics">{{ item.count }}</span>
+                                    <span class="text-body-medium">{{ tt(item.title) }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 60px; height: 27px" :loading="true" v-if="loadingDataStatistics"></v-skeleton-loader>
+                                    <span class="text-title-medium" v-if="!loadingDataStatistics">{{ item.count }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -89,12 +89,12 @@
 
         <v-col cols="12" v-if="isDataExportingEnabled()">
             <v-card :class="{ 'disabled': exportingData }" :title="tt('Export Data')">
-                <v-card-text>
-                    <span class="text-body-1">{{ tt('Export all transaction data to file.') }}&nbsp;{{ tt('It may take a long time, please wait for a few minutes.') }}</span>
+                <v-card-text class="mt-2 py-0 pb-1">
+                    <span class="text-body-large">{{ tt('Export all transaction data to file.') }}&nbsp;{{ tt('It may take a long time, please wait for a few minutes.') }}</span>
                 </v-card-text>
 
                 <v-card-text class="d-flex flex-wrap gap-4">
-                    <v-btn-group variant="elevated" density="comfortable" color="primary">
+                    <v-btn-group density="comfortable" color="primary">
                         <v-btn :disabled="loadingDataStatistics || exportingData || !dataStatistics || !dataStatistics.totalTransactionCount || dataStatistics.totalTransactionCount === '0'">
                             {{ tt('Export Data') }}
                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="exportingData"></v-progress-circular>
@@ -120,11 +120,10 @@
                     <span class="text-error">{{ tt('Danger Zone') }}</span>
                 </template>
 
-                <v-card-text class="py-0">
-                    <span class="text-body-1 text-error">
-                        <v-icon class="mt-n1" :icon="mdiAlert"/>
+                <v-card-text class="mt-2 py-0">
+                    <v-alert type="error" variant="tonal" :icon="mdiAlert">
                         {{ tt('You CANNOT undo this action. "Clear All Transactions" will clear all your transactions data, and "Clear All Data" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.') }}
-                    </span>
+                    </v-alert>
                 </v-card-text>
 
                 <v-card-text class="pb-0">

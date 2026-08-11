@@ -6,7 +6,7 @@ export const DEFAULT_ICON_COLOR: ColorValue = defaultColor;
 export const DEFAULT_ACCOUNT_COLOR: ColorValue = defaultColor;
 export const DEFAULT_CATEGORY_COLOR: ColorValue = defaultColor;
 
-export const DEFAULT_COLOR_STYLE_VARIABLE: ColorStyleValue = 'var(--default-icon-color)';
+export const DEFAULT_COLOR_STYLE_VARIABLE: ColorStyleValue = 'var(--ebk-icon-default-color)';
 
 const allAvailableColors: ColorValue[] = [
     '000000', // black

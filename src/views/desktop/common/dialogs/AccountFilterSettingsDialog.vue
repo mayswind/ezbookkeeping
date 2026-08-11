@@ -10,7 +10,7 @@
                               :placeholder="tt('Find account')"
                               v-model="filterContent"></v-text-field>
 
-                <v-btn class="ms-2" density="comfortable" variant="outlined"
+                <v-btn density="comfortable" variant="outlined"
                        :disabled="!hasAnyAvailableAccount" @click="save">{{ tt(applyText) }}</v-btn>
 
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
@@ -49,7 +49,7 @@
                 </div>
 
                 <div v-if="!loading && !hasAnyVisibleAccount">
-                    <span class="text-body-1">{{ tt('No available account') }}</span>
+                    <span class="text-body-large">{{ tt('No available account') }}</span>
                 </div>
 
                 <div v-else-if="!loading && hasAnyVisibleAccount">
@@ -59,7 +59,7 @@
                                            class="border"
                                            v-for="accountCategory in allCategorizedAccounts">
                             <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                                <span class="ms-3">{{ tt(accountCategory.name) }}</span>
+                                <span class="text-body-large">{{ tt(accountCategory.name) }}</span>
                             </v-expansion-panel-title>
                             <v-expansion-panel-text>
                                 <v-list rounded density="comfortable" class="pa-0">
@@ -73,9 +73,9 @@
                                                             :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
                                                             @update:model-value="updateAccountOrSubAccountsSelected(account, $event)">
                                                     <template #label>
-                                                        <ItemIcon class="d-flex" icon-type="account" :icon-id="account.icon"
+                                                        <ItemIcon class="d-flex ms-1" icon-type="account" :icon-id="account.icon"
                                                                   :color="account.color" :hidden-status="account.hidden"></ItemIcon>
-                                                        <span class="ms-3">{{ account.name }}</span>
+                                                        <span class="text-body-medium ms-2">{{ account.name }}</span>
                                                     </template>
                                                 </v-checkbox>
                                             </template>
@@ -94,9 +94,9 @@
                                                         <v-checkbox :model-value="isAccountChecked(subAccount, filterAccountIds)"
                                                                     @update:model-value="updateAccountSelected(subAccount, $event)">
                                                             <template #label>
-                                                                <ItemIcon class="d-flex" icon-type="account" :icon-id="subAccount.icon"
+                                                                <ItemIcon class="d-flex ms-1" icon-type="account" :icon-id="subAccount.icon"
                                                                           :color="subAccount.color" :hidden-status="subAccount.hidden"></ItemIcon>
-                                                                <span class="ms-3">{{ subAccount.name }}</span>
+                                                                <span class="text-body-medium ms-2">{{ subAccount.name }}</span>
                                                             </template>
                                                         </v-checkbox>
                                                     </template>

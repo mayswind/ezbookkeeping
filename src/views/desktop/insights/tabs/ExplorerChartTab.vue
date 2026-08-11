@@ -1,5 +1,5 @@
 <template>
-    <v-card-text class="px-5 py-0 mb-4">
+    <v-card-text class="px-4 py-0">
         <v-row>
             <v-col cols="12">
                 <div class="d-flex overflow-x-auto align-center gap-2 pt-2">
@@ -39,10 +39,10 @@
                         :model-value="TransactionExplorerChartType.valueOf(currentExploration.chartType)?.seriesDimensionRequired ? currentExploration.seriesDimension : TransactionExplorerDataDimension.None.value"
                         @update:model-value="currentExploration.seriesDimension = $event as TransactionExplorerDataDimensionType"
                     >
-                        <template #item="{ props, item }">
-                            <v-list-item :disabled="item.value === currentExploration.categoryDimension && item.value !== TransactionExplorerDataDimension.SeriesDimensionDefault.value" v-bind="props">
+                        <template #item="{ props, internalItem }">
+                            <v-list-item :disabled="internalItem.value === currentExploration.categoryDimension && internalItem.value !== TransactionExplorerDataDimension.SeriesDimensionDefault.value" v-bind="props">
                                 <template #title>
-                                    <div class="text-truncate">{{ item.raw.name }}</div>
+                                    <div class="text-truncate">{{ internalItem.raw.name }}</div>
                                 </template>
                             </v-list-item>
                         </template>

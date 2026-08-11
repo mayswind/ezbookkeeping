@@ -10,7 +10,7 @@
                               :placeholder="tt('Find category')"
                               v-model="filterContent"></v-text-field>
 
-                <v-btn class="ms-2" density="comfortable" variant="outlined"
+                <v-btn density="comfortable" variant="outlined"
                        :disabled="!hasAnyAvailableCategory" @click="save">{{ tt(applyText) }}</v-btn>
 
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
@@ -55,7 +55,7 @@
                                            class="border"
                                            v-for="(categories, categoryType) in allVisibleTransactionCategories">
                             <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
-                                <span class="ms-3">{{ getCategoryTypeName(parseInt(categoryType)) }}</span>
+                                <span class="text-body-large">{{ getCategoryTypeName(parseInt(categoryType)) }}</span>
                             </v-expansion-panel-title>
                             <v-expansion-panel-text>
                                 <v-list rounded density="comfortable" class="pa-0">
@@ -71,9 +71,9 @@
                                                             :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
                                                             @update:model-value="updateAllSubCategoriesSelected(category, $event)">
                                                     <template #label>
-                                                        <ItemIcon class="d-flex" icon-type="category" :icon-id="category.icon"
+                                                        <ItemIcon class="d-flex ms-1" icon-type="category" :icon-id="category.icon"
                                                                   :color="category.color" :hidden-status="category.hidden"></ItemIcon>
-                                                        <span class="ms-3">{{ category.name }}</span>
+                                                        <span class="text-body-medium ms-2">{{ category.name }}</span>
                                                     </template>
                                                 </v-checkbox>
                                             </template>
@@ -92,9 +92,9 @@
                                                         <v-checkbox :model-value="isCategoryChecked(subCategory, filterCategoryIds)"
                                                                     @update:model-value="updateCategorySelected(subCategory, $event)">
                                                             <template #label>
-                                                                <ItemIcon class="d-flex" icon-type="category" :icon-id="subCategory.icon"
+                                                                <ItemIcon class="d-flex ms-1" icon-type="category" :icon-id="subCategory.icon"
                                                                           :color="subCategory.color" :hidden-status="subCategory.hidden"></ItemIcon>
-                                                                <span class="ms-3">{{ subCategory.name }}</span>
+                                                                <span class="text-body-medium ms-2">{{ subCategory.name }}</span>
                                                             </template>
                                                         </v-checkbox>
                                                     </template>

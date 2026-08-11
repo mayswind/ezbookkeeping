@@ -4,7 +4,7 @@
                                   :title="tt('Change Exploration Display Order')" :cancel-button-title="tt('Close')"
                                   @cancel="close">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text" size="22"
+                <v-btn density="compact" color="default" variant="text"
                        class="ms-2" :icon="true" :disabled="loading || updating"
                        :loading="loading" @click="reload">
                     <template #loader>

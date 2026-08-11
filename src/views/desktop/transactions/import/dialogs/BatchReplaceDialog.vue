@@ -4,7 +4,7 @@
                                   :disabled="loading"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text" size="22"
+                <v-btn density="compact" color="default" variant="text"
                        class="ms-2" :icon="true" :disabled="loading" :loading="loading"
                        @click="reload"
                        v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory' || type === 'account' || type === 'destinationAccount' || type === 'tag'"
@@ -24,7 +24,7 @@
             </template>
 
             <template #content>
-                <div class="w-100 mt-5 d-flex justify-center" v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory'">
+                <div class="w-100 mt-1 d-flex justify-center" v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory'">
                     <v-row>
                         <v-col cols="12" v-if="mode === 'replaceInvalidItems'">
                             <v-autocomplete
@@ -94,7 +94,7 @@
                         </v-col>
                     </v-row>
                 </div>
-                <div class="w-100 mt-5 d-flex justify-center" v-if="type === 'account' || type === 'destinationAccount'">
+                <div class="w-100 mt-1 d-flex justify-center" v-if="type === 'account' || type === 'destinationAccount'">
                     <v-row>
                         <v-col cols="12" v-if="mode === 'replaceInvalidItems'">
                             <v-autocomplete
@@ -129,7 +129,7 @@
                         </v-col>
                     </v-row>
                 </div>
-                <div class="w-100 mt-5 d-flex justify-center" v-if="type === 'timezone'">
+                <div class="w-100 mt-1 d-flex justify-center" v-if="type === 'timezone'">
                     <v-row>
                         <v-col cols="12">
                             <v-autocomplete
@@ -147,7 +147,7 @@
                         </v-col>
                     </v-row>
                 </div>
-                <div class="w-100 mt-5 d-flex justify-center" v-if="type === 'tag'">
+                <div class="w-100 mt-1 d-flex justify-center" v-if="type === 'tag'">
                     <v-row>
                         <v-col cols="12" v-if="mode === 'batchReplace'">
                             <v-autocomplete
@@ -188,21 +188,21 @@
                                 :no-data-text="tt('No available tag')"
                                 v-model="targetItem"
                             >
-                                <template #chip="{ props, item }">
-                                    <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props"/>
+                                <template #chip="{ props, internalItem }">
+                                    <v-chip :prepend-icon="mdiPound" :text="internalItem.title" v-bind="props"/>
                                 </template>
 
                                 <template #subheader="{ props }">
-                                    <v-list-subheader>{{ props['title'] }}</v-list-subheader>
+                                    <v-list-subheader class="text-body-small">{{ props['title'] }}</v-list-subheader>
                                 </template>
 
-                                <template #item="{ props, item }">
-                                    <v-list-item :value="item.value" v-bind="props" v-if="item.raw instanceof TransactionTag && !item.raw.hidden">
+                                <template #item="{ props, internalItem }">
+                                    <v-list-item :value="internalItem.value" v-bind="props" v-if="internalItem.raw instanceof TransactionTag && !internalItem.raw.hidden">
                                         <template #title>
                                             <v-list-item-title>
                                                 <div class="d-flex align-center">
                                                     <v-icon size="20" start :icon="mdiPound"/>
-                                                    <span>{{ item.title }}</span>
+                                                    <span>{{ internalItem.title }}</span>
                                                 </div>
                                             </v-list-item-title>
                                         </template>

@@ -3,7 +3,7 @@
         <one-column-dialog-layout :title="dialogTitle || defaultTitle" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #content>
-                <div class="mt-4">
+                <div class="mt-2">
                     <v-text-field persistent-placeholder
                                   :autofocus="true"
                                   :label="label"

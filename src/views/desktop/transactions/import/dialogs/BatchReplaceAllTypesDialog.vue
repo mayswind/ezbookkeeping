@@ -4,7 +4,7 @@
                                   :title="tt('Batch Replace Categories / Accounts / Tags')" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text" size="22"
+                <v-btn density="compact" color="default" variant="text"
                        class="ms-2" :icon="true" :disabled="loading"
                        :loading="loading" @click="reload">
                     <template #loader>
@@ -59,7 +59,7 @@
                     <tfoot>
                     <tr style="background-color: rgb(var(--v-theme-surface))">
                         <td>
-                            <v-select class="w-100" density="compact" variant="underlined"
+                            <v-select class="w-100" variant="underlined"
                                       item-title="name"
                                       item-value="value"
                                       :disabled="loading"
@@ -90,7 +90,7 @@
                             />
                         </td>
                         <td>
-                            <v-autocomplete class="w-100" density="compact" variant="underlined"
+                            <v-autocomplete class="w-100" variant="underlined"
                                             item-title="name" item-value="value" persistent-placeholder
                                             :disabled="loading" :items="sourceItems"
                                             :no-data-text="noSourceItemText"
@@ -98,7 +98,7 @@
                             </v-autocomplete>
                         </td>
                         <td>
-                            <two-column-select density="compact" variant="underlined"
+                            <two-column-select variant="underlined"
                                                primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -114,7 +114,7 @@
                                                v-model="newRule.targetId"
                                                v-if="newRule.dataType === 'expenseCategory'">
                             </two-column-select>
-                            <two-column-select density="compact" variant="underlined"
+                            <two-column-select variant="underlined"
                                                primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -130,7 +130,7 @@
                                                v-model="newRule.targetId"
                                                v-if="newRule.dataType === 'incomeCategory'">
                             </two-column-select>
-                            <two-column-select density="compact" variant="underlined"
+                            <two-column-select variant="underlined"
                                                primary-key-field="id" primary-value-field="id" primary-title-field="name"
                                                primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
                                                primary-hidden-field="hidden" primary-sub-items-field="subCategories"
@@ -146,7 +146,7 @@
                                                v-model="newRule.targetId"
                                                v-if="newRule.dataType === 'transferCategory'">
                             </two-column-select>
-                            <two-column-select density="compact" variant="underlined"
+                            <two-column-select variant="underlined"
                                                primary-key-field="id" primary-value-field="category"
                                                primary-title-field="name" primary-footer-field="displayBalance"
                                                primary-icon-field="icon" primary-icon-type="account"
@@ -162,28 +162,28 @@
                                                v-model="newRule.targetId"
                                                v-if="newRule.dataType === 'account'">
                             </two-column-select>
-                            <v-autocomplete density="compact" variant="underlined"
+                            <v-autocomplete variant="underlined"
                                             item-title="name" item-value="id"
                                             persistent-placeholder chips
                                             :disabled="loading" :items="allTagsWithGroupHeader"
                                             :no-data-text="tt('No available tag')"
                                             v-model="newRule.targetId"
                                             v-if="newRule.dataType == 'tag'">
-                                <template #chip="{ props, item }">
-                                    <v-chip :prepend-icon="mdiPound" :text="item.title" v-bind="props" v-if="newRule.targetId"/>
+                                <template #chip="{ props, internalItem }">
+                                    <v-chip :prepend-icon="mdiPound" :text="internalItem.title" v-bind="props" v-if="newRule.targetId"/>
                                 </template>
 
                                 <template #subheader="{ props }">
-                                    <v-list-subheader>{{ props['title'] }}</v-list-subheader>
+                                    <v-list-subheader class="text-body-small">{{ props['title'] }}</v-list-subheader>
                                 </template>
 
-                                <template #item="{ props, item }">
-                                    <v-list-item :value="item.value" v-bind="props" v-if="item.raw instanceof TransactionTag && !item.raw.hidden">
+                                <template #item="{ props, internalItem }">
+                                    <v-list-item :value="internalItem.value" v-bind="props" v-if="internalItem.raw instanceof TransactionTag && !internalItem.raw.hidden">
                                         <template #title>
                                             <v-list-item-title>
                                                 <div class="d-flex align-center">
                                                     <v-icon size="20" start :icon="mdiPound"/>
-                                                    <span>{{ item.title }}</span>
+                                                    <span>{{ internalItem.title }}</span>
                                                 </div>
                                             </v-list-item-title>
                                         </template>

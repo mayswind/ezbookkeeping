@@ -1,7 +1,7 @@
 <template>
-    <v-row class="ma-0">
+    <v-row class="ma-3">
         <v-col cols="12" md="6">
-            <div class="d-flex w-100 mb-2">
+            <div class="title-and-toolbar d-flex w-100 mb-1">
                 <v-btn density="compact" variant="tonal" :prepend-icon="mdiPlay"
                        :disabled="disabled || !sandboxLoaded || executingScript" :loading="executingScript"
                        @click="executeCustomScript()">
@@ -16,7 +16,7 @@
                         v-model="customScript"></v-textarea>
         </v-col>
         <v-col cols="12" md="6">
-            <div class="d-flex w-100 mb-2">
+            <div class="title-and-toolbar d-flex w-100 mb-1">
                 <v-btn density="compact" color="default" variant="text"
                        :disabled="disabled || !sandboxLoaded || executingScript || !previewResult">
                     <span>{{ tt('format.misc.previewCount', { count: previewCount > 0 ? formatNumberToLocalizedNumerals(previewCount) : tt('All') }) }}</span>

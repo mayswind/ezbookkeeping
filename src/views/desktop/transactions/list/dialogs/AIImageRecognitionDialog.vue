@@ -24,12 +24,12 @@
                     <div class="d-flex w-100 h-100 justify-center align-center justify-content-center text-center px-4"
                          :class="{ 'dropzone': true, 'dropzone-dark': isDarkMode, 'dropzone-blurry-bg': loading || isDragOver || recognizing, 'dropzone-dragover': isDragOver }">
                         <div class="d-inline-flex flex-column" v-if="!loading && !imageFile && !isDragOver">
-                            <h3 class="pa-2">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</h3>
-                            <span class="pa-2">{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
+                            <span class="text-title-medium font-weight-bold pa-2">{{ tt('You can drag and drop, paste or click to select a receipt or transaction image') }}</span>
+                            <span class="text-body-large pa-2">{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</span>
                         </div>
-                        <h3 class="pa-2" v-else-if="!loading && isDragOver">{{ tt('Release to load image') }}</h3>
-                        <h3 class="pa-2" v-else-if="loading">{{ tt('Loading image...') }}</h3>
-                        <h3 class="pa-2" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</h3>
+                        <span class="text-title-medium font-weight-bold pa-2" v-else-if="!loading && isDragOver">{{ tt('Release to load image') }}</span>
+                        <span class="text-title-medium font-weight-bold pa-2" v-else-if="loading">{{ tt('Loading image...') }}</span>
+                        <span class="text-title-medium font-weight-bold pa-2" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</span>
                     </div>
                     <v-img :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver, 'h-100': true }"
                            :src="imageSrc" @click="showOpenImageDialog">

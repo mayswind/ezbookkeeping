@@ -28,7 +28,7 @@
                 </f7-list-item>
                 <f7-list-item link="#" no-chevron popover-close
                               :title="tt('Account Balance Trends')"
-                              :class="{ 'list-item-selected': showAccountBalanceTrendsCharts }"
+                              :class="{ 'list-item-selected': showAccountBalanceTrendsCharts, 'disabled': !reconciliationStatements?.transactions?.length }"
                               @click="showAccountBalanceTrendsCharts = true">
                     <template #after>
                         <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="showAccountBalanceTrendsCharts"></f7-icon>

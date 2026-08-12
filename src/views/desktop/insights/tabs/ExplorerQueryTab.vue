@@ -900,7 +900,6 @@ watch(() => queries.value, () => {
 <style>
 .query-name {
     white-space: pre;
-    letter-spacing: normal;
 }
 
 .query-name-edit {
@@ -915,6 +914,5 @@ watch(() => queries.value, () => {
 
 .query-name-edit .v-field__input {
     padding-top: 0;
-    letter-spacing: normal;
 }
 </style>

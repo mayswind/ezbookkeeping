@@ -778,7 +778,6 @@ watch(lgAndUp, (newValue) => {
 
             .v-field__input {
                 padding-top: 0;
-                letter-spacing: normal;
             }
         }
     }

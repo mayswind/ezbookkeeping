@@ -106,7 +106,7 @@ type AccountCreateRequest struct {
 	Icon                    int64                   `json:"icon,string" binding:"required,min=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency                string                  `json:"currency" binding:"required,len=3,validCurrency"`
-	Balance                 string                  `json:"balance" binding:"required,validTransactionAmount"`
+	Balance                 string                  `json:"balance" binding:"validTransactionAmount"`
 	BalanceTime             int64                   `json:"balanceTime"`
 	Comment                 string                  `json:"comment" binding:"max=255"`
 	CreditCardStatementDate int                     `json:"creditCardStatementDate" binding:"min=0,max=28"`

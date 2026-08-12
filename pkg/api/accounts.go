@@ -159,10 +159,14 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
-	mainAccountBalance, err := utils.StringToInt64(accountCreateReq.Balance)
+	mainAccountBalance := int64(0)
 
-	if err != nil {
-		return nil, errs.ErrIncompleteOrIncorrectSubmission
+	if accountCreateReq.Balance != "" {
+		mainAccountBalance, err = utils.StringToInt64(accountCreateReq.Balance)
+
+		if err != nil {
+			return nil, errs.ErrIncompleteOrIncorrectSubmission
+		}
 	}
 
 	subAccountBalances := make([]int64, len(accountCreateReq.SubAccounts))
@@ -210,10 +214,14 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 
 		for i := 0; i < len(accountCreateReq.SubAccounts); i++ {
 			subAccount := accountCreateReq.SubAccounts[i]
-			subAccountBalance, err := utils.StringToInt64(subAccount.Balance)
+			subAccountBalance := int64(0)
 
-			if err != nil {
-				return nil, errs.ErrIncompleteOrIncorrectSubmission
+			if subAccount.Balance != "" {
+				subAccountBalance, err = utils.StringToInt64(subAccount.Balance)
+
+				if err != nil {
+					return nil, errs.ErrIncompleteOrIncorrectSubmission
+				}
 			}
 
 			subAccountBalances[i] = subAccountBalance
@@ -416,15 +424,14 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 					return nil, errs.ErrAccountCurrencyInvalid
 				}
 
-				if subAccountReq.Balance == nil {
-					defaultBalance := "0"
-					subAccountReq.Balance = &defaultBalance
-				}
+				subAccountBalance := int64(0)
 
-				subAccountBalance, err := utils.StringToInt64(*subAccountReq.Balance)
+				if subAccountReq.Balance != nil && *subAccountReq.Balance != "" {
+					subAccountBalance, err = utils.StringToInt64(*subAccountReq.Balance)
 
-				if err != nil {
-					return nil, errs.ErrIncompleteOrIncorrectSubmission
+					if err != nil {
+						return nil, errs.ErrIncompleteOrIncorrectSubmission
+					}
 				}
 
 				subAccountBalances[i] = subAccountBalance

@@ -313,9 +313,9 @@
                         />
                     </v-window-item>
                     <v-window-item value="finalResult">
-                        <div class="mx-4 mt-3">
-                            <span class="text-headline-large">{{ tt('Data Import Completed') }}</span>
-                            <span class="my-5">{{ tt('format.misc.importTransactionResult', { count: formatNumberToLocalizedNumerals(importedCount || 0) }) }}</span>
+                        <div class="mx-4 my-4">
+                            <v-alert type="success" color="success-darken-1" variant="tonal">{{ tt('Data Import Completed') }}</v-alert>
+                            <div class="text-body-large my-4">{{ tt('format.misc.importTransactionResult', { count: formatNumberToLocalizedNumerals(importedCount || 0) }) }}</div>
                         </div>
                     </v-window-item>
                 </v-window>

@@ -73,6 +73,7 @@
                                     :label="tt('Chart Color Scheme')"
                                     :placeholder="tt('Chart Color Scheme')"
                                     :model-value="chartColorSchemeContent"
+                                    @pointerdown.prevent
                                     @click="chartColorSchemeDialog?.open().catch(()=>{})"
                                 />
                             </v-col>
@@ -145,6 +146,7 @@
                                     :label="tt('Accounts Included in Overview Statistics')"
                                     :placeholder="tt('Accounts Included in Overview Statistics')"
                                     :model-value="accountsIncludedInHomePageOverviewDisplayContent"
+                                    @pointerdown.prevent
                                     @click="showAccountsIncludedInHomePageOverviewDialog = true"
                                 />
                             </v-col>
@@ -161,6 +163,7 @@
                                     :label="tt('Transaction Categories Included in Overview Statistics')"
                                     :placeholder="tt('Transaction Categories Included in Overview Statistics')"
                                     :model-value="transactionCategoriesIncludedInHomePageOverviewDisplayContent"
+                                    @pointerdown.prevent
                                     @click="showTransactionCategoriesIncludedInHomePageOverviewDialog = true"
                                 />
                             </v-col>
@@ -385,6 +388,7 @@
                                     :label="tt('Accounts Included in Total')"
                                     :placeholder="tt('Accounts Included in Total')"
                                     :model-value="accountsIncludedInTotalDisplayContent"
+                                    @pointerdown.prevent
                                     @click="showAccountsIncludedInTotalDialog = true"
                                 />
                             </v-col>
@@ -398,6 +402,7 @@
                                     :label="tt('Account Category Order')"
                                     :placeholder="tt('Account Category Order')"
                                     :model-value="accountCategorysDisplayOrderContent"
+                                    @pointerdown.prevent
                                     @click="accountCategorysDisplayOrderDialog?.open().catch(()=>{})"
                                 />
                             </v-col>

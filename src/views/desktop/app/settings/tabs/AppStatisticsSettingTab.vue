@@ -53,6 +53,7 @@
                                     :label="tt('Default Account Filter')"
                                     :placeholder="tt('Default Account Filter')"
                                     :model-value="defaultAccountFilterDisplayContent"
+                                    @pointerdown.prevent
                                     @click="showFilterAccountDialog = true"
                                 />
                             </v-col>
@@ -69,6 +70,7 @@
                                     :label="tt('Default Transaction Category Filter')"
                                     :placeholder="tt('Default Transaction Category Filter')"
                                     :model-value="defaultTransactionCategoryFilterDisplayContent"
+                                    @pointerdown.prevent
                                     @click="showFilterCategoryDialog = true"
                                 />
                             </v-col>

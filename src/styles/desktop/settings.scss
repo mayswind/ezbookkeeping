@@ -79,5 +79,7 @@
     $skeleton-loader-gutter: 12px,
 
     /* Tooltip */
-    $tooltip-padding: 4px 12px
+    $tooltip-background-color: rgb(var(--v-tooltip-background)),
+    $tooltip-text-color: rgb(var(--v-tooltip-color)),
+    $tooltip-padding: 3px 10px
 );

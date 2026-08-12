@@ -1,7 +1,7 @@
 <template>
     <v-dialog :persistent="loading || updatingLastReconciledTime" v-model="showState">
         <one-column-dialog-layout ref="dialogLayout" class="reconciliation-statement-dialog-layout d-flex flex-column"
-                                  content-class="pa-0 d-flex flex-column" footer-class="py-1"
+                                  content-class="reconciliation-statement-dialog-content pa-0 d-flex flex-column" footer-class="py-1"
                                   :style="{ '--reconciliation-statement-dialog-height': preserveDialogHeight ? transactionListDialogHeight + 'px' : undefined }"
                                   :disabled="loading || updatingLastReconciledTime"
                                   :title="tt('Reconciliation Statement')" :cancel-button-title="tt('Close')"
@@ -170,6 +170,7 @@
                 <v-data-table
                     fixed-header
                     fixed-footer
+                    height="100%"
                     multi-sort
                     density="compact"
                     item-value="index"
@@ -759,24 +760,33 @@ defineExpose({
 .reconciliation-statement-dialog-layout {
     min-height: min(max(var(--reconciliation-statement-dialog-height), 581px), calc(100dvh - 48px));
 
-    .v-table.reconciliation-statement-table > .v-table__wrapper > table {
-        th:not(:nth-last-child(2)),
-        td:not(:nth-last-child(2)) {
-            width: auto !important;
-            white-space: nowrap;
+    .reconciliation-statement-dialog-content {
+        min-height: 0;
+        overflow-y: hidden !important;
+
+        .v-table.reconciliation-statement-table {
+            min-height: 0;
+            flex: 1 1 auto;
+
+            > .v-table__wrapper > table {
+                th:not(:nth-last-child(2)),
+                td:not(:nth-last-child(2)) {
+                    width: auto !important;
+                    white-space: nowrap;
+                }
+
+                th:nth-last-child(2),
+                td:nth-last-child(2) {
+                    width: 100% !important;
+                }
+            }
         }
 
-        th:nth-last-child(2),
-        td:nth-last-child(2) {
-            width: 100% !important;
+        .reconciliation-statement-chart-container > .account-balance-trends-chart-container {
+            flex: 1 1 auto;
+            height: auto !important;
+            min-height: 422px;
         }
     }
-
-    .reconciliation-statement-chart-container > .account-balance-trends-chart-container {
-        flex: 1 1 auto;
-        height: auto !important;
-        min-height: 422px;
-    }
-
 }
 </style>

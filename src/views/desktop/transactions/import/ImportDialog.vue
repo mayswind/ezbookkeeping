@@ -1,6 +1,8 @@
 <template>
     <v-dialog :persistent="!!persistent || loading || submitting" v-model="showState">
-        <one-column-dialog-layout content-class="pa-0" :title="tt('Import Transactions')" :cancel-button-title="tt('Cancel')"
+        <one-column-dialog-layout :class="{ 'import-transaction-dialog-layout': currentStep === 'defineColumn' || currentStep === 'checkData' }"
+                                  :content-class="currentStep === 'defineColumn' || currentStep === 'checkData' ? 'pa-0 import-transaction-dialog-content' : 'pa-0'"
+                                  :title="tt('Import Transactions')" :cancel-button-title="tt('Cancel')"
                                   :disabled="loading || submitting"
                                   :loading="currentStep !== 'checkData' && loading"
                                   @cancel="close(currentStep === 'finalResult')">
@@ -122,12 +124,15 @@
             <template #subtitle>
                 <v-divider class="mt-2" />
                 <div class="cursor-default mt-3 mx-3 mb-md-2">
-                    <steps-bar min-width="700" :clickable="false" :steps="allSteps" :current-step="currentStep" />
+                    <steps-bar min-width="700" :always-horizontal="true" :clickable="false"
+                               :steps="allSteps" :current-step="currentStep" />
                 </div>
             </template>
 
             <template #content>
-                <v-window class="disable-tab-transition" v-model="currentStep">
+                <v-window class="disable-tab-transition"
+                          :class="{ 'import-transaction-dialog-window': currentStep === 'defineColumn' || currentStep === 'checkData' }"
+                          v-model="currentStep">
                     <v-window-item value="uploadFile">
                         <div class="pa-4">
                             <v-row>
@@ -1314,6 +1319,49 @@ defineExpose({
 </script>
 
 <style>
+.import-transaction-dialog-layout {
+    max-height: calc(100dvh - 48px);
+
+    .import-transaction-dialog-content {
+        min-height: 0;
+        overflow-y: hidden !important;
+
+        .import-transaction-dialog-window {
+            min-height: 0;
+
+            > .v-window__container {
+                height: auto;
+            }
+
+            .v-window-item--active {
+                min-height: 0;
+            }
+
+            .import-transaction-table-container {
+                max-height: calc(100dvh - 164px);
+                min-height: 0;
+                overflow-y: hidden !important;
+
+                .import-transaction-table {
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    overflow: hidden;
+
+                    > .v-table__wrapper {
+                        height: 100% !important;
+                        min-height: 0;
+                        overflow-y: auto;
+                    }
+                }
+
+                .import-transaction-table-footer {
+                    flex: 0 0 auto;
+                }
+            }
+        }
+    }
+}
+
 .import-transaction-images {
     .import-image {
         .picture-control-icon {

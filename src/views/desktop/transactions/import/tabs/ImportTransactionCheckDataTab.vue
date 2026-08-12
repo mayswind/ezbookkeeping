@@ -1,330 +1,336 @@
 <template>
-    <v-data-table
-        fixed-header
-        fixed-footer
-        show-select
-        multi-sort
-        density="compact"
-        item-value="index"
-        :class="{ 'import-transaction-table': true, 'disabled': !!disabled }"
-        :headers="importTransactionHeaders"
-        :items="importTransactions"
-        :hover="true"
-        :search="JSON.stringify(filters)"
-        :custom-filter="importTransactionsFilter"
-        :no-data-text="tt('No data to import')"
-        v-model:items-per-page="countPerPage"
-        v-model:page="currentPage"
-    >
-        <template #header.data-table-select>
-            <v-checkbox readonly class="always-cursor-pointer"
-                        density="compact" width="28"
-                        :disabled="!!disabled"
-                        :indeterminate="anyButNotAllTransactionSelected"
-                        v-model="allTransactionSelected"
-            >
-                <v-menu activator="parent" location="bottom">
-                    <v-list>
-                        <v-list-item :prepend-icon="mdiSelectAll"
-                                     :title="tt('Select All Valid Items')"
-                                     :disabled="!!disabled"
-                                     @click="selectAllValid"></v-list-item>
-                        <v-list-item :prepend-icon="mdiSelectAll"
-                                     :title="tt('Select All Invalid Items')"
-                                     :disabled="!!disabled"
-                                     @click="selectAllInvalid"></v-list-item>
-                        <v-divider class="my-2"/>
-                        <v-list-item :prepend-icon="mdiSelectAll"
-                                     :title="tt('Select All')"
-                                     :disabled="!!disabled"
-                                     @click="selectAll"></v-list-item>
-                        <v-list-item :prepend-icon="mdiSelect"
-                                     :title="tt('Select None')"
-                                     :disabled="!!disabled"
-                                     @click="selectNone"></v-list-item>
-                        <v-list-item :prepend-icon="mdiSelectInverse"
-                                     :title="tt('Invert Selection')"
-                                     :disabled="!!disabled"
-                                     @click="selectInvert"></v-list-item>
-                        <v-divider class="my-2"/>
-                        <v-list-item :prepend-icon="mdiSelectAll"
-                                     :title="tt('Select All on This Page')"
-                                     :disabled="!!disabled"
-                                     @click="selectAllInThisPage"></v-list-item>
-                        <v-list-item :prepend-icon="mdiSelect"
-                                     :title="tt('Select None on This Page')"
-                                     :disabled="!!disabled"
-                                     @click="selectNoneInThisPage"></v-list-item>
-                        <v-list-item :prepend-icon="mdiSelectInverse"
-                                     :title="tt('Invert Selection on This Page')"
-                                     :disabled="!!disabled"
-                                     @click="selectInvertInThisPage"></v-list-item>
-                    </v-list>
-                </v-menu>
-            </v-checkbox>
-        </template>
-        <template #item.data-table-select="{ item }">
-            <v-checkbox density="compact"
-                        :color="!item.valid ? 'error' : 'primary'"
-                        :disabled="!!disabled"
-                        v-model="item.selected"></v-checkbox>
-        </template>
-        <template #item.valid="{ item }">
-            <v-icon size="small" :class="{ 'text-error': !item.valid }"
-                    :disabled="!!disabled"
-                    :icon="editingTransaction === item ? mdiCheck : mdiPencilOutline"
-                    @click="editTransaction(item)">
-            </v-icon>
-            <v-tooltip activator="parent" v-if="!disabled">{{ tt('Edit') }}</v-tooltip>
-        </template>
-        <template #item.time="{ item }">
-            <span>{{ getDisplayDateTime(item) }}</span>
-            <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
-                    v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
-        </template>
-        <template #item.type="{ value }">
-            <v-chip label color="secondary" variant="outlined" size="x-small" v-if="value === TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-chip>
-            <v-chip label class="text-income" variant="outlined" size="x-small" v-else-if="value === TransactionType.Income">{{ tt('Income') }}</v-chip>
-            <v-chip label class="text-expense" variant="outlined" size="x-small" v-else-if="value === TransactionType.Expense">{{ tt('Expense') }}</v-chip>
-            <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="value === TransactionType.Transfer">{{ tt('Transfer') }}</v-chip>
-            <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ tt('Unknown') }}</v-chip>
-        </template>
-        <template #item.actualCategoryName="{ item }">
-            <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === TransactionType.ModifyBalance">
-                <span v-if="item.type === TransactionType.ModifyBalance">-</span>
-                <ItemIcon size="24px" icon-type="category"
-                          :icon-id="allCategoriesMap[item.categoryId]?.icon ?? ''"
-                          :color="allCategoriesMap[item.categoryId]?.color ?? ''"
-                          v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
-                <span class="ms-2" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
-                                    {{ allCategoriesMap[item.categoryId]?.name }}
-                                </span>
-                <div class="text-error font-italic" v-else-if="item.type !== TransactionType.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">
-                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
-                    <span>{{ item.originalCategoryName }}</span>
-                </div>
-            </div>
-            <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Expense">
-                <two-column-select density="compact" variant="plain"
-                                   primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                   secondary-hidden-field="hidden"
-                                   :disabled="!!disabled || !hasVisibleExpenseCategories"
-                                   :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
-                                   :show-selection-primary-text="true"
-                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Expense])"
-                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Expense])"
-                                   :placeholder="tt('Category')"
-                                   :items="allCategories[CategoryType.Expense]"
-                                   v-model="item.categoryId">
-                </two-column-select>
-            </div>
-            <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Income">
-                <two-column-select density="compact" variant="plain"
-                                   primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                   secondary-hidden-field="hidden"
-                                   :disabled="!!disabled || !hasVisibleIncomeCategories"
-                                   :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
-                                   :show-selection-primary-text="true"
-                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Income])"
-                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Income])"
-                                   :placeholder="tt('Category')"
-                                   :items="allCategories[CategoryType.Income]"
-                                   v-model="item.categoryId">
-                </two-column-select>
-            </div>
-            <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Transfer">
-                <two-column-select density="compact" variant="plain"
-                                   primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
-                                   primary-hidden-field="hidden" primary-sub-items-field="subCategories"
-                                   secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
-                                   secondary-hidden-field="hidden"
-                                   :disabled="!!disabled || !hasVisibleTransferCategories"
-                                   :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
-                                   :show-selection-primary-text="true"
-                                   :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Transfer])"
-                                   :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Transfer])"
-                                   :placeholder="tt('Category')"
-                                   :items="allCategories[CategoryType.Transfer]"
-                                   v-model="item.categoryId">
-                </two-column-select>
-            </div>
-        </template>
-        <template #item.sourceAmount="{ item }">
-            <div class="d-flex align-center" v-if="editingTransaction !== item">
-                <span>{{ getTransactionDisplayAmount(item) }}</span>
-                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
-                <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
-                <v-tooltip activator="parent" v-if="(item.type !== TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency) || (item.type === TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency && getTransactionDestinationAccountCurrency(item) !== defaultCurrency)">
-                    <span>{{ getTransactionDisplaySourceAmountInDefaultCurrency(item) }}</span>
-                    <v-icon class="ms-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount"></v-icon>
-                    <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount">{{ getTransactionDisplayDestinationAmountInDefaultCurrency(item) }}</span>
-                </v-tooltip>
-            </div>
-            <div class="d-flex align-center" :style="`width: ${item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId ? 250 : 100}px`" v-if="editingTransaction === item">
-                <amount-input density="compact" variant="plain"
-                              persistent-placeholder
-                              :currency="getTransactionSourceAccountCurrency(item)"
-                              :show-currency="true"
-                              :disabled="!!disabled"
-                              :placeholder="tt('Amount')"
-                              v-model="item.sourceAmount"/>
-                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
-                <amount-input density="compact" variant="plain"
-                              persistent-placeholder
-                              :currency="getTransactionDestinationAccountCurrency(item)"
-                              :show-currency="true"
-                              :disabled="!!disabled"
-                              :placeholder="tt('Transfer In Amount')"
-                              v-model="item.destinationAmount"
-                              v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"/>
-            </div>
-        </template>
-        <template #item.actualSourceAccountName="{ item }">
-            <div class="d-flex align-center" v-if="editingTransaction !== item">
-                <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId]?.name }}</span>
-                <div class="text-error font-italic" v-else>
-                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
-                    <span>{{ item.originalSourceAccountName }}</span>
-                </div>
-                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
-                <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId]?.name }}</span>
-                <div class="text-error font-italic" v-else-if="item.type === TransactionType.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
-                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
-                    <span>{{ item.originalDestinationAccountName }}</span>
-                </div>
-            </div>
-            <div class="d-flex align-center" :style="`width: ${item.type === TransactionType.Transfer ? 450 : 200}px`"  v-if="editingTransaction === item">
-                <two-column-select density="compact" variant="plain"
-                                   primary-key-field="id" primary-value-field="category"
-                                   primary-title-field="name" primary-footer-field="displayBalance"
-                                   primary-icon-field="icon" primary-icon-type="account"
-                                   primary-sub-items-field="accounts"
-                                   :primary-title-i18n="true"
-                                   secondary-key-field="id" secondary-value-field="id"
-                                   secondary-title-field="name" secondary-footer-field="displayBalance"
-                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                   :disabled="!!disabled || !allVisibleAccounts.length"
-                                   :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
-                                   :custom-selection-primary-text="getSourceAccountDisplayName(item)"
-                                   :placeholder="getSourceAccountTitle(item)"
-                                   :items="allVisibleCategorizedAccounts"
-                                   v-model="item.sourceAccountId">
-                </two-column-select>
-                <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
-                <two-column-select density="compact" variant="plain"
-                                   primary-key-field="id" primary-value-field="category"
-                                   primary-title-field="name" primary-footer-field="displayBalance"
-                                   primary-icon-field="icon" primary-icon-type="account"
-                                   primary-sub-items-field="accounts"
-                                   :primary-title-i18n="true"
-                                   secondary-key-field="id" secondary-value-field="id"
-                                   secondary-title-field="name" secondary-footer-field="displayBalance"
-                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
-                                   :disabled="!!disabled || !allVisibleAccounts.length"
-                                   :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
-                                   :custom-selection-primary-text="getDestinationAccountDisplayName(item)"
-                                   :placeholder="tt('Destination Account')"
-                                   :items="allVisibleCategorizedAccounts"
-                                   v-model="item.destinationAccountId"
-                                   v-if="item.type === TransactionType.Transfer">
-                </two-column-select>
-            </div>
-        </template>
-        <template #item.geoLocation="{ item }">
-            <span v-if="item.geoLocation">{{ `(${formatCoordinate(item.geoLocation, coordinateDisplayType)})` }}</span>
-            <span v-else-if="!item.geoLocation">{{ tt('None') }}</span>
-        </template>
-        <template #item.tagIds="{ item }">
-            <div v-if="editingTransaction !== item">
-                <v-chip class="transaction-tag" size="small"
-                        :class="{ 'font-italic': !tagId || tagId === '0' || !allTagsMap[tagId] }"
-                        :prepend-icon="tagId && tagId !== '0' && allTagsMap[tagId] ? mdiPound : mdiAlertOutline"
-                        :color="tagId && tagId !== '0' && allTagsMap[tagId] ? 'default' : 'error'"
-                        :text="tagId && tagId !== '0' && allTagsMap[tagId] ? allTagsMap[tagId].name : item.originalTagNames[index]"
-                        :key="tagId"
-                        v-for="(tagId, index) in item.tagIds"/>
-                <v-chip class="transaction-tag" size="small"
-                        :text="tt('None')"
-                        v-if="!item.tagIds || !item.tagIds.length"/>
-            </div>
-            <div style="width: 200px" v-if="editingTransaction === item">
-                <v-autocomplete
-                    item-title="name"
-                    item-value="id"
-                    auto-select-first
-                    persistent-placeholder
-                    multiple
-                    chips
-                    closable-chips
-                    density="compact" variant="plain"
-                    :disabled="!!disabled"
-                    :placeholder="tt('None')"
-                    :items="allTagsWithGroupHeader"
-                    :no-data-text="tt('No available tag')"
-                    v-model="editingTags"
+    <div class="import-transaction-table-container d-flex flex-column">
+        <v-data-table
+            fixed-header
+            fixed-footer
+            height="100%"
+            show-select
+            multi-sort
+            density="compact"
+            item-value="index"
+            :class="{ 'import-transaction-table': true, 'disabled': !!disabled }"
+            :headers="importTransactionHeaders"
+            :items="importTransactions"
+            :hover="true"
+            :search="JSON.stringify(filters)"
+            :custom-filter="importTransactionsFilter"
+            :no-data-text="tt('No data to import')"
+            v-model:items-per-page="countPerPage"
+            v-model:page="currentPage"
+        >
+            <template #header.data-table-select>
+                <v-checkbox readonly class="always-cursor-pointer"
+                            density="compact" width="28"
+                            :disabled="!!disabled"
+                            :indeterminate="anyButNotAllTransactionSelected"
+                            v-model="allTransactionSelected"
                 >
-                    <template #chip="{ props, index }">
-                        <v-chip :class="{ 'font-italic': !isTagValid(editingTags, index) }"
-                                :prepend-icon="isTagValid(editingTags, index) ? mdiPound : mdiAlertOutline"
-                                :color="isTagValid(editingTags, index) ? 'default' : 'error'"
-                                :text="isTagValid(editingTags, index) ? allTagsMap[editingTags[index] as string]?.name : item.originalTagNames[index]"
-                                v-bind="props"/>
-                    </template>
-
-                    <template #subheader="{ props }">
-                        <v-list-subheader class="text-body-small">{{ props['title'] }}</v-list-subheader>
-                    </template>
-
-                    <template #item="{ props, internalItem }">
-                        <v-list-item :value="internalItem.value" v-bind="props" v-if="internalItem.raw instanceof TransactionTag && !internalItem.raw.hidden">
-                            <template #title>
-                                <v-list-item-title>
-                                    <div class="d-flex align-center">
-                                        <v-icon size="20" start :icon="mdiPound"/>
-                                        <span>{{ internalItem.title }}</span>
-                                    </div>
-                                </v-list-item-title>
-                            </template>
-                        </v-list-item>
-                    </template>
-                </v-autocomplete>
-            </div>
-        </template>
-        <template #item.comment="{ item }">
-            <template v-if="editingTransaction !== item">
-                <span v-if="!item.comment || item.comment.length <= TRANSACTION_MAX_COMMENT_LENGTH">{{ item.comment || '' }}</span>
-                <div class="text-error font-italic" v-else-if="item.comment && item.comment.length > TRANSACTION_MAX_COMMENT_LENGTH">
-                    <v-tooltip activator="parent">{{ getTransactionDescriptionTooltip(item) }}</v-tooltip>
-                    <v-icon class="me-1" :icon="mdiAlertOutline"/>
-                    <span>{{ item.comment }}</span>
+                    <v-menu activator="parent" location="bottom">
+                        <v-list>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Valid Items')"
+                                         :disabled="!!disabled"
+                                         @click="selectAllValid"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All Invalid Items')"
+                                         :disabled="!!disabled"
+                                         @click="selectAllInvalid"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All')"
+                                         :disabled="!!disabled"
+                                         @click="selectAll"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelect"
+                                         :title="tt('Select None')"
+                                         :disabled="!!disabled"
+                                         @click="selectNone"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectInverse"
+                                         :title="tt('Invert Selection')"
+                                         :disabled="!!disabled"
+                                         @click="selectInvert"></v-list-item>
+                            <v-divider class="my-2"/>
+                            <v-list-item :prepend-icon="mdiSelectAll"
+                                         :title="tt('Select All on This Page')"
+                                         :disabled="!!disabled"
+                                         @click="selectAllInThisPage"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelect"
+                                         :title="tt('Select None on This Page')"
+                                         :disabled="!!disabled"
+                                         @click="selectNoneInThisPage"></v-list-item>
+                            <v-list-item :prepend-icon="mdiSelectInverse"
+                                         :title="tt('Invert Selection on This Page')"
+                                         :disabled="!!disabled"
+                                         @click="selectInvertInThisPage"></v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-checkbox>
+            </template>
+            <template #item.data-table-select="{ item }">
+                <v-checkbox density="compact"
+                            :color="!item.valid ? 'error' : 'primary'"
+                            :disabled="!!disabled"
+                            v-model="item.selected"></v-checkbox>
+            </template>
+            <template #item.valid="{ item }">
+                <v-icon size="small" :class="{ 'text-error': !item.valid }"
+                        :disabled="!!disabled"
+                        :icon="editingTransaction === item ? mdiCheck : mdiPencilOutline"
+                        @click="editTransaction(item)">
+                </v-icon>
+                <v-tooltip activator="parent" v-if="!disabled">{{ tt('Edit') }}</v-tooltip>
+            </template>
+            <template #item.time="{ item }">
+                <span>{{ getDisplayDateTime(item) }}</span>
+                <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
+                        v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
+            </template>
+            <template #item.type="{ value }">
+                <v-chip label color="secondary" variant="outlined" size="x-small" v-if="value === TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-chip>
+                <v-chip label class="text-income" variant="outlined" size="x-small" v-else-if="value === TransactionType.Income">{{ tt('Income') }}</v-chip>
+                <v-chip label class="text-expense" variant="outlined" size="x-small" v-else-if="value === TransactionType.Expense">{{ tt('Expense') }}</v-chip>
+                <v-chip label color="primary" variant="outlined" size="x-small" v-else-if="value === TransactionType.Transfer">{{ tt('Transfer') }}</v-chip>
+                <v-chip label color="default" variant="outlined" size="x-small" v-else>{{ tt('Unknown') }}</v-chip>
+            </template>
+            <template #item.actualCategoryName="{ item }">
+                <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === TransactionType.ModifyBalance">
+                    <span v-if="item.type === TransactionType.ModifyBalance">-</span>
+                    <ItemIcon size="24px" icon-type="category"
+                              :icon-id="allCategoriesMap[item.categoryId]?.icon ?? ''"
+                              :color="allCategoriesMap[item.categoryId]?.color ?? ''"
+                              v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
+                    <span class="ms-2" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
+                                        {{ allCategoriesMap[item.categoryId]?.name }}
+                                    </span>
+                    <div class="text-error font-italic" v-else-if="item.type !== TransactionType.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">
+                        <v-icon class="me-1" :icon="mdiAlertOutline"/>
+                        <span>{{ item.originalCategoryName }}</span>
+                    </div>
+                </div>
+                <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Expense">
+                    <two-column-select density="compact" variant="plain"
+                                       primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-hidden-field="hidden"
+                                       :disabled="!!disabled || !hasVisibleExpenseCategories"
+                                       :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
+                                       :show-selection-primary-text="true"
+                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Expense])"
+                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Expense])"
+                                       :placeholder="tt('Category')"
+                                       :items="allCategories[CategoryType.Expense]"
+                                       v-model="item.categoryId">
+                    </two-column-select>
+                </div>
+                <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Income">
+                    <two-column-select density="compact" variant="plain"
+                                       primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-hidden-field="hidden"
+                                       :disabled="!!disabled || !hasVisibleIncomeCategories"
+                                       :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
+                                       :show-selection-primary-text="true"
+                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Income])"
+                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Income])"
+                                       :placeholder="tt('Category')"
+                                       :items="allCategories[CategoryType.Income]"
+                                       v-model="item.categoryId">
+                    </two-column-select>
+                </div>
+                <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Transfer">
+                    <two-column-select density="compact" variant="plain"
+                                       primary-key-field="id" primary-value-field="id" primary-title-field="name"
+                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-hidden-field="hidden" primary-sub-items-field="subCategories"
+                                       secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
+                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-hidden-field="hidden"
+                                       :disabled="!!disabled || !hasVisibleTransferCategories"
+                                       :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
+                                       :show-selection-primary-text="true"
+                                       :custom-selection-primary-text="getTransactionPrimaryCategoryName(item.categoryId, allCategories[CategoryType.Transfer])"
+                                       :custom-selection-secondary-text="getTransactionSecondaryCategoryName(item.categoryId, allCategories[CategoryType.Transfer])"
+                                       :placeholder="tt('Category')"
+                                       :items="allCategories[CategoryType.Transfer]"
+                                       v-model="item.categoryId">
+                    </two-column-select>
                 </div>
             </template>
-            <div v-if="editingTransaction === item">
-                <v-text-field style="width: calc(max(300px, 100%))" type="text"
-                              density="compact" variant="plain"
-                              persistent-placeholder
-                              :placeholder="tt('Description')"
-                              :disabled="!!disabled"
-                              v-model="item.comment">
-                    <v-tooltip activator="parent" v-if="item.comment && item.comment.length > TRANSACTION_MAX_COMMENT_LENGTH">
-                        {{ getTransactionDescriptionTooltip(item) }}
+            <template #item.sourceAmount="{ item }">
+                <div class="d-flex align-center" v-if="editingTransaction !== item">
+                    <span>{{ getTransactionDisplayAmount(item) }}</span>
+                    <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                    <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
+                    <v-tooltip activator="parent" v-if="(item.type !== TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency) || (item.type === TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency && getTransactionDestinationAccountCurrency(item) !== defaultCurrency)">
+                        <span>{{ getTransactionDisplaySourceAmountInDefaultCurrency(item) }}</span>
+                        <v-icon class="ms-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount"></v-icon>
+                        <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount">{{ getTransactionDisplayDestinationAmountInDefaultCurrency(item) }}</span>
                     </v-tooltip>
-                </v-text-field>
-            </div>
-        </template>
-        <template #bottom>
+                </div>
+                <div class="d-flex align-center" :style="`width: ${item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId ? 250 : 100}px`" v-if="editingTransaction === item">
+                    <amount-input density="compact" variant="plain"
+                                  persistent-placeholder
+                                  :currency="getTransactionSourceAccountCurrency(item)"
+                                  :show-currency="true"
+                                  :disabled="!!disabled"
+                                  :placeholder="tt('Amount')"
+                                  v-model="item.sourceAmount"/>
+                    <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"></v-icon>
+                    <amount-input density="compact" variant="plain"
+                                  persistent-placeholder
+                                  :currency="getTransactionDestinationAccountCurrency(item)"
+                                  :show-currency="true"
+                                  :disabled="!!disabled"
+                                  :placeholder="tt('Transfer In Amount')"
+                                  v-model="item.destinationAmount"
+                                  v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId"/>
+                </div>
+            </template>
+            <template #item.actualSourceAccountName="{ item }">
+                <div class="d-flex align-center" v-if="editingTransaction !== item">
+                    <span v-if="item.sourceAccountId && item.sourceAccountId !== '0' && allAccountsMap[item.sourceAccountId]">{{ allAccountsMap[item.sourceAccountId]?.name }}</span>
+                    <div class="text-error font-italic" v-else>
+                        <v-icon class="me-1" :icon="mdiAlertOutline"/>
+                        <span>{{ item.originalSourceAccountName }}</span>
+                    </div>
+                    <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                    <span v-if="item.type === TransactionType.Transfer && item.destinationAccountId && item.destinationAccountId !== '0' && allAccountsMap[item.destinationAccountId]">{{allAccountsMap[item.destinationAccountId]?.name }}</span>
+                    <div class="text-error font-italic" v-else-if="item.type === TransactionType.Transfer && (!item.destinationAccountId || item.destinationAccountId === '0' || !allAccountsMap[item.destinationAccountId])">
+                        <v-icon class="me-1" :icon="mdiAlertOutline"/>
+                        <span>{{ item.originalDestinationAccountName }}</span>
+                    </div>
+                </div>
+                <div class="d-flex align-center" :style="`width: ${item.type === TransactionType.Transfer ? 450 : 200}px`"  v-if="editingTransaction === item">
+                    <two-column-select density="compact" variant="plain"
+                                       primary-key-field="id" primary-value-field="category"
+                                       primary-title-field="name" primary-footer-field="displayBalance"
+                                       primary-icon-field="icon" primary-icon-type="account"
+                                       primary-sub-items-field="accounts"
+                                       :primary-title-i18n="true"
+                                       secondary-key-field="id" secondary-value-field="id"
+                                       secondary-title-field="name" secondary-footer-field="displayBalance"
+                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                       :disabled="!!disabled || !allVisibleAccounts.length"
+                                       :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
+                                       :custom-selection-primary-text="getSourceAccountDisplayName(item)"
+                                       :placeholder="getSourceAccountTitle(item)"
+                                       :items="allVisibleCategorizedAccounts"
+                                       v-model="item.sourceAccountId">
+                    </two-column-select>
+                    <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer"></v-icon>
+                    <two-column-select density="compact" variant="plain"
+                                       primary-key-field="id" primary-value-field="category"
+                                       primary-title-field="name" primary-footer-field="displayBalance"
+                                       primary-icon-field="icon" primary-icon-type="account"
+                                       primary-sub-items-field="accounts"
+                                       :primary-title-i18n="true"
+                                       secondary-key-field="id" secondary-value-field="id"
+                                       secondary-title-field="name" secondary-footer-field="displayBalance"
+                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                       :disabled="!!disabled || !allVisibleAccounts.length"
+                                       :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
+                                       :custom-selection-primary-text="getDestinationAccountDisplayName(item)"
+                                       :placeholder="tt('Destination Account')"
+                                       :items="allVisibleCategorizedAccounts"
+                                       v-model="item.destinationAccountId"
+                                       v-if="item.type === TransactionType.Transfer">
+                    </two-column-select>
+                </div>
+            </template>
+            <template #item.geoLocation="{ item }">
+                <span v-if="item.geoLocation">{{ `(${formatCoordinate(item.geoLocation, coordinateDisplayType)})` }}</span>
+                <span v-else-if="!item.geoLocation">{{ tt('None') }}</span>
+            </template>
+            <template #item.tagIds="{ item }">
+                <div v-if="editingTransaction !== item">
+                    <v-chip class="transaction-tag" size="small"
+                            :class="{ 'font-italic': !tagId || tagId === '0' || !allTagsMap[tagId] }"
+                            :prepend-icon="tagId && tagId !== '0' && allTagsMap[tagId] ? mdiPound : mdiAlertOutline"
+                            :color="tagId && tagId !== '0' && allTagsMap[tagId] ? 'default' : 'error'"
+                            :text="tagId && tagId !== '0' && allTagsMap[tagId] ? allTagsMap[tagId].name : item.originalTagNames[index]"
+                            :key="tagId"
+                            v-for="(tagId, index) in item.tagIds"/>
+                    <v-chip class="transaction-tag" size="small"
+                            :text="tt('None')"
+                            v-if="!item.tagIds || !item.tagIds.length"/>
+                </div>
+                <div style="width: 200px" v-if="editingTransaction === item">
+                    <v-autocomplete
+                        item-title="name"
+                        item-value="id"
+                        auto-select-first
+                        persistent-placeholder
+                        multiple
+                        chips
+                        closable-chips
+                        density="compact" variant="plain"
+                        :disabled="!!disabled"
+                        :placeholder="tt('None')"
+                        :items="allTagsWithGroupHeader"
+                        :no-data-text="tt('No available tag')"
+                        v-model="editingTags"
+                    >
+                        <template #chip="{ props, index }">
+                            <v-chip :class="{ 'font-italic': !isTagValid(editingTags, index) }"
+                                    :prepend-icon="isTagValid(editingTags, index) ? mdiPound : mdiAlertOutline"
+                                    :color="isTagValid(editingTags, index) ? 'default' : 'error'"
+                                    :text="isTagValid(editingTags, index) ? allTagsMap[editingTags[index] as string]?.name : item.originalTagNames[index]"
+                                    v-bind="props"/>
+                        </template>
+
+                        <template #subheader="{ props }">
+                            <v-list-subheader class="text-body-small">{{ props['title'] }}</v-list-subheader>
+                        </template>
+
+                        <template #item="{ props, internalItem }">
+                            <v-list-item :value="internalItem.value" v-bind="props" v-if="internalItem.raw instanceof TransactionTag && !internalItem.raw.hidden">
+                                <template #title>
+                                    <v-list-item-title>
+                                        <div class="d-flex align-center">
+                                            <v-icon size="20" start :icon="mdiPound"/>
+                                            <span>{{ internalItem.title }}</span>
+                                        </div>
+                                    </v-list-item-title>
+                                </template>
+                            </v-list-item>
+                        </template>
+                    </v-autocomplete>
+                </div>
+            </template>
+            <template #item.comment="{ item }">
+                <template v-if="editingTransaction !== item">
+                    <span v-if="!item.comment || item.comment.length <= TRANSACTION_MAX_COMMENT_LENGTH">{{ item.comment || '' }}</span>
+                    <div class="text-error font-italic" v-else-if="item.comment && item.comment.length > TRANSACTION_MAX_COMMENT_LENGTH">
+                        <v-tooltip activator="parent">{{ getTransactionDescriptionTooltip(item) }}</v-tooltip>
+                        <v-icon class="me-1" :icon="mdiAlertOutline"/>
+                        <span>{{ item.comment }}</span>
+                    </div>
+                </template>
+                <div v-if="editingTransaction === item">
+                    <v-text-field style="width: calc(max(300px, 100%))" type="text"
+                                  density="compact" variant="plain"
+                                  persistent-placeholder
+                                  :placeholder="tt('Description')"
+                                  :disabled="!!disabled"
+                                  v-model="item.comment">
+                        <v-tooltip activator="parent" v-if="item.comment && item.comment.length > TRANSACTION_MAX_COMMENT_LENGTH">
+                            {{ getTransactionDescriptionTooltip(item) }}
+                        </v-tooltip>
+                    </v-text-field>
+                </div>
+            </template>
+            <template #bottom>
+            </template>
+        </v-data-table>
+
+        <div class="import-transaction-table-footer">
             <v-divider />
-            <div class="title-and-toolbar d-flex align-center text-no-wrap my-1 mx-3" v-if="importTransactions">
+            <div class="title-and-toolbar d-flex text-body-large align-center text-no-wrap my-1 mx-3" v-if="importTransactions">
                 <span :class="{ 'text-error': selectedInvalidTransactionCount > 0 }">
                     {{ tt('format.misc.selectedCount', { count: formatNumberToLocalizedNumerals(selectedImportTransactionCount), totalCount: formatNumberToLocalizedNumerals(importTransactions.length) }) }}
                 </span>
@@ -344,8 +350,8 @@
                                     v-model="currentPage"
                                     v-if="importTransactions.length > 10"></pagination-buttons>
             </div>
-        </template>
-    </v-data-table>
+        </div>
+    </div>
 
     <v-dialog width="640" v-model="showCustomAmountFilterDialog">
         <one-column-dialog-layout :title="tt('Filter Amount')" :cancel-button-title="tt('Cancel')"

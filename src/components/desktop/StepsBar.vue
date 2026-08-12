@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex" :style="`min-width: ${minWidth}px`" v-if="minWidth"></div>
-    <v-slide-group class="slide-group-with-stepper hidden-xs" show-arrows>
+    <v-slide-group class="slide-group-with-stepper" :class="{ 'hidden-xs': !alwaysHorizontal }" show-arrows>
         <v-slide-group-item :key="idx" v-for="(step, idx) in steps">
             <div class="mx-1"
                  :class="{ 'slide-group-step-active': isStepActive(step), 'slide-group-step-completed': isStepCompleted(idx), 'cursor-pointer': isClickable }"
@@ -21,7 +21,7 @@
             </div>
         </v-slide-group-item>
     </v-slide-group>
-    <v-slide-group class="slide-group-with-stepper hidden-sm-and-up" direction="vertical">
+    <v-slide-group class="slide-group-with-stepper hidden-sm-and-up" direction="vertical" v-if="!alwaysHorizontal">
         <v-slide-group-item :key="idx" v-for="(step, idx) in steps">
             <div class="mx-1 mb-3"
                  :class="{ 'slide-group-step-active': isStepActive(step), 'slide-group-step-completed': isStepCompleted(idx), 'cursor-pointer': isClickable }"
@@ -62,6 +62,7 @@ const props = defineProps<{
     currentStep: string;
     clickable?: string | boolean;
     minWidth: string | number;
+    alwaysHorizontal?: boolean;
 }>();
 
 const emit = defineEmits<{

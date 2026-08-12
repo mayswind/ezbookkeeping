@@ -34,7 +34,7 @@
                     <v-img :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver, 'h-100': true }"
                            :src="imageSrc" @click="showOpenImageDialog">
                         <template #placeholder>
-                            <div :class="{ 'w-100 h-100': true, 'bg-grey-200': !isDarkMode, 'bg-grey-100': isDarkMode }"></div>
+                            <div :class="{ 'w-100 h-100': true, 'bg-grey-200': !isDarkMode, 'bg-grey-50': isDarkMode }"></div>
                         </template>
                     </v-img>
                 </div>

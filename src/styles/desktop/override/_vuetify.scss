@@ -384,15 +384,14 @@
     .v-snackbar__wrapper {
         border-radius: var(--ebk-radius-md) !important;
         box-shadow: var(--ebk-shadow-lg) !important;
+    }
+
+    .v-snackbar__wrapper:not([class^="bg-"]):not([class*=" bg-"]) {
         background-color: rgba(var(--v-tooltip-background));
-    }
 
-    .v-snackbar__content {
-        color: rgb(var(--v-tooltip-color));
-    }
-
-    .bg-notification-background .v-snackbar__content {
-        color: rgb(var(--v-theme-on-notification-background)) !important;
+        .v-snackbar__content {
+            color: rgb(var(--v-tooltip-color));
+        }
     }
 }
 

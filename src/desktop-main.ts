@@ -421,7 +421,7 @@ const vuetify = createVuetify({
                     'on-background': '#fcf0e3',
                     'surface': '#1a1a1a',
                     'on-surface': '#fcf0e3',
-                    'notification-background': '#1e1e1e',
+                    'notification-background': '#2e2e2e',
                     'on-notification-background': '#fff',
                     'grey': '#4d4c4b',
                     'grey-50': '#212121',

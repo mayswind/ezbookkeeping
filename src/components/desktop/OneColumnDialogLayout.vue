@@ -22,7 +22,7 @@
             <slot name="content" />
         </v-card-text>
         <v-divider v-if="$slots['footer']" />
-        <v-card-text class="py-3" v-if="$slots['footer']">
+        <v-card-text :class="footerClass ?? 'py-3'" :style="footerStyle" v-if="$slots['footer']">
             <div class="w-100 d-flex justify-center flex-wrap gap-4">
                 <slot name="footer" />
             </div>
@@ -42,6 +42,8 @@ defineProps<{
     disabled?: boolean;
     contentClass?: string;
     contentStyle?: string;
+    footerClass?: string;
+    footerStyle?: string;
 }>();
 
 const emit = defineEmits<{

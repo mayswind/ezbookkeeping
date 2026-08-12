@@ -1,7 +1,7 @@
 <template>
     <v-dialog :persistent="loading || updatingLastReconciledTime" v-model="showState">
-        <one-column-dialog-layout ref="dialogLayout" content-class="pa-0 d-flex flex-column"
-                                  class="reconciliation-statement-dialog-layout d-flex flex-column"
+        <one-column-dialog-layout ref="dialogLayout" class="reconciliation-statement-dialog-layout d-flex flex-column"
+                                  content-class="pa-0 d-flex flex-column" footer-class="py-1"
                                   :style="{ '--reconciliation-statement-dialog-height': preserveDialogHeight ? transactionListDialogHeight + 'px' : undefined }"
                                   :disabled="loading || updatingLastReconciledTime"
                                   :title="tt('Reconciliation Statement')" :cancel-button-title="tt('Close')"
@@ -238,8 +238,8 @@
                         </v-btn>
                     </template>
                     <template #no-data>
-                        <div class="my-6" v-if="loading && (!reconciliationStatements || !reconciliationStatements.transactions || !reconciliationStatements.transactions.length)">
-                            <v-skeleton-loader class="skeleton-no-margin my-6" type="text" :loading="true"
+                        <div class="d-flex flex-column gap-1 mt-2 mb-4" v-if="loading && (!reconciliationStatements || !reconciliationStatements.transactions || !reconciliationStatements.transactions.length)">
+                            <v-skeleton-loader class="skeleton-no-margin mt-3 mb-2" type="text" :loading="true"
                                                :key="idx" v-for="idx in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"></v-skeleton-loader>
                         </div>
                         <div class="my-5" v-else>
@@ -757,7 +757,7 @@ defineExpose({
 
 <style>
 .reconciliation-statement-dialog-layout {
-    min-height: min(max(var(--reconciliation-statement-dialog-height), 597px), calc(100dvh - 48px));
+    min-height: min(max(var(--reconciliation-statement-dialog-height), 581px), calc(100dvh - 48px));
 
     .v-table.reconciliation-statement-table > .v-table__wrapper > table {
         th:not(:nth-last-child(2)),
@@ -775,7 +775,7 @@ defineExpose({
     .reconciliation-statement-chart-container > .account-balance-trends-chart-container {
         flex: 1 1 auto;
         height: auto !important;
-        min-height: 438px;
+        min-height: 422px;
     }
 
 }

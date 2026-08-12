@@ -163,7 +163,7 @@
                                                 <span class="text-income ms-2" v-if="loading">
                                                     <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                                 </span>
-                                                <span class="text-income ms-2" v-else-if="!loading">
+                                                <span class="text-body-large text-income ms-2" v-else-if="!loading">
                                                     {{ currentMonthTotalAmount.income }}
                                                     <v-tooltip activator="parent" v-if="!currentMonthTotalAmount.incomeIsZero && currentMonthTotalAmount.incomeInDefaultCurrency !== currentMonthTotalAmount.income">
                                                         <span>{{ currentMonthTotalAmount.incomeInDefaultCurrency }}</span>
@@ -173,7 +173,7 @@
                                                 <span class="text-expense ms-2" v-if="loading">
                                                     <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                                 </span>
-                                                <span class="text-expense ms-2" v-else-if="!loading">
+                                                <span class="text-body-large text-expense ms-2" v-else-if="!loading">
                                                     {{ currentMonthTotalAmount.expense }}
                                                     <v-tooltip activator="parent" v-if="!currentMonthTotalAmount.expenseIsZero && currentMonthTotalAmount.expenseInDefaultCurrency !== currentMonthTotalAmount.expense">
                                                         <span>{{ currentMonthTotalAmount.expenseInDefaultCurrency }}</span>

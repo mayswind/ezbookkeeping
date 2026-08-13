@@ -47,6 +47,11 @@ export function isDataImportingEnabled(): boolean {
     return getServerSetting('i') === 1;
 }
 
+// [PLUGIN:budget]
+export function isUserBudgetingEnabled(): boolean {
+    return getServerSetting('bg') === 1;
+}
+
 export function getOAuth2Provider(): string {
     return getServerSetting('op') as string;
 }

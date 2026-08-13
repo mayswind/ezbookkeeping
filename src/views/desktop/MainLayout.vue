@@ -63,6 +63,12 @@
                         <span class="nav-item-title">{{ tt('Transaction Categories') }}</span>
                     </router-link>
                 </li>
+                <li class="nav-link" v-if="isUserBudgetingEnabled()"> <!-- [PLUGIN:budget] -->
+                    <router-link to="/budget/overview">
+                        <v-icon class="nav-item-icon" :icon="mdiWalletOutline"/>
+                        <span class="nav-item-title">{{ tt('Budgets') }}</span>
+                    </router-link>
+                </li>
                 <li class="nav-link">
                     <router-link to="/tag/list">
                         <v-icon class="nav-item-icon" :icon="mdiTagOutline"/>
@@ -218,7 +224,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 
 import { getShareCacheImageBlob } from '@/lib/cache.ts';
-import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
+import { isUserScheduledTransactionEnabled, isUserBudgetingEnabled } from '@/lib/server_settings.ts'; // [PLUGIN:budget]
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -229,6 +235,7 @@ import {
     mdiPlusCircle,
     mdiCreditCardOutline,
     mdiViewDashboardOutline,
+    mdiWalletOutline, // [PLUGIN:budget]
     mdiTagOutline,
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,

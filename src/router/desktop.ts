@@ -24,6 +24,9 @@ import AccountListPage from '@/views/desktop/accounts/ListPage.vue';
 
 import TransactionCategoryListPage from '@/views/desktop/categories/ListPage.vue';
 
+// [PLUGIN:budget]
+import BudgetOverviewPage from '@/views/desktop/budgets/OverviewPage.vue';
+
 import TransactionTagListPage from '@/views/desktop/tags/ListPage.vue';
 
 import TransactionTemplateListPage from '@/views/desktop/templates/ListPage.vue';
@@ -160,6 +163,12 @@ const router = createRouter({
                 {
                     path: '/category/list',
                     component: TransactionCategoryListPage,
+                    beforeEnter: checkLogin
+                },
+                {
+                    // [PLUGIN:budget]
+                    path: '/budget/overview',
+                    component: BudgetOverviewPage,
                     beforeEnter: checkLogin
                 },
                 {

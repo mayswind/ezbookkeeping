@@ -186,6 +186,7 @@ func (s *CategoryBudgetLimitService) GetBudgetOverview(c core.Context, uid int64
 		return &models.CategoryBudgetOverviewResponse{
 			StartDate: startUnix,
 			EndDate:   endUnix,
+			Items:     make([]*models.CategoryBudgetOverviewItem, 0),
 		}, nil
 	}
 

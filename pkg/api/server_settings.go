@@ -49,6 +49,7 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 	a.appendBooleanSetting(builder, "s", config.EnableScheduledTransaction)
 	a.appendBooleanSetting(builder, "e", config.EnableDataExport)
 	a.appendBooleanSetting(builder, "i", config.EnableDataImport)
+	a.appendBooleanSetting(builder, "bg", config.EnableBudgeting) // [PLUGIN:budget]
 
 	a.appendStringSetting(builder, "op", config.OAuth2Provider)
 

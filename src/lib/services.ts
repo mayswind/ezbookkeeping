@@ -104,6 +104,13 @@ import type {
     TransactionCategoryDeleteRequest,
     TransactionCategoryInfoResponse
 } from '@/models/transaction_category.ts';
+// [PLUGIN:budget]
+import type {
+    CategoryBudgetLimitCreateRequest,
+    CategoryBudgetLimitModifyRequest,
+    CategoryBudgetLimitInfoResponse,
+    CategoryBudgetOverviewResponse
+} from '@/models/category_budget_limit.ts';
 import type {
     TransactionPictureUnusedDeleteRequest,
     TransactionPictureInfoBasicResponse
@@ -768,6 +775,25 @@ export default {
     },
     deleteTransactionCategory: (req: TransactionCategoryDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/categories/delete.json', req);
+    },
+    // [PLUGIN:budget] Category Budget Limits
+    getCategoryBudgetLimitsByMonth: ({ startDate }: { startDate: string }): ApiResponsePromise<CategoryBudgetLimitInfoResponse[]> => {
+        return axios.get<ApiResponse<CategoryBudgetLimitInfoResponse[]>>('v1/transaction/categories/budgets/list.json?startDate=' + startDate);
+    },
+    getCategoryBudgetLimit: ({ id }: { id: string }): ApiResponsePromise<CategoryBudgetLimitInfoResponse> => {
+        return axios.get<ApiResponse<CategoryBudgetLimitInfoResponse>>('v1/transaction/categories/budgets/get.json?id=' + id);
+    },
+    getCategoryBudgetOverview: ({ startDate }: { startDate: string }): ApiResponsePromise<CategoryBudgetOverviewResponse> => {
+        return axios.get<ApiResponse<CategoryBudgetOverviewResponse>>('v1/transaction/categories/budgets/overview.json?startDate=' + startDate);
+    },
+    addCategoryBudgetLimit: (req: CategoryBudgetLimitCreateRequest): ApiResponsePromise<CategoryBudgetLimitInfoResponse> => {
+        return axios.post<ApiResponse<CategoryBudgetLimitInfoResponse>>('v1/transaction/categories/budgets/add.json', req);
+    },
+    modifyCategoryBudgetLimit: (req: CategoryBudgetLimitModifyRequest): ApiResponsePromise<CategoryBudgetLimitInfoResponse> => {
+        return axios.post<ApiResponse<CategoryBudgetLimitInfoResponse>>('v1/transaction/categories/budgets/modify.json', req);
+    },
+    deleteCategoryBudgetLimit: ({ id }: { id: string }): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/categories/budgets/delete.json', { id });
     },
     getAllTransactionTagGroups: (): ApiResponsePromise<TransactionTagGroupInfoResponse[]> => {
         return axios.get<ApiResponse<TransactionTagInfoResponse[]>>('v1/transaction/tags/groups/list.json');

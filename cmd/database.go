@@ -173,5 +173,14 @@ func updateAllDatabaseTablesStructure(c *core.CliContext) error {
 
 	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] insights explorer table maintained successfully")
 
+	// [PLUGIN:budget] category budget limit table
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.CategoryBudgetLimit))
+
+	if err != nil {
+		return err
+	}
+
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] category budget limit table maintained successfully")
+
 	return nil
 }

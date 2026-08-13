@@ -45,6 +45,7 @@ const (
 	NormalSubcategoryOAuth2                 = 17
 	NormalSubcategoryInsightsExplorer       = 18
 	NormalSubcategoryTagGroup               = 19
+	NormalSubcategoryCategoryBudgetLimit    = 20 // [PLUGIN:budget]
 )
 
 // Error represents the specific error returned to user

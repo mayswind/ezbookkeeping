@@ -437,6 +437,16 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.POST("/transaction/categories/move.json", bindApi(api.TransactionCategories.CategoryMoveHandler, config))
 			apiV1Route.POST("/transaction/categories/delete.json", bindApi(api.TransactionCategories.CategoryDeleteHandler, config))
 
+			// [PLUGIN:budget] Category Budget Limits
+			if config.EnableBudgeting {
+				apiV1Route.GET("/transaction/categories/budgets/list.json", bindApi(api.CategoryBudgetLimits.BudgetListByMonthHandler, config))
+				apiV1Route.GET("/transaction/categories/budgets/get.json", bindApi(api.CategoryBudgetLimits.BudgetGetHandler, config))
+				apiV1Route.GET("/transaction/categories/budgets/overview.json", bindApi(api.CategoryBudgetLimits.BudgetOverviewHandler, config))
+				apiV1Route.POST("/transaction/categories/budgets/add.json", bindApi(api.CategoryBudgetLimits.BudgetCreateHandler, config))
+				apiV1Route.POST("/transaction/categories/budgets/modify.json", bindApi(api.CategoryBudgetLimits.BudgetModifyHandler, config))
+				apiV1Route.POST("/transaction/categories/budgets/delete.json", bindApi(api.CategoryBudgetLimits.BudgetDeleteHandler, config))
+			}
+
 			// Transaction Tag Groups
 			apiV1Route.GET("/transaction/tags/groups/list.json", bindApi(api.TransactionTagGroups.TagGroupListHandler, config))
 			apiV1Route.GET("/transaction/tags/groups/get.json", bindApi(api.TransactionTagGroups.TagGroupGetHandler, config))

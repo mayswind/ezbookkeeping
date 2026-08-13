@@ -442,6 +442,9 @@ type Config struct {
 	EnableDataImport  bool
 	MaxImportFileSize uint32
 
+	// [PLUGIN:budget] Budgeting feature
+	EnableBudgeting bool
+
 	// Tip
 	LoginPageTips MultiLanguageContentConfig
 
@@ -1169,6 +1172,9 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableDataExport = getConfigItemBoolValue(configFile, sectionName, "enable_export", false)
 	config.EnableDataImport = getConfigItemBoolValue(configFile, sectionName, "enable_import", false)
 	config.MaxImportFileSize = getConfigItemUint32Value(configFile, sectionName, "max_import_file_size", defaultImportFileMaxSize)
+
+	// [PLUGIN:budget]
+	config.EnableBudgeting = getConfigItemBoolValue(configFile, sectionName, "enable_budgeting", false)
 
 	return nil
 }

@@ -165,3 +165,10 @@ ezbookkeeping
 /data/
 /storage/
 /log/
+
+# Local-only AI assistant config
+CLAUDE.md
+
+# Local-only planning and documentation
+/plans/
+/docs/

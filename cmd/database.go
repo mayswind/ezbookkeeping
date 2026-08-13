@@ -182,5 +182,38 @@ func updateAllDatabaseTablesStructure(c *core.CliContext) error {
 
 	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] category budget limit table maintained successfully")
 
+	// [PLUGIN:rules] rule engine tables
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.RuleGroup))
+
+	if err != nil {
+		return err
+	}
+
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] rule group table maintained successfully")
+
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.Rule))
+
+	if err != nil {
+		return err
+	}
+
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] rule table maintained successfully")
+
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.RuleTrigger))
+
+	if err != nil {
+		return err
+	}
+
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] rule trigger table maintained successfully")
+
+	err = datastore.Container.UserDataStore.SyncStructs(new(models.RuleAction))
+
+	if err != nil {
+		return err
+	}
+
+	log.BootInfof(c, "[database.updateAllDatabaseTablesStructure] rule action table maintained successfully")
+
 	return nil
 }

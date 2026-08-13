@@ -17,4 +17,5 @@ const (
 	UUID_TYPE_EXPLORER    UuidType = 9
 	UUID_TYPE_TAG_GROUP   UuidType = 10
 	UUID_TYPE_BUDGET      UuidType = 11 // [PLUGIN:budget]
+	UUID_TYPE_RULE        UuidType = 12 // [PLUGIN:rules]
 )

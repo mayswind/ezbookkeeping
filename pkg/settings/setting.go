@@ -445,6 +445,9 @@ type Config struct {
 	// [PLUGIN:budget] Budgeting feature
 	EnableBudgeting bool
 
+	// [PLUGIN:rules] Rules engine feature
+	EnableRulesEngine bool
+
 	// Tip
 	LoginPageTips MultiLanguageContentConfig
 
@@ -1175,6 +1178,9 @@ func loadDataConfiguration(config *Config, configFile *ini.File, sectionName str
 
 	// [PLUGIN:budget]
 	config.EnableBudgeting = getConfigItemBoolValue(configFile, sectionName, "enable_budgeting", false)
+
+	// [PLUGIN:rules]
+	config.EnableRulesEngine = getConfigItemBoolValue(configFile, sectionName, "enable_rules_engine", false)
 
 	return nil
 }

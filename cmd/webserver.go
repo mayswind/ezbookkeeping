@@ -447,6 +447,21 @@ func startWebServer(c *core.CliContext) error {
 				apiV1Route.POST("/transaction/categories/budgets/delete.json", bindApi(api.CategoryBudgetLimits.BudgetDeleteHandler, config))
 			}
 
+			// [PLUGIN:rules] Rules Engine
+			if config.EnableRulesEngine {
+				apiV1Route.GET("/transaction/rules/groups/list.json", bindApi(api.Rules.RuleGroupListHandler, config))
+				apiV1Route.GET("/transaction/rules/groups/get.json", bindApi(api.Rules.RuleGroupGetHandler, config))
+				apiV1Route.POST("/transaction/rules/groups/add.json", bindApi(api.Rules.RuleGroupCreateHandler, config))
+				apiV1Route.POST("/transaction/rules/groups/modify.json", bindApi(api.Rules.RuleGroupModifyHandler, config))
+				apiV1Route.POST("/transaction/rules/groups/delete.json", bindApi(api.Rules.RuleGroupDeleteHandler, config))
+
+				apiV1Route.GET("/transaction/rules/list.json", bindApi(api.Rules.RuleListHandler, config))
+				apiV1Route.GET("/transaction/rules/get.json", bindApi(api.Rules.RuleGetHandler, config))
+				apiV1Route.POST("/transaction/rules/add.json", bindApi(api.Rules.RuleCreateHandler, config))
+				apiV1Route.POST("/transaction/rules/modify.json", bindApi(api.Rules.RuleModifyHandler, config))
+				apiV1Route.POST("/transaction/rules/delete.json", bindApi(api.Rules.RuleDeleteHandler, config))
+			}
+
 			// Transaction Tag Groups
 			apiV1Route.GET("/transaction/tags/groups/list.json", bindApi(api.TransactionTagGroups.TagGroupListHandler, config))
 			apiV1Route.GET("/transaction/tags/groups/get.json", bindApi(api.TransactionTagGroups.TagGroupGetHandler, config))

@@ -50,6 +50,7 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 	a.appendBooleanSetting(builder, "e", config.EnableDataExport)
 	a.appendBooleanSetting(builder, "i", config.EnableDataImport)
 	a.appendBooleanSetting(builder, "bg", config.EnableBudgeting) // [PLUGIN:budget]
+	a.appendBooleanSetting(builder, "re", config.EnableRulesEngine) // [PLUGIN:rules]
 
 	a.appendStringSetting(builder, "op", config.OAuth2Provider)
 

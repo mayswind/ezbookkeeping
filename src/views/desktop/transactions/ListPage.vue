@@ -1925,7 +1925,6 @@ init(props);
 .v-table.transaction-table {
     .transaction-list-row-date > td {
         font-size: 0.8rem;
-        height: 42px !important;
     }
 
     .transaction-table-column-time {

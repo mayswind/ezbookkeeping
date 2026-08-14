@@ -53,7 +53,7 @@
         <template #no-data>
             <v-list class="py-0">
                 <v-list-item v-if="tagSearchContent && allowAddNewTag" @click="saveNewTag(tagSearchContent)">{{ tt('format.misc.addNewTag', { tag: tagSearchContent }) }}</v-list-item>
-                <v-list-item v-else-if="!tagSearchContent || !allowAddNewTag">{{ tt('No available tag') }}</v-list-item>
+                <v-list-item class="text-body-medium" v-else-if="!tagSearchContent || !allowAddNewTag">{{ tt('No available tag') }}</v-list-item>
             </v-list>
         </template>
     </v-autocomplete>

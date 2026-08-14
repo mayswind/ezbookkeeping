@@ -69,6 +69,12 @@
                         <span class="nav-item-title">{{ tt('Budgets') }}</span>
                     </router-link>
                 </li>
+                <li class="nav-link" v-if="isRulesEngineEnabled()"> <!-- [PLUGIN:rules] -->
+                    <router-link to="/rule/list">
+                        <v-icon class="nav-item-icon" :icon="mdiAutoFix"/>
+                        <span class="nav-item-title">{{ tt('Rules') }}</span>
+                    </router-link>
+                </li>
                 <li class="nav-link">
                     <router-link to="/tag/list">
                         <v-icon class="nav-item-icon" :icon="mdiTagOutline"/>
@@ -224,7 +230,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 
 import { getShareCacheImageBlob } from '@/lib/cache.ts';
-import { isUserScheduledTransactionEnabled, isUserBudgetingEnabled } from '@/lib/server_settings.ts'; // [PLUGIN:budget]
+import { isUserScheduledTransactionEnabled, isUserBudgetingEnabled, isRulesEngineEnabled } from '@/lib/server_settings.ts'; // [PLUGIN:budget] [PLUGIN:rules]
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -236,6 +242,7 @@ import {
     mdiCreditCardOutline,
     mdiViewDashboardOutline,
     mdiWalletOutline, // [PLUGIN:budget]
+    mdiAutoFix, // [PLUGIN:rules]
     mdiTagOutline,
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,

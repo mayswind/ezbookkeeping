@@ -1024,6 +1024,16 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrClientTimezoneOffsetInvalid
 	}
 
+	// [PLUGIN:rules] apply user rules to the request DTO as EARLY as possible — before tagIds /
+	// pictureIds are extracted below, so that add_tag / remove_tag actions take effect. The hook
+	// only mutates the request DTO (category, tags, description, ...); it never touches
+	// models.Transaction or doCreateTransaction. Gated by config.EnableRulesEngine.
+	if a.CurrentConfig().EnableRulesEngine {
+		if _, ruleErr := services.Rules.ApplyToCreateRequest(c, c.GetCurrentUid(), &transactionCreateReq); ruleErr != nil {
+			log.Warnf(c, "[transactions.TransactionCreateHandler] rules engine skipped, because %s", ruleErr.Error())
+		}
+	}
+
 	tagIds, err := utils.StringArrayToInt64Array(transactionCreateReq.TagIds)
 
 	if err != nil {
@@ -1078,15 +1088,6 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		}
 
 		return nil, errs.ErrUserNotFound
-	}
-
-	// [PLUGIN:rules] apply user rules to the request DTO before building the transaction model.
-	// This mutates the request in place (category, tags, description, ...). It never touches
-	// models.Transaction or doCreateTransaction. Gated by config.EnableRulesEngine.
-	if a.CurrentConfig().EnableRulesEngine {
-		if _, ruleErr := services.Rules.ApplyToCreateRequest(c, uid, &transactionCreateReq); ruleErr != nil {
-			log.Warnf(c, "[transactions.TransactionCreateHandler] rules engine skipped, because %s", ruleErr.Error())
-		}
 	}
 
 	transaction := a.createNewTransactionModel(uid, &transactionCreateReq, c.ClientIP())
@@ -2603,6 +2604,19 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 
 	for i := 0; i < len(transactionImportReq.Transactions); i++ {
 		transactionCreateReq := transactionImportReq.Transactions[i]
+
+		// [PLUGIN:rules] apply user rules to this imported row BEFORE tagIds extraction below,
+		// so add_tag / remove_tag / set_category actions take effect on both the validation
+		// and the persisted transaction. Runs once per row; for large imports this re-loads the
+		// user's rules + category/tag/account maps each time (in-memory eval stays fast; see
+		// docs notes). Gated by config.EnableRulesEngine. Never touches models.Transaction.
+		if a.CurrentConfig().EnableRulesEngine {
+			if _, ruleErr := services.Rules.ApplyToCreateRequest(c, uid, transactionCreateReq); ruleErr != nil {
+				log.Warnf(c, "[transactions.TransactionImportHandler] rules engine skipped for index:%d, because %s", i, ruleErr.Error())
+				// continue applying rules to remaining rows; do not abort the whole import
+			}
+		}
+
 		tagIds, err := utils.StringArrayToInt64Array(transactionCreateReq.TagIds)
 
 		if err != nil {
@@ -2656,23 +2670,11 @@ func (a *TransactionsApi) TransactionImportHandler(c *core.WebContext) (any, *er
 
 	newTransactions := make([]*models.Transaction, len(transactionImportReq.Transactions))
 
-	// [PLUGIN:rules] build the evaluation context once and apply rules to every imported
-	// transaction before it is turned into a model. The rules engine loads all user rules +
-	// category/tag/account maps on the first call; subsequent calls in this loop reuse them
-	// via the per-request rule cache is NOT implemented here, so each imported row re-loads.
-	// For large imports this is acceptable for v1 (in-memory eval is fast); see docs notes.
-	rulesEnabled := a.CurrentConfig().EnableRulesEngine
-
+	// [PLUGIN:rules] NOTE: rules are applied in the validation loop above (before tagIds
+	// extraction), so by the time we reach here the request DTOs already reflect any
+	// rule-driven mutations. We just build the models.
 	for i := 0; i < len(transactionImportReq.Transactions); i++ {
 		transactionCreateReq := transactionImportReq.Transactions[i]
-
-		if rulesEnabled {
-			if _, ruleErr := services.Rules.ApplyToCreateRequest(c, uid, transactionCreateReq); ruleErr != nil {
-				log.Warnf(c, "[transactions.TransactionImportHandler] rules engine skipped for index:%d, because %s", i, ruleErr.Error())
-				// continue applying rules to remaining rows; do not abort the whole import
-			}
-		}
-
 		transaction := a.createNewTransactionModel(uid, transactionCreateReq, c.ClientIP())
 		newTransactions[i] = transaction
 	}

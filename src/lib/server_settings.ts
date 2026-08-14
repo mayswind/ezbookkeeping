@@ -52,6 +52,11 @@ export function isUserBudgetingEnabled(): boolean {
     return getServerSetting('bg') === 1;
 }
 
+// [PLUGIN:rules]
+export function isRulesEngineEnabled(): boolean {
+    return getServerSetting('re') === 1;
+}
+
 export function getOAuth2Provider(): string {
     return getServerSetting('op') as string;
 }

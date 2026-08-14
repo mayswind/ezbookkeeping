@@ -111,6 +111,15 @@ import type {
     CategoryBudgetLimitInfoResponse,
     CategoryBudgetOverviewResponse
 } from '@/models/category_budget_limit.ts';
+// [PLUGIN:rules]
+import type {
+    RuleCreateRequest,
+    RuleModifyRequest,
+    RuleGroupCreateRequest,
+    RuleGroupModifyRequest,
+    RuleInfoResponse,
+    RuleGroupInfoResponse
+} from '@/models/rule.ts';
 import type {
     TransactionPictureUnusedDeleteRequest,
     TransactionPictureInfoBasicResponse
@@ -794,6 +803,39 @@ export default {
     },
     deleteCategoryBudgetLimit: ({ id }: { id: string }): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/categories/budgets/delete.json', { id });
+    },
+    // [PLUGIN:rules] Rule Groups
+    getAllRuleGroups: (): ApiResponsePromise<RuleGroupInfoResponse[]> => {
+        return axios.get<ApiResponse<RuleGroupInfoResponse[]>>('v1/transaction/rules/groups/list.json');
+    },
+    getRuleGroup: ({ id }: { id: string }): ApiResponsePromise<RuleGroupInfoResponse> => {
+        return axios.get<ApiResponse<RuleGroupInfoResponse>>('v1/transaction/rules/groups/get.json?id=' + id);
+    },
+    addRuleGroup: (req: RuleGroupCreateRequest): ApiResponsePromise<RuleGroupInfoResponse> => {
+        return axios.post<ApiResponse<RuleGroupInfoResponse>>('v1/transaction/rules/groups/add.json', req);
+    },
+    modifyRuleGroup: (req: RuleGroupModifyRequest): ApiResponsePromise<RuleGroupInfoResponse> => {
+        return axios.post<ApiResponse<RuleGroupInfoResponse>>('v1/transaction/rules/groups/modify.json', req);
+    },
+    deleteRuleGroup: ({ id }: { id: string }): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/rules/groups/delete.json', { id });
+    },
+    // [PLUGIN:rules] Rules
+    getAllRules: ({ groupId }: { groupId?: string }): ApiResponsePromise<RuleInfoResponse[]> => {
+        const query = groupId ? ('?groupId=' + groupId) : '';
+        return axios.get<ApiResponse<RuleInfoResponse[]>>('v1/transaction/rules/list.json' + query);
+    },
+    getRule: ({ id }: { id: string }): ApiResponsePromise<RuleInfoResponse> => {
+        return axios.get<ApiResponse<RuleInfoResponse>>('v1/transaction/rules/get.json?id=' + id);
+    },
+    addRule: (req: RuleCreateRequest): ApiResponsePromise<RuleInfoResponse> => {
+        return axios.post<ApiResponse<RuleInfoResponse>>('v1/transaction/rules/add.json', req);
+    },
+    modifyRule: (req: RuleModifyRequest): ApiResponsePromise<RuleInfoResponse> => {
+        return axios.post<ApiResponse<RuleInfoResponse>>('v1/transaction/rules/modify.json', req);
+    },
+    deleteRule: ({ id }: { id: string }): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/rules/delete.json', { id });
     },
     getAllTransactionTagGroups: (): ApiResponsePromise<TransactionTagGroupInfoResponse[]> => {
         return axios.get<ApiResponse<TransactionTagInfoResponse[]>>('v1/transaction/tags/groups/list.json');

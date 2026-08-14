@@ -49,6 +49,10 @@ import CategoryPresetPage from '@/views/mobile/categories/PresetPage.vue';
 import BudgetOverviewPage from '@/views/mobile/budgets/OverviewPage.vue';
 import BudgetEditPage from '@/views/mobile/budgets/EditPage.vue';
 
+// [PLUGIN:rules]
+import RuleListPage from '@/views/mobile/rules/ListPage.vue';
+import RuleEditPage from '@/views/mobile/rules/EditPage.vue';
+
 import TagListPage from '@/views/mobile/tags/ListPage.vue';
 import TagGroupListPage from '@/views/mobile/tags/GroupListPage.vue';
 
@@ -345,6 +349,17 @@ const routes: Router.RouteParameters[] = [
     {
         path: '/budget/edit',
         async: asyncResolve(BudgetEditPage),
+        beforeEnter: [checkLogin]
+    },
+    // [PLUGIN:rules]
+    {
+        path: '/rule/list',
+        async: asyncResolve(RuleListPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/rule/edit',
+        async: asyncResolve(RuleEditPage),
         beforeEnter: [checkLogin]
     },
     {

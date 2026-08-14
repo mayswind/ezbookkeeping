@@ -27,6 +27,9 @@ import TransactionCategoryListPage from '@/views/desktop/categories/ListPage.vue
 // [PLUGIN:budget]
 import BudgetOverviewPage from '@/views/desktop/budgets/OverviewPage.vue';
 
+// [PLUGIN:rules]
+import RulesListPage from '@/views/desktop/rules/ListPage.vue';
+
 import TransactionTagListPage from '@/views/desktop/tags/ListPage.vue';
 
 import TransactionTemplateListPage from '@/views/desktop/templates/ListPage.vue';
@@ -169,6 +172,12 @@ const router = createRouter({
                     // [PLUGIN:budget]
                     path: '/budget/overview',
                     component: BudgetOverviewPage,
+                    beforeEnter: checkLogin
+                },
+                {
+                    // [PLUGIN:rules]
+                    path: '/rule/list',
+                    component: RulesListPage,
                     beforeEnter: checkLogin
                 },
                 {

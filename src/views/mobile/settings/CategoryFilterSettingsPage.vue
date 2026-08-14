@@ -59,6 +59,10 @@
             </f7-block>
         </div>
 
+        <f7-list strong inset dividers accordion-list class="margin-top" v-if="!loading && !hasAnyVisibleCategory">
+            <f7-list-item :title="tt('No available category')"></f7-list-item>
+        </f7-list>
+
         <f7-block class="combination-list-wrapper margin-vertical"
                   :key="categoryType"
                   v-for="(categories, categoryType) in allVisibleTransactionCategories"

@@ -48,6 +48,10 @@
                                        :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]"></v-skeleton-loader>
                 </div>
 
+                <div v-if="!loading && !hasAnyVisibleCategory">
+                    <span class="text-body-large">{{ tt('No available category') }}</span>
+                </div>
+
                 <div v-else-if="!loading">
                     <v-expansion-panels class="category-types" multiple v-model="expandCategoryTypes">
                         <v-expansion-panel :key="categoryType"

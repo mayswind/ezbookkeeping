@@ -2741,6 +2741,8 @@
     "Are you sure you want to clear all file cache?": "您确定要清除所有文件缓存？",
     "Clear Map Data Cache": "清除地图数据缓存",
     "Are you sure you want to clear map data cache?": "您确定要清除地图数据缓存？",
+    "Clear Custom Icon Cache": "清除自定义图标缓存",
+    "Are you sure you want to clear custom icon cache?": "您确定要清除自定义图标缓存？",
     "Clear Application Code Cache": "清除应用代码缓存",
     "Are you sure you want to clear application code cache?": "您确定要清除应用代码缓存？",
     "Clear Exchange Rates Data Cache": "清除汇率数据缓存",

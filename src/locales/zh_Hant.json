@@ -2741,6 +2741,8 @@
     "Are you sure you want to clear all file cache?": "您確定要清除所有檔案快取？",
     "Clear Map Data Cache": "清除地圖資料快取",
     "Are you sure you want to clear map data cache?": "您確定要清除地圖資料快取？",
+    "Clear Custom Icon Cache": "清除自訂圖示快取",
+    "Are you sure you want to clear custom icon cache?": "您確定要清除自訂圖示快取？",
     "Clear Application Code Cache": "清除應用程式碼快取",
     "Are you sure you want to clear application code cache?": "您確定要清除應用程式碼快取？",
     "Clear Exchange Rates Data Cache": "清除匯率資料快取",

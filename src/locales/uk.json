@@ -2741,6 +2741,8 @@
     "Are you sure you want to clear all file cache?": "Очистити весь файловий кеш?",
     "Clear Map Data Cache": "Очистити кеш даних карти",
     "Are you sure you want to clear map data cache?": "Очистити кеш даних карти?",
+    "Clear Custom Icon Cache": "Clear Custom Icon Cache",
+    "Are you sure you want to clear custom icon cache?": "Are you sure you want to clear custom icon cache?",
     "Clear Application Code Cache": "Очистити кеш коду застосунку",
     "Are you sure you want to clear application code cache?": "Очистити кеш коду застосунку?",
     "Clear Exchange Rates Data Cache": "Очистити кеш курсів валют",

@@ -2741,6 +2741,8 @@
     "Are you sure you want to clear all file cache?": "Are you sure you want to clear all file cache?",
     "Clear Map Data Cache": "Clear Map Data Cache",
     "Are you sure you want to clear map data cache?": "Are you sure you want to clear map data cache?",
+    "Clear Custom Icon Cache": "Clear Custom Icon Cache",
+    "Are you sure you want to clear custom icon cache?": "Are you sure you want to clear custom icon cache?",
     "Clear Application Code Cache": "Clear Application Code Cache",
     "Are you sure you want to clear application code cache?": "Are you sure you want to clear application code cache?",
     "Clear Exchange Rates Data Cache": "Clear Exchange Rates Data Cache",

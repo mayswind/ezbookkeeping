@@ -2741,6 +2741,8 @@
     "Are you sure you want to clear all file cache?": "Sind Sie sicher, dass Sie den gesamten Datei-Cache löschen möchten?",
     "Clear Map Data Cache": "Kartendaten-Cache löschen",
     "Are you sure you want to clear map data cache?": "Sind Sie sicher, dass Sie den Kartendaten-Cache löschen möchten?",
+    "Clear Custom Icon Cache": "Clear Custom Icon Cache",
+    "Are you sure you want to clear custom icon cache?": "Are you sure you want to clear custom icon cache?",
     "Clear Application Code Cache": "Anwendungscode-Cache löschen",
     "Are you sure you want to clear application code cache?": "Sind Sie sicher, dass Sie den Anwendungscode-Cache löschen möchten?",
     "Clear Exchange Rates Data Cache": "Wechselkursdaten-Cache löschen",

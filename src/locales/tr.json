@@ -2741,6 +2741,8 @@
     "Are you sure you want to clear all file cache?": "Tüm dosya önbelleğini temizlemek istediğinizden emin misiniz?",
     "Clear Map Data Cache": "Harita Verileri Önbelleğini Temizle",
     "Are you sure you want to clear map data cache?": "Harita verileri önbelleğini temizlemek istediğinizden emin misiniz?",
+    "Clear Custom Icon Cache": "Clear Custom Icon Cache",
+    "Are you sure you want to clear custom icon cache?": "Are you sure you want to clear custom icon cache?",
     "Clear Application Code Cache": "Uygulama Kodu Önbelleğini Temizle",
     "Are you sure you want to clear application code cache?": "Uygulama kodu önbelleğini temizlemek istediğinizden emin misiniz?",
     "Clear Exchange Rates Data Cache": "Döviz Kurları Önbelleğini Temizle",

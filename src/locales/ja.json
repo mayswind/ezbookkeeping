@@ -2741,6 +2741,8 @@
     "Are you sure you want to clear all file cache?": "すべてのファイルキャッシュをクリアしますか？",
     "Clear Map Data Cache": "地図データキャッシュをクリア",
     "Are you sure you want to clear map data cache?": "地図データキャッシュをクリアしますか？",
+    "Clear Custom Icon Cache": "Clear Custom Icon Cache",
+    "Are you sure you want to clear custom icon cache?": "Are you sure you want to clear custom icon cache?",
     "Clear Application Code Cache": "アプリケーションコードキャッシュをクリア",
     "Are you sure you want to clear application code cache?": "アプリケーションコードキャッシュをクリアしますか？",
     "Clear Exchange Rates Data Cache": "為替レートデータキャッシュをクリア",

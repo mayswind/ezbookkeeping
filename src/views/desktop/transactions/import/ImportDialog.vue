@@ -1241,6 +1241,7 @@ function submit(): void {
 
             accountsStore.updateAccountListInvalidState(true);
             transactionsStore.updateTransactionListInvalidState(true);
+            transactionTagsStore.updateTransactionTagListInvalidState(true); // [PLUGIN:rules] a rule may have created new tags during import
             overviewStore.updateTransactionOverviewInvalidState(true);
             statisticsStore.updateTransactionStatisticsInvalidState(true);
 

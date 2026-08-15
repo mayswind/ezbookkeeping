@@ -5,6 +5,7 @@ import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
+import { useTransactionTagsStore } from './transactionTag.ts';
 import { useOverviewStore } from './overview.ts';
 import { useStatisticsStore } from './statistics.ts';
 import { useExplorersStore } from '@/stores/explorer.ts';
@@ -111,6 +112,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     const userStore = useUserStore();
     const accountsStore = useAccountsStore();
     const transactionCategoriesStore = useTransactionCategoriesStore();
+    const transactionTagsStore = useTransactionTagsStore();
     const overviewStore = useOverviewStore();
     const statisticsStore = useStatisticsStore();
     const explorersStore = useExplorersStore();
@@ -615,7 +617,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactionReconciliationStatementStateInvalid.value = invalidState;
     }
 
-    function updateStoreInvalidState(options: { transactionList?: boolean, reconciliationStatement?: boolean, accountList?: boolean, overview?: boolean, statistics?: boolean, explorer?: boolean }): void {
+    function updateStoreInvalidState(options: { transactionList?: boolean, reconciliationStatement?: boolean, accountList?: boolean, tagList?: boolean, overview?: boolean, statistics?: boolean, explorer?: boolean }): void {
         if (options.transactionList && !transactionListStateInvalid.value) {
             updateTransactionListInvalidState(true);
         }
@@ -626,6 +628,14 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         if (options.accountList && !accountsStore.accountListStateInvalid) {
             accountsStore.updateAccountListInvalidState(true);
+        }
+
+        // [PLUGIN:rules] The rules engine's add_tag action is find-or-create: saving a
+        // transaction can bring a brand-new tag into existence server-side, which the
+        // client-side tag map (used to render tag chips in transaction lists) has never
+        // seen. Invalidate the tag list so the next list reload also refetches tags.
+        if (options.tagList && !transactionTagsStore.transactionTagListStateInvalid) {
+            transactionTagsStore.updateTransactionTagListInvalidState(true);
         }
 
         if (options.overview && !overviewStore.transactionOverviewStateInvalid) {
@@ -1137,6 +1147,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 updateStoreInvalidState({
                     reconciliationStatement: true,
                     accountList: true,
+                    tagList: true, // [PLUGIN:rules] a rule may have created a new tag server-side
                     overview: true,
                     statistics: true,
                     explorer: true

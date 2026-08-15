@@ -1,0 +1,49 @@
+services:
+  ezbookkeeping:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_PIPELINE: "1"
+    image: ezbookkeeping:local
+    container_name: ezbookkeeping
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: ${TZ:-UTC}
+      EBK_DATABASE_TYPE: postgres
+      EBK_DATABASE_HOST: db:5432
+      EBK_DATABASE_NAME: ${POSTGRES_DB:-ezbookkeeping}
+      EBK_DATABASE_USER: ${POSTGRES_USER:-ezbookkeeping}
+      EBK_DATABASE_PASSWD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      EBK_DATABASE_SSL_MODE: disable
+    volumes:
+      - ebk_data:/ezbookkeeping/data
+      - ebk_log:/ezbookkeeping/log
+      - ebk_storage:/ezbookkeeping/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    container_name: ezbookkeeping-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ezbookkeeping}
+      POSTGRES_USER: ${POSTGRES_USER:-ezbookkeeping}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - ebk_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ezbookkeeping} -d ${POSTGRES_DB:-ezbookkeeping}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ebk_data:
+  ebk_log:
+  ebk_storage:
+  ebk_db:

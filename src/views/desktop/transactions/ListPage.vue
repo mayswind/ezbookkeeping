@@ -1995,7 +1995,7 @@ init(props);
 
 .transaction-calendar-container .dp--main {
     &.transaction-calendar-with-alternate-date .dp--calendar .dp--calendar-row {
-        --dp-cell-size: 96px;
+        --dp-cell-size: 90px;
     }
 
     .dp--menu {
@@ -2011,7 +2011,7 @@ init(props);
         }
 
         .dp--calendar-row {
-            --dp-cell-size: 80px;
+            --dp-cell-size: 76px;
             --dp-primary-color: rgba(var(--v-theme-primary), var(--v-activated-opacity));
             --dp-primary-text-color: rgb(var(--v-theme-primary));
 

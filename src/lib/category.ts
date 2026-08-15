@@ -1,5 +1,6 @@
 import { reversed, keys, keysIfValueEquals, values } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
+import { IconType } from '@/core/icon.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
@@ -41,6 +42,7 @@ export function localizedPresetCategoryToTransactionCategoryCreateWithSubCategor
             type: subPresetCategory.type,
             parentId: '0',
             icon: subPresetCategory.icon,
+            iconType: IconType.System,
             color: subPresetCategory.color,
             comment: '',
             clientSessionId: ''
@@ -53,6 +55,7 @@ export function localizedPresetCategoryToTransactionCategoryCreateWithSubCategor
         name: presetCategory.name,
         type: presetCategory.type,
         icon: presetCategory.icon,
+        iconType: IconType.System,
         color: presetCategory.color,
         subCategories: subCategories
     };

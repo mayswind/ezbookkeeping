@@ -147,10 +147,10 @@
                                         <template v-slot:activator="{ props }">
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                                   primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                                                    primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                                   secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                                                    secondary-hidden-field="hidden"
                                                                    :readonly="mode === TransactionEditPageMode.View"
                                                                    :disabled="loading || submitting || recognizing || !hasVisibleExpenseCategories"
@@ -171,10 +171,10 @@
                                         <template v-slot:activator="{ props }">
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                                   primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                                                    primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                                   secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                                                    secondary-hidden-field="hidden"
                                                                    :readonly="mode === TransactionEditPageMode.View"
                                                                    :disabled="loading || submitting || recognizing || !hasVisibleIncomeCategories"
@@ -195,10 +195,10 @@
                                         <template v-slot:activator="{ props }">
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                                                   primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                                                   primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                                                    primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                                    secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                                                   secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                                                   secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                                                    secondary-hidden-field="hidden"
                                                                    :readonly="mode === TransactionEditPageMode.View"
                                                                    :disabled="loading || submitting || recognizing || !hasVisibleTransferCategories"
@@ -220,12 +220,12 @@
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="category"
                                                                    primary-title-field="name" primary-footer-field="displayBalance"
-                                                                   primary-icon-field="icon" primary-icon-type="account"
+                                                                   primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
                                                                    primary-sub-items-field="accounts"
                                                                    :primary-title-i18n="true"
                                                                    secondary-key-field="id" secondary-value-field="id"
                                                                    secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                                   secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
                                                                    :readonly="mode === TransactionEditPageMode.View"
                                                                    :disabled="loading || submitting || recognizing || !allVisibleAccounts.length || (mode === TransactionEditPageMode.Edit && transaction.type === TransactionType.ModifyBalance)"
                                                                    :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
@@ -245,12 +245,12 @@
                                             <div v-bind="props" class="d-block">
                                                 <two-column-select primary-key-field="id" primary-value-field="category"
                                                                    primary-title-field="name" primary-footer-field="displayBalance"
-                                                                   primary-icon-field="icon" primary-icon-type="account"
+                                                                   primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
                                                                    primary-sub-items-field="accounts"
                                                                    :primary-title-i18n="true"
                                                                    secondary-key-field="id" secondary-value-field="id"
                                                                    secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                                   secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                                   secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
                                                                    :readonly="mode === TransactionEditPageMode.View"
                                                                    :disabled="loading || submitting || recognizing || !allVisibleAccounts.length"
                                                                    :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"

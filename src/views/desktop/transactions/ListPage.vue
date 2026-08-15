@@ -290,7 +290,7 @@
                                                                                  v-bind="props">
                                                                         <v-list-item-title>
                                                                             <div class="d-flex align-center">
-                                                                                <ItemIcon icon-type="category" size="24px" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                                                                <ItemIcon :icon-type="getCategoryIconType(category.iconType)" size="24px" :icon-id="category.icon" :color="category.color"></ItemIcon>
                                                                                 <span class="text-body-medium ms-2">{{ category.name }}</span>
                                                                             </div>
                                                                         </v-list-item-title>
@@ -322,7 +322,7 @@
                                                                         <v-list-item-title class="cursor-pointer"
                                                                                            @click="changeCategoryFilter(subCategory.id)">
                                                                             <div class="d-flex align-center">
-                                                                                <ItemIcon icon-type="category" size="24px" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                                                <ItemIcon :icon-type="getCategoryIconType(subCategory.iconType)" size="24px" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                                                                 <span class="text-body-medium ms-2">{{ subCategory.name }}</span>
                                                                             </div>
                                                                         </v-list-item-title>
@@ -433,7 +433,7 @@
                                                                 <v-list-item-title class="cursor-pointer"
                                                                                    @click="changeAccountFilter(account.id)">
                                                                     <div class="d-flex align-center">
-                                                                        <ItemIcon icon-type="account" size="24px" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                                                                        <ItemIcon :icon-type="getAccountIconType(account.iconType)" size="24px" :icon-id="account.icon" :color="account.color"></ItemIcon>
                                                                         <span class="text-body-medium ms-2">{{ account.name }}</span>
                                                                     </div>
                                                                 </v-list-item-title>
@@ -566,7 +566,7 @@
                                                 </td>
                                                 <td class="transaction-table-column-category">
                                                     <div class="d-flex align-center">
-                                                        <ItemIcon size="24px" icon-type="category"
+                                                        <ItemIcon size="24px" :icon-type="getCategoryIconType(transaction.category.iconType)"
                                                                   :icon-id="transaction.category.icon"
                                                                   :color="transaction.category.color"
                                                                   v-if="transaction.category && transaction.category.color"></ItemIcon>
@@ -781,6 +781,10 @@ import {
     getFullMonthDateRange,
     getValidMonthDayOrCurrentDayShortDate
 } from '@/lib/datetime.ts';
+import {
+    getAccountIconType,
+    getCategoryIconType
+} from '@/lib/icon.ts';
 import {
     categoryTypeToTransactionType,
     transactionTypeToCategoryType

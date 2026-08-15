@@ -85,6 +85,7 @@ input[type=number] {
 
 /** Replacing the default style of framework7 **/
 :root {
+    --f7-list-item-media-margin: 12px;
     --f7-toolbar-inner-padding-left: 8px;
     --f7-toolbar-inner-padding-right: 8px;
     --f7-fab-size: 44px;
@@ -600,7 +601,8 @@ html[dir="rtl"] .icon.las .badge.right-bottom-icon {
     background: #666
 }
 
-.toolbar-with-swipe-handler > .toolbar-inner {
+.toolbar-with-swipe-handler > .toolbar-inner
+.toolbar-with-swipe-handler > .segmented {
     > div.left,
     > div.right,
     > form.searchbar {

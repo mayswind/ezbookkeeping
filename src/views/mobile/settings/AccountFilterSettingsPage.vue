@@ -84,7 +84,7 @@
                                           v-for="account in accountCategory.accounts"
                                           @change="updateAccountOrSubAccountsSelected">
                                 <template #media>
-                                    <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
+                                    <ItemIcon :icon-type="getAccountIconType(account.iconType)" :icon-id="account.icon" :color="account.color">
                                         <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                             <f7-icon f7="eye_slash_fill"></f7-icon>
                                         </f7-badge>
@@ -102,7 +102,7 @@
                                                       v-for="subAccount in account.subAccounts"
                                                       @change="updateAccountSelected">
                                             <template #media>
-                                                <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color">
+                                                <ItemIcon :icon-type="getAccountIconType(subAccount.iconType)" :icon-id="subAccount.icon" :color="subAccount.color">
                                                     <f7-badge color="gray" class="right-bottom-icon" v-if="subAccount.hidden">
                                                         <f7-icon f7="eye_slash_fill"></f7-icon>
                                                     </f7-badge>
@@ -149,6 +149,8 @@ import {
 import { useAccountsStore } from '@/stores/account.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
+
+import { getAccountIconType } from '@/lib/icon.ts';
 import {
     selectAccountOrSubAccounts,
     selectAll,

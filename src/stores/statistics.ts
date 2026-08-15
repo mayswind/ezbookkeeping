@@ -13,6 +13,7 @@ import type { BigDecimal } from '@/core/numeral.ts';
 import { type DateTime, type TextualYearMonth, type TimeRangeAndDateType, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import type { ColorValue } from '@/core/color.ts';
+import { IconType } from '@/core/icon.ts';
 import type { CategoricalChartSourceDataItem, TrendsChartSourceDataItem } from '@/core/chart.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionRelatedAccountType } from '@/core/transaction.ts';
@@ -97,6 +98,7 @@ interface WritableTransactionCategoricalAnalysisDataItem extends Record<string, 
     type: TransactionStatisticDataItemType;
     id: string;
     icon: string;
+    iconType: IconType;
     color: ColorValue;
     hidden: boolean;
     displayOrders: number[];
@@ -109,6 +111,7 @@ interface WritableTransactionTrendsAnalysisDataItem extends Record<string, unkno
     type: TransactionStatisticDataItemType;
     id: string;
     icon: string;
+    iconType: IconType;
     color: ColorValue;
     hidden: boolean;
     displayOrders: number[];
@@ -121,6 +124,7 @@ interface WritableTransactionAssetTrendsAnalysisDataItem extends Record<string, 
     type: TransactionStatisticDataItemType;
     id: string;
     icon: string;
+    iconType: IconType;
     color: ColorValue;
     hidden: boolean;
     displayOrders: number[];
@@ -581,6 +585,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                 type: 'account',
                 id: account.id,
                 icon: account.icon || DEFAULT_ACCOUNT_ICON.icon,
+                iconType: account.iconType,
                 color: account.color || DEFAULT_ACCOUNT_COLOR,
                 hidden: primaryAccount.hidden || account.hidden,
                 displayOrders: [primaryAccountCategoryDisplayOrder, primaryAccount.displayOrder, account.displayOrder],
@@ -662,6 +667,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     type: dataItem.type,
                     id: dataItem.id,
                     icon: dataItem.icon,
+                    iconType: dataItem.iconType,
                     color: dataItem.color,
                     hidden: dataItem.hidden,
                     displayOrders: dataItem.displayOrders,
@@ -725,6 +731,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                         type: item.type,
                         id: item.id,
                         icon: item.icon,
+                        iconType: item.iconType,
                         color: item.color,
                         hidden: item.hidden,
                         displayOrders: item.displayOrders,
@@ -912,6 +919,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             type: 'account',
                             id: item.account.id,
                             icon: item.account.icon || DEFAULT_ACCOUNT_ICON.icon,
+                            iconType: item.account.iconType,
                             color: item.account.color || DEFAULT_ACCOUNT_COLOR,
                             hidden: item.primaryAccount.hidden || item.account.hidden,
                             displayOrders: [primaryAccountCategoryDisplayOrder, item.primaryAccount.displayOrder, item.account.displayOrder],
@@ -948,6 +956,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                         type: 'total',
                         id: 'total',
                         icon: '',
+                        iconType: IconType.System,
                         color: '',
                         hidden: false,
                         displayOrders: [1],
@@ -1157,6 +1166,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             type: 'account',
                             id: item.account.id,
                             icon: item.account.icon || DEFAULT_ACCOUNT_ICON.icon,
+                            iconType: item.account.iconType,
                             color: item.account.color || DEFAULT_ACCOUNT_COLOR,
                             hidden: item.primaryAccount.hidden || item.account.hidden,
                             displayOrders: [primaryAccountCategoryDisplayOrder, item.primaryAccount.displayOrder, item.account.displayOrder],
@@ -1197,6 +1207,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             type: 'category',
                             id: item.primaryCategory.id,
                             icon: item.primaryCategory.icon || DEFAULT_CATEGORY_ICON.icon,
+                            iconType: item.primaryCategory.iconType,
                             color: item.primaryCategory.color || DEFAULT_CATEGORY_COLOR,
                             hidden: item.primaryCategory.hidden,
                             displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder],
@@ -1225,6 +1236,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             type: 'category',
                             id: item.category.id,
                             icon: item.category.icon || DEFAULT_CATEGORY_ICON.icon,
+                            iconType: item.category.iconType,
                             color: item.category.color || DEFAULT_CATEGORY_COLOR,
                             hidden: item.primaryCategory.hidden || item.category.hidden,
                             displayOrders: [item.primaryCategory.type, item.primaryCategory.displayOrder, item.category.displayOrder],
@@ -1290,6 +1302,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                             type: 'total',
                             id: 'total',
                             icon: '',
+                            iconType: IconType.System,
                             color: '',
                             hidden: false,
                             displayOrders: [1],

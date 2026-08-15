@@ -116,6 +116,10 @@ import {
 } from '@/core/color.ts';
 
 import {
+    IconType
+} from '@/core/icon.ts';
+
+import {
     ImageUploadQualityType
 } from '@/core/image.ts';
 
@@ -1504,6 +1508,7 @@ export function useI18n() {
                     name: t('category.' + category.name, {}, { locale: locale }),
                     type: categoryType,
                     icon: category.categoryIconId,
+                    iconType: IconType.System,
                     color: category.color,
                     subCategories: []
                 };
@@ -1513,6 +1518,7 @@ export function useI18n() {
                         name: t('category.' + subCategory.name, {}, { locale: locale }),
                         type: categoryType,
                         icon: subCategory.categoryIconId,
+                        iconType: IconType.System,
                         color: subCategory.color
                     };
 

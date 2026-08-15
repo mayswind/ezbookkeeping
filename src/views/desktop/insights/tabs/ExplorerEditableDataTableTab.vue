@@ -139,7 +139,7 @@
         </template>
         <template #item.secondaryCategoryName="{ item }">
             <div class="d-flex align-center">
-                <ItemIcon size="24px" icon-type="category"
+                <ItemIcon size="24px" :icon-type="getCategoryIconType(item.secondaryCategory?.iconType)"
                           :icon-id="item.secondaryCategory?.icon ?? ''"
                           :color="item.secondaryCategory?.color ?? ''"
                           v-if="item.secondaryCategory?.color"></ItemIcon>
@@ -233,6 +233,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
 
 import { getObjectOwnFieldWithValueCount } from '@/lib/common.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 
 import {
     mdiArrowRight,

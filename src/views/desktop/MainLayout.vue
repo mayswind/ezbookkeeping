@@ -81,6 +81,12 @@
                         <span class="nav-item-title">{{ tt('Scheduled Transactions') }}</span>
                     </router-link>
                 </li>
+                <li class="nav-link" v-if="isUserCustomIconEnabled()">
+                    <router-link to="/custom_icon/list">
+                        <v-icon class="nav-item-icon" :icon="mdiShapePlusOutline"/>
+                        <span class="nav-item-title">{{ tt('Custom Icons') }}</span>
+                    </router-link>
+                </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
                         <span class="title-text">{{ tt('Miscellaneous') }}</span>
@@ -218,7 +224,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 
 import { getShareCacheImageBlob } from '@/lib/cache.ts';
-import { isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
+import { isUserCustomIconEnabled, isUserScheduledTransactionEnabled } from '@/lib/server_settings.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
@@ -232,6 +238,7 @@ import {
     mdiTagOutline,
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,
+    mdiShapePlusOutline,
     mdiChartPieOutline,
     mdiCompassOutline,
     mdiSwapHorizontal,
@@ -338,4 +345,3 @@ function showAddDialogInTransactionListPage(): void {
 
 clearShareImageCache();
 </script>
-

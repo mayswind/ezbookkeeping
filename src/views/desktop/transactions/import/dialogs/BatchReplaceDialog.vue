@@ -41,10 +41,10 @@
                         </v-col>
                         <v-col cols="12">
                             <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                               primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                               primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                                primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                               secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                               secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                                secondary-hidden-field="hidden"
                                                :disabled="loading || !hasVisibleExpenseCategories"
                                                :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -58,10 +58,10 @@
                                                v-if="type === 'expenseCategory'">
                             </two-column-select>
                             <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                               primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                               primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                                primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                               secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                               secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                                secondary-hidden-field="hidden"
                                                :disabled="loading || !hasVisibleIncomeCategories"
                                                :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -75,10 +75,10 @@
                                                v-if="type === 'incomeCategory'">
                             </two-column-select>
                             <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                               primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                               primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                                primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                                secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                               secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                               secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                                secondary-hidden-field="hidden"
                                                :disabled="loading || !hasVisibleTransferCategories"
                                                :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -112,12 +112,12 @@
                         <v-col cols="12">
                             <two-column-select primary-key-field="id" primary-value-field="category"
                                                primary-title-field="name" primary-footer-field="displayBalance"
-                                               primary-icon-field="icon" primary-icon-type="account"
+                                               primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
                                                primary-sub-items-field="accounts"
                                                :primary-title-i18n="true"
                                                secondary-key-field="id" secondary-value-field="id"
                                                secondary-title-field="name" secondary-footer-field="displayBalance"
-                                               secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                               secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
                                                :disabled="loading || !allVisibleAccounts.length"
                                                :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                                :custom-selection-primary-text="getAccountDisplayName(targetItem)"

@@ -65,6 +65,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import { type NameValue, values } from '@/core/base.ts';
+import { IconType } from '@/core/icon.ts';
 import { CategoryType } from '@/core/category.ts';
 import { AUTOMATICALLY_CREATED_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
@@ -257,6 +258,7 @@ function confirm(): void {
             name: primaryCategoryName,
             type: categoryType,
             icon: AUTOMATICALLY_CREATED_CATEGORY_ICON_ID,
+            iconType: IconType.System,
             color: DEFAULT_CATEGORY_COLOR,
             subCategories: subCategories
         }];

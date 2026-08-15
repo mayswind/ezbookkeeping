@@ -28,6 +28,8 @@ import TransactionTagListPage from '@/views/desktop/tags/ListPage.vue';
 
 import TransactionTemplateListPage from '@/views/desktop/templates/ListPage.vue';
 
+import UserCustomIconListPage from '@/views/desktop/customicons/ListPage.vue';
+
 import UserSettingsPage from '@/views/desktop/user/UserSettingsPage.vue';
 import AppSettingsPage from '@/views/desktop/app/AppSettingsPage.vue';
 
@@ -174,6 +176,11 @@ const router = createRouter({
                     props: {
                         initType: TemplateType.Normal.type
                     }
+                },
+                {
+                    path: '/custom_icon/list',
+                    component: UserCustomIconListPage,
+                    beforeEnter: checkLogin
                 },
                 {
                     path: '/schedule/list',

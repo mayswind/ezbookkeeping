@@ -95,7 +95,7 @@
                               @taphold="setSortable()"
                 >
                     <template #media v-if="account.type !== AccountType.MultiSubAccounts.type || !hasVisibleSubAccount(account)">
-                        <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color">
+                        <ItemIcon :icon-type="getAccountIconType(account.iconType)" :icon-id="account.icon" :color="account.color">
                             <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                 <f7-icon f7="eye_slash_fill"></f7-icon>
                             </f7-badge>
@@ -104,7 +104,7 @@
 
                     <template #title>
                         <div class="nested-list-item-inner display-flex padding-top-half padding-bottom-half">
-                            <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"
+                            <ItemIcon :icon-type="getAccountIconType(account.iconType)" :icon-id="account.icon" :color="account.color"
                                       v-if="account.type === AccountType.MultiSubAccounts.type && hasVisibleSubAccount(account)">
                                 <f7-badge color="gray" class="right-bottom-icon" v-if="account.hidden">
                                     <f7-icon f7="eye_slash_fill"></f7-icon>
@@ -130,7 +130,7 @@
                                               v-show="showHidden || !subAccount.hidden"
                                 >
                                     <template #media>
-                                        <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color">
+                                        <ItemIcon :icon-type="getAccountIconType(subAccount.iconType)" :icon-id="subAccount.icon" :color="subAccount.color">
                                             <f7-badge color="gray" class="right-bottom-icon" v-if="subAccount.hidden">
                                                 <f7-icon f7="eye_slash_fill"></f7-icon>
                                             </f7-badge>
@@ -238,6 +238,7 @@ import { AccountType, AccountCategory } from '@/core/account.ts';
 import type { Account, AccountShowingIds } from '@/models/account.ts';
 
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
+import { getAccountIconType } from '@/lib/icon.ts';
 import { onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{

@@ -97,7 +97,7 @@
                                       v-for="category in categories"
                                       @change="updateAllSubCategoriesSelected">
                             <template #media>
-                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
+                                <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color">
                                     <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
                                         <f7-icon f7="eye_slash_fill"></f7-icon>
                                     </f7-badge>
@@ -115,7 +115,7 @@
                                                   v-for="subCategory in category.subCategories"
                                                   @change="updateCategorySelected">
                                         <template #media>
-                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color">
+                                            <ItemIcon :icon-type="getCategoryIconType(subCategory.iconType)" :icon-id="subCategory.icon" :color="subCategory.color">
                                                 <f7-badge color="gray" class="right-bottom-icon" v-if="subCategory.hidden">
                                                     <f7-icon f7="eye_slash_fill"></f7-icon>
                                                 </f7-badge>
@@ -162,6 +162,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
 
+import { getCategoryIconType } from '@/lib/icon.ts';
 import {
     selectAllSubCategories,
     selectAll,

@@ -202,6 +202,7 @@ const (
 	defaultOAuth2StateExpiredTime uint32 = 300   // 5 minutes
 	defaultOAuth2RequestTimeout   uint32 = 10000 // 10 seconds
 
+	defaultUserCustomIconFileMaxSize     uint32 = 1048576  // 1MB
 	defaultTransactionPictureFileMaxSize uint32 = 10485760 // 10MB
 	defaultUserAvatarFileMaxSize         uint32 = 1048576  // 1MB
 
@@ -430,6 +431,8 @@ type Config struct {
 	EnableUserRegister            bool
 	EnableUserVerifyEmail         bool
 	EnableUserForceVerifyEmail    bool
+	EnableUserCustomIcon          bool
+	MaxUserCustomIconFileSize     uint32
 	EnableTransactionPictures     bool
 	MaxTransactionPictureFileSize uint32
 	EnableScheduledTransaction    bool
@@ -1145,6 +1148,8 @@ func loadUserConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableUserRegister = getConfigItemBoolValue(configFile, sectionName, "enable_register", false)
 	config.EnableUserVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_email_verify", false)
 	config.EnableUserForceVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "enable_force_email_verify", false)
+	config.EnableUserCustomIcon = getConfigItemBoolValue(configFile, sectionName, "enable_custom_icon", false)
+	config.MaxUserCustomIconFileSize = getConfigItemUint32Value(configFile, sectionName, "max_user_custom_icon_size", defaultUserCustomIconFileMaxSize)
 	config.EnableTransactionPictures = getConfigItemBoolValue(configFile, sectionName, "enable_transaction_picture", false)
 	config.MaxTransactionPictureFileSize = getConfigItemUint32Value(configFile, sectionName, "max_transaction_picture_size", defaultTransactionPictureFileMaxSize)
 	config.EnableScheduledTransaction = getConfigItemBoolValue(configFile, sectionName, "enable_scheduled_transaction", false)

@@ -202,6 +202,14 @@ func startWebServer(c *core.CliContext) error {
 		}
 	}
 
+	if config.EnableUserCustomIcon {
+		customIconRoute := router.Group("/icons")
+		customIconRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString(config), config))
+		{
+			customIconRoute.GET("/:fileName", bindImage(api.UserCustomIcons.CustomIconGetHandler, config))
+		}
+	}
+
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler, config))
 
 	proxyRoute := router.Group("/proxy")
@@ -484,6 +492,14 @@ func startWebServer(c *core.CliContext) error {
 				if config.TransactionFromAIImageRecognition {
 					apiV1Route.POST("/llm/transactions/recognize_receipt_image.json", bindApi(api.LargeLanguageModels.RecognizeReceiptImageHandler, config))
 				}
+			}
+
+			// User Custom Icons
+			if config.EnableUserCustomIcon {
+				apiV1Route.GET("/custom_icons/list.json", bindApi(api.UserCustomIcons.CustomIconListHandler, config))
+				apiV1Route.POST("/custom_icons/upload.json", bindApi(api.UserCustomIcons.CustomIconUploadHandler, config))
+				apiV1Route.POST("/custom_icons/move.json", bindApi(api.UserCustomIcons.CustomIconMoveHandler, config))
+				apiV1Route.POST("/custom_icons/delete.json", bindApi(api.UserCustomIcons.CustomIconDeleteHandler, config))
 			}
 
 			// Exchange Rates

@@ -189,7 +189,7 @@
                         <div class="display-flex no-padding-horizontal" v-if="item.type == 'transaction' && item.transaction">
                             <div class="item-media">
                                 <div class="transaction-icon display-flex align-items-center">
-                                    <ItemIcon icon-type="category"
+                                    <ItemIcon :icon-type="getCategoryIconType(item.transaction.category?.iconType)"
                                               :icon-id="item.transaction.category?.icon"
                                               :color="item.transaction.category?.color"
                                               v-if="item.transaction.category && item.transaction.category?.color"></ItemIcon>
@@ -389,6 +389,7 @@ import {
     getDateRangeByBillingCycleDateType,
     getDateRangeByLastReconciledTimeRangeDateType
 } from '@/lib/datetime.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 
 interface ReconciliationStatementVirtualListData {
     items: ReconciliationStatementVirtualListItem[],

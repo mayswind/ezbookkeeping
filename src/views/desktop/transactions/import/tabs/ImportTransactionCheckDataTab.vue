@@ -94,7 +94,7 @@
             <template #item.actualCategoryName="{ item }">
                 <div class="d-flex align-center" v-if="editingTransaction !== item || item.type === TransactionType.ModifyBalance">
                     <span v-if="item.type === TransactionType.ModifyBalance">-</span>
-                    <ItemIcon size="24px" icon-type="category"
+                    <ItemIcon size="24px" :icon-type="getCategoryIconType(allCategoriesMap[item.categoryId]?.iconType)"
                               :icon-id="allCategoriesMap[item.categoryId]?.icon ?? ''"
                               :color="allCategoriesMap[item.categoryId]?.color ?? ''"
                               v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
@@ -109,10 +109,10 @@
                 <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Expense">
                     <two-column-select density="compact" variant="plain"
                                        primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                        secondary-hidden-field="hidden"
                                        :disabled="!!disabled || !hasVisibleExpenseCategories"
                                        :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -127,10 +127,10 @@
                 <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Income">
                     <two-column-select density="compact" variant="plain"
                                        primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                        secondary-hidden-field="hidden"
                                        :disabled="!!disabled || !hasVisibleIncomeCategories"
                                        :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -145,10 +145,10 @@
                 <div style="width: 260px" v-if="editingTransaction === item && item.type === TransactionType.Transfer">
                     <two-column-select density="compact" variant="plain"
                                        primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                        secondary-hidden-field="hidden"
                                        :disabled="!!disabled || !hasVisibleTransferCategories"
                                        :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -209,12 +209,12 @@
                     <two-column-select density="compact" variant="plain"
                                        primary-key-field="id" primary-value-field="category"
                                        primary-title-field="name" primary-footer-field="displayBalance"
-                                       primary-icon-field="icon" primary-icon-type="account"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
                                        primary-sub-items-field="accounts"
                                        :primary-title-i18n="true"
                                        secondary-key-field="id" secondary-value-field="id"
                                        secondary-title-field="name" secondary-footer-field="displayBalance"
-                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
                                        :disabled="!!disabled || !allVisibleAccounts.length"
                                        :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                        :custom-selection-primary-text="getSourceAccountDisplayName(item)"
@@ -226,12 +226,12 @@
                     <two-column-select density="compact" variant="plain"
                                        primary-key-field="id" primary-value-field="category"
                                        primary-title-field="name" primary-footer-field="displayBalance"
-                                       primary-icon-field="icon" primary-icon-type="account"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
                                        primary-sub-items-field="accounts"
                                        :primary-title-i18n="true"
                                        secondary-key-field="id" secondary-value-field="id"
                                        secondary-title-field="name" secondary-footer-field="displayBalance"
-                                       secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
                                        :disabled="!!disabled || !allVisibleAccounts.length"
                                        :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                        :custom-selection-primary-text="getDestinationAccountDisplayName(item)"
@@ -461,6 +461,7 @@ import {
     parseDateTimeFromUnixTimeWithTimezoneOffset
 } from '@/lib/datetime.ts';
 import { formatCoordinate } from '@/lib/coordinate.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { getAccountMapByName } from '@/lib/account.ts';
 import {
     transactionTypeToCategoryType,
@@ -472,7 +473,7 @@ import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
     extendMdiSemicolon
-} from '@/icons/desktop/extend_mdi_icons.ts';
+} from '@/exticons/desktop/extend_mdi_icons.ts';
 import {
     mdiCheck,
     mdiArrowRight,

@@ -9,6 +9,7 @@ import {
     SW_ASSETS_CACHE_NAME,
     SW_CODE_CACHE_NAME,
     SW_MAP_CACHE_NAME,
+    SW_CUSTOM_ICON_CACHE_NAME,
     SW_SHARE_CACHE_NAME,
     SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG,
     SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG_RESPONSE,
@@ -156,8 +157,9 @@ export function loadBrowserCacheStatistics(): Promise<BrowserCacheStatistics> {
             findFirstCacheName(SW_RUNTIME_CACHE_NAME_PREFIX).then(cacheName => getCacheTotalSize(cacheName)).catch(() => 0),
             getCacheTotalSize(SW_CODE_CACHE_NAME),
             getCacheTotalSize(SW_ASSETS_CACHE_NAME),
-            getCacheTotalSize(SW_MAP_CACHE_NAME)
-        ]).then(([storageEstimate, precacheCacheSize, runtimeCacheSize, codeCacheSize, assetsCacheSize, mapCacheSize]) => {
+            getCacheTotalSize(SW_MAP_CACHE_NAME),
+            getCacheTotalSize(SW_CUSTOM_ICON_CACHE_NAME)
+        ]).then(([storageEstimate, precacheCacheSize, runtimeCacheSize, codeCacheSize, assetsCacheSize, mapCacheSize, customIconCacheSize]) => {
             let totalCacheSize: number = 0;
 
             if (storageEstimate) {
@@ -174,10 +176,10 @@ export function loadBrowserCacheStatistics(): Promise<BrowserCacheStatistics> {
             }
 
             if (totalCacheSize < 1) {
-                totalCacheSize = precacheCacheSize + runtimeCacheSize + codeCacheSize + assetsCacheSize + mapCacheSize;
+                totalCacheSize = precacheCacheSize + runtimeCacheSize + codeCacheSize + assetsCacheSize + mapCacheSize + customIconCacheSize;
             }
 
-            let othersCacheSize: number = totalCacheSize - precacheCacheSize - runtimeCacheSize - codeCacheSize - assetsCacheSize - mapCacheSize;
+            let othersCacheSize: number = totalCacheSize - precacheCacheSize - runtimeCacheSize - codeCacheSize - assetsCacheSize - mapCacheSize - customIconCacheSize;
 
             if (othersCacheSize < 0) {
                 othersCacheSize = 0;
@@ -188,6 +190,7 @@ export function loadBrowserCacheStatistics(): Promise<BrowserCacheStatistics> {
                 codeCacheSize: codeCacheSize + runtimeCacheSize,
                 assetsCacheSize: assetsCacheSize + precacheCacheSize,
                 mapCacheSize: mapCacheSize,
+                customIconCacheSize: customIconCacheSize,
                 othersCacheSize: othersCacheSize
             });
         }).catch(error => {
@@ -266,6 +269,24 @@ export function clearApplicationCodeCache(): Promise<void> {
 
 export function clearMapDataCache(): Promise<void> {
     return clearCaches([SW_MAP_CACHE_NAME]);
+}
+
+export function clearCustomIconCache(): Promise<void> {
+    return clearCaches([SW_CUSTOM_ICON_CACHE_NAME]);
+}
+
+export function deleteCustomIconCacheEntry(iconUrl: string): Promise<boolean> {
+    if (!window.caches || !iconUrl) {
+        return Promise.resolve(false);
+    }
+
+    const url = new URL(iconUrl, window.location.href);
+    url.searchParams.delete('token');
+
+    return window.caches.open(SW_CUSTOM_ICON_CACHE_NAME).then(cache => cache.delete(url.href)).catch(error => {
+        logger.warn(`failed to delete custom icon cache entry "${iconUrl}"`, error);
+        return false;
+    });
 }
 
 export function clearAllBrowserCaches(): Promise<void> {

@@ -114,7 +114,7 @@ import logger from '@/lib/logger.ts';
 
 import {
     extendMdiSemicolon
-} from '@/icons/desktop/extend_mdi_icons.ts';
+} from '@/exticons/desktop/extend_mdi_icons.ts';
 import {
     mdiDotsVertical,
     mdiCheck,

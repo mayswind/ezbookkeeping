@@ -3,6 +3,7 @@ export interface BrowserCacheStatistics {
     readonly codeCacheSize: number;
     readonly assetsCacheSize: number;
     readonly mapCacheSize: number;
+    readonly customIconCacheSize: number;
     readonly othersCacheSize: number;
 }
 

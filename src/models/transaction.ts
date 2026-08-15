@@ -2,8 +2,9 @@ import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
 import type { BigDecimal } from '@/core/numeral.ts';
 import type { TextualYearMonthDay, Year1BasedMonth, YearMonthDay, StartEndTime, WeekDay } from '@/core/datetime.ts';
 import { type Coordinate, getNormalizedCoordinate } from '@/core/coordinate.ts';
-import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import type { ColorValue } from '@/core/color.ts';
+import type { IconType } from '@/core/icon.ts';
+import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import type { CategoricalChartSourceDataItem } from '@/core/chart.ts';
 
 import { Account, type AccountInfoResponse } from './account.ts';
@@ -918,6 +919,7 @@ export interface TransactionStatisticDataItemBase extends SortableTransactionSta
     readonly type: TransactionStatisticDataItemType;
     readonly id: string;
     readonly icon: string;
+    readonly iconType: IconType;
     readonly color: ColorValue;
     readonly hidden: boolean;
     readonly displayOrders: number[];

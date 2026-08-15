@@ -460,7 +460,8 @@
     overflow-x: hidden;
 }
 
-.skeleton-no-margin .v-skeleton-loader__text {
+.skeleton-no-margin .v-skeleton-loader__text,
+.skeleton-no-margin .v-skeleton-loader__avatar {
     margin: 0;
 }
 

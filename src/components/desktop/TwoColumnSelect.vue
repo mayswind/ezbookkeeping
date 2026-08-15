@@ -21,7 +21,7 @@
                 <span class="text-truncate" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem">{{ selectionPrimaryItemText }}</span>
                 <v-icon class="icon-with-direction disabled" :icon="mdiChevronRight" size="23" v-if="!customSelectionPrimaryText && showSelectionPrimaryText && selectedPrimaryItem && selectedSecondaryItem" />
                 <ItemIcon class="me-2" size="21.5px"
-                          :icon-type="secondaryIconType"
+                          :icon-type="getIconType(secondaryIconType, selectedSecondaryItem && secondaryIconTypeField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryIconTypeField] : undefined)"
                           :icon-id="selectedSecondaryItem && secondaryIconField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryIconField] : null"
                           :color="selectedSecondaryItem && secondaryColorField ? (selectedSecondaryItem as Record<string, unknown>)[secondaryColorField] : null"
                           v-if="!customSelectionPrimaryText && selectedSecondaryItem && showSelectionSecondaryIcon" />
@@ -49,7 +49,8 @@
                                      v-for="item in filteredItems"
                                      @click="onPrimaryItemClicked(item)">
                             <template #prepend>
-                                <ItemIcon class="me-2" :icon-type="primaryIconType"
+                                <ItemIcon class="me-2"
+                                          :icon-type="getIconType(primaryIconType, primaryIconTypeField ? (item as Record<string, unknown>)[primaryIconTypeField] : undefined)"
                                           :icon-id="primaryIconField ? (item as Record<string, unknown>)[primaryIconField] : undefined"
                                           :color="primaryColorField ? (item as Record<string, unknown>)[primaryColorField] : undefined"
                                           v-if="primaryIconField"></ItemIcon>
@@ -70,7 +71,8 @@
                                      v-for="subItem in filteredSubItems"
                                      @click="onSecondaryItemClicked(subItem)">
                             <template #prepend>
-                                <ItemIcon class="me-2" :icon-type="secondaryIconType"
+                                <ItemIcon class="me-2"
+                                          :icon-type="getIconType(secondaryIconType, secondaryIconTypeField ? subItem[secondaryIconTypeField] : undefined)"
                                           :icon-id="secondaryIconField ? subItem[secondaryIconField] : undefined"
                                           :color="secondaryColorField ? subItem[secondaryColorField] : undefined"
                                           v-if="secondaryIconField"></ItemIcon>
@@ -103,6 +105,7 @@ import {
     getNameByKeyValue
 } from '@/lib/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { getIconType } from '@/lib/icon.ts';
 import { type ComponentDensity, type InputVariant, setChildInputFocus } from '@/lib/ui/desktop.ts';
 
 import {

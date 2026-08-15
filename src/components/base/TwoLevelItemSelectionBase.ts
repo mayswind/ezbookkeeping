@@ -13,6 +13,7 @@ export interface TwoLevelItemSelectionBaseProps {
     primaryTitleI18n?: boolean;
     primaryIconField?: string;
     primaryIconType?: string;
+    primaryIconTypeField?: string;
     primaryColorField?: string;
     primaryHiddenField?: string;
     primarySubItemsField: string;
@@ -22,6 +23,7 @@ export interface TwoLevelItemSelectionBaseProps {
     secondaryTitleI18n?: boolean;
     secondaryIconField?: string;
     secondaryIconType?: string;
+    secondaryIconTypeField?: string;
     secondaryColorField?: string;
     secondaryHiddenField?: string;
     enableFilter?: boolean;

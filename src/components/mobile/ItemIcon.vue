@@ -1,5 +1,9 @@
 <template>
-    <f7-icon :f7="f7IconValue" :icon="icon" :style="style">
+    <div class="icon item-img-icon-container" :style="style" v-if="customIconUrl">
+        <img class="item-img-icon" :src="customIconUrl" />
+        <slot></slot>
+    </div>
+    <f7-icon :f7="f7IconValue" :icon="icon" :style="style" v-else-if="!customIconUrl">
         <slot></slot>
     </f7-icon>
 </template>
@@ -9,7 +13,7 @@ import { computed } from 'vue';
 import { type CommonIconProps, useItemIconBase } from '@/components/base/ItemIconBase.ts';
 
 const props = defineProps<CommonIconProps>();
-const { style, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
+const { style, customIconUrl, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
 
 const f7IconValue = computed<string>(() => {
     if (props.iconType === 'fixed-f7') {
@@ -31,3 +35,21 @@ const icon = computed<string>(() => {
     }
 });
 </script>
+
+<style>
+.item-img-icon,
+.item-img-icon-container {
+    display: inline-flex;
+    vertical-align: middle;
+    background-size: 100% auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-style: normal;
+    position: relative;
+}
+
+.item-img-icon {
+    width: var(--ebk-icon-font-size);
+    height: var(--ebk-icon-font-size);
+}
+</style>

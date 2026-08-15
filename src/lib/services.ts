@@ -179,6 +179,11 @@ import type {
 import type {
     RecognizedTransactionResponse
 } from '@/models/large_language_model.ts';
+import type {
+    UserCustomIconInfoResponse,
+    UserCustomIconMoveRequest,
+    UserCustomIconDeleteRequest
+} from '@/models/user_custom_icon.ts';
 
 import {
     getCurrentToken,
@@ -868,6 +873,23 @@ export default {
             cancelableUuid: cancelableUuid
         } as ApiRequestConfig);
     },
+    getAllUserCustomIcons: (): ApiResponsePromise<UserCustomIconInfoResponse[]> => {
+        return axios.get<ApiResponse<UserCustomIconInfoResponse[]>>('v1/custom_icons/list.json');
+    },
+    uploadUserCustomIcon: ({ iconFile, clientSessionId }: { iconFile: File, clientSessionId?: string }): ApiResponsePromise<UserCustomIconInfoResponse> => {
+        return axios.postForm<ApiResponse<UserCustomIconInfoResponse>>('v1/custom_icons/upload.json', {
+            icon: iconFile,
+            clientSessionId: clientSessionId
+        }, {
+            timeout: DEFAULT_UPLOAD_API_TIMEOUT
+        } as ApiRequestConfig);
+    },
+    moveUserCustomIcons: (req: UserCustomIconMoveRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/custom_icons/move.json', req);
+    },
+    deleteUserCustomIcon: (req: UserCustomIconDeleteRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/custom_icons/delete.json', req);
+    },
     getLatestExchangeRates: (param: { ignoreError?: boolean }): ApiResponsePromise<LatestExchangeRateResponse> => {
         return axios.get<ApiResponse<LatestExchangeRateResponse>>('v1/exchange_rates/latest.json', {
             ignoreError: !!param.ignoreError,
@@ -960,6 +982,9 @@ export default {
         } else {
             return avatarUrl + '?' + params.join('&');
         }
+    },
+    getUserCustomIconUrlWithToken(iconId: string | number): string {
+        return `${getBasePath()}/icons/${iconId}.png?token=${getCurrentToken()}`;
     },
     getTransactionPictureUrlWithToken(pictureUrl: string, disableBrowserCache?: boolean | string): string {
         if (!pictureUrl) {

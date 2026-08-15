@@ -1,4 +1,5 @@
 import type { ColorValue } from '@/core/color.ts';
+import type { IconType } from '@/core/icon.ts';
 
 export enum CategoryType {
     Income = 1,
@@ -29,6 +30,7 @@ export interface LocalizedPresetCategory {
     readonly name: string;
     readonly type: CategoryType;
     readonly icon: string;
+    readonly iconType: IconType;
     readonly color: ColorValue;
     readonly subCategories: LocalizedPresetSubCategory[];
 }
@@ -37,5 +39,6 @@ export interface LocalizedPresetSubCategory {
     readonly name: string;
     readonly type: CategoryType;
     readonly icon: string;
+    readonly iconType: IconType;
     readonly color: ColorValue;
 }

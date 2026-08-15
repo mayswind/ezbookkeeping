@@ -15,4 +15,5 @@ var (
 	ErrNotAllowChangeSecondaryTransactionCategoryToPrimary = NewNormalError(NormalSubcategoryCategory, 8, http.StatusBadRequest, "not allow to change secondary category to primary category")
 	ErrNotAllowChangePrimaryTransactionType                = NewNormalError(NormalSubcategoryCategory, 9, http.StatusBadRequest, "not allow to change primary category with different type")
 	ErrNotAllowUseSecondaryTransactionAsPrimaryCategory    = NewNormalError(NormalSubcategoryCategory, 10, http.StatusBadRequest, "not allow to use secondary category as primary category")
+	ErrTransactionCategoryIconInvalid                      = NewNormalError(NormalSubcategoryCategory, 11, http.StatusBadRequest, "transaction category icon is invalid")
 )

@@ -122,7 +122,7 @@
                                                         <div class="d-flex align-center">
                                                             <div class="d-flex align-center" :class="{ 'cursor-pointer': isCategorySupportSwitch(element) }"
                                                                  @click="switchPrimaryCategory(element)">
-                                                                <ItemIcon icon-type="category"
+                                                                <ItemIcon :icon-type="getCategoryIconType(element.iconType)"
                                                                           :icon-id="element.icon" :color="element.color"
                                                                           :hidden-status="element.hidden" />
                                                                 <div class="d-flex flex-column py-2">
@@ -212,6 +212,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 
+import { getCategoryIconType } from '@/lib/icon.ts';
 import {
     isNoAvailableCategory,
     getAvailableCategoryCount

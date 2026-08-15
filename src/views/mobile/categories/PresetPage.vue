@@ -18,7 +18,7 @@
                               :key="idx"
                               v-for="(category, idx) in categories">
                     <template #media>
-                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                        <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color"></ItemIcon>
                     </template>
 
                     <f7-accordion-content v-if="category.subCategories.length" class="padding-inline-start">
@@ -27,7 +27,7 @@
                                           :key="subIdx"
                                           v-for="(subCategory, subIdx) in category.subCategories">
                                 <template #media>
-                                    <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                    <ItemIcon :icon-type="getCategoryIconType(subCategory.iconType)" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                 </template>
                             </f7-list-item>
                         </f7-list>
@@ -67,6 +67,7 @@ import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.t
 import type { LanguageOption } from '@/locales/index.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { getObjectOwnFieldCount, categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';
 
 const props = defineProps<{

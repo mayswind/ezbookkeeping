@@ -159,11 +159,11 @@
                                                     <div class="list-group-item">
                                                         <v-card border class="card-title-with-bg account-card mb-4 h-auto" v-if="showHidden || !element.hidden">
                                                             <template #title>
-                                                                <div class="account-title d-flex align-baseline">
-                                                                    <ItemIcon size="1.5rem" icon-type="account" :icon-id="element.icon"
+                                                                <div class="account-title d-flex align-center">
+                                                                    <ItemIcon size="1.5rem" :icon-type="getAccountIconType(element.iconType)" :icon-id="element.icon"
                                                                               :color="element.color" :hidden-status="element.hidden" />
                                                                     <span class="account-name text-truncate ms-2">{{ element.name }}</span>
-                                                                    <small class="account-currency text-truncate ms-2">
+                                                                    <small class="account-currency text-truncate ms-2 align-self-end">
                                                                         {{ accountCurrency(element) }}
                                                                     </small>
                                                                     <v-spacer/>
@@ -191,7 +191,7 @@
                                                                         <v-btn :key="subAccount.id" :value="subAccount.id"
                                                                                v-for="subAccount in element.subAccounts"
                                                                                v-show="showHidden || !subAccount.hidden">
-                                                                            <ItemIcon size="1.5rem" icon-type="account" :icon-id="subAccount.icon"
+                                                                            <ItemIcon size="1.5rem" :icon-type="getAccountIconType(subAccount.iconType)" :icon-id="subAccount.icon"
                                                                                       :color="subAccount.color" :hidden-status="subAccount.hidden" />
                                                                             <span class="ms-2">{{ subAccount.name }}</span>
                                                                         </v-btn>
@@ -349,6 +349,7 @@ import {
     getDateRangeByBillingCycleDateType,
     getDateRangeByLastReconciledTimeRangeDateType
 } from '@/lib/datetime.ts';
+import { getAccountIconType } from '@/lib/icon.ts';
 
 import {
     mdiEyeOutline,

@@ -73,7 +73,7 @@
                                                             :indeterminate="isAccountOrSubAccountsHasButNotAllChecked(account, filterAccountIds)"
                                                             @update:model-value="updateAccountOrSubAccountsSelected(account, $event)">
                                                     <template #label>
-                                                        <ItemIcon class="d-flex ms-1" icon-type="account" :icon-id="account.icon"
+                                                        <ItemIcon class="d-flex ms-1" :icon-type="getAccountIconType(account.iconType)" :icon-id="account.icon"
                                                                   :color="account.color" :hidden-status="account.hidden"></ItemIcon>
                                                         <span class="text-body-medium ms-2">{{ account.name }}</span>
                                                     </template>
@@ -94,7 +94,7 @@
                                                         <v-checkbox :model-value="isAccountChecked(subAccount, filterAccountIds)"
                                                                     @update:model-value="updateAccountSelected(subAccount, $event)">
                                                             <template #label>
-                                                                <ItemIcon class="d-flex ms-1" icon-type="account" :icon-id="subAccount.icon"
+                                                                <ItemIcon class="d-flex ms-1" :icon-type="getAccountIconType(subAccount.iconType)" :icon-id="subAccount.icon"
                                                                           :color="subAccount.color" :hidden-status="subAccount.hidden"></ItemIcon>
                                                                 <span class="text-body-medium ms-2">{{ subAccount.name }}</span>
                                                             </template>
@@ -132,6 +132,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import type { Account } from '@/models/account.ts';
 
+import { getAccountIconType } from '@/lib/icon.ts';
 import {
     selectAccountOrSubAccounts,
     selectAll,

@@ -196,7 +196,7 @@
                     </template>
                     <template #item.categoryName="{ item }">
                         <div class="d-flex align-center">
-                            <ItemIcon size="24px" icon-type="category"
+                            <ItemIcon size="24px" :icon-type="getCategoryIconType(item.category?.iconType)"
                                       :icon-id="item.category?.icon ?? ''"
                                       :color="item.category?.color ?? ''"
                                       v-if="item.category && item.category?.color"></ItemIcon>
@@ -344,11 +344,12 @@ import { Transaction, type TransactionReconciliationStatementResponseItem } from
 
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
     extendMdiSemicolon
-} from '@/icons/desktop/extend_mdi_icons.ts';
+} from '@/exticons/desktop/extend_mdi_icons.ts';
 import {
     mdiRefresh,
     mdiArrowRight,

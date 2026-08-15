@@ -29,4 +29,5 @@ var (
 	ErrParentAccountCannotSetLastReconciledTime = NewNormalError(NormalSubcategoryAccount, 23, http.StatusBadRequest, "parent account cannot set last reconciled time")
 	ErrCannotSetLastReconciledTimeBeforeCurrent = NewNormalError(NormalSubcategoryAccount, 24, http.StatusBadRequest, "cannot set last reconciled time before current value")
 	ErrAccountBalanceOverflow                   = NewNormalError(NormalSubcategoryAccount, 25, http.StatusBadRequest, "account balance overflow")
+	ErrAccountIconInvalid                       = NewNormalError(NormalSubcategoryAccount, 26, http.StatusBadRequest, "account icon is invalid")
 )

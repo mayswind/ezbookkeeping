@@ -75,7 +75,7 @@
                                                             :indeterminate="isSubCategoriesHasButNotAllChecked(category, filterCategoryIds)"
                                                             @update:model-value="updateAllSubCategoriesSelected(category, $event)">
                                                     <template #label>
-                                                        <ItemIcon class="d-flex ms-1" icon-type="category" :icon-id="category.icon"
+                                                        <ItemIcon class="d-flex ms-1" :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon"
                                                                   :color="category.color" :hidden-status="category.hidden"></ItemIcon>
                                                         <span class="text-body-medium ms-2">{{ category.name }}</span>
                                                     </template>
@@ -96,7 +96,7 @@
                                                         <v-checkbox :model-value="isCategoryChecked(subCategory, filterCategoryIds)"
                                                                     @update:model-value="updateCategorySelected(subCategory, $event)">
                                                             <template #label>
-                                                                <ItemIcon class="d-flex ms-1" icon-type="category" :icon-id="subCategory.icon"
+                                                                <ItemIcon class="d-flex ms-1" :icon-type="getCategoryIconType(subCategory.iconType)" :icon-id="subCategory.icon"
                                                                           :color="subCategory.color" :hidden-status="subCategory.hidden"></ItemIcon>
                                                                 <span class="text-body-medium ms-2">{{ subCategory.name }}</span>
                                                             </template>
@@ -134,6 +134,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 
+import { getCategoryIconType } from '@/lib/icon.ts';
 import {
     selectAllSubCategories,
     selectAll,

@@ -44,10 +44,10 @@
                                 color: 'warning'
                             },
                             {
-                                title: 'Others',
-                                count: fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.othersCacheSize, 2) : '-',
-                                icon: mdiFileOutline,
-                                color: 'grey'
+                                title: 'Custom Icons',
+                                count: fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.customIconCacheSize, 2) : '-',
+                                icon: mdiShapePlusOutline,
+                                color: 'error-darken-1'
                             }
                         ]">
                             <div class="d-flex align-center">
@@ -75,6 +75,10 @@
                     <v-btn class="ms-2" color="secondary" variant="tonal"
                            :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearMapCache()">
                         {{ tt('Clear Map Data Cache') }}
+                    </v-btn>
+                    <v-btn class="ms-2" color="secondary" variant="tonal"
+                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearCustomIconsCache()">
+                        {{ tt('Clear Custom Icon Cache') }}
                     </v-btn>
                     <v-btn class="ms-2" color="secondary" variant="tonal"
                            :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearAllFileCache()">
@@ -163,7 +167,7 @@ import {
     mdiFileCodeOutline,
     mdiFileImageOutline,
     mdiFileImageMarkerOutline,
-    mdiFileOutline
+    mdiShapePlusOutline
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
@@ -185,6 +189,7 @@ const {
     loadCacheStatistics,
     clearApplicationCodeCache,
     clearMapDataCache,
+    clearCustomIconCache,
     clearAllBrowserCaches,
     clearExchangeRatesDataCache
 } = useAppBrowserCacheSettingPageBase();
@@ -202,6 +207,14 @@ function clearApplicationCodeFileCache(): void {
 function clearMapCache(): void {
     confirmDialog.value?.open('Are you sure you want to clear map data cache?').then(() => {
         clearMapDataCache().then(() => {
+            loadCacheStatistics(true);
+        });
+    });
+}
+
+function clearCustomIconsCache(): void {
+    confirmDialog.value?.open('Are you sure you want to clear custom icon cache?').then(() => {
+        clearCustomIconCache().then(() => {
             loadCacheStatistics(true);
         });
     });

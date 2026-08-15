@@ -133,7 +133,7 @@
                                                 </v-list>
                                             </v-menu>
 
-                                            <v-btn density="compact" color="default" variant="text" size="24"
+                                            <v-btn density="compact" color="default" variant="text"
                                                    class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>

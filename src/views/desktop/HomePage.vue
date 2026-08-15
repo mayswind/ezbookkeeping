@@ -9,7 +9,7 @@
                             <span class="text-title-large">·</span>
                             <span class="text-title-small">{{ tt('Expense') }}</span>
                         </div>
-                        <v-btn density="compact" color="default" variant="text" size="24"
+                        <v-btn density="compact" color="default" variant="text"
                                class="ms-2" :icon="true" :loading="loadingOverview" @click="reload(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>

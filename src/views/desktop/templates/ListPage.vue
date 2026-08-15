@@ -10,7 +10,7 @@
                         <v-btn class="ms-3" color="primary" variant="tonal"
                                :disabled="loading || updating" @click="saveSortResult"
                                v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
-                        <v-btn density="compact" color="default" variant="text" size="24"
+                        <v-btn density="compact" color="default" variant="text"
                                class="ms-2" :icon="true" :disabled="loading || updating"
                                :loading="loading" @click="reload">
                             <template #loader>

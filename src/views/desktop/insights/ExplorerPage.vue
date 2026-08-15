@@ -72,7 +72,7 @@
                                                @click="shiftDateRange(1)"/>
                                     </v-btn-group>
 
-                                    <v-btn density="compact" color="default" variant="text" size="24"
+                                    <v-btn density="compact" color="default" variant="text"
                                            class="ms-2" :icon="true" :loading="loading" :disabled="updating" @click="reload(true)">
                                         <template #loader>
                                             <v-progress-circular indeterminate size="20"/>

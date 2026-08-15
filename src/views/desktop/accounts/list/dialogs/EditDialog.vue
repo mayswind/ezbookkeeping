@@ -97,7 +97,7 @@
                                                  v-model="selectedAccount.icon" />
                                 </v-col>
                                 <v-col cols="12" md="6">
-                                    <color-select :all-color-infos="ALL_ACCOUNT_COLORS"
+                                    <color-select :all-system-color-infos="ALL_ACCOUNT_COLORS"
                                                   :label="currentAccountIndex < 0 ? tt('Account Color') : tt('Sub-account Color')"
                                                   :disabled="loading || submitting"
                                                   v-model="selectedAccount.color" />

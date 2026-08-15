@@ -121,7 +121,7 @@
                                 </div>
                             </a>
 
-                            <color-selection-sheet :all-color-infos="ALL_CATEGORY_COLORS"
+                            <color-selection-sheet :all-system-color-infos="ALL_CATEGORY_COLORS"
                                                    v-model:show="showColorSelectionSheet"
                                                    v-model="category.color"
                             ></color-selection-sheet>

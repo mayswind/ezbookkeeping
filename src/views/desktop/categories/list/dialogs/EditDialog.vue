@@ -51,7 +51,7 @@
                                          v-model="category.icon" />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <color-select :all-color-infos="ALL_CATEGORY_COLORS"
+                            <color-select :all-system-color-infos="ALL_CATEGORY_COLORS"
                                           :label="tt('Category Color')"
                                           :disabled="loading || submitting"
                                           v-model="category.color" />

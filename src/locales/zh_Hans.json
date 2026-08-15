@@ -2663,6 +2663,8 @@
     "Unable to move custom icon": "无法移动自定义图标",
     "Are you sure you want to delete this custom icon?": "您确定要删除该自定义图标？",
     "Unable to delete custom icon": "无法删除自定义图标",
+    "Custom Color": "自定义颜色",
+    "System Colors": "系统颜色",
     "Generate Token": "生成令牌",
     "Token Type": "令牌类型",
     "Expiration Time": "过期时间",

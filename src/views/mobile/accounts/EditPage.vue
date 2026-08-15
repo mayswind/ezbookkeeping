@@ -145,7 +145,7 @@
                                 </div>
                             </a>
 
-                            <color-selection-sheet :all-color-infos="ALL_ACCOUNT_COLORS"
+                            <color-selection-sheet :all-system-color-infos="ALL_ACCOUNT_COLORS"
                                                    v-model:show="accountContext.showColorSelectionSheet"
                                                    v-model="account.color"
                             ></color-selection-sheet>
@@ -334,7 +334,7 @@
                                 </div>
                             </a>
 
-                            <color-selection-sheet :all-color-infos="ALL_ACCOUNT_COLORS"
+                            <color-selection-sheet :all-system-color-infos="ALL_ACCOUNT_COLORS"
                                                    v-model:show="accountContext.showColorSelectionSheet"
                                                    v-model="account.color"
                             ></color-selection-sheet>
@@ -442,7 +442,7 @@
                                     </div>
                                 </a>
 
-                                <color-selection-sheet :all-color-infos="ALL_ACCOUNT_COLORS"
+                                <color-selection-sheet :all-system-color-infos="ALL_ACCOUNT_COLORS"
                                                        v-model:show="subAccountContexts[idx]!.showColorSelectionSheet"
                                                        v-model="subAccount.color"
                                 ></color-selection-sheet>

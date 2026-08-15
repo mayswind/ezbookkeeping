@@ -2663,6 +2663,8 @@
     "Unable to move custom icon": "Unable to move custom icon",
     "Are you sure you want to delete this custom icon?": "Are you sure you want to delete this custom icon?",
     "Unable to delete custom icon": "Unable to delete custom icon",
+    "Custom Color": "Custom Color",
+    "System Colors": "System Colors",
     "Generate Token": "Сгенерировать токен",
     "Token Type": "Тип токена",
     "Expiration Time": "Время экспирации",

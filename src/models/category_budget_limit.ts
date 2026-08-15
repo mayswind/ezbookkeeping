@@ -21,7 +21,9 @@ export class CategoryBudgetLimit implements CategoryBudgetLimitInfoResponse {
     public toCreateRequest(clientSessionId: string): CategoryBudgetLimitCreateRequest {
         return {
             categoryId: this.categoryId,
-            startDate: this.startDate,
+            // startDate is sent as a quoted string: the backend CreateRequest uses the
+            // `,string` json tag (consistent with all large int64 fields in ezBookkeeping).
+            startDate: String(this.startDate),
             amount: this.amount,
             currency: this.currency,
             clientSessionId
@@ -51,7 +53,7 @@ export class CategoryBudgetLimit implements CategoryBudgetLimitInfoResponse {
 
 export interface CategoryBudgetLimitCreateRequest {
     readonly categoryId: string;
-    readonly startDate: number;
+    readonly startDate: string;
     readonly amount: number;
     readonly currency: string;
     readonly clientSessionId: string;

@@ -752,6 +752,9 @@ import { AmountFilterType } from '@/core/numeral.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
+
+import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
+
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import { type Transaction, TransactionTagFilter } from '@/models/transaction.ts';
 import type { TransactionTemplate } from '@/models/transaction_template.ts';
@@ -857,7 +860,7 @@ const {
     tt,
     getAllRecentMonthDateRanges,
     getWeekdayLongName,
-    formatNumberToLocalizedNumerals
+    getTablePageOptions
 } = useI18n();
 
 const {
@@ -958,18 +961,7 @@ const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
-
-const allPageCounts = computed<NameNumeralValue[]>(() => {
-    const pageCounts: NameNumeralValue[] = [];
-    const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
-
-    for (const count of availableCountPerPage) {
-        pageCounts.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
-    }
-
-    return pageCounts;
-});
-
+const allPageCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, undefined, false, true));
 const recentMonthDateRanges = computed<LocalizedRecentMonthDateRange[]>(() => getAllRecentMonthDateRanges(pageType.value === TransactionListPageType.List.type || pageType.value === TransactionListPageType.Gallery.type, true));
 
 const allTransactionTemplates = computed<TransactionTemplate[]>(() => {

@@ -108,7 +108,7 @@ export interface TransactionExplorerFilter extends TransactionExplorerPartialFil
 export interface CategoriedInfo {
     categoryName: string;
     categoryNameNeedI18n?: boolean;
-    categoryNameI18nParameters?: Record<string, string>;
+    categoryNameI18nParameters?: Record<string, unknown>;
     categoryId: string;
     categoryIdType: TransactionExplorerDimensionType;
     categoryDisplayOrders: number[];
@@ -125,7 +125,7 @@ export interface CategoriedTransactionExplorerData extends CategoriedInfo {
 export interface SeriesInfo {
     seriesName: string;
     seriesNameNeedI18n?: boolean;
-    seriesNameI18nParameters?: Record<string, string>;
+    seriesNameI18nParameters?: Record<string, unknown>;
     seriesId: string;
     seriesIdType: TransactionExplorerDimensionType;
     seriesDisplayOrders: number[];
@@ -424,7 +424,7 @@ export const useExplorersStore = defineStore('explorers', () => {
                     categoryName: `format.misc.queryIndex`,
                     categoryNameNeedI18n: true,
                     categoryNameI18nParameters: {
-                        index: (queryIndex + 1).toString(10)
+                        index: queryIndex + 1
                     },
                     categoryId: (queryIndex + 1).toString(10),
                     categoryIdType: TransactionExplorerDimensionType.Other,

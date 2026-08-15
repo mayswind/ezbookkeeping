@@ -440,6 +440,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { ImportTransactionColumnType } from '@/core/import_transaction.ts';
 
+import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 import { TRANSACTION_MAX_COMMENT_LENGTH } from '@/consts/transaction.ts';
 
 import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/account.ts';
@@ -536,7 +537,8 @@ const {
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency,
     formatNumberToLocalizedNumerals,
-    getCategorizedAccountsWithDisplayBalance
+    getCategorizedAccountsWithDisplayBalance,
+    getTablePageOptions
 } = useI18n();
 
 const { allTagsWithGroupHeader } = useTransactionTagSelectionBase({ modelValue: [] }, false);
@@ -1011,7 +1013,7 @@ const importTransactionHeaders = computed<object[]>(() => {
     ];
 });
 
-const importTransactionsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(props.importTransactions?.length));
+const importTransactionsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, props.importTransactions?.length, true, false));
 
 const totalPageCount = computed<number>(() => {
     if (!props.importTransactions || props.importTransactions.length < 1) {
@@ -1218,27 +1220,6 @@ const displayFilterCustomDateRange = computed<string>(() => {
 
     return `${minDisplayTime} - ${maxDisplayTime}`
 });
-
-function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
-    const pageOptions: NameNumeralValue[] = [];
-
-    if (!linesCount || linesCount < 1) {
-        pageOptions.push({ value: -1, name: tt('All') });
-        return pageOptions;
-    }
-
-    for (const count of [ 5, 10, 15, 20, 25, 30, 50 ]) {
-        if (linesCount < count) {
-            break;
-        }
-
-        pageOptions.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
-    }
-
-    pageOptions.push({ value: -1, name: tt('All') });
-
-    return pageOptions;
-}
 
 function isTransactionDisplayed(transaction: ImportTransaction): boolean {
     if (isNumber(filters.value.minDatetime) && isNumber(filters.value.maxDatetime) && (transaction.time < filters.value.minDatetime || transaction.time > filters.value.maxDatetime)) {

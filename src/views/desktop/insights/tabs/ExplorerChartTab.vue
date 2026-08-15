@@ -272,7 +272,7 @@ import {
 import type { SortableTransactionStatisticDataItem, TransactionInsightDataItem } from '@/models/transaction.ts';
 import type { InsightsExplorer } from '@/models/explorer.ts';
 
-import { isDefined, isNumber, findNameByValue } from '@/lib/common.ts';
+import { isDefined, isString, isNumber, findNameByValue } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
@@ -340,6 +340,7 @@ const {
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping,
     formatNumberToLocalizedNumerals,
+    formatNumberToLocalizedNumeralsWithoutDigitGrouping,
     formatPercentToLocalizedNumerals
 } = useI18n();
 
@@ -650,6 +651,24 @@ const axisChartTooltipExtraColumnNames = computed<string[]>(() => {
     return extraColumnNames;
 });
 
+function getFormattedI18nParameters(i18nParameters: Record<string, unknown> | undefined): Record<string, string> | undefined {
+    if (!i18nParameters) {
+        return undefined;
+    }
+
+    const formattedParameters: Record<string, string> = {};
+
+    for (const [key, value] of entries(i18nParameters)) {
+        if (isNumber(value)) {
+            formattedParameters[key] = formatNumberToLocalizedNumeralsWithoutDigitGrouping(value);
+        } else if (isString(value)) {
+            formattedParameters[key] = value;
+        }
+    }
+
+    return formattedParameters;
+}
+
 function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string {
     let name: string = '';
     let needI18n: boolean | undefined = false;
@@ -660,13 +679,13 @@ function getCategoriedDataDisplayName(info: CategoriedInfo | SeriesInfo): string
     if ('categoryName' in info) {
         name = info.categoryName;
         needI18n = info.categoryNameNeedI18n;
-        i18nParameters = info.categoryNameI18nParameters;
+        i18nParameters = getFormattedI18nParameters(info.categoryNameI18nParameters);
         dimessionType = info.categoryIdType;
         dimessionValue = currentExploration.value.categoryDimension;
     } else if ('seriesName' in info) {
         name = info.seriesName;
         needI18n = info.seriesNameNeedI18n;
-        i18nParameters = info.seriesNameI18nParameters;
+        i18nParameters = getFormattedI18nParameters(info.seriesNameI18nParameters);
         dimessionType = info.seriesIdType;
         dimessionValue = currentExploration.value.seriesDimension;
     }

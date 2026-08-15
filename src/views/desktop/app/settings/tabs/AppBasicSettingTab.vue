@@ -180,10 +180,12 @@
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-select
+                                    item-title="name"
+                                    item-value="value"
                                     persistent-placeholder
                                     :label="tt('Transactions Per Page')"
                                     :placeholder="tt('Transactions Per Page')"
-                                    :items="[ 5, 10, 15, 20, 25, 30, 50 ]"
+                                    :items="allPageCounts"
                                     v-model="itemsCountInTransactionListPage"
                                 />
                             </v-col>
@@ -493,11 +495,13 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
-import type { LocalizedSwitchOption } from '@/core/base.ts';
+import type { NameNumeralValue, LocalizedSwitchOption } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
 import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP } from '@/core/statistics.ts';
+
+import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
@@ -507,7 +511,7 @@ type AccountCategoryDisplayOrderDialogType = InstanceType<typeof AccountCategory
 
 const theme = useTheme();
 
-const { tt, getAllEnableDisableOptions, getAllDateRanges } = useI18n();
+const { tt, getAllEnableDisableOptions, getAllDateRanges, getTablePageOptions } = useI18n();
 const {
     loadingAccounts,
     loadingTransactionCategories,
@@ -558,6 +562,7 @@ const showTransactionCategoriesIncludedInHomePageOverviewDialog = ref<boolean>(f
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
 const enableDisableOptions = computed<LocalizedSwitchOption[]>(() => getAllEnableDisableOptions());
+const allPageCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, undefined, false, true));
 const allInsightsExplorerDefaultDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, {}));
 
 const currentTheme = computed<string>({

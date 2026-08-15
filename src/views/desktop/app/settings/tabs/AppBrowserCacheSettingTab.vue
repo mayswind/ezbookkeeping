@@ -19,7 +19,7 @@
                 <v-card-text class="d-flex align-end" style="height: 3rem">
                     <span class="text-body-large">{{ tt('Used storage') }}</span>
                     <v-skeleton-loader class="d-inline-block skeleton-no-margin ms-2 pt-1 pb-1" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <span class="text-headline-small ms-2" v-if="!loading">{{ fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.totalCacheSize, 2) : '-' }}</span>
+                    <span class="text-title-large ms-2" v-if="!loading">{{ fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.totalCacheSize, 2) : '-' }}</span>
                 </v-card-text>
 
                 <v-card-text class="py-0">
@@ -60,7 +60,7 @@
                                 <div class="d-flex flex-column">
                                     <span class="text-body-small">{{ tt(item.title) }}</span>
                                     <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
-                                    <span class="text-headline-small" v-if="!loading">{{ item.count }}</span>
+                                    <span class="text-title-large" v-if="!loading">{{ item.count }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -99,7 +99,7 @@
                 <v-card-text class="d-flex align-end" style="height: 3rem">
                     <span class="text-body-large">{{ tt('Used storage') }}</span>
                     <v-skeleton-loader class="d-inline-block skeleton-no-margin ms-2 pt-1 pb-1" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <span class="text-headline-small ms-2" v-if="!loading">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
+                    <span class="text-title-large ms-2" v-if="!loading">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
                 </v-card-text>
 
                 <v-card-text>

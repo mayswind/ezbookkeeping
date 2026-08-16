@@ -261,7 +261,7 @@
 
         <f7-card v-if="finishQuery && showAccountBalanceTrendsCharts">
             <f7-card-header class="no-border display-block">
-                <div class="statistics-chart-header display-flex full-line justify-content-space-between">
+                <div class="statistics-chart-header display-flex width-100 justify-content-space-between">
                     <div></div>
                     <div class="align-self-flex-end">
                         <span style="margin-inline-end: 4px;">{{ tt('Time Granularity') }}</span>

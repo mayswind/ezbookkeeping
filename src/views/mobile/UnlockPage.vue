@@ -8,7 +8,7 @@
         <f7-list form class="login-page-form">
             <f7-list-item class="no-padding margin-top-half">
                 <template #inner>
-                    <div class="display-flex justify-content-center full-line">{{ tt('Unlock Application') }}</div>
+                    <div class="display-flex justify-content-center width-100">{{ tt('Unlock Application') }}</div>
                 </template>
             </f7-list-item>
 

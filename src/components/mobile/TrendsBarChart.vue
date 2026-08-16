@@ -69,13 +69,13 @@
                 <div class="statistics-list-item-text">
                     <span>{{ item.displayDateRange }}</span>
                 </div>
-                <div class="full-line statistics-percent-line statistics-multi-percent-line display-flex flex-direction-column" v-if="!stacked && item.items.length > 1">
+                <div class="width-100 statistics-percent-line statistics-multi-percent-line display-flex flex-direction-column" v-if="!stacked && item.items.length > 1">
                     <div class="display-flex flex-direction-column"
                          style="margin-top: 4px"
                          :key="dataIdx"
                          v-for="(data, dataIdx) in item.items"
                          v-show="data.value.isPositive()">
-                        <div class="full-line display-flex flex-direction-row">
+                        <div class="width-100 display-flex flex-direction-row">
                             <div class="display-inline-flex" :style="{ 'width': data.value.divide(item.maxAmount).multiply(item.percent).toDoubleNumber() + '%' }">
                                 <f7-progressbar :progress="100" :style="{ '--f7-progressbar-progress-color': (data.color ? data.color : '') } "></f7-progressbar>
                             </div>

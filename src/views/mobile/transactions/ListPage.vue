@@ -109,8 +109,8 @@
                                           :key="itemIdx" v-for="itemIdx in (pageType === TransactionListPageType.List.type && blockIdx === 1 ? [ 1, 2, 3, 4, 5, 6, 7 ] : [ 1, 2, 3 ])">
                                 <template #media>
                                     <div class="display-flex flex-direction-column transaction-date">
-                                        <span class="transaction-day full-line flex-direction-column">DD</span>
-                                        <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                                        <span class="transaction-day width-100 flex-direction-column">DD</span>
+                                        <span class="transaction-day-of-week width-100 flex-direction-column">Sun</span>
                                     </div>
                                 </template>
                                 <template #inner>
@@ -224,10 +224,10 @@
                         >
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : undefined)">
-                                    <span class="transaction-day full-line flex-direction-column">
+                                    <span class="transaction-day width-100 flex-direction-column">
                                         {{ transaction.gregorianCalendarDayOfMonth ? formatNumberToLocalizedNumeralsWithoutDigitGrouping(transaction.gregorianCalendarDayOfMonth) : '' }}
                                     </span>
-                                    <span class="transaction-day-of-week full-line flex-direction-column" v-if="transaction.displayDayOfWeek">
+                                    <span class="transaction-day-of-week width-100 flex-direction-column" v-if="transaction.displayDayOfWeek">
                                         {{ getWeekdayShortName(transaction.displayDayOfWeek) }}
                                     </span>
                                 </div>

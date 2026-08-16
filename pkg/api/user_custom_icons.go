@@ -25,6 +25,7 @@ type UserCustomIconsApi struct {
 	ApiUsingConfig
 	ApiUsingDuplicateChecker
 	icons *services.UserCustomIconService
+	users *services.UserService
 }
 
 // Initialize a user custom icons api singleton instance
@@ -40,6 +41,7 @@ var (
 			container: duplicatechecker.Container,
 		},
 		icons: services.UserCustomIcons,
+		users: services.Users,
 	}
 )
 
@@ -67,6 +69,20 @@ func (a *UserCustomIconsApi) CustomIconListHandler(c *core.WebContext) (any, *er
 // CustomIconUploadHandler saves a new custom icon for current user
 func (a *UserCustomIconsApi) CustomIconUploadHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[user_custom_icons.CustomIconUploadHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UPLOAD_CUSTOM_ICON) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	form, err := c.MultipartForm()
 
 	if err != nil {
@@ -260,6 +276,20 @@ func (a *UserCustomIconsApi) CustomIconDeleteHandler(c *core.WebContext) (any, *
 	}
 
 	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[user_custom_icons.CustomIconDeleteHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_UPLOAD_CUSTOM_ICON) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
 	err = a.icons.DeleteCustomIcon(c, uid, iconDeleteReq.Id)
 
 	if err != nil {

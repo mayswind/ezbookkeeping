@@ -10,7 +10,7 @@
 
             <template #content>
                 <div class="w-100 h-100">
-                    <v-textarea no-resize class="w-100 h-100 ps-3 always-cursor-text"
+                    <v-textarea no-resize class="w-100 h-100 ps-3 code-textarea always-cursor-text"
                                 density="compact" variant="plain" :rounded="false"
                                 v-model="queriesJson"></v-textarea>
                 </div>

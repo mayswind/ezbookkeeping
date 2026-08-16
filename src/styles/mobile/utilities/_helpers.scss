@@ -2,6 +2,11 @@
     pointer-events: none !important;
 }
 
+.always-ltr {
+    direction: ltr !important;
+    unicode-bidi: isolate;
+}
+
 .smaller {
     font-size: var(--ebk-smaller-font-size);
 }
@@ -65,6 +70,13 @@
 
 .compact-tabbar {
     --f7-toolbar-height: 48px;
+}
+
+html[dir="rtl"] .code-textarea {
+    textarea {
+        direction: ltr;
+        text-align: left;
+    }
 }
 
 .ebk-extra-small-amount {

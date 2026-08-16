@@ -50,7 +50,9 @@
                                                            :value="'#' + element" @input="onColorInput(index, $event)" />
                                                     <div class="color-preview-box" :style="{ backgroundColor: '#' + element }"></div>
                                                 </div>
-                                                <span class="ms-3 hextual-color">{{ '#' + element.toLowerCase() }}</span>
+                                                <div class="ms-3 hextual-color">
+                                                    <span class="always-ltr">{{ '#' + element.toLowerCase() }}</span>
+                                                </div>
                                             </div>
 
                                             <v-spacer/>
@@ -75,7 +77,7 @@
                         </draggable-list>
                     </v-table>
                     <div class="w-100 h-100" v-if="showRawData">
-                        <v-textarea no-resize class="w-100 h-100 ps-4 hextual-color always-cursor-text"
+                        <v-textarea no-resize class="w-100 h-100 ps-4 code-textarea hextual-color always-cursor-text"
                                     density="compact" variant="plain" :rounded="false"
                                     :placeholder="tt('Each line should be a hex color value (e.g. c67e48 or #c67e48)')"
                                     v-model="textualChartColors"></v-textarea>

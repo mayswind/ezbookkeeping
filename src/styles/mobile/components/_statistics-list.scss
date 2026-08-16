@@ -7,6 +7,8 @@
 }
 
 .statistics-list-item-text {
+    display: flex;
+    align-items: baseline;
     overflow: hidden;
     text-overflow: ellipsis;
 }

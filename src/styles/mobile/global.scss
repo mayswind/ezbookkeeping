@@ -598,14 +598,14 @@ html[dir="rtl"] .icon.las .badge.right-bottom-icon {
     margin-inline-start: -18px;
     margin-top: -8px;
     border-radius: 3px;
-    background: #666
+    background: #666;
 }
 
-.toolbar-with-swipe-handler > .toolbar-inner
-.toolbar-with-swipe-handler > .segmented {
+.toolbar-with-swipe-handler > .toolbar-inner {
     > div.left,
     > div.right,
-    > form.searchbar {
+    > form.searchbar,
+    > .segmented {
         margin-top: var(--f7-typography-margin) !important;
     }
 }

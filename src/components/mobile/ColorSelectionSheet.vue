@@ -27,7 +27,7 @@
                     </div>
                 </div>
             </f7-block>
-            <f7-block class="no-margin no-padding" v-if="currentTab === 'custom'">
+            <f7-block class="margin-vertical-half no-padding" v-if="currentTab === 'custom'">
                 <div class="custom-color-picker" ref="customColorPickerContainer"></div>
             </f7-block>
         </f7-page-content>

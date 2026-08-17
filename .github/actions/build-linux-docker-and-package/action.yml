@@ -10,6 +10,9 @@ inputs:
   build-date:
     required: false
     description: "The date to use for building the linux package. The value should be a string representing the date in the format of 'YYYYMMDD'."
+  build-node-options:
+    required: false
+    description: "The NODE_OPTIONS value to use for building the frontend."
   check-3rd-api:
     required: false
     description: "Whether to run integration tests that call third party APIs. If set to '1', the tests will be run. Otherwise, the tests will be skipped."
@@ -88,6 +91,7 @@ runs:
           *.args.BUILD_PIPELINE=1
           *.args.BUILD_UNIXTIME=${{ inputs.build-unix-time }}
           *.args.BUILD_DATE=${{ inputs.build-date }}
+          *.args.BUILD_NODE_OPTIONS=${{ inputs.build-node-options }}
           *.args.CHECK_3RD_API=${{ inputs.check-3rd-api }}
           *.args.SKIP_TESTS=${{ inputs.skip-tests }}
           *.output=type=image,push-by-digest=true,name-canonical=true,push=${{ inputs.docker-push }}

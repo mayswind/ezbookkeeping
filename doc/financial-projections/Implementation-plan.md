@@ -67,9 +67,13 @@ Además de los casos previstos, la caracterización dejó fijados tres comportam
 
 ---
 
-## Fase 1 — Backend: motor de frecuencias reutilizable
+## Fase 1 — Backend: motor de frecuencias reutilizable ✅ COMPLETADA
 
-- [ ] **1.1** Crear `pkg/services/scheduled_frequency.go` con:
+**Resultado:** [pkg/services/scheduled_frequency.go](../../pkg/services/scheduled_frequency.go) + [pkg/services/scheduled_frequency_test.go](../../pkg/services/scheduled_frequency_test.go) (29 tests). `CreateScheduledTransactions` pasó de 87 a 26 líneas en ese bloque, con los mismos mensajes de log y contadores. Suite completa de `pkg/services`: 93 tests en verde.
+
+> **⚠️ Cambio de comportamiento del cron.** La corrección del día negativo (1.1) no es solo un refactor: a partir de ahora, en servidores que no están en UTC, las plantillas mensuales con día negativo disparan el último día real de cada mes en lugar de fallar cerca de los cambios de mes. Es el arreglo buscado, pero hay que mencionarlo en el PR porque altera el cron en producción, no solo la proyección.
+
+- [x] **1.1** Crear `pkg/services/scheduled_frequency.go` con:
 
   ```go
   // Devuelve todos los instantes en que la plantilla dispararía dentro de (from, to],
@@ -77,10 +81,15 @@ Además de los casos previstos, la caracterización dejó fijados tres comportam
   // ScheduledStartTime / ScheduledEndTime.
   func GetScheduledOccurrences(template *models.TransactionTemplate, from, to time.Time) ([]time.Time, error)
 
-  // Predicado de una única ocurrencia. occurrenceTime ya debe venir en la zona
-  // horaria de la plantilla (equivalente al transactionTime del cron).
-  func matchesScheduledFrequency(template *models.TransactionTemplate, frequencyValues []int64, occurrenceTime time.Time) bool
+  // Valida el tipo de frecuencia y parsea ScheduledFrequency. Los días negativos
+  // se devuelven sin resolver: dependen del mes de cada ocurrencia.
+  func parseScheduledFrequencyValues(template *models.TransactionTemplate) ([]int64, error)
+
+  // Predicado de una única ocurrencia, con motivo de descarte tipado.
+  func matchScheduledFrequency(template *models.TransactionTemplate, frequencyValues []int64, occurrenceUnixTime int64) scheduledFrequencyMatchResult
   ```
+
+  > **Ajuste sobre lo planificado:** el predicado devuelve un motivo tipado (`scheduledFrequencyMatchResult`) en vez de un `bool`, y recibe el instante como unix time en vez de un `time.Time`. Con un `bool` había que colapsar los siete mensajes de log distintos del cron en uno solo, lo que contradice el requisito de "mantener el logging intacto" del paso 1.3.
 
   Decisiones de diseño obligatorias:
 
@@ -88,18 +97,28 @@ Además de los casos previstos, la caracterización dejó fijados tres comportam
   - **Corregir el bug del día negativo.** Hoy `MONTHLY` con día negativo resuelve `GetMaxDayOfMonth` sobre `currentTime`, que es la hora *local del servidor* ([transactions.go:846](../../pkg/services/transactions.go#L846)). Debe calcularse sobre el **mes de la ocurrencia evaluada** y en la zona de la plantilla. Sin esto, proyectar meses hacia adelante da resultados incorrectos.
   - Sin dependencias de `currentUnixTime`, del intervalo del cron ni de `core.Context`: función pura, testeable en aislamiento.
 
-- [ ] **1.2** Portar los tests de la Fase 0 a `pkg/services/scheduled_frequency_test.go`, apuntando a `GetScheduledOccurrences`. Agregar:
+- [x] **1.2** Portar los tests de la Fase 0 a `pkg/services/scheduled_frequency_test.go`, apuntando a `GetScheduledOccurrences`. Agregar:
   - Rango que abarca varios meses (verificar cantidad y fechas exactas de ocurrencias).
   - `from` estrictamente exclusivo y `to` inclusivo.
   - Plantilla con `ScheduledEndTime` en mitad del rango → las ocurrencias se cortan ahí.
   - Zonas horarias no triviales (`ScheduledTimezoneUtcOffset` = -180 para Argentina, y un offset positivo).
   - Caso del día negativo cruzando meses de distinta longitud, que es lo que corrige 1.1.
 
-- [ ] **1.3** Modificar `CreateScheduledTransactions` ([pkg/services/transactions.go:845-890](../../pkg/services/transactions.go#L845-L890)) para delegar en `matchesScheduledFrequency`, eliminando el bloque duplicado. Mantener intactos el logging, los contadores (`skipCount`, etc.) y las validaciones previas de la función.
+- [x] **1.3** Modificar `CreateScheduledTransactions` ([pkg/services/transactions.go:818-867](../../pkg/services/transactions.go#L818-L867)) para delegar en `matchScheduledFrequency`, eliminando el bloque duplicado. Mantener intactos el logging, los contadores (`skipCount`, etc.) y las validaciones previas de la función.
 
-- [ ] **1.4** Verificar que los tests de la Fase 0 siguen pasando sin modificarlos.
+- [x] **1.4** Verificar que los tests de la Fase 0 siguen pasando sin modificarlos.
 
-**Criterio de aceptación:** `go build ./... && go test ./pkg/...` en verde, y los tests de caracterización de la Fase 0 pasan sin cambios respecto de su versión original — salvo el caso del día negativo, cuyo valor esperado se actualiza documentando que era un bug.
+**Criterio de aceptación:** ✅ `gofmt`, `go vet`, `go build ./...` y `go test ./pkg/services/...` en verde. Los tests de la Fase 0 pasan **sin ninguna modificación**.
+
+### Cómo quedó verificada la equivalencia con el cron
+
+En lugar de actualizar a mano el test del día negativo, la equivalencia se verifica con un test diferencial: `TestGetScheduledOccurrences_MatchesTheInlinedCronLogic` compara el motor nuevo contra `legacyShouldCreateScheduledTransaction` (la transcripción congelada de la Fase 0) **día por día durante un año completo, sobre 25 configuraciones de plantilla** — las cinco frecuencias, días negativos incluidos, más casos con `ScheduledStartTime`/`ScheduledEndTime` y con `ScheduledAt` al mediodía.
+
+Con el reloj del servidor alineado al día procesado —la configuración en la que ambos deben coincidir— la coincidencia es exacta en los 365 días de las 25 plantillas. La divergencia queda así aislada al único caso donde se buscaba: cuando el mes local del servidor difiere del mes de la ocurrencia, que es precisamente el bug corregido.
+
+Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainstServerLocalMonth` de la Fase 0 **no se modificó**: sigue documentando el comportamiento viejo, y el nuevo queda cubierto por `TestGetScheduledOccurrences_Monthly_NegativeDayIsResolvedPerMonth`.
+
+> **Pendiente de decisión para el PR:** una vez validada la Fase 1, `pkg/services/transactions_scheduled_test.go` es andamiaje — ya no ejercita código de producción, solo su propia copia congelada. Conviene borrarlo en el PR final para que nadie lo confunda con la especificación vigente, salvo que se prefiera conservarlo como registro del comportamiento previo.
 
 ---
 

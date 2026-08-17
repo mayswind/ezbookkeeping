@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/big"
@@ -823,81 +824,45 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			continue
 		}
 
-		if (template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY &&
-			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY &&
-			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY &&
-			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY &&
-			template.ScheduledFrequencyType != models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS) ||
-			template.ScheduledFrequency == "" {
-			skipCount++
-			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency", template.TemplateId)
-			continue
-		}
-
-		frequencyValues, err := utils.StringArrayToInt64Array(strings.Split(template.ScheduledFrequency, ","))
+		frequencyValues, err := parseScheduledFrequencyValues(template)
 
 		if err != nil {
 			skipCount++
-			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency, because %s", template.TemplateId, err.Error())
+
+			if errors.Is(err, errInvalidScheduledFrequencyType) {
+				log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency", template.TemplateId)
+			} else {
+				log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency, because %s", template.TemplateId, err.Error())
+			}
+
 			continue
 		}
 
-		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY {
-			maxDayInMonth := utils.GetMaxDayOfMonth(currentTime.Year(), currentTime.Month())
-
-			for i := 0; i < len(frequencyValues); i++ {
-				if frequencyValues[i] < 0 {
-					frequencyValues[i] = int64(maxDayInMonth) + frequencyValues[i] + 1
-				}
-			}
-		}
-
-		frequencyValueSet := utils.ToSet(frequencyValues)
-		templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
+		templateTimeZone := getScheduledTemplateTimeZone(template)
 		transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60
 		transactionTime := time.Unix(transactionUnixTime, 0).In(templateTimeZone)
+		matchResult := matchScheduledFrequency(template, frequencyValues, transactionUnixTime)
 
-		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY && !frequencyValueSet[int64(transactionTime.Weekday())] {
+		if matchResult != scheduledFrequencyMatched {
 			skipCount++
-			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %s", template.TemplateId, startTimeInUTC.Weekday())
-			continue
-		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY && !frequencyValueSet[int64(transactionTime.Day())] {
-			skipCount++
-			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d of month", template.TemplateId, startTimeInUTC.Day())
-			continue
-		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY && !frequencyValueSet[int64(transactionTime.Month())*100+int64(transactionTime.Day())] {
-			skipCount++
-			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d-%d of year", template.TemplateId, startTimeInUTC.Month(), startTimeInUTC.Day())
-			continue
-		} else if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS {
-			if template.ScheduledStartTime == nil || len(frequencyValues) != 1 || frequencyValues[0] <= 0 {
-				skipCount++
+
+			switch matchResult {
+			case scheduledFrequencyUnmatchedWeekday:
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %s", template.TemplateId, startTimeInUTC.Weekday())
+			case scheduledFrequencyUnmatchedDayOfMonth:
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d of month", template.TemplateId, startTimeInUTC.Day())
+			case scheduledFrequencyUnmatchedDayOfYear:
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, today is %d-%d of year", template.TemplateId, startTimeInUTC.Month(), startTimeInUTC.Day())
+			case scheduledFrequencyInvalidEveryNDays:
 				log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid scheduled transaction frequency for every N days", template.TemplateId)
-				continue
+			case scheduledFrequencyUnmatchedEveryNDays:
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, days diff is %d with interval %d", template.TemplateId, getScheduledEveryNDaysDiff(template, transactionUnixTime), frequencyValues[0])
+			case scheduledFrequencyBeforeStartTime:
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, now is earlier than the start time %d", template.TemplateId, *template.ScheduledStartTime)
+			case scheduledFrequencyAfterEndTime:
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, now is later than the end time %d", template.TemplateId, *template.ScheduledEndTime)
 			}
 
-			n := frequencyValues[0]
-			startDate := time.Unix(*template.ScheduledStartTime, 0).In(templateTimeZone)
-			startDateOnly := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, templateTimeZone)
-			transactionDateOnly := time.Date(transactionTime.Year(), transactionTime.Month(), transactionTime.Day(), 0, 0, 0, 0, templateTimeZone)
-			daysDiff := int(transactionDateOnly.Sub(startDateOnly).Hours() / 24)
-
-			if daysDiff < 0 || int64(daysDiff)%n != 0 {
-				skipCount++
-				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, days diff is %d with interval %d", template.TemplateId, daysDiff, n)
-				continue
-			}
-		}
-
-		if template.ScheduledStartTime != nil && *template.ScheduledStartTime > transactionUnixTime {
-			skipCount++
-			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, now is earlier than the start time %d", template.TemplateId, *template.ScheduledStartTime)
-			continue
-		}
-
-		if template.ScheduledEndTime != nil && *template.ScheduledEndTime < transactionUnixTime {
-			skipCount++
-			log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" does not need to create transaction, now is later than the end time %d", template.TemplateId, *template.ScheduledEndTime)
 			continue
 		}
 

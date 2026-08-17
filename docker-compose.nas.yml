@@ -13,6 +13,7 @@ services:
       EBK_DATABASE_USER: ${POSTGRES_USER:-ezbookkeeping}
       EBK_DATABASE_PASSWD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       EBK_DATABASE_SSL_MODE: disable
+      EBK_EXCHANGE_RATES_DATA_SOURCE: central_bank_of_argentina
     volumes:
       - ebk_data:/ezbookkeeping/data
       - ebk_log:/ezbookkeeping/log

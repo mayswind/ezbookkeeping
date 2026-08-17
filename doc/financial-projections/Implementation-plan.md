@@ -122,9 +122,9 @@ Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainst
 
 ---
 
-## Fase 2 — Backend: modelo de request
+## Fase 2 — Backend: modelo de request ✅ COMPLETADA
 
-- [ ] **2.1** En [pkg/models/transaction.go](../../pkg/models/transaction.go), agregar junto a `TransactionStatisticTrendsRequest` (línea 304):
+- [x] **2.1** En [pkg/models/transaction.go](../../pkg/models/transaction.go), agregar junto a `TransactionStatisticTrendsRequest` (línea 304):
 
   ```go
   // TransactionProjectionRequest represents all parameters of transaction projection request
@@ -134,17 +134,19 @@ Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainst
   }
   ```
 
-- [ ] **2.2** **No crear DTOs de respuesta nuevos.** Se reutilizan `TransactionStatisticTrendsResponseItem` (línea 475) y `TransactionStatisticResponseItem` (línea 836) tal cual. Verificar antes de seguir que:
-  - `TransactionStatisticResponseItem` incluye `AccountId` — es lo que permite la conversión de moneda en el frontend.
-  - `TransactionStatisticResponseItem` **no** tiene campo `Type` — ingreso vs. egreso se deriva del tipo de la categoría en el frontend, el backend no lo envía.
+- [x] **2.2** **No crear DTOs de respuesta nuevos.** Se reutilizan `TransactionStatisticTrendsResponseItem` (línea 475) y `TransactionStatisticResponseItem` (línea 836) tal cual. Verificar antes de seguir que:
+  - `TransactionStatisticResponseItem` incluye `AccountId` — es lo que permite la conversión de moneda en el frontend. ✅ verificado
+  - `TransactionStatisticResponseItem` **no** tiene campo `Type` — ingreso vs. egreso se deriva del tipo de la categoría en el frontend, el backend no lo envía. ✅ verificado
 
-**Criterio de aceptación:** `go build ./...` compila.
+**Criterio de aceptación:** ✅ `go build ./...` compila.
 
 ---
 
-## Fase 3 — Backend: servicio de proyección
+## Fase 3 — Backend: servicio de proyección ✅ COMPLETADA
 
-- [ ] **3.1** Crear `pkg/services/transaction_projections.go` con un **método de la struct existente `TransactionService`** (no una struct nueva: crear una obligaría a cablear inyección de dependencias sin ganancia):
+**Resultado:** [pkg/services/transaction_projections.go](../../pkg/services/transaction_projections.go) + [pkg/services/transaction_projections_test.go](../../pkg/services/transaction_projections_test.go). Suite de `pkg/services`: 118 tests en verde.
+
+- [x] **3.1** Crear `pkg/services/transaction_projections.go` con un **método de la struct existente `TransactionService`** (no una struct nueva: crear una obligaría a cablear inyección de dependencias sin ganancia):
 
   ```go
   func (s *TransactionService) GetProjectedCategoryAmountsByMonth(
@@ -157,32 +159,32 @@ Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainst
 
   `currentUnixTime` se recibe por parámetro en lugar de llamar a `time.Now()` internamente, para poder testear el corte.
 
-- [ ] **3.2** Implementar la **validación del rango**:
+- [x] **3.2** Implementar la **validación del rango**:
   - `uid > 0`, `start` y `end` presentes, `start <= end`.
   - Tope máximo de meses (sugerido: 60). El lado real carga en memoria todas las transacciones del período, así que un rango abierto es un vector de abuso.
   - Devolver `errs.ErrIncompleteOrIncorrectSubmission` / el error apropiado del paquete `errs` en cada caso.
 
-- [ ] **3.3** Implementar el **lado real**:
+- [x] **3.3** Implementar el **lado real**:
   - Llamar a `GetAccountsAndCategoriesMonthlyInflowAndOutflow` ([pkg/services/transactions.go:2551](../../pkg/services/transactions.go#L2551)) con el rango pedido, sin filtros de tag ni keyword.
   - **Filtrar transferencias**: descartar `TRANSACTION_DB_TYPE_TRANSFER_OUT` y `TRANSACTION_DB_TYPE_TRANSFER_IN`. Si no se hace, los meses pasados muestran transferencias y los futuros no.
   - **Filtrar por el corte en `now`**: descartar todo lo que tenga `transaction_time > currentUnixTime`. Esta función devuelve **todo** el rango de meses, incluidas transacciones manuales con fecha futura; sin este filtro los dos conjuntos se solapan y hay doble conteo.
 
   > Como `GetAccountsAndCategoriesMonthlyInflowAndOutflow` ya agrega y descarta el `transaction_time` individual, hará falta o bien un método hermano que acepte un `maxTransactionTime`, o bien reimplementar la consulta acotada. Preferir extender la función existente con un parámetro opcional de tiempo máximo antes que duplicar la query.
 
-- [ ] **3.4** Implementar el **lado simulado**:
+- [x] **3.4** Implementar el **lado simulado**:
   - Traer las plantillas del usuario con `TemplateType = TRANSACTION_TEMPLATE_TYPE_SCHEDULE`, `Deleted = false` y `ScheduledFrequencyType != DISABLED`.
   - **No filtrar por `Hidden`**: el cron tampoco lo hace, y proyección y realidad deben coincidir.
   - Excluir las plantillas con `Type = TRANSACTION_TYPE_TRANSFER`.
   - Para cada plantilla, `GetScheduledOccurrences(template, now, finDelRango)`.
   - Cada ocurrencia aporta `template.Amount` a la clave `(Year, Month, CategoryId, AccountId)`.
 
-- [ ] **3.5** Implementar el **bucketeo por mes de las ocurrencias simuladas usando la misma regla de zona horaria que el lado real**: `clientTimezone`, o la zona propia si `useTransactionTimezone = true`. Si el mes se calcula con la zona de la plantilla y los reales con la del cliente, la misma ocurrencia puede caer en meses distintos.
+- [x] **3.5** Implementar el **bucketeo por mes de las ocurrencias simuladas usando la misma regla de zona horaria que el lado real**: `clientTimezone`, o la zona propia si `useTransactionTimezone = true`. Si el mes se calcula con la zona de la plantilla y los reales con la del cliente, la misma ocurrencia puede caer en meses distintos.
 
-- [ ] **3.6** Implementar el **merge**: sumar ambos conjuntos por `(Year, Month, CategoryId, AccountId)`, devolviendo `map[yearMonth][]*models.TransactionTotalAmount`, el mismo tipo que devuelve el servicio de tendencias.
+- [x] **3.6** Implementar el **merge**: sumar ambos conjuntos por `(Year, Month, CategoryId, AccountId)`, devolviendo `map[yearMonth][]*models.TransactionTotalAmount`, el mismo tipo que devuelve el servicio de tendencias.
 
   > **La clave debe conservar `AccountId`.** El `Amount` de una plantilla está expresado en la moneda de su cuenta; agregar sin `AccountId` mezcla monedas y hace imposible la conversión en el frontend.
 
-- [ ] **3.7** Tests en `pkg/services/transaction_projections_test.go`:
+- [x] **3.7** Tests en `pkg/services/transaction_projections_test.go`:
   - Mes completamente pasado → solo importes reales.
   - Mes completamente futuro → solo importes simulados.
   - Mes en curso → mezcla de ambos, sin doble conteo, con `currentUnixTime` fijo a mitad de mes.
@@ -191,7 +193,23 @@ Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainst
   - Dos plantillas de la misma categoría pero **cuentas con monedas distintas** → se devuelven como dos ítems separados, no sumados.
   - Rango inválido y rango que excede el tope → error.
 
-**Criterio de aceptación:** `go test ./pkg/services/...` en verde, incluidos los casos de multi-moneda y de corte en `now`.
+**Criterio de aceptación:** ✅ `gofmt`, `go vet ./...`, `go build ./...` y `go test ./pkg/services/...` en verde, incluidos los casos de multi-moneda y de corte en `now`.
+
+### Decisiones tomadas durante la Fase 3
+
+1. **El corte del lado real se implementó extendiendo la función existente** (opción preferida en 3.3): `GetAccountsAndCategoriesMonthlyInflowAndOutflow` recibe un parámetro nuevo `maxTransactionUnixTime` que estrecha el rango SQL. El único llamador previo ([pkg/api/transactions.go:634](../../pkg/api/transactions.go#L634), tendencias) pasa `0` y no cambia de comportamiento.
+
+   El corte es exacto: `transaction_time` se codifica como `unix*1000 + secuencia`, así que `GetMaxTransactionTimeFromUnixTime(now)` = `now*1000+999` incluye todo hasta el segundo `now`, y el lado simulado arranca **exclusivo** en `now`. No hay ni hueco ni solape.
+
+2. **La simulación se partió en dos** para poder testearla sin base de datos: `getScheduledCategoryAmountsByMonth` (consulta las plantillas) y `projectScheduledCategoryAmountsByMonth` (función pura que las recibe). Los tests atacan la segunda.
+
+3. **`currentUnixTime <= 0` devuelve error** en vez de tomar un valor por defecto: un cero desactivaría el corte y haría que ambas mitades se solaparan en silencio.
+
+4. **La ventana simulada se ensancha un día en cada extremo** antes de filtrar por año-mes. Las ocurrencias se agrupan en meses según la zona del cliente o de la plantilla, que puede estar hasta 14 horas de UTC, así que una ocurrencia apenas fuera de los límites UTC del período todavía puede pertenecer a un mes pedido.
+
+5. **La clave de agrupación es una struct tipada** (`monthlyTotalAmountKey{yearMonth, categoryId, accountId}`) en lugar de la clave string con `fmt.Sprintf` que usa la función de tendencias. Evita tener que volver a parsear el año-mes desde el string al reagrupar.
+
+> **Limitación de cobertura:** `GetProjectedCategoryAmountsByMonth` en sí no tiene test — necesita las bases de datos de usuario y el paquete no tiene harness. Lo que los tests cubren son sus dos mitades (simulación y merge) y la validación del rango. El corte del lado real queda verificado manualmente en el paso 4.3.
 
 ---
 

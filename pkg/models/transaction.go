@@ -310,6 +310,12 @@ type TransactionStatisticTrendsRequest struct {
 	UseTransactionTimezone bool           `form:"use_transaction_timezone"`
 }
 
+// TransactionProjectionRequest represents all parameters of transaction projection request
+type TransactionProjectionRequest struct {
+	YearMonthRangeRequest
+	UseTransactionTimezone bool `form:"use_transaction_timezone"`
+}
+
 // TransactionStatisticAssetTrendsRequest represents all parameters of transaction statistic asset trends request
 type TransactionStatisticAssetTrendsRequest struct {
 	StartTime int64 `form:"start_time"`

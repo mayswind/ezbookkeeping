@@ -2513,7 +2513,12 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalInflowAndOutflow(c cor
 }
 
 // GetAccountsAndCategoriesMonthlyInflowAndOutflow returns the every accounts monthly inflows and outflows amount by specific date range
-func (s *TransactionService) GetAccountsAndCategoriesMonthlyInflowAndOutflow(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, tagFilters []*models.TransactionTagFilter, noTags bool, keyword string, matchMode core.MatchMode, clientTimezone *time.Location, useTransactionTimezone bool) (map[int32][]*models.TransactionTotalAmount, error) {
+//
+// When maxTransactionUnixTime is greater than zero, transactions after that instant are excluded even
+// if they fall inside the requested months. Transactions can be dated in the future, so a caller that
+// needs everything that has actually happened up to a given moment -- the projection service, which
+// simulates everything after it -- must set this cutoff to avoid counting the same month twice.
+func (s *TransactionService) GetAccountsAndCategoriesMonthlyInflowAndOutflow(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, tagFilters []*models.TransactionTagFilter, noTags bool, keyword string, matchMode core.MatchMode, clientTimezone *time.Location, useTransactionTimezone bool, maxTransactionUnixTime int64) (map[int32][]*models.TransactionTotalAmount, error) {
 	if uid <= 0 {
 		return nil, errs.ErrUserIdInvalid
 	}
@@ -2534,6 +2539,14 @@ func (s *TransactionService) GetAccountsAndCategoriesMonthlyInflowAndOutflow(c c
 
 		if err != nil {
 			return nil, errs.ErrSystemError
+		}
+	}
+
+	if maxTransactionUnixTime > 0 {
+		cutoffTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(maxTransactionUnixTime)
+
+		if endTransactionTime <= 0 || cutoffTransactionTime < endTransactionTime {
+			endTransactionTime = cutoffTransactionTime
 		}
 	}
 

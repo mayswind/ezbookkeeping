@@ -363,17 +363,29 @@ Casos de error, todos correctos: rango invertido → 400, 61 meses → 400 `quer
 
 ---
 
-## Fase 7 — Frontend: página, ruta y navegación
+## Fase 7 — Frontend: página, ruta y navegación ✅ COMPLETADA
 
-- [ ] **7.1** Crear `src/views/desktop/projections/TransactionPage.vue`: selector de período reutilizando [MonthRangeSelectionDialog.vue](../../src/components/desktop/MonthRangeSelectionDialog.vue) + `ProjectionTable`.
+**Resultado:** [src/views/desktop/projections/TransactionPage.vue](../../src/views/desktop/projections/TransactionPage.vue), ruta en [src/router/desktop.ts](../../src/router/desktop.ts), ítem de navegación en [src/views/desktop/MainLayout.vue](../../src/views/desktop/MainLayout.vue) y registro global del componente en [src/desktop-main.ts](../../src/desktop-main.ts). `vue-tsc`, `eslint` y `npm run build` en verde.
 
-- [ ] **7.2** Definir el horizonte por defecto al entrar por primera vez. Sugerido: **mes en curso + 11 meses hacia adelante**, sin meses pasados, para que la tabla se lea como una proyección y no como un histórico.
+- [x] **7.1** Crear `src/views/desktop/projections/TransactionPage.vue`: selector de período reutilizando [MonthRangeSelectionDialog.vue](../../src/components/desktop/MonthRangeSelectionDialog.vue) + `ProjectionTable`.
 
-- [ ] **7.3** En [src/router/desktop.ts](../../src/router/desktop.ts): agregar el import de la página (junto al de `StatisticsTransactionPage`, línea 19) y la ruta `/projections/transaction` con el mismo guard de login que el resto.
+- [x] **7.2** Definir el horizonte por defecto al entrar por primera vez. Sugerido: **mes en curso + 11 meses hacia adelante**, sin meses pasados, para que la tabla se lea como una proyección y no como un histórico.
 
-- [ ] **7.4** En [src/views/desktop/MainLayout.vue](../../src/views/desktop/MainLayout.vue): agregar un `<li class="nav-link">` en la sección "Transaction Data", después de "Insights Explorer" (líneas 43-48), con `router-link to="/projections/transaction"` y un ícono `mdi` acorde.
+- [x] **7.3** En [src/router/desktop.ts](../../src/router/desktop.ts): agregar el import de la página (junto al de `StatisticsTransactionPage`, línea 19) y la ruta `/projections/transaction` con el mismo guard de login que el resto.
 
-**Criterio de aceptación:** la pestaña aparece en la navegación, navega correctamente y carga datos reales del backend.
+- [x] **7.4** En [src/views/desktop/MainLayout.vue](../../src/views/desktop/MainLayout.vue): agregar un `<li class="nav-link">` en la sección "Transaction Data", después de "Insights Explorer" (líneas 43-48), con `router-link to="/projections/transaction"` y un ícono `mdi` acorde.
+
+**Criterio de aceptación:** ⚠️ el build compila y la ruta está registrada, pero "navega correctamente y carga datos reales" se verifica al levantar la app en la Fase 9. Hasta la Fase 8 la pantalla muestra las claves de i18n en crudo.
+
+### Detalles de la Fase 7
+
+1. **Paso extra no previsto en el plan:** los componentes de escritorio se registran globalmente en [src/desktop-main.ts](../../src/desktop-main.ts) (`app.component('ProjectionTable', ...)`), no se importan en cada página. Sin ese registro `<projection-table>` no resuelve.
+
+2. **Horizonte por defecto (7.2):** mes en curso + 11, es decir 12 columnas arrancando en el mes actual, sin meses pasados. El período elegido vive en el store, así que se conserva al navegar dentro de la sesión.
+
+3. **El selector de período reutiliza `MonthRangeSelectionDialog`**, el mismo que usa Estadísticas para su rango de meses personalizado.
+
+4. **Ícono de navegación:** `mdiChartTimelineVariant`, para distinguirlo del `mdiChartPieOutline` de Estadísticas y del `mdiCompassOutline` de Insights.
 
 ---
 

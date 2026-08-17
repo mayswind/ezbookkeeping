@@ -46,6 +46,12 @@
                         <span class="nav-item-title">{{ tt('Insights Explorer') }}</span>
                     </router-link>
                 </li>
+                <li class="nav-link">
+                    <router-link to="/projections/transaction">
+                        <v-icon class="nav-item-icon" :icon="mdiChartTimelineVariant"/>
+                        <span class="nav-item-title">{{ tt('Projections') }}</span>
+                    </router-link>
+                </li>
                 <li class="nav-section-title">
                     <div class="title-wrapper">
                         <span class="title-text">{{ tt('Basis Data') }}</span>
@@ -241,6 +247,7 @@ import {
     mdiShapePlusOutline,
     mdiChartPieOutline,
     mdiCompassOutline,
+    mdiChartTimelineVariant,
     mdiSwapHorizontal,
     mdiCogOutline,
     mdiCellphone,

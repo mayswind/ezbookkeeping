@@ -269,9 +269,11 @@ Casos de error, todos correctos: rango invertido → 400, 61 meses → 400 `quer
 
 ---
 
-## Fase 5 — Frontend: capa de datos
+## Fase 5 — Frontend: capa de datos ✅ COMPLETADA
 
-- [ ] **5.1** En [src/models/transaction.ts](../../src/models/transaction.ts), agregar junto a `TransactionStatisticTrendsRequest` (línea 693):
+**Resultado:** [src/core/projection.ts](../../src/core/projection.ts), [src/lib/projection.ts](../../src/lib/projection.ts), [src/stores/projection.ts](../../src/stores/projection.ts) y [src/lib/__tests__/projection.test.ts](../../src/lib/__tests__/projection.test.ts) (18 tests). `vue-tsc`, `eslint` y la suite completa de vitest en verde.
+
+- [x] **5.1** En [src/models/transaction.ts](../../src/models/transaction.ts), agregar junto a `TransactionStatisticTrendsRequest` (línea 693):
 
   ```ts
   export interface TransactionProjectionRequest extends YearMonthRangeRequest {
@@ -281,15 +283,15 @@ Casos de error, todos correctos: rango invertido → 400, 61 meses → 400 `quer
 
   Los tipos de respuesta se reutilizan (`TransactionStatisticTrendsResponseItem`, `TransactionStatisticResponseItem`) — no crear tipos paralelos.
 
-- [ ] **5.2** En [src/lib/services.ts](../../src/lib/services.ts), agregar `getTransactionProjections(req)` con el mismo esqueleto que `getTransactionStatisticsTrends` (líneas 573-597): arma `start_year_month` / `end_year_month` y llama a `GET v1/transactions/statistics/projections.json`.
+- [x] **5.2** En [src/lib/services.ts](../../src/lib/services.ts), agregar `getTransactionProjections(req)` con el mismo esqueleto que `getTransactionStatisticsTrends` (líneas 573-597): arma `start_year_month` / `end_year_month` y llama a `GET v1/transactions/statistics/projections.json`.
 
-- [ ] **5.3** Crear `src/stores/projection.ts` siguiendo el patrón de [src/stores/statistics.ts](../../src/stores/statistics.ts):
+- [x] **5.3** Crear `src/stores/projection.ts` siguiendo el patrón de [src/stores/statistics.ts](../../src/stores/statistics.ts):
   - **Estado**: `startYearMonth`, `endYearMonth`, datos crudos, `projectionDataLoaded`.
   - **Acción** `loadProjections({ force })`, análoga a `loadTrendAnalysis` ([statistics.ts:1899](../../src/stores/statistics.ts#L1899)).
   - **Enriquecimiento**: resolver `category` / `primaryCategory` / `account` y convertir a la moneda por defecto vía `exchangeRatesStore.getExchangedAmount(...)`, replicando `assembleAccountAndCategoryInfo` ([statistics.ts:1030-1088](../../src/stores/statistics.ts#L1030)). Los ítems sin cuenta resuelta quedan con `amountInDefaultCurrency = null` y deben poder señalarse en la UI.
   - **Clasificación** ingreso/egreso por `item.category.type === CategoryType.Income | Expense` ([src/core/category.ts:4](../../src/core/category.ts#L4)) — el backend no envía ese dato.
 
-- [ ] **5.4** Computeds del store que arman las filas de la tabla:
+- [x] **5.4** Computeds del store que arman las filas de la tabla:
   - Árbol `sección → categoría → subcategoría` con un importe por mes.
   - `Subtotal <categoría>` por mes.
   - `Total Ingresos` / `Total Egresos` por mes.
@@ -297,11 +299,25 @@ Casos de error, todos correctos: rango invertido → 400, 61 meses → 400 `quer
   - `Acumulado` = suma corrida del Neto mes a mes.
   - Columna **Total**: suma horizontal para todas las filas, **excepto** `Acumulado`, cuya celda Total es el valor del **último mes** del período (ya es un acumulado, no se vuelve a sumar).
 
-- [ ] **5.5** **Invalidación de caché**: el resultado depende de `now` **y** del conjunto de plantillas. Invalidar al crear/editar/borrar una plantilla programada y al cambiar de día. Cachear solo por período seleccionado es incorrecto.
+- [x] **5.5** **Invalidación de caché**: el resultado depende de `now` **y** del conjunto de plantillas. Invalidar al crear/editar/borrar una plantilla programada y al cambiar de día. Cachear solo por período seleccionado es incorrecto.
 
-- [ ] **5.6** Tests con vitest de los computeds de 5.4: subtotales, neto, acumulado, y el caso de la celda Total de la fila Acumulado.
+- [x] **5.6** Tests con vitest de los computeds de 5.4: subtotales, neto, acumulado, y el caso de la celda Total de la fila Acumulado.
 
-**Criterio de aceptación:** `npm run lint && npm run test` en verde.
+**Criterio de aceptación:** ✅ `npm run lint` y `npm run test` en verde (38.573 tests, 8 archivos).
+
+### Decisiones tomadas durante la Fase 5
+
+1. **La lógica de la tabla no vive en el store, vive en [src/lib/projection.ts](../../src/lib/projection.ts).** El store solo cablea las otras stores contra esa función pura. Sin esa separación, testear los computeds del paso 5.4 exigía montar pinia y mockear cinco stores; así los 18 tests no necesitan nada.
+
+   La función recibe por parámetro `categoriesMap` y un callback `convertAmount`, en vez de importar las stores. Los tipos de fila viven en [src/core/projection.ts](../../src/core/projection.ts), siguiendo la separación `core` / `lib` del repo.
+
+2. **Los importes no convertibles se descartan, no se suman en crudo.** Sumar un importe sin tipo de cambio mezclaría monedas en silencio. La tabla expone `hasUnconvertedAmounts` para que la UI pueda avisar que los totales están incompletos (lo consume el paso 6.4).
+
+3. **La caché se valida por período + día + estado de plantillas.** `isProjectionDataUpToDate()` exige las tres cosas; `loadProjections({ force })` recarga igual si se lo pide. La invalidación por plantillas se enganchó en los tres helpers de mutación de lista de [src/stores/transactionTemplate.ts](../../src/stores/transactionTemplate.ts) (alta, edición y baja).
+
+   **Ocultar una plantilla no invalida**, a propósito: el cron crea transacciones para las plantillas ocultas igual, así que la proyección no cambia. Reordenarlas tampoco.
+
+4. **La clasificación ingreso/egreso sale del tipo de la categoría**, no del backend, que no manda ese dato. Las categorías de transferencia se descartan de forma defensiva aunque el backend ya las excluya.
 
 ---
 

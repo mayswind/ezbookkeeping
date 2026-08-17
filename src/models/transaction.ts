@@ -697,6 +697,10 @@ export interface TransactionStatisticTrendsRequest extends YearMonthRangeRequest
     readonly useTransactionTimezone: boolean;
 }
 
+export interface TransactionProjectionRequest extends YearMonthRangeRequest {
+    readonly useTransactionTimezone: boolean;
+}
+
 export interface TransactionStatisticAssetTrendsRequest {
     readonly startTime: number;
     readonly endTime: number;

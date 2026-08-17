@@ -86,6 +86,7 @@ import type {
     TransactionStatisticRequest,
     TransactionStatisticResponse,
     TransactionStatisticTrendsRequest,
+    TransactionProjectionRequest,
     TransactionStatisticTrendsResponseItem,
     TransactionStatisticAssetTrendsRequest,
     TransactionStatisticAssetTrendsResponseItem,
@@ -594,6 +595,19 @@ export default {
         }
 
         return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/trends.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
+    },
+    getTransactionProjections: (req: TransactionProjectionRequest): ApiResponsePromise<TransactionStatisticTrendsResponseItem[]> => {
+        const queryParams: string[] = [];
+
+        if (req.startYearMonth) {
+            queryParams.push(`start_year_month=${req.startYearMonth}`);
+        }
+
+        if (req.endYearMonth) {
+            queryParams.push(`end_year_month=${req.endYearMonth}`);
+        }
+
+        return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/projections.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
     getTransactionStatisticsAssetTrends: (req: TransactionStatisticAssetTrendsRequest): ApiResponsePromise<TransactionStatisticAssetTrendsResponseItem[]> => {
         const queryParams: string[] = [];

@@ -1,8 +1,11 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
+import { useProjectionsStore } from './projection.ts';
+
 import { type BeforeResolveFunction, itemAndIndex, entries } from '@/core/base.ts';
 
+import { TemplateType } from '@/core/template.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
 import {
@@ -17,6 +20,8 @@ import logger from '@/lib/logger.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 
 export const useTransactionTemplatesStore = defineStore('transactionTemplates', () =>{
+    const projectionsStore = useProjectionsStore();
+
     const allTransactionTemplates = ref<Record<number, TransactionTemplate[]>>({});
     const allTransactionTemplatesMap = ref<Record<number, Record<string, TransactionTemplate>>>({});
     const transactionTemplateListStatesInvalid = ref<Record<number, boolean>>({});
@@ -79,6 +84,8 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         if (isObject(templateMap)) {
             templateMap[template.id] = template;
         }
+
+        invalidateProjectionsIfScheduled(templateType);
     }
 
     function updateTemplateInTransactionTemplateList(templateType: number, currentTemplate: TransactionTemplate): void {
@@ -97,6 +104,8 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         if (isObject(templateMap)) {
             templateMap[currentTemplate.id] = currentTemplate;
         }
+
+        invalidateProjectionsIfScheduled(templateType);
     }
 
     function updateTemplateDisplayOrderInTransactionTemplateList(templateType: number, { from, to }: { from: number, to: number }): void {
@@ -134,6 +143,17 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
             if (templateMap[currentTemplate.id]) {
                 delete templateMap[currentTemplate.id];
             }
+        }
+
+        invalidateProjectionsIfScheduled(templateType);
+    }
+
+    // A projection is built from the scheduled templates, so it stops being valid as soon as one of
+    // them is created, edited or deleted. Hiding one does not count: the cron creates transactions
+    // for hidden templates too, so the projection includes them either way.
+    function invalidateProjectionsIfScheduled(templateType: number): void {
+        if (templateType === TemplateType.Schedule.type && !projectionsStore.projectionStateInvalid) {
+            projectionsStore.updateProjectionInvalidState(true);
         }
     }
 

@@ -213,9 +213,11 @@ Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainst
 
 ---
 
-## Fase 4 — Backend: API y ruta
+## Fase 4 — Backend: API y ruta ✅ COMPLETADA
 
-- [ ] **4.1** Crear `pkg/api/transaction_projections.go` con `TransactionProjectionsHandler` como **método de la struct existente `TransactionsApi`**, siguiendo el esqueleto de `TransactionStatisticsTrendsHandler` ([pkg/api/transactions.go:597-670](../../pkg/api/transactions.go#L597-L670)):
+**Resultado:** [pkg/api/transaction_projections.go](../../pkg/api/transaction_projections.go) + ruta registrada en [cmd/webserver.go:412](../../cmd/webserver.go#L412).
+
+- [x] **4.1** Crear `pkg/api/transaction_projections.go` con `TransactionProjectionsHandler` como **método de la struct existente `TransactionsApi`**, siguiendo el esqueleto de `TransactionStatisticsTrendsHandler` ([pkg/api/transactions.go:597-670](../../pkg/api/transactions.go#L597-L670)):
   1. `c.ShouldBindQuery(&projectionReq)`.
   2. `c.GetClientTimezone()` → error `errs.ErrClientTimezoneOffsetInvalid` si falla.
   3. `projectionReq.GetNumericYearMonthRange()`.
@@ -223,7 +225,7 @@ Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainst
   5. Llamar al servicio pasando `time.Now().Unix()` como `currentUnixTime`.
   6. Mapear el `map[int32][]*models.TransactionTotalAmount` a `[]*models.TransactionStatisticTrendsResponseItem`, incluyendo **siempre** `AccountId`, y ordenar con `sort.Sort` sobre `TransactionStatisticTrendsResponseItemSlice`.
 
-- [ ] **4.2** Registrar la ruta en [cmd/webserver.go](../../cmd/webserver.go), inmediatamente después de la línea 411 (`asset_trends.json`):
+- [x] **4.2** Registrar la ruta en [cmd/webserver.go](../../cmd/webserver.go), inmediatamente después de la línea 411 (`asset_trends.json`):
 
   ```go
   apiV1Route.GET("/transactions/statistics/projections.json", bindApi(api.Transactions.TransactionProjectionsHandler, config))
@@ -231,13 +233,39 @@ Por eso el test `TestLegacyScheduledFrequency_Monthly_NegativeDayResolvedAgainst
 
   Se ubica bajo `/transactions/statistics/` por consistencia con `trends.json` y `asset_trends.json`, no en la raíz de `/transactions/`.
 
-- [ ] **4.3** Prueba manual con `curl` sobre un usuario con plantillas programadas activas:
+- [x] **4.3** Prueba manual con `curl` sobre un usuario con plantillas programadas activas:
   - Rango solo pasado, solo futuro, y a caballo del mes en curso.
   - Verificar que cada ítem trae `accountId`.
   - Verificar que no aparecen ítems de categorías de transferencia.
   - Rango invertido y rango de 100 meses → error 400.
 
-**Criterio de aceptación:** el endpoint responde con la misma forma que `trends.json` y los tres escenarios de rango dan valores coherentes con los datos de prueba.
+**Criterio de aceptación:** ✅ el endpoint responde con la misma forma que `trends.json` y los tres escenarios de rango dan valores coherentes con los datos de prueba.
+
+### Cómo se verificó (paso 4.3)
+
+Se levantó una **instancia descartable con sqlite** en el puerto 8099, aislada de la instancia real del usuario (contenedor con postgres), y se cargó un escenario por API: dos cuentas (ARS y USD), categorías padre/hija de ingreso, egreso y transferencia, cinco transacciones reales, una transferencia real y cuatro plantillas programadas.
+
+Resultado con `now` = 2026-08-17, período 2026-06 a 2026-11:
+
+| Mes | Salario (ING, ARS) | Alquiler (EGR, ARS) | Alquiler (EGR, USD) |
+|---|---|---|---|
+| 2026-06 | — | 400.000 real | — |
+| 2026-07 | — | 400.000 real | — |
+| 2026-08 | 1.500.000 proyectado | **407.000 real** | — |
+| 2026-09 | 1.500.000 | 400.000 | 50.000 |
+| 2026-10 | 1.500.000 | 400.000 | 50.000 |
+| 2026-11 | 1.500.000 | 400.000 | 50.000 |
+
+Lo que confirma cada celda:
+
+- **Mes en curso sin doble conteo.** Agosto da 407.000 = 400.000 del alquiler real del día 5 + 7.000 de un gasto suelto del día 10. La plantilla de alquiler del día 5 **no** se proyectó porque su ocurrencia ya pasó. El salario sí, porque cae el 31.
+- **La transacción futura cargada a mano queda fuera.** Se cargó a propósito un gasto de 999.999 con fecha 2026-09-20, y septiembre da 400.000, no 1.399.999. Contraste directo: `trends.json` sobre el mismo período **sí** devuelve 999.999 en septiembre, que es exactamente la diferencia que introduce el corte.
+- **Multi-moneda separada.** Misma categoría Alquiler, dos ítems distintos: 400.000 en la cuenta ARS y 50.000 en la USD, cada uno con su `accountId`.
+- **Transferencias excluidas de ambos lados.** Ni la transferencia real de julio ni la plantilla de ahorro mensual aparecen en ningún mes. `trends.json` sí las muestra en julio.
+- **Día negativo por mes.** El salario cae el 31/8, el 30/9, el 31/10 y el 30/11 — la corrección de la Fase 1 funcionando de punta a punta.
+- **`trends.json` no cambió.** Devuelve todo lo que devolvía antes, incluidas transferencias y la transacción futura, confirmando que el parámetro `maxTransactionUnixTime` nuevo con valor `0` es inocuo.
+
+Casos de error, todos correctos: rango invertido → 400, 61 meses → 400 `query items too much`, 60 meses → 200, sin rango → 400, mes 13 → 400.
 
 ---
 

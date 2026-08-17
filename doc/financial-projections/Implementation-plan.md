@@ -321,11 +321,13 @@ Casos de error, todos correctos: rango invertido → 400, 61 meses → 400 `quer
 
 ---
 
-## Fase 6 — Frontend: componente de tabla
+## Fase 6 — Frontend: componente de tabla ✅ COMPLETADA
 
-- [ ] **6.1** Crear `src/components/desktop/ProjectionTable.vue`: una columna por mes del período + columna **Total**.
+**Resultado:** [src/components/desktop/ProjectionTable.vue](../../src/components/desktop/ProjectionTable.vue). `vue-tsc`, `eslint` y vitest en verde.
 
-- [ ] **6.2** Implementar la jerarquía de 3 niveles con `v-expansion-panels multiple` (mismo patrón que [PresetDialog.vue](../../src/views/desktop/categories/list/dialogs/PresetDialog.vue)):
+- [x] **6.1** Crear `src/components/desktop/ProjectionTable.vue`: una columna por mes del período + columna **Total**.
+
+- [x] **6.2** Implementar la jerarquía de 3 niveles con `v-expansion-panels multiple` (mismo patrón que [PresetDialog.vue](../../src/views/desktop/categories/list/dialogs/PresetDialog.vue)):
 
   | Nivel | Fila | Colapsable | Al colapsar |
   |---|---|---|---|
@@ -335,13 +337,29 @@ Casos de error, todos correctos: rango invertido → 400, 61 meses → 400 `quer
 
   Los dos niveles se controlan de forma independiente. El estado de expansión vive en el componente, no en el store.
 
-- [ ] **6.3** Filas de cierre, siempre visibles y fuera del acordeón: `Neto del mes` y `Acumulado`.
+- [x] **6.3** Filas de cierre, siempre visibles y fuera del acordeón: `Neto del mes` y `Acumulado`.
 
-- [ ] **6.4** Formateo de importes reutilizando `BigDecimal` y los helpers de `numeral.ts` ya usados en el resto de la app. Manejar el caso de importe sin conversión de moneda disponible.
+- [x] **6.4** Formateo de importes reutilizando `BigDecimal` y los helpers de `numeral.ts` ya usados en el resto de la app. Manejar el caso de importe sin conversión de moneda disponible.
 
-- [ ] **6.5** Marcar visualmente la separación entre meses ya transcurridos (datos reales) y meses proyectados, para que el usuario entienda por qué las columnas no son directamente comparables.
+- [x] **6.5** Marcar visualmente la separación entre meses ya transcurridos (datos reales) y meses proyectados, para que el usuario entienda por qué las columnas no son directamente comparables.
 
-**Criterio de aceptación:** el componente renderiza el ejemplo de [Technical-spec.md](./Technical-spec.md) con los mismos números, y el acordeón se comporta según la tabla de 6.2.
+**Criterio de aceptación:** ⚠️ cumplido a medias, a propósito. Los **números** del ejemplo de [Technical-spec.md](./Technical-spec.md) están verificados, pero por el test `should reproduce the example of the technical spec` de la Fase 5, no por el componente: el componente solo los formatea. La verificación **visual y de interacción** del acordeón se hace en la Fase 9 (pasos 9.6 y 9.7), que es cuando existe una página donde montarlo.
+
+> **Por qué no hay test de componente:** el proyecto no tiene `@vue/test-utils` y `vitest.config.ts` usa `environment: 'node'`, sin DOM. Montar componentes exigiría agregar dependencias de desarrollo y cambiar la configuración de tests del proyecto, que excede lo que pide esta feature. Lo verificable sin eso —tipos y lint— está en verde.
+
+### Decisiones tomadas durante la Fase 6
+
+1. **No se usó `v-expansion-panels`, contra lo que decía el paso 6.2.** Los paneles de Vuetify renderizan `div`s apilados, cada uno con su propio contenedor: alinear una columna por mes más la de Total entre cabeceras y contenidos de paneles distintos es frágil y se rompe al agregar meses. La tabla usa un `<table>` real, donde las columnas se alinean solas, y el acordeón se resuelve con estado local (`expandedSections`, `collapsedCategories`) más botones de flecha en las filas de sección y de categoría.
+
+   El comportamiento pedido se cumple igual: cada nivel se pliega de forma independiente al presionar su flecha, y al plegar quedan visibles el subtotal de la categoría y el total de la sección.
+
+2. **La columna de etiquetas es `position: sticky`** y el contenedor scrollea en horizontal, para que un período largo no obligue a perder de vista el nombre de la categoría.
+
+3. **Los meses proyectados se distinguen en la cabecera** (cursiva + tooltip), con textos distintos para el mes en curso (parcialmente proyectado) y los siguientes. Es el paso 6.5, que existe porque las columnas pasadas incluyen gastos únicos y las futuras no, y sin la marca el usuario lee una caída artificial.
+
+4. **Se quitó el prop `currency`.** Los importes ya vienen convertidos a la moneda por defecto del usuario, que es a lo que recurre el formateador cuando no se le pasa moneda; exponer el prop invitaba a un uso incorrecto.
+
+5. **`hasUnconvertedAmounts` se muestra como alerta** debajo de la tabla, para que un total incompleto por falta de tipo de cambio no pase por silencioso.
 
 ---
 

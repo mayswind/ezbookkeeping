@@ -196,13 +196,23 @@ function rulesOfGroup(groupId: string): Rule[] {
     return rules.value.filter(r => r.ruleGroupId === groupId);
 }
 
+function triggerTypeLabel(type: RuleTriggerType): string {
+    const item = triggerTypeItems.find(t => t.value === type);
+    return item ? item.label : type.replace(/_/g, ' ');
+}
+
+function actionTypeLabel(type: RuleActionType): string {
+    const item = actionTypeItems.find(a => a.value === type);
+    return item ? item.label : type.replace(/_/g, ' ');
+}
+
 function summarizeTriggers(rule: Rule): string {
     const mode = rule.strict ? tt('ALL') : tt('ANY');
-    return `${mode}: ${rule.triggers.map(t => t.triggerType.replace(/_/g, ' ')).join(', ')}`;
+    return `${mode}: ${rule.triggers.map(t => triggerTypeLabel(t.triggerType)).join(', ')}`;
 }
 
 function summarizeActions(rule: Rule): string {
-    return rule.actions.map(a => a.actionType.replace(/_/g, ' ')).join(', ');
+    return rule.actions.map(a => actionTypeLabel(a.actionType)).join(', ');
 }
 
 function loadData(): void {

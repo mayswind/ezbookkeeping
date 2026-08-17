@@ -1,450 +1,442 @@
 <template>
-    <v-row class="match-height">
-        <v-col cols="12">
-            <v-card>
-                <v-layout class="page-with-navigation-drawer">
-                    <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-4 my-3">
-                            <btn-vertical-group :disabled="loading" :buttons="[
-                                { name: tt('Categorical Analysis'), value: StatisticsAnalysisType.CategoricalAnalysis },
-                                { name: tt('Trend Analysis'), value: StatisticsAnalysisType.TrendAnalysis },
-                                { name: tt('Asset Trends'), value: StatisticsAnalysisType.AssetTrends }
-                            ]" v-model="queryAnalysisType" />
-                        </div>
-                        <v-divider />
-                        <div class="mx-4 mt-3">
-                            <span class="text-body-medium">{{ tt('Chart Type') }}</span>
-                            <v-select
-                                item-title="displayName"
-                                item-value="type"
-                                class="mt-2"
-                                density="compact"
-                                :disabled="loading"
-                                :items="allChartTypes"
-                                v-model="queryChartType"
-                                v-show="!isQuerySpecialChartType"
-                            />
-                            <v-select
-                                item-title="displayName"
-                                item-value="type"
-                                class="mt-2"
-                                density="compact"
-                                :disabled="true"
-                                :items="[{ displayName: tt('Sankey Chart'), type: 0 }]"
-                                :model-value="0"
-                                v-show="isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type"
-                            />
-                        </div>
-                        <div class="mx-4 mt-2">
-                            <span class="text-body-medium">{{ tt('Sort Order') }}</span>
-                            <v-select
-                                item-title="displayName"
-                                item-value="type"
-                                class="mt-2"
-                                density="compact"
-                                :disabled="loading"
-                                :items="allSortingTypes"
-                                v-model="querySortingType"
-                            />
-                        </div>
-                        <v-tabs show-arrows class="my-3" direction="vertical"
-                                :disabled="loading" v-model="queryChartDataType">
-                            <v-tab class="tab-text-truncate" :key="dataType.type" :value="dataType.type"
-                                   v-for="dataType in ChartDataType.values(undefined, true)"
-                                   v-show="dataType.isAvailableAnalysisType(queryAnalysisType)">
-                                <span class="text-truncate">{{ tt(dataType.name) }}</span>
-                                <v-tooltip activator="parent" location="right">{{ tt(dataType.name) }}</v-tooltip>
-                            </v-tab>
-                        </v-tabs>
-                    </v-navigation-drawer>
-                    <v-main>
-                        <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
-                            <v-window-item value="statisticsPage">
-                                <v-card variant="flat" :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis || queryAnalysisType === StatisticsAnalysisType.AssetTrends ? '860' : '780'">
-                                    <template #title>
-                                        <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
-                                                   :ripple="false" :icon="true" @click="showNav = !showNav">
-                                                <v-icon :icon="mdiMenu" size="24" />
-                                            </v-btn>
-                                            <span>{{ tt('Statistics & Analysis') }}</span>
-                                            <v-btn-group class="ms-4" color="default" density="comfortable" variant="outlined" divided>
-                                                <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
-                                                       :disabled="loading || !canShiftDateRange"
-                                                       @click="shiftDateRange(-1)"/>
-                                                <v-menu location="bottom" max-height="500">
-                                                    <template #activator="{ props }">
-                                                        <v-btn :disabled="loading || !canChangeDateRange"
-                                                               v-bind="props">{{ queryDateRangeName }}</v-btn>
-                                                    </template>
-                                                    <v-list :selected="[queryDateType]">
-                                                        <v-list-item :key="dateRange.type" :value="dateRange.type"
-                                                                     :append-icon="(queryDateType === dateRange.type ? mdiCheck : undefined)"
-                                                                     v-for="dateRange in allDateRanges">
-                                                            <v-list-item-title class="cursor-pointer"
-                                                                               @click="setDateFilter(dateRange.type)">
-                                                                <div class="d-flex align-center">
-                                                                    <span>{{ dateRange.displayName }}</span>
-                                                                </div>
-                                                                <div class="statistics-custom-datetime-range smaller" v-if="dateRange.isUserCustomRange && canShowCustomDateRange(dateRange.type)">
-                                                                    <span>{{ queryStartTime }}</span>
-                                                                    <span>&nbsp;-&nbsp;</span>
-                                                                    <br/>
-                                                                    <span>{{ queryEndTime }}</span>
-                                                                </div>
-                                                            </v-list-item-title>
-                                                        </v-list-item>
-                                                    </v-list>
-                                                </v-menu>
-                                                <v-btn class="button-icon-with-direction" :icon="mdiArrowRight"
-                                                       :disabled="loading || !canShiftDateRange"
-                                                       @click="shiftDateRange(1)"/>
-                                            </v-btn-group>
+    <main-page-layout>
+        <template #nav-items>
+            <div class="mb-2">
+                <btn-vertical-group :disabled="loading" :buttons="[
+                    { name: tt('Categorical Analysis'), value: StatisticsAnalysisType.CategoricalAnalysis },
+                    { name: tt('Trend Analysis'), value: StatisticsAnalysisType.TrendAnalysis },
+                    { name: tt('Asset Trends'), value: StatisticsAnalysisType.AssetTrends }
+                ]" v-model="queryAnalysisType" />
+            </div>
+            <v-divider class="my-2" />
+            <div class="mt-2">
+                <span class="mx-3 text-body-medium">{{ tt('Chart Type') }}</span>
+                <v-select
+                    item-title="displayName"
+                    item-value="type"
+                    class="mt-1"
+                    density="compact"
+                    :disabled="loading"
+                    :items="allChartTypes"
+                    v-model="queryChartType"
+                    v-show="!isQuerySpecialChartType"
+                />
+                <v-select
+                    item-title="displayName"
+                    item-value="type"
+                    class="mt-1"
+                    density="compact"
+                    :disabled="true"
+                    :items="[{ displayName: tt('Sankey Chart'), type: 0 }]"
+                    :model-value="0"
+                    v-show="isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type"
+                />
+            </div>
+            <div class="my-2">
+                <span class="mx-3 text-body-medium">{{ tt('Sort Order') }}</span>
+                <v-select
+                    item-title="displayName"
+                    item-value="type"
+                    class="mt-1"
+                    density="compact"
+                    :disabled="loading"
+                    :items="allSortingTypes"
+                    v-model="querySortingType"
+                />
+            </div>
+            <li class="nav-link" :key="dataType.type"
+                v-for="dataType in ChartDataType.values(undefined, true)"
+                v-show="dataType.isAvailableAnalysisType(queryAnalysisType)">
+                <a class="d-flex align-center cursor-pointer my-1"
+                   :class="{ 'router-link-active router-link-exact-active': queryChartDataType === dataType.type, 'disabled': loading }"
+                   @click="queryChartDataType = dataType.type">
+                    <span class="nav-item-title text-truncate">{{ tt(dataType.name) }}</span>
+                    <v-tooltip activator="parent" location="right">{{ tt(dataType.name) }}</v-tooltip>
+                </a>
+            </li>
+        </template>
 
-                                            <v-menu location="bottom" max-height="500" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
-                                                <template #activator="{ props }">
-                                                    <v-btn class="ms-3" color="default" variant="outlined"
-                                                           :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
-                                                           v-bind="props">{{ queryTrendDateAggregationTypeName }}</v-btn>
-                                                </template>
-                                                <v-list>
-                                                    <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
-                                                                 :append-icon="(trendDateAggregationType === aggregationType.type ? mdiCheck : undefined)"
-                                                                 :title="aggregationType.displayName"
-                                                                 v-for="aggregationType in allTrendAnalysisDateAggregationTypes"
-                                                                 @click="setTrendDateAggregationType(aggregationType.type)">
-                                                    </v-list-item>
-                                                </v-list>
-                                            </v-menu>
-
-                                            <v-menu location="bottom" max-height="500" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
-                                                <template #activator="{ props }">
-                                                    <v-btn class="ms-3" color="default" variant="outlined"
-                                                           :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
-                                                           v-bind="props">{{ queryAssetTrendsDateAggregationTypeName }}</v-btn>
-                                                </template>
-                                                <v-list>
-                                                    <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
-                                                                 :append-icon="(assetTrendsDateAggregationType === aggregationType.type ? mdiCheck : undefined)"
-                                                                 :title="aggregationType.displayName"
-                                                                 v-for="aggregationType in allAssetTrendsDateAggregationTypes"
-                                                                 @click="setAssetTrendsDateAggregationType(aggregationType.type)">
-                                                    </v-list-item>
-                                                </v-list>
-                                            </v-menu>
-
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
-                                                <template #loader>
-                                                    <v-progress-circular indeterminate size="20"/>
-                                                </template>
-                                                <v-icon :icon="mdiRefresh" size="24" />
-                                                <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
-                                            </v-btn>
-                                            <v-spacer/>
-                                            <div class="transaction-keyword-filter ms-2">
-                                                <v-text-field density="compact" :disabled="loading"
-                                                              :prepend-inner-icon="mdiMagnify"
-                                                              :append-inner-icon="filterKeyword !== query.keyword ? mdiCheck : undefined"
-                                                              :placeholder="tt('Filter transaction description')"
-                                                              v-model="filterKeyword"
-                                                              v-if="canUseKeywordFilter"
-                                                              @click:append-inner="setKeywordFilter(filterKeyword)"
-                                                              @keyup.enter="setKeywordFilter(filterKeyword)"
-                                                />
-                                            </div>
-                                            <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                                   :disabled="loading" :icon="true">
-                                                <v-icon :icon="mdiDotsVertical" />
-                                                <v-menu activator="parent">
-                                                    <v-list>
-                                                        <v-list-item :disabled="loading"
-                                                                     :prepend-icon="mdiFilterOutline"
-                                                                     :title="tt('Filter Accounts')"
-                                                                     @click="showFilterAccountDialog = true"></v-list-item>
-                                                        <v-list-item :disabled="loading"
-                                                                     :prepend-icon="mdiFilterOutline"
-                                                                     :title="tt('Filter Transaction Categories')"
-                                                                     @click="showFilterCategoryDialog = true"
-                                                                     v-if="canUseCategoryFilter"></v-list-item>
-                                                        <v-list-item :disabled="loading"
-                                                                     :prepend-icon="mdiFilterOutline"
-                                                                     :title="tt('Filter Transaction Tags')"
-                                                                     @click="showFilterTagDialog = true"
-                                                                     v-if="canUseTagFilter"></v-list-item>
-                                                        <v-divider class="my-2" v-if="!isQuerySpecialChartType" />
-                                                        <v-list-item :prepend-icon="mdiExport"
-                                                                     :title="tt('Export Results')"
-                                                                     :disabled="!statisticsDataHasData"
-                                                                     @click="exportResults"
-                                                                     v-if="!isQuerySpecialChartType"></v-list-item>
-                                                        <v-divider class="my-2"/>
-                                                        <v-list-item to="/app/settings?tab=statisticsSetting"
-                                                                     :prepend-icon="mdiFilterCogOutline"
-                                                                     :title="tt('Settings')"></v-list-item>
-                                                    </v-list>
-                                                </v-menu>
-                                            </v-btn>
-                                        </div>
-                                    </template>
-
-                                    <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type && (initing || categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length)">
-                                        <span class="statistics-subtitle">{{ tt('Total Income') }}</span>
-                                        <span class="statistics-overview-amount ms-3 text-income"
-                                              v-if="!initing && categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length">
-                                            {{ getDisplayAmount(categoricalOverviewAnalysisData.totalIncome, defaultCurrency) }}
-                                        </span>
-                                        <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
-                                                           width="120px" type="text" :loading="true"
-                                                           v-else-if="initing"></v-skeleton-loader>
-                                        <span class="statistics-subtitle ms-3">{{ tt('Total Expense') }}</span>
-                                        <span class="statistics-overview-amount ms-3 text-expense"
-                                              v-if="!initing && categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length">
-                                            {{ getDisplayAmount(categoricalOverviewAnalysisData.totalExpense, defaultCurrency) }}
-                                        </span>
-                                        <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
-                                                           width="120px" type="text" :loading="true"
-                                                           v-else-if="initing"></v-skeleton-loader>
-                                    </v-card-text>
-
-                                    <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
-                                                 v-else-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
-                                        <span class="statistics-subtitle">{{ totalAmountName }}</span>
-                                        <span class="statistics-overview-amount ms-3"
-                                              :class="statisticsTextColor"
-                                              v-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
-                                            {{ getDisplayAmount(categoricalAnalysisData.value, defaultCurrency) }}
-                                        </span>
-                                        <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
-                                                           width="120px" type="text" :loading="true"
-                                                           v-else-if="initing"></v-skeleton-loader>
-                                    </v-card-text>
-
-                                    <v-card-text class="statistics-overview-title pt-0"
-                                                 v-else-if="!loading && (
-                                                     (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type && (!categoricalOverviewAnalysisData || !categoricalOverviewAnalysisData.items || !categoricalOverviewAnalysisData.items.length))
-                                                  || (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
-                                                  || (queryAnalysisType === StatisticsAnalysisType.TrendAnalysis && (!trendsAnalysisData || !trendsAnalysisData.items || !trendsAnalysisData.items.length))
-                                                  || (queryAnalysisType === StatisticsAnalysisType.AssetTrends && (!assetTrendsData || !assetTrendsData.items || !assetTrendsData.items.length))
-                                                  )">
-                                        <span class="statistics-subtitle statistics-overview-empty-tip">{{ tt('No transaction data') }}</span>
-                                    </v-card-text>
-
-                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && queryChartDataType === ChartDataType.Overview.type">
-                                        <account-and-category-sankey-chart
-                                            :items="[]"
-                                            :sorting-type="querySortingType"
-                                            :skeleton="true"
-                                            v-if="initing"
-                                        />
-                                        <account-and-category-sankey-chart
-                                            :items="categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length ? categoricalOverviewAnalysisData.items : []"
-                                            :enable-click-item="true"
-                                            :default-currency="defaultCurrency"
-                                            v-else-if="!initing"
-                                            @click="onClickSankeyChartItem"
-                                        />
-                                    </v-card-text>
-
-                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Pie.type">
-                                        <pie-chart
-                                            :items="[
-                                                { id: '1', name: '---', value: parseBigDecimal(60), color: '7c7c7f' },
-                                                { id: '2', name: '---', value: parseBigDecimal(20), color: 'a5a5aa' },
-                                                { id: '3', name: '---', value: parseBigDecimal(20), color: 'c5c5c9' }
-                                            ]"
-                                            :value-type="ChartValueType.Amount"
-                                            :skeleton="true"
-                                            :use-custom-color="true"
-                                            v-if="initing"
-                                        />
-                                        <pie-chart
-                                            :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
-                                            :value-type="ChartValueType.Amount"
-                                            :show-value="showAmountInChart"
-                                            :show-percent="showPercentInCategoricalChart"
-                                            :enable-click-item="true"
-                                            :default-currency="defaultCurrency"
-                                            v-else-if="!initing"
-                                            @click="onClickPieChartItem"
-                                        />
-                                    </v-card-text>
-
-                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Bar.type">
-                                        <v-list rounded lines="two" v-if="initing">
-                                            <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
-                                                <v-list-item class="ps-0">
-                                                    <template #prepend>
-                                                        <div>
-                                                            <v-icon class="disabled me-0" size="34" :icon="mdiSquareRounded" />
-                                                        </div>
-                                                    </template>
-                                                    <div class="d-flex flex-column ms-2">
-                                                        <div class="d-flex">
-                                                            <v-skeleton-loader class="skeleton-no-margin my-2"
-                                                                               width="120px" type="text" :loading="true"></v-skeleton-loader>
-                                                        </div>
-                                                        <div>
-                                                            <v-progress-linear :model-value="0" :height="4"></v-progress-linear>
-                                                        </div>
+        <template #content>
+            <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
+                <v-window-item value="statisticsPage">
+                    <v-card :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis || queryAnalysisType === StatisticsAnalysisType.AssetTrends ? '860' : '780'">
+                        <template #title>
+                            <div class="title-and-toolbar d-flex align-center">
+                                <span>{{ tt('Statistics & Analysis') }}</span>
+                                <v-btn-group class="ms-4" color="default" density="comfortable" variant="outlined" divided>
+                                    <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
+                                           :disabled="loading || !canShiftDateRange"
+                                           @click="shiftDateRange(-1)"/>
+                                    <v-menu location="bottom" max-height="500">
+                                        <template #activator="{ props }">
+                                            <v-btn :disabled="loading || !canChangeDateRange"
+                                                   v-bind="props">{{ queryDateRangeName }}</v-btn>
+                                        </template>
+                                        <v-list :selected="[queryDateType]">
+                                            <v-list-item :key="dateRange.type" :value="dateRange.type"
+                                                         :append-icon="(queryDateType === dateRange.type ? mdiCheck : undefined)"
+                                                         v-for="dateRange in allDateRanges">
+                                                <v-list-item-title class="cursor-pointer"
+                                                                   @click="setDateFilter(dateRange.type)">
+                                                    <div class="d-flex align-center">
+                                                        <span>{{ dateRange.displayName }}</span>
                                                     </div>
-                                                </v-list-item>
-                                                <v-divider v-if="itemIdx < 3"/>
-                                            </template>
+                                                    <div class="statistics-custom-datetime-range smaller" v-if="dateRange.isUserCustomRange && canShowCustomDateRange(dateRange.type)">
+                                                        <span>{{ queryStartTime }}</span>
+                                                        <span>&nbsp;-&nbsp;</span>
+                                                        <br/>
+                                                        <span>{{ queryEndTime }}</span>
+                                                    </div>
+                                                </v-list-item-title>
+                                            </v-list-item>
                                         </v-list>
-                                        <v-list class="py-0" rounded lines="two" v-else-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
-                                            <template :key="idx"
-                                                      v-for="(item, idx) in categoricalAnalysisData.items">
-                                                <v-list-item class="ps-0" density="comfortable" v-if="!item.hidden">
-                                                    <template #prepend>
-                                                        <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
-                                                            <ItemIcon :icon-type="getIconType(queryChartDataCategory, item.iconType)" size="34px"
-                                                                      :icon-id="item.icon"
-                                                                      :color="item.color"></ItemIcon>
-                                                        </router-link>
-                                                    </template>
-                                                    <router-link class="statistics-list-item link-no-color" :to="getTransactionItemLinkUrl(item.id)">
-                                                        <div class="d-flex flex-column ms-2">
-                                                            <div class="d-flex">
-                                                                <span>{{ item.name }}</span>
-                                                                <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.value.isPositiveOrZero()">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
-                                                                <v-spacer/>
-                                                                <span class="statistics-amount">{{ getDisplayAmount(item.value, defaultCurrency) }}</span>
-                                                            </div>
-                                                            <div class="mt-1">
-                                                                <v-progress-linear :color="item.color ? getTransactionCategoricalAnalysisDataItemDisplayColor(item) : 'primary'"
-                                                                                   :bg-color="isDarkMode ? '#444444' : '#f8f8f8'" :bg-opacity="1"
-                                                                                   :model-value="item.percent >= 0 ? item.percent : 0"
-                                                                                   :height="4"></v-progress-linear>
-                                                            </div>
-                                                        </div>
-                                                    </router-link>
-                                                </v-list-item>
-                                                <v-divider v-if="!item.hidden && idx !== categoricalAnalysisData.items.length - 1"/>
-                                            </template>
+                                    </v-menu>
+                                    <v-btn class="button-icon-with-direction" :icon="mdiArrowRight"
+                                           :disabled="loading || !canShiftDateRange"
+                                           @click="shiftDateRange(1)"/>
+                                </v-btn-group>
+
+                                <v-menu location="bottom" max-height="500" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
+                                    <template #activator="{ props }">
+                                        <v-btn class="ms-3" color="default" variant="outlined"
+                                               :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
+                                               v-bind="props">{{ queryTrendDateAggregationTypeName }}</v-btn>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
+                                                     :append-icon="(trendDateAggregationType === aggregationType.type ? mdiCheck : undefined)"
+                                                     :title="aggregationType.displayName"
+                                                     v-for="aggregationType in allTrendAnalysisDateAggregationTypes"
+                                                     @click="setTrendDateAggregationType(aggregationType.type)">
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+
+                                <v-menu location="bottom" max-height="500" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
+                                    <template #activator="{ props }">
+                                        <v-btn class="ms-3" color="default" variant="outlined"
+                                               :prepend-icon="mdiCalendarRangeOutline" :disabled="loading"
+                                               v-bind="props">{{ queryAssetTrendsDateAggregationTypeName }}</v-btn>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item class="cursor-pointer" :key="aggregationType.type" :value="aggregationType.type"
+                                                     :append-icon="(assetTrendsDateAggregationType === aggregationType.type ? mdiCheck : undefined)"
+                                                     :title="aggregationType.displayName"
+                                                     v-for="aggregationType in allAssetTrendsDateAggregationTypes"
+                                                     @click="setAssetTrendsDateAggregationType(aggregationType.type)">
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+
+                                <v-btn density="compact" color="default" variant="text"
+                                       class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
+                                    <template #loader>
+                                        <v-progress-circular indeterminate size="20"/>
+                                    </template>
+                                    <v-icon :icon="mdiRefresh" size="24" />
+                                    <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                                </v-btn>
+                                <v-spacer/>
+                                <div class="transaction-keyword-filter ms-2">
+                                    <v-text-field density="compact" :disabled="loading"
+                                                  :prepend-inner-icon="mdiMagnify"
+                                                  :append-inner-icon="filterKeyword !== query.keyword ? mdiCheck : undefined"
+                                                  :placeholder="tt('Filter transaction description')"
+                                                  v-model="filterKeyword"
+                                                  v-if="canUseKeywordFilter"
+                                                  @click:append-inner="setKeywordFilter(filterKeyword)"
+                                                  @keyup.enter="setKeywordFilter(filterKeyword)"
+                                    />
+                                </div>
+                                <v-btn density="comfortable" color="default" variant="text" class="ms-2"
+                                       :disabled="loading" :icon="true">
+                                    <v-icon :icon="mdiDotsVertical" />
+                                    <v-menu activator="parent">
+                                        <v-list>
+                                            <v-list-item :disabled="loading"
+                                                         :prepend-icon="mdiFilterOutline"
+                                                         :title="tt('Filter Accounts')"
+                                                         @click="showFilterAccountDialog = true"></v-list-item>
+                                            <v-list-item :disabled="loading"
+                                                         :prepend-icon="mdiFilterOutline"
+                                                         :title="tt('Filter Transaction Categories')"
+                                                         @click="showFilterCategoryDialog = true"
+                                                         v-if="canUseCategoryFilter"></v-list-item>
+                                            <v-list-item :disabled="loading"
+                                                         :prepend-icon="mdiFilterOutline"
+                                                         :title="tt('Filter Transaction Tags')"
+                                                         @click="showFilterTagDialog = true"
+                                                         v-if="canUseTagFilter"></v-list-item>
+                                            <v-divider class="my-2" v-if="!isQuerySpecialChartType" />
+                                            <v-list-item :prepend-icon="mdiExport"
+                                                         :title="tt('Export Results')"
+                                                         :disabled="!statisticsDataHasData"
+                                                         @click="exportResults"
+                                                         v-if="!isQuerySpecialChartType"></v-list-item>
+                                            <v-divider class="my-2"/>
+                                            <v-list-item to="/app/settings/statistics"
+                                                         :prepend-icon="mdiFilterCogOutline"
+                                                         :title="tt('Settings')"></v-list-item>
                                         </v-list>
-                                    </v-card-text>
+                                    </v-menu>
+                                </v-btn>
+                            </div>
+                        </template>
 
-                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Radar.type">
-                                        <radar-chart
-                                            :items="[
-                                                {name: '---', value: 10},
-                                                {name: '---', value: 10},
-                                                {name: '---', value: 10},
-                                                {name: '---', value: 10},
-                                                {name: '---', value: 10},
-                                                {name: '---', value: 10}
-                                            ]"
-                                            :value-type="ChartValueType.Amount"
-                                            :skeleton="true"
-                                            v-if="initing"
-                                        />
-                                        <radar-chart
-                                            :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
-                                            :value-type="ChartValueType.Amount"
-                                            :show-value="showAmountInChart"
-                                            :show-percent="showPercentInCategoricalChart"
-                                            :default-currency="defaultCurrency"
-                                            v-else-if="!initing"
-                                        />
-                                    </v-card-text>
+                        <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
+                                     v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type && (initing || categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length)">
+                            <span class="statistics-subtitle">{{ tt('Total Income') }}</span>
+                            <span class="statistics-overview-amount ms-3 text-income"
+                                  v-if="!initing && categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length">
+                                {{ getDisplayAmount(categoricalOverviewAnalysisData.totalIncome, defaultCurrency) }}
+                            </span>
+                            <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
+                                               width="120px" type="text" :loading="true"
+                                               v-else-if="initing"></v-skeleton-loader>
+                            <span class="statistics-subtitle ms-3">{{ tt('Total Expense') }}</span>
+                            <span class="statistics-overview-amount ms-3 text-expense"
+                                  v-if="!initing && categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length">
+                                {{ getDisplayAmount(categoricalOverviewAnalysisData.totalExpense, defaultCurrency) }}
+                            </span>
+                            <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
+                                               width="120px" type="text" :loading="true"
+                                               v-else-if="initing"></v-skeleton-loader>
+                        </v-card-text>
 
-                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
-                                        <trends-chart
-                                            chart-mode="monthly"
-                                            :type="queryChartType"
-                                            :start-time="undefined"
-                                            :end-time="undefined"
-                                            :start-year-month="query.trendChartStartYearMonth"
-                                            :end-year-month="query.trendChartEndYearMonth"
-                                            :sorting-type="querySortingType"
-                                            :data-aggregation-type="ChartDataAggregationType.Sum"
-                                            :date-aggregation-type="trendDateAggregationType"
-                                            :fiscal-year-start="fiscalYearStart"
-                                            :items="[]"
-                                            :value-type="ChartValueType.Amount"
-                                            :skeleton="true"
-                                            v-if="initing"
-                                        />
-                                        <trends-chart
-                                            chart-mode="monthly"
-                                            :type="queryChartType"
-                                            :start-time="undefined"
-                                            :end-time="undefined"
-                                            :start-year-month="query.trendChartStartYearMonth"
-                                            :end-year-month="query.trendChartEndYearMonth"
-                                            :sorting-type="querySortingType"
-                                            :data-aggregation-type="ChartDataAggregationType.Sum"
-                                            :date-aggregation-type="trendDateAggregationType"
-                                            :fiscal-year-start="fiscalYearStart"
-                                            :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
-                                            :value-type="ChartValueType.Amount"
-                                            :translate-name="translateNameInTrendsChart"
-                                            :show-value="showAmountInChart"
-                                            :enable-click-item="true"
-                                            :default-currency="defaultCurrency"
-                                            :stacked="showStackedInTrendsChart"
-                                            :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
-                                            :show-year-over-year="true"
-                                            :show-period-over-period="trendDateAggregationType === ChartDateAggregationType.Month.type || trendDateAggregationType === ChartDateAggregationType.Quarter.type"
-                                            ref="monthlyTrendsChart"
-                                            v-else-if="!initing && trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length"
-                                            @click="onClickTrendChartItem"
-                                        />
-                                    </v-card-text>
+                        <v-card-text class="statistics-overview-title pt-0" :class="{ 'disabled': loading }"
+                                     v-else-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (initing || (categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length))">
+                            <span class="statistics-subtitle">{{ totalAmountName }}</span>
+                            <span class="statistics-overview-amount ms-3"
+                                  :class="statisticsTextColor"
+                                  v-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
+                                {{ getDisplayAmount(categoricalAnalysisData.value, defaultCurrency) }}
+                            </span>
+                            <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2"
+                                               width="120px" type="text" :loading="true"
+                                               v-else-if="initing"></v-skeleton-loader>
+                        </v-card-text>
 
-                                    <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
-                                        <trends-chart
-                                            chart-mode="daily"
-                                            :type="queryChartType"
-                                            :start-time="query.assetTrendsChartStartTime"
-                                            :end-time="query.assetTrendsChartEndTime"
-                                            :start-year-month="undefined"
-                                            :end-year-month="undefined"
-                                            :sorting-type="querySortingType"
-                                            :data-aggregation-type="ChartDataAggregationType.Last"
-                                            :date-aggregation-type="assetTrendsDateAggregationType"
-                                            :fiscal-year-start="fiscalYearStart"
-                                            :items="[]"
-                                            :value-type="ChartValueType.Amount"
-                                            :skeleton="true"
-                                            v-if="initing"
-                                        />
-                                        <trends-chart
-                                            chart-mode="daily"
-                                            :type="queryChartType"
-                                            :start-time="query.assetTrendsChartStartTime"
-                                            :end-time="query.assetTrendsChartEndTime"
-                                            :start-year-month="undefined"
-                                            :end-year-month="undefined"
-                                            :sorting-type="querySortingType"
-                                            :data-aggregation-type="ChartDataAggregationType.Last"
-                                            :date-aggregation-type="assetTrendsDateAggregationType"
-                                            :fiscal-year-start="fiscalYearStart"
-                                            :items="assetTrendsData && assetTrendsData.items && assetTrendsData.items.length ? assetTrendsData.items : []"
-                                            :value-type="ChartValueType.Amount"
-                                            :translate-name="translateNameInTrendsChart"
-                                            :show-value="showAmountInChart"
-                                            :enable-click-item="true"
-                                            :default-currency="defaultCurrency"
-                                            :stacked="showStackedInTrendsChart"
-                                            :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
-                                            :show-year-over-year="true"
-                                            :show-period-over-period="assetTrendsDateAggregationType === ChartDateAggregationType.Day.type || assetTrendsDateAggregationType === ChartDateAggregationType.Month.type || assetTrendsDateAggregationType === ChartDateAggregationType.Quarter.type"
-                                            ref="dailyTrendsChart"
-                                            v-else-if="!initing && assetTrendsData && assetTrendsData.items && assetTrendsData.items.length"
-                                            @click="onClickTrendChartItem"
-                                        />
-                                    </v-card-text>
-                                </v-card>
-                            </v-window-item>
-                        </v-window>
-                    </v-main>
-                </v-layout>
-            </v-card>
-        </v-col>
-    </v-row>
+                        <v-card-text class="statistics-overview-title pt-0"
+                                     v-else-if="!loading && (
+                                         (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && isQuerySpecialChartType && queryChartDataType === ChartDataType.Overview.type && (!categoricalOverviewAnalysisData || !categoricalOverviewAnalysisData.items || !categoricalOverviewAnalysisData.items.length))
+                                      || (queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && (!categoricalAnalysisData || !categoricalAnalysisData.items || !categoricalAnalysisData.items.length))
+                                      || (queryAnalysisType === StatisticsAnalysisType.TrendAnalysis && (!trendsAnalysisData || !trendsAnalysisData.items || !trendsAnalysisData.items.length))
+                                      || (queryAnalysisType === StatisticsAnalysisType.AssetTrends && (!assetTrendsData || !assetTrendsData.items || !assetTrendsData.items.length))
+                                      )">
+                            <span class="statistics-subtitle statistics-overview-empty-tip">{{ tt('No transaction data') }}</span>
+                        </v-card-text>
+
+                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && queryChartDataType === ChartDataType.Overview.type">
+                            <account-and-category-sankey-chart
+                                :items="[]"
+                                :sorting-type="querySortingType"
+                                :skeleton="true"
+                                v-if="initing"
+                            />
+                            <account-and-category-sankey-chart
+                                :items="categoricalOverviewAnalysisData && categoricalOverviewAnalysisData.items && categoricalOverviewAnalysisData.items.length ? categoricalOverviewAnalysisData.items : []"
+                                :enable-click-item="true"
+                                :default-currency="defaultCurrency"
+                                v-else-if="!initing"
+                                @click="onClickSankeyChartItem"
+                            />
+                        </v-card-text>
+
+                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Pie.type">
+                            <pie-chart
+                                :items="[
+                                    { id: '1', name: '---', value: parseBigDecimal(60), color: '7c7c7f' },
+                                    { id: '2', name: '---', value: parseBigDecimal(20), color: 'a5a5aa' },
+                                    { id: '3', name: '---', value: parseBigDecimal(20), color: 'c5c5c9' }
+                                ]"
+                                :value-type="ChartValueType.Amount"
+                                :skeleton="true"
+                                :use-custom-color="true"
+                                v-if="initing"
+                            />
+                            <pie-chart
+                                :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
+                                :value-type="ChartValueType.Amount"
+                                :show-value="showAmountInChart"
+                                :show-percent="showPercentInCategoricalChart"
+                                :enable-click-item="true"
+                                :default-currency="defaultCurrency"
+                                v-else-if="!initing"
+                                @click="onClickPieChartItem"
+                            />
+                        </v-card-text>
+
+                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Bar.type">
+                            <v-list rounded lines="two" v-if="initing">
+                                <template :key="itemIdx" v-for="itemIdx in [ 1, 2, 3 ]">
+                                    <v-list-item class="ps-0">
+                                        <template #prepend>
+                                            <div>
+                                                <v-icon class="disabled me-0" size="34" :icon="mdiSquareRounded" />
+                                            </div>
+                                        </template>
+                                        <div class="d-flex flex-column ms-2">
+                                            <div class="d-flex">
+                                                <v-skeleton-loader class="skeleton-no-margin my-2"
+                                                                   width="120px" type="text" :loading="true"></v-skeleton-loader>
+                                            </div>
+                                            <div>
+                                                <v-progress-linear :model-value="0" :height="4"></v-progress-linear>
+                                            </div>
+                                        </div>
+                                    </v-list-item>
+                                    <v-divider v-if="itemIdx < 3"/>
+                                </template>
+                            </v-list>
+                            <v-list class="py-0" rounded lines="two" v-else-if="!initing && categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length">
+                                <template :key="idx"
+                                          v-for="(item, idx) in categoricalAnalysisData.items">
+                                    <v-list-item class="ps-0" density="comfortable" v-if="!item.hidden">
+                                        <template #prepend>
+                                            <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
+                                                <ItemIcon :icon-type="getIconType(queryChartDataCategory, item.iconType)" size="34px"
+                                                          :icon-id="item.icon"
+                                                          :color="item.color"></ItemIcon>
+                                            </router-link>
+                                        </template>
+                                        <router-link class="statistics-list-item link-no-color" :to="getTransactionItemLinkUrl(item.id)">
+                                            <div class="d-flex flex-column ms-2">
+                                                <div class="d-flex">
+                                                    <span>{{ item.name }}</span>
+                                                    <small class="statistics-percent" v-if="showPercentInCategoricalChart && item.percent >= 0 && item.value.isPositiveOrZero()">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
+                                                    <v-spacer/>
+                                                    <span class="statistics-amount">{{ getDisplayAmount(item.value, defaultCurrency) }}</span>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <v-progress-linear :color="item.color ? getTransactionCategoricalAnalysisDataItemDisplayColor(item) : 'primary'"
+                                                                       :bg-color="isDarkMode ? '#444444' : '#f8f8f8'" :bg-opacity="1"
+                                                                       :model-value="item.percent >= 0 ? item.percent : 0"
+                                                                       :height="4"></v-progress-linear>
+                                                </div>
+                                            </div>
+                                        </router-link>
+                                    </v-list-item>
+                                    <v-divider v-if="!item.hidden && idx !== categoricalAnalysisData.items.length - 1"/>
+                                </template>
+                            </v-list>
+                        </v-card-text>
+
+                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Radar.type">
+                            <radar-chart
+                                :items="[
+                                    {name: '---', value: 10},
+                                    {name: '---', value: 10},
+                                    {name: '---', value: 10},
+                                    {name: '---', value: 10},
+                                    {name: '---', value: 10},
+                                    {name: '---', value: 10}
+                                ]"
+                                :value-type="ChartValueType.Amount"
+                                :skeleton="true"
+                                v-if="initing"
+                            />
+                            <radar-chart
+                                :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
+                                :value-type="ChartValueType.Amount"
+                                :show-value="showAmountInChart"
+                                :show-percent="showPercentInCategoricalChart"
+                                :default-currency="defaultCurrency"
+                                v-else-if="!initing"
+                            />
+                        </v-card-text>
+
+                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
+                            <trends-chart
+                                chart-mode="monthly"
+                                :type="queryChartType"
+                                :start-time="undefined"
+                                :end-time="undefined"
+                                :start-year-month="query.trendChartStartYearMonth"
+                                :end-year-month="query.trendChartEndYearMonth"
+                                :sorting-type="querySortingType"
+                                :data-aggregation-type="ChartDataAggregationType.Sum"
+                                :date-aggregation-type="trendDateAggregationType"
+                                :fiscal-year-start="fiscalYearStart"
+                                :items="[]"
+                                :value-type="ChartValueType.Amount"
+                                :skeleton="true"
+                                v-if="initing"
+                            />
+                            <trends-chart
+                                chart-mode="monthly"
+                                :type="queryChartType"
+                                :start-time="undefined"
+                                :end-time="undefined"
+                                :start-year-month="query.trendChartStartYearMonth"
+                                :end-year-month="query.trendChartEndYearMonth"
+                                :sorting-type="querySortingType"
+                                :data-aggregation-type="ChartDataAggregationType.Sum"
+                                :date-aggregation-type="trendDateAggregationType"
+                                :fiscal-year-start="fiscalYearStart"
+                                :items="trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length ? trendsAnalysisData.items : []"
+                                :value-type="ChartValueType.Amount"
+                                :translate-name="translateNameInTrendsChart"
+                                :show-value="showAmountInChart"
+                                :enable-click-item="true"
+                                :default-currency="defaultCurrency"
+                                :stacked="showStackedInTrendsChart"
+                                :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
+                                :show-year-over-year="true"
+                                :show-period-over-period="trendDateAggregationType === ChartDateAggregationType.Month.type || trendDateAggregationType === ChartDateAggregationType.Quarter.type"
+                                ref="monthlyTrendsChart"
+                                v-else-if="!initing && trendsAnalysisData && trendsAnalysisData.items && trendsAnalysisData.items.length"
+                                @click="onClickTrendChartItem"
+                            />
+                        </v-card-text>
+
+                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
+                            <trends-chart
+                                chart-mode="daily"
+                                :type="queryChartType"
+                                :start-time="query.assetTrendsChartStartTime"
+                                :end-time="query.assetTrendsChartEndTime"
+                                :start-year-month="undefined"
+                                :end-year-month="undefined"
+                                :sorting-type="querySortingType"
+                                :data-aggregation-type="ChartDataAggregationType.Last"
+                                :date-aggregation-type="assetTrendsDateAggregationType"
+                                :fiscal-year-start="fiscalYearStart"
+                                :items="[]"
+                                :value-type="ChartValueType.Amount"
+                                :skeleton="true"
+                                v-if="initing"
+                            />
+                            <trends-chart
+                                chart-mode="daily"
+                                :type="queryChartType"
+                                :start-time="query.assetTrendsChartStartTime"
+                                :end-time="query.assetTrendsChartEndTime"
+                                :start-year-month="undefined"
+                                :end-year-month="undefined"
+                                :sorting-type="querySortingType"
+                                :data-aggregation-type="ChartDataAggregationType.Last"
+                                :date-aggregation-type="assetTrendsDateAggregationType"
+                                :fiscal-year-start="fiscalYearStart"
+                                :items="assetTrendsData && assetTrendsData.items && assetTrendsData.items.length ? assetTrendsData.items : []"
+                                :value-type="ChartValueType.Amount"
+                                :translate-name="translateNameInTrendsChart"
+                                :show-value="showAmountInChart"
+                                :enable-click-item="true"
+                                :default-currency="defaultCurrency"
+                                :stacked="showStackedInTrendsChart"
+                                :show-total-amount-in-tooltip="showTotalAmountInTrendsChart"
+                                :show-year-over-year="true"
+                                :show-period-over-period="assetTrendsDateAggregationType === ChartDateAggregationType.Day.type || assetTrendsDateAggregationType === ChartDateAggregationType.Month.type || assetTrendsDateAggregationType === ChartDateAggregationType.Quarter.type"
+                                ref="dailyTrendsChart"
+                                v-else-if="!initing && assetTrendsData && assetTrendsData.items && assetTrendsData.items.length"
+                                @click="onClickTrendChartItem"
+                            />
+                        </v-card-text>
+                    </v-card>
+                </v-window-item>
+            </v-window>
+        </template>
+    </main-page-layout>
 
     <date-range-selection-dialog :title="tt('Custom Date Range')"
                                   :min-time="query.categoricalChartStartTime"
@@ -486,9 +478,9 @@ import CategoryFilterSettingsDialog from '@/views/desktop/common/dialogs/Categor
 import TransactionTagFilterSettingsDialog from '@/views/desktop/common/dialogs/TransactionTagFilterSettingsDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
-import { useDisplay, useTheme } from 'vuetify';
+import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useStatisticsTransactionPageBase } from '@/views/base/statistics/StatisticsTransactionPageBase.ts';
@@ -541,7 +533,6 @@ import {
     mdiRefresh,
     mdiSquareRounded,
     mdiMagnify,
-    mdiMenu,
     mdiFilterOutline,
     mdiFilterCogOutline,
     mdiExport,
@@ -572,7 +563,6 @@ interface TransactionStatisticsProps {
 const props = defineProps<TransactionStatisticsProps>();
 
 const router = useRouter();
-const { lgAndUp } = useDisplay();
 const theme = useTheme();
 
 const {
@@ -635,8 +625,6 @@ const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const activeTab = ref<string>('statisticsPage');
 const initing = ref<boolean>(true);
 const filterKeyword = ref<string>('');
-const alwaysShowNav = ref<boolean>(lgAndUp.value);
-const showNav = ref<boolean>(lgAndUp.value);
 const showCustomDateRangeDialog = ref<boolean>(false);
 const showCustomMonthRangeDialog = ref<boolean>(false);
 const showFilterAccountDialog = ref<boolean>(false);
@@ -1333,14 +1321,6 @@ onBeforeRouteUpdate((to) => {
         });
     } else {
         init({});
-    }
-});
-
-watch(lgAndUp, (newValue) => {
-    alwaysShowNav.value = newValue;
-
-    if (!showNav.value) {
-        showNav.value = newValue;
     }
 });
 

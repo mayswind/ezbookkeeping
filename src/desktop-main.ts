@@ -93,6 +93,7 @@ import DateTimePicker from '@/components/common/DateTimePicker.vue';
 import MonthPicker from '@/components/common/MonthPicker.vue';
 import TransactionCalendar from '@/components/common/TransactionCalendar.vue';
 
+import MainPageLayout from '@/components/desktop/MainPageLayout.vue';
 import OneColumnDialogLayout from '@/components/desktop/OneColumnDialogLayout.vue';
 import TwoColumnDialogLayout from '@/components/desktop/TwoColumnDialogLayout.vue';
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
@@ -557,6 +558,7 @@ app.component('DateTimePicker', DateTimePicker);
 app.component('MonthPicker', MonthPicker);
 app.component('TransactionCalendar', TransactionCalendar);
 
+app.component('MainPageLayout', MainPageLayout);
 app.component('OneColumnDialogLayout', OneColumnDialogLayout);
 app.component('TwoColumnDialogLayout', TwoColumnDialogLayout);
 app.component('ItemIcon', ItemIcon);

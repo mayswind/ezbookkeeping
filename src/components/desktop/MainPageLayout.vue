@@ -109,14 +109,8 @@
                         </v-btn>
                         <v-avatar class="cursor-pointer ms-3" variant="tonal"
                                   :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
-                            <v-img :src="currentUserAvatar" v-if="currentUserAvatar">
-                                <template #placeholder>
-                                    <div class="d-flex align-center justify-center bg-light-primary">
-                                        <v-icon color="primary" :icon="mdiAccount"/>
-                                    </div>
-                                </template>
-                            </v-img>
-                            <v-icon :icon="mdiAccount" v-else-if="!currentUserAvatar"/>
+                            <v-icon :color="currentUserAvatar ? 'primary' : undefined" :icon="mdiAccount"/>
+                            <span class="user-avatar-image" :style="currentUserAvatarStyle" v-if="currentUserAvatar"></span>
                             <v-menu activator="parent" width="230" location="bottom end" offset="14px">
                                 <v-list>
                                     <v-list-item>
@@ -259,7 +253,10 @@ const showMobileQrCode = ref<boolean>(false);
 const showAboutDialog = ref<boolean>(false);
 
 const currentNickName = computed<string>(() => userStore.currentUserNickname || tt('User'));
-const currentUserAvatar = computed<string | null>(() => userStore.getUserAvatarUrl(userStore.currentUserBasicInfo, true));
+const currentUserAvatar = computed<string | null>(() => userStore.currentUserAvatar);
+const currentUserAvatarStyle = computed<Record<string, string> | undefined>(() => currentUserAvatar.value ? {
+    backgroundImage: `url("${currentUserAvatar.value}")`
+} : undefined);
 
 const currentTheme = computed<string>({
     get: () => {
@@ -337,5 +334,15 @@ function showAddDialogInTransactionListPage(): void {
     width: 38px;
     min-width: 38px;
     border-radius: 10px;
+}
+
+.user-avatar-image {
+    position: absolute;
+    z-index: 1;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    inset: 0;
+    pointer-events: none;
 }
 </style>

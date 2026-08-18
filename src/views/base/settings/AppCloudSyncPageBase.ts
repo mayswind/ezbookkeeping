@@ -42,6 +42,7 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
     {
         categoryName: 'Overview Page',
         items: [
+            { settingKey: 'desktopOverviewPageLayout', settingName: 'Home Page Layout', mobile: false, desktop: true },
             { settingKey: 'showAmountInHomePage', settingName: 'Show Amount', mobile: true, desktop: true },
             { settingKey: 'timezoneUsedForStatisticsInHomePage', settingName: 'Timezone Used for Statistics', mobile: true, desktop: true },
             { settingKey: 'overviewAccountFilterInHomePage', settingName: 'Accounts Included in Overview Statistics', mobile: true, desktop: true },

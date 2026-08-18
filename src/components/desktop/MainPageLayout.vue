@@ -33,65 +33,67 @@
                         </div>
                         <div class="app-top-toolbar d-inline-flex"
                              :class="{ 'app-top-toolbar-without-navbar': noNavbar }">
-                            <router-link to="/">
-                                <v-btn class="top-navigation-button" density="comfortable" variant="text" :icon="true"
-                                       :aria-label="tt('Overview')"
-                                       :active="isTopNavigationActive('/')"
-                                       :color="isTopNavigationActive('/') ? 'primary' : 'default'">
-                                    <v-icon :icon="isTopNavigationActive('/') ? mdiHome : mdiHomeOutline" size="24" />
-                                    <v-tooltip activator="parent">{{ tt('Overview') }}</v-tooltip>
-                                </v-btn>
-                            </router-link>
+                            <slot name="top-toolbar">
+                                <router-link to="/">
+                                    <v-btn class="top-navigation-button" density="comfortable" variant="text" :icon="true"
+                                           :aria-label="tt('Overview')"
+                                           :active="isTopNavigationActive('/')"
+                                           :color="isTopNavigationActive('/') ? 'primary' : 'default'">
+                                        <v-icon :icon="isTopNavigationActive('/') ? mdiHome : mdiHomeOutline" size="24" />
+                                        <v-tooltip activator="parent">{{ tt('Overview') }}</v-tooltip>
+                                    </v-btn>
+                                </router-link>
 
-                            <router-link to="/transaction/list?pageType=0&dateType=7">
-                                <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                       :aria-label="tt('Transaction Details')"
-                                       :active="isTopNavigationActive('/transaction/list')"
-                                       :color="isTopNavigationActive('/transaction/list') ? 'primary' : 'default'">
-                                    <v-icon :icon="isTopNavigationActive('/transaction/list') ? mdiListBox : mdiListBoxOutline" size="24" />
-                                    <v-tooltip activator="parent">{{ tt('Transaction Details') }}</v-tooltip>
-                                </v-btn>
-                            </router-link>
+                                <router-link to="/transaction/list?pageType=0&dateType=7">
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
+                                           :aria-label="tt('Transaction Details')"
+                                           :active="isTopNavigationActive('/transaction/list')"
+                                           :color="isTopNavigationActive('/transaction/list') ? 'primary' : 'default'">
+                                        <v-icon :icon="isTopNavigationActive('/transaction/list') ? mdiListBox : mdiListBoxOutline" size="24" />
+                                        <v-tooltip activator="parent">{{ tt('Transaction Details') }}</v-tooltip>
+                                    </v-btn>
+                                </router-link>
 
-                            <router-link to="/statistics/transaction">
-                                <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                       :aria-label="tt('Statistics & Analysis')"
-                                       :active="isTopNavigationActive('/statistics/transaction')"
-                                       :color="isTopNavigationActive('/statistics/transaction') ? 'primary' : 'default'">
-                                    <v-icon :icon="isTopNavigationActive('/statistics/transaction') ? mdiChartPie : mdiChartPieOutline" size="24" />
-                                    <v-tooltip activator="parent">{{ tt('Statistics & Analysis') }}</v-tooltip>
-                                </v-btn>
-                            </router-link>
+                                <router-link to="/statistics/transaction">
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
+                                           :aria-label="tt('Statistics & Analysis')"
+                                           :active="isTopNavigationActive('/statistics/transaction')"
+                                           :color="isTopNavigationActive('/statistics/transaction') ? 'primary' : 'default'">
+                                        <v-icon :icon="isTopNavigationActive('/statistics/transaction') ? mdiChartPie : mdiChartPieOutline" size="24" />
+                                        <v-tooltip activator="parent">{{ tt('Statistics & Analysis') }}</v-tooltip>
+                                    </v-btn>
+                                </router-link>
 
-                            <router-link to="/insights/explorer">
-                                <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                       :aria-label="tt('Insights Explorer')"
-                                       :active="isTopNavigationActive('/insights/explorer')"
-                                       :color="isTopNavigationActive('/insights/explorer') ? 'primary' : 'default'">
-                                    <v-icon :icon="isTopNavigationActive('/insights/explorer') ? mdiCompass : mdiCompassOutline" size="24" />
-                                    <v-tooltip activator="parent">{{ tt('Insights Explorer') }}</v-tooltip>
-                                </v-btn>
-                            </router-link>
+                                <router-link to="/insights/explorer">
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
+                                           :aria-label="tt('Insights Explorer')"
+                                           :active="isTopNavigationActive('/insights/explorer')"
+                                           :color="isTopNavigationActive('/insights/explorer') ? 'primary' : 'default'">
+                                        <v-icon :icon="isTopNavigationActive('/insights/explorer') ? mdiCompass : mdiCompassOutline" size="24" />
+                                        <v-tooltip activator="parent">{{ tt('Insights Explorer') }}</v-tooltip>
+                                    </v-btn>
+                                </router-link>
 
-                            <router-link to="/account/list">
-                                <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                       :aria-label="tt('Accounts')"
-                                       :active="isTopNavigationActive('/account/list')"
-                                       :color="isTopNavigationActive('/account/list') ? 'primary' : 'default'">
-                                    <v-icon :icon="isTopNavigationActive('/account/list') ? mdiCreditCard : mdiCreditCardOutline" size="24" />
-                                    <v-tooltip activator="parent">{{ tt('Accounts') }}</v-tooltip>
-                                </v-btn>
-                            </router-link>
+                                <router-link to="/account/list">
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
+                                           :aria-label="tt('Accounts')"
+                                           :active="isTopNavigationActive('/account/list')"
+                                           :color="isTopNavigationActive('/account/list') ? 'primary' : 'default'">
+                                        <v-icon :icon="isTopNavigationActive('/account/list') ? mdiCreditCard : mdiCreditCardOutline" size="24" />
+                                        <v-tooltip activator="parent">{{ tt('Accounts') }}</v-tooltip>
+                                    </v-btn>
+                                </router-link>
 
-                            <router-link class="d-inline-flex align-center" to="/transaction/list?pageType=0&dateType=7"
-                                         v-if="showAddTransactionButtonInDesktopNavbar">
-                                <v-btn class="add-transaction-button ms-2" color="primary" density="comfortable" variant="flat"
-                                       :aria-label="tt('Add Transaction')" :icon="true"
-                                       @click="showAddDialogInTransactionListPage">
-                                    <v-icon :icon="mdiPlus" size="22" />
-                                    <v-tooltip activator="parent">{{ tt('Add Transaction') }}</v-tooltip>
-                                </v-btn>
-                            </router-link>
+                                <router-link class="d-inline-flex align-center" to="/transaction/list?pageType=0&dateType=7"
+                                             v-if="showAddTransactionButtonInDesktopNavbar">
+                                    <v-btn class="add-transaction-button ms-2" color="primary" density="comfortable" variant="flat"
+                                           :aria-label="tt('Add Transaction')" :icon="true"
+                                           @click="showAddDialogInTransactionListPage">
+                                        <v-icon :icon="mdiPlus" size="22" />
+                                        <v-tooltip activator="parent">{{ tt('Add Transaction') }}</v-tooltip>
+                                    </v-btn>
+                                </router-link>
+                            </slot>
                         </div>
                         <v-spacer />
                         <v-btn class="ms-2" color="primary" variant="text" density="comfortable"

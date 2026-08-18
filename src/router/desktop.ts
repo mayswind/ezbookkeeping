@@ -29,6 +29,8 @@ import TransactionTemplateListPage from '@/views/desktop/templates/ListPage.vue'
 
 import UserCustomIconListPage from '@/views/desktop/customicons/ListPage.vue';
 
+import OverviewLayoutEditorPage from '@/views/desktop/overview/LayoutEditorPage.vue';
+
 import UserSettingsPageLayout from '@/views/desktop/user/UserSettingsPageLayout.vue';
 import UserBasicSettingPage from '@/views/desktop/user/UserBasicSettingPage.vue';
 import UserSecuritySettingPage from '@/views/desktop/user/UserSecuritySettingPage.vue';
@@ -219,6 +221,11 @@ const router = createRouter({
                     beforeEnter: checkLogin
                 }
             ]
+        },
+        {
+            path: '/overview/edit',
+            component: OverviewLayoutEditorPage,
+            beforeEnter: checkLogin
         },
         {
             path: '/',

@@ -1,17 +1,17 @@
 <template>
     <v-dialog width="1000" v-model="showState">
         <one-column-dialog-layout content-class="pa-0" content-style="height: 500px"
-                                  :title="tt('Export Queries')" :cancel-button-title="tt('Cancel')"
+                                  :title="title" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
                 <div ref="buttonContainer">
                     <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
-                           :disabled="!queriesJson" @click="copy">
+                           :disabled="!json" @click="copy">
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>
                     <v-btn density="compact" color="default" variant="text" class="ms-1" :icon="true"
-                           :disabled="!queriesJson" @click="save()">
+                           :disabled="!json" @click="save">
                         <v-icon :icon="mdiContentSaveOutline" size="22" />
                         <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
                     </v-btn>
@@ -23,7 +23,7 @@
                     <v-textarea no-resize class="w-100 h-100 ps-3 always-cursor-text"
                                 density="compact" variant="plain"
                                 :readonly="true" :rounded="false"
-                                :value="queriesJson"></v-textarea>
+                                :value="json"></v-textarea>
                 </div>
             </template>
         </one-column-dialog-layout>
@@ -35,12 +35,9 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-
-import { useUserStore } from '@/stores/user.ts';
-
 import { KnownFileType } from '@/core/file.ts';
 
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
@@ -50,43 +47,38 @@ import {
     mdiContentSaveOutline
 } from '@mdi/js';
 
+export interface JsonExportDialogOptions {
+    json: string;
+}
+
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const { tt } = useI18n();
+const props = defineProps<{
+    title: string;
+    fileName: string;
+}>();
 
-const userStore = useUserStore();
+const { tt } = useI18n();
 
 const buttonContainer = useTemplateRef<HTMLElement>('buttonContainer');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
-const queriesJson = ref<string>('');
+const json = ref<string>('');
 
-const fileName = computed<string>(() => {
-    const nickname = userStore.currentUserNickname;
-
-    if (nickname) {
-        return tt('dataExport.insightsExplorerQueryFileName', {
-            nickname: nickname
-        });
-    }
-
-    return tt('dataExport.defaultInsightsExplorerQueryFileName');
-});
-
-function open(options: { queriesJson: string }): void {
-    queriesJson.value = options.queriesJson;
+function open(options: JsonExportDialogOptions): void {
+    json.value = options.json;
     showState.value = true;
 }
 
 function copy(): void {
-    copyTextToClipboard(queriesJson.value, buttonContainer.value);
+    copyTextToClipboard(json.value, buttonContainer.value);
     snackbar.value?.showMessage('Data copied');
 }
 
 function save(): void {
     const fileType = KnownFileType.JSON;
-    startDownloadFile(fileType.formatFileName(fileName.value), fileType.createBlob(queriesJson.value));
+    startDownloadFile(fileType.formatFileName(props.fileName), fileType.createBlob(json.value));
 }
 
 function cancel(): void {

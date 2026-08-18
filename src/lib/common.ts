@@ -208,6 +208,14 @@ export function getNumberValue(value: unknown, defaultValue: number): number {
     }
 }
 
+export function normalizeInteger(value: unknown, fallback: number, min: number, max: number): number {
+    if (!isInteger(value)) {
+        return fallback;
+    }
+
+    return Math.min(max, Math.max(min, Math.round(value)));
+}
+
 export function sortNumbersArray(array: number[]): number[] {
     return array.sort(function (num1, num2) {
         return num1 - num2;

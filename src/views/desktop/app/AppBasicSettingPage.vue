@@ -111,6 +111,19 @@
                     <v-card-text>
                         <v-row>
                             <v-col cols="12" md="6">
+                                <v-text-field
+                                    class="always-cursor-pointer"
+                                    persistent-placeholder
+                                    :readonly="true"
+                                    :label="tt('Home Page Layout')"
+                                    :placeholder="tt('Home Page Layout')"
+                                    :model-value="desktopOverviewPageLayoutDisplayContent"
+                                    @pointerdown.prevent
+                                    @click="router.push('/overview/edit')"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
                                 <v-select
                                     item-title="displayName"
                                     item-value="value"
@@ -486,6 +499,7 @@ import ChartColorSchemeDialog from '@/views/desktop/app/settings/dialogs/ChartCo
 import AccountCategoryDisplayOrderDialog from '@/views/desktop/app/settings/dialogs/AccountCategoryDisplayOrderDialog.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -503,6 +517,7 @@ import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP } from '@/core/s
 
 import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 
+import { isDefaultDesktopOverviewLayout, parseDesktopOverviewLayout } from '@/lib/overview_layout.ts';
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -510,6 +525,7 @@ type ChartColorSchemeDialogType = InstanceType<typeof ChartColorSchemeDialog>;
 type AccountCategoryDisplayOrderDialogType = InstanceType<typeof AccountCategoryDisplayOrderDialog>;
 
 const theme = useTheme();
+const router = useRouter();
 
 const { tt, getAllEnableDisableOptions, getAllDateRanges, getTablePageOptions } = useI18n();
 const {
@@ -577,6 +593,14 @@ const currentTheme = computed<string>({
                 theme.change(getSystemTheme());
             }
         }
+    }
+});
+
+const desktopOverviewPageLayoutDisplayContent = computed(() => {
+    try {
+        return tt(isDefaultDesktopOverviewLayout(parseDesktopOverviewLayout(settingsStore.appSettings.desktopOverviewPageLayout)) ? 'Default' : 'Custom');
+    } catch {
+        return tt('Custom');
     }
 });
 

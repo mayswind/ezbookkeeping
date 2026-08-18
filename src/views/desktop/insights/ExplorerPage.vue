@@ -193,8 +193,8 @@
 
     <explorer-change-display-order-dialog ref="explorerChangeDisplayOrderDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
-    <query-import-dialog ref="queryImportDialog" />
-    <query-export-dialog ref="queryExportDialog" />
+    <json-import-dialog ref="queryImportDialog" :title="tt('Import Queries')" :sample-json="sampleQueryJson" :on-import="onImportQueries" />
+    <json-export-dialog ref="queryExportDialog" :title="tt('Export Queries')" :file-name="queryExportFileName" />
     <export-dialog ref="exportDialog" />
 
     <rename-dialog ref="renameDialog"
@@ -208,14 +208,14 @@
 import RenameDialog from '@/components/desktop/RenameDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import JsonImportDialog from '@/components/desktop/JsonImportDialog.vue';
+import JsonExportDialog from '@/components/desktop/JsonExportDialog.vue';
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
 import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTableTab.vue';
 import ExplorerEditableDataTableTab from '@/views/desktop/insights/tabs/ExplorerEditableDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
 import ExplorerChangeDisplayOrderDialog from '@/views/desktop/insights/dialogs/ExplorerChangeDisplayOrderDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
-import QueryImportDialog from '@/views/desktop/insights/dialogs/QueryImportDialog.vue';
-import QueryExportDialog from '@/views/desktop/insights/dialogs/QueryExportDialog.vue';
 import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -245,8 +245,9 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.ts';
 
-import { isEquals } from '@/lib/common.ts';
+import { isEquals, isTextualUUID } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
+import logger from '@/lib/logger.ts';
 
 import {
     mdiArrowLeft,
@@ -283,12 +284,12 @@ type ExplorerPageTabType = 'query' | 'table' | 'chart';
 type RenameDialogType = InstanceType<typeof RenameDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
+type JsonImportDialogType = InstanceType<typeof JsonImportDialog>;
+type JsonExportDialogType = InstanceType<typeof JsonExportDialog>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
 type ExplorerChangeDisplayOrderDialogType = InstanceType<typeof ExplorerChangeDisplayOrderDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
-type QueryImportDialogType = InstanceType<typeof QueryImportDialog>;
-type QueryExportDialogType = InstanceType<typeof QueryExportDialog>;
 type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 const router = useRouter();
@@ -314,11 +315,11 @@ const timezoneTypeIconMap = {
 const renameDialog = useTemplateRef<RenameDialogType>('renameDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const queryImportDialog = useTemplateRef<JsonImportDialogType>('queryImportDialog');
+const queryExportDialog = useTemplateRef<JsonExportDialogType>('queryExportDialog');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
 const explorerChangeDisplayOrderDialog = useTemplateRef<ExplorerChangeDisplayOrderDialogType>('explorerChangeDisplayOrderDialog');
-const queryImportDialog = useTemplateRef<QueryImportDialogType>('queryImportDialog');
-const queryExportDialog = useTemplateRef<QueryExportDialogType>('queryExportDialog');
 const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
@@ -333,6 +334,36 @@ const showCustomDateRangeDialog = ref<boolean>(false);
 
 const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
 const fiscalYearStart = computed<number>(() => userStore.currentUserFiscalYearStart);
+
+const queryExportFileName = computed<string>(() => {
+    const nickname = userStore.currentUserNickname;
+
+    if (nickname) {
+        return tt('dataExport.insightsExplorerQueryFileName', {
+            nickname: nickname
+        });
+    }
+
+    return tt('dataExport.defaultInsightsExplorerQueryFileName');
+});
+
+const sampleQueryJson = computed<string>(() => `[
+    {
+        "id": "", // ${tt('sample.importInsightsExplorerQueries.queryIdDescription')}
+        "name": "", // ${tt('sample.importInsightsExplorerQueries.queryNameDescription')}
+        "conditions": [
+            {
+                "condition": { // ${tt('sample.importInsightsExplorerQueries.conditionDescription')}
+                    "field": "", // ${tt('sample.importInsightsExplorerQueries.conditionFieldDescription')}
+                    "operator": "", // ${tt('sample.importInsightsExplorerQueries.conditionOperatorDescription')}
+                    "value": "" // ${tt('sample.importInsightsExplorerQueries.conditionValueDescription')}
+                },
+                "relation": "" // ${tt('sample.importInsightsExplorerQueries.conditionRelationDescription')}
+            }
+            // ${tt('sample.importInsightsExplorerQueries.additionalQueryDescription')}
+        ]
+    }
+]`);
 
 const allExplorations = computed<InsightsExplorerBasicInfo[]>(() => explorersStore.allExplorationBasicInfos);
 const allVisibleExplorations = computed<InsightsExplorerBasicInfo[]>(() => {
@@ -665,22 +696,14 @@ function removeExploration(): void {
 
 function importQueries(): void {
     if (activeTab.value === 'query') {
-        queryImportDialog.value?.open().then((queries: TransactionExplorerQuery[]) => {
-            if (!queries || queries.length < 1) {
-                return;
-            }
-
-            explorersStore.currentExploration.queries.length = 0;
-            explorersStore.currentExploration.queries.push(...queries);
-            initExploration.value = InsightsExplorer.of(currentExploration.value);
-        });
+        queryImportDialog.value?.open();
     }
 }
 
 function exportQueries(): void {
     if (activeTab.value === 'query') {
         queryExportDialog.value?.open({
-            queriesJson: explorersStore.currentExploration.getQueryiesPrettyJson()
+            json: explorersStore.currentExploration.getQueryiesPrettyJson()
         });
     }
 }
@@ -767,6 +790,71 @@ function shiftDateRange(scale: number): void {
         loading.value = true;
         explorersStore.updateTransactionExplorerInvalidState(true);
         router.push(getFilterLinkUrl());
+    }
+}
+
+function onImportQueries(data: string): boolean {
+    try {
+        const queryItems = JSON.parse(data);
+
+        if (!Array.isArray(queryItems)) {
+            snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
+            return false;
+        }
+
+        if (!queryItems || queryItems.length < 1) {
+            snackbar.value?.showError('No valid queries found in the input. Please make sure the queries are valid and try again.');
+            return false;
+        }
+
+        const queries: TransactionExplorerQuery[] = [];
+        const queryIds: Record<string, boolean> = {};
+
+        for (const queryItem of queryItems) {
+            let originalId: string = '';
+
+            if (!('id' in queryItem) || !queryItem['id']) {
+                queryItem['id'] = generateRandomUUID();
+            } else {
+                const queryId = queryItem['id'];
+
+                if (!isTextualUUID(queryId)) {
+                    snackbar.value?.showMessage('format.misc.queryIdInvalidTip', { id: queryId });
+                    return false;
+                }
+
+                originalId = queryId;
+            }
+
+            const query = TransactionExplorerQuery.parse(queryItem);
+
+            if (!query) {
+                snackbar.value?.showMessage('format.misc.queryInvalidTip', { id: originalId });
+                return false;
+            }
+
+            if (queryIds[query.id]) {
+                snackbar.value?.showMessage('format.misc.queryIdDuplicatedTip', { id: query.id });
+                return false;
+            }
+
+            queries.push(query);
+            queryIds[query.id] = true;
+        }
+
+        if (!queries || queries.length < 1) {
+            snackbar.value?.showError('No valid queries found in the input. Please make sure the queries are valid and try again.');
+            return false;
+        }
+
+        explorersStore.currentExploration.queries.length = 0;
+        explorersStore.currentExploration.queries.push(...queries);
+        initExploration.value = InsightsExplorer.of(currentExploration.value);
+        return true;
+    } catch (error) {
+        logger.error('Failed to import queries', error);
+        snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
+        return false;
     }
 }
 

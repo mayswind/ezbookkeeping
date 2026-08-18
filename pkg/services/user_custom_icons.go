@@ -246,6 +246,25 @@ func (s *UserCustomIconService) DeleteCustomIcon(c core.Context, uid int64, icon
 	})
 }
 
+// DeleteAllCustomIcons deletes all existed user custom icons from database
+func (s *UserCustomIconService) DeleteAllCustomIcons(c core.Context, uid int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	now := time.Now().Unix()
+
+	updateModel := &models.UserCustomIcon{
+		Deleted:         true,
+		DeletedUnixTime: now,
+	}
+
+	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
+		return err
+	})
+}
+
 // ExistsCustomIcon returns whether the given user has existed custom icon
 func (s *UserCustomIconService) ExistsCustomIcon(c core.Context, uid int64, iconId int64) (bool, error) {
 	if uid <= 0 {

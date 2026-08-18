@@ -28,7 +28,8 @@ export function useDataManagementPageBase() {
             totalTransactionPictureCount: formatBigDecimalToLocalizedNumerals(parseBigDecimal(dataStatistics.value.totalTransactionPictureCount)),
             totalExplorationCount: formatBigDecimalToLocalizedNumerals(parseBigDecimal(dataStatistics.value.totalExplorationCount)),
             totalTransactionTemplateCount: formatBigDecimalToLocalizedNumerals(parseBigDecimal(dataStatistics.value.totalTransactionTemplateCount)),
-            totalScheduledTransactionCount: formatBigDecimalToLocalizedNumerals(parseBigDecimal(dataStatistics.value.totalScheduledTransactionCount))
+            totalScheduledTransactionCount: formatBigDecimalToLocalizedNumerals(parseBigDecimal(dataStatistics.value.totalScheduledTransactionCount)),
+            totalCustomIconCount: formatBigDecimalToLocalizedNumerals(parseBigDecimal(dataStatistics.value.totalCustomIconCount))
         };
     });
 

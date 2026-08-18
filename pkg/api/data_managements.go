@@ -31,6 +31,7 @@ type DataManagementsApi struct {
 	tagGroups               *services.TransactionTagGroupService
 	pictures                *services.TransactionPictureService
 	templates               *services.TransactionTemplateService
+	userCustomIcons         *services.UserCustomIconService
 	userCustomExchangeRates *services.UserCustomExchangeRatesService
 	insightsExploreres      *services.InsightsExplorerService
 }
@@ -50,6 +51,7 @@ var (
 		tagGroups:               services.TransactionTagGroups,
 		pictures:                services.TransactionPictures,
 		templates:               services.TransactionTemplates,
+		userCustomIcons:         services.UserCustomIcons,
 		userCustomExchangeRates: services.UserCustomExchangeRates,
 		insightsExploreres:      services.InsightsExplorers,
 	}
@@ -124,6 +126,13 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrOperationFailed
 	}
 
+	totalCustomIconCount, err := a.userCustomIcons.GetTotalCustomIconsCountByUid(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.DataStatisticsHandler] failed to get total custom icon count for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.ErrOperationFailed
+	}
+
 	dataStatisticsResp := &models.DataStatisticsResponse{
 		TotalAccountCount:              totalAccountCount,
 		TotalTransactionCategoryCount:  totalTransactionCategoryCount,
@@ -133,6 +142,7 @@ func (a *DataManagementsApi) DataStatisticsHandler(c *core.WebContext) (any, *er
 		TotalExplorationCount:          totalExplorationCount,
 		TotalTransactionTemplateCount:  totalTransactionTemplateCount,
 		TotalScheduledTransactionCount: totalScheduledTransactionCount,
+		TotalCustomIconCount:           totalCustomIconCount,
 	}
 
 	return dataStatisticsResp, nil
@@ -199,6 +209,13 @@ func (a *DataManagementsApi) ClearAllDataHandler(c *core.WebContext) (any, *errs
 
 	if err != nil {
 		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all transaction tag groups, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	err = a.userCustomIcons.DeleteAllCustomIcons(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all user custom icons, because %s", err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

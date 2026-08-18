@@ -66,6 +66,12 @@
                                 count: displayDataStatistics ? displayDataStatistics.totalScheduledTransactionCount : '-',
                                 icon: mdiClipboardTextClockOutline,
                                 color: 'success-darken-1'
+                            },
+                            {
+                                title: 'Custom Icons',
+                                count: displayDataStatistics ? displayDataStatistics.totalCustomIconCount : '-',
+                                icon: mdiShapePlusOutline,
+                                color: 'purple'
                             }
                         ]">
                             <div class="d-flex align-center">
@@ -193,6 +199,7 @@ import {
     mdiTagOutline,
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,
+    mdiShapePlusOutline,
     mdiAlert
 } from '@mdi/js';
 

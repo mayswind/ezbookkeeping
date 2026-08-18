@@ -30,6 +30,7 @@ import {
     isObject,
     isString
 } from '@/lib/common.ts';
+import { clearCustomIconCache } from '@/lib/cache.ts';
 import {
     hasUserAppLockState,
     getUserAppLockState,
@@ -629,6 +630,9 @@ export const useRootStore = defineStore('root', () => {
                 if (!statisticsStore.transactionStatisticsStateInvalid) {
                     statisticsStore.updateTransactionStatisticsInvalidState(true);
                 }
+
+                userCustomIconsStore.resetCustomIcons();
+                clearCustomIconCache();
 
                 resolve(data.result);
             }).catch(error => {

@@ -18,6 +18,7 @@ export type OverviewWidgetSettingValue = string | number | boolean;
 export interface DesktopOverviewWidgetDefinition {
     type: OverviewWidgetType;
     name: string;
+    supportsSettings: boolean;
     defaultWidth: number;
     defaultHeight: number;
     minWidth: number;

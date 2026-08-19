@@ -13,6 +13,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: Record<OverviewWidgetType, Des
     [OverviewWidgetType.CurrentMonthOverview]: {
         type: OverviewWidgetType.CurrentMonthOverview,
         name: 'Monthly Expense Overview',
+        supportsSettings: false,
         defaultWidth: 4,
         defaultHeight: 3,
         minWidth: 3,
@@ -25,6 +26,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: Record<OverviewWidgetType, Des
     [OverviewWidgetType.AssetSummary]: {
         type: OverviewWidgetType.AssetSummary,
         name: 'Asset Summary',
+        supportsSettings: false,
         defaultWidth: 8,
         defaultHeight: 3,
         minWidth: 3,
@@ -37,6 +39,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: Record<OverviewWidgetType, Des
     [OverviewWidgetType.PeriodIncomeExpense]: {
         type: OverviewWidgetType.PeriodIncomeExpense,
         name: 'Period Income and Expense',
+        supportsSettings: true,
         defaultWidth: 3,
         defaultHeight: 3,
         minWidth: 2,
@@ -51,6 +54,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: Record<OverviewWidgetType, Des
     [OverviewWidgetType.IncomeExpenseTrend]: {
         type: OverviewWidgetType.IncomeExpenseTrend,
         name: 'Income and Expense Trends',
+        supportsSettings: true,
         defaultWidth: 6,
         defaultHeight: 6,
         minWidth: 3,

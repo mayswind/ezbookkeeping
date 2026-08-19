@@ -19,9 +19,11 @@
                         <v-tooltip activator="parent">{{ tt('More') }}</v-tooltip>
                         <v-menu activator="parent">
                             <v-list>
-                                <v-list-item :prepend-icon="mdiCogOutline" :title="tt('Settings')"
-                                             @click="$emit('configure', widget)" />
-                                <v-divider class="my-2" />
+                                <template v-if="DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.type].supportsSettings">
+                                    <v-list-item :prepend-icon="mdiCogOutline" :title="tt('Settings')"
+                                                 @click="$emit('configure', widget)" />
+                                    <v-divider class="my-2" />
+                                </template>
                                 <v-list-item :prepend-icon="mdiDeleteOutline" :title="tt('Delete')"
                                              @click="$emit('remove', widget.id)" />
                             </v-list>

@@ -19,6 +19,7 @@ import {
     isObject,
     isArray,
     isString,
+    isInteger,
     normalizeInteger
 } from '@/lib/common.ts';
 
@@ -70,6 +71,22 @@ export function getOverviewDataRequirements(layout: DesktopOverviewLayout): Over
     }
 
     return result;
+}
+
+export function getOverviewTransactionOverviewMonths(layout: DesktopOverviewLayout): number {
+    let months: number = 1;
+
+    for (const widget of layout.widgets) {
+        if (widget.type === OverviewWidgetType.IncomeExpenseTrend) {
+            const monthsValue = widget.settings['months'];
+
+            if (isInteger(monthsValue)) {
+                months = Math.max(months, monthsValue);
+            }
+        }
+    }
+
+    return months;
 }
 
 export function resolveOverviewWidgetCollisions(widgets: DesktopOverviewWidgetLayout[], activeId?: string): DesktopOverviewWidgetLayout[] {

@@ -24,7 +24,11 @@ import { DEFAULT_DESKTOP_OVERVIEW_LAYOUT } from '@/consts/overview_layout.ts';
 
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { getShareCacheImageBlob } from '@/lib/cache.ts';
-import { getOverviewDataRequirements, parseDesktopOverviewLayout } from '@/lib/overview_layout.ts';
+import {
+    getOverviewDataRequirements,
+    getOverviewTransactionOverviewMonths,
+    parseDesktopOverviewLayout
+} from '@/lib/overview_layout.ts';
 import logger from '@/lib/logger.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -66,8 +70,8 @@ function reload(force: boolean): void {
 
     if (requirements.includes(OverviewWidgetDataRequirement.TransactionOverview)) {
         promises.push(overviewStore.loadTransactionOverview({
-            force,
-            loadLast11Months: requirements.includes(OverviewWidgetDataRequirement.TransactionOverviewLast12Months)
+            force: force,
+            months: getOverviewTransactionOverviewMonths(layout.value)
         }));
     }
 

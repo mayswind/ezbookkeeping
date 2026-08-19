@@ -208,9 +208,9 @@ export function getNumberValue(value: unknown, defaultValue: number): number {
     }
 }
 
-export function normalizeInteger(value: unknown, fallback: number, min: number, max: number): number {
+export function normalizeInteger(value: unknown, defaultValue: number, min: number, max: number): number {
     if (!isInteger(value)) {
-        return fallback;
+        return defaultValue;
     }
 
     return Math.min(max, Math.max(min, Math.round(value)));

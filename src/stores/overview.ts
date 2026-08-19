@@ -17,13 +17,17 @@ import type {
     TransactionAmountsResponse,
     TransactionOverviewData
 } from '@/models/transaction.ts';
-import { ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE } from '@/models/transaction.ts';
+import {
+    ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE,
+    LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES
+} from '@/models/transaction.ts';
 
 import {
     isDefined,
     isNumber,
     isEquals,
     isObjectEmpty,
+    normalizeInteger,
     objectFieldWithValueToArrayItem
 } from '@/lib/common.ts';
 import {
@@ -110,7 +114,7 @@ interface TransactionDataRange extends Record<TransactionAmountsRequestType, Wri
 }
 
 interface TransactionOverviewOptions {
-    loadLast11Months: boolean;
+    loadedMonths: number;
 }
 
 export const useOverviewStore = defineStore('overview', () => {
@@ -123,7 +127,7 @@ export const useOverviewStore = defineStore('overview', () => {
     const transactionDataRange = ref<TransactionDataRange>(getTransactionDateRange());
 
     const transactionOverviewOptions = ref<TransactionOverviewOptions>({
-        loadLast11Months: false
+        loadedMonths: 1
     });
 
     const transactionOverviewData = ref<TransactionAmountsResponse>({});
@@ -257,21 +261,22 @@ export const useOverviewStore = defineStore('overview', () => {
 
     function resetTransactionOverview(): void {
         updateTransactionDateRange();
-        transactionOverviewOptions.value.loadLast11Months = false;
+        transactionOverviewOptions.value.loadedMonths = 1;
         transactionOverviewData.value = {};
         transactionOverviewStateInvalid.value = true;
     }
 
-    function loadTransactionOverview({ force, loadLast11Months }: { force: boolean, loadLast11Months?: boolean }): Promise<TransactionAmountsResponse> {
-        let dateChanged = false;
-        let rangeChanged = false;
+    function loadTransactionOverview({ force, months }: { force: boolean, months?: number }): Promise<TransactionAmountsResponse> {
+        const requestedMonths: number = normalizeInteger(months, 1, 1, 12);
+        let dateChanged: boolean = false;
+        let rangeChanged: boolean = false;
 
         if (transactionDataRange.value.today.startTime !== getTodayFirstUnixTime()) {
             dateChanged = true;
             updateTransactionDateRange();
         }
 
-        if (loadLast11Months && !transactionOverviewOptions.value.loadLast11Months) {
+        if (requestedMonths > transactionOverviewOptions.value.loadedMonths) {
             rangeChanged = true;
         }
 
@@ -289,18 +294,10 @@ export const useOverviewStore = defineStore('overview', () => {
             thisYear: transactionDataRange.value.thisYear
         };
 
-        if (loadLast11Months) {
-            requestParams.lastMonth = transactionDataRange.value.lastMonth;
-            requestParams.monthBeforeLastMonth = transactionDataRange.value.monthBeforeLastMonth;
-            requestParams.monthBeforeLast2Months = transactionDataRange.value.monthBeforeLast2Months;
-            requestParams.monthBeforeLast3Months = transactionDataRange.value.monthBeforeLast3Months;
-            requestParams.monthBeforeLast4Months = transactionDataRange.value.monthBeforeLast4Months;
-            requestParams.monthBeforeLast5Months = transactionDataRange.value.monthBeforeLast5Months;
-            requestParams.monthBeforeLast6Months = transactionDataRange.value.monthBeforeLast6Months;
-            requestParams.monthBeforeLast7Months = transactionDataRange.value.monthBeforeLast7Months;
-            requestParams.monthBeforeLast8Months = transactionDataRange.value.monthBeforeLast8Months;
-            requestParams.monthBeforeLast9Months = transactionDataRange.value.monthBeforeLast9Months;
-            requestParams.monthBeforeLast10Months = transactionDataRange.value.monthBeforeLast10Months;
+        const requestedMonthTypes: TransactionAmountsRequestType[] = LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES.slice(-requestedMonths, -1);
+
+        for (const requestType of requestedMonthTypes) {
+            requestParams[requestType] = transactionDataRange.value[requestType];
         }
 
         const excludeAccountIds: string[] = objectFieldWithValueToArrayItem(settingsStore.appSettings.overviewAccountFilterInHomePage, true);
@@ -325,7 +322,7 @@ export const useOverviewStore = defineStore('overview', () => {
                 }
 
                 transactionOverviewData.value = data.result;
-                transactionOverviewOptions.value.loadLast11Months = !!loadLast11Months;
+                transactionOverviewOptions.value.loadedMonths = requestedMonths;
 
                 resolve(data.result);
             }).catch(error => {

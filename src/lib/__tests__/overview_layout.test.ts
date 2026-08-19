@@ -8,6 +8,7 @@ import {
     serializeDesktopOverviewLayout,
     isDefaultDesktopOverviewLayout,
     getOverviewDataRequirements,
+    getOverviewTransactionOverviewMonths,
     resolveOverviewWidgetCollisions,
     compactOverviewWidgets,
     normalizeDesktopOverviewLayout,
@@ -78,6 +79,23 @@ describe('desktop overview layout', () => {
         expect(requirements.includes(OverviewWidgetDataRequirement.TransactionOverview)).toBe(true);
         expect(requirements.includes(OverviewWidgetDataRequirement.TransactionOverviewLast12Months)).toBe(true);
         expect(requirements.includes(OverviewWidgetDataRequirement.Accounts)).toBe(false);
+    });
+
+    test('gets the maximum transaction overview months required by widgets', () => {
+        const sixMonthLayout = normalizeDesktopOverviewLayout({
+            version: 1,
+            widgets: [{ id: 'trend', type: OverviewWidgetType.IncomeExpenseTrend, x: 0, y: 0, w: 6, h: 6, settings: { months: 6 } }]
+        });
+        expect(getOverviewTransactionOverviewMonths(sixMonthLayout)).toBe(6);
+
+        const mixedLayout = normalizeDesktopOverviewLayout({
+            version: 1,
+            widgets: [
+                { id: 'six-month-trend', type: OverviewWidgetType.IncomeExpenseTrend, x: 0, y: 0, w: 6, h: 6, settings: { months: 6 } },
+                { id: 'twelve-month-trend', type: OverviewWidgetType.IncomeExpenseTrend, x: 6, y: 0, w: 6, h: 6, settings: { months: 12 } }
+            ]
+        });
+        expect(getOverviewTransactionOverviewMonths(mixedLayout)).toBe(12);
     });
 
     test('round trips serialized layout', () => {

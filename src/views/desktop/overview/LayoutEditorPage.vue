@@ -83,6 +83,7 @@ import {
     cloneOverviewLayout,
     findOverviewWidgetPosition,
     getOverviewDataRequirements,
+    getOverviewTransactionOverviewMonths,
     isDefaultDesktopOverviewLayout,
     normalizeDesktopOverviewLayout,
     parseDesktopOverviewLayout,
@@ -158,7 +159,7 @@ function reload(force: boolean): void {
     if (requirements.includes(OverviewWidgetDataRequirement.TransactionOverview)) {
         promises.push(overviewStore.loadTransactionOverview({
             force: force,
-            loadLast11Months: requirements.includes(OverviewWidgetDataRequirement.TransactionOverviewLast12Months)
+            months: getOverviewTransactionOverviewMonths(draftLayout.value)
         }));
     }
 

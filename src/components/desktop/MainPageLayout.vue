@@ -19,7 +19,7 @@
         <div :class="{ 'layout-content-wrapper': !noNavbar }">
             <div class="layout-navbar navbar-blur">
                 <div class="navbar-content-container">
-                    <div class="d-flex h-100 align-center">
+                    <div class="navbar-content d-flex h-100 align-center">
                         <v-btn class="ms-n2 d-lg-none" color="default" variant="text"
                                :aria-label="tt('Open Menu')"
                                :icon="true" @click="showVerticalOverlayMenu = true" v-if="!noNavbar">

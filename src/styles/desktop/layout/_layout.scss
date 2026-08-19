@@ -191,6 +191,18 @@
     padding-inline: var(--ebk-space-5);
 }
 
+.navbar-content {
+    min-width: 0;
+}
+
+.app-top-toolbar {
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+}
+
 .layout-page-content {
     width: 100%;
     flex: 1;

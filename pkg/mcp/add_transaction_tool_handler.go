@@ -25,7 +25,7 @@ type MCPAddTransactionRequest struct {
 	Time                   string   `json:"time" jsonschema:"format=date-time" jsonschema_description:"Transaction time in RFC 3339 format (e.g. 2023-01-01T12:00:00Z)"`
 	SecondaryCategoryName  string   `json:"category_name" jsonschema_description:"Secondary category name for the transaction"`
 	AccountName            string   `json:"account_name" jsonschema_description:"Account name for the transaction"`
-	Amount                 string   `json:"amount" jsonschema_description:"Transaction amount"`
+	Amount                 string   `json:"amount" jsonschema_description:"Transaction amount (e.g. for an expense transaction, 12.34 represents an expense of 12.34)"`
 	DestinationAccountName string   `json:"destination_account_name,omitempty" jsonschema_description:"Destination account name for transfer transactions (optional)"`
 	DestinationAmount      string   `json:"destination_amount,omitempty" jsonschema_description:"Destination amount for transfer transactions (optional)"`
 	Tags                   []string `json:"tags,omitempty" jsonschema_description:"List of tags associated with the transaction (optional, maximum 10 tags allowed)"`

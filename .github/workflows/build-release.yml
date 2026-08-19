@@ -73,6 +73,7 @@ jobs:
           release-build: 1
           build-unix-time: ${{ needs.setup.outputs.build-unix-time }}
           build-date: ${{ needs.setup.outputs.build-date }}
+          build-node-options: ${{ vars.BUILD_NODE_OPTIONS }}
           check-3rd-api: ${{ vars.CHECK_3RD_API }}
           skip-tests: ${{ vars.SKIP_TESTS }}
           platform: linux/amd64
@@ -109,6 +110,7 @@ jobs:
           release-build: 1
           build-unix-time: ${{ needs.setup.outputs.build-unix-time }}
           build-date: ${{ needs.setup.outputs.build-date }}
+          build-node-options: ${{ vars.BUILD_NODE_OPTIONS }}
           check-3rd-api: ${{ vars.CHECK_3RD_API }}
           skip-tests: ${{ vars.SKIP_TESTS }}
           platform: ${{ matrix.platform }}

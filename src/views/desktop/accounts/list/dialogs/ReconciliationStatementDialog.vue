@@ -196,7 +196,7 @@
                     </template>
                     <template #item.categoryName="{ item }">
                         <div class="d-flex align-center">
-                            <ItemIcon size="24px" icon-type="category"
+                            <ItemIcon size="24px" :icon-type="getCategoryIconType(item.category?.iconType)"
                                       :icon-id="item.category?.icon ?? ''"
                                       :color="item.category?.color ?? ''"
                                       v-if="item.category && item.category?.color"></ItemIcon>
@@ -339,16 +339,20 @@ import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
 import { KnownFileType } from '@/core/file.ts';
+
+import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts'
+
 import { Transaction, type TransactionReconciliationStatementResponseItem } from '@/models/transaction.ts';
 
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
     extendMdiSemicolon
-} from '@/icons/desktop/extend_mdi_icons.ts';
+} from '@/exticons/desktop/extend_mdi_icons.ts';
 import {
     mdiRefresh,
     mdiArrowRight,
@@ -382,7 +386,8 @@ const emit = defineEmits<{
 
 const {
     tt,
-    formatNumberToLocalizedNumerals
+    formatNumberToLocalizedNumerals,
+    getTablePageOptions
 } = useI18n();
 
 const {
@@ -471,7 +476,7 @@ const transactionListDialogHeight = ref<number>(0);
 
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
-const reconciliationStatementsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(reconciliationStatements.value?.transactions.length));
+const reconciliationStatementsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, reconciliationStatements.value?.transactions.length, true, false));
 const preserveDialogHeight = computed<boolean>(() => showAccountBalanceTrendsCharts.value && transactionListDialogHeight.value > 0);
 
 const totalPageCount = computed<number>(() => {
@@ -497,29 +502,6 @@ const dataTableHeaders = computed<object[]>(() => {
     headers.push({ key: 'operation', title: tt('Operation'), sortable: false, nowrap: true, align: 'center' });
     return headers;
 });
-
-function getTablePageOptions(linesCount?: number): NameNumeralValue[] {
-    const pageOptions: NameNumeralValue[] = [];
-
-    if (!linesCount || linesCount < 1) {
-        pageOptions.push({ value: -1, name: tt('All') });
-        return pageOptions;
-    }
-
-    const availableCountPerPage = [ 5, 10, 15, 20, 25, 30, 50 ];
-
-    for (const count of availableCountPerPage) {
-        if (linesCount < count) {
-            break;
-        }
-
-        pageOptions.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
-    }
-
-    pageOptions.push({ value: -1, name: tt('All') });
-
-    return pageOptions;
-}
 
 function getTransactionTypeColor(transaction: TransactionReconciliationStatementResponseItem): string | undefined {
     if (transaction.type === TransactionType.ModifyBalance) {

@@ -118,10 +118,10 @@
                     </div>
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
-                                           primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                           primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                           secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                            :items="allCategories[CategoryType.Expense]"
@@ -150,10 +150,10 @@
                     </div>
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
-                                           primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                           primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                           secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                            :items="allCategories[CategoryType.Income]"
@@ -182,10 +182,10 @@
                     </div>
                 </template>
                 <tree-view-selection-sheet primary-key-field="id" primary-title-field="name"
-                                           primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                           primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                            primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                            secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                           secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                           secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                            secondary-hidden-field="hidden"
                                            :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
                                            :items="allCategories[CategoryType.Transfer]"
@@ -204,12 +204,12 @@
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
                                                       primary-title-field="name" primary-footer-field="displayBalance"
-                                                      primary-icon-field="icon" primary-icon-type="account"
+                                                      primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
                                                       primary-sub-items-field="accounts"
                                                       :primary-title-i18n="true"
                                                       secondary-key-field="id" secondary-value-field="id"
                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                      secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                      secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
                                                       :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                                       :items="allVisibleCategorizedAccounts"
                                                       v-model:show="showSourceAccountSheet"
@@ -228,12 +228,12 @@
             >
                 <two-column-list-item-selection-sheet primary-key-field="id" primary-value-field="category"
                                                       primary-title-field="name" primary-footer-field="displayBalance"
-                                                      primary-icon-field="icon" primary-icon-type="account"
+                                                      primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
                                                       primary-sub-items-field="accounts"
                                                       :primary-title-i18n="true"
                                                       secondary-key-field="id" secondary-value-field="id"
                                                       secondary-title-field="name" secondary-footer-field="displayBalance"
-                                                      secondary-icon-field="icon" secondary-icon-type="account" secondary-color-field="color"
+                                                      secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
                                                       :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                                       :items="allVisibleCategorizedAccounts"
                                                       v-model:show="showDestinationAccountSheet"

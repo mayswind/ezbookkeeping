@@ -1,6 +1,7 @@
 package api
 
 import (
+	"slices"
 	"sort"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -20,6 +21,7 @@ type AccountsApi struct {
 	ApiUsingDuplicateChecker
 	accounts *services.AccountService
 	users    *services.UserService
+	icons    *services.UserCustomIconService
 }
 
 // Initialize an account api singleton instance
@@ -36,6 +38,7 @@ var (
 		},
 		accounts: services.Accounts,
 		users:    services.Users,
+		icons:    services.UserCustomIcons,
 	}
 )
 
@@ -266,6 +269,12 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 
 	mainAccount := a.createNewAccountModel(uid, &accountCreateReq, mainAccountBalance, false, maxOrderId+1)
 	childrenAccounts, childrenAccountBalanceTimes := a.createSubAccountModels(uid, &accountCreateReq, subAccountBalances)
+	iconTypeValid := a.isAccountsIconTypeValid(c, uid, slices.Concat([]*models.Account{mainAccount}, childrenAccounts))
+
+	if !iconTypeValid {
+		log.Warnf(c, "[accounts.AccountCreateHandler] icon type invalid for user \"uid:%d\"", uid)
+		return nil, errs.ErrTransactionCategoryIconInvalid
+	}
 
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_ACCOUNT, uid, accountCreateReq.ClientSessionId)
@@ -546,6 +555,13 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 
 	if !anythingUpdate {
 		return nil, errs.ErrNothingWillBeUpdated
+	}
+
+	iconTypeValid := a.isAccountsIconTypeValid(c, uid, slices.Concat(toAddAccounts, toUpdateAccounts))
+
+	if !iconTypeValid {
+		log.Warnf(c, "[accounts.AccountModifyHandler] icon type invalid for user \"uid:%d\"", uid)
+		return nil, errs.ErrTransactionCategoryIconInvalid
 	}
 
 	if len(toAddAccounts) > 0 && a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountModifyReq.ClientSessionId != "" {
@@ -837,6 +853,7 @@ func (a *AccountsApi) createNewAccountModel(uid int64, accountCreateReq *models.
 		Category:     accountCreateReq.Category,
 		Type:         accountCreateReq.Type,
 		Icon:         accountCreateReq.Icon,
+		IconType:     accountCreateReq.IconType,
 		Color:        accountCreateReq.Color,
 		Currency:     accountCreateReq.Currency,
 		Balance:      balance,
@@ -855,6 +872,7 @@ func (a *AccountsApi) createNewSubAccountModelForModify(uid int64, accountType m
 		Category:     accountModifyReq.Category,
 		Type:         accountType,
 		Icon:         accountModifyReq.Icon,
+		IconType:     accountModifyReq.IconType,
 		Color:        accountModifyReq.Color,
 		Currency:     *accountModifyReq.Currency,
 		Balance:      balance,
@@ -894,6 +912,7 @@ func (a *AccountsApi) getToUpdateAccount(user *models.User, accountModifyReq *mo
 		DisplayOrder: oldAccount.DisplayOrder,
 		Category:     accountModifyReq.Category,
 		Icon:         accountModifyReq.Icon,
+		IconType:     accountModifyReq.IconType,
 		Color:        accountModifyReq.Color,
 		Comment:      accountModifyReq.Comment,
 		Extend:       newAccountExtend,
@@ -903,6 +922,7 @@ func (a *AccountsApi) getToUpdateAccount(user *models.User, accountModifyReq *mo
 	if newAccount.Name != oldAccount.Name ||
 		newAccount.Category != oldAccount.Category ||
 		newAccount.Icon != oldAccount.Icon ||
+		newAccount.IconType != oldAccount.IconType ||
 		newAccount.Color != oldAccount.Color ||
 		newAccount.Comment != oldAccount.Comment ||
 		newAccount.Hidden != oldAccount.Hidden {
@@ -952,4 +972,31 @@ func (a *AccountsApi) getToDeleteSubAccountIds(accountModifyReq *models.AccountM
 	}
 
 	return toDeleteAccountIds
+}
+
+func (a *AccountsApi) isAccountsIconTypeValid(c *core.WebContext, uid int64, accounts []*models.Account) bool {
+	iconIds := make([]int64, 0)
+
+	for _, account := range accounts {
+		if !account.IconType.IsValid() {
+			return false
+		}
+
+		if account.IconType == core.ICON_TYPE_USER_CUSTOM {
+			iconIds = append(iconIds, account.Icon)
+		}
+	}
+
+	if len(iconIds) < 1 {
+		return true
+	}
+
+	iconExists, err := a.icons.ExistsCustomIcons(c, uid, iconIds)
+
+	if err != nil {
+		log.Errorf(c, "[accounts.isAccountsIconTypeValid] failed to check custom icons for user \"uid:%d\", because %s", uid, err.Error())
+		return false
+	}
+
+	return iconExists
 }

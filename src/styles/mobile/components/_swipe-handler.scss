@@ -1,0 +1,31 @@
+.swipe-handler {
+    height: 26px;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
+    cursor: pointer;
+    z-index: 10;
+
+    &:after {
+        content: "";
+        width: 36px;
+        height: 6px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-inline-start: -18px;
+        margin-top: -8px;
+        border-radius: 3px;
+        background: #666;
+    }
+}
+
+.toolbar-with-swipe-handler > .toolbar-inner {
+    > div.left,
+    > div.right,
+    > form.searchbar,
+    > .segmented {
+        margin-top: var(--f7-typography-margin) !important;
+    }
+}

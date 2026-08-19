@@ -18,10 +18,10 @@
             <template #content>
                 <div class="mt-5">
                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                        secondary-hidden-field="hidden"
                                        :disabled="loading || submitting || !hasVisibleExpenseCategories"
                                        :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -35,10 +35,10 @@
                                        v-if="type === CategoryType.Expense">
                     </two-column-select>
                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                        secondary-hidden-field="hidden"
                                        :disabled="loading || submitting || !hasVisibleIncomeCategories"
                                        :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"
@@ -52,10 +52,10 @@
                                        v-if="type === CategoryType.Income">
                     </two-column-select>
                     <two-column-select primary-key-field="id" primary-value-field="id" primary-title-field="name"
-                                       primary-icon-field="icon" primary-icon-type="category" primary-color-field="color"
+                                       primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="category" primary-color-field="color"
                                        primary-hidden-field="hidden" primary-sub-items-field="subCategories"
                                        secondary-key-field="id" secondary-value-field="id" secondary-title-field="name"
-                                       secondary-icon-field="icon" secondary-icon-type="category" secondary-color-field="color"
+                                       secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="category" secondary-color-field="color"
                                        secondary-hidden-field="hidden"
                                        :disabled="loading || submitting || !hasVisibleTransferCategories"
                                        :enable-filter="true" :filter-placeholder="tt('Find category')" :filter-no-items-text="tt('No available category')"

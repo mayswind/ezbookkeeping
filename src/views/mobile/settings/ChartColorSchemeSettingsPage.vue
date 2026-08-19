@@ -13,7 +13,6 @@
                  @sortable:sort="onSort">
             <f7-list-item :id="getColorDomId(color)"
                           :key="`${color}_${index}`"
-                          :title="'#' + color.toLowerCase()"
                           v-for="(color, index) in chartColors">
                 <template #media>
                     <div class="color-preview-wrapper">
@@ -21,6 +20,9 @@
                                :value="'#' + color" @input="onColorInput(index, $event)" />
                         <div class="color-preview-box" :style="{ backgroundColor: '#' + color }"></div>
                     </div>
+                </template>
+                <template #title>
+                    <span class="always-ltr">{{ '#' + color.toLowerCase() }}</span>
                 </template>
                 <template #after>
                     <div class="display-flex align-items-center">
@@ -56,7 +58,7 @@
                     <f7-list strong inset dividers class="no-margin margin-bottom">
                         <f7-list-input
                             type="textarea"
-                            class="import-chart-color-scheme-textarea"
+                            class="import-chart-color-scheme-textarea code-textarea"
                             :placeholder="tt('Each line should be a hex color value (e.g. c67e48 or #c67e48)')"
                             :value="importText"
                             @input="importText = $event.target.value"

@@ -152,7 +152,7 @@ class DynamicExpirationPlugin implements WorkboxPlugin {
     }
 }
 
-class MapDataRequestStripTokenPlugin implements WorkboxPlugin {
+class AuthenticatedImageRequestStripTokenPlugin implements WorkboxPlugin {
     public async cacheKeyWillBeUsed(param: CacheKeyWillBeUsedCallbackParam): Promise<Request> {
         const url = new URL(param.request.url);
 
@@ -168,8 +168,12 @@ class MapDataRequestStripTokenPlugin implements WorkboxPlugin {
 interface MapCacheConfig {
     enabled: boolean;
     patterns: RegExp[];
-    mapDataRequestStripTokenPlugin: MapDataRequestStripTokenPlugin;
+    mapDataRequestStripTokenPlugin: AuthenticatedImageRequestStripTokenPlugin;
     expirationPlugin: DynamicExpirationPlugin;
+}
+
+interface CustomIconCacheConfig {
+    customIconRequestStripTokenPlugin: AuthenticatedImageRequestStripTokenPlugin;
 }
 
 declare const self: ServiceWorkerGlobalScope;
@@ -177,6 +181,7 @@ declare const self: ServiceWorkerGlobalScope;
 const SW_ASSETS_CACHE_NAME: string = 'ezbookkeeping-assets-cache';
 const SW_CODE_CACHE_NAME: string = 'ezbookkeeping-code-cache';
 const SW_MAP_CACHE_NAME: string = 'ezbookkeeping-map-cache';
+const SW_CUSTOM_ICON_CACHE_NAME: string = 'ezbookkeeping-custom-icon-cache';
 const SW_SHARE_CACHE_NAME: string = 'ezbookkeeping-share-cache';
 const SW_SHARE_IMAGE_URL_PATHNAME: string = '__share__image__';
 const SW_SHARE_IMAGE_PARAM_NAME: string = 'image';
@@ -190,8 +195,12 @@ const DEFAULT_MAP_CACHE_MAX_AGE_MILLISECONDS: number = 30 * 24 * 60 * 60 * 1000;
 const mapCacheConfig: MapCacheConfig = {
     enabled: false,
     patterns: [],
-    mapDataRequestStripTokenPlugin: new MapDataRequestStripTokenPlugin(),
+    mapDataRequestStripTokenPlugin: new AuthenticatedImageRequestStripTokenPlugin(),
     expirationPlugin: new DynamicExpirationPlugin(DEFAULT_MAP_CACHE_MAX_ENTRIES, DEFAULT_MAP_CACHE_MAX_AGE_MILLISECONDS)
+};
+
+const customIconCacheConfig: CustomIconCacheConfig = {
+    customIconRequestStripTokenPlugin: new AuthenticatedImageRequestStripTokenPlugin()
 };
 
 self.skipWaiting();
@@ -274,6 +283,16 @@ registerRoute(
         plugins: [
             mapCacheConfig.mapDataRequestStripTokenPlugin,
             mapCacheConfig.expirationPlugin
+        ]
+    })
+);
+
+registerRoute(
+    /.*\/icons\/\d+\.png/,
+    new CacheFirst({
+        cacheName: SW_CUSTOM_ICON_CACHE_NAME,
+        plugins: [
+            customIconCacheConfig.customIconRequestStripTokenPlugin
         ]
     })
 );

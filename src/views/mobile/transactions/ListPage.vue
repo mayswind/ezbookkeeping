@@ -109,8 +109,8 @@
                                           :key="itemIdx" v-for="itemIdx in (pageType === TransactionListPageType.List.type && blockIdx === 1 ? [ 1, 2, 3, 4, 5, 6, 7 ] : [ 1, 2, 3 ])">
                                 <template #media>
                                     <div class="display-flex flex-direction-column transaction-date">
-                                        <span class="transaction-day full-line flex-direction-column">DD</span>
-                                        <span class="transaction-day-of-week full-line flex-direction-column">Sun</span>
+                                        <span class="transaction-day width-100 flex-direction-column">DD</span>
+                                        <span class="transaction-day-of-week width-100 flex-direction-column">Sun</span>
                                     </div>
                                 </template>
                                 <template #inner>
@@ -224,10 +224,10 @@
                         >
                             <template #media>
                                 <div class="display-flex flex-direction-column transaction-date" :style="getTransactionDateStyle(transaction, idx > 0 ? transactionMonthList.items[idx - 1] : undefined)">
-                                    <span class="transaction-day full-line flex-direction-column">
+                                    <span class="transaction-day width-100 flex-direction-column">
                                         {{ transaction.gregorianCalendarDayOfMonth ? formatNumberToLocalizedNumeralsWithoutDigitGrouping(transaction.gregorianCalendarDayOfMonth) : '' }}
                                     </span>
-                                    <span class="transaction-day-of-week full-line flex-direction-column" v-if="transaction.displayDayOfWeek">
+                                    <span class="transaction-day-of-week width-100 flex-direction-column" v-if="transaction.displayDayOfWeek">
                                         {{ getWeekdayShortName(transaction.displayDayOfWeek) }}
                                     </span>
                                 </div>
@@ -236,7 +236,7 @@
                                 <div class="display-flex no-padding-horizontal">
                                     <div class="item-media">
                                         <div class="transaction-icon display-flex align-items-center">
-                                            <ItemIcon icon-type="category"
+                                            <ItemIcon :icon-type="getCategoryIconType(transaction.category.iconType)"
                                                       :icon-id="transaction.category.icon"
                                                       :color="transaction.category.color"
                                                       v-if="transaction.category && transaction.category.color"></ItemIcon>
@@ -417,7 +417,7 @@
                                       v-show="!category.hidden || queryAllFilterCategoryIds[category.id] || allCategories[query.categoryIds]?.parentId === category.id || hasSubCategoryInQuery(category)"
                         >
                             <template #media>
-                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color"></ItemIcon>
                             </template>
                             <f7-accordion-content>
                                 <f7-list dividers class="padding-inline-start">
@@ -440,7 +440,7 @@
                                                   @click="changeCategoryFilter(subCategory.id)"
                                     >
                                         <template #media>
-                                            <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                            <ItemIcon :icon-type="getCategoryIconType(subCategory.iconType)" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                         </template>
                                         <template #after>
                                             <f7-icon class="list-item-checked-icon"
@@ -491,7 +491,7 @@
                               @click="changeAccountFilter(account.id)"
                 >
                     <template #media>
-                        <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                        <ItemIcon :icon-type="getAccountIconType(account.iconType)" :icon-id="account.icon" :color="account.color"></ItemIcon>
                     </template>
                     <template #after>
                         <f7-icon class="list-item-checked-icon"
@@ -701,6 +701,10 @@ import {
     getFullMonthDateRange,
     getValidMonthDayOrCurrentDayShortDate
 } from '@/lib/datetime.ts';
+import {
+    getAccountIconType,
+    getCategoryIconType
+} from '@/lib/icon.ts';
 import {
     categoryTypeToTransactionType,
     transactionTypeToCategoryType

@@ -1,11 +1,13 @@
 import { type Ref, watch } from 'vue';
 import { f7, f7ready } from 'framework7-vue';
-import type { Dialog, Picker, Router } from 'framework7/types';
+import type { Dialog, ColorPicker, Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import type { ColorValue } from '@/core/color.ts';
 import { TextDirection } from '@/core/text.ts';
 import { FontSize, FONT_SIZE_PREVIEW_CLASSNAME_PREFIX } from '@/core/font.ts';
+
 import { isEnableAnimate } from '../settings.ts';
 
 export interface Framework7Dom {
@@ -65,15 +67,20 @@ export function closeAllDialog(): void {
     });
 }
 
-export function createInlinePicker(containerEl: string, inputEl: string, cols: Picker.ColumnParameters[], value: string[], events?: { change: (picker: Picker.Picker, value: unknown, displayValue: unknown) => void }): Picker.Picker {
-    return f7.picker.create({
+export function createInlineColorPicker(containerEl: HTMLElement, value: ColorValue, onChange: (value: ColorValue) => void): ColorPicker.ColorPicker {
+    return f7.colorPicker.create({
         containerEl: containerEl,
-        inputEl: inputEl,
-        toolbar: false,
-        rotateEffect: true,
-        value: value,
-        cols: cols,
-        on: events || {}
+        value: { hex: `#${value}` },
+        modules: ['sb-spectrum', 'hue-slider', 'hex'],
+        hexValueEditable: true,
+        on: {
+            // @ts-expect-error there is an "change" event in the ColorPicker module, but it is not declared in the type definition file
+            change: (picker: ColorPicker.ColorPicker, color: ColorPicker.ColorPickerValue) => {
+                if (color && color.hex) {
+                    onChange(color.hex.replace(/^#/, '').substring(0, 6).toLowerCase());
+                }
+            }
+        }
     });
 }
 

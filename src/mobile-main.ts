@@ -26,6 +26,7 @@ import Framework7Toggle from 'framework7/components/toggle';
 import Framework7Range from 'framework7/components/range';
 import Framework7Grid from 'framework7/components/grid';
 import Framework7Picker from 'framework7/components/picker';
+import Framework7ColorPicker from 'framework7/components/color-picker';
 import Framework7Fab from 'framework7/components/fab';
 import Framework7InfiniteScroll from 'framework7/components/infinite-scroll';
 import Framework7PullToRefresh from 'framework7/components/pull-to-refresh';
@@ -86,7 +87,7 @@ import AIImageRecognitionSheet from '@/components/mobile/AIImageRecognitionSheet
 
 import TextareaAutoSize from '@/directives/mobile/textareaAutoSize.ts';
 
-import '@/styles/mobile/global.scss';
+import '@/styles/mobile/index.scss';
 import '@/styles/mobile/font-size-default.scss';
 import '@/styles/mobile/font-size-small.scss';
 import '@/styles/mobile/font-size-large.scss';
@@ -95,7 +96,6 @@ import '@/styles/mobile/font-size-xx-large.scss';
 import '@/styles/mobile/font-size-xxx-large.scss';
 import '@/styles/mobile/font-size-xxxx-large.scss';
 import '@/styles/mobile/amount-color.scss';
-import '@/styles/mobile/common/login-page.scss';
 
 import App from '@/MobileApp.vue';
 
@@ -123,6 +123,7 @@ Framework7.use([
     Framework7Range,
     Framework7Grid,
     Framework7Picker,
+    Framework7ColorPicker,
     Framework7Fab,
     Framework7InfiniteScroll,
     Framework7PullToRefresh,

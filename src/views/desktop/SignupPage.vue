@@ -148,7 +148,7 @@
                                             <v-expansion-panels class="compacted-expansion-panels mt-2" variant="accordion" multiple>
                                                 <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                                                     <v-expansion-panel-title class="py-0 px-4">
-                                                        <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                                        <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color"></ItemIcon>
                                                         <span class="text-body-medium ms-2">{{ category.name }}</span>
                                                     </v-expansion-panel-title>
                                                     <v-expansion-panel-text v-if="category.subCategories.length">
@@ -157,7 +157,7 @@
                                                                       v-for="(subCategory, subIdx) in category.subCategories">
                                                                 <v-list-item>
                                                                     <template #prepend>
-                                                                        <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                                        <ItemIcon :icon-type="getCategoryIconType(subCategory.iconType)" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                                                     </template>
                                                                     <span class="text-body-medium ms-2">{{ subCategory.name }}</span>
                                                                 </v-list-item>
@@ -230,6 +230,7 @@ import { ThemeType } from '@/core/theme.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { isUserLogined } from '@/lib/userstate.ts';
 
 import {

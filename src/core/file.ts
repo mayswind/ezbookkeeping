@@ -10,6 +10,7 @@ export class KnownFileType {
     public static readonly MERMAID = new KnownFileType('mermaid', 'text/vnd.mermaid');
     public static readonly JS = new KnownFileType('js', 'application/javascript');
     public static readonly JPG = new KnownFileType('jpg', 'image/jpeg');
+    public static readonly PNG = new KnownFileType('png', 'image/png');
 
     public readonly extension: string;
     public readonly contentType: string;

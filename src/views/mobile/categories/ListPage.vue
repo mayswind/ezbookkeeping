@@ -45,7 +45,7 @@
                           v-show="showHidden || !category.hidden"
                           @taphold="setSortable()">
                 <template #media>
-                    <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color">
+                    <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="category.hidden">
                             <f7-icon f7="eye_slash_fill"></f7-icon>
                         </f7-badge>
@@ -107,6 +107,7 @@ import { TextDirection } from '@/core/text.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 
+import { getCategoryIconType } from '@/lib/icon.ts';
 import {
     isNoAvailableCategory,
     getFirstShowingId,

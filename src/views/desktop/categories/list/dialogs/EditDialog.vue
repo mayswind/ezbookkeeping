@@ -31,7 +31,7 @@
                                 <template #item="{ props, internalItem }">
                                     <v-list-item v-bind="props">
                                         <template #prepend>
-                                            <ItemIcon class="me-2" icon-type="category"
+                                            <ItemIcon class="me-2" :icon-type="getCategoryIconType(internalItem.raw.iconType)"
                                                       :icon-id="internalItem.raw.icon" :color="internalItem.raw.color"></ItemIcon>
                                         </template>
                                         <template #title>
@@ -42,15 +42,16 @@
                             </v-select>
                         </v-col>
                         <v-col cols="12" md="6">
-                            <icon-select icon-type="category"
-                                         :all-icon-infos="ALL_CATEGORY_ICONS"
+                            <icon-select type="category"
+                                         :all-system-icon-infos="ALL_CATEGORY_ICONS"
                                          :label="tt('Category Icon')"
                                          :color="category.color"
                                          :disabled="loading || submitting"
+                                         v-model:icon-type="category.iconType"
                                          v-model="category.icon" />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <color-select :all-color-infos="ALL_CATEGORY_COLORS"
+                            <color-select :all-system-color-infos="ALL_CATEGORY_COLORS"
                                           :label="tt('Category Color')"
                                           :disabled="loading || submitting"
                                           v-model="category.color" />
@@ -110,6 +111,7 @@ import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 
 import { isEquals } from '@/lib/common.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 
 interface TransactionCategoryEditResponse {

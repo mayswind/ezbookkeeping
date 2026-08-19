@@ -3,6 +3,7 @@ import moment from 'moment-timezone';
 
 import {
     type NameValue,
+    type NameNumeralValue,
     type TypeAndName,
     type TypeAndNameWithAlternativeName,
     type TypeAndDisplayName,
@@ -114,6 +115,10 @@ import {
 import {
     PresetAmountColor
 } from '@/core/color.ts';
+
+import {
+    IconType
+} from '@/core/icon.ts';
 
 import {
     ImageUploadQualityType
@@ -582,7 +587,7 @@ export function useI18n() {
                 ret.push({
                     type: qualityType.type,
                     displayName: t(`format.volume.${qualityType.name}`, {
-                        size: qualityType.estimatedKiB ? appendDigitGroupingSymbolAndDecimalSeparator(qualityType.estimatedKiB.toString(), getNumberFormatOptions({})) : '-',
+                        size: qualityType.estimatedKiB ? getFormattedNumber(qualityType.estimatedKiB) : '-',
                     })
                 });
             } else {
@@ -1504,6 +1509,7 @@ export function useI18n() {
                     name: t('category.' + category.name, {}, { locale: locale }),
                     type: categoryType,
                     icon: category.categoryIconId,
+                    iconType: IconType.System,
                     color: category.color,
                     subCategories: []
                 };
@@ -1513,6 +1519,7 @@ export function useI18n() {
                         name: t('category.' + subCategory.name, {}, { locale: locale }),
                         type: categoryType,
                         icon: subCategory.categoryIconId,
+                        iconType: IconType.System,
                         color: subCategory.color
                     };
 
@@ -2406,6 +2413,37 @@ export function useI18n() {
         return ret;
     }
 
+    function getTablePageOptions(availableCountPerPage: number[], totalCount: number | undefined, includeAll: boolean, alwaysAllCount: boolean): NameNumeralValue[] {
+        const numeralSystem = getCurrentNumeralSystemType();
+        const pageOptions: NameNumeralValue[] = [];
+
+        if (!alwaysAllCount && (!totalCount || totalCount < 1)) {
+            if (includeAll) {
+                pageOptions.push({value: -1, name: t('All')});
+            }
+
+            return pageOptions;
+        }
+
+        if (!totalCount) {
+            totalCount = 0;
+        }
+
+        for (const count of availableCountPerPage) {
+            if (!alwaysAllCount && (totalCount < count)) {
+                break;
+            }
+
+            pageOptions.push({ value: count, name: numeralSystem.formatNumber(count) });
+        }
+
+        if (includeAll) {
+            pageOptions.push({value: -1, name: t('All')});
+        }
+
+        return pageOptions;
+    }
+
     function getLocalizedFileEncodingName(encoding: string): string {
         return t(`encoding.${encoding}`);
     }
@@ -2738,6 +2776,7 @@ export function useI18n() {
         getAdaptiveAmountRate,
         getAmountPrependAndAppendText,
         getCategorizedAccountsWithDisplayBalance,
+        getTablePageOptions,
         // other format functions
         getLocalizedFileEncodingName,
         getLocalizedOAuth2ProviderName,

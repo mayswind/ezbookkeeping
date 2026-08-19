@@ -58,6 +58,7 @@ jobs:
             BUILD_PIPELINE=1
             BUILD_UNIXTIME=${{ steps.setup.outputs.build_unix_time }}
             BUILD_DATE=${{ steps.setup.outputs.build_date }}
+            BUILD_NODE_OPTIONS=${{ vars.BUILD_NODE_OPTIONS }}
             CHECK_3RD_API=${{ vars.CHECK_3RD_API }}
             SKIP_TESTS=${{ vars.SKIP_TESTS }}
           tags: ${{ steps.meta.outputs.tags }}

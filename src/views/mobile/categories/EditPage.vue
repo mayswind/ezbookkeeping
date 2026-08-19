@@ -91,16 +91,17 @@
                                         </div>
                                         <div class="item-title">
                                             <div class="list-item-custom-title no-padding">
-                                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                                <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color"></ItemIcon>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
 
-                            <icon-selection-sheet :all-icon-infos="ALL_CATEGORY_ICONS"
+                            <icon-selection-sheet :all-system-icon-infos="ALL_CATEGORY_ICONS"
                                                   :color="category.color"
                                                   v-model:show="showIconSelectionSheet"
+                                                  v-model:icon-type="category.iconType"
                                                   v-model="category.icon"
                             ></icon-selection-sheet>
                         </div>
@@ -120,7 +121,7 @@
                                 </div>
                             </a>
 
-                            <color-selection-sheet :all-color-infos="ALL_CATEGORY_COLORS"
+                            <color-selection-sheet :all-system-color-infos="ALL_CATEGORY_COLORS"
                                                    v-model:show="showColorSelectionSheet"
                                                    v-model="category.color"
                             ></color-selection-sheet>
@@ -163,6 +164,7 @@ import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
 import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 
 const props = defineProps<{

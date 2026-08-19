@@ -12,7 +12,7 @@
                     <span>{{ tt('Execute Custom Script') }}</span>
                 </v-btn>
             </div>
-            <v-textarea class="w-100" style="height: 360px" :readonly="disabled"
+            <v-textarea class="w-100 code-textarea" style="height: 360px" :readonly="disabled"
                         v-model="customScript"></v-textarea>
         </v-col>
         <v-col cols="12" md="6">

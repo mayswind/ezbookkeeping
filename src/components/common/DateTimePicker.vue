@@ -188,6 +188,7 @@ defineExpose({
 }
 
 .dp--main.datetime-picker.datetime-picker-with-alternate-date .dp--calendar .dp--calendar-row {
-    --dp-cell-size: 45px;
+    --dp-cell-size: 38px;
+    line-height: 1.3;
 }
 </style>

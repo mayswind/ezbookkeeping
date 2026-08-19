@@ -36,7 +36,9 @@
                             <f7-icon class="list-item-checked-icon" f7="checkmark_alt" :style="{ 'color': isSelected(item, index) ? '' : 'transparent' }"></f7-icon>
                         </template>
                         <template #media v-if="iconField">
-                            <ItemIcon :icon-type="iconType" :icon-id="(item as Record<string, unknown>)[iconField]" :color="colorField ? (item as Record<string, unknown>)[colorField] : undefined"></ItemIcon>
+                            <ItemIcon :icon-type="getIconType(iconType, iconTypeField ? (item as Record<string, unknown>)[iconTypeField] : undefined)"
+                                      :icon-id="(item as Record<string, unknown>)[iconField]"
+                                      :color="colorField ? (item as Record<string, unknown>)[colorField] : undefined"></ItemIcon>
                         </template>
                         <template #after>
                             <small v-if="afterField">{{ getItemAfterText(item) }}</small>
@@ -58,6 +60,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { NormalizedText } from '@/core/text.ts';
 
+import { getIconType } from '@/lib/icon.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
@@ -71,8 +74,9 @@ const props = defineProps<{
     titleI18n?: boolean;
     afterField?: string;
     afterI18n?: boolean;
-    iconField?: string;
     iconType?: string;
+    iconTypeField?: string;
+    iconField?: string;
     colorField?: string;
     hiddenField?: string;
     enableFilter?: boolean;

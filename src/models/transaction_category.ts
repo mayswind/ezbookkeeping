@@ -1,5 +1,6 @@
 import { entries } from '@/core/base.ts';
 import type { ColorValue } from '@/core/color.ts';
+import { IconType } from '@/core/icon.ts';
 import { CategoryType } from '@/core/category.ts';
 import { DEFAULT_CATEGORY_ICON_ID } from '@/consts/icon.ts';
 import { DEFAULT_CATEGORY_COLOR } from '@/consts/color.ts';
@@ -10,18 +11,20 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     public parentId: string;
     public type: CategoryType;
     public icon: string;
+    public iconType: number;
     public color: ColorValue;
     public comment: string;
     public displayOrder: number;
     public visible: boolean;
     public subCategories?: TransactionCategory[];
 
-    private constructor(id: string, name: string, parentId: string, type: CategoryType, icon: string, color: ColorValue, comment: string, displayOrder: number, visible: boolean, subCategories?: TransactionCategory[]) {
+    private constructor(id: string, name: string, parentId: string, type: CategoryType, icon: string, iconType: number, color: ColorValue, comment: string, displayOrder: number, visible: boolean, subCategories?: TransactionCategory[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
         this.type = type;
         this.icon = icon;
+        this.iconType = iconType;
         this.color = color;
         this.comment = comment;
         this.displayOrder = displayOrder;
@@ -44,6 +47,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             this.parentId === other.parentId &&
             this.type === other.type &&
             this.icon === other.icon &&
+            this.iconType === other.iconType &&
             this.color === other.color &&
             this.comment === other.comment &&
             this.displayOrder === other.displayOrder &&
@@ -76,6 +80,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         this.parentId = other.parentId;
         this.type = other.type;
         this.icon = other.icon;
+        this.iconType = other.iconType;
         this.color = other.color;
         this.comment = other.comment;
         this.visible = other.visible;
@@ -88,6 +93,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             this.parentId,
             this.type,
             this.icon,
+            this.iconType,
             this.color,
             this.comment,
             this.displayOrder,
@@ -101,6 +107,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             type: this.type,
             parentId: this.parentId,
             icon: this.icon,
+            iconType: this.iconType,
             color: this.color,
             comment: this.comment,
             clientSessionId: clientSessionId
@@ -113,6 +120,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             name: this.name,
             parentId: this.parentId,
             icon: this.icon,
+            iconType: this.iconType,
             color: this.color,
             comment: this.comment,
             hidden: !this.visible
@@ -126,6 +134,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             categoryResponse.parentId,
             categoryResponse.type,
             categoryResponse.icon,
+            categoryResponse.iconType,
             categoryResponse.color,
             categoryResponse.comment,
             categoryResponse.displayOrder,
@@ -165,7 +174,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     }
 
     public static createNewCategory(type?: CategoryType, parentId?: string): TransactionCategory {
-        return new TransactionCategory('', '', parentId || '0', type || CategoryType.Income, DEFAULT_CATEGORY_ICON_ID, DEFAULT_CATEGORY_COLOR, '', 0, true);
+        return new TransactionCategory('', '', parentId || '0', type || CategoryType.Income, DEFAULT_CATEGORY_ICON_ID, IconType.System, DEFAULT_CATEGORY_COLOR, '', 0, true);
     }
 }
 
@@ -174,6 +183,7 @@ export interface TransactionCategoryCreateRequest {
     readonly type: number;
     readonly parentId: string;
     readonly icon: string;
+    readonly iconType: number;
     readonly color: string;
     readonly comment: string;
     readonly clientSessionId: string;
@@ -187,6 +197,7 @@ export interface TransactionCategoryCreateWithSubCategories {
     readonly name: string;
     readonly type: CategoryType;
     readonly icon: string;
+    readonly iconType: number;
     readonly color: ColorValue;
     readonly subCategories: TransactionCategoryCreateRequest[];
 }
@@ -196,6 +207,7 @@ export interface TransactionCategoryModifyRequest {
     readonly name: string;
     readonly parentId: string;
     readonly icon: string;
+    readonly iconType: number;
     readonly color: string;
     readonly comment: string;
     readonly hidden: boolean;
@@ -225,6 +237,7 @@ export interface TransactionCategoryInfoResponse {
     readonly parentId: string;
     readonly type: number;
     readonly icon: string;
+    readonly iconType: number;
     readonly color: string;
     readonly comment: string;
     readonly displayOrder: number;

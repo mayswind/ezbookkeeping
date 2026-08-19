@@ -31,6 +31,10 @@ export function isUserVerifyEmailEnabled(): boolean {
     return getServerSetting('v') === 1;
 }
 
+export function isUserCustomIconEnabled(): boolean {
+    return getServerSetting('c') === 1;
+}
+
 export function isTransactionPicturesEnabled(): boolean {
     return getServerSetting('p') === 1;
 }

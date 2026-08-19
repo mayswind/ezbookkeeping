@@ -1,5 +1,6 @@
 import type { BigDecimal, HiddenAmount, BigDecimalWithSuffix } from '@/core/numeral.ts';
 import type { ColorValue } from '@/core/color.ts';
+import { IconType } from '@/core/icon.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
 import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
@@ -11,6 +12,7 @@ export class Account implements AccountInfoResponse {
     public category: number;
     public type: number;
     public icon: string;
+    public iconType: number;
     public color: ColorValue;
     public currency: string;
     public balanceTime?: number;
@@ -27,13 +29,14 @@ export class Account implements AccountInfoResponse {
     private readonly _isAsset?: boolean;
     private readonly _isLiability?: boolean;
 
-    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, color: string, currency: string, initialBalance: string, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, lastReconciledTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
+    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, iconType: number, color: string, currency: string, initialBalance: string, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, lastReconciledTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
         this.category = category;
         this.type = type;
         this.icon = icon;
+        this.iconType = iconType;
         this.color = color;
         this.currency = currency;
         this.balanceTime = balanceTime;
@@ -125,6 +128,7 @@ export class Account implements AccountInfoResponse {
             this.category === other.category &&
             this.type === other.type &&
             this.icon === other.icon &&
+            this.iconType === other.iconType &&
             this.color === other.color &&
             this.currency === other.currency &&
             this.balance === other.balance &&
@@ -163,6 +167,7 @@ export class Account implements AccountInfoResponse {
         this.type = other.type;
         this.name = other.name;
         this.icon = other.icon;
+        this.iconType = other.iconType;
         this.color = other.color;
         this.currency = other.currency;
         this.balanceTime = other.balanceTime;
@@ -191,6 +196,7 @@ export class Account implements AccountInfoResponse {
         for (const category of allCategories) {
             if (category.type === newCategory) {
                 this.icon = category.defaultAccountIconId;
+                this.iconType = IconType.System;
             }
         }
     }
@@ -217,6 +223,7 @@ export class Account implements AccountInfoResponse {
             category: parentAccount ? parentAccount.category : this.category,
             type: parentAccount ? AccountType.SingleAccount.type : this.type,
             icon: this.icon,
+            iconType: this.iconType,
             color: this.color,
             currency: parentAccount || this.type === AccountType.SingleAccount.type ? this.currency : PARENT_ACCOUNT_CURRENCY_PLACEHOLDER,
             balance: parentAccount || this.type === AccountType.SingleAccount.type ? this.balance : '0',
@@ -250,6 +257,7 @@ export class Account implements AccountInfoResponse {
             name: this.name,
             category: parentAccount ? parentAccount.category : this.category,
             icon: this.icon,
+            iconType: this.iconType,
             color: this.color,
             currency: parentAccount && (!this.id || this.id === '0') ? this.currency : undefined,
             balance: parentAccount && (!this.id || this.id === '0') ? this.balance : undefined,
@@ -399,6 +407,7 @@ export class Account implements AccountInfoResponse {
             this.category,
             this.type,
             this.icon,
+            this.iconType,
             this.color,
             this.currency,
             this.balance,
@@ -421,6 +430,7 @@ export class Account implements AccountInfoResponse {
             this.category,
             this.type,
             this.icon,
+            this.iconType,
             this.color,
             this.currency,
             this.balance,
@@ -443,6 +453,7 @@ export class Account implements AccountInfoResponse {
             0, // category
             0, // type
             this.icon, // icon
+            this.iconType, // iconType
             this.color, // color
             currency, // currency
             '0', // balance
@@ -463,6 +474,7 @@ export class Account implements AccountInfoResponse {
             accountCategory.type, // category
             AccountType.SingleAccount.type, // type
             accountCategory.defaultAccountIconId, // icon
+            IconType.System, // iconType
             DEFAULT_ACCOUNT_COLOR, // color
             currency, // currency
             '0', // balance
@@ -483,6 +495,7 @@ export class Account implements AccountInfoResponse {
             accountResponse.category,
             accountResponse.type,
             accountResponse.icon,
+            accountResponse.iconType,
             accountResponse.color,
             accountResponse.currency,
             accountResponse.balance,
@@ -598,6 +611,7 @@ export class AccountWithDisplayBalance extends Account {
             account.category,
             account.type,
             account.icon,
+            account.iconType,
             account.color,
             account.currency,
             account.balance,
@@ -625,6 +639,7 @@ export interface AccountCreateRequest {
     readonly category: number;
     readonly type: number;
     readonly icon: string;
+    readonly iconType: number;
     readonly color: string;
     readonly currency: string;
     readonly balance: string;
@@ -640,6 +655,7 @@ export interface AccountModifyRequest {
     readonly name: string;
     readonly category: number;
     readonly icon: string;
+    readonly iconType: number;
     readonly color: string;
     readonly currency?: string;
     readonly balance?: string;
@@ -664,6 +680,7 @@ export interface AccountInfoResponse {
     readonly category: number;
     readonly type: number;
     readonly icon: string;
+    readonly iconType: number;
     readonly color: string;
     readonly currency: string;
     readonly balance: string;

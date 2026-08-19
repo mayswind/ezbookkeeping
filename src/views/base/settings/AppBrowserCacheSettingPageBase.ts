@@ -13,6 +13,7 @@ import {
     updateMapCacheExpiration,
     clearApplicationCodeCache,
     clearMapDataCache,
+    clearCustomIconCache,
     clearAllBrowserCaches
 } from '@/lib/cache.ts';
 
@@ -117,6 +118,7 @@ export function useAppBrowserCacheSettingPageBase() {
         loadCacheStatistics,
         clearApplicationCodeCache,
         clearMapDataCache,
+        clearCustomIconCache,
         clearAllBrowserCaches,
         clearExchangeRatesDataCache
     };

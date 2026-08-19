@@ -22,7 +22,7 @@
                              v-if="enableCopy"
                     ></f7-link>
                 </p>
-                <textarea class="information-content full-line" :readonly="true" :rows="rowCount" :value="information"></textarea>
+                <textarea class="information-content always-ltr width-100" :readonly="true" :rows="rowCount" :value="information"></textarea>
                 <div class="margin-top text-align-center">
                     <f7-link @click="close" :text="tt('Close')"></f7-link>
                 </div>

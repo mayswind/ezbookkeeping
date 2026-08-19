@@ -30,7 +30,9 @@
                                           v-for="item in filteredItems"
                                           @click="onPrimaryItemClicked(item)">
                                 <template #media>
-                                    <ItemIcon :icon-type="primaryIconType" :icon-id="primaryIconField ? item[primaryIconField] : undefined" :color="primaryColorField ? item[primaryColorField] : undefined"></ItemIcon>
+                                    <ItemIcon :icon-type="getIconType(primaryIconType, primaryIconTypeField ? item[primaryIconTypeField] : undefined)"
+                                              :icon-id="primaryIconField ? item[primaryIconField] : undefined"
+                                              :color="primaryColorField ? item[primaryColorField] : undefined"></ItemIcon>
                                 </template>
                                 <template #after>
                                     <f7-icon class="list-item-showing icon-with-direction" f7="chevron_right" v-if="item === selectedPrimaryItem"></f7-icon>
@@ -54,7 +56,9 @@
                                           v-for="subItem in filteredSubItems"
                                           @click="onSecondaryItemClicked(subItem)">
                                 <template #media>
-                                    <ItemIcon :icon-type="secondaryIconType" :icon-id="secondaryIconField ? subItem[secondaryIconField] : undefined" :color="secondaryColorField ? subItem[secondaryColorField] : undefined"></ItemIcon>
+                                    <ItemIcon :icon-type="getIconType(secondaryIconType, secondaryIconTypeField ? subItem[secondaryIconTypeField] : undefined)"
+                                              :icon-id="secondaryIconField ? subItem[secondaryIconField] : undefined"
+                                              :color="secondaryColorField ? subItem[secondaryColorField] : undefined"></ItemIcon>
                                 </template>
                                 <template #after>
                                     <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="isSecondarySelected(subItem)"></f7-icon>
@@ -75,6 +79,7 @@ import type { Sheet, Searchbar } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { type CommonTwoColumnListItemSelectionProps, useTwoColumnListItemSelectionBase } from '@/components/base/TwoColumnListItemSelectionBase.ts';
 
+import { getIconType } from '@/lib/icon.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type Framework7Dom, scrollSheetToTop } from '@/lib/ui/mobile.ts';
 

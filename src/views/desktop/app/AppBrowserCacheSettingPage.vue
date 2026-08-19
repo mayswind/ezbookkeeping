@@ -5,7 +5,7 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ tt('File Cache') }}</span>
-                        <v-btn density="compact" color="default" variant="text" size="24"
+                        <v-btn density="compact" color="default" variant="text"
                                class="ms-2" :icon="true" :loading="loading" @click="loadCacheStatistics(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
@@ -19,7 +19,7 @@
                 <v-card-text class="d-flex align-end" style="height: 3rem">
                     <span class="text-body-large">{{ tt('Used storage') }}</span>
                     <v-skeleton-loader class="d-inline-block skeleton-no-margin ms-2 pt-1 pb-1" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <span class="text-headline-small ms-2" v-if="!loading">{{ fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.totalCacheSize, 2) : '-' }}</span>
+                    <span class="text-title-medium ms-2" v-if="!loading">{{ fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.totalCacheSize, 2) : '-' }}</span>
                 </v-card-text>
 
                 <v-card-text class="py-0">
@@ -44,10 +44,10 @@
                                 color: 'warning'
                             },
                             {
-                                title: 'Others',
-                                count: fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.othersCacheSize, 2) : '-',
-                                icon: mdiFileOutline,
-                                color: 'grey'
+                                title: 'Custom Icons',
+                                count: fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.customIconCacheSize, 2) : '-',
+                                icon: mdiShapePlusOutline,
+                                color: 'error-darken-1'
                             }
                         ]">
                             <div class="d-flex align-center">
@@ -59,8 +59,8 @@
 
                                 <div class="d-flex flex-column">
                                     <span class="text-body-small">{{ tt(item.title) }}</span>
-                                    <v-skeleton-loader class="skeleton-no-margin pt-3 pb-2" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
-                                    <span class="text-headline-small" v-if="!loading">{{ item.count }}</span>
+                                    <v-skeleton-loader class="skeleton-no-margin pt-2 pb-2" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
+                                    <span class="text-title-medium" v-if="!loading">{{ item.count }}</span>
                                 </div>
                             </div>
                         </v-col>
@@ -75,6 +75,10 @@
                     <v-btn class="ms-2" color="secondary" variant="tonal"
                            :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearMapCache()">
                         {{ tt('Clear Map Data Cache') }}
+                    </v-btn>
+                    <v-btn class="ms-2" color="secondary" variant="tonal"
+                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearCustomIconsCache()">
+                        {{ tt('Clear Custom Icon Cache') }}
                     </v-btn>
                     <v-btn class="ms-2" color="secondary" variant="tonal"
                            :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearAllFileCache()">
@@ -92,10 +96,10 @@
                     </div>
                 </template>
 
-                <v-card-text class="d-flex align-end" style="height: 3rem">
+                <v-card-text class="d-flex align-end py-0">
                     <span class="text-body-large">{{ tt('Used storage') }}</span>
-                    <v-skeleton-loader class="d-inline-block skeleton-no-margin ms-2 pt-1 pb-1" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
-                    <span class="text-headline-small ms-2" v-if="!loading">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
+                    <v-skeleton-loader class="d-inline-block skeleton-no-margin ms-2 mt-1 pt-1 pb-1" type="text" style="width: 100px" :loading="true" v-if="loading"></v-skeleton-loader>
+                    <span class="text-title-medium ms-2" v-if="!loading">{{ formatVolumeToLocalizedNumerals(exchangeRatesCacheSize ?? 0, 2) }}</span>
                 </v-card-text>
 
                 <v-card-text>
@@ -163,7 +167,7 @@ import {
     mdiFileCodeOutline,
     mdiFileImageOutline,
     mdiFileImageMarkerOutline,
-    mdiFileOutline
+    mdiShapePlusOutline
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
@@ -185,6 +189,7 @@ const {
     loadCacheStatistics,
     clearApplicationCodeCache,
     clearMapDataCache,
+    clearCustomIconCache,
     clearAllBrowserCaches,
     clearExchangeRatesDataCache
 } = useAppBrowserCacheSettingPageBase();
@@ -202,6 +207,14 @@ function clearApplicationCodeFileCache(): void {
 function clearMapCache(): void {
     confirmDialog.value?.open('Are you sure you want to clear map data cache?').then(() => {
         clearMapDataCache().then(() => {
+            loadCacheStatistics(true);
+        });
+    });
+}
+
+function clearCustomIconsCache(): void {
+    confirmDialog.value?.open('Are you sure you want to clear custom icon cache?').then(() => {
+        clearCustomIconCache().then(() => {
             loadCacheStatistics(true);
         });
     });

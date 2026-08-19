@@ -115,16 +115,17 @@
                                         </div>
                                         <div class="item-title">
                                             <div class="list-item-custom-title no-padding">
-                                                <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                                                <ItemIcon :icon-type="getAccountIconType(account.iconType)" :icon-id="account.icon" :color="account.color"></ItemIcon>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
 
-                            <icon-selection-sheet :all-icon-infos="ALL_ACCOUNT_ICONS"
+                            <icon-selection-sheet :all-system-icon-infos="ALL_ACCOUNT_ICONS"
                                                   :color="account.color"
                                                   v-model:show="accountContext.showIconSelectionSheet"
+                                                  v-model:icon-type="account.iconType"
                                                   v-model="account.icon"
                             ></icon-selection-sheet>
                         </div>
@@ -144,7 +145,7 @@
                                 </div>
                             </a>
 
-                            <color-selection-sheet :all-color-infos="ALL_ACCOUNT_COLORS"
+                            <color-selection-sheet :all-system-color-infos="ALL_ACCOUNT_COLORS"
                                                    v-model:show="accountContext.showColorSelectionSheet"
                                                    v-model="account.color"
                             ></color-selection-sheet>
@@ -303,16 +304,17 @@
                                         </div>
                                         <div class="item-title">
                                             <div class="list-item-custom-title no-padding">
-                                                <ItemIcon icon-type="account" :icon-id="account.icon" :color="account.color"></ItemIcon>
+                                                <ItemIcon :icon-type="getAccountIconType(account.iconType)" :icon-id="account.icon" :color="account.color"></ItemIcon>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </a>
 
-                            <icon-selection-sheet :all-icon-infos="ALL_ACCOUNT_ICONS"
+                            <icon-selection-sheet :all-system-icon-infos="ALL_ACCOUNT_ICONS"
                                                   :color="account.color"
                                                   v-model:show="accountContext.showIconSelectionSheet"
+                                                  v-model:icon-type="account.iconType"
                                                   v-model="account.icon"
                             ></icon-selection-sheet>
                         </div>
@@ -332,7 +334,7 @@
                                 </div>
                             </a>
 
-                            <color-selection-sheet :all-color-infos="ALL_ACCOUNT_COLORS"
+                            <color-selection-sheet :all-system-color-infos="ALL_ACCOUNT_COLORS"
                                                    v-model:show="accountContext.showColorSelectionSheet"
                                                    v-model="account.color"
                             ></color-selection-sheet>
@@ -410,16 +412,17 @@
                                             </div>
                                             <div class="item-title">
                                                 <div class="list-item-custom-title no-padding">
-                                                    <ItemIcon icon-type="account" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
+                                                    <ItemIcon :icon-type="getAccountIconType(subAccount.iconType)" :icon-id="subAccount.icon" :color="subAccount.color"></ItemIcon>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </a>
 
-                                <icon-selection-sheet :all-icon-infos="ALL_ACCOUNT_ICONS"
+                                <icon-selection-sheet :all-system-icon-infos="ALL_ACCOUNT_ICONS"
                                                       :color="subAccount.color"
                                                       v-model:show="subAccountContexts[idx]!.showIconSelectionSheet"
+                                                      v-model:icon-type="subAccount.iconType"
                                                       v-model="subAccount.icon"
                                 ></icon-selection-sheet>
                             </div>
@@ -439,7 +442,7 @@
                                     </div>
                                 </a>
 
-                                <color-selection-sheet :all-color-infos="ALL_ACCOUNT_COLORS"
+                                <color-selection-sheet :all-system-color-infos="ALL_ACCOUNT_COLORS"
                                                        v-model:show="subAccountContexts[idx]!.showColorSelectionSheet"
                                                        v-model="subAccount.color"
                                 ></color-selection-sheet>
@@ -598,12 +601,13 @@ import type { Account } from '@/models/account.ts';
 
 import { isDefined, findDisplayNameByType } from '@/lib/common.ts';
 import { parseBigDecimal } from '@/lib/numeral.ts';
-import { generateRandomUUID } from '@/lib/misc.ts';
+import { getAccountIconType } from '@/lib/icon.ts';
 import {
     getTimezoneOffsetMinutes,
     getCurrentUnixTime,
     parseDateTimeFromUnixTimeWithTimezoneOffset
 } from '@/lib/datetime.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 
 interface AccountContext {
     showIconSelectionSheet: boolean;

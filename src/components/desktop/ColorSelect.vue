@@ -7,6 +7,7 @@
         persistent-placeholder
         :disabled="disabled"
         :label="label"
+        :menu-props="{ contentClass: 'color-select-menu' }"
         v-model="color"
         @update:menu="onMenuStateChanged"
     >
@@ -17,24 +18,36 @@
         </template>
 
         <template #no-data>
-            <div class="color-select-dropdown px-2" ref="dropdownMenu">
-                <div class="color-item" :class="{ 'row-has-selected-item': hasSelectedIcon(row) }"
-                     :style="`grid-template-columns: repeat(${itemPerRow}, minmax(0, 1fr));`"
-                     :key="idx" v-for="(row, idx) in allColorRows">
-                    <div class="text-center" :key="colorInfo.color" v-for="colorInfo in row">
-                        <div class="cursor-pointer" @click="color = colorInfo.color">
-                            <v-icon class="ma-2" size="28"
-                                    :icon="mdiSquareRounded" :color="getDisplayColor(colorInfo.color)"
-                                    v-if="!modelValue || modelValue !== colorInfo.color" />
-                            <v-badge class="right-bottom-icon" color="primary"
-                                     offset-x="8" offset-y="8"
-                                     :location="`bottom ${textDirection === TextDirection.LTR ? 'right' : 'left'}`"
-                                     :icon="mdiCheck"
-                                     v-if="modelValue && modelValue === colorInfo.color">
-                                <v-icon class="ma-2" size="28" :icon="mdiSquareRounded" :color="getDisplayColor(colorInfo.color)" />
-                            </v-badge>
+            <div ref="dropdownMenu" class="color-select-dropdown px-2" :class="{ 'color-select-dropdown-custom': currentTab === 'custom' }">
+                <div class="color-select-tabs-container">
+                    <v-tabs grow density="compact" v-model="currentTab">
+                        <v-tab value="system">{{ tt('System Colors') }}</v-tab>
+                        <v-tab value="custom">{{ tt('Custom Color') }}</v-tab>
+                    </v-tabs>
+                </div>
+                <div v-if="currentTab === 'system'">
+                    <div class="color-item" :class="{ 'row-has-selected-item': hasSelectedColor(row) }"
+                         :style="`grid-template-columns: repeat(${itemPerRow}, minmax(0, 1fr));`"
+                         :key="idx" v-for="(row, idx) in allColorRows">
+                        <div class="text-center" :key="colorInfo.color" v-for="colorInfo in row">
+                            <div class="cursor-pointer" @click="color = colorInfo.color">
+                                <v-icon class="ma-2" size="28"
+                                        :icon="mdiSquareRounded" :color="getDisplayColor(colorInfo.color)"
+                                        v-if="!modelValue || modelValue !== colorInfo.color" />
+                                <v-badge class="right-bottom-icon" color="primary"
+                                         offset-x="8" offset-y="8"
+                                         :location="`bottom ${textDirection === TextDirection.LTR ? 'right' : 'left'}`"
+                                         :icon="mdiCheck"
+                                         v-if="modelValue && modelValue === colorInfo.color">
+                                    <v-icon class="ma-2" size="28" :icon="mdiSquareRounded" :color="getDisplayColor(colorInfo.color)" />
+                                </v-badge>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div class="d-flex justify-center" v-if="currentTab === 'custom'">
+                    <v-color-picker hide-input-labels elevation="0" :width="Math.max(320, dropdownMenuWidth - 16)"
+                                    hide-alpha mode="hex" :modes="['hex']" v-model="customColor" />
                 </div>
             </div>
         </template>
@@ -63,36 +76,56 @@ const props = defineProps<{
     disabled?: boolean;
     label?: string;
     columnCount?: number;
-    allColorInfos: ColorValue[];
+    allSystemColorInfos: ColorValue[];
 }>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: ColorValue): void;
 }>();
 
-const { getCurrentLanguageTextDirection } = useI18n();
+const { tt, getCurrentLanguageTextDirection } = useI18n();
 
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
+
+const currentTab = ref<'system' | 'custom'>(isSystemColor(props.modelValue) ? 'system' : 'custom');
 const itemPerRow = ref<number>(props.columnCount || 7);
+const dropdownMenuWidth = ref<number>(320);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
-const allColorRows = computed<ColorInfo[][]>(() => getColorsInRows(props.allColorInfos, itemPerRow.value));
+const allColorRows = computed<ColorInfo[][]>(() => getColorsInRows(props.allSystemColorInfos, itemPerRow.value));
 
 const color = computed<ColorValue>({
     get: () => props.modelValue,
     set: (value: ColorValue) => emit('update:modelValue', value)
 });
 
-function hasSelectedIcon(row: ColorInfo[]): boolean {
-    return arrayContainsFieldValue(row, 'id', props.modelValue);
+const customColor = computed<string>({
+    get: () => `#${props.modelValue}`,
+    set: (value: string) => emit('update:modelValue', value.replace(/^#/, '').substring(0, 6).toLowerCase())
+});
+
+function isSystemColor(value: ColorValue): boolean {
+    return props.allSystemColorInfos.includes(value);
+}
+
+function hasSelectedColor(row: ColorInfo[]): boolean {
+    return arrayContainsFieldValue(row, 'color', props.modelValue);
 }
 
 function onMenuStateChanged(state: boolean): void {
     if (state) {
+        currentTab.value = isSystemColor(props.modelValue) ? 'system' : 'custom';
+
         nextTick(() => {
             if (dropdownMenu.value && dropdownMenu.value.parentElement) {
                 scrollToSelectedItem(dropdownMenu.value.parentElement, null, null, '.row-has-selected-item');
             }
+
+            window.requestAnimationFrame(() => {
+                if (dropdownMenu.value) {
+                    dropdownMenuWidth.value = Math.floor(dropdownMenu.value.clientWidth);
+                }
+            });
         });
     }
 }
@@ -104,7 +137,34 @@ function onMenuStateChanged(state: boolean): void {
     opacity: 1;
 }
 
-.color-select-dropdown .color-item {
-    display: grid;
+.color-select-menu {
+    .color-select-dropdown {
+        .color-select-tabs-container {
+            position: sticky;
+            top: -8px;
+            z-index: 1;
+            margin: -8px -8px 8px;
+            padding: 8px 8px 0;
+            background-color: rgb(var(--v-theme-surface));
+        }
+
+        .color-item {
+            display: grid;
+        }
+
+        .v-color-picker__controls {
+            padding: 4px;
+
+            .v-color-picker-edit {
+                margin-top: 4px;
+
+                > .v-color-picker-edit__input {
+                    > input {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

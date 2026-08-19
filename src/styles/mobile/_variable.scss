@@ -1,0 +1,53 @@
+:root {
+    --f7-navbar-height: 60px;
+    --f7-list-item-media-margin: 12px;
+    --f7-toolbar-inner-padding-left: 8px;
+    --f7-toolbar-inner-padding-right: 8px;
+    --f7-fab-size: 44px;
+    --f7-fab-extended-size: 44px;
+    --f7-fab-bg-color: var(--f7-glass-bg-color);
+    --f7-fab-pressed-bg-color: var(--f7-glass-bg-color);
+    --f7-fab-text-color: var(--f7-theme-color);
+    --f7-fab-extended-text-font-size: var(--f7-navbar-font-size);
+    --f7-fab-extended-text-font-weight: inherit;
+    --f7-fab-extended-text-transform: inherit;
+    --f7-glass-shadow-fab: var(--f7-glass-shadow);
+    --f7-color-gray: #8e8e93;
+    --f7-color-gray-rgb: 142, 142, 147;
+    --f7-color-gray-shade: #79797f;
+    --f7-color-gray-tint: #a3a3a7;
+    --f7-notification-title-text-transform: unset;
+
+    --ebk-icon-default-color: #000;
+    --ebk-primary-color: 198, 126, 72;
+    --ebk-transaction-tag-chip-bg-color: rgba(0, 0, 0, 0.04);
+}
+
+:root.dark {
+    --f7-fab-bg-color: var(--f7-glass-bg-color);
+    --f7-fab-pressed-bg-color: var(--f7-glass-bg-color);
+    --f7-fab-text-color: var(--f7-theme-color);
+    --f7-glass-shadow-fab: var(--f7-glass-shadow);
+
+    --ebk-icon-default-color: #fff;
+    --ebk-transaction-tag-chip-bg-color: rgba(255, 255, 255, 0.04);
+}
+
+.ios .dark,
+.ios.dark {
+    --f7-list-item-header-text-color: inherit !important;
+}
+
+.pin-codes-input {
+    --ebk-pin-code-border-color: var(--f7-input-outline-border-color);
+    --ebk-pin-code-focued-color: var(--f7-input-outline-invalid-border-color, var(--f7-theme-color));
+    --ebk-pin-code-border-radius: var(--f7-input-outline-border-radius);
+    --ebk-pin-code-input-height: 46px;
+}
+
+.color-gray {
+    --f7-theme-color: var(--f7-color-gray);
+    --f7-theme-color-rgb: var(--f7-color-gray-rgb);
+    --f7-theme-color-shade: var(--f7-color-gray-shade);
+    --f7-theme-color-tint: var(--f7-color-gray-tint);
+}

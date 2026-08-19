@@ -14,6 +14,7 @@ import { VBtnToggle } from 'vuetify/components/VBtnToggle';
 import { VCard, VCardActions, VCardItem, VCardSubtitle, VCardText, VCardTitle } from 'vuetify/components/VCard';
 import { VCheckbox, VCheckboxBtn } from 'vuetify/components/VCheckbox';
 import { VChip } from 'vuetify/components/VChip';
+import { VColorPicker } from 'vuetify/components/VColorPicker';
 import { VDataTable } from 'vuetify/components/VDataTable';
 import { VDialog } from 'vuetify/components/VDialog';
 import { VDivider } from 'vuetify/components/VDivider';
@@ -92,6 +93,7 @@ import DateTimePicker from '@/components/common/DateTimePicker.vue';
 import MonthPicker from '@/components/common/MonthPicker.vue';
 import TransactionCalendar from '@/components/common/TransactionCalendar.vue';
 
+import MainPageLayout from '@/components/desktop/MainPageLayout.vue';
 import OneColumnDialogLayout from '@/components/desktop/OneColumnDialogLayout.vue';
 import TwoColumnDialogLayout from '@/components/desktop/TwoColumnDialogLayout.vue';
 import ItemIcon from '@/components/desktop/ItemIcon.vue';
@@ -158,6 +160,7 @@ const vuetify = createVuetify({
         VCheckbox,
         VCheckboxBtn,
         VChip,
+        VColorPicker,
         VDataTable,
         VDialog,
         VDivider,
@@ -555,6 +558,7 @@ app.component('DateTimePicker', DateTimePicker);
 app.component('MonthPicker', MonthPicker);
 app.component('TransactionCalendar', TransactionCalendar);
 
+app.component('MainPageLayout', MainPageLayout);
 app.component('OneColumnDialogLayout', OneColumnDialogLayout);
 app.component('TwoColumnDialogLayout', TwoColumnDialogLayout);
 app.component('ItemIcon', ItemIcon);

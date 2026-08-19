@@ -10,7 +10,9 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 import { type NameValue, type NameNumeralValue, itemAndIndex } from '@/core/base.ts';
 import type { BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
+
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
+import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
 import type { InsightsExplorer } from '@/models/explorer.ts';
@@ -30,7 +32,8 @@ export function useExplorerDataTablePageBase() {
         getCurrentNumeralSystemType,
         formatDateTimeToLongDateTime,
         formatAmountToLocalizedNumeralsWithCurrency,
-        formatNumberToLocalizedNumerals
+        formatNumberToLocalizedNumeralsWithoutDigitGrouping,
+        getTablePageOptions
     } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -63,7 +66,7 @@ export function useExplorerDataTablePageBase() {
                 });
             } else {
                 sources.push({
-                    name: tt('format.misc.queryIndex', { index: index + 1 }),
+                    name: tt('format.misc.queryIndex', { index: formatNumberToLocalizedNumeralsWithoutDigitGrouping(index + 1) }),
                     value: query.id
                 });
             }
@@ -72,18 +75,7 @@ export function useExplorerDataTablePageBase() {
         return sources;
     });
 
-    const allPageCounts = computed<NameNumeralValue[]>(() => {
-        const pageCounts: NameNumeralValue[] = [];
-        const availableCountPerPage: number[] = [ 5, 10, 15, 20, 25, 30, 50 ];
-
-        for (const count of availableCountPerPage) {
-            pageCounts.push({ value: count, name: formatNumberToLocalizedNumerals(count) });
-        }
-
-        pageCounts.push({ value: -1, name: tt('All') });
-
-        return pageCounts;
-    });
+    const allPageCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, undefined, true, true));
 
     const skeletonData = computed<number[]>(() => {
         const data: number[] = [];

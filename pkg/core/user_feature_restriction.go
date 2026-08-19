@@ -94,10 +94,11 @@ const (
 	USER_FEATURE_RESTRICTION_TYPE_UNLINK_THIRD_PARTY_LOGIN                     UserFeatureRestrictionType = 16
 	USER_FEATURE_RESTRICTION_TYPE_GENERATE_API_TOKEN                           UserFeatureRestrictionType = 17
 	USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_TEXT_RECOGNITION  UserFeatureRestrictionType = 18
+	USER_FEATURE_RESTRICTION_TYPE_UPLOAD_CUSTOM_ICON                           UserFeatureRestrictionType = 19
 )
 
 const userFeatureRestrictionTypeMinValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_UPDATE_PASSWORD
-const userFeatureRestrictionTypeMaxValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_TEXT_RECOGNITION
+const userFeatureRestrictionTypeMaxValue UserFeatureRestrictionType = USER_FEATURE_RESTRICTION_TYPE_UPLOAD_CUSTOM_ICON
 
 // String returns a textual representation of the restriction type of user features
 func (t UserFeatureRestrictionType) String() string {
@@ -138,6 +139,8 @@ func (t UserFeatureRestrictionType) String() string {
 		return "Generate API Token"
 	case USER_FEATURE_RESTRICTION_TYPE_CREATE_TRANSACTION_FROM_AI_TEXT_RECOGNITION:
 		return "Create Transaction from AI Text Recognition"
+	case USER_FEATURE_RESTRICTION_TYPE_UPLOAD_CUSTOM_ICON:
+		return "Upload Custom Icon"
 	default:
 		return fmt.Sprintf("Invalid(%d)", int(t))
 	}

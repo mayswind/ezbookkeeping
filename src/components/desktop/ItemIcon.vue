@@ -1,13 +1,15 @@
 <template>
-    <i class="item-icon" :class="classes" :style="style" v-if="!hiddenStatus">
-        <slot></slot>
-    </i>
+    <div class="item-img-icon-container" :class="classes" :style="style" v-if="!hiddenStatus && customIconUrl">
+        <img class="item-img-icon" :src="customIconUrl" />
+    </div>
+    <i class="item-icon" :class="classes" :style="style" v-else-if="!hiddenStatus && !customIconUrl"></i>
     <v-badge class="right-bottom-icon" color="secondary" offset-y="4"
              :location="`bottom ${textDirection === TextDirection.LTR ? 'right' : 'left'}`"
              :icon="mdiEyeOffOutline" v-if="hiddenStatus">
-        <i class="item-icon" :class="classes" :style="style">
-            <slot></slot>
-        </i>
+        <div class="item-img-icon-container" :class="classes" :style="style" v-if="customIconUrl">
+            <img class="item-img-icon" :src="customIconUrl" />
+        </div>
+        <i class="item-icon" :class="classes" :style="style" v-else-if="!customIconUrl"></i>
     </v-badge>
 </template>
 
@@ -31,7 +33,7 @@ interface DesktopItemIconProps extends CommonIconProps {
 const props = defineProps<DesktopItemIconProps>();
 
 const { getCurrentLanguageTextDirection } = useI18n();
-const { style, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
+const { style, customIconUrl, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
 
@@ -51,14 +53,24 @@ const classes = computed<string>(() => {
 </script>
 
 <style>
-.item-icon {
-    font-size: var(--ebk-icon-font-size);
-    display: inline-block;
+.item-icon,
+.item-img-icon,
+.item-img-icon-container {
+    display: inline-flex;
     vertical-align: middle;
     background-size: 100% auto;
     background-position: center;
     background-repeat: no-repeat;
     font-style: normal;
     position: relative;
+}
+
+.item-icon {
+    font-size: var(--ebk-icon-font-size);
+}
+
+.item-img-icon {
+    width: var(--ebk-icon-font-size);
+    height: var(--ebk-icon-font-size);
 }
 </style>

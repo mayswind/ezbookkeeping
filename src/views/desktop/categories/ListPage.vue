@@ -45,7 +45,7 @@
                                             <v-btn class="ms-3" color="primary" variant="tonal"
                                                    :disabled="loading || updating" @click="saveSortResult"
                                                    v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
-                                            <v-btn density="compact" color="default" variant="text" size="24"
+                                            <v-btn density="compact" color="default" variant="text"
                                                    class="ms-2" :icon="true" :loading="loading || updating" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
@@ -122,7 +122,7 @@
                                                         <div class="d-flex align-center">
                                                             <div class="d-flex align-center" :class="{ 'cursor-pointer': isCategorySupportSwitch(element) }"
                                                                  @click="switchPrimaryCategory(element)">
-                                                                <ItemIcon icon-type="category"
+                                                                <ItemIcon :icon-type="getCategoryIconType(element.iconType)"
                                                                           :icon-id="element.icon" :color="element.color"
                                                                           :hidden-status="element.hidden" />
                                                                 <div class="d-flex flex-column py-2">
@@ -212,6 +212,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 
+import { getCategoryIconType } from '@/lib/icon.ts';
 import {
     isNoAvailableCategory,
     getAvailableCategoryCount

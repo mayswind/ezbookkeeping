@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 
+	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -81,12 +82,13 @@ type Account struct {
 	Name            string          `xorm:"VARCHAR(64) NOT NULL"`
 	DisplayOrder    int32           `xorm:"INDEX(IDX_account_uid_deleted_parent_account_id_order) NOT NULL"`
 	Icon            int64           `xorm:"NOT NULL"`
-	Color           string          `xorm:"VARCHAR(6) NOT NULL"`
-	Currency        string          `xorm:"VARCHAR(3) NOT NULL"`
-	Balance         int64           `xorm:"NOT NULL"`
-	Comment         string          `xorm:"VARCHAR(255) NOT NULL"`
-	Extend          *AccountExtend  `xorm:"BLOB"`
-	Hidden          bool            `xorm:"NOT NULL"`
+	IconType        core.IconType
+	Color           string         `xorm:"VARCHAR(6) NOT NULL"`
+	Currency        string         `xorm:"VARCHAR(3) NOT NULL"`
+	Balance         int64          `xorm:"NOT NULL"`
+	Comment         string         `xorm:"VARCHAR(255) NOT NULL"`
+	Extend          *AccountExtend `xorm:"BLOB"`
+	Hidden          bool           `xorm:"NOT NULL"`
 	CreatedUnixTime int64
 	UpdatedUnixTime int64
 	DeletedUnixTime int64
@@ -104,6 +106,7 @@ type AccountCreateRequest struct {
 	Category                AccountCategory         `json:"category" binding:"required"`
 	Type                    AccountType             `json:"type" binding:"required"`
 	Icon                    int64                   `json:"icon,string" binding:"required,min=1"`
+	IconType                core.IconType           `json:"iconType" binding:"min=0,max=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency                string                  `json:"currency" binding:"required,len=3,validCurrency"`
 	Balance                 string                  `json:"balance" binding:"validTransactionAmount"`
@@ -120,6 +123,7 @@ type AccountModifyRequest struct {
 	Name                    string                  `json:"name" binding:"required,notBlank,max=64"`
 	Category                AccountCategory         `json:"category" binding:"required"`
 	Icon                    int64                   `json:"icon,string" binding:"min=1"`
+	IconType                core.IconType           `json:"iconType" binding:"min=0,max=1"`
 	Color                   string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Currency                *string                 `json:"currency" binding:"omitempty,len=3,validCurrency"`
 	Balance                 *string                 `json:"balance" binding:"omitempty,validTransactionAmount"`
@@ -178,6 +182,7 @@ type AccountInfoResponse struct {
 	Category                AccountCategory          `json:"category"`
 	Type                    AccountType              `json:"type"`
 	Icon                    int64                    `json:"icon,string"`
+	IconType                core.IconType            `json:"iconType"`
 	Color                   string                   `json:"color"`
 	Currency                string                   `json:"currency"`
 	Balance                 string                   `json:"balance"`
@@ -224,6 +229,7 @@ func (a *Account) ToAccountInfoResponse() *AccountInfoResponse {
 		Category:                a.Category,
 		Type:                    a.Type,
 		Icon:                    a.Icon,
+		IconType:                a.IconType,
 		Color:                   a.Color,
 		Currency:                a.Currency,
 		Balance:                 utils.Int64ToString(a.Balance),

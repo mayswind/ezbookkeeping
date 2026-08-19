@@ -16,7 +16,7 @@
                     <v-expansion-panels class="compacted-expansion-panels" variant="accordion" multiple :disabled="submitting">
                         <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                             <v-expansion-panel-title class="py-0 px-4">
-                                <ItemIcon icon-type="category" :icon-id="category.icon" :color="category.color"></ItemIcon>
+                                <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color"></ItemIcon>
                                 <span class="text-body-medium ms-2">{{ category.name }}</span>
                             </v-expansion-panel-title>
                             <v-expansion-panel-text v-if="category.subCategories.length">
@@ -25,7 +25,7 @@
                                               v-for="(subCategory, subIdx) in category.subCategories">
                                         <v-list-item>
                                             <template #prepend>
-                                                <ItemIcon icon-type="category" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
+                                                <ItemIcon :icon-type="getCategoryIconType(subCategory.iconType)" :icon-id="subCategory.icon" :color="subCategory.color"></ItemIcon>
                                             </template>
                                             <span class="text-body-medium ms-2">{{ subCategory.name }}</span>
                                         </v-list-item>
@@ -62,6 +62,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;

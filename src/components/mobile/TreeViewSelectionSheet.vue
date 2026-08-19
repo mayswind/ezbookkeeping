@@ -26,7 +26,8 @@
                                   :key="primaryKeyField ? item[primaryKeyField] : item"
                                   v-for="item in filteredItems">
                     <template #media>
-                        <ItemIcon :icon-type="primaryIconType" :icon-id="item[primaryIconField]"
+                        <ItemIcon :icon-type="getIconType(primaryIconType, primaryIconTypeField ? item[primaryIconTypeField] : undefined)"
+                                  :icon-id="item[primaryIconField]"
                                   :color="primaryColorField ? item[primaryColorField] : undefined" v-if="primaryIconField"></ItemIcon>
                     </template>
 
@@ -37,7 +38,8 @@
                                       v-for="subItem in getFilteredSubItems(item)"
                                       @click="onSecondaryItemClicked(subItem)">
                         <template #media>
-                            <ItemIcon :icon-type="secondaryIconType" :icon-id="(subItem as Record<string, unknown>)[secondaryIconField]"
+                            <ItemIcon :icon-type="getIconType(secondaryIconType, secondaryIconTypeField ? (subItem as Record<string, unknown>)[secondaryIconTypeField] : undefined)"
+                                      :icon-id="(subItem as Record<string, unknown>)[secondaryIconField]"
                                       :color="secondaryColorField ? (subItem as Record<string, unknown>)[secondaryColorField] : undefined" v-if="secondaryIconField"></ItemIcon>
                         </template>
                     </f7-treeview-item>
@@ -56,6 +58,7 @@ import { type TwoLevelItemSelectionBaseProps, useTwoLevelItemSelectionBase } fro
 
 import { NormalizedText } from '@/core/text.ts';
 
+import { getIconType } from '@/lib/icon.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type Framework7Dom, scrollSheetToTop } from '@/lib/ui/mobile.ts';
 

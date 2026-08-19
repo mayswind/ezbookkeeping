@@ -189,7 +189,7 @@
                         <div class="display-flex no-padding-horizontal" v-if="item.type == 'transaction' && item.transaction">
                             <div class="item-media">
                                 <div class="transaction-icon display-flex align-items-center">
-                                    <ItemIcon icon-type="category"
+                                    <ItemIcon :icon-type="getCategoryIconType(item.transaction.category?.iconType)"
                                               :icon-id="item.transaction.category?.icon"
                                               :color="item.transaction.category?.color"
                                               v-if="item.transaction.category && item.transaction.category?.color"></ItemIcon>
@@ -261,7 +261,7 @@
 
         <f7-card v-if="finishQuery && showAccountBalanceTrendsCharts">
             <f7-card-header class="no-border display-block">
-                <div class="statistics-chart-header display-flex full-line justify-content-space-between">
+                <div class="statistics-chart-header display-flex width-100 justify-content-space-between">
                     <div></div>
                     <div class="align-self-flex-end">
                         <span style="margin-inline-end: 4px;">{{ tt('Time Granularity') }}</span>
@@ -389,6 +389,7 @@ import {
     getDateRangeByBillingCycleDateType,
     getDateRangeByLastReconciledTimeRangeDateType
 } from '@/lib/datetime.ts';
+import { getCategoryIconType } from '@/lib/icon.ts';
 
 interface ReconciliationStatementVirtualListData {
     items: ReconciliationStatementVirtualListItem[],

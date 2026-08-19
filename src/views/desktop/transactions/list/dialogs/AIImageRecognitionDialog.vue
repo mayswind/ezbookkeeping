@@ -257,37 +257,3 @@ defineExpose({
     open
 });
 </script>
-
-<style>
-.dropzone {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    pointer-events: none;
-    border-radius: 8px;
-    z-index: 10;
-
-    h3, span {
-        color: rgb(var(--v-theme-on-grey-200)) !important;
-        text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-    }
-
-    &.dropzone-dark {
-        h3, span {
-            color: rgb(var(--v-theme-on-grey-100)) !important;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-        }
-    }
-}
-
-.dropzone-blurry-bg {
-    /* stylelint-disable property-no-vendor-prefix */
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-}
-
-.dropzone-dragover {
-    border: 6px dashed rgba(var(--v-border-color),var(--v-border-opacity));
-}
-</style>

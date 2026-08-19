@@ -33,8 +33,8 @@
                             <f7-list-item chevron-center class="transaction-info" link="#">
                                 <template #media>
                                     <div class="display-flex flex-direction-column transaction-date">
-                                        <span class="transaction-day full-line flex-direction-column">{{ currentDayOfMonth }}</span>
-                                        <span class="transaction-day-of-week full-line flex-direction-column">{{ currentDayOfWeek }}</span>
+                                        <span class="transaction-day width-100 flex-direction-column">{{ currentDayOfMonth }}</span>
+                                        <span class="transaction-day-of-week width-100 flex-direction-column">{{ currentDayOfWeek }}</span>
                                     </div>
                                 </template>
                                 <template #inner>
@@ -89,7 +89,7 @@
 
         <f7-block class="fontsize-panel no-padding margin-bottom">
             <f7-block strong inset class="no-padding-bottom margin-bottom">
-                <div class="full-line padding-bottom padding-top-half">
+                <div class="width-100 padding-bottom padding-top-half">
                     <div class="display-flex justify-content-space-between">
                         <div class="fontsize-minimum">A</div>
                         <div class="fontsize-maximum">A</div>

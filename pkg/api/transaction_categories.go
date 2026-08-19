@@ -20,6 +20,7 @@ type TransactionCategoriesApi struct {
 	ApiUsingConfig
 	ApiUsingDuplicateChecker
 	categories *services.TransactionCategoryService
+	icons      *services.UserCustomIconService
 }
 
 // Initialize a transaction category api singleton instance
@@ -35,6 +36,7 @@ var (
 			container: duplicatechecker.Container,
 		},
 		categories: services.TransactionCategories,
+		icons:      services.UserCustomIcons,
 	}
 )
 
@@ -132,6 +134,12 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.WebContext) (an
 	}
 
 	category := a.createNewCategoryModel(uid, &categoryCreateReq, maxOrderId+1)
+	iconTypeValid := a.isTransactionCategoryIconTypeValid(c, uid, []*models.TransactionCategory{category})
+
+	if !iconTypeValid {
+		log.Warnf(c, "[transaction_categories.CategoryCreateHandler] icon type invalid for user \"uid:%d\"", uid)
+		return nil, errs.ErrTransactionCategoryIconInvalid
+	}
 
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && categoryCreateReq.ClientSessionId != "" {
 		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_CATEGORY, uid, categoryCreateReq.ClientSessionId)
@@ -216,6 +224,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 		Name:             categoryModifyReq.Name,
 		DisplayOrder:     category.DisplayOrder,
 		Icon:             categoryModifyReq.Icon,
+		IconType:         categoryModifyReq.IconType,
 		Color:            categoryModifyReq.Color,
 		Comment:          categoryModifyReq.Comment,
 		Hidden:           categoryModifyReq.Hidden,
@@ -224,6 +233,7 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 	if newCategory.ParentCategoryId == category.ParentCategoryId &&
 		newCategory.Name == category.Name &&
 		newCategory.Icon == category.Icon &&
+		newCategory.IconType == category.IconType &&
 		newCategory.Color == category.Color &&
 		newCategory.Comment == category.Comment &&
 		newCategory.Hidden == category.Hidden {
@@ -269,6 +279,13 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 		}
 
 		newCategory.DisplayOrder = maxOrderId + 1
+	}
+
+	iconTypeValid := a.isTransactionCategoryIconTypeValid(c, uid, []*models.TransactionCategory{newCategory})
+
+	if !iconTypeValid {
+		log.Warnf(c, "[transaction_categories.CategoryModifyHandler] icon type invalid for user \"uid:%d\"", uid)
+		return nil, errs.ErrTransactionCategoryIconInvalid
 	}
 
 	err = a.categories.ModifyCategory(c, newCategory)
@@ -368,6 +385,7 @@ func (a *TransactionCategoriesApi) CategoryDeleteHandler(c *core.WebContext) (an
 func (a *TransactionCategoriesApi) createBatchCategories(c *core.WebContext, uid int64, categoryCreateBatchReq *models.TransactionCategoryCreateBatchRequest) ([]*models.TransactionCategory, error) {
 	var err error
 	categoryTypeMaxOrderMap := make(map[models.TransactionCategoryType]int32)
+	categories := make([]*models.TransactionCategory, 0)
 	categoriesMap := make(map[*models.TransactionCategory][]*models.TransactionCategory)
 	categoriesMap[nil] = make([]*models.TransactionCategory, len(categoryCreateBatchReq.Categories))
 	totalCount := 0
@@ -386,16 +404,20 @@ func (a *TransactionCategoriesApi) createBatchCategories(c *core.WebContext, uid
 		}
 
 		category := a.createNewCategoryModel(uid, &models.TransactionCategoryCreateRequest{
-			Name:  categoryCreateReq.Name,
-			Type:  categoryCreateReq.Type,
-			Icon:  categoryCreateReq.Icon,
-			Color: categoryCreateReq.Color,
+			Name:     categoryCreateReq.Name,
+			Type:     categoryCreateReq.Type,
+			Icon:     categoryCreateReq.Icon,
+			IconType: categoryCreateReq.IconType,
+			Color:    categoryCreateReq.Color,
 		}, maxOrderId+1)
 
+		categories = append(categories, category)
 		categoriesMap[category] = make([]*models.TransactionCategory, len(categoryCreateReq.SubCategories))
 
 		for j := int32(0); j < int32(len(categoryCreateReq.SubCategories)); j++ {
 			subCategory := a.createNewCategoryModel(uid, categoryCreateReq.SubCategories[j], j+1)
+
+			categories = append(categories, subCategory)
 			categoriesMap[category][j] = subCategory
 			totalCount++
 		}
@@ -405,7 +427,14 @@ func (a *TransactionCategoriesApi) createBatchCategories(c *core.WebContext, uid
 		totalCount++
 	}
 
-	categories, err := a.categories.CreateCategories(c, uid, categoriesMap)
+	iconTypeValid := a.isTransactionCategoryIconTypeValid(c, uid, categories)
+
+	if !iconTypeValid {
+		log.Warnf(c, "[transaction_categories.createBatchCategories] icon type invalid for user \"uid:%d\"", uid)
+		return nil, errs.ErrTransactionCategoryIconInvalid
+	}
+
+	categories, err = a.categories.CreateCategories(c, uid, categoriesMap)
 
 	if err != nil {
 		log.Errorf(c, "[transaction_categories.createBatchCategories] failed to create categories for user \"uid:%d\", because %s", uid, err.Error())
@@ -425,6 +454,7 @@ func (a *TransactionCategoriesApi) createNewCategoryModel(uid int64, categoryCre
 		ParentCategoryId: categoryCreateReq.ParentId,
 		DisplayOrder:     order,
 		Icon:             categoryCreateReq.Icon,
+		IconType:         categoryCreateReq.IconType,
 		Color:            categoryCreateReq.Color,
 		Comment:          categoryCreateReq.Comment,
 	}
@@ -479,4 +509,31 @@ func (a *TransactionCategoriesApi) getTransactionCategoryListByTypeResponse(cate
 	}
 
 	return typeCategoryMapResponse, nil
+}
+
+func (a *TransactionCategoriesApi) isTransactionCategoryIconTypeValid(c *core.WebContext, uid int64, categories []*models.TransactionCategory) bool {
+	iconIds := make([]int64, 0)
+
+	for _, category := range categories {
+		if !category.IconType.IsValid() {
+			return false
+		}
+
+		if category.IconType == core.ICON_TYPE_USER_CUSTOM {
+			iconIds = append(iconIds, category.Icon)
+		}
+	}
+
+	if len(iconIds) < 1 {
+		return true
+	}
+
+	iconExists, err := a.icons.ExistsCustomIcons(c, uid, iconIds)
+
+	if err != nil {
+		log.Errorf(c, "[category.isTransactionCategoryIconTypeValid] failed to check custom icons for user \"uid:%d\", because %s", uid, err.Error())
+		return false
+	}
+
+	return iconExists
 }

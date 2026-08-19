@@ -1,14 +1,15 @@
 import { computed } from 'vue';
 
-import type {ColorStyleValue, ColorValue} from '@/core/color.ts';
+import type { CommonIconItemType } from '@/core/icon.ts';
+import type { ColorStyleValue, ColorValue } from '@/core/color.ts';
 import { ALL_ACCOUNT_ICONS, DEFAULT_ACCOUNT_ICON, ALL_CATEGORY_ICONS, DEFAULT_CATEGORY_ICON } from '@/consts/icon.ts';
 import { DEFAULT_ICON_COLOR, DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR, DEFAULT_COLOR_STYLE_VARIABLE } from '@/consts/color.ts';
 
 import { isNumber } from '@/lib/common.ts';
+import services from '@/lib/services.ts';
 
 type IconItemStyleName = string;
 type IconItemStyleValue = ColorValue | string | number | undefined;
-type CommonIconItemType = 'account' | 'category' | 'fixed';
 type MobileIconItemType = 'fixed-f7';
 
 export interface CommonIconProps {
@@ -21,6 +22,14 @@ export interface CommonIconProps {
 }
 
 export function useItemIconBase(props: CommonIconProps) {
+    const customIconUrl = computed<string | undefined>(() => {
+        if (props.iconType !== 'user-custom') {
+            return undefined;
+        }
+
+        return services.getUserCustomIconUrlWithToken(props.iconId);
+    });
+
     const style = computed<Record<IconItemStyleName, IconItemStyleValue>>(() => {
         let defaultColor: ColorStyleValue = DEFAULT_COLOR_STYLE_VARIABLE;
 
@@ -81,7 +90,7 @@ export function useItemIconBase(props: CommonIconProps) {
         }
 
         if (props.size) {
-            ret['font-size'] = props.size;
+            ret['--ebk-icon-font-size'] = props.size;
         }
 
         return ret;
@@ -103,7 +112,7 @@ export function useItemIconBase(props: CommonIconProps) {
         }
 
         if (props.size) {
-            ret['font-size'] = props.size;
+            ret['--ebk-icon-font-size'] = props.size;
         }
 
         return ret;
@@ -125,7 +134,7 @@ export function useItemIconBase(props: CommonIconProps) {
         }
 
         if (props.size) {
-            ret['font-size'] = props.size;
+            ret['--ebk-icon-font-size'] = props.size;
         }
 
         return ret;
@@ -133,6 +142,7 @@ export function useItemIconBase(props: CommonIconProps) {
 
     return {
         style,
+        customIconUrl,
         getAccountIcon,
         getCategoryIcon
     }

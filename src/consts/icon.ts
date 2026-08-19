@@ -1,8 +1,8 @@
-import type { IconInfo } from '@/core/icon.ts';
+import type { SystemIconInfo } from '@/core/icon.ts';
 
 export const DEFAULT_ACCOUNT_ICON_ID = '1';
 
-export const ALL_ACCOUNT_ICONS: Record<string, IconInfo> = {
+export const ALL_ACCOUNT_ICONS: Record<string, SystemIconInfo> = {
     // 1 - 99 : Cash Symbols
     '1': {
         icon: 'las la-wallet'
@@ -164,12 +164,12 @@ export const ALL_ACCOUNT_ICONS: Record<string, IconInfo> = {
     }
 };
 
-export const DEFAULT_ACCOUNT_ICON: IconInfo = ALL_ACCOUNT_ICONS[DEFAULT_ACCOUNT_ICON_ID] as IconInfo;
+export const DEFAULT_ACCOUNT_ICON: SystemIconInfo = ALL_ACCOUNT_ICONS[DEFAULT_ACCOUNT_ICON_ID] as SystemIconInfo;
 
 export const DEFAULT_CATEGORY_ICON_ID = '1';
 export const AUTOMATICALLY_CREATED_CATEGORY_ICON_ID = '561';
 
-export const ALL_CATEGORY_ICONS: Record<string, IconInfo> = {
+export const ALL_CATEGORY_ICONS: Record<string, SystemIconInfo> = {
     // 1 - 99 : Expense - Food & Drink
     '1': {
         icon: 'las la-utensils'
@@ -897,4 +897,4 @@ export const ALL_CATEGORY_ICONS: Record<string, IconInfo> = {
     }
 };
 
-export const DEFAULT_CATEGORY_ICON: IconInfo = ALL_CATEGORY_ICONS[DEFAULT_CATEGORY_ICON_ID] as IconInfo;
+export const DEFAULT_CATEGORY_ICON: SystemIconInfo = ALL_CATEGORY_ICONS[DEFAULT_CATEGORY_ICON_ID] as SystemIconInfo;

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/pquerna/otp/totp"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // AuthorizationsApi represents authorization api
@@ -196,6 +198,12 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 		return nil, errs.Or(err, errs.ErrSystemError)
 	}
 
+	passcodeUsed, passcodeHash := a.is2FAPasscodeUsed(c, uid, credential.Passcode)
+
+	if passcodeUsed {
+		return nil, errs.ErrPasscodeInvalid
+	}
+
 	if !totp.Validate(credential.Passcode, twoFactorSetting.Secret) {
 		log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
 
@@ -208,6 +216,8 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 
 		return nil, errs.ErrPasscodeInvalid
 	}
+
+	a.update2FAPasscodeUsed(c, uid, passcodeHash)
 
 	user, err := a.users.GetUserById(c, uid)
 
@@ -441,6 +451,12 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 					return nil, errs.ErrPasscodeEmpty
 				}
 
+				passcodeUsed, passcodeHash := a.is2FAPasscodeUsed(c, uid, credential.Passcode)
+
+				if passcodeUsed {
+					return nil, errs.ErrPasscodeInvalid
+				}
+
 				if !totp.Validate(credential.Passcode, twoFactorSetting.Secret) {
 					log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
 
@@ -453,6 +469,8 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 
 					return nil, errs.ErrPasscodeInvalid
 				}
+
+				a.update2FAPasscodeUsed(c, uid, passcodeHash)
 			}
 		}
 
@@ -544,4 +562,20 @@ func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, ne
 		ApplicationCloudSettings: applicationCloudSettings,
 		NotificationContent:      a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
 	}
+}
+
+func (a *AuthorizationsApi) is2FAPasscodeUsed(c *core.WebContext, uid int64, passcode string) (bool, string) {
+	passcodeHash := utils.MD5EncodeToStringWithUidAndSalt([]byte(passcode), uid, a.CurrentConfig().SecretKey)
+	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_2FA_PASSCODE, uid, passcodeHash)
+
+	if found {
+		log.Warnf(c, "[authorizations.is2FAPasscodeUsed] passcode \"%s\" has been used for user \"uid:%d\" in unix timestamp %s", passcode, uid, remark)
+		return true, passcodeHash
+	}
+
+	return false, passcodeHash
+}
+
+func (a *AuthorizationsApi) update2FAPasscodeUsed(c *core.WebContext, uid int64, passcodeHash string) {
+	a.SetSubmissionRemarkWithCustomExpiration(duplicatechecker.DUPLICATE_CHECKER_TYPE_2FA_PASSCODE, uid, passcodeHash, utils.Int64ToString(time.Now().Unix()), 30*time.Second)
 }

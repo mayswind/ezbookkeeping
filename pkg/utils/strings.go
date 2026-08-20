@@ -166,6 +166,13 @@ func MD5EncodeToString(data []byte) string {
 	return hex.EncodeToString(hash)
 }
 
+// MD5EncodeToStringWithUidAndSalt returns a hashed string by md5 with uid and salt
+func MD5EncodeToStringWithUidAndSalt(data []byte, uid int64, salt string) string {
+	hash := MD5Encode(append(data, []byte(salt+Int64ToString(uid))...))
+	hash = MD5Encode(append(hash, []byte(Int64ToString(uid)+salt)...))
+	return hex.EncodeToString(hash)
+}
+
 // AESGCMEncrypt returns a encrypted string by aes-gcm
 func AESGCMEncrypt(key []byte, plainText []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)

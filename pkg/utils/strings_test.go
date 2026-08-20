@@ -147,6 +147,20 @@ func TestMD5EncodeToString(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestMD5EncodeToStringWithUidAndSalt(t *testing.T) {
+	str := "foobar"
+	uid := int64(12345)
+	salt := "salt"
+	expectedValue := "aeb360a70b82f7ca8aac8d66cd326069"
+	actualValue := MD5EncodeToStringWithUidAndSalt([]byte(str), uid, salt)
+	assert.Equal(t, expectedValue, actualValue)
+
+	str = ""
+	expectedValue = "cb4439f409d0cac03f7e60fb0f7c12f9"
+	actualValue = MD5EncodeToStringWithUidAndSalt([]byte(str), uid, salt)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestEncodePassword(t *testing.T) {
 	password := "foobar"
 	salt := "salt"

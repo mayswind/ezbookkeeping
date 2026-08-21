@@ -1,4 +1,5 @@
 import de from './de.json';
+import el from './el.json';
 import en from './en.json';
 import es from './es.json';
 import fr from './fr.json';
@@ -44,6 +45,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'de-DE',
         textDirection: 'ltr',
         content: de
+    },
+    'el': {
+        name: 'Greek',
+        displayName: 'Ελληνικά',
+        alternativeLanguageTag: 'el-GR',
+        textDirection: 'ltr',
+        content: el
     },
     'en': {
         name: 'English',

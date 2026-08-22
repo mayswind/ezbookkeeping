@@ -1110,7 +1110,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'TWD': { // New Taiwan Dollar
         code: 'TWD',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'NT$'
         },

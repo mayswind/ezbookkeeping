@@ -108,13 +108,13 @@
                                         <div class="account-title d-flex align-center">
                                             <v-icon class="disabled me-0" size="28px" :icon="mdiSquareRounded" />
                                             <span class="account-name text-truncate ms-2">
-                                                            <v-skeleton-loader class="skeleton-no-margin my-1"
-                                                                               width="120px" type="text" :loading="true"></v-skeleton-loader>
-                                                        </span>
+                                                <v-skeleton-loader class="skeleton-no-margin my-1"
+                                                                   width="120px" type="text" :loading="true"></v-skeleton-loader>
+                                            </span>
                                             <v-spacer/>
                                             <span class="align-self-center">
-                                                            <v-icon class="disabled" :icon="mdiDrag"/>
-                                                        </span>
+                                                <v-icon class="disabled" :icon="mdiDrag"/>
+                                            </span>
                                         </div>
                                     </template>
                                     <v-divider/>
@@ -126,9 +126,9 @@
                                             </v-btn>
                                             <v-spacer/>
                                             <span class="account-balance ms-2">
-                                                            <v-skeleton-loader class="skeleton-no-margin"
-                                                                               width="100px" type="text" :loading="true"></v-skeleton-loader>
-                                                        </span>
+                                                <v-skeleton-loader class="skeleton-no-margin"
+                                                                   width="100px" type="text" :loading="true"></v-skeleton-loader>
+                                            </span>
                                         </div>
                                     </v-card-text>
                                 </v-card>
@@ -166,10 +166,10 @@
                                                         </small>
                                                         <v-spacer/>
                                                         <span class="align-self-center">
-                                                                        <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
-                                                                                :icon="mdiDrag"/>
-                                                                        <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
-                                                                    </span>
+                                                            <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
+                                                                    :icon="mdiDrag"/>
+                                                            <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
+                                                        </span>
                                                     </div>
 
                                                     <div class="mt-4" v-if="element.type === AccountType.MultiSubAccounts.type">

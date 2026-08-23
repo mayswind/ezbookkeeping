@@ -197,7 +197,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 import type { LanguageOption } from '@/locales';
 import { useI18n } from '@/locales/helpers.ts';
@@ -242,7 +242,11 @@ const showState = computed<boolean>({
 
 const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(false));
 
-init();
+watch(() => props.show, (newValue) => {
+    if (newValue) {
+        init();
+    }
+});
 </script>
 
 <style>

@@ -245,7 +245,7 @@ import {
     getDateRangeByDateType
 } from '@/lib/datetime.ts';
 
-import { isEquals, isTextualUUID } from '@/lib/common.ts';
+import { isObject, isArray, isEquals, isTextualUUID } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
 
@@ -797,7 +797,7 @@ function onImportQueries(data: string): boolean {
     try {
         const queryItems = JSON.parse(data);
 
-        if (!Array.isArray(queryItems)) {
+        if (!isArray(queryItems)) {
             snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
             return false;
         }
@@ -811,10 +811,15 @@ function onImportQueries(data: string): boolean {
         const queryIds: Record<string, boolean> = {};
 
         for (const queryItem of queryItems) {
+            if (!isObject(queryItem)) {
+                snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
+                return false;
+            }
+
             let originalId: string = '';
 
             if (!('id' in queryItem) || !queryItem['id']) {
-                queryItem['id'] = generateRandomUUID();
+                (queryItem as Record<string, unknown>)['id'] = generateRandomUUID();
             } else {
                 const queryId = queryItem['id'];
 

@@ -17,8 +17,28 @@
     vertical-align: middle !important;
 }
 
+.no-min-height {
+    min-height: 0 !important;
+}
+
 .smaller {
     font-size: 0.75rem;
+}
+
+.mt-h1 {
+    margin-top: 2px;
+}
+
+.mb-h1 {
+    margin-bottom: 2px;
+}
+
+.pt-h1 {
+    padding-top: 2px;
+}
+
+.pb-h1 {
+    padding-bottom: 2px;
 }
 
 .gap-x-1 {

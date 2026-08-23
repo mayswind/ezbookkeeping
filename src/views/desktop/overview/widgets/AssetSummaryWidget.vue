@@ -1,7 +1,7 @@
 <template>
     <v-card class="h-100" :class="{ disabled: loading }">
         <template #title>
-            <span class="text-title-medium">{{ tt('Asset Summary') }}</span>
+            <span class="text-title-medium">{{ title || tt('Asset Summary') }}</span>
         </template>
 
         <v-card-text class="mt-4">
@@ -34,7 +34,7 @@
 import { computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { useHomePageBase } from '@/views/base/HomePageBase.ts';
+import { useAssetSummaryWidgetBase } from '@/views/base/overview/AssetSummaryWidgetBase.ts';
 
 import {
     mdiBankOutline,
@@ -50,7 +50,8 @@ interface SummaryItem {
 }
 
 defineProps<{
-    loading: boolean
+    loading: boolean;
+    title?: string;
 }>();
 
 const { tt, formatNumberToLocalizedNumerals } = useI18n();
@@ -60,7 +61,7 @@ const {
     netAssets,
     totalAssets,
     totalLiabilities
-} = useHomePageBase();
+} = useAssetSummaryWidgetBase();
 
 const displayAccountCount = computed<string>(() => formatNumberToLocalizedNumerals(allAccounts.value?.length ?? 0));
 

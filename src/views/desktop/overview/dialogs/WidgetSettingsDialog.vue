@@ -8,16 +8,41 @@
 
             <template #content>
                 <div class="mt-1">
-                    <v-select item-title="name" item-value="value" :label="tt('Date Range')" :items="allPeriodOptions"
-                              v-model="settingValue"
-                              v-if="widget?.type === OverviewWidgetType.PeriodIncomeExpense" />
+                    <template :key="setting.settingName" v-for="(setting, index) in supportsSettings">
+                        <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
+                                  :label="tt(setting.displayName)" :items="getItemCountOptions(setting.itemCountValues)"
+                                  :model-value="getSettingValue(setting.settingName)"
+                                  @update:model-value="updateSettingValue(setting, $event)"
+                                  v-if="setting.settingType === 'itemCountSelect'" />
 
-                    <v-select item-title="name" item-value="value" :label="tt('Date Range')" :items="allMonthOptions"
-                              v-model="settingValue"
-                              v-else-if="widget?.type === OverviewWidgetType.IncomeExpenseTrend" />
+                        <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
+                                  :label="tt(setting.displayName)" :items="getMonthOptions(setting.monthValues)"
+                                  :model-value="getSettingValue(setting.settingName)"
+                                  @update:model-value="updateSettingValue(setting, $event)"
+                                  v-else-if="setting.settingType === 'monthSelect'" />
+
+                        <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
+                                  :label="tt(setting.displayName)" :items="getCustomSelectOptions(setting)"
+                                  :multiple="setting.multiple" :chips="setting.multiple" :closable-chips="setting.multiple"
+                                  :model-value="getSettingValue(setting.settingName)"
+                                  @update:model-value="updateSettingValue(setting, $event)"
+                                  v-else-if="setting.settingType === 'customSelect'" />
+
+                        <v-switch :class="{ 'mt-2': index > 0 }" :label="tt(setting.displayName)"
+                                  :model-value="getSettingValue(setting.settingName)"
+                                  @update:model-value="updateSettingValue(setting, $event)"
+                                  v-else-if="setting.settingType === 'switch'" />
+
+                        <v-text-field :class="{ 'mt-4': index > 0 }" :label="tt(setting.displayName)"
+                                      :placeholder="setting.placeholder ? tt(setting.placeholder) : undefined"
+                                      :persistent-placeholder="!!setting.placeholder"
+                                      :model-value="getSettingValue(setting.settingName)"
+                                      @update:model-value="updateSettingValue(setting, $event)"
+                                      v-else-if="setting.settingType === 'textbox'" />
+                    </template>
                 </div>
 
-                <div class="text-body-large text-medium-emphasis text-center" v-if="widget && !hasSettings">{{ tt('This widget has no configurable parameters') }}</div>
+                <div class="text-body-large text-medium-emphasis text-center" v-if="widget && !supportsSettings.length">{{ tt('This widget has no configurable parameters') }}</div>
             </template>
         </one-column-dialog-layout>
     </v-dialog>
@@ -27,18 +52,29 @@
 import { computed, ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { useSettingsStore } from '@/stores/setting.ts';
 
-import type { NameValue, NameNumeralValue } from '@/core/base.ts';
+import type { GenericNameValue, NameNumeralValue } from '@/core/base.ts';
 import {
-    type OverviewWidgetSettingValue,
+    type DesktopOverviewWidgetCustomSelectSetting,
     type DesktopOverviewWidgetLayout,
-    OverviewWidgetType
+    type DesktopOverviewWidgetSetting,
+    type OverviewWidgetSettingValue
 } from '@/core/overview_layout.ts';
 
-import { isDefined } from '@/lib/common.ts';
+import { DESKTOP_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
+
+import { isDefined, isArray } from '@/lib/common.ts';
 import { cloneWidget } from '@/lib/overview_layout.ts';
 
-const { tt, formatNumberToLocalizedNumerals } = useI18n();
+const {
+    tt,
+    getAllAccountCategories,
+    formatNumberToLocalizedNumerals,
+    getTablePageOptions
+} = useI18n();
+
+const settingsStore = useSettingsStore();
 
 let resolveFunc: ((widget: DesktopOverviewWidgetLayout) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -46,72 +82,63 @@ let rejectFunc: ((reason?: unknown) => void) | null = null;
 const showState = ref<boolean>(false);
 const widget = ref<DesktopOverviewWidgetLayout | null>(null);
 
-const allPeriodOptions = computed<NameValue[]>(() => [
-    {
-        name: tt('Today'),
-        value: 'today'
-    },
-    {
-        name: tt('This Week'),
-        value: 'thisWeek'
-    },
-    {
-        name: tt('This Month'),
-        value: 'thisMonth'
-    },
-    {
-        name: tt('This Year'),
-        value: 'thisYear'
+const supportsSettings = computed<DesktopOverviewWidgetSetting[]>(() => widget.value ? DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.supportsSettings ?? [] : []);
+
+function getItemCountOptions(values: number[]): NameNumeralValue[] {
+    return getTablePageOptions(values, undefined, false, true);
+}
+
+function getMonthOptions(values: number[]): NameNumeralValue[] {
+    return values.map(value => ({
+        name: tt('format.misc.nMonths', { n: formatNumberToLocalizedNumerals(value) }),
+        value: value
+    }));
+}
+
+function getCustomSelectOptions(setting: DesktopOverviewWidgetCustomSelectSetting): GenericNameValue<string | number>[] {
+    if (setting.selectValueSource === 'accountCategories') {
+        return [
+            { name: tt('All'), value: 0 },
+            ...getAllAccountCategories(settingsStore.appSettings.accountCategoryOrders).map(category => ({ name: category.displayName, value: category.type }))
+        ];
     }
-]);
 
-const allMonthOptions = computed<NameNumeralValue[]>(() => [
-    {
-        name: tt('format.misc.nMonths', { n: formatNumberToLocalizedNumerals(6) }),
-        value: 6
-    },
-    {
-        name: tt('format.misc.nMonths', { n: formatNumberToLocalizedNumerals(12) }),
-        value: 12
-    }
-]);
+    return setting.selectValues.map(item => ({ name: tt(item.name), value: item.value }));
+}
 
+function getSettingValue(settingName: string): OverviewWidgetSettingValue | undefined {
+    return widget.value?.settings[settingName];
+}
 
-const settingValue = computed<OverviewWidgetSettingValue | undefined>({
-    get: () => {
-        if (widget.value?.type === OverviewWidgetType.PeriodIncomeExpense) {
-            return widget.value?.settings['dateRange'];
-        } else if (widget.value?.type === OverviewWidgetType.IncomeExpenseTrend) {
-            return widget.value?.settings['months'];
-        } else {
-            return undefined;
-        }
-    },
-    set: (value: OverviewWidgetSettingValue | undefined) => {
-        if (isDefined(value) && widget.value?.type === OverviewWidgetType.PeriodIncomeExpense) {
-            updateWidgetSettings('dateRange', value);
-        } else if (isDefined(value) && widget.value?.type === OverviewWidgetType.IncomeExpenseTrend) {
-            updateWidgetSettings('months', value);
-        }
-    }
-});
-
-const hasSettings = computed<boolean>(() => widget.value?.type === OverviewWidgetType.PeriodIncomeExpense || widget.value?.type === OverviewWidgetType.IncomeExpenseTrend);
-
-function updateWidgetSettings(settingKey: string, settingValue: OverviewWidgetSettingValue): void {
-    if (!widget.value) {
+function updateSettingValue(setting: DesktopOverviewWidgetSetting, value: OverviewWidgetSettingValue | null): void {
+    if (!widget.value || value === null) {
         return;
     }
 
-    if (!widget.value.settings) {
-        widget.value.settings = {};
-    }
+    if (setting.settingType === 'customSelect' && setting.multiple && isDefined(setting.allValue) && isArray(value)) {
+        const previousValue = widget.value.settings[setting.settingName];
+        const previousValues = isArray(previousValue) ? previousValue : [];
+        const allValue = setting.allValue as number;
 
-    widget.value.settings[settingKey] = settingValue;
+        if (value.includes(allValue) && !previousValues.includes(allValue)) {
+            widget.value.settings[setting.settingName] = [allValue];
+        } else {
+            const selectedValues = value.filter(item => item !== allValue);
+            widget.value.settings[setting.settingName] = selectedValues.length ? selectedValues : [allValue];
+        }
+    } else {
+        widget.value.settings[setting.settingName] = value;
+    }
 }
 
 function open(value: DesktopOverviewWidgetLayout): Promise<DesktopOverviewWidgetLayout> {
     widget.value = cloneWidget(value);
+
+    if (DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]) {
+        const defaultSettings = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type].defaultSettings;
+        widget.value.settings = { ...defaultSettings, ...widget.value.settings };
+    }
+
     showState.value = true;
 
     return new Promise((resolve, reject) => {

@@ -59,7 +59,7 @@
         <template #content>
             <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
                 <v-window-item value="statisticsPage">
-                    <v-card :min-height="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis || queryAnalysisType === StatisticsAnalysisType.AssetTrends ? '860' : '780'">
+                    <v-card min-height="780">
                         <template #title>
                             <div class="title-and-toolbar d-flex align-center">
                                 <span>{{ tt('Statistics & Analysis') }}</span>

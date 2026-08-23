@@ -20,6 +20,7 @@ import type { BigDecimal } from '@/core/numeral.ts';
 import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type AxisChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
+import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
 import type { SortableTransactionStatisticDataItem } from '@/models/transaction.ts';
 
@@ -63,6 +64,10 @@ const props = defineProps<{
     skeleton?: boolean;
     type: AxisChartDisplayType;
     stacked?: boolean;
+    hideLegend?: boolean;
+    legendPosition?: 'top' | 'bottom';
+    hideXAxisLabels?: boolean;
+    hideYAxisLabels?: boolean;
     oneHundredPercentStacked?: boolean;
     sortingType: number;
     showValue?: boolean;
@@ -92,6 +97,7 @@ const {
     getCurrentLanguageTextDirection,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping,
+    formatAmountToLocalizedNumeralsWithCurrency,
     formatChartValueToLocalizedNumerals
 } = useI18n();
 
@@ -414,9 +420,11 @@ const chartOptions = computed<object>(() => {
             }
         },
         legend: {
+            show: !props.hideLegend,
             orient: 'horizontal',
             type: 'scroll',
-            top: 0,
+            top: (!props.legendPosition || props.legendPosition === 'top') ? 0 : undefined,
+            bottom: props.legendPosition === 'bottom' ? 0 : undefined,
             data: axisChartData.value.allSeries.map(item => item.name),
             selected: selectedLegends.value,
             textStyle: {
@@ -425,16 +433,19 @@ const chartOptions = computed<object>(() => {
             formatter: (id: string) => allItemsMap.value[id] ? getItemName(allItemsMap.value[id].name) : id
         },
         grid: {
-            left: yAxisWidth.value,
+            left: props.hideYAxisLabels ? 20 : yAxisWidth.value,
+            top: !props.hideLegend && (!props.legendPosition || props.legendPosition === 'top') ? 50 : 0,
             right: 20,
-            bottom: 40
+            bottom: (props.hideXAxisLabels ? 10 : 30) + (!props.hideLegend && props.legendPosition === 'bottom' ? 30 : 0),
         },
         xAxis: [
             {
                 type: 'category',
                 data: props.allCategoryNames,
+                boundaryGap: !props.hideYAxisLabels,
                 inverse: textDirection.value === TextDirection.RTL,
                 axisLabel: {
+                    show: !props.hideXAxisLabels,
                     color: isDarkMode.value ? '#888' : '#666'
                 }
             }
@@ -445,6 +456,7 @@ const chartOptions = computed<object>(() => {
                 min: props.oneHundredPercentStacked ? 0 : undefined,
                 max: props.oneHundredPercentStacked ? 100 : undefined,
                 axisLabel: {
+                    show: !props.hideYAxisLabels && (props.showValue !== false || props.valueType !== ChartValueType.Amount),
                     color: isDarkMode.value ? '#888' : '#666',
                     formatter: (value: number) => {
                         return getDisplayValue(parseBigDecimal(value));
@@ -452,6 +464,7 @@ const chartOptions = computed<object>(() => {
                 },
                 axisPointer: {
                     label: {
+                        show: props.showValue !== false || props.valueType !== ChartValueType.Amount,
                         formatter: (params: CallbackDataParams) => {
                             return getDisplayValue(parseBigDecimal(params.value as number).truncate());
                         }
@@ -473,6 +486,10 @@ function getItemName(name: string): string {
 }
 
 function getDisplayValue(value: BigDecimal): string {
+    if (props.showValue === false && props.valueType === ChartValueType.Amount) {
+        return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, props.defaultCurrency);
+    }
+
     if (props.oneHundredPercentStacked) {
         return formatChartValueToLocalizedNumerals(value, ChartValueType.Percent, props.defaultCurrency);
     } else {

@@ -1,6 +1,7 @@
-import { keys } from '@/core/base.ts';
+import { entries, keys } from '@/core/base.ts';
 import {
     type OverviewWidgetSettingValue,
+    type DesktopOverviewWidgetSetting,
     type DesktopOverviewLayout,
     type DesktopOverviewWidgetLayout,
     OverviewWidgetType,
@@ -16,9 +17,12 @@ import {
 } from '@/consts/overview_layout.ts';
 
 import {
+    isDefined,
     isObject,
     isArray,
     isString,
+    isNumber,
+    isBoolean,
     isInteger,
     normalizeInteger
 } from '@/lib/common.ts';
@@ -27,18 +31,88 @@ function widgetsOverlap(first: DesktopOverviewWidgetLayout, second: DesktopOverv
     return first.x < second.x + second.w && first.x + first.w > second.x && first.y < second.y + second.h && first.y + first.h > second.y;
 }
 
+function getMaximumWidgetMonths(layout: DesktopOverviewLayout, type: OverviewWidgetType): number {
+    let months: number = 6;
+
+    for (const widget of layout.widgets) {
+        if (widget.type === type) {
+            const monthsValue = widget.settings['months'];
+
+            if (isInteger(monthsValue)) {
+                months = Math.max(months, monthsValue);
+            }
+        }
+    }
+
+    return months;
+}
+
 function normalizeOverviewWidgetSettings(type: OverviewWidgetType, settings: unknown): Record<string, OverviewWidgetSettingValue> {
-    const normalized = { ...DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[type].defaultSettings };
+    const definition = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[type];
+    const normalized = { ...definition.defaultSettings };
     const source: Record<string, unknown> = isObject(settings) ? settings as Record<string, unknown> : {};
 
-    if (type === OverviewWidgetType.PeriodIncomeExpense) {
-        const dateRange = source['dateRange'];
-        normalized['dateRange'] = dateRange === 'today' || dateRange === 'thisWeek' || dateRange === 'thisMonth' || dateRange === 'thisYear' ? dateRange : 'today';
-    } else if (type === OverviewWidgetType.IncomeExpenseTrend) {
-        normalized['months'] = source['months'] === 6 ? 6 : 12;
+    for (const setting of definition.supportsSettings) {
+        const sourceValue = source[setting.settingName];
+        const normalizedValue = normalizeOverviewWidgetSetting(setting, sourceValue);
+
+        if (isDefined(normalizedValue) &&
+            ((isString(normalizedValue) && normalizedValue.trim() !== '' && normalizedValue.trim() !== normalized[setting.settingName])
+                || isNumber(normalizedValue)
+                || isBoolean(normalizedValue)
+                || isArray(normalizedValue)
+            )) {
+            normalized[setting.settingName] = normalizedValue;
+        }
     }
 
     return normalized;
+}
+
+function normalizeOverviewWidgetSetting(setting: DesktopOverviewWidgetSetting, value: unknown): OverviewWidgetSettingValue | undefined {
+    if (setting.settingType === 'itemCountSelect') {
+        return isInteger(value) && setting.itemCountValues.includes(value) ? value : undefined;
+    } else if (setting.settingType === 'monthSelect') {
+        return isInteger(value) && setting.monthValues.includes(value) ? value : undefined;
+    } else if (setting.settingType === 'customSelect') {
+        if (!setting.multiple) {
+            return (isString(value) || isNumber(value)) && setting.selectValues.some(item => item.value === value) ? value : undefined;
+        } else if (setting.multiple) {
+            if (!isArray(value)) {
+                return undefined;
+            }
+
+            const allowedValues: Record<string, boolean> = {};
+
+            for (const item of setting.selectValues) {
+                allowedValues[item.value] = true;
+            }
+
+            const selectedValues: (string | number)[] = [];
+            const selectedValuesMap: Record<string, boolean> = {};
+
+            for (const item of value) {
+                if (isDefined(setting.allValue) && item === setting.allValue) {
+                    return [setting.allValue];
+                }
+
+                if ((isString(item) || isNumber(item)) && allowedValues[item] && !selectedValuesMap[item]) {
+                    selectedValues.push(item);
+                    selectedValuesMap[item] = true;
+                }
+            }
+
+            return selectedValues.length ? selectedValues : undefined;
+        } else {
+            return undefined;
+        }
+    } else if (setting.settingType === 'switch') {
+        return isBoolean(value) ? value : undefined;
+    } else if (setting.settingType === 'textbox') {
+        return isString(value) ? value : undefined;
+    } else {
+        return undefined;
+    }
 }
 
 export function serializeDesktopOverviewLayout(layout: DesktopOverviewLayout, pretty?: boolean): string {
@@ -64,6 +138,10 @@ export function getOverviewDataRequirements(layout: DesktopOverviewLayout): Over
         requirements[OverviewWidgetDataRequirement.TransactionOverview] = true;
     }
 
+    if (requirements[OverviewWidgetDataRequirement.TransactionOverviewLast2Months]) {
+        requirements[OverviewWidgetDataRequirement.TransactionOverview] = true;
+    }
+
     for (const requirement of keys(requirements)) {
         if (requirements[requirement]) {
             result.push(requirement as OverviewWidgetDataRequirement);
@@ -83,17 +161,47 @@ export function getOverviewTransactionOverviewMonths(layout: DesktopOverviewLayo
             if (isInteger(monthsValue)) {
                 months = Math.max(months, monthsValue);
             }
+        } else if (widget.type === OverviewWidgetType.CurrentMonthExpenseProgress) {
+            months = Math.max(months, 2);
         }
     }
 
     return months;
 }
 
+export function getOverviewRecentTransactionCount(layout: DesktopOverviewLayout): number {
+    let count: number = 3;
+
+    for (const widget of layout.widgets) {
+        if (widget.type === OverviewWidgetType.RecentTransactions) {
+            const countValue = widget.settings['itemCount'];
+
+            if (isInteger(countValue)) {
+                count = Math.max(count, countValue);
+            }
+        }
+    }
+
+    return count;
+}
+
+export function getOverviewAssetTrendMonths(layout: DesktopOverviewLayout): number {
+    return getMaximumWidgetMonths(layout, OverviewWidgetType.NetAssetsTrend);
+}
+
+export function getOverviewCalendarHeatmapMonths(layout: DesktopOverviewLayout): number {
+    return getMaximumWidgetMonths(layout, OverviewWidgetType.TransactionCalendarHeatmap);
+}
+
 export function resolveOverviewWidgetCollisions(widgets: DesktopOverviewWidgetLayout[], activeId?: string): DesktopOverviewWidgetLayout[] {
     const sorted: DesktopOverviewWidgetLayout[] = widgets.map(cloneWidget).sort((a, b) => {
-        if (a.id === activeId) return -1;
-        if (b.id === activeId) return 1;
-        return a.y - b.y || a.x - b.x || a.id.localeCompare(b.id);
+        if (a.id === activeId) {
+            return -1;
+        } else if (b.id === activeId) {
+            return 1;
+        } else {
+            return a.y - b.y || a.x - b.x || a.id.localeCompare(b.id);
+        }
     });
     const placed: DesktopOverviewWidgetLayout[] = [];
 
@@ -111,10 +219,27 @@ export function resolveOverviewWidgetCollisions(widgets: DesktopOverviewWidgetLa
     return placed;
 }
 
-export function compactOverviewWidgets(widgets: DesktopOverviewWidgetLayout[]): DesktopOverviewWidgetLayout[] {
+export function compactOverviewWidgets(widgets: DesktopOverviewWidgetLayout[], fixedId?: string): DesktopOverviewWidgetLayout[] {
     const result: DesktopOverviewWidgetLayout[] = widgets.map(cloneWidget).sort((a, b) => a.y - b.y || a.x - b.x || a.id.localeCompare(b.id));
 
     for (const widget of result) {
+        if (widget.id === fixedId) {
+            continue;
+        }
+
+        if (fixedId) {
+            for (let y = 0; y < widget.y; y++) {
+                const candidate = { ...widget, y };
+
+                if (!result.some(other => other.id !== widget.id && widgetsOverlap(candidate, other))) {
+                    widget.y = y;
+                    break;
+                }
+            }
+
+            continue;
+        }
+
         while (widget.y > 0) {
             const candidate = { ...widget, y: widget.y - 1 };
 
@@ -211,7 +336,33 @@ export function findOverviewWidgetPosition(widgets: DesktopOverviewWidgetLayout[
 }
 
 export function cloneWidget(widget: DesktopOverviewWidgetLayout): DesktopOverviewWidgetLayout {
-    return { ...widget, settings: { ...widget.settings } };
+    const settings: Record<string, OverviewWidgetSettingValue> = {};
+
+    for (const [key, value] of entries(widget.settings)) {
+        settings[key] = isArray(value) ? [...value] : value;
+    }
+
+    return { ...widget, settings };
+}
+
+export function getOverviewTransactionCategoryStatisticDateTypes(layout: DesktopOverviewLayout): number[] {
+    const dateTypes: number[] = [];
+    const existingDateTypes: Record<number, boolean> = {};
+
+    for (const widget of layout.widgets) {
+        if (widget.type !== OverviewWidgetType.ExpenseCategoryRanking) {
+            continue;
+        }
+
+        const dateType = widget.settings['dateRange'];
+
+        if (isNumber(dateType) && !existingDateTypes[dateType]) {
+            dateTypes.push(dateType);
+            existingDateTypes[dateType] = true;
+        }
+    }
+
+    return dateTypes;
 }
 
 export function cloneOverviewLayout(original: DesktopOverviewLayout): DesktopOverviewLayout {

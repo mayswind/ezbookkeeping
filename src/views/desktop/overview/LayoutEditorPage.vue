@@ -80,14 +80,19 @@ import {
 } from '@/consts/overview_layout.ts';
 
 import {
-    cloneOverviewLayout,
-    findOverviewWidgetPosition,
+    serializeDesktopOverviewLayout,
     getOverviewDataRequirements,
-    getOverviewTransactionOverviewMonths,
     isDefaultDesktopOverviewLayout,
+    getOverviewTransactionOverviewMonths,
+    getOverviewRecentTransactionCount,
+    getOverviewAssetTrendMonths,
+    getOverviewCalendarHeatmapMonths,
+    compactOverviewWidgets,
     normalizeDesktopOverviewLayout,
-    parseDesktopOverviewLayout,
-    serializeDesktopOverviewLayout
+    findOverviewWidgetPosition,
+    getOverviewTransactionCategoryStatisticDateTypes,
+    cloneOverviewLayout,
+    parseDesktopOverviewLayout
 } from '@/lib/overview_layout.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
@@ -163,6 +168,36 @@ function reload(force: boolean): void {
         }));
     }
 
+    if (requirements.includes(OverviewWidgetDataRequirement.TransactionCategoryStatistics)) {
+        for (const dateType of getOverviewTransactionCategoryStatisticDateTypes(draftLayout.value)) {
+            promises.push(overviewStore.loadTransactionCategoryStatistics({
+                force: force,
+                dateType: dateType
+            }));
+        }
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.AssetTrends)) {
+        promises.push(overviewStore.loadTransactionAssetTrends({
+            force: force,
+            months: getOverviewAssetTrendMonths(draftLayout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.RecentTransactions)) {
+        promises.push(overviewStore.loadRecentTransactions({
+            force: force,
+            count: getOverviewRecentTransactionCount(draftLayout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.DailyTransactionAmounts)) {
+        promises.push(overviewStore.loadTransactionDailyAmounts({
+            force: force,
+            months: getOverviewCalendarHeatmapMonths(draftLayout.value)
+        }));
+    }
+
     Promise.all(promises).then(() => {
         loadingOverview.value = false;
         if (force) snackbar.value?.showMessage('Data has been updated');
@@ -194,6 +229,7 @@ function removeWidget(id: string): void {
     for (const [widget, index] of itemAndIndex(draftLayout.value.widgets)) {
         if (widget.id === id) {
             draftLayout.value.widgets.splice(index, 1);
+            draftLayout.value.widgets = compactOverviewWidgets(draftLayout.value.widgets);
             return;
         }
     }

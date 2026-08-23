@@ -1034,6 +1034,19 @@ export interface TransactionAmountsResponseItemAmountInfo {
     readonly expenseAmount: string;
 }
 
+export interface TransactionDailyAmountsRequest {
+    readonly startTime: number;
+    readonly endTime: number;
+    readonly useTransactionTimezone: boolean;
+    readonly excludeAccountIds: string[];
+    readonly excludeCategoryIds: string[];
+}
+
+export interface TransactionDailyAmountsResponseItem {
+    readonly date: string;
+    readonly amounts: TransactionAmountsResponseItemAmountInfo[];
+}
+
 export type TransactionOverviewData = PartialRecord<TransactionAmountsRequestType, TransactionOverviewDataItem>;
 
 export type TransactionOverviewDisplayTime = PartialRecord<TransactionAmountsRequestType, TransactionOverviewDisplayTimeItem>;

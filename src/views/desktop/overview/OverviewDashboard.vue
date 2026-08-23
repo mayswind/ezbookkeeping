@@ -19,7 +19,7 @@
                         <v-tooltip activator="parent">{{ tt('More') }}</v-tooltip>
                         <v-menu activator="parent">
                             <v-list>
-                                <template v-if="DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.type].supportsSettings">
+                                <template v-if="DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.type].supportsSettings.length">
                                     <v-list-item :prepend-icon="mdiCogOutline" :title="tt('Settings')"
                                                  @click="$emit('configure', widget)" />
                                     <v-divider class="my-2" />
@@ -232,7 +232,8 @@ function handlePointerMove(event: PointerEvent): void {
     }
 
     const widgets = props.layout.widgets.map(widget => widget.id === nextWidget.id ? nextWidget : widget);
-    emit('update:layout', { ...props.layout, widgets: resolveOverviewWidgetCollisions(widgets, nextWidget.id) });
+    const resolvedWidgets = resolveOverviewWidgetCollisions(widgets, nextWidget.id);
+    emit('update:layout', { ...props.layout, widgets: compactOverviewWidgets(resolvedWidgets, nextWidget.id) });
 }
 
 function finishPointerAction(event: PointerEvent): void {

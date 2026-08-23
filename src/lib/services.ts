@@ -90,7 +90,9 @@ import type {
     TransactionStatisticAssetTrendsRequest,
     TransactionStatisticAssetTrendsResponseItem,
     TransactionAmountsRequestParams,
-    TransactionAmountsResponse
+    TransactionAmountsResponse,
+    TransactionDailyAmountsRequest,
+    TransactionDailyAmountsResponseItem
 } from '@/models/transaction.ts';
 import {
     TransactionAmountsRequest
@@ -621,6 +623,23 @@ export default {
         }
 
         return axios.get<ApiResponse<TransactionAmountsResponse>>(`v1/transactions/amounts.json?${queryParams}`);
+    },
+    getTransactionDailyAmounts: (req: TransactionDailyAmountsRequest): ApiResponsePromise<TransactionDailyAmountsResponseItem[]> => {
+        const queryParams: string[] = [
+            `start_time=${req.startTime}`,
+            `end_time=${req.endTime}`,
+            `use_transaction_timezone=${req.useTransactionTimezone}`
+        ];
+
+        if (req.excludeAccountIds.length) {
+            queryParams.push(`exclude_account_ids=${req.excludeAccountIds.join(',')}`);
+        }
+
+        if (req.excludeCategoryIds.length) {
+            queryParams.push(`exclude_category_ids=${req.excludeCategoryIds.join(',')}`);
+        }
+
+        return axios.get<ApiResponse<TransactionDailyAmountsResponseItem[]>>(`v1/transactions/amounts/daily.json?${queryParams.join('&')}`);
     },
     getTransaction: ({ id, withPictures }: { id: string, withPictures: boolean | undefined }): ApiResponsePromise<TransactionInfoResponse> => {
         if (!isDefined(withPictures)) {

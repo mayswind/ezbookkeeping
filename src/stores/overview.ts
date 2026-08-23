@@ -7,17 +7,23 @@ import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
-import { type WritableStartEndTime, DateRange } from '@/core/datetime.ts';
+import { keys } from '@/core/base.ts';
+import { type StartEndTime, type WritableStartEndTime, DateRange} from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { KeywordMatchMode } from '@/core/text.ts';
 import type { TransactionType } from '@/core/transaction.ts';
 
 import type {
     TransactionAmountsRequestType,
     TransactionAmountsRequestParams,
     TransactionAmountsResponse,
-    TransactionOverviewData
+    TransactionOverviewData,
+    TransactionStatisticResponse,
+    TransactionStatisticAssetTrendsResponseItem,
+    TransactionDailyAmountsResponseItem
 } from '@/models/transaction.ts';
 import {
+    type TransactionInfoResponse,
     ALL_TRANSACTION_AMOUNTS_REQUEST_TYPE,
     LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES
 } from '@/models/transaction.ts';
@@ -36,6 +42,7 @@ import {
 } from '@/lib/numeral.ts';
 import {
     getUnixTimeBeforeUnixTime,
+    getUnixTimeAfterUnixTime,
     getTodayFirstUnixTime,
     getTodayLastUnixTime,
     getThisWeekFirstUnixTime,
@@ -45,6 +52,7 @@ import {
     getThisYearFirstUnixTime,
     getThisYearLastUnixTime
 } from '@/lib/datetime.ts';
+
 import { getFinalAccountIdsByFilteredAccountIds } from '@/lib/account.ts';
 import { getFinalCategoryIdsByFilteredCategoryIds } from '@/lib/category.ts';
 import logger from '@/lib/logger.ts';
@@ -132,6 +140,14 @@ export const useOverviewStore = defineStore('overview', () => {
 
     const transactionOverviewData = ref<TransactionAmountsResponse>({});
     const transactionOverviewStateInvalid = ref<boolean>(true);
+    const transactionCategoryStatisticsData = ref<Record<number, TransactionStatisticResponse>>({});
+    const transactionCategoryStatisticsStateInvalid = ref<Record<number, boolean>>({});
+    const transactionAssetTrendsData = ref<TransactionStatisticAssetTrendsResponseItem[]>([]);
+    const transactionAssetTrendsStateInvalid = ref<boolean>(true);
+    const recentTransactions = ref<TransactionInfoResponse[]>([]);
+    const recentTransactionsStateInvalid = ref<boolean>(true);
+    const transactionDailyAmountsData = ref<TransactionDailyAmountsResponseItem[]>([]);
+    const transactionDailyAmountsStateInvalid = ref<boolean>(true);
 
     const transactionOverview = computed<TransactionOverviewData>(() => {
         const overviewData = transactionOverviewData.value;
@@ -257,6 +273,14 @@ export const useOverviewStore = defineStore('overview', () => {
 
     function updateTransactionOverviewInvalidState(invalidState: boolean): void {
         transactionOverviewStateInvalid.value = invalidState;
+
+        for (const dateType of keys(transactionCategoryStatisticsData.value)) {
+            transactionCategoryStatisticsStateInvalid.value[parseInt(dateType)] = invalidState;
+        }
+
+        transactionAssetTrendsStateInvalid.value = invalidState;
+        recentTransactionsStateInvalid.value = invalidState;
+        transactionDailyAmountsStateInvalid.value = invalidState;
     }
 
     function resetTransactionOverview(): void {
@@ -264,6 +288,14 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewOptions.value.loadedMonths = 1;
         transactionOverviewData.value = {};
         transactionOverviewStateInvalid.value = true;
+        transactionCategoryStatisticsData.value = {};
+        transactionCategoryStatisticsStateInvalid.value = {};
+        transactionAssetTrendsData.value = [];
+        transactionAssetTrendsStateInvalid.value = true;
+        recentTransactions.value = [];
+        recentTransactionsStateInvalid.value = true;
+        transactionDailyAmountsData.value = [];
+        transactionDailyAmountsStateInvalid.value = true;
     }
 
     function loadTransactionOverview({ force, months }: { force: boolean, months?: number }): Promise<TransactionAmountsResponse> {
@@ -313,7 +345,7 @@ export const useOverviewStore = defineStore('overview', () => {
                 }
 
                 if (transactionOverviewStateInvalid.value) {
-                    updateTransactionOverviewInvalidState(false);
+                    transactionOverviewStateInvalid.value = false;
                 }
 
                 if (force && data.result && isEquals(transactionOverviewData.value, data.result)) {
@@ -340,6 +372,202 @@ export const useOverviewStore = defineStore('overview', () => {
                     reject(error);
                 }
             });
+        });
+    }
+
+    function loadTransactionCategoryStatistics({ force, dateType }: { force: boolean, dateType: number }): Promise<TransactionStatisticResponse> {
+        if (transactionDataRange.value.today.startTime !== getTodayFirstUnixTime()) {
+            updateTransactionDateRange();
+            transactionCategoryStatisticsData.value = {};
+            transactionCategoryStatisticsStateInvalid.value = {};
+        }
+
+        if (!force && !transactionCategoryStatisticsStateInvalid.value[dateType] && transactionCategoryStatisticsData.value[dateType]) {
+            return Promise.resolve(transactionCategoryStatisticsData.value[dateType]);
+        }
+
+        let requestDateRange: StartEndTime | null = null;
+
+        if (dateType === DateRange.ThisMonth.type) {
+            requestDateRange = transactionDataRange.value.thisMonth;
+        } else if (dateType === DateRange.ThisYear.type) {
+            requestDateRange = transactionDataRange.value.thisYear;
+        }
+
+        if (!requestDateRange) {
+            return Promise.reject({ message: 'Invalid date range' });
+        }
+
+        return new Promise((resolve, reject) => {
+            services.getTransactionStatistics({
+                startTime: requestDateRange.startTime,
+                endTime: requestDateRange.endTime,
+                tagFilter: '',
+                keyword: '',
+                matchMode: KeywordMatchMode.Default.type,
+                useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage === TimezoneTypeForStatistics.TransactionTimezone.type
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to retrieve transaction statistics' });
+                    return;
+                }
+
+                if (transactionCategoryStatisticsStateInvalid.value[dateType]) {
+                    transactionCategoryStatisticsStateInvalid.value[dateType] = false;
+                }
+
+                if (force && data.result && isEquals(transactionCategoryStatisticsData.value[dateType], data.result)) {
+                    reject({ message: 'Data is up to date', isUpToDate: true });
+                    return;
+                }
+
+                transactionCategoryStatisticsData.value[dateType] = data.result;
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to retrieve transaction statistics', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve transaction statistics' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function loadTransactionAssetTrends({ force, months }: { force: boolean, months: number }): Promise<TransactionStatisticAssetTrendsResponseItem[]> {
+        if (!force && !transactionAssetTrendsStateInvalid.value) {
+            return Promise.resolve(transactionAssetTrendsData.value);
+        }
+
+        const endTime = transactionDataRange.value.thisMonth.endTime;
+        const startTime = getUnixTimeBeforeUnixTime(transactionDataRange.value.thisMonth.startTime, Math.max(1, months) - 1, 'months');
+
+        return new Promise((resolve, reject) => {
+            services.getTransactionStatisticsAssetTrends({
+                startTime: startTime,
+                endTime: endTime
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to retrieve transaction statistics' });
+                    return;
+                }
+
+                if (transactionAssetTrendsStateInvalid.value) {
+                    transactionAssetTrendsStateInvalid.value = false;
+                }
+
+                if (force && data.result && isEquals(transactionAssetTrendsData.value, data.result)) {
+                    reject({ message: 'Data is up to date', isUpToDate: true });
+                    return;
+                }
+
+                transactionAssetTrendsData.value = data.result;
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to retrieve transaction statistics', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve transaction statistics' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function loadRecentTransactions({ force, count }: { force: boolean, count: number }): Promise<TransactionInfoResponse[]> {
+        if (!force && !recentTransactionsStateInvalid.value && recentTransactions.value.length >= count) {
+            return Promise.resolve(recentTransactions.value);
+        }
+
+        const accountIds = isObjectEmpty(settingsStore.appSettings.overviewAccountFilterInHomePage) ? '' : getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, settingsStore.appSettings.overviewAccountFilterInHomePage);
+        const categoryIds = isObjectEmpty(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage) ? '' : getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage);
+
+        return new Promise((resolve, reject) => {
+            services.getTransactions({
+                maxTime: 0,
+                minTime: 0,
+                count: count,
+                page: 1,
+                withCount: false,
+                withPictures: false,
+                mustHavePictures: false,
+                type: 0,
+                categoryIds: categoryIds,
+                accountIds: accountIds,
+                tagFilter: '',
+                amountFilter: '',
+                keyword: '',
+                matchMode: KeywordMatchMode.Default.type
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to retrieve transaction list' });
+                }
+
+                if (recentTransactionsStateInvalid.value) {
+                    recentTransactionsStateInvalid.value = false;
+                }
+
+                recentTransactions.value = response.data.result.items;
+
+                resolve(recentTransactions.value);
+            }).catch(error => {
+                logger.error('failed to retrieve transaction list', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve transaction list' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function loadTransactionDailyAmounts({ force, months }: { force: boolean, months: number }): Promise<TransactionDailyAmountsResponseItem[]> {
+        if (transactionDataRange.value.today.startTime !== getTodayFirstUnixTime()) {
+            updateTransactionDateRange();
+            transactionDailyAmountsData.value = [];
+            transactionDailyAmountsStateInvalid.value = true;
+        }
+
+        if (!force && !transactionDailyAmountsStateInvalid.value) {
+            return Promise.resolve(transactionDailyAmountsData.value);
+        }
+
+        const excludeAccountIds = objectFieldWithValueToArrayItem(settingsStore.appSettings.overviewAccountFilterInHomePage, true);
+        const excludeCategoryIds = objectFieldWithValueToArrayItem(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage, true);
+        const endTime = transactionDataRange.value.today.endTime;
+        const startTime = getUnixTimeAfterUnixTime(getUnixTimeBeforeUnixTime(transactionDataRange.value.today.startTime, Math.max(1, months), 'months'), 1, 'days');
+
+        return services.getTransactionDailyAmounts({
+            startTime,
+            endTime,
+            useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage === TimezoneTypeForStatistics.TransactionTimezone.type,
+            excludeAccountIds,
+            excludeCategoryIds
+        }).then(response => {
+            if (!response.data?.success || !response.data.result) {
+                throw { message: 'Unable to retrieve transaction overview' };
+            }
+
+            transactionDailyAmountsData.value = response.data.result;
+            transactionDailyAmountsStateInvalid.value = false;
+            return response.data.result;
         });
     }
 
@@ -381,12 +609,20 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewOptions,
         transactionOverviewData,
         transactionOverviewStateInvalid,
+        transactionCategoryStatisticsData,
+        transactionAssetTrendsData,
+        recentTransactions,
+        transactionDailyAmountsData,
         // computed states,
         transactionOverview,
         // functions
         updateTransactionOverviewInvalidState,
         resetTransactionOverview,
         loadTransactionOverview,
+        loadTransactionCategoryStatistics,
+        loadTransactionAssetTrends,
+        loadRecentTransactions,
+        loadTransactionDailyAmounts,
         getTransactionListPageParams
     };
 });

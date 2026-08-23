@@ -161,6 +161,16 @@ func TestFormatUnixTimeToNumericLocalDateTime(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestFormatNumericYearMonthDayToLongDate(t *testing.T) {
+	expectedValue := "2026-12-31"
+	actualValue := FormatNumericYearMonthDayToLongDate(int32(20261231))
+	assert.Equal(t, expectedValue, actualValue)
+
+	expectedValue = "2026-01-01"
+	actualValue = FormatNumericYearMonthDayToLongDate(int32(20260101))
+	assert.Equal(t, expectedValue, actualValue)
+}
+
 func TestGetMinUnixTimeWithSameLocalDateTime(t *testing.T) {
 	expectedValue := int64(1690797600)
 	actualValue := GetMinUnixTimeWithSameLocalDateTime(1690819200, 480)

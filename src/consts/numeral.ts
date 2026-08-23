@@ -5,4 +5,5 @@ export const MAX_SUPPORTED_DECIMAL_NUMBER_COUNT: number = 2;
 export const AMOUNT_FACTOR: number = 10 ** MAX_SUPPORTED_DECIMAL_NUMBER_COUNT;
 
 export const DISPLAY_HIDDEN_AMOUNT: HiddenAmount = '***';
+export const DISPLAY_HIDDEN_PERCENT: string = '*.**%';
 export const INCOMPLETE_AMOUNT_SUFFIX: string = '+';

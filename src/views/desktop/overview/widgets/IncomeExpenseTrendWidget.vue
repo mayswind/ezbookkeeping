@@ -1,6 +1,7 @@
 <template>
-    <monthly-income-and-expense-chart class="h-100" :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode"
+    <monthly-income-and-expense-chart :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode" :title="title"
                                       :loading="loading" :disabled="loading" :enable-click-item="true"
+                                      :hide-x-axis-labels="!showXAxisLabels" :hide-legend="!showLegend"
                                       @click="clickMonthlyIncomeOrExpense" />
 </template>
 
@@ -11,13 +12,12 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
-import { useHomePageBase } from '@/views/base/HomePageBase.ts';
-
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import {
+    type TransactionOverviewData,
     type TransactionMonthlyIncomeAndExpenseData,
     LATEST_12MONTHS_TRANSACTION_AMOUNTS_REQUEST_TYPES
 } from '@/models/transaction.ts';
@@ -27,19 +27,19 @@ import { getUnixTimeAfterUnixTime, getUnixTimeBeforeUnixTime } from '@/lib/datet
 
 const props = defineProps<{
     loading: boolean;
-    months: number
+    title?: string;
+    months: number;
+    showXAxisLabels: boolean;
+    showLegend: boolean;
 }>();
 
 const router = useRouter();
 const theme = useTheme();
 
-const {
-    transactionOverview
-} = useHomePageBase();
-
 const overviewStore = useOverviewStore();
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const transactionOverview = computed<TransactionOverviewData>(() => overviewStore.transactionOverview);
 
 const monthlyIncomeAndExpenseData = computed<TransactionMonthlyIncomeAndExpenseData[]>(() => {
     const data: TransactionMonthlyIncomeAndExpenseData[] = [];

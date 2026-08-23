@@ -963,6 +963,19 @@ export function useI18n() {
         return t('format.misc.startEndRange', { start: start, end: end });
     }
 
+    function formatTypeAndNames(...typeAndName: TypeAndName[]): TypeAndDisplayName[] {
+        const ret: TypeAndDisplayName[] = [];
+
+        for (const item of typeAndName) {
+            ret.push({
+                type: item.type,
+                displayName: t(item.name)
+            });
+        }
+
+        return ret;
+    }
+
     function getServerMultiLanguageConfigContent(multiLanguageConfig: Record<string, string>): string {
         if (!multiLanguageConfig) {
             return '';
@@ -2608,6 +2621,7 @@ export function useI18n() {
         te: translateError,
         joinMultiText,
         formatRange,
+        formatTypeAndNames,
         getServerMultiLanguageConfigContent,
         // get current language info
         getCurrentLanguageTag,

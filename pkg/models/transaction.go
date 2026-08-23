@@ -324,6 +324,15 @@ type TransactionAmountsRequest struct {
 	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
 }
 
+// TransactionDailyAmountsRequest represents all parameters of transaction daily amounts request
+type TransactionDailyAmountsRequest struct {
+	StartTime              int64  `form:"start_time" binding:"required,min=1"`
+	EndTime                int64  `form:"end_time" binding:"required,min=1"`
+	ExcludeAccountIds      string `form:"exclude_account_ids"`
+	ExcludeCategoryIds     string `form:"exclude_category_ids"`
+	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
+}
+
 // TransactionAmountsRequestItem represents an item of transaction amounts request
 type TransactionAmountsRequestItem struct {
 	Name      string
@@ -500,6 +509,12 @@ type TransactionAmountsResponseItem struct {
 	StartTime int64                                       `json:"startTime"`
 	EndTime   int64                                       `json:"endTime"`
 	Amounts   []*TransactionAmountsResponseItemAmountInfo `json:"amounts"`
+}
+
+// TransactionDailyAmountsResponseItem represents an item of transaction daily amounts
+type TransactionDailyAmountsResponseItem struct {
+	Date    string                                      `json:"date"`
+	Amounts []*TransactionAmountsResponseItemAmountInfo `json:"amounts"`
 }
 
 // TransactionMonthAmountsResponseItem represents an item of transaction month amounts

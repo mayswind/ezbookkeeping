@@ -5,6 +5,8 @@
                 :show-total-amount-in-tooltip="showTotalAmountInTooltip" :total-name-in-tooltip="tt('Total Amount')"
                 :category-type-name="tt('Date')" :all-category-names="allDisplayDateRanges"
                 :items="allSeriesData" :value-type="valueType"
+                :hide-legend="hideLegend" :legend-position="legendPosition"
+                :hide-x-axis-labels="hideXAxisLabels" :hide-y-axis-labels="hideYAxisLabels"
                 :translate-name="translateName"
                 :default-currency="defaultCurrency" :use-custom-color="useCustomColor"
                 :enable-click-item="enableClickItem"
@@ -89,6 +91,10 @@ interface DesktopTrendsChartProps<T extends TrendsChartDateType> extends CommonT
     showTotalAmountInTooltip?: boolean;
     showYearOverYear?: boolean;
     showPeriodOverPeriod?: boolean;
+    hideXAxisLabels?: boolean;
+    hideYAxisLabels?: boolean;
+    hideLegend?: boolean;
+    legendPosition?: 'top' | 'bottom';
 }
 
 const props = defineProps<DesktopTrendsChartProps<TrendsChartDateType>>();
@@ -479,13 +485,13 @@ defineExpose({
 <style scoped>
 .trends-chart-container {
     width: 100%;
-    height: 720px;
+    height: 640px;
     margin-top: 10px;
 }
 
 @media (min-width: 600px) {
     .trends-chart-container {
-        height: 790px;
+        height: 690px;
     }
 }
 </style>

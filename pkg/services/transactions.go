@@ -2306,81 +2306,10 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, ui
 	startLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientTimezone)
 	endLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientTimezone)
 
-	startUnixTime = utils.GetMinUnixTimeWithSameLocalDateTime(startUnixTime, utils.GetTimezoneOffsetMinutes(startUnixTime, clientTimezone))
-	endUnixTime = utils.GetMaxUnixTimeWithSameLocalDateTime(endUnixTime, utils.GetTimezoneOffsetMinutes(endUnixTime, clientTimezone))
+	allTransactions, err := s.getAllTransactionsInSpecifiedDateRange(c, uid, startUnixTime, endUnixTime, excludeAccountIds, excludeCategoryIds, clientTimezone)
 
-	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
-	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
-
-	condition := "uid=? AND deleted=? AND (type=? OR type=?)"
-	conditionParams := make([]any, 0, 4+len(excludeAccountIds)+len(excludeCategoryIds))
-	conditionParams = append(conditionParams, uid)
-	conditionParams = append(conditionParams, false)
-	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
-	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
-
-	if len(excludeAccountIds) > 0 {
-		var accountIdsCondition strings.Builder
-		accountIdConditionParams := make([]any, 0, len(excludeAccountIds))
-
-		for i := 0; i < len(excludeAccountIds); i++ {
-			if i > 0 {
-				accountIdsCondition.WriteString(",")
-			}
-
-			accountIdsCondition.WriteString("?")
-			accountIdConditionParams = append(accountIdConditionParams, excludeAccountIds[i])
-		}
-
-		condition = condition + " AND account_id NOT IN (" + accountIdsCondition.String() + ")"
-		conditionParams = append(conditionParams, accountIdConditionParams...)
-	}
-
-	if len(excludeCategoryIds) > 0 {
-		var categoryIdsCondition strings.Builder
-		categoryIdConditionParams := make([]any, 0, len(excludeCategoryIds))
-
-		for i := 0; i < len(excludeCategoryIds); i++ {
-			if i > 0 {
-				categoryIdsCondition.WriteString(",")
-			}
-
-			categoryIdsCondition.WriteString("?")
-			categoryIdConditionParams = append(categoryIdConditionParams, excludeCategoryIds[i])
-		}
-
-		condition = condition + " AND category_id NOT IN (" + categoryIdsCondition.String() + ")"
-		conditionParams = append(conditionParams, categoryIdConditionParams...)
-	}
-
-	condition = condition + " AND transaction_time>=? AND transaction_time<=?"
-
-	minTransactionTime := startTransactionTime
-	maxTransactionTime := endTransactionTime
-	var allTransactions []*models.Transaction
-
-	for maxTransactionTime > 0 {
-		var transactions []*models.Transaction
-
-		finalConditionParams := make([]any, 0, 6)
-		finalConditionParams = append(finalConditionParams, conditionParams...)
-		finalConditionParams = append(finalConditionParams, minTransactionTime)
-		finalConditionParams = append(finalConditionParams, maxTransactionTime)
-
-		err := s.UserDataDB(uid).NewSession(c).Select("type, account_id, transaction_time, timezone_utc_offset, amount").Where(condition, finalConditionParams...).Limit(pageCountForLoadTransactionAmounts, 0).OrderBy("transaction_time desc").Find(&transactions)
-
-		if err != nil {
-			return nil, nil, err
-		}
-
-		allTransactions = append(allTransactions, transactions...)
-
-		if len(transactions) < pageCountForLoadTransactionAmounts {
-			maxTransactionTime = 0
-			break
-		}
-
-		maxTransactionTime = transactions[len(transactions)-1].TransactionTime - 1
+	if err != nil {
+		return nil, nil, err
 	}
 
 	incomeAmounts := make(map[int64]*big.Int)
@@ -2416,6 +2345,68 @@ func (s *TransactionService) GetAccountsTotalIncomeAndExpense(c core.Context, ui
 
 		totalAmounts.Add(totalAmounts, big.NewInt(transaction.Amount))
 		amountsMap[transaction.AccountId] = totalAmounts
+	}
+
+	return incomeAmounts, expenseAmounts, nil
+}
+
+// GetAccountsDailyIncomeAndExpense returns daily income and expense amounts grouped by account
+func (s *TransactionService) GetAccountsDailyIncomeAndExpense(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, excludeAccountIds []int64, excludeCategoryIds []int64, clientTimezone *time.Location, useTransactionTimezone bool) (map[int32]map[int64]*big.Int, map[int32]map[int64]*big.Int, error) {
+	if uid <= 0 {
+		return nil, nil, errs.ErrUserIdInvalid
+	}
+
+	startLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(startUnixTime, clientTimezone)
+	endLocalDateTime := utils.FormatUnixTimeToNumericLocalDateTime(endUnixTime, clientTimezone)
+
+	allTransactions, err := s.getAllTransactionsInSpecifiedDateRange(c, uid, startUnixTime, endUnixTime, excludeAccountIds, excludeCategoryIds, clientTimezone)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	incomeAmounts := make(map[int32]map[int64]*big.Int)
+	expenseAmounts := make(map[int32]map[int64]*big.Int)
+
+	for i := 0; i < len(allTransactions); i++ {
+		transaction := allTransactions[i]
+		timeZone := clientTimezone
+
+		if useTransactionTimezone {
+			timeZone = time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60)
+		}
+
+		unixTime := utils.GetUnixTimeFromTransactionTime(transaction.TransactionTime)
+		localDateTime := utils.FormatUnixTimeToNumericLocalDateTime(unixTime, timeZone)
+
+		if localDateTime < startLocalDateTime || localDateTime > endLocalDateTime {
+			continue
+		}
+
+		var allAmounts map[int32]map[int64]*big.Int
+
+		if transaction.Type == models.TRANSACTION_DB_TYPE_INCOME {
+			allAmounts = incomeAmounts
+		} else if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {
+			allAmounts = expenseAmounts
+		}
+
+		yearMonthDay := utils.FormatUnixTimeToNumericYearMonthDay(unixTime, timeZone)
+		dailyAmounts, exists := allAmounts[yearMonthDay]
+
+		if !exists {
+			dailyAmounts = make(map[int64]*big.Int)
+		}
+
+		amount, exists := dailyAmounts[transaction.AccountId]
+
+		if !exists {
+			amount = big.NewInt(0)
+		}
+
+		amount.Add(amount, big.NewInt(transaction.Amount))
+		dailyAmounts[transaction.AccountId] = amount
+		allAmounts[yearMonthDay] = dailyAmounts
 	}
 
 	return incomeAmounts, expenseAmounts, nil
@@ -2993,6 +2984,87 @@ func (s *TransactionService) updateAccountBalance(sess *xorm.Session, account *m
 	}
 
 	return updatedRows, err
+}
+
+func (s *TransactionService) getAllTransactionsInSpecifiedDateRange(c core.Context, uid int64, startUnixTime int64, endUnixTime int64, excludeAccountIds []int64, excludeCategoryIds []int64, clientTimezone *time.Location) ([]*models.Transaction, error) {
+	startUnixTime = utils.GetMinUnixTimeWithSameLocalDateTime(startUnixTime, utils.GetTimezoneOffsetMinutes(startUnixTime, clientTimezone))
+	endUnixTime = utils.GetMaxUnixTimeWithSameLocalDateTime(endUnixTime, utils.GetTimezoneOffsetMinutes(endUnixTime, clientTimezone))
+
+	startTransactionTime := utils.GetMinTransactionTimeFromUnixTime(startUnixTime)
+	endTransactionTime := utils.GetMaxTransactionTimeFromUnixTime(endUnixTime)
+
+	condition := "uid=? AND deleted=? AND (type=? OR type=?)"
+	conditionParams := make([]any, 0, 4+len(excludeAccountIds)+len(excludeCategoryIds))
+	conditionParams = append(conditionParams, uid)
+	conditionParams = append(conditionParams, false)
+	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_INCOME)
+	conditionParams = append(conditionParams, models.TRANSACTION_DB_TYPE_EXPENSE)
+
+	if len(excludeAccountIds) > 0 {
+		var accountIdsCondition strings.Builder
+		accountIdConditionParams := make([]any, 0, len(excludeAccountIds))
+
+		for i := 0; i < len(excludeAccountIds); i++ {
+			if i > 0 {
+				accountIdsCondition.WriteString(",")
+			}
+
+			accountIdsCondition.WriteString("?")
+			accountIdConditionParams = append(accountIdConditionParams, excludeAccountIds[i])
+		}
+
+		condition = condition + " AND account_id NOT IN (" + accountIdsCondition.String() + ")"
+		conditionParams = append(conditionParams, accountIdConditionParams...)
+	}
+
+	if len(excludeCategoryIds) > 0 {
+		var categoryIdsCondition strings.Builder
+		categoryIdConditionParams := make([]any, 0, len(excludeCategoryIds))
+
+		for i := 0; i < len(excludeCategoryIds); i++ {
+			if i > 0 {
+				categoryIdsCondition.WriteString(",")
+			}
+
+			categoryIdsCondition.WriteString("?")
+			categoryIdConditionParams = append(categoryIdConditionParams, excludeCategoryIds[i])
+		}
+
+		condition = condition + " AND category_id NOT IN (" + categoryIdsCondition.String() + ")"
+		conditionParams = append(conditionParams, categoryIdConditionParams...)
+	}
+
+	condition = condition + " AND transaction_time>=? AND transaction_time<=?"
+
+	minTransactionTime := startTransactionTime
+	maxTransactionTime := endTransactionTime
+	var allTransactions []*models.Transaction
+
+	for maxTransactionTime > 0 {
+		var transactions []*models.Transaction
+
+		finalConditionParams := make([]any, 0, 6)
+		finalConditionParams = append(finalConditionParams, conditionParams...)
+		finalConditionParams = append(finalConditionParams, minTransactionTime)
+		finalConditionParams = append(finalConditionParams, maxTransactionTime)
+
+		err := s.UserDataDB(uid).NewSession(c).Select("type, account_id, transaction_time, timezone_utc_offset, amount").Where(condition, finalConditionParams...).Limit(pageCountForLoadTransactionAmounts, 0).OrderBy("transaction_time desc").Find(&transactions)
+
+		if err != nil {
+			return nil, err
+		}
+
+		allTransactions = append(allTransactions, transactions...)
+
+		if len(transactions) < pageCountForLoadTransactionAmounts {
+			maxTransactionTime = 0
+			break
+		}
+
+		maxTransactionTime = transactions[len(transactions)-1].TransactionTime - 1
+	}
+
+	return allTransactions, nil
 }
 
 func (s *TransactionService) buildTransactionQueryCondition(uid int64, maxTransactionTime int64, minTransactionTime int64, transactionDbType models.TransactionDbType, categoryIds []int64, accountIds []int64, tagFilters []*models.TransactionTagFilter, amountFilter string, keyword string, matchMode core.MatchMode, noDuplicated bool) (string, []any) {

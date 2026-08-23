@@ -27,6 +27,10 @@ import { getShareCacheImageBlob } from '@/lib/cache.ts';
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
+    getOverviewTransactionCategoryStatisticDateTypes,
+    getOverviewRecentTransactionCount,
+    getOverviewAssetTrendMonths,
+    getOverviewCalendarHeatmapMonths,
     parseDesktopOverviewLayout
 } from '@/lib/overview_layout.ts';
 import logger from '@/lib/logger.ts';
@@ -72,6 +76,36 @@ function reload(force: boolean): void {
         promises.push(overviewStore.loadTransactionOverview({
             force: force,
             months: getOverviewTransactionOverviewMonths(layout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.TransactionCategoryStatistics)) {
+        for (const dateType of getOverviewTransactionCategoryStatisticDateTypes(layout.value)) {
+            promises.push(overviewStore.loadTransactionCategoryStatistics({
+                force: force,
+                dateType: dateType
+            }));
+        }
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.AssetTrends)) {
+        promises.push(overviewStore.loadTransactionAssetTrends({
+            force: force,
+            months: getOverviewAssetTrendMonths(layout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.RecentTransactions)) {
+        promises.push(overviewStore.loadRecentTransactions({
+            force: force,
+            count: getOverviewRecentTransactionCount(layout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.DailyTransactionAmounts)) {
+        promises.push(overviewStore.loadTransactionDailyAmounts({
+            force: force,
+            months: getOverviewCalendarHeatmapMonths(layout.value)
         }));
     }
 

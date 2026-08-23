@@ -352,6 +352,11 @@
 }
 
 .v-switch {
+    &.v-switch--size-default .v-selection-control__input {
+        width: 24px;
+        height: 24px;
+    }
+
     .v-selection-control:not(.v-selection-control--dirty) .v-switch__track {
         opacity: 0.5;
     }

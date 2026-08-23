@@ -1,27 +1,29 @@
 <template>
-    <v-card :class="{ 'disabled': disabled }">
+    <v-card class="overview-monthly-chart-card" :class="{ 'disabled': disabled }">
         <template #title>
-            <span class="text-title-medium">{{ tt('Income and Expense Trends') }}</span>
+            <span class="text-title-medium">{{ title || tt('Income and Expense Trends') }}</span>
         </template>
 
-        <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-if="loading && !hasAnyData">
-            <div class="overview-monthly-chart-skeleton-container h-100" style="margin-top: -30px">
-                <div class="d-flex w-100 h-100 align-center justify-center"
-                     :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]">
-                    <v-skeleton-loader width="16" height="200" :loading="true"></v-skeleton-loader>
+        <div class="overview-monthly-chart-body">
+            <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-if="loading && !hasAnyData">
+                <div class="overview-monthly-chart-skeleton-container h-100" style="margin-top: -30px">
+                    <div class="d-flex w-100 h-100 align-center justify-center"
+                         :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]">
+                        <v-skeleton-loader width="16" height="200" :loading="true"></v-skeleton-loader>
+                    </div>
                 </div>
-            </div>
-        </v-card-text>
+            </v-card-text>
 
-        <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-else-if="!loading && !hasAnyData">
-            <div class="d-flex flex-column align-center justify-center w-100 h-100">
-                <span class="text-title-medium mt-n13">{{ tt('No data') }}</span>
-            </div>
-        </v-card-text>
+            <v-card-text class="overview-monthly-chart-container overview-monthly-chart-overlay" v-else-if="!loading && !hasAnyData">
+                <div class="d-flex flex-column align-center justify-center w-100 h-100">
+                    <span class="text-title-medium mt-n13">{{ tt('No data') }}</span>
+                </div>
+            </v-card-text>
 
-        <v-chart autoresize class="overview-monthly-chart-container" :class="{ 'readonly': !hasAnyData }"
-                 :option="chartOptions" :update-options="{ notMerge: true }"
-                 @click="clickItem"/>
+            <v-chart autoresize class="overview-monthly-chart-container" :class="{ 'readonly': !hasAnyData }"
+                     :option="chartOptions" :update-options="{ notMerge: true }"
+                     @click="clickItem"/>
+        </div>
     </v-card>
 </template>
 
@@ -55,8 +57,11 @@ const props = defineProps<{
     loading: boolean;
     data: TransactionMonthlyIncomeAndExpenseData[];
     disabled: boolean;
+    title?: string;
     isDarkMode?: boolean;
     enableClickItem?: boolean;
+    hideLegend?: boolean;
+    hideXAxisLabels?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -183,7 +188,8 @@ const chartOptions = computed<object>(() => {
             }
         },
         legend: {
-            bottom: 20,
+            show: !props.hideLegend,
+            bottom: 10,
             itemWidth: 14,
             itemHeight: 14,
             textStyle: {
@@ -193,10 +199,10 @@ const chartOptions = computed<object>(() => {
             data: [ tt('Income'), tt('Expense') ]
         },
         grid: {
-            left: '20px',
-            right: '20px',
-            top: '10px',
-            bottom: '100px'
+            left: 10,
+            right: 10,
+            top: 10,
+            bottom: !props.hideLegend && !props.hideXAxisLabels ? 90 : (!props.hideLegend || !props.hideXAxisLabels ? 50 : 20)
         },
         xAxis: [
             {
@@ -210,6 +216,7 @@ const chartOptions = computed<object>(() => {
                     show: false
                 },
                 axisLabel: {
+                    show: !props.hideXAxisLabels,
                     padding: [ 20, 0, 0, 0 ]
                 }
             }
@@ -325,14 +332,21 @@ function clickItem(e: ECElementEvent): void {
 </script>
 
 <style>
-.overview-monthly-chart-container {
-    width: 100%;
-    height: 400px;
+.overview-monthly-chart-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.overview-monthly-chart-body {
+    flex: 1 1 0;
+    min-height: 0;
+    position: relative;
 }
 
 .overview-monthly-chart-overlay {
     position: absolute !important;
     z-index: 10;
+    inset: 0;
 }
 
 .overview-monthly-chart-skeleton-container {

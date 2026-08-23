@@ -32,7 +32,7 @@
                 <span class="text-body-medium" v-if="!loading || (transactionOverview && transactionOverview.thisMonth && transactionOverview.thisMonth.valid)">{{ transactionOverview && transactionOverview.thisMonth ? getDisplayIncomeAmount(transactionOverview.thisMonth) : '-' }}</span>
                 <v-skeleton-loader class="d-inline-block skeleton-no-margin mt-1 pb-1" width="120px" type="text" :loading="true" v-else-if="loading && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
             </div>
-            <v-btn class="mt-4" variant="tonal" :to="detailsUrl">{{ tt('View Details') }}</v-btn>
+            <v-btn class="mt-4" variant="tonal" :to="currentDetailsUrl">{{ tt('View Details') }}</v-btn>
             <v-img class="overview-card-background img-with-direction" src="img/desktop/card-background.png" />
             <v-img class="overview-card-background-image img-with-direction" width="116" src="img/desktop/document.svg" />
         </v-card-text>
@@ -40,12 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import { useI18n } from '@/locales/helpers.ts';
-import { useHomePageBase } from '@/views/base/HomePageBase.ts';
-
-import { useOverviewStore } from '@/stores/overview.ts';
+import { usePeriodStatisticsWidgetBase } from '@/views/base/overview/PeriodStatisticsWidgetBase.ts';
 
 import { DateRange } from '@/core/datetime.ts';
 
@@ -56,7 +52,7 @@ import {
 } from '@mdi/js';
 
 defineProps<{
-    loading: boolean
+    loading: boolean;
 }>();
 
 defineEmits<{
@@ -65,15 +61,14 @@ defineEmits<{
 
 const { tt } = useI18n();
 
-const overviewStore = useOverviewStore();
-
 const {
     showAmountInHomePage,
     displayDateRange,
     transactionOverview,
+    currentDetailsUrl,
     getDisplayIncomeAmount,
     getDisplayExpenseAmount
-} = useHomePageBase();
-
-const detailsUrl = computed<string>(() => `/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: DateRange.ThisMonth.type })}`);
+} = usePeriodStatisticsWidgetBase({
+    dateType: DateRange.ThisMonth.type
+});
 </script>

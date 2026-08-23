@@ -29,6 +29,7 @@ var (
 	ErrRepeatedRequest                 = NewNormalError(NormalSubcategoryGlobal, 19, http.StatusBadRequest, "repeated request")
 	ErrIPForbidden                     = NewNormalError(NormalSubcategoryGlobal, 20, http.StatusBadRequest, "ip address is forbidden to access this resource")
 	ErrNumericOverflow                 = NewNormalError(NormalSubcategoryGlobal, 21, http.StatusBadRequest, "numeric overflow")
+	ErrDateRangeInvalid                = NewNormalError(NormalSubcategoryGlobal, 22, http.StatusBadRequest, "date range is invalid")
 )
 
 // GetParameterInvalidMessage returns specific error message for invalid parameter error

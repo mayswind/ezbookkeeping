@@ -230,7 +230,8 @@ import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, isiOS } from '@/lib/ui/mobile.ts';
-import { useHomePageBase } from '@/views/base/HomePageBase.ts';
+import { useAssetSummaryWidgetBase } from '@/views/base/overview/AssetSummaryWidgetBase.ts';
+import { usePeriodStatisticsWidgetBase } from '@/views/base/overview/PeriodStatisticsWidgetBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -260,13 +261,13 @@ const props = defineProps<{
 const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
 
+const { showAmountInHomePage } = useAssetSummaryWidgetBase();
 const {
-    showAmountInHomePage,
     displayDateRange,
     transactionOverview,
     getDisplayIncomeAmount,
     getDisplayExpenseAmount
-} = useHomePageBase();
+} = usePeriodStatisticsWidgetBase({});
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();

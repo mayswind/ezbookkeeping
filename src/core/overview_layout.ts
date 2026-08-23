@@ -1,24 +1,76 @@
+import type { GenericNameValue } from './base.ts';
+
 export enum OverviewWidgetType {
-    CurrentMonthOverview = 'current-month-overview',
     AssetSummary = 'asset-summary',
+    AccountBalanceList = 'account-balance-list',
+    CurrentMonthOverview = 'current-month-overview',
+    CurrentMonthExpenseProgress = 'current-month-expense-progress',
     PeriodIncomeExpense = 'period-income-expense',
-    IncomeExpenseTrend = 'income-expense-trend'
+    PeriodNetIncomeAndSavingsRate = 'period-net-income-and-savings-rate',
+    IncomeExpenseTrend = 'income-expense-trend',
+    NetAssetsTrend = 'net-assets-trend',
+    ExpenseCategoryRanking = 'expense-category-ranking',
+    RecentTransactions = 'recent-transactions',
+    TransactionCalendarHeatmap = 'transaction-calendar-heatmap'
 }
 
 export enum OverviewWidgetDataRequirement {
     Accounts = 'accounts',
     TransactionCategories = 'transactionCategories',
     TransactionOverview = 'transactionOverview',
-    TransactionOverviewLast12Months = 'transactionOverviewLast12Months'
+    TransactionOverviewLast2Months = 'transactionOverviewLast2Months',
+    TransactionOverviewLast12Months = 'transactionOverviewLast12Months',
+    TransactionCategoryStatistics = 'transactionCategoryStatistics',
+    AssetTrends = 'assetTrends',
+    RecentTransactions = 'recentTransactions',
+    DailyTransactionAmounts = 'dailyTransactionAmounts'
 }
 
-export type OverviewPeriod = 'today' | 'thisWeek' | 'thisMonth' | 'thisYear';
-export type OverviewWidgetSettingValue = string | number | boolean;
+export type OverviewWidgetSettingValue = string | number | boolean | (string | number)[];
+
+interface DesktopOverviewWidgetSettingBase {
+    settingType: 'itemCountSelect' | 'monthSelect' | 'customSelect' | 'switch' | 'textbox';
+    settingName: string;
+    displayName: string;
+}
+
+export interface DesktopOverviewWidgetItemCountSelectSetting extends DesktopOverviewWidgetSettingBase {
+    settingType: 'itemCountSelect';
+    itemCountValues: number[];
+}
+
+export interface DesktopOverviewWidgetMonthSelectSetting extends DesktopOverviewWidgetSettingBase {
+    settingType: 'monthSelect';
+    monthValues: number[];
+}
+
+export interface DesktopOverviewWidgetCustomSelectSetting extends DesktopOverviewWidgetSettingBase {
+    settingType: 'customSelect';
+    selectValues: GenericNameValue<string | number>[];
+    multiple?: boolean;
+    allValue?: string | number;
+    selectValueSource?: 'accountCategories';
+}
+
+export interface DesktopOverviewWidgetSwitchSetting extends DesktopOverviewWidgetSettingBase {
+    settingType: 'switch';
+}
+
+export interface DesktopOverviewWidgetTextboxSetting extends DesktopOverviewWidgetSettingBase {
+    settingType: 'textbox';
+    placeholder?: string;
+}
+
+export type DesktopOverviewWidgetSetting = DesktopOverviewWidgetItemCountSelectSetting |
+    DesktopOverviewWidgetMonthSelectSetting |
+    DesktopOverviewWidgetCustomSelectSetting |
+    DesktopOverviewWidgetSwitchSetting |
+    DesktopOverviewWidgetTextboxSetting;
 
 export interface DesktopOverviewWidgetDefinition {
     type: OverviewWidgetType;
     name: string;
-    supportsSettings: boolean;
+    supportsSettings: DesktopOverviewWidgetSetting[];
     defaultWidth: number;
     defaultHeight: number;
     minWidth: number;

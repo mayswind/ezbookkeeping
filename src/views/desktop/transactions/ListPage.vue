@@ -554,7 +554,7 @@
                                     <td class="transaction-table-column-time">
                                         <div class="d-flex flex-column">
                                             <span>{{ getDisplayTime(transaction) }}</span>
-                                            <span class="text-body-small" v-if="!isSameAsDefaultTimezoneOffsetMinutes(transaction)">{{ getDisplayTimezone(transaction) }}</span>
+                                            <span class="text-body-small text-medium-emphasis" v-if="!isSameAsDefaultTimezoneOffsetMinutes(transaction)">{{ getDisplayTimezone(transaction) }}</span>
                                             <v-tooltip activator="parent" v-if="!isSameAsDefaultTimezoneOffsetMinutes(transaction)">{{ getDisplayTimeInDefaultTimezone(transaction) }}</v-tooltip>
                                         </div>
                                     </td>

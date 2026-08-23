@@ -294,9 +294,8 @@
                                     <v-list-item class="ps-0" density="comfortable" v-if="!item.hidden">
                                         <template #prepend>
                                             <router-link class="statistics-list-item" :to="getTransactionItemLinkUrl(item.id)">
-                                                <ItemIcon :icon-type="getIconType(queryChartDataCategory, item.iconType)" size="34px"
-                                                          :icon-id="item.icon"
-                                                          :color="item.color"></ItemIcon>
+                                                <ItemIcon size="34px" :icon-type="getIconType(queryChartDataCategory, item.iconType)"
+                                                          :icon-id="item.icon" :color="item.color"></ItemIcon>
                                             </router-link>
                                         </template>
                                         <router-link class="statistics-list-item link-no-color" :to="getTransactionItemLinkUrl(item.id)">

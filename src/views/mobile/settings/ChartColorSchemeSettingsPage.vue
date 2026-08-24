@@ -76,7 +76,7 @@
             </f7-page-content>
         </f7-sheet>
 
-        <information-sheet class="backup-code-sheet"
+        <information-sheet class="code-information-sheet"
                            :title="tt('Export')"
                            :information="textualChartColors"
                            :row-count="15"

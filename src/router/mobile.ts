@@ -21,6 +21,7 @@ import StatisticsSettingsPage from '@/views/mobile/statistics/SettingsPage.vue';
 
 import TextSizeSettingsPage from '@/views/mobile/settings/TextSizeSettingsPage.vue';
 import PageSettingsPage from '@/views/mobile/settings/PageSettingsPage.vue';
+import OverviewLayoutEditorPage from '@/views/mobile/overview/LayoutEditorPage.vue';
 import ChartColorSchemeSettingsPage from '@/views/mobile/settings/ChartColorSchemeSettingsPage.vue';
 import AccountCategoryDisplayOrderSettingsPage from '@/views/mobile/settings/AccountCategoryDisplayOrderSettingsPage.vue';
 import ApplicationCloudSyncSettingsPage from '@/views/mobile/settings/ApplicationCloudSyncSettingsPage.vue';
@@ -240,6 +241,11 @@ const routes: Router.RouteParameters[] = [
     {
         path: '/settings/page',
         async: asyncResolve(PageSettingsPage),
+        beforeEnter: [checkLogin]
+    },
+    {
+        path: '/settings/overview_layout',
+        async: asyncResolve(OverviewLayoutEditorPage),
         beforeEnter: [checkLogin]
     },
     {

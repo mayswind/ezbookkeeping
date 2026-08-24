@@ -28,23 +28,23 @@ export enum OverviewWidgetDataRequirement {
 
 export type OverviewWidgetSettingValue = string | number | boolean | (string | number)[];
 
-interface DesktopOverviewWidgetSettingBase {
+interface OverviewWidgetSettingItemBase {
     settingType: 'itemCountSelect' | 'monthSelect' | 'customSelect' | 'switch' | 'textbox';
     settingName: string;
     displayName: string;
 }
 
-export interface DesktopOverviewWidgetItemCountSelectSetting extends DesktopOverviewWidgetSettingBase {
+export interface OverviewWidgetItemCountSelectSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'itemCountSelect';
     itemCountValues: number[];
 }
 
-export interface DesktopOverviewWidgetMonthSelectSetting extends DesktopOverviewWidgetSettingBase {
+export interface OverviewWidgetMonthSelectSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'monthSelect';
     monthValues: number[];
 }
 
-export interface DesktopOverviewWidgetCustomSelectSetting extends DesktopOverviewWidgetSettingBase {
+export interface OverviewWidgetCustomSelectSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'customSelect';
     selectValues: GenericNameValue<string | number>[];
     multiple?: boolean;
@@ -52,25 +52,43 @@ export interface DesktopOverviewWidgetCustomSelectSetting extends DesktopOvervie
     selectValueSource?: 'accountCategories';
 }
 
-export interface DesktopOverviewWidgetSwitchSetting extends DesktopOverviewWidgetSettingBase {
+export interface OverviewWidgetSwitchSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'switch';
 }
 
-export interface DesktopOverviewWidgetTextboxSetting extends DesktopOverviewWidgetSettingBase {
+export interface OverviewWidgetTextboxSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'textbox';
     placeholder?: string;
 }
 
-export type DesktopOverviewWidgetSetting = DesktopOverviewWidgetItemCountSelectSetting |
-    DesktopOverviewWidgetMonthSelectSetting |
-    DesktopOverviewWidgetCustomSelectSetting |
-    DesktopOverviewWidgetSwitchSetting |
-    DesktopOverviewWidgetTextboxSetting;
+export type OverviewWidgetSettingItem = OverviewWidgetItemCountSelectSettingItem |
+    OverviewWidgetMonthSelectSettingItem |
+    OverviewWidgetCustomSelectSettingItem |
+    OverviewWidgetSwitchSettingItem |
+    OverviewWidgetTextboxSettingItem;
 
-export interface DesktopOverviewWidgetDefinition {
+export interface OverviewWidgetDefinitionBase {
     type: OverviewWidgetType;
     name: string;
-    supportsSettings: DesktopOverviewWidgetSetting[];
+    supportsSettings: OverviewWidgetSettingItem[];
+    defaultSettings: Record<string, OverviewWidgetSettingValue>;
+    dataRequirements: OverviewWidgetDataRequirement[];
+}
+
+export interface OverviewLayoutBase {
+    widgets: OverviewWidgetLayoutBase[];
+}
+
+export interface OverviewWidgetLayoutBase {
+    id: string;
+    type: OverviewWidgetType;
+    settings: Record<string, OverviewWidgetSettingValue>;
+}
+
+export interface DesktopOverviewWidgetDefinition extends OverviewWidgetDefinitionBase{
+    type: OverviewWidgetType;
+    name: string;
+    supportsSettings: OverviewWidgetSettingItem[];
     defaultWidth: number;
     defaultHeight: number;
     minWidth: number;
@@ -81,16 +99,34 @@ export interface DesktopOverviewWidgetDefinition {
     dataRequirements: OverviewWidgetDataRequirement[];
 }
 
-export interface DesktopOverviewLayout {
+export interface DesktopOverviewLayout extends OverviewLayoutBase {
     widgets: DesktopOverviewWidgetLayout[];
 }
 
-export interface DesktopOverviewWidgetLayout {
+export interface DesktopOverviewWidgetLayout extends OverviewWidgetLayoutBase {
     id: string;
     type: OverviewWidgetType;
     x: number;
     y: number;
     w: number;
     h: number;
+    settings: Record<string, OverviewWidgetSettingValue>;
+}
+
+export interface MobileOverviewWidgetDefinition extends OverviewWidgetDefinitionBase {
+    type: OverviewWidgetType;
+    name: string;
+    supportsSettings: OverviewWidgetSettingItem[];
+    defaultSettings: Record<string, OverviewWidgetSettingValue>;
+    dataRequirements: OverviewWidgetDataRequirement[];
+}
+
+export interface MobileOverviewLayout extends OverviewLayoutBase {
+    widgets: MobileOverviewWidgetLayout[];
+}
+
+export interface MobileOverviewWidgetLayout extends OverviewWidgetLayoutBase {
+    id: string;
+    type: OverviewWidgetType;
     settings: Record<string, OverviewWidgetSettingValue>;
 }

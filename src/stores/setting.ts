@@ -217,6 +217,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('desktopOverviewPageLayout', value);
     }
 
+    function setMobileOverviewPageLayout(value: string): void {
+        updateApplicationSettingsValue('mobileOverviewPageLayout', value);
+        appSettings.value.mobileOverviewPageLayout = value;
+        updateUserApplicationCloudSettingValue('mobileOverviewPageLayout', value);
+    }
+
     function setShowAmountInHomePage(value: boolean): void {
         updateApplicationSettingsValue('showAmountInHomePage', value);
         appSettings.value.showAmountInHomePage = value;
@@ -609,6 +615,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setShowAddTransactionButtonInDesktopNavbar,
         // -- Overview Page
         setDesktopOverviewPageLayout,
+        setMobileOverviewPageLayout,
         setShowAmountInHomePage,
         setTimezoneUsedForStatisticsInHomePage,
         setOverviewAccountFilterInHomePage,

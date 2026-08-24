@@ -49,6 +49,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     showAddTransactionButtonInDesktopNavbar: boolean;
     // Overview Page
     desktopOverviewPageLayout: string;
+    mobileOverviewPageLayout: string;
     showAmountInHomePage: boolean;
     timezoneUsedForStatisticsInHomePage: number;
     overviewAccountFilterInHomePage: Record<string, boolean>;
@@ -139,6 +140,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'showAddTransactionButtonInDesktopNavbar': UserApplicationCloudSettingType.Boolean,
     // Overview Page
     'desktopOverviewPageLayout': UserApplicationCloudSettingType.String,
+    'mobileOverviewPageLayout': UserApplicationCloudSettingType.String,
     'showAmountInHomePage': UserApplicationCloudSettingType.Boolean,
     'timezoneUsedForStatisticsInHomePage': UserApplicationCloudSettingType.Number,
     'overviewAccountFilterInHomePage': UserApplicationCloudSettingType.StringBooleanMap,
@@ -211,6 +213,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     showAddTransactionButtonInDesktopNavbar: true,
     // Overview Page
     desktopOverviewPageLayout: '',
+    mobileOverviewPageLayout: '',
     showAmountInHomePage: true,
     timezoneUsedForStatisticsInHomePage: TimezoneTypeForStatistics.Default.type,
     overviewAccountFilterInHomePage: {},

@@ -74,35 +74,9 @@ export function usePeriodStatisticsWidgetBase(props: CommonPeriodStatisticsWidge
         };
     });
 
-    const currentOverviewItem = computed<TransactionOverviewDataItem | undefined>(() => {
-        if (props.dateType === DateRange.Today.type) {
-            return transactionOverview.value.today;
-        } else if (props.dateType === DateRange.ThisWeek.type) {
-            return transactionOverview.value.thisWeek;
-        } else if (props.dateType === DateRange.ThisMonth.type) {
-            return transactionOverview.value.thisMonth;
-        } else if (props.dateType === DateRange.ThisYear.type) {
-            return transactionOverview.value.thisYear;
-        } else {
-            return undefined;
-        }
-    });
-
+    const currentOverviewItem = computed<TransactionOverviewDataItem | undefined>(() => getOverviewItem(props.dateType));
     const currentPeriodTitle = computed<string>(() => tt(isInteger(props.dateType) ? (DateRange.valueOf(props.dateType)?.name ?? 'Unknown') : 'Unknown'));
-
-    const currentDisplayDateTime = computed<string>(() => {
-        if (props.dateType === DateRange.Today.type) {
-            return displayDateRange.value.today?.displayTime || '';
-        } else if (props.dateType === DateRange.ThisWeek.type) {
-            return formatRange(displayDateRange.value.thisWeek?.startTime ?? '', displayDateRange.value.thisWeek?.endTime ?? '');
-        } else if (props.dateType === DateRange.ThisMonth.type) {
-            return formatRange(displayDateRange.value.thisMonth?.startTime ?? '', displayDateRange.value.thisMonth?.endTime ?? '');
-        } else if (props.dateType === DateRange.ThisYear.type) {
-            return displayDateRange.value.thisYear?.displayTime || '';
-        } else {
-            return '';
-        }
-    });
+    const currentDisplayDateTime = computed<string>(() => getDisplayDateTime(props.dateType));
 
     const currentIncomeAmount = computed<BigDecimal>(() => currentOverviewItem.value?.incomeAmount ?? BIG_DECIMAL_ZERO);
     const currentExpenseAmount = computed<BigDecimal>(() => currentOverviewItem.value?.expenseAmount ?? BIG_DECIMAL_ZERO);
@@ -145,6 +119,34 @@ export function usePeriodStatisticsWidgetBase(props: CommonPeriodStatisticsWidge
         return `/transaction/list?${overviewStore.getTransactionListPageParams({ dateType: props.dateType })}`
     });
 
+    function getOverviewItem(dateType: number | undefined): TransactionOverviewDataItem | undefined {
+        if (dateType === DateRange.Today.type) {
+            return transactionOverview.value.today;
+        } else if (dateType === DateRange.ThisWeek.type) {
+            return transactionOverview.value.thisWeek;
+        } else if (dateType === DateRange.ThisMonth.type) {
+            return transactionOverview.value.thisMonth;
+        } else if (dateType === DateRange.ThisYear.type) {
+            return transactionOverview.value.thisYear;
+        } else {
+            return undefined;
+        }
+    }
+
+    function getDisplayDateTime(dateType: number | undefined): string {
+        if (dateType === DateRange.Today.type) {
+            return displayDateRange.value.today?.displayTime || '';
+        } else if (dateType === DateRange.ThisWeek.type) {
+            return formatRange(displayDateRange.value.thisWeek?.startTime ?? '', displayDateRange.value.thisWeek?.endTime ?? '');
+        } else if (dateType === DateRange.ThisMonth.type) {
+            return formatRange(displayDateRange.value.thisMonth?.startTime ?? '', displayDateRange.value.thisMonth?.endTime ?? '');
+        } else if (dateType === DateRange.ThisYear.type) {
+            return displayDateRange.value.thisYear?.displayTime || '';
+        } else {
+            return '';
+        }
+    }
+
     function getDisplayAmount(amount: BigDecimal, incomplete: boolean): string {
         if (!showAmountInHomePage.value) {
             return formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, defaultCurrency.value);
@@ -179,6 +181,8 @@ export function usePeriodStatisticsWidgetBase(props: CommonPeriodStatisticsWidge
         currentDisplaySavingsRate,
         currentDetailsUrl,
         // functions
+        getOverviewItem,
+        getDisplayDateTime,
         getDisplayAmount,
         getDisplayIncomeAmount,
         getDisplayExpenseAmount

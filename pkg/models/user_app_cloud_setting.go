@@ -23,6 +23,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"showAddTransactionButtonInDesktopNavbar": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Overview Page
 	"desktopOverviewPageLayout":                   USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
+	"mobileOverviewPageLayout":                    USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	"showAmountInHomePage":                        USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"timezoneUsedForStatisticsInHomePage":         USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"overviewAccountFilterInHomePage":             USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,

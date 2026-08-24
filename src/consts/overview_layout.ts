@@ -1,10 +1,13 @@
+import type { PartialRecord } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { AccountCategory } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
+    type OverviewWidgetTextboxSettingItem,
     type DesktopOverviewLayout,
     type DesktopOverviewWidgetDefinition,
-    type DesktopOverviewWidgetTextboxSetting,
+    type MobileOverviewLayout,
+    type MobileOverviewWidgetDefinition,
     OverviewWidgetType,
     OverviewWidgetDataRequirement
 } from '@/core/overview_layout.ts';
@@ -12,19 +15,22 @@ import {
 export const DESKTOP_OVERVIEW_LAYOUT_COLUMNS: number = 12;
 export const DESKTOP_OVERVIEW_LAYOUT_MAX_WIDGETS: number = 100;
 export const DESKTOP_OVERVIEW_LAYOUT_MAX_ROWS: number = 1000;
+export const MOBILE_OVERVIEW_LAYOUT_MAX_WIDGETS: number = 100;
 
-const WIDGET_TITLE_SETTING: DesktopOverviewWidgetTextboxSetting = {
+const WIDGET_TITLE_SETTING: OverviewWidgetTextboxSettingItem = {
     settingType: 'textbox',
     settingName: 'title',
     displayName: 'Widget Title',
     placeholder: 'Widget Title'
 };
 
-export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: Record<OverviewWidgetType, DesktopOverviewWidgetDefinition> = {
+export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetType, DesktopOverviewWidgetDefinition> = {
     [OverviewWidgetType.AssetSummary]: {
         type: OverviewWidgetType.AssetSummary,
         name: 'Asset Summary',
-        supportsSettings: [WIDGET_TITLE_SETTING],
+        supportsSettings: [
+            WIDGET_TITLE_SETTING
+        ],
         defaultSettings: {},
         defaultWidth: 8,
         defaultHeight: 3,
@@ -105,7 +111,9 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: Record<OverviewWidgetType, Des
     [OverviewWidgetType.CurrentMonthExpenseProgress]: {
         type: OverviewWidgetType.CurrentMonthExpenseProgress,
         name: 'This Month\'s Expense Progress',
-        supportsSettings: [WIDGET_TITLE_SETTING],
+        supportsSettings: [
+            WIDGET_TITLE_SETTING
+        ],
         defaultSettings: {},
         defaultWidth: 3,
         defaultHeight: 3,
@@ -387,7 +395,7 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
             settings: {}
         },
         {
-            id: 'default-period-today',
+            id: 'default-today-income-expense',
             type: OverviewWidgetType.PeriodIncomeExpense,
             x: 0,
             y: 3,
@@ -398,7 +406,7 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
             }
         },
         {
-            id: 'default-period-week',
+            id: 'default-week-income-expense',
             type: OverviewWidgetType.PeriodIncomeExpense,
             x: 3,
             y: 3,
@@ -409,7 +417,7 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
             }
         },
         {
-            id: 'default-period-month',
+            id: 'default-month-income-expense',
             type: OverviewWidgetType.PeriodIncomeExpense,
             x: 0,
             y: 6,
@@ -420,7 +428,7 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
             }
         },
         {
-            id: 'default-period-year',
+            id: 'default-year-income-expense',
             type: OverviewWidgetType.PeriodIncomeExpense,
             x: 3,
             y: 6,
@@ -441,6 +449,109 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
                 months: 12,
                 showXAxisLabels: true,
                 showLegend: true
+            }
+        }
+    ]
+};
+
+export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetType, MobileOverviewWidgetDefinition> = {
+    [OverviewWidgetType.AssetSummary]: {
+        type: OverviewWidgetType.AssetSummary,
+        name: 'Asset Summary',
+        supportsSettings: [
+            {
+                settingType: 'customSelect',
+                settingName: 'height',
+                displayName: 'Widget Height',
+                selectValues: [
+                    { name: 'Small', value: 1 },
+                    { name: 'Medium', value: 2 },
+                    { name: 'Large', value: 3 }
+                ]
+            }
+        ],
+        defaultSettings: {
+            height: 3
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.Accounts
+        ]
+    },
+    [OverviewWidgetType.CurrentMonthOverview]: {
+        type: OverviewWidgetType.CurrentMonthOverview,
+        name: 'This Month\'s Income and Expense Overview',
+        supportsSettings: [
+            {
+                settingType: 'customSelect',
+                settingName: 'height',
+                displayName: 'Widget Height',
+                selectValues: [
+                    { name: 'Small', value: 1 },
+                    { name: 'Medium', value: 2 },
+                    { name: 'Large', value: 3 }
+                ]
+            }
+        ],
+        defaultSettings: {
+            height: 3
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.TransactionOverview
+        ]
+    },
+    [OverviewWidgetType.PeriodIncomeExpense]: {
+        type: OverviewWidgetType.PeriodIncomeExpense,
+        name: 'Period Income and Expense',
+        supportsSettings: [
+            {
+                settingType: 'customSelect',
+                settingName: 'dateRanges',
+                displayName: 'Date Range',
+                selectValues: [
+                    DateRange.Today,
+                    DateRange.ThisWeek,
+                    DateRange.ThisMonth,
+                    DateRange.ThisYear
+                ].map(dateRange => ({
+                    name: dateRange.name,
+                    value: dateRange.type
+                })),
+                multiple: true
+            }
+        ],
+        defaultSettings: {
+            dateRanges: [
+                DateRange.Today.type,
+                DateRange.ThisWeek.type,
+                DateRange.ThisMonth.type,
+                DateRange.ThisYear.type
+            ]
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.TransactionOverview
+        ]
+    }
+};
+
+export const DEFAULT_MOBILE_OVERVIEW_LAYOUT: MobileOverviewLayout = {
+    widgets: [
+        {
+            id: 'default-current-month-overview',
+            type: OverviewWidgetType.CurrentMonthOverview,
+            settings: {
+                height: 3
+            }
+        },
+        {
+            id: 'default-period-income-expense',
+            type: OverviewWidgetType.PeriodIncomeExpense,
+            settings: {
+                dateRanges: [
+                    DateRange.Today.type,
+                    DateRange.ThisWeek.type,
+                    DateRange.ThisMonth.type,
+                    DateRange.ThisYear.type
+                ]
             }
         }
     ]

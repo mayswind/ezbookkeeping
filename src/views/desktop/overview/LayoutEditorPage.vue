@@ -69,7 +69,6 @@ import { useOverviewStore } from '@/stores/overview.ts';
 import { itemAndIndex } from '@/core/base.ts';
 import {
     type OverviewWidgetType,
-    type DesktopOverviewWidgetDefinition,
     type DesktopOverviewLayout,
     type DesktopOverviewWidgetLayout,
     OverviewWidgetDataRequirement
@@ -80,18 +79,18 @@ import {
 } from '@/consts/overview_layout.ts';
 
 import {
-    serializeDesktopOverviewLayout,
     getOverviewDataRequirements,
-    isDefaultDesktopOverviewLayout,
     getOverviewTransactionOverviewMonths,
     getOverviewRecentTransactionCount,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
-    compactOverviewWidgets,
-    normalizeDesktopOverviewLayout,
-    findOverviewWidgetPosition,
     getOverviewTransactionCategoryStatisticDateTypes,
-    cloneOverviewLayout,
+    compactDesktopOverviewWidgets,
+    findDesktopOverviewWidgetPosition,
+    isDefaultDesktopOverviewLayout,
+    normalizeDesktopOverviewLayout,
+    cloneDesktopOverviewLayout,
+    serializeDesktopOverviewLayout,
     parseDesktopOverviewLayout
 } from '@/lib/overview_layout.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
@@ -134,7 +133,7 @@ const layoutExportDialog = useTemplateRef<JsonExportDialogType>('layoutExportDia
 const loadingOverview = ref<boolean>(true);
 const leavingAfterAction = ref<boolean>(false);
 const initialLayout = ref<DesktopOverviewLayout>(getInitialLayout());
-const draftLayout = ref<DesktopOverviewLayout>(cloneOverviewLayout(initialLayout.value));
+const draftLayout = ref<DesktopOverviewLayout>(cloneDesktopOverviewLayout(initialLayout.value));
 const initialJson = ref<string>(serializeDesktopOverviewLayout(initialLayout.value));
 
 const isModified = computed<boolean>(() => serializeDesktopOverviewLayout(draftLayout.value) !== initialJson.value);
@@ -146,7 +145,7 @@ function getInitialLayout(): DesktopOverviewLayout {
         initialLayout = parseDesktopOverviewLayout(settingsStore.appSettings.desktopOverviewPageLayout);
     } catch (error) {
         logger.warn('failed to parse desktop overview page layout in editor', error);
-        initialLayout = cloneOverviewLayout(DEFAULT_DESKTOP_OVERVIEW_LAYOUT);
+        initialLayout = cloneDesktopOverviewLayout(DEFAULT_DESKTOP_OVERVIEW_LAYOUT);
     }
 
     return initialLayout;
@@ -155,7 +154,7 @@ function getInitialLayout(): DesktopOverviewLayout {
 function reload(force: boolean): void {
     loadingOverview.value = true;
 
-    const requirements = getOverviewDataRequirements(draftLayout.value);
+    const requirements = getOverviewDataRequirements(draftLayout.value, DESKTOP_OVERVIEW_WIDGET_DEFINITIONS);
     const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false })
@@ -200,17 +199,28 @@ function reload(force: boolean): void {
 
     Promise.all(promises).then(() => {
         loadingOverview.value = false;
-        if (force) snackbar.value?.showMessage('Data has been updated');
+
+        if (force) {
+            snackbar.value?.showMessage('Data has been updated');
+        }
     }).catch(error => {
         loadingOverview.value = false;
-        if (!error.processed && !error.isUpToDate) snackbar.value?.showError(error);
+
+        if (!error.processed && !error.isUpToDate) {
+            snackbar.value?.showError(error);
+        }
     });
 }
 
 function addWidget(): void {
     addWidgetDialog.value?.open().then((type: OverviewWidgetType) => {
-        const definition: DesktopOverviewWidgetDefinition = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[type];
-        const position = findOverviewWidgetPosition(draftLayout.value.widgets, definition.defaultWidth, definition.defaultHeight);
+        const definition = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[type];
+
+        if (!definition) {
+            return;
+        }
+
+        const position = findDesktopOverviewWidgetPosition(draftLayout.value.widgets, definition.defaultWidth, definition.defaultHeight);
         const newWidget: DesktopOverviewWidgetLayout = {
             id: generateRandomUUID(),
             type: type,
@@ -229,7 +239,7 @@ function removeWidget(id: string): void {
     for (const [widget, index] of itemAndIndex(draftLayout.value.widgets)) {
         if (widget.id === id) {
             draftLayout.value.widgets.splice(index, 1);
-            draftLayout.value.widgets = compactOverviewWidgets(draftLayout.value.widgets);
+            draftLayout.value.widgets = compactDesktopOverviewWidgets(draftLayout.value.widgets);
             return;
         }
     }
@@ -259,7 +269,7 @@ function clearLayout(): void {
 
 function resetLayout(): void {
     confirmDialog.value?.open('Reset the layout to its default value?').then(() => {
-        draftLayout.value = cloneOverviewLayout(DEFAULT_DESKTOP_OVERVIEW_LAYOUT);
+        draftLayout.value = cloneDesktopOverviewLayout(DEFAULT_DESKTOP_OVERVIEW_LAYOUT);
         reload(false);
     });
 }

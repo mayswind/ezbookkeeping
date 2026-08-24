@@ -20,6 +20,19 @@
 
         <f7-block-title>{{ tt('Overview Page') }}</f7-block-title>
         <f7-list strong inset dividers class="settings-list">
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="/settings/overview_layout">
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Home Page Layout') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>{{ overviewPageLayoutDisplayContent }}</div>
+                </template>
+            </f7-list-item>
+
             <f7-list-item>
                 <template #after-title>
                     {{ tt('Show Amount') }}
@@ -382,6 +395,7 @@ import { TransactionQuickSaveButtonStyle } from '@/core/transaction.ts';
 import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE } from '@/core/statistics.ts';
 
 import { findNameByValue, findDisplayNameByType } from '@/lib/common.ts';
+import { isDefaultMobileOverviewLayout, parseMobileOverviewLayout } from '@/lib/overview_layout.ts';
 
 const {
     tt,
@@ -435,6 +449,14 @@ const showCurrencySortByInExchangeRatesPagePopup = ref<boolean>(false);
 
 const allTransactionQuickSaveButtonStyles = computed<TypeAndDisplayName[]>(() => getAllTransactionQuickSaveButtonStyles());
 const allTransactionQuickAddButtonActionTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionQuickAddButtonActionTypes());
+
+const overviewPageLayoutDisplayContent = computed<string>(() => {
+    try {
+        return tt(isDefaultMobileOverviewLayout(parseMobileOverviewLayout(settingsStore.appSettings.mobileOverviewPageLayout)) ? 'Default' : 'Custom');
+    } catch {
+        return tt('Custom');
+    }
+});
 
 const quickSaveButtonStyleInMobileTransactionListPage = computed<number>({
     get: () => settingsStore.appSettings.quickSaveButtonStyleInMobileTransactionListPage,

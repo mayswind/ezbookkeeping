@@ -19,7 +19,7 @@
                         <v-tooltip activator="parent">{{ tt('More') }}</v-tooltip>
                         <v-menu activator="parent">
                             <v-list>
-                                <template v-if="DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.type].supportsSettings.length">
+                                <template v-if="DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.type]?.supportsSettings?.length">
                                     <v-list-item :prepend-icon="mdiCogOutline" :title="tt('Settings')"
                                                  @click="$emit('configure', widget)" />
                                     <v-divider class="my-2" />
@@ -53,7 +53,6 @@ import OverviewWidget from './OverviewWidget.vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import {
-    type DesktopOverviewWidgetDefinition,
     type DesktopOverviewLayout,
     type DesktopOverviewWidgetLayout
 } from '@/core/overview_layout.ts';
@@ -63,8 +62,8 @@ import {
 } from '@/consts/overview_layout.ts';
 
 import {
-    resolveOverviewWidgetCollisions,
-    compactOverviewWidgets
+    resolveDesktopOverviewWidgetCollisions,
+    compactDesktopOverviewWidgets
 } from '@/lib/overview_layout.ts';
 
 import {
@@ -209,10 +208,16 @@ function handlePointerMove(event: PointerEvent): void {
         return;
     }
 
+    const definition = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[state.widget.type];
+
+    if (!definition) {
+        return;
+    }
+
     const columnWidth: number = (grid.value.clientWidth - GAP * (DESKTOP_OVERVIEW_LAYOUT_COLUMNS - 1)) / DESKTOP_OVERVIEW_LAYOUT_COLUMNS;
     const deltaColumns: number = Math.round((event.clientX - state.startX) / (columnWidth + GAP));
     const deltaRows: number = Math.round((event.clientY - state.startY) / (ROW_HEIGHT + GAP));
-    const definition: DesktopOverviewWidgetDefinition = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[state.widget.type];
+
     const nextWidget = { ...state.widget, settings: { ...state.widget.settings } };
 
     if (state.action === 'move') {
@@ -232,8 +237,8 @@ function handlePointerMove(event: PointerEvent): void {
     }
 
     const widgets = props.layout.widgets.map(widget => widget.id === nextWidget.id ? nextWidget : widget);
-    const resolvedWidgets = resolveOverviewWidgetCollisions(widgets, nextWidget.id);
-    emit('update:layout', { ...props.layout, widgets: compactOverviewWidgets(resolvedWidgets, nextWidget.id) });
+    const resolvedWidgets = resolveDesktopOverviewWidgetCollisions(widgets, nextWidget.id);
+    emit('update:layout', { ...props.layout, widgets: compactDesktopOverviewWidgets(resolvedWidgets, nextWidget.id) });
 }
 
 function finishPointerAction(event: PointerEvent): void {
@@ -248,7 +253,7 @@ function finishPointerAction(event: PointerEvent): void {
     window.removeEventListener('pointerup', finishPointerAction);
     window.removeEventListener('pointercancel', finishPointerAction);
 
-    emit('update:layout', { ...props.layout, widgets: compactOverviewWidgets(props.layout.widgets) });
+    emit('update:layout', { ...props.layout, widgets: compactDesktopOverviewWidgets(props.layout.widgets) });
 }
 
 onBeforeUnmount(() => {

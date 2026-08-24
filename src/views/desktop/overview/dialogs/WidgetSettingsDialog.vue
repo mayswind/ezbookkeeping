@@ -56,10 +56,10 @@ import { useSettingsStore } from '@/stores/setting.ts';
 
 import type { GenericNameValue, NameNumeralValue } from '@/core/base.ts';
 import {
-    type DesktopOverviewWidgetCustomSelectSetting,
-    type DesktopOverviewWidgetLayout,
-    type DesktopOverviewWidgetSetting,
-    type OverviewWidgetSettingValue
+    type OverviewWidgetSettingValue,
+    type OverviewWidgetCustomSelectSettingItem,
+    type OverviewWidgetSettingItem,
+    type DesktopOverviewWidgetLayout
 } from '@/core/overview_layout.ts';
 
 import { DESKTOP_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
@@ -82,7 +82,7 @@ let rejectFunc: ((reason?: unknown) => void) | null = null;
 const showState = ref<boolean>(false);
 const widget = ref<DesktopOverviewWidgetLayout | null>(null);
 
-const supportsSettings = computed<DesktopOverviewWidgetSetting[]>(() => widget.value ? DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.supportsSettings ?? [] : []);
+const supportsSettings = computed<OverviewWidgetSettingItem[]>(() => widget.value ? DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.supportsSettings ?? [] : []);
 
 function getItemCountOptions(values: number[]): NameNumeralValue[] {
     return getTablePageOptions(values, undefined, false, true);
@@ -95,7 +95,7 @@ function getMonthOptions(values: number[]): NameNumeralValue[] {
     }));
 }
 
-function getCustomSelectOptions(setting: DesktopOverviewWidgetCustomSelectSetting): GenericNameValue<string | number>[] {
+function getCustomSelectOptions(setting: OverviewWidgetCustomSelectSettingItem): GenericNameValue<string | number>[] {
     if (setting.selectValueSource === 'accountCategories') {
         return [
             { name: tt('All'), value: 0 },
@@ -110,7 +110,7 @@ function getSettingValue(settingName: string): OverviewWidgetSettingValue | unde
     return widget.value?.settings[settingName];
 }
 
-function updateSettingValue(setting: DesktopOverviewWidgetSetting, value: OverviewWidgetSettingValue | null): void {
+function updateSettingValue(setting: OverviewWidgetSettingItem, value: OverviewWidgetSettingValue | null): void {
     if (!widget.value || value === null) {
         return;
     }
@@ -135,7 +135,7 @@ function open(value: DesktopOverviewWidgetLayout): Promise<DesktopOverviewWidget
     widget.value = cloneWidget(value);
 
     if (DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]) {
-        const defaultSettings = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type].defaultSettings;
+        const defaultSettings = DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.defaultSettings ?? {};
         widget.value.settings = { ...defaultSettings, ...widget.value.settings };
     }
 

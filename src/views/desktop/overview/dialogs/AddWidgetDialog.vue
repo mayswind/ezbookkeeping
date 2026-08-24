@@ -5,14 +5,16 @@
                                   @cancel="cancel">
             <template #content>
                 <v-list lines="two">
-                    <v-list-item :key="definition.type" :title="tt(definition.name)"
-                                 :subtitle="`${definition.defaultWidth} × ${definition.defaultHeight}`"
-                                 v-for="definition in DESKTOP_OVERVIEW_WIDGET_DEFINITIONS"
-                                 @click="select(definition.type)">
-                        <template #append>
-                            <v-icon :icon="mdiPlus" />
-                        </template>
-                    </v-list-item>
+                    <template v-for="definition in DESKTOP_OVERVIEW_WIDGET_DEFINITIONS">
+                        <v-list-item :key="definition.type" :title="tt(definition.name)"
+                                     :subtitle="`${definition.defaultWidth} × ${definition.defaultHeight}`"
+                                     v-if="definition"
+                                     @click="select(definition.type)">
+                            <template #append>
+                                <v-icon :icon="mdiPlus" />
+                            </template>
+                        </v-list-item>
+                    </template>
                 </v-list>
             </template>
         </one-column-dialog-layout>

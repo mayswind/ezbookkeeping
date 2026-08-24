@@ -65,3 +65,9 @@ function onSheetClosed(): void {
     close();
 }
 </script>
+
+<style>
+.code-information-sheet .information-content {
+    font-family: monospace;
+}
+</style>

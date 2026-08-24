@@ -44,7 +44,7 @@
                               @password:confirm="regenerateBackupCode">
         </password-input-sheet>
 
-        <information-sheet class="backup-code-sheet"
+        <information-sheet class="code-information-sheet"
                            :title="tt('Backup Code')"
                            :hint="tt('Please copy these backup codes to safe place, the following backup codes will be displayed only once. If these codes were lost, you can regenerate them at any time.')"
                            :information="currentBackupCode"
@@ -243,9 +243,5 @@ init();
 .img-qrcode {
     width: 240px;
     height: 240px
-}
-
-.backup-code-sheet .information-content {
-    font-family: monospace;
 }
 </style>

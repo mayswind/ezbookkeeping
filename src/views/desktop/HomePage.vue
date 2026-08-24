@@ -20,17 +20,17 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { type DesktopOverviewLayout, OverviewWidgetDataRequirement } from '@/core/overview_layout.ts';
-import { DEFAULT_DESKTOP_OVERVIEW_LAYOUT } from '@/consts/overview_layout.ts';
+import { DESKTOP_OVERVIEW_WIDGET_DEFINITIONS, DEFAULT_DESKTOP_OVERVIEW_LAYOUT } from '@/consts/overview_layout.ts';
 
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { getShareCacheImageBlob } from '@/lib/cache.ts';
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
-    getOverviewTransactionCategoryStatisticDateTypes,
     getOverviewRecentTransactionCount,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
+    getOverviewTransactionCategoryStatisticDateTypes,
     parseDesktopOverviewLayout
 } from '@/lib/overview_layout.ts';
 import logger from '@/lib/logger.ts';
@@ -66,7 +66,7 @@ function clearShareImageCache(): void {
 function reload(force: boolean): void {
     loadingOverview.value = true;
 
-    const requirements: OverviewWidgetDataRequirement[] = getOverviewDataRequirements(layout.value);
+    const requirements: OverviewWidgetDataRequirement[] = getOverviewDataRequirements(layout.value, DESKTOP_OVERVIEW_WIDGET_DEFINITIONS);
     const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false })

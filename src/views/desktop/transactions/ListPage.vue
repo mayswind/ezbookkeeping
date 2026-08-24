@@ -10,7 +10,7 @@
                 })" v-model="queryPageType" />
             </div>
             <v-divider class="my-2" />
-            <div class="mt-2">
+            <div class="my-2">
                 <span class="mx-3 text-body-medium">{{ tt('Transaction Type') }}</span>
                 <v-select
                     item-title="displayName"

@@ -34,7 +34,7 @@
             <f7-list-item :title="tt('Provider')" :after="mapProviderName" v-if="!mapProviderWebsite"></f7-list-item>
         </f7-list>
 
-        <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="license-popup">
+        <f7-popup push swipe-to-close class="license-popup">
             <f7-page>
                 <f7-navbar>
                     <div class="swipe-handler"></div>
@@ -118,10 +118,9 @@
             </f7-page>
         </f7-popup>
 
-        <f7-popup push swipe-to-close swipe-handler=".swipe-handler" class="document-popup" @popup:open="onDocumentPopupOpen">
+        <f7-popup push swipe-to-close class="document-popup" @popup:open="onDocumentPopupOpen">
             <f7-page>
                 <f7-navbar>
-                    <div class="swipe-handler"></div>
                     <f7-nav-left>
                         <f7-link popup-close icon-f7="xmark"></f7-link>
                     </f7-nav-left>
@@ -309,10 +308,10 @@ init();
 
 <style>
 .license-popup {
-    --f7-navbar-height: 72px;
+    --f7-navbar-height: 60px;
 
     .license-title {
-        margin-top: 26px;
+        margin-top: 18px;
         font-size: var(--ebk-license-popup-title-font-size);
     }
 

@@ -1,8 +1,7 @@
 <template>
-    <f7-popup push swipe-to-close swipe-handler=".swipe-handler" :opened="show" @popup:open="onPopupOpen" @popup:closed="onPopupClosed">
+    <f7-popup push swipe-to-close :opened="show" @popup:open="onPopupOpen" @popup:closed="onPopupClosed">
         <f7-page>
             <f7-navbar>
-                <div class="swipe-handler"></div>
                 <f7-nav-left>
                     <f7-link popup-close icon-f7="xmark"></f7-link>
                 </f7-nav-left>

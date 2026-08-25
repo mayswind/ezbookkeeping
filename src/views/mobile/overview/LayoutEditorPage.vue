@@ -50,7 +50,7 @@
             </f7-actions-group>
         </f7-actions>
 
-        <f7-popup push swipe-to-close swipe-handler=".swipe-handler" :opened="showAddWidgetPopup" @popup:closed="showAddWidgetPopup = false">
+        <f7-popup push swipe-to-close :opened="showAddWidgetPopup" @popup:closed="showAddWidgetPopup = false">
             <f7-page>
                 <f7-navbar>
                     <div class="swipe-handler"></div>

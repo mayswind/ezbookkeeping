@@ -1,5 +1,5 @@
 <template>
-    <f7-popup push :opened="show" @popup:open="onPopupOpen" @popup:closed="onPopupClosed">
+    <f7-popup push swipe-to-close :opened="show" @popup:open="onPopupOpen" @popup:closed="onPopupClosed">
         <f7-page>
             <f7-navbar :outline="false">
                 <f7-nav-left>

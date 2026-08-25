@@ -120,7 +120,7 @@
             </f7-list-item>
 
             <f7-list-item
-                link="#" no-chevron
+                link="#"
                 class="list-item-with-header-and-title list-item-no-item-after"
                 popover-open=".use-last-reconciled-time-popover-menu"
                 :header="tt('Use Last Reconciled Time')"

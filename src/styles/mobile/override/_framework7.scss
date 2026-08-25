@@ -89,6 +89,24 @@ html[dir="rtl"] .progressbar {
     transform: scaleX(-1);
 }
 
+:not(.no-chevron) {
+    li > {
+        .item-link.popover-open[data-popover] {
+            > .item-content {
+                > .item-inner {
+                    &:before {
+                        --f7-list-chevron-icon-right: 'chevron_up_chevron_down';
+                        --f7-list-chevron-icon-color: rgba(0, 0, 0, 0.3);
+                        font-family: 'Framework7 Icons';
+                        padding-right: 8px;
+                        transform: scaleX(0.6) scaleY(0.9);
+                    }
+                }
+            }
+        }
+    }
+}
+
 /** Common class for replacing the default style of framework7 **/
 .navbar .navbar-compact-icons.right a + a {
     margin-inline-start: 0;

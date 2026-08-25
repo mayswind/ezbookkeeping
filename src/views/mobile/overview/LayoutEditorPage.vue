@@ -123,6 +123,8 @@ import type { Router } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
 import { itemAndIndex } from '@/core/base.ts';
@@ -161,6 +163,8 @@ const { tt } = useI18n();
 const { showToast, showConfirm } = useI18nUIComponents();
 
 const settingsStore = useSettingsStore();
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
 
 const widgetSettingsPopup = useTemplateRef<WidgetSettingsPopupType>('widgetSettingsPopup');
@@ -207,7 +211,10 @@ function reload(force: boolean): void {
     loadingOverview.value = true;
 
     const requirements: OverviewWidgetDataRequirement[] = getOverviewDataRequirements(draftLayout.value, MOBILE_OVERVIEW_WIDGET_DEFINITIONS);
-    const promises: Promise<unknown>[] = [];
+    const promises: Promise<unknown>[] = [
+        accountsStore.loadAllAccounts({ force: false }),
+        transactionCategoriesStore.loadAllCategories({ force: false })
+    ];
 
     if (requirements.includes(OverviewWidgetDataRequirement.TransactionOverview)) {
         promises.push(overviewStore.loadTransactionOverview({

@@ -59,9 +59,13 @@ i.icon.la, i.icon.las, i.icon.lab {
     border: 0;
 }
 
-.ios .popover-inner {
-    > :not(.list) {
-        display: none;
+.color-picker-popover.popover > .popover-inner {
+    > .color-picker {
+        width: 100%;
+
+        .color-picker-hex-value {
+            width: 100%;
+        }
     }
 }
 
@@ -309,6 +313,44 @@ html[dir="rtl"] .list .item-content > .item-inner > .item-after .list-item-check
 
 .list li.no-margin .item-content.item-input {
     margin: 0;
+}
+
+.list li.list-color-picker-input {
+    > .item-content {
+        > .item-inner {
+            flex-direction: row;
+            justify-content: space-between;
+
+            > .item-input-wrap {
+                position: absolute;
+                z-index: 1;
+                inset: 0;
+                inset-inline-start: calc(-1 * var(--f7-list-item-padding-horizontal));
+                margin: 0;
+                width: auto;
+
+                > input {
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0;
+                    cursor: pointer;
+                }
+            }
+
+            > .color-picker-display {
+                margin-right: -4px;
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+
+                > .color-picker-chevron {
+                    color: rgba(0, 0, 0, 0.3);
+                    font-size: var(--f7-list-chevron-icon-font-size);
+                    transform: scaleX(0.6) scaleY(0.9);
+                }
+            }
+        }
+    }
 }
 
 .skeleton-text .list-item-toggle .item-after {

@@ -28,6 +28,9 @@ const allAvailableColors: ColorValue[] = [
 export const ALL_ACCOUNT_COLORS: ColorValue[] = allAvailableColors;
 export const ALL_CATEGORY_COLORS: ColorValue[] = allAvailableColors;
 
+export const DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR: ColorValue = 'ffcc00';
+export const DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR: ColorValue = 'c67e48';
+
 export const DEFAULT_CHART_COLORS: ColorValue[] = [
     'cc4a66',
     'e3564a',

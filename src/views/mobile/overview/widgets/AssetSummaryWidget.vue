@@ -1,6 +1,6 @@
 <template>
-    <f7-card class="account-overview-card no-margin-top margin-bottom" :class="{ 'skeleton-text': loading }">
-        <f7-card-header class="display-block" :style="style">
+    <f7-card class="account-overview-card no-margin-top margin-bottom" :class="{ 'skeleton-text': loading }" :style="cardStyle">
+        <f7-card-header class="display-block" :style="cardHeaderStyle">
             <p class="no-margin">
                 <small class="card-header-content" v-if="loading">Net assets</small>
                 <small class="card-header-content" v-else-if="!loading">{{ tt('Net assets') }}</small>
@@ -31,13 +31,40 @@ import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useAssetSummaryWidgetBase } from '@/views/base/overview/AssetSummaryWidgetBase.ts';
 
+import { useEnvironmentsStore } from '@/stores/environment.ts';
+
+import type { ColorValue } from '@/core/color.ts';
+import {
+    DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR,
+    DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR
+} from '@/consts/color.ts';
+
+import { getDisplayColor, getContrastTextColor } from '@/lib/color.ts';
+
 const props = defineProps<{
     loading: boolean;
     height: number;
+    lightBackgroundColor?: ColorValue;
+    darkBackgroundColor?: ColorValue;
 }>();
 
-const style = computed<Record<string, string>>(() => {
-    const finalStyle: Record<string, string> = {};
+const environmentsStore = useEnvironmentsStore();
+
+const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
+const backgroundColor = computed<ColorValue>(() => isDarkMode.value ?
+    props.darkBackgroundColor ?? DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR :
+    props.lightBackgroundColor ?? DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR);
+const foregroundColor = computed<ColorValue>(() => getContrastTextColor(backgroundColor.value));
+
+const cardStyle = computed<Record<string, string>>(() => ({
+    'background-color': getDisplayColor(backgroundColor.value),
+    'color': getDisplayColor(foregroundColor.value)
+}));
+
+const cardHeaderStyle = computed<Record<string, string>>(() => {
+    const finalStyle: Record<string, string> = {
+        color: getDisplayColor(foregroundColor.value)
+    };
 
     if (props.height === 1) {
         finalStyle['padding-top'] = '10px';

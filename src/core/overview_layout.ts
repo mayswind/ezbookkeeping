@@ -29,7 +29,7 @@ export enum OverviewWidgetDataRequirement {
 export type OverviewWidgetSettingValue = string | number | boolean | (string | number)[];
 
 interface OverviewWidgetSettingItemBase {
-    settingType: 'itemCountSelect' | 'monthSelect' | 'customSelect' | 'switch' | 'textbox';
+    settingType: 'itemCountSelect' | 'monthSelect' | 'customSelect' | 'switch' | 'color' | 'textbox';
     settingName: string;
     displayName: string;
 }
@@ -56,6 +56,10 @@ export interface OverviewWidgetSwitchSettingItem extends OverviewWidgetSettingIt
     settingType: 'switch';
 }
 
+export interface OverviewWidgetColorSettingItem extends OverviewWidgetSettingItemBase {
+    settingType: 'color';
+}
+
 export interface OverviewWidgetTextboxSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'textbox';
     placeholder?: string;
@@ -65,6 +69,7 @@ export type OverviewWidgetSettingItem = OverviewWidgetItemCountSelectSettingItem
     OverviewWidgetMonthSelectSettingItem |
     OverviewWidgetCustomSelectSettingItem |
     OverviewWidgetSwitchSettingItem |
+    OverviewWidgetColorSettingItem |
     OverviewWidgetTextboxSettingItem;
 
 export interface OverviewWidgetDefinitionBase {

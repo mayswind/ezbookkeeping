@@ -199,23 +199,31 @@ describe('mobile overview layout', () => {
                 type: OverviewWidgetType.PeriodIncomeExpense,
                 settings: { dateRanges: [DateRange.Today.type, DateRange.ThisWeek.type, DateRange.ThisMonth.type, DateRange.ThisYear.type] }
             },
-            { id: 'asset-summary', type: OverviewWidgetType.AssetSummary, settings: { height: 3 } },
-            { id: 'month', type: OverviewWidgetType.CurrentMonthOverview, settings: { height: 3 } }
+            {
+                id: 'asset-summary',
+                type: OverviewWidgetType.AssetSummary,
+                settings: { height: 3, lightBackgroundColor: 'ffcc00', darkBackgroundColor: 'c67e48' }
+            },
+            {
+                id: 'month',
+                type: OverviewWidgetType.CurrentMonthOverview,
+                settings: { height: 3, lightBackgroundColor: 'ffcc00', darkBackgroundColor: 'c67e48' }
+            }
         ]);
     });
 
     test('normalizes mobile widget settings', () => {
         const layout = normalizeMobileOverviewLayout({
             widgets: [
-                { id: 'small-month', type: OverviewWidgetType.CurrentMonthOverview, settings: { height: 1 } },
-                { id: 'invalid-month', type: OverviewWidgetType.CurrentMonthOverview, settings: { height: 99 } },
+                { id: 'small-month', type: OverviewWidgetType.CurrentMonthOverview, settings: { height: 1, lightBackgroundColor: '112233', darkBackgroundColor: 'abcdef' } },
+                { id: 'invalid-month', type: OverviewWidgetType.CurrentMonthOverview, settings: { height: 99, lightBackgroundColor: 'invalid', darkBackgroundColor: '#ffffff' } },
                 { id: 'selected-periods', type: OverviewWidgetType.PeriodIncomeExpense, settings: { dateRanges: [DateRange.ThisYear.type, DateRange.Today.type] } },
                 { id: 'empty-periods', type: OverviewWidgetType.PeriodIncomeExpense, settings: { dateRanges: [] } }
             ]
         });
 
-        expect(layout.widgets[0]?.settings).toEqual({ height: 1 });
-        expect(layout.widgets[1]?.settings).toEqual({ height: 3 });
+        expect(layout.widgets[0]?.settings).toEqual({ height: 1, lightBackgroundColor: '112233', darkBackgroundColor: 'abcdef' });
+        expect(layout.widgets[1]?.settings).toEqual({ height: 3, lightBackgroundColor: 'ffcc00', darkBackgroundColor: 'c67e48' });
         expect(layout.widgets[2]?.settings).toEqual({ dateRanges: [DateRange.ThisYear.type, DateRange.Today.type] });
         expect(layout.widgets[3]?.settings).toEqual({ dateRanges: [DateRange.Today.type, DateRange.ThisWeek.type, DateRange.ThisMonth.type, DateRange.ThisYear.type] });
     });

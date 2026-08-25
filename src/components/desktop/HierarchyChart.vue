@@ -190,6 +190,18 @@ const chartOptions = computed<object>(() => {
         seriesOptions['breadcrumb'] = {
             show: false
         };
+        seriesOptions['label'] = {
+            lineHeight: 16,
+            formatter: (params: CallbackDataParams) => {
+                if (!props.showValue) {
+                    return params.name;
+                }
+
+                const dataItem = params.data as HierarchyDataItem;
+                const displayValue = isString(dataItem.originalValue) ? formatChartValueToLocalizedNumerals(parseBigDecimal(dataItem.originalValue), props.valueType, props.defaultCurrency) : '';
+                return displayValue ? `${params.name}\n${displayValue}` : params.name;
+            }
+        };
     } if (props.type === 'sunburst') {
         seriesOptions['radius'] = [60, '95%'];
         seriesOptions['itemStyle'] = {

@@ -44,7 +44,7 @@ import { type Framework7Dom } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: unknown;
-    valueType: string; // item or index
+    valueType: 'item' | 'index'; // item or index
     keyField?: string; // for value type == item
     valueField?: string; // for value type == item
     titleField: string;
@@ -91,7 +91,7 @@ function isSelected(item: unknown, index: number): boolean {
     }
 }
 
-function getItemValue(item: unknown, index: number, fieldName: string | undefined, valueType: string): unknown {
+function getItemValue(item: unknown, index: number, fieldName: string | undefined, valueType: 'item' | 'index'): unknown {
     if (valueType === 'index') {
         return index;
     } else if (fieldName) {

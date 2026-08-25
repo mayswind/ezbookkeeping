@@ -7,6 +7,7 @@
                 :items="allSeriesData" :value-type="valueType"
                 :hide-legend="hideLegend" :legend-position="legendPosition"
                 :hide-x-axis-labels="hideXAxisLabels" :hide-y-axis-labels="hideYAxisLabels"
+                :hide-horizontal-grid-lines="hideHorizontalGridLines"
                 :translate-name="translateName"
                 :default-currency="defaultCurrency" :use-custom-color="useCustomColor"
                 :enable-click-item="enableClickItem"
@@ -93,6 +94,7 @@ interface DesktopTrendsChartProps<T extends TrendsChartDateType> extends CommonT
     showPeriodOverPeriod?: boolean;
     hideXAxisLabels?: boolean;
     hideYAxisLabels?: boolean;
+    hideHorizontalGridLines?: boolean;
     hideLegend?: boolean;
     legendPosition?: 'top' | 'bottom';
 }

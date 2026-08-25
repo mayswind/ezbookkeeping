@@ -68,6 +68,7 @@ const props = defineProps<{
     legendPosition?: 'top' | 'bottom';
     hideXAxisLabels?: boolean;
     hideYAxisLabels?: boolean;
+    hideHorizontalGridLines?: boolean;
     oneHundredPercentStacked?: boolean;
     sortingType: number;
     showValue?: boolean;
@@ -471,6 +472,7 @@ const chartOptions = computed<object>(() => {
                     }
                 },
                 splitLine: {
+                    show: !props.hideHorizontalGridLines,
                     lineStyle: {
                         color: isDarkMode.value ? '#4f4f4f' : '#e1e6f2',
                     }

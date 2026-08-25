@@ -4,7 +4,8 @@
             <span class="text-title-medium">{{ title || tt('Net Assets Trends') }}</span>
         </template>
 
-        <trends-chart hide-y-axis-labels class="mb-2" chart-mode="daily" :type="TrendChartType.Area.type"
+        <trends-chart hide-y-axis-labels hide-horizontal-grid-lines
+                      class="mb-2" chart-mode="daily" :type="TrendChartType.Area.type"
                       :start-time="startTime" :end-time="endTime"
                       :start-year-month="undefined" :end-year-month="undefined"
                       :sorting-type="ChartSortingType.Amount.type"

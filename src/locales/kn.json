@@ -122,7 +122,7 @@
             "nDays": "{n} ದಿನಗಳು",
             "nMonth": "{n} Month",
             "nMonths": "{n} Months",
-            "startEndRange": "{start} ~ {end}",
+            "startEndRange": "{start} - {end}",
             "multiTextJoinSeparator": ", ",
             "charactersRemaining": "{count} remaining",
             "charactersOverLimit": "{count} over",

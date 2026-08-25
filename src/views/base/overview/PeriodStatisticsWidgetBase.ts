@@ -108,7 +108,7 @@ export function usePeriodStatisticsWidgetBase(props: CommonPeriodStatisticsWidge
         const expenseAmount: BigDecimal = currentExpenseAmount.value;
 
         if (incomeAmount.isZero()) {
-            return formatPercentToLocalizedNumerals(0, 2, '<0.01');
+            return expenseAmount.isZero() ? formatPercentToLocalizedNumerals(0, 2, '<0.01') : '-';
         }
 
         const rate = incomeAmount.subtract(expenseAmount).divide(incomeAmount).multiply(100).toDoubleNumber();

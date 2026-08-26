@@ -1,13 +1,19 @@
 <template>
+    <asset-summary-widget :loading="loading" :title="widgetTitle"
+                          v-if="widget.type === OverviewWidgetType.AssetSummary" />
+
+    <account-balance-list-widget :loading="loading" :editing="editing" :title="widgetTitle"
+                                 :account-categories="widget.settings['accountCategories'] as number[]"
+                                 :item-count="widget.settings['itemCount'] as number"
+                                 :sort-by="widget.settings['sortBy'] as string"
+                                 v-else-if="widget.type === OverviewWidgetType.AccountBalanceList" />
+
     <monthly-expense-overview-widget :loading="loading"
                                      @refresh="$emit('refresh')"
-                                     v-if="widget.type === OverviewWidgetType.CurrentMonthOverview" />
+                                     v-else-if="widget.type === OverviewWidgetType.CurrentMonthOverview" />
 
     <monthly-expense-progress-widget :loading="loading" :title="widgetTitle"
                                      v-else-if="widget.type === OverviewWidgetType.CurrentMonthExpenseProgress" />
-
-    <asset-summary-widget :loading="loading" :title="widgetTitle"
-                          v-else-if="widget.type === OverviewWidgetType.AssetSummary" />
 
     <period-income-expense-widget :loading="loading" :editing="editing" :title="widgetTitle"
                                   :date-type="widget.settings['dateRange'] as number"
@@ -27,12 +33,6 @@
                              :show-x-axis-labels="widget.settings['showXAxisLabels'] as boolean"
                              :show-legend="widget.settings['showLegend'] as boolean"
                              v-else-if="widget.type === OverviewWidgetType.NetAssetsTrend" />
-
-    <account-balance-list-widget :loading="loading" :editing="editing" :title="widgetTitle"
-                                 :account-categories="widget.settings['accountCategories'] as number[]"
-                                 :item-count="widget.settings['itemCount'] as number"
-                                 :sort-by="widget.settings['sortBy'] as string"
-                                 v-else-if="widget.type === OverviewWidgetType.AccountBalanceList" />
 
     <expense-category-ranking-widget :loading="loading" :title="widgetTitle"
                                       :date-type="widget.settings['dateRange'] as number"

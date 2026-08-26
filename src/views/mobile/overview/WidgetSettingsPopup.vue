@@ -269,3 +269,10 @@ function onPopupClosed(): void {
     close();
 }
 </script>
+
+<style>
+.widget-setting-selection-popover .popover-inner {
+    max-height: 350px;
+    overflow-y: auto;
+}
+</style>

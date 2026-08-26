@@ -18,7 +18,7 @@ import {
     Account
 } from '@/models/account.ts';
 
-import { isEquals } from '@/lib/common.ts';
+import { isArray, isEquals } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.ts';
 import services from '@/lib/services.ts';
@@ -739,6 +739,60 @@ export const useAccountsStore = defineStore('accounts', () => {
         };
     }
 
+    function getSortedAccounts(accountCategories: number[] | undefined, sortBy: 'displayOrder' | 'balance' | string, count: number): Account[] {
+        const accounts: Account[] = allAccounts.value.filter(account => {
+            if (account.hidden) {
+                return false;
+            }
+
+            return isArray(accountCategories) && (accountCategories.includes(0) || accountCategories.includes(account.category));
+        });
+
+        if (sortBy === 'balance') {
+            const accountBalances: Record<string, BigDecimal> = {};
+
+            for (const account of accounts) {
+                let totalBalance: BigDecimal = BIG_DECIMAL_ZERO;
+
+                if (account.type === AccountType.SingleAccount.type) {
+                    totalBalance = parseBigDecimal(account.balance);
+
+                    if (account.currency !== userStore.currentUserDefaultCurrency) {
+                        const exchangedBalance = exchangeRatesStore.getExchangedAmount(totalBalance, account.currency, userStore.currentUserDefaultCurrency);
+
+                        if (exchangedBalance) {
+                            totalBalance = exchangedBalance.truncate();
+                        }
+                    }
+                } else if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
+                    for (const subAccount of account.subAccounts) {
+                        let subAccountBalance = parseBigDecimal(subAccount.balance);
+
+                        if (subAccount.currency !== userStore.currentUserDefaultCurrency) {
+                            const exchangedBalance = exchangeRatesStore.getExchangedAmount(subAccountBalance, subAccount.currency, userStore.currentUserDefaultCurrency);
+
+                            if (exchangedBalance) {
+                                subAccountBalance = exchangedBalance.truncate();
+                            }
+                        }
+
+                        totalBalance = totalBalance.add(subAccountBalance);
+                    }
+                }
+
+                accountBalances[account.id] = totalBalance;
+            }
+
+            accounts.sort((a, b) => {
+                const balanceA = accountBalances[a.id] ?? BIG_DECIMAL_ZERO;
+                const balanceB = accountBalances[b.id] ?? BIG_DECIMAL_ZERO;
+                return balanceB.compareTo(balanceA);
+            });
+        }
+
+        return accounts.slice(0, count);
+    }
+
     function hasAccount(accountCategory: AccountCategory, visibleOnly: boolean): boolean {
         const categorizedAccounts = allCategorizedAccountsMap.value[accountCategory.type];
 
@@ -1140,6 +1194,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         getAccountCategoryTotalBalance,
         getAccountBalance,
         getAccountSubAccountBalance,
+        getSortedAccounts,
         hasAccount,
         hasVisibleSubAccount,
         loadAllAccounts,

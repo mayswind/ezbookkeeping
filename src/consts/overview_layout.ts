@@ -499,6 +499,57 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             OverviewWidgetDataRequirement.Accounts
         ]
     },
+    [OverviewWidgetType.AccountBalanceList]: {
+        type: OverviewWidgetType.AccountBalanceList,
+        name: 'Account Balance List',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'itemCount',
+                displayName: 'Item Count',
+                itemCountValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'sortBy',
+                displayName: 'Sort By',
+                selectValues: [
+                    {
+                        name: 'Display Order',
+                        value: 'displayOrder'
+                    },
+                    {
+                        name: 'Balance',
+                        value: 'balance'
+                    }
+                ]
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'accountCategories',
+                displayName: 'Account Category',
+                selectValues: [
+                    { name: 'All', value: 0 },
+                    ...AccountCategory.values().map(category => ({
+                        name: category.name,
+                        value: category.type
+                    }))
+                ],
+                multiple: true,
+                allValue: 0,
+                selectValueSource: 'accountCategories'
+            }
+        ],
+        defaultSettings: {
+            accountCategories: [0],
+            itemCount: 4,
+            sortBy: 'displayOrder'
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.Accounts
+        ]
+    },
     [OverviewWidgetType.CurrentMonthOverview]: {
         type: OverviewWidgetType.CurrentMonthOverview,
         name: 'This Month\'s Income and Expense Overview',

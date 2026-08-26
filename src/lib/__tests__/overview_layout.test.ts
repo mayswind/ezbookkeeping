@@ -182,12 +182,12 @@ describe('desktop overview layout', () => {
 });
 
 describe('mobile overview layout', () => {
-    test('keeps the single-column order and ignores unsupported or duplicate widgets', () => {
+    test('keeps the single-column order and ignores duplicate widgets', () => {
         const layout = normalizeMobileOverviewLayout({
             widgets: [
                 { id: 'period', type: OverviewWidgetType.PeriodIncomeExpense, settings: { invalid: true } },
                 { id: 'asset-summary', type: OverviewWidgetType.AssetSummary },
-                { id: 'unsupported', type: OverviewWidgetType.AccountBalanceList },
+                { id: 'accounts', type: OverviewWidgetType.AccountBalanceList },
                 { id: 'month', type: OverviewWidgetType.CurrentMonthOverview },
                 { id: 'period', type: OverviewWidgetType.CurrentMonthOverview }
             ]
@@ -203,6 +203,11 @@ describe('mobile overview layout', () => {
                 id: 'asset-summary',
                 type: OverviewWidgetType.AssetSummary,
                 settings: { height: 3, lightBackgroundColor: 'ffcc00', darkBackgroundColor: 'c67e48' }
+            },
+            {
+                id: 'accounts',
+                type: OverviewWidgetType.AccountBalanceList,
+                settings: { accountCategories: [0], itemCount: 4, sortBy: 'displayOrder' }
             },
             {
                 id: 'month',

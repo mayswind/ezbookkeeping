@@ -102,7 +102,7 @@ html[dir="rtl"] .progressbar {
                         --f7-list-chevron-icon-right: 'chevron_up_chevron_down';
                         --f7-list-chevron-icon-color: rgba(0, 0, 0, 0.3);
                         font-family: 'Framework7 Icons';
-                        padding-right: 8px;
+                        padding-right: 5px;
                         transform: scaleX(0.6) scaleY(0.9);
                     }
                 }
@@ -338,10 +338,10 @@ html[dir="rtl"] .list .item-content > .item-inner > .item-after .list-item-check
             }
 
             > .color-picker-display {
-                margin-right: -4px;
+                margin-right: -6px;
                 display: inline-flex;
                 align-items: center;
-                gap: 2px;
+                gap: 1px;
 
                 > .color-picker-chevron {
                     color: rgba(0, 0, 0, 0.3);

@@ -90,7 +90,7 @@ watch(() => props.show, (newValue) => {
 .month-selection-dialog .dp--main {
     .dp--menu {
         border: 0;
-        padding-left: 3px;
+        padding-inline-start: 3px;
     }
 
     .dp--instance-calendar .dp--overlay.dp--overlay-relative {

@@ -37,10 +37,18 @@
                 :disabled="loggingInByPassword || loggingInByOAuth2"
                 :label="tt('Password')"
                 :placeholder="tt('Your password')"
+                minlength="6"
+                maxlength="128"
                 v-model:value="password"
                 @input="tempToken = ''"
                 @keyup.enter="loginByPressEnter"
             ></f7-list-input>
+
+            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="inputInvalidProblemMessage"></f7-list-item>
+
+            <f7-list-item class="login-divider no-margin display-flex align-items-center">
+                <hr class="no-margin" />
+            </f7-list-item>
 
             <f7-list-item class="login-page-utilities">
                 <template #title>
@@ -55,7 +63,7 @@
                 </template>
             </f7-list-item>
 
-            <f7-list-button class="login-page-primary-action margin-horizontal" :class="{ 'disabled': inputIsEmpty || loggingInByPassword || loggingInByOAuth2 }" :text="tt('Log In')"
+            <f7-list-button class="login-page-primary-action margin-horizontal" :class="{ 'disabled': inputIsEmpty || inputIsInvalid || loggingInByPassword || loggingInByOAuth2 }" :text="tt('Log In')"
                             @click="login" v-if="isInternalAuthEnabled()"></f7-list-button>
 
             <f7-list-item class="login-divider margin-vertical-half display-flex align-items-center" v-if="isInternalAuthEnabled() && isOAuth2Enabled()">
@@ -228,6 +236,9 @@ const {
     loggingInByOAuth2,
     verifying,
     inputIsEmpty,
+    inputIsInvalid,
+    inputInvalidProblem,
+    inputInvalidProblemMessage,
     twoFAInputIsEmpty,
     oauth2LoginUrl,
     oauth2LoginDisplayName,
@@ -269,6 +280,11 @@ function login(): void {
 
     if (!password.value) {
         showAlert('Password cannot be blank');
+        return;
+    }
+
+    if (inputInvalidProblem.value) {
+        showAlert(inputInvalidProblem.value.message, inputInvalidProblem.value.options);
         return;
     }
 

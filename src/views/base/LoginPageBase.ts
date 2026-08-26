@@ -12,9 +12,15 @@ import { updateMapCacheExpiration } from '@/lib/cache.ts';
 import { getOAuth2Provider, getOIDCCustomDisplayNames, getLoginPageTips } from '@/lib/server_settings.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+import {
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    type ValidationProblem,
+    isValidPassword
+} from '@/lib/validation.ts';
 
 export function useLoginPageBase(platform: 'mobile' | 'desktop') {
-    const { getServerMultiLanguageConfigContent, getLocalizedOAuth2LoginText, setLanguage } = useI18n();
+    const { tt, getServerMultiLanguageConfigContent, getLocalizedOAuth2LoginText, setLanguage } = useI18n();
 
     const rootStore = useRootStore();
     const settingsStore = useSettingsStore();
@@ -34,7 +40,42 @@ export function useLoginPageBase(platform: 'mobile' | 'desktop') {
     const loggingInByOAuth2 = ref<boolean>(false);
     const verifying = ref<boolean>(false);
 
+    function getPasswordProblem(passwordValue: string): ValidationProblem | null {
+        if (passwordValue.length < PASSWORD_MIN_LENGTH) {
+            return {
+                message: 'parameterizedError.parameter too short',
+                options: {
+                    parameter: tt('parameter.password'),
+                    length: PASSWORD_MIN_LENGTH
+                }
+            };
+        } else if (passwordValue.length > PASSWORD_MAX_LENGTH) {
+            return {
+                message: 'parameterizedError.parameter too long',
+                options: {
+                    parameter: tt('parameter.password'),
+                    length: PASSWORD_MAX_LENGTH
+                }
+            };
+        }
+
+        return null;
+    }
+
+    function getProblemMessage(problem: ValidationProblem): string {
+        return problem.options ? tt(problem.message, problem.options) : tt(problem.message);
+    }
+
+    const inputInvalidProblem = computed<ValidationProblem | null>(() => password.value && !isValidPassword(password.value) ? getPasswordProblem(password.value) : null);
+    const inputInvalidProblemMessage = computed<string>(() => inputInvalidProblem.value ? getProblemMessage(inputInvalidProblem.value) : '');
+    const passwordRules = computed<((value: string) => true | string)[]>(() => [
+        (value: string): true | string => {
+            const problem = getPasswordProblem(value);
+            return !value || !problem || getProblemMessage(problem);
+        }
+    ]);
     const inputIsEmpty = computed<boolean>(() => !username.value || !password.value);
+    const inputIsInvalid = computed<boolean>(() => !!inputInvalidProblemMessage.value);
     const twoFAInputIsEmpty = computed<boolean>(() => {
         if (twoFAVerifyType.value === 'backupcode') {
             return !backupCode.value;
@@ -80,6 +121,10 @@ export function useLoginPageBase(platform: 'mobile' | 'desktop') {
         verifying,
         // computed states
         inputIsEmpty,
+        inputIsInvalid,
+        inputInvalidProblem,
+        inputInvalidProblemMessage,
+        passwordRules,
         twoFAInputIsEmpty,
         oauth2LoginUrl,
         oauth2LoginDisplayName,

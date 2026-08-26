@@ -57,6 +57,10 @@
                                             :disabled="show2faInput || loggingInByPassword || loggingInByOAuth2 || verifying"
                                             :label="tt('Password')"
                                             :placeholder="tt('Your password')"
+                                            :rules="passwordRules"
+                                            minlength="6"
+                                            maxlength="128"
+                                            validate-on="blur"
                                             v-model="password"
                                             @input="tempToken = ''"
                                             @keyup.enter="login"
@@ -106,7 +110,7 @@
                                     </v-col>
 
                                     <v-col cols="12">
-                                        <v-btn block :disabled="inputIsEmpty || loggingInByPassword || loggingInByOAuth2 || verifying"
+                                        <v-btn block :disabled="inputIsEmpty || inputIsInvalid || loggingInByPassword || loggingInByOAuth2 || verifying"
                                                @click="login" v-if="isInternalAuthEnabled() && !show2faInput">
                                             {{ tt('Log In') }}
                                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="loggingInByPassword"></v-progress-circular>
@@ -220,6 +224,9 @@ const {
     loggingInByOAuth2,
     verifying,
     inputIsEmpty,
+    inputIsInvalid,
+    inputInvalidProblem,
+    passwordRules,
     twoFAInputIsEmpty,
     oauth2LoginUrl,
     oauth2LoginDisplayName,
@@ -244,6 +251,11 @@ function login(): void {
 
     if (!password.value) {
         snackbar.value?.showMessage('Password cannot be blank');
+        return;
+    }
+
+    if (inputInvalidProblem.value) {
+        snackbar.value?.showMessage(inputInvalidProblem.value.message, inputInvalidProblem.value.options);
         return;
     }
 

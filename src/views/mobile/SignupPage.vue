@@ -28,6 +28,8 @@
                 clear-button
                 :label="tt('Password')"
                 :placeholder="tt('Your password, at least 6 characters')"
+                minlength="6"
+                maxlength="128"
                 v-model:value="user.password"
             ></f7-list-input>
 
@@ -37,6 +39,8 @@
                 clear-button
                 :label="tt('Confirm Password')"
                 :placeholder="tt('Re-enter the password')"
+                minlength="6"
+                maxlength="128"
                 v-model:value="user.confirmPassword"
             ></f7-list-input>
 
@@ -58,7 +62,7 @@
                 v-model:value="user.nickname"
             ></f7-list-input>
 
-            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="tt(inputInvalidProblemMessage)"></f7-list-item>
+            <f7-list-item class="ebk-list-item-error-info" v-if="inputIsInvalid" :footer="inputInvalidProblemMessage"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers class="margin-vertical">
@@ -234,6 +238,7 @@ const {
     currentLocale,
     currentLanguageName,
     inputEmptyProblemMessage,
+    inputInvalidProblem,
     inputInvalidProblemMessage,
     inputIsEmpty,
     inputIsInvalid,
@@ -260,10 +265,11 @@ const currentDayOfWeekName = computed<string | null>(() => findDisplayNameByType
 function submit(): void {
     const router = props.f7router;
 
-    const problemMessage = inputEmptyProblemMessage.value || inputInvalidProblemMessage.value;
+    const emptyProblemMessage = inputEmptyProblemMessage.value;
+    const invalidProblem = inputInvalidProblem.value;
 
-    if (problemMessage) {
-        showAlert(problemMessage);
+    if (emptyProblemMessage || invalidProblem) {
+        showAlert(emptyProblemMessage || invalidProblem!.message, invalidProblem?.options);
         return;
     }
 

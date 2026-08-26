@@ -13,6 +13,13 @@ import type { User } from '@/models/user.ts';
 
 import { updateMapCacheExpiration } from '@/lib/cache.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+import {
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    type ValidationProblem,
+    isValidEmail,
+    isValidPassword
+} from '@/lib/validation.ts';
 
 export function useSignupPageBase() {
     const { tt, getCurrentLanguageTag, getLanguageInfo, setLanguage } = useI18n();
@@ -84,13 +91,64 @@ export function useSignupPageBase() {
         }
     });
 
-    const inputInvalidProblemMessage = computed<string>(() => {
-        if (user.value.password && user.value.confirmPassword && user.value.password !== user.value.confirmPassword) {
-            return 'Password and password confirmation do not match';
+    function getPasswordProblem(password: string): ValidationProblem | null {
+        if (password.length < PASSWORD_MIN_LENGTH) {
+            return {
+                message: 'parameterizedError.parameter too short',
+                options: {
+                    parameter: tt('parameter.password'),
+                    length: PASSWORD_MIN_LENGTH
+                }
+            };
+        } else if (password.length > PASSWORD_MAX_LENGTH) {
+            return {
+                message: 'parameterizedError.parameter too long',
+                options: {
+                    parameter: tt('parameter.password'),
+                    length: PASSWORD_MAX_LENGTH
+                }
+            };
+        }
+
+        return null;
+    }
+
+    function getProblemMessage(problem: ValidationProblem): string {
+        return problem.options ? tt(problem.message, problem.options) : tt(problem.message);
+    }
+
+    const inputInvalidProblem = computed<ValidationProblem | null>(() => {
+        if (user.value.password && !isValidPassword(user.value.password)) {
+            return getPasswordProblem(user.value.password);
+        } else if (user.value.password && user.value.confirmPassword && user.value.password !== user.value.confirmPassword) {
+            return {
+                message: 'Password and password confirmation do not match'
+            };
+        } else if (user.value.email && !isValidEmail(user.value.email)) {
+            return {
+                message: 'error.email is invalid'
+            };
         } else {
-            return '';
+            return null;
         }
     });
+
+    const inputInvalidProblemMessage = computed<string>(() => inputInvalidProblem.value ? getProblemMessage(inputInvalidProblem.value) : '');
+
+    const passwordRules = computed<((value: string) => true | string)[]>(() => [
+        (value: string): true | string => {
+            const problem = getPasswordProblem(value);
+            return !value || !problem || getProblemMessage(problem);
+        }
+    ]);
+
+    const confirmPasswordRules = computed<((value: string) => true | string)[]>(() => [
+        (value: string): true | string => !value || !user.value.password || value === user.value.password || tt('Password and password confirmation do not match')
+    ]);
+
+    const emailRules = computed<((value: string) => true | string)[]>(() => [
+        (value: string): true | string => !value || isValidEmail(value) || tt('error.email is invalid')
+    ]);
 
     const inputIsEmpty = computed<boolean>(() => !!inputEmptyProblemMessage.value);
     const inputIsInvalid = computed<boolean>(() => !!inputInvalidProblemMessage.value);
@@ -134,9 +192,13 @@ export function useSignupPageBase() {
         currentLocale,
         currentLanguageName,
         inputEmptyProblemMessage,
+        inputInvalidProblem,
         inputInvalidProblemMessage,
         inputIsEmpty,
         inputIsInvalid,
+        emailRules,
+        passwordRules,
+        confirmPasswordRules,
         // functions
         getCategoryTypeName,
         doAfterSignupSuccess

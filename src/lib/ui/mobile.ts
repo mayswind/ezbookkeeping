@@ -199,11 +199,11 @@ export function useI18nUIComponents() {
         });
     }
 
-    function showAlert(message: string, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
+    function showAlert(message: string, options?: Record<string, unknown>, confirmCallback?: (dialog: Dialog.Dialog, e: Event) => void): void {
         f7ready((f7) => {
             f7.dialog.create({
                 title: tt('global.app.title'),
-                text: te(message),
+                text: options ? tt(message, options) : te(message),
                 animate: isEnableAnimate(),
                 buttons: [
                     {

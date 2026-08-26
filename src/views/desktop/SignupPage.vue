@@ -66,6 +66,8 @@
                                             :disabled="submitting || navigateToHomePage"
                                             :label="tt('E-mail')"
                                             :placeholder="tt('Your email address')"
+                                            :rules="emailRules"
+                                            validate-on="blur"
                                             v-model="user.email"
                                         />
                                     </v-col>
@@ -78,6 +80,10 @@
                                             :disabled="submitting || navigateToHomePage"
                                             :label="tt('Password')"
                                             :placeholder="tt('Your password, at least 6 characters')"
+                                            :rules="passwordRules"
+                                            minlength="6"
+                                            maxlength="128"
+                                            validate-on="blur"
                                             v-model="user.password"
                                         />
                                     </v-col>
@@ -88,6 +94,10 @@
                                             :disabled="submitting || navigateToHomePage"
                                             :label="tt('Confirm Password')"
                                             :placeholder="tt('Re-enter the password')"
+                                            :rules="confirmPasswordRules"
+                                            minlength="6"
+                                            maxlength="128"
+                                            validate-on="blur"
                                             v-model="user.confirmPassword"
                                         />
                                     </v-col>
@@ -252,7 +262,10 @@ const {
     languageTitle,
     currentLocale,
     inputEmptyProblemMessage,
-    inputInvalidProblemMessage,
+    inputInvalidProblem,
+    emailRules,
+    passwordRules,
+    confirmPasswordRules,
     getCategoryTypeName,
     doAfterSignupSuccess
 } = useSignupPageBase();
@@ -303,10 +316,11 @@ function switchToTab(tabName: string): void {
     if (tabName === 'basicSetting') {
         currentStep.value = 'basicSetting';
     } else if (tabName === 'presetCategories') {
-        const problemMessage = inputEmptyProblemMessage.value || inputInvalidProblemMessage.value;
+        const emptyProblemMessage = inputEmptyProblemMessage.value;
+        const invalidProblem = inputInvalidProblem.value;
 
-        if (problemMessage) {
-            snackbar.value?.showMessage(problemMessage);
+        if (emptyProblemMessage || invalidProblem) {
+            snackbar.value?.showMessage(emptyProblemMessage || invalidProblem!.message, invalidProblem?.options);
             return;
         }
 
@@ -323,10 +337,11 @@ function switchToNextTab(): void {
 }
 
 function submit(): void {
-    const problemMessage = inputEmptyProblemMessage.value || inputInvalidProblemMessage.value;
+    const emptyProblemMessage = inputEmptyProblemMessage.value;
+    const invalidProblem = inputInvalidProblem.value;
 
-    if (problemMessage) {
-        snackbar.value?.showMessage(problemMessage);
+    if (emptyProblemMessage || invalidProblem) {
+        snackbar.value?.showMessage(emptyProblemMessage || invalidProblem!.message, invalidProblem?.options);
         return;
     }
 

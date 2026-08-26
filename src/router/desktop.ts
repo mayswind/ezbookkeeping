@@ -1,6 +1,7 @@
 import { type NavigationGuardReturn, createRouter, createWebHashHistory } from 'vue-router';
 
 import { TemplateType } from '@/core/template.ts';
+import { isUserRegistrationEnabled } from '@/lib/server_settings.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import LoginPage from '@/views/desktop/LoginPage.vue';
@@ -93,6 +94,20 @@ function checkNotLogin(): NavigationGuardReturn {
     if (isUserLogined()) {
         return {
             path: '/',
+            replace: true
+        };
+    }
+
+    return true;
+}
+
+function checkUserRegistration(): NavigationGuardReturn {
+    if (!isUserRegistrationEnabled()) {
+        return {
+            path: '/login',
+            query: {
+                registrationDisabled: 'true'
+            },
             replace: true
         };
     }
@@ -272,7 +287,7 @@ const router = createRouter({
         {
             path: '/signup',
             component: SignUpPage,
-            beforeEnter: checkNotLogin
+            beforeEnter: [checkNotLogin, checkUserRegistration]
         },
         {
             path: '/verify_email',

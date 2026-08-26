@@ -77,8 +77,11 @@
 
             <f7-list-item class="block-footer margin-bottom-half" v-if="isInternalAuthEnabled()">
                 <div class="width-100 align-content-center">
-                    <span style="margin-right: 2px;">{{ tt('Don\'t have an account?') }}</span>
-                    <f7-link :class="{ 'disabled': !isUserRegistrationEnabled() || loggingInByPassword || loggingInByOAuth2 }" href="/signup" :text="tt('Create an account')"></f7-link>
+                    <template v-if="isUserRegistrationEnabled()">
+                        <span style="margin-right: 2px;">{{ tt('Don\'t have an account?') }}</span>
+                        <f7-link :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" href="/signup" :text="tt('Create an account')"></f7-link>
+                    </template>
+                    <span class="text-color-gray" v-else>{{ tt('User registration is disabled') }}</span>
                 </div>
             </f7-list-item>
 
@@ -192,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -215,6 +218,7 @@ import { getDesktopVersionPath } from '@/lib/version.ts';
 import { useI18nUIComponents, showLoading, hideLoading, isModalShowing } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
+    f7route: Router.Route;
     f7router: Router.Router;
 }>();
 
@@ -261,6 +265,15 @@ const twoFAVerifyTypeSwitchName = computed<string>(() => {
         return 'Use Passcode';
     } else {
         return 'Use Backup Code';
+    }
+});
+
+onMounted(() => {
+    const hashQuery = window.location.hash.split('?')[1] || '';
+    const registrationDisabled = props.f7route.query['registrationDisabled'] === 'true' || new URLSearchParams(hashQuery).get('registrationDisabled') === 'true';
+
+    if (registrationDisabled) {
+        showToast('User registration is disabled', 5000);
     }
 });
 

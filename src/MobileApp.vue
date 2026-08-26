@@ -24,6 +24,7 @@ import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
 
 import { isFunction } from '@/lib/common.ts';
+import { isUserRegistrationEnabled } from '@/lib/server_settings.ts';
 import { isProduction } from '@/lib/version.ts';
 import { getTheme, isEnableSwipeBack, isEnableAnimate } from '@/lib/settings.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
@@ -40,6 +41,12 @@ const environmentsStore = useEnvironmentsStore();
 const userStore = useUserStore();
 const tokensStore = useTokensStore();
 const exchangeRatesStore = useExchangeRatesStore();
+
+if (!isUserRegistrationEnabled() && window.location.hash.split('?')[0] === '#/signup') {
+    const redirectUrl = new URL(window.location.href);
+    redirectUrl.hash = '/login?registrationDisabled=true';
+    window.history.replaceState(window.history.state, '', redirectUrl);
+}
 
 const f7params = ref<Framework7Parameters>({
     name: 'ezBookkeeping',

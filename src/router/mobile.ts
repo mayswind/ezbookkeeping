@@ -1,5 +1,6 @@
 import type { Router } from 'framework7/types';
 
+import { isUserRegistrationEnabled } from '@/lib/server_settings.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import HomePage from '@/views/mobile/HomePage.vue';
@@ -125,6 +126,19 @@ function checkNotLogin({ router, resolve, reject }: { router: Router.Router, res
     resolve();
 }
 
+function checkUserRegistration({ resolve, reject }: { resolve: () => void, reject: () => void }): void {
+    if (!isUserRegistrationEnabled()) {
+        reject();
+
+        const redirectUrl = new URL(window.location.href);
+        redirectUrl.hash = '/login?registrationDisabled=true';
+        window.location.replace(redirectUrl);
+        return;
+    }
+
+    resolve();
+}
+
 const routes: Router.RouteParameters[] = [
     {
         path: '/',
@@ -145,7 +159,7 @@ const routes: Router.RouteParameters[] = [
     {
         path: '/signup',
         async: asyncResolve(SignUpPage),
-        beforeEnter: [checkNotLogin],
+        beforeEnter: [checkNotLogin, checkUserRegistration],
         options: {
             animate: false,
         }

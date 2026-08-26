@@ -135,11 +135,17 @@
                                     </v-col>
 
                                     <v-col cols="12" class="auth-links text-center text-body-large mt-2" v-if="isInternalAuthEnabled()">
-                                        <span class="me-1">{{ tt('Don\'t have an account?') }}</span>
-                                        <router-link class="text-primary" to="/signup"
-                                                     :class="{ 'disabled': !isUserRegistrationEnabled() || loggingInByPassword || loggingInByOAuth2 || verifying }">
-                                            {{ tt('Create an account') }}
-                                        </router-link>
+                                        <template v-if="isUserRegistrationEnabled()">
+                                            <span class="me-1">{{ tt('Don\'t have an account?') }}</span>
+                                            <router-link class="text-primary" to="/signup"
+                                                         :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 || verifying }">
+                                                {{ tt('Create an account') }}
+                                            </router-link>
+                                        </template>
+                                        <span class="d-inline-flex align-center ga-1 text-medium-emphasis" v-else>
+                                            <v-icon size="16" :icon="mdiInformationOutline" />
+                                            <span>{{ tt('User registration is disabled') }}</span>
+                                        </span>
                                     </v-col>
                                 </v-row>
                             </v-form>
@@ -175,8 +181,8 @@
 import { VTextField } from 'vuetify/components/VTextField';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, watch, useTemplateRef, nextTick } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -198,6 +204,7 @@ import {
 } from '@/lib/server_settings.ts';
 
 import {
+    mdiInformationOutline,
     mdiOnepassword,
     mdiHelpCircleOutline
 } from '@mdi/js';
@@ -205,6 +212,7 @@ import {
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 const router = useRouter();
+const route = useRoute();
 const theme = useTheme();
 
 const { tt } = useI18n();
@@ -242,6 +250,15 @@ const show2faInput = ref<boolean>(false);
 const showMobileQrCode = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const registrationDisabledRedirect = computed<boolean>(() => route.query['registrationDisabled'] === 'true');
+
+watch(registrationDisabledRedirect, (registrationDisabled) => {
+    if (registrationDisabled) {
+        nextTick(() => snackbar.value?.showMessage('User registration is disabled'));
+    }
+}, {
+    immediate: true
+});
 
 function login(): void {
     if (!username.value) {

@@ -2507,7 +2507,7 @@
     "You have been successfully registered, but there was an failure when adding preset categories. You can re-add preset categories in settings page anytime.": "您已经注册成功，但是添加预设分类时出错。您可以随时在设置页面中重新添加预设分类。",
     "You have been successfully registered. An account activation link has been sent to your email address, please activate your account first.": "您已经注册成功。账号激活链接已经发送到您的邮箱地址，请先激活您的账号。",
     "Unable to sign up": "无法注册",
-    "User registration is disabled": "用户注册已禁用",
+    "User registration is disabled": "未开放注册，请联系管理员",
     "Unable to retrieve user profile": "无法获取用户信息",
     "Basic": "基本",
     "Security": "安全",

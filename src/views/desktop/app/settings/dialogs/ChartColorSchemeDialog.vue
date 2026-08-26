@@ -45,14 +45,10 @@
                                     <td>
                                         <div class="d-flex align-center">
                                             <div class="d-flex align-center">
-                                                <div class="color-preview-wrapper">
-                                                    <input type="color" class="color-picker-input"
-                                                           :value="'#' + element" @input="onColorInput(index, $event)" />
-                                                    <div class="color-preview-box" :style="{ backgroundColor: '#' + element }"></div>
-                                                </div>
-                                                <div class="ms-3 hextual-color">
-                                                    <span class="always-ltr">{{ '#' + element.toLowerCase() }}</span>
-                                                </div>
+                                                <v-icon size="36" :icon="mdiSquareRounded" :color="getDisplayColor(element)" />
+                                                <input type="color" class="color-picker-input"
+                                                       :value="'#' + element" @input="onColorInput(index, $event)" />
+                                                <span class="mx-1 hextual-color always-ltr">{{ '#' + element.toLowerCase() }}</span>
                                             </div>
 
                                             <v-spacer/>
@@ -95,10 +91,13 @@ import { ref, useTemplateRef, nextTick } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useChartColorSchemeSettingsPageBase } from '@/views/base/settings/ChartColorSchemeSettingsPageBase.ts';
 
+import { getDisplayColor } from '@/lib/color.ts';
+
 import {
     mdiPlus,
     mdiCheck,
     mdiDotsVertical,
+    mdiSquareRounded,
     mdiRestore,
     mdiDeleteOutline,
     mdiDrag
@@ -167,28 +166,19 @@ defineExpose({
 </script>
 
 <style>
-.color-preview-wrapper {
-    position: relative;
-    width: 32px;
-    height: 32px;
-}
-
 .color-picker-input {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 7rem; /* #rrggbb is 7 characters long */
     height: 100%;
     opacity: 0;
     cursor: pointer;
 }
 
-.color-preview-box {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    pointer-events: none;
+html[dir="rtl"] .color-picker-input {
+    left: unset;
+    right: 0;
 }
 
 .hextual-color {

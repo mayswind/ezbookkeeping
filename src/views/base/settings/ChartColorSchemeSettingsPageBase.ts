@@ -31,8 +31,12 @@ export function useChartColorSchemeSettingsPageBase() {
         chartColors.value.splice(index, 1);
     }
 
-    function updateChartColor(index: number, color: ColorValue): void {
-        chartColors.value[index] = color.toLowerCase();
+    function updateChartColor(index: number, color: string): void {
+        const hex = color.replace(/^#/, '');
+
+        if (isHextualColor(hex)) {
+            chartColors.value[index] = hex.toLowerCase();
+        }
     }
 
     function resetChartColorsToDefault(): void {
@@ -56,11 +60,7 @@ export function useChartColorSchemeSettingsPageBase() {
 
     function onColorInput(index: number, event: Event): void {
         const target = event.target as HTMLInputElement;
-        const hex = target.value.replace(/^#/, '');
-
-        if (isHextualColor(hex)) {
-            updateChartColor(index, hex as ColorValue);
-        }
+        updateChartColor(index, target.value);
     }
 
     return {

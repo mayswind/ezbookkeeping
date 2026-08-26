@@ -140,6 +140,8 @@ function getWidgetStyle(widget: DesktopOverviewWidgetLayout): Record<string, str
     const style: Record<string, string> = getGridPositionStyle(widget);
     const preview: DraggingPreview | null = draggingPreview.value;
 
+    style['--overview-dashboard-item-height'] = `${widget.h * ROW_HEIGHT + (widget.h - 1) * GAP}px`;
+
     if (preview?.id === widget.id) {
         style['position'] = 'fixed';
         style['left'] = `${preview.left}px`;

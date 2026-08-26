@@ -97,4 +97,12 @@
         flex-direction: column;
         min-height: 0 !important;
     }
+
+    .overview-dashboard:not(.overview-dashboard-editing) > .overview-dashboard-item {
+        min-height: var(--overview-dashboard-item-height);
+    }
+
+    .overview-dashboard:not(.overview-dashboard-editing) > .overview-dashboard-item > .overview-dashboard-widget {
+        min-height: var(--overview-dashboard-item-height);
+    }
 }

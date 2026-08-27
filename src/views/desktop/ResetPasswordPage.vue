@@ -8,16 +8,7 @@
         </router-link>
         <v-row no-gutters class="auth-wrapper">
             <v-col cols="12" md="8" class="auth-image-background d-none d-md-flex align-center justify-center position-relative">
-                <div class="d-flex auth-img-footer" v-if="!isDarkMode">
-                    <v-img class="img-with-direction" src="img/desktop/background.svg"/>
-                </div>
-                <div class="d-flex auth-img-footer" v-if="isDarkMode">
-                    <v-img class="img-with-direction" src="img/desktop/background-dark.svg"/>
-                </div>
-                <div class="d-flex align-center justify-center w-100 pt-10">
-                    <v-img class="img-with-direction" max-width="600px" src="img/desktop/people4.svg" v-if="!isDarkMode"/>
-                    <v-img class="img-with-direction" max-width="600px" src="img/desktop/people4-dark.svg" v-else-if="isDarkMode"/>
-                </div>
+                <auth-illustration variant="recovery" />
             </v-col>
             <v-col cols="12" md="4" class="auth-card d-flex flex-column">
                 <div class="d-flex align-center justify-center h-100">
@@ -119,13 +110,11 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
-import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useRootStore } from '@/stores/index.ts';
 
-import { ThemeType } from '@/core/theme.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 
 import { getClientDisplayVersion } from '@/lib/version.ts';
@@ -142,7 +131,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const theme = useTheme();
 
 const { tt } = useI18n();
 
@@ -160,8 +148,6 @@ const newPassword = ref<string>('');
 const confirmPassword = ref<string>('');
 const updating = ref<boolean>(false);
 const passwordChanged = ref<boolean>(false);
-
-const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 
 const inputProblemMessage = computed<string | null>(() => {
     if (!email.value) {

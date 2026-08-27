@@ -105,4 +105,9 @@
     .overview-dashboard:not(.overview-dashboard-editing) > .overview-dashboard-item > .overview-dashboard-widget {
         min-height: var(--overview-dashboard-item-height);
     }
+
+    .overview-dashboard:not(.overview-dashboard-editing) > .overview-dashboard-item-fixed-height {
+        flex: 0 0 var(--overview-dashboard-item-height);
+        height: var(--overview-dashboard-item-height);
+    }
 }

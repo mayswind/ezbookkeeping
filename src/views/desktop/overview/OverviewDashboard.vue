@@ -5,7 +5,7 @@
         <div class="overview-dashboard-drop-placeholder" :style="getGridPositionStyle(draggingWidget)"
              v-if="draggingWidget"></div>
         <div class="overview-dashboard-item"
-             :class="{ 'overview-dashboard-item-editing': editing, 'overview-dashboard-item-dragging': draggingWidget?.id === widget.id }"
+             :class="{ 'overview-dashboard-item-editing': editing, 'overview-dashboard-item-dragging': draggingWidget?.id === widget.id, 'overview-dashboard-item-fixed-height': isFixedHeightWidget(widget) }"
              :style="getWidgetStyle(widget)" :key="widget.id" v-for="widget in sortedWidgets">
             <overview-widget class="overview-dashboard-widget" :widget="widget" :loading="loading" :editing="editing"
                              @refresh="$emit('refresh')" />
@@ -54,7 +54,8 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import {
     type DesktopOverviewLayout,
-    type DesktopOverviewWidgetLayout
+    type DesktopOverviewWidgetLayout,
+    OverviewWidgetType
 } from '@/core/overview_layout.ts';
 import {
     DESKTOP_OVERVIEW_LAYOUT_COLUMNS,
@@ -128,6 +129,12 @@ const gridStyle = computed<Record<string, string>>(() => ({
     '--overview-dashboard-gap': `${GAP}px`,
     minHeight: props.layout.widgets.length ? `${rowCount.value * ROW_HEIGHT + (rowCount.value - 1) * GAP}px` : '360px'
 }));
+
+function isFixedHeightWidget(widget: DesktopOverviewWidgetLayout): boolean {
+    return widget.type === OverviewWidgetType.IncomeExpenseTrend ||
+        widget.type === OverviewWidgetType.NetAssetsTrend ||
+        widget.type === OverviewWidgetType.TransactionCalendarHeatmap;
+}
 
 function getGridPositionStyle(widget: DesktopOverviewWidgetLayout): Record<string, string> {
     return {

@@ -1,49 +1,51 @@
 <template>
-    <v-card class="h-100" :class="{ disabled: loading }">
+    <v-card class="overview-widget expense-ranking-widget h-100" :class="{ disabled: loading }">
         <template #title>
-            <span class="text-title-medium">{{ title || tt('Expense Category Ranking') }}</span>
+            <overview-widget-header :title="title || tt('Expense Category Ranking')" :icon="mdiViewDashboardOutline" />
         </template>
 
-        <v-card-text class="py-0">
+        <v-card-text class="overview-widget__body">
             <v-list class="py-0" lines="two" v-if="rankingItems.length">
-                <template :key="item.id" v-for="(item, idx) in rankingItems">
-                    <v-list-item class="px-0 py-3 no-min-height" density="compact">
+                <template :key="item.id" v-for="item in rankingItems">
+                    <v-list-item class="px-0 py-1 mb-1 no-min-height" density="compact">
                         <template #prepend>
-                            <router-link class="ranking-list-item" :to="getTransactionItemLinkUrl(item.id)">
+                            <router-link class="overview-widget__item-icon" :to="getTransactionItemLinkUrl(item.id)" :aria-label="item.name">
                                 <ItemIcon size="28px" :icon-type="getCategoryIconType(item.iconType)"
                                           :icon-id="item.icon" :color="item.color" />
                             </router-link>
                         </template>
                         <router-link class="ranking-list-item link-no-color" :to="getTransactionItemLinkUrl(item.id)">
-                            <div class="d-flex flex-column ms-2">
-                                <div class="d-flex align-center">
-                                    <span class="text-truncate">{{ item.name }}</span>
-                                    <small class="ranking-percent">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
-                                    <v-spacer />
-                                    <span class="ranking-amount ms-2">{{ getDisplayAmount(item.value, rankingData.incomplete) }}</span>
+                            <div class="d-flex flex-column">
+                                <div class="expense-ranking-widget__label-row">
+                                    <span class="text-truncate" :title="item.name">{{ item.name }}</span>
+                                    <span class="overview-widget__amount ranking-amount">{{ getDisplayAmount(item.value, rankingData.incomplete) }}</span>
                                 </div>
-                                <div class="mt-1">
-                                    <v-progress-linear :color="item.color ? getCategoryDisplayColor(item.color) : 'primary'"
-                                                       :bg-color="isDarkMode ? '#444444' : '#f8f8f8'" :bg-opacity="1"
-                                                       :model-value="item.percent" :height="4" />
+                                <div class="expense-ranking-widget__progress">
+                                    <v-progress-linear rounded :color="item.color ? getCategoryDisplayColor(item.color) : 'primary'"
+                                                       :bg-opacity="0.1" :aria-label="item.name"
+                                                       :model-value="item.percent" :height="5" />
+                                    <small class="ranking-percent">{{ formatPercentToLocalizedNumerals(item.percent, 2, '<0.01') }}</small>
                                 </div>
                             </div>
                         </router-link>
                     </v-list-item>
-                    <v-divider v-if="idx !== rankingItems.length - 1" />
                 </template>
             </v-list>
             <div v-if="loading && !rankingItems.length">
-                <v-skeleton-loader class="skeleton-no-margin py-5 mb-h1" type="text" :key="idx" :loading="true" v-for="idx in props.itemCount"></v-skeleton-loader>
+                <v-skeleton-loader class="skeleton-no-margin py-4 mb-1" type="text" :key="idx" :loading="true" v-for="idx in props.itemCount"></v-skeleton-loader>
             </div>
-            <div class="text-medium-emphasis text-center pt-4" v-if="!loading && !rankingItems.length">{{ tt('No data') }}</div>
+            <div class="overview-widget__empty" v-if="!loading && !rankingItems.length">
+                <v-icon :icon="mdiViewDashboardOutline" size="32" />
+                <span>{{ tt('No data') }}</span>
+            </div>
         </v-card-text>
     </v-card>
 </template>
 
 <script setup lang="ts">
+import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
+
 import { computed } from 'vue';
-import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -56,7 +58,6 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { BigDecimal } from '@/core/numeral.ts';
 import { CategoryType } from '@/core/category.ts';
-import { ThemeType } from '@/core/theme.ts';
 import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
 import type { Account } from '@/models/account.ts';
@@ -65,6 +66,10 @@ import type { TransactionCategory } from '@/models/transaction_category.ts';
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { getCategoryDisplayColor } from '@/lib/color.ts';
+
+import {
+    mdiViewDashboardOutline
+} from '@mdi/js';
 
 interface RankingItem {
     id: string;
@@ -84,7 +89,6 @@ const props = defineProps<{
     itemCount: number
 }>();
 
-const theme = useTheme();
 
 const {
     tt,
@@ -99,7 +103,6 @@ const categoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
 const exchangeRatesStore = useExchangeRatesStore();
 
-const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const showAmountInHomePage = computed<boolean>(() => settingsStore.appSettings.showAmountInHomePage);
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 

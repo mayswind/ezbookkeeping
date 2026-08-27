@@ -398,11 +398,5 @@
         "url": "https://materialdesignicons.com",
         "license": "MIT License (Code) and Apache License 2.0 (Icons & Fonts)",
         "licenseUrl": "https://github.com/Templarian/MaterialDesign-JS/blob/v7.4.47/LICENSE"
-    },
-    {
-        "name": "Solar Icons Set",
-        "url": "https://www.figma.com/community/file/1166831539721848736/Solar-Icons-Set",
-        "license": "Creative Commons Attribution 4.0 International License",
-        "licenseUrl": "https://creativecommons.org/licenses/by/4.0"
     }
 ]

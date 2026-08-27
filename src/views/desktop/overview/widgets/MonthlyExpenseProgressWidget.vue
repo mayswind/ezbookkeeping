@@ -1,36 +1,38 @@
 <template>
-    <v-card class="h-100" :class="{ disabled: loading }">
+    <v-card class="overview-widget expense-progress-widget h-100" :class="{ disabled: loading }">
         <template #title>
-            <span class="text-title-medium">{{ title || tt('Monthly Expense Progress') }}</span>
+            <overview-widget-header :title="title || tt('Monthly Expense Progress')" :icon="mdiCalendarClockOutline" />
         </template>
 
-        <v-card-text class="py-0">
-            <div class="d-flex align-baseline mt-1">
-                <span class="text-headline-small" :class="{ 'text-expense': !!currentDisplayExpenseAmount }" v-if="!loading || currentDisplayExpenseAmount">{{ currentDisplayExpenseAmount !== '' ? currentDisplayExpenseAmount : tt('No data') }}</span>
-                <v-skeleton-loader class="skeleton-no-margin mt-3 mb-2" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
-                <v-spacer />
-                <span class="text-body-medium">{{ displayElapsedPercent }}</span>
+        <v-card-text class="overview-widget__body">
+            <div class="expense-progress-widget__amount text-truncate">
+                <span class="overview-widget__amount text-headline-small" :class="{ 'text-expense': !!currentDisplayExpenseAmount }" v-if="!loading || currentDisplayExpenseAmount">{{ currentDisplayExpenseAmount !== '' ? currentDisplayExpenseAmount : tt('No data') }}</span>
+                <v-skeleton-loader class="skeleton-no-margin mt-2 mb-4" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
             </div>
-            <v-progress-linear class="mt-3" color="expense" rounded height="10" :model-value="currentMonthElapsedPercent * 100" />
-            <div class="text-body-small text-medium-emphasis mt-2">{{ tt('Month elapsed') }}</div>
-            <v-divider class="my-3" />
-            <div class="d-flex align-center">
-                <span>{{ tt('Estimated month-end expense') }}</span>
-                <v-spacer />
-                <span class="font-weight-medium" v-if="!loading || currentDisplayExpenseAmount">{{ displayEstimatedExpense }}</span>
-                <v-skeleton-loader class="skeleton-no-margin" type="text" width="100px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
+            <div class="overview-widget__caption d-flex justify-space-between mt-2">
+                <span>{{ tt('Month elapsed') }}</span>
+                <span class="font-weight-medium">{{ displayElapsedPercent }}</span>
             </div>
-            <div class="d-flex align-center mt-2 text-medium-emphasis">
-                <span>{{ tt('Last month total') }}</span>
-                <v-spacer />
-                <span v-if="!loading || currentDisplayExpenseAmount">{{ displayLastMonthExpense }}</span>
-                <v-skeleton-loader class="skeleton-no-margin" type="text" width="100px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
+            <v-progress-linear class="mt-2" color="primary" rounded height="6" :model-value="currentMonthElapsedPercent * 100" :aria-label="tt('Month elapsed')" />
+            <div class="expense-progress-widget__projection mt-3 pt-3">
+                <div class="overview-widget__detail-row">
+                    <span class="text-truncate">{{ tt('Estimated month-end expense') }}</span>
+                    <span class="overview-widget__amount font-weight-medium text-truncate" v-if="!loading || currentDisplayExpenseAmount">{{ displayEstimatedExpense }}</span>
+                    <v-skeleton-loader class="skeleton-no-margin" type="text" width="100px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
+                </div>
+                <div class="overview-widget__detail-row overview-widget__caption mt-2">
+                    <span class="text-truncate">{{ tt('Last month total') }}</span>
+                    <span class="overview-widget__amount text-truncate" v-if="!loading || currentDisplayExpenseAmount">{{ displayLastMonthExpense }}</span>
+                    <v-skeleton-loader class="skeleton-no-margin" type="text" width="100px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
+                </div>
             </div>
         </v-card-text>
     </v-card>
 </template>
 
 <script setup lang="ts">
+import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
+
 import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -41,6 +43,10 @@ import { type DateTime, DateRange } from '@/core/datetime.ts';
 
 import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
 import { getCurrentDateTime } from '@/lib/datetime.ts';
+
+import {
+    mdiCalendarClockOutline
+} from '@mdi/js';
 
 defineProps<{
     loading?: boolean;

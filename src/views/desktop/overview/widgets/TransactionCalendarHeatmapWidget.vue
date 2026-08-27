@@ -1,7 +1,7 @@
 <template>
-    <v-card class="transaction-calendar-heatmap-card h-100" :class="{ disabled: loading }">
+    <v-card class="overview-widget transaction-calendar-heatmap-card h-100" :class="{ disabled: loading }">
         <template #title>
-            <span class="text-title-medium">{{ title || tt('Transaction Calendar Heatmap') }}</span>
+            <overview-widget-header :title="title || tt('Transaction Calendar Heatmap')" :icon="mdiCalendarMonthOutline" />
         </template>
 
         <v-card-text class="transaction-calendar-heatmap-body pa-0 overflow-hidden">
@@ -15,6 +15,8 @@
 </template>
 
 <script setup lang="ts">
+import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
+
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -36,6 +38,10 @@ import {
     getUnixTimeBeforeUnixTime,
     getUnixTimeAfterUnixTime
 } from '@/lib/datetime.ts';
+
+import {
+    mdiCalendarMonthOutline
+} from '@mdi/js';
 
 const props = defineProps<{
     loading: boolean;

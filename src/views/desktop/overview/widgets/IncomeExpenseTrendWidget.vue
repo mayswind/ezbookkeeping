@@ -1,16 +1,25 @@
 <template>
-    <monthly-income-and-expense-chart :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode" :title="title"
-                                      :loading="loading" :disabled="loading" :enable-click-item="true"
-                                      :hide-x-axis-labels="!showXAxisLabels" :hide-legend="!showLegend"
-                                      @click="clickMonthlyIncomeOrExpense" />
+    <v-card class="overview-widget d-flex flex-column" :class="{ 'disabled': loading }">
+        <template #title>
+            <overview-widget-header :title="title || tt('Income and Expense Trends')" :icon="mdiChartBar" />
+        </template>
+
+        <monthly-income-and-expense-chart :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode" :title="title"
+                                          :loading="loading" :disabled="loading" :enable-click-item="true"
+                                          :hide-x-axis-labels="!showXAxisLabels" :hide-legend="!showLegend"
+                                          @click="clickMonthlyIncomeOrExpense" />
+    </v-card>
 </template>
 
 <script setup lang="ts">
+import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
 import { type MonthlyIncomeAndExpenseCardClickEvent } from '@/components/desktop/MonthlyIncomeAndExpenseChart.vue';
 
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTheme } from 'vuetify';
+
+import { useI18n } from '@/locales/helpers.ts';
 
 import { useOverviewStore } from '@/stores/overview.ts';
 
@@ -25,6 +34,10 @@ import {
 import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
 import { getUnixTimeAfterUnixTime, getUnixTimeBeforeUnixTime } from '@/lib/datetime.ts';
 
+import {
+    mdiChartBar
+} from '@mdi/js';
+
 const props = defineProps<{
     loading: boolean;
     title?: string;
@@ -35,6 +48,8 @@ const props = defineProps<{
 
 const router = useRouter();
 const theme = useTheme();
+
+const { tt } = useI18n();
 
 const overviewStore = useOverviewStore();
 

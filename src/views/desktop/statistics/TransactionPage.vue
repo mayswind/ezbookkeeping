@@ -344,7 +344,7 @@
                             />
                         </v-card-text>
 
-                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
+                        <v-card-text class="py-0 mt-2" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.TrendAnalysis">
                             <trends-chart
                                 chart-mode="monthly"
                                 :type="queryChartType"
@@ -388,7 +388,7 @@
                             />
                         </v-card-text>
 
-                        <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
+                        <v-card-text class="py-0 mt-2" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.AssetTrends">
                             <trends-chart
                                 chart-mode="daily"
                                 :type="queryChartType"

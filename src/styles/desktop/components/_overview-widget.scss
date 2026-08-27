@@ -1,0 +1,547 @@
+.overview-widget {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    container: overview-widget / inline-size;
+    border: 1px solid rgba(var(--ebk-border), 0.075);
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(var(--v-theme-primary), 0.045), transparent 18rem),
+        rgb(var(--v-theme-surface));
+
+    > .v-card-item {
+        flex: 0 0 auto;
+    }
+
+    .overview-widget__header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        min-height: 32px;
+    }
+
+    .overview-widget__icon {
+        flex: 0 0 auto;
+    }
+
+    .overview-widget__title {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        color: rgba(var(--v-theme-on-surface), 0.86);
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .overview-widget__body {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 0 16px 14px;
+        overflow: auto;
+        scrollbar-width: thin;
+    }
+
+    .overview-widget__caption {
+        color: rgba(var(--v-theme-on-surface), 0.62);
+        line-height: 1.5;
+    }
+
+    .v-skeleton-loader {
+        max-width: 100%;
+    }
+
+    .overview-widget__amount {
+        min-width: 0;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.025em;
+        overflow-wrap: anywhere;
+        line-height: 1.3;
+    }
+
+    .overview-widget__stat {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .overview-widget__dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-inline-end: 6px;
+        border-radius: 50%;
+        vertical-align: middle;
+    }
+
+    .overview-widget__footer {
+        margin-block-start: auto;
+        padding-block-start: 10px;
+        border-block-start: 1px solid rgba(var(--ebk-border), 0.07);
+        color: rgba(var(--v-theme-on-surface), 0.58);
+        font-size: 0.75rem;
+    }
+
+    .overview-widget__detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px 16px;
+
+        > :last-child {
+            text-align: end;
+        }
+    }
+
+    .overview-widget__empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        min-height: 120px;
+        height: 100%;
+        color: rgba(var(--v-theme-on-surface), 0.55);
+
+        .v-icon {
+            color: rgba(var(--v-theme-primary), 0.45);
+        }
+    }
+
+    .overview-widget__list-body {
+        padding-inline: 6px;
+        padding-block-end: 8px;
+    }
+
+    .v-list {
+        background: transparent;
+    }
+
+    .overview-widget__list-item {
+        min-height: 44px;
+        padding: 4px 8px;
+        border-radius: var(--ebk-radius-md);
+
+        + .overview-widget__list-item {
+            margin-block-start: 4px;
+        }
+
+        .v-list-item-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 20px;
+        }
+
+        .v-list-item__append {
+            min-width: 0;
+        }
+
+        .overview-widget__caption {
+            line-height: 16px !important;
+        }
+    }
+
+    .overview-widget__item-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 32px;
+        height: 32px;
+        margin-inline-end: 10px;
+        border-radius: var(--ebk-radius-md);
+        background: rgba(var(--v-theme-on-surface), 0.035);
+        text-decoration: none;
+    }
+
+    .overview-widget__list-amount {
+        padding-inline-start: 12px;
+        text-align: end;
+        font-size: 0.875rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 360px) {
+    .overview-widget .overview-widget__detail-row {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 240px) {
+    .overview-widget .overview-widget__list-item {
+        .v-list-item__append {
+            grid-column: 2;
+            grid-row: 2;
+            justify-self: start;
+            max-width: 100%;
+        }
+
+        .overview-widget__list-amount {
+            padding-inline-start: 0;
+            text-align: start;
+            margin-block-start: 4px;
+            white-space: normal;
+        }
+    }
+}
+
+.asset-summary-widget {
+    .asset-summary-widget__metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        flex: 1 0 auto;
+    }
+
+    .asset-summary-widget__metric {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 8px;
+        min-width: 0;
+
+        + .asset-summary-widget__metric {
+            border-inline-start: 1px solid rgba(var(--ebk-border), 0.09);
+            padding-left: 20px;
+        }
+    }
+
+    .asset-summary-widget__metric--primary {
+        color: rgb(var(--v-theme-primary));
+    }
+
+    @media (max-width: 839px) {
+        .asset-summary-widget__metrics {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .asset-summary-widget__metric {
+            flex-direction: row;
+            align-items: center;
+            padding: 8px 0;
+
+            + .asset-summary-widget__metric {
+                border-inline-start: 0;
+                border-block-start: 1px solid rgba(var(--ebk-border), 0.07);
+                padding-left: 0;
+            }
+        }
+    }
+}
+
+.monthly-expense-widget {
+    background:
+        radial-gradient(circle at 100% 100%, rgba(var(--v-theme-primary), 0.075), transparent 11rem),
+        linear-gradient(145deg, rgba(var(--v-theme-primary), 0.035), transparent 56%),
+        rgb(var(--v-theme-surface));
+
+    &::after {
+        position: absolute;
+        z-index: 0;
+        width: 9rem;
+        height: 9rem;
+        border-radius: 50%;
+        background: rgba(var(--v-theme-primary), 0.055);
+        content: '';
+        filter: blur(1.5rem);
+        inset-block-end: -4.5rem;
+        inset-inline-end: -3.5rem;
+        pointer-events: none;
+    }
+
+    .monthly-expense-widget__content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        width: calc(100% - 7.5rem);
+        min-width: 10rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .monthly-expense-widget__income {
+        display: inline-flex;
+        max-width: 100%;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.4rem 0.8rem;
+        border: 1px solid rgba(var(--ebk-border), 0.07);
+        border-radius: 999px;
+        background: rgba(var(--ebk-surface-raised), 0.72);
+        box-shadow: var(--ebk-shadow-sm);
+    }
+
+    .monthly-expense-widget__income-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        background: rgba(var(--v-theme-primary), 0.72);
+        box-shadow: 0 0 0 0.22rem rgba(var(--v-theme-primary), 0.1);
+    }
+
+    .monthly-expense-widget__income-label {
+        overflow: hidden;
+        color: rgba(var(--v-theme-on-surface), 0.66);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .monthly-expense-widget__details {
+        border-radius: var(--ebk-radius-md);
+    }
+
+    .monthly-expense-widget__illustration {
+        position: absolute;
+        z-index: 1;
+        width: clamp(7.25rem, 28%, 9.25rem);
+        color: rgb(var(--v-theme-primary));
+        inset-block-end: 0.3rem;
+        inset-inline-end: 1rem;
+        opacity: 0.9;
+
+        svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            overflow: visible;
+            filter: drop-shadow(0 0.55rem 0.8rem rgba(var(--ebk-shadow-color), 0.08));
+        }
+
+        .monthly-expense-widget__illustration-halo {
+            fill: currentColor;
+            opacity: 0.055;
+        }
+
+        .monthly-expense-widget__illustration-dot {
+            fill: currentColor;
+            opacity: 0.32;
+        }
+
+        .monthly-expense-widget__illustration-dot--muted {
+            opacity: 0.16;
+        }
+
+        .monthly-expense-widget__illustration-paper {
+            fill: rgb(var(--v-theme-surface));
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linejoin: round;
+
+            > path {
+                fill: currentColor;
+                opacity: 0.1;
+            }
+        }
+
+        .monthly-expense-widget__illustration-line {
+            fill: currentColor;
+            stroke: none;
+            opacity: 0.34;
+        }
+
+        .monthly-expense-widget__illustration-line--short {
+            opacity: 0.15;
+        }
+
+        .monthly-expense-widget__illustration-total {
+            fill: currentColor;
+            stroke: none;
+            opacity: 0.1;
+        }
+
+        .monthly-expense-widget__illustration-total-line {
+            fill: none !important;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-width: 3;
+            opacity: 0.5 !important;
+        }
+
+        .monthly-expense-widget__illustration-chart {
+            fill: rgb(var(--v-theme-surface));
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .monthly-expense-widget__illustration-chart-track,
+        .monthly-expense-widget__illustration-chart-value {
+            fill: none;
+            stroke-width: 6;
+        }
+
+        .monthly-expense-widget__illustration-chart-track {
+            opacity: 0.12;
+        }
+
+        .monthly-expense-widget__illustration-chart-value {
+            stroke-dasharray: 58 42;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 117px 82px;
+            opacity: 0.65;
+        }
+
+        .monthly-expense-widget__illustration-chart-center {
+            fill: currentColor;
+            stroke: none;
+            opacity: 0.12;
+        }
+
+        .monthly-expense-widget__illustration-coins {
+            fill: rgb(var(--v-theme-surface));
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+    }
+
+    @media (max-width: 1199px) {
+        .monthly-expense-widget__content {
+            width: calc(100% - 6.25rem);
+        }
+
+        .monthly-expense-widget__illustration {
+            width: 7.25rem;
+            inset-block-end: 1.8rem;
+            inset-inline-end: 0.75rem;
+            opacity: 0.78;
+        }
+    }
+}
+
+.period-income-expense-widget__body {
+    .period-income-expense-widget__content {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        flex: 1 0 auto;
+    }
+
+    .period-income-expense-widget__metrics {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        gap: 10px;
+    }
+
+    .overview-widget__caption {
+        font-size: 0.75rem;
+        line-height: 18px;
+    }
+
+    .overview-widget__footer {
+        padding-block-start: 8px;
+        line-height: 18px;
+    }
+
+    .overview-widget__amount {
+        font-size: clamp(1.25rem, 8cqi, 1.5rem) !important;
+        line-height: 1.2 !important;
+    }
+
+    .period-income-expense-widget__illustration {
+        display: none;
+        width: 128px;
+        max-width: 100%;
+        color: rgb(var(--v-theme-primary));
+        opacity: 0.75;
+        pointer-events: none;
+    }
+
+    .period-income-expense-widget__paper,
+    .period-income-expense-widget__flow circle {
+        fill: rgb(var(--v-theme-surface));
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-opacity: 0.45;
+    }
+
+    .period-income-expense-widget__flow path {
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: 0.65;
+    }
+}
+
+@container overview-widget (min-width: 400px) {
+    .period-income-expense-widget__body .period-income-expense-widget__content {
+        grid-template-columns: minmax(0, 1fr) 128px;
+    }
+
+    .period-income-expense-widget__body .period-income-expense-widget__illustration {
+        display: block;
+        justify-self: end;
+    }
+}
+
+.savings-rate-widget {
+    .savings-rate-widget__breakdown {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        > div + div {
+            padding-inline-start: 12px;
+            border-inline-start: 1px solid rgba(var(--ebk-border), 0.09);
+        }
+    }
+}
+
+.expense-progress-widget {
+    .expense-progress-widget__projection {
+        border-block-start: 1px solid rgba(var(--ebk-border), 0.07);
+    }
+}
+
+.expense-ranking-widget__label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-block-end: 3px;
+}
+
+.overview-widget--accounts .overview-widget__list-item {
+    min-height: 34px;
+    padding-block: 3px;
+
+    .overview-widget__item-icon {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+.expense-ranking-widget .overview-widget__body {
+    padding-block-end: 8px;
+}
+
+.expense-ranking-widget__progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 16px;
+
+    .v-progress-linear {
+        flex: 1 1 auto;
+    }
+}
+
+.overview-widget--chart {
+    > .v-card-item {
+        padding-block-end: 8px;
+    }
+
+    .overview-monthly-chart-overlay {
+        color: rgba(var(--v-theme-on-surface), 0.55);
+    }
+}

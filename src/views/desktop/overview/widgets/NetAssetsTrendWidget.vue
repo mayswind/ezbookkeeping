@@ -1,7 +1,7 @@
 <template>
-    <v-card class="net-assets-trend-card h-100" :class="{ disabled: loading }">
+    <v-card class="overview-widget net-assets-trend-card h-100" :class="{ disabled: loading }">
         <template #title>
-            <span class="text-title-medium">{{ title || tt('Net Assets Trends') }}</span>
+            <overview-widget-header :title="title || tt('Net Assets Trends')" :icon="mdiChartTimelineVariant" />
         </template>
 
         <trends-chart hide-y-axis-labels hide-horizontal-grid-lines
@@ -20,6 +20,8 @@
 </template>
 
 <script setup lang="ts">
+import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
+
 import { computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -38,6 +40,10 @@ import type { TransactionAssetTrendsAnalysisDataItem, TransactionAssetTrendsAnal
 
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getUnixTimeBeforeUnixTime } from '@/lib/datetime.ts';
+
+import {
+    mdiChartTimelineVariant
+} from '@mdi/js';
 
 const props = defineProps<{
     loading: boolean;

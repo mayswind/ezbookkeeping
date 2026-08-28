@@ -279,7 +279,7 @@
                                                             {{ tt('Delete') }}
                                                         </v-btn>
                                                         <v-spacer/>
-                                                        <span class="account-balance ms-2">{{ accountBalance(element, activeSubAccount[element.id]) }}</span>
+                                                        <span class="account-balance ms-2">{{ accountBalance(element, activeSubAccount[element.id], showAccountBalance) }}</span>
                                                     </div>
                                                 </v-card-text>
                                             </v-card>

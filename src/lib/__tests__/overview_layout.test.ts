@@ -207,7 +207,7 @@ describe('mobile overview layout', () => {
             {
                 id: 'accounts',
                 type: OverviewWidgetType.AccountBalanceList,
-                settings: { accountCategories: [0], itemCount: 4, sortBy: 'displayOrder' }
+                settings: { accountCategories: [0], itemCount: 4, sortBy: 'displayOrder', alwaysShowAmount: false }
             },
             {
                 id: 'month',

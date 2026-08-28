@@ -99,12 +99,18 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
                         value: 'balance'
                     }
                 ]
+            },
+            {
+                settingType: 'switch',
+                settingName: 'alwaysShowAmount',
+                displayName: 'Always Show Amount'
             }
         ],
         defaultSettings: {
             accountCategories: [0],
             itemCount: 4,
             sortBy: 'displayOrder',
+            alwaysShowAmount: false
         },
         defaultWidth: 3,
         defaultHeight: 3,
@@ -539,12 +545,18 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                 multiple: true,
                 allValue: 0,
                 selectValueSource: 'accountCategories'
+            },
+            {
+                settingType: 'switch',
+                settingName: 'alwaysShowAmount',
+                displayName: 'Always Show Amount'
             }
         ],
         defaultSettings: {
             accountCategories: [0],
             itemCount: 4,
-            sortBy: 'displayOrder'
+            sortBy: 'displayOrder',
+            alwaysShowAmount: false
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.Accounts

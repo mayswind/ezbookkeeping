@@ -15,7 +15,7 @@
                         </span>
                     </template>
                     <template #append>
-                        <span class="overview-widget__list-amount overview-widget__amount">{{ accountBalance(account) }}</span>
+                        <span class="overview-widget__list-amount overview-widget__amount">{{ accountBalance(account, undefined, showAmount) }}</span>
                     </template>
                 </v-list-item>
             </v-list>
@@ -38,6 +38,7 @@ import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useAccountListPageBase } from '@/views/base/accounts/AccountListPageBase.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
 import { DateRange } from '@/core/datetime.ts';
@@ -55,6 +56,7 @@ const props = defineProps<{
     accountCategories: number[];
     itemCount: number;
     sortBy: string;
+    alwaysShowAmount: boolean;
     editing?: boolean
 }>();
 
@@ -62,7 +64,9 @@ const { tt } = useI18n();
 
 const { accountBalance } = useAccountListPageBase();
 
+const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 
+const showAmount = computed<boolean>(() => !!props.alwaysShowAmount || settingsStore.appSettings.showAmountInHomePage);
 const displayAccounts = computed<Account[]>(() => accountsStore.getSortedAccounts(props.accountCategories, props.sortBy, props.itemCount));
 </script>

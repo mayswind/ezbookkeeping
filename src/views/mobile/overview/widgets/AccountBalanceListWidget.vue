@@ -4,7 +4,7 @@
             <small>{{ title || tt('Account Balance List') }}</small>
         </f7-list-item>
         <f7-list-item :key="account.id" :title="account.name"
-                      :after="accountBalance(account) || ''"
+                      :after="accountBalance(account, undefined, showAmount) || ''"
                       :link="`/transaction/list?accountIds=${account.id}&dateType=${DateRange.All.type}`"
                       v-for="account in displayAccounts">
             <template #media>
@@ -28,6 +28,7 @@ import { computed } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { useAccountListPageBase } from '@/views/base/accounts/AccountListPageBase.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
 import { DateRange } from '@/core/datetime.ts';
@@ -41,13 +42,16 @@ const props = defineProps<{
     accountCategories: number[];
     itemCount: number;
     sortBy: string;
+    alwaysShowAmount: boolean;
 }>();
 
 const { tt } = useI18n();
 
 const { accountBalance } = useAccountListPageBase();
 
+const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 
+const showAmount = computed<boolean>(() => !!props.alwaysShowAmount || settingsStore.appSettings.showAmountInHomePage);
 const displayAccounts = computed<Account[]>(() => accountsStore.getSortedAccounts(props.accountCategories, props.sortBy, props.itemCount));
 </script>

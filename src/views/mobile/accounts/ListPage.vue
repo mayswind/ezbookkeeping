@@ -87,7 +87,7 @@
                               class="nested-list-item"
                               :id="getAccountDomId(account)"
                               :class="{ 'has-child-list-item': account.type === AccountType.MultiSubAccounts.type && hasVisibleSubAccount(account), 'actual-first-child': account.id === firstShowingIds.accounts[accountCategory.type], 'actual-last-child': account.id === lastShowingIds.accounts[accountCategory.type] }"
-                              :after="account.type === AccountType.SingleAccount.type ? accountBalance(account) : ''"
+                              :after="account.type === AccountType.SingleAccount.type ? accountBalance(account, undefined, showAccountBalance) : ''"
                               :link="!sortable ? '/transaction/list?accountIds=' + account.id : null"
                               :key="account.id"
                               v-for="account in allCategorizedAccountsMap[accountCategory.type]!.accounts"
@@ -115,7 +115,7 @@
                                 <div class="item-footer" v-if="account.comment">{{ account.comment }}</div>
                             </div>
                             <div class="nested-list-item-after" v-if="account.type === AccountType.MultiSubAccounts.type">
-                                <span>{{ accountBalance(account) }}</span>
+                                <span>{{ accountBalance(account, undefined, showAccountBalance) }}</span>
                             </div>
                         </div>
                         <li v-if="account.type === AccountType.MultiSubAccounts.type">
@@ -123,7 +123,7 @@
                                 <f7-list-item class="no-sortable nested-list-item-child"
                                               :class="{ 'actual-first-child': subAccount.id === firstShowingIds.subAccounts[account.id], 'actual-last-child': subAccount.id === lastShowingIds.subAccounts[account.id] }"
                                               :id="getAccountDomId(subAccount)"
-                                              :title="subAccount.name" :footer="subAccount.comment" :after="accountBalance(account, subAccount.id)"
+                                              :title="subAccount.name" :footer="subAccount.comment" :after="accountBalance(account, subAccount.id, showAccountBalance)"
                                               :link="!sortable ? '/transaction/list?accountIds=' + subAccount.id : null"
                                               :key="subAccount.id"
                                               v-for="subAccount in account.subAccounts"

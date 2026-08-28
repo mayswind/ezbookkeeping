@@ -66,8 +66,8 @@
                                    v-else-if="setting.settingType === 'textbox'"></f7-list-input>
 
                     <f7-list-item class="item-truncate-after-text"
-                                  link="#" popover-open=".widget-setting-selection-popover"
-                                  @click="selectedSetting = setting"
+                                  link="#"
+                                  @click="openSettingSelection(setting, $event)"
                                   v-else>
                         <template #after-title>
                             <div class="item-actual-title">
@@ -81,7 +81,7 @@
                 </template>
             </f7-list>
 
-            <f7-popover class="widget-setting-selection-popover">
+            <f7-popover class="widget-setting-selection-popover" @popover:open="onPopoverOpen">
                 <f7-list dividers>
                     <f7-list-item link="#" no-chevron popover-close
                                   :title="option.name"
@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -119,6 +119,8 @@ import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts'
 import { isDefined, isArray } from '@/lib/common.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 import { cloneWidget } from '@/lib/overview_layout.ts';
+import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type Framework7Dom, openPopover } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: MobileOverviewWidgetLayout | null;
@@ -230,6 +232,14 @@ function updateMultipleValue(setting: OverviewWidgetCustomSelectSettingItem, val
     updateSettingValue(setting.settingName, selectedValues);
 }
 
+function openSettingSelection(setting: OverviewWidgetSettingItem, event: MouseEvent): void {
+    selectedSetting.value = setting;
+
+    nextTick(() => {
+        openPopover('.widget-setting-selection-popover', event.currentTarget as HTMLElement);
+    });
+}
+
 function updateSelectedSettingValue(value: string | number): void {
     if (selectedSetting.value) {
         updateSettingValue(selectedSetting.value.settingName, value);
@@ -246,6 +256,10 @@ function confirm(): void {
 
 function close(): void {
     emit('update:show', false);
+}
+
+function onPopoverOpen(event: { $el: Framework7Dom }): void {
+    scrollToSelectedItem(event.$el[0], '.popover-inner', '.popover-inner', 'li.list-item-selected');
 }
 
 function onPopupOpen(): void {

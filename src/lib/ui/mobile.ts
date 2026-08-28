@@ -51,6 +51,12 @@ export function hideLoading(): void {
     });
 }
 
+export function openPopover(selector: string, targetEl: HTMLElement): void {
+    f7ready((f7) => {
+        f7.popover.open(selector, targetEl);
+    });
+}
+
 export function closePopover(selector: string): void {
     f7ready((f7) => {
         const popover = f7.popover.get(selector);

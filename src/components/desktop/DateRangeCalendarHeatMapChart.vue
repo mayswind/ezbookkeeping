@@ -19,6 +19,7 @@ import type { BigDecimal } from '@/core/numeral.ts';
 import { type WeekDayValue, KnownDateTimeFormat } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { ChartValueType, type CalendarChartSourceDataItem } from '@/core/chart.ts';
+import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
 
 import {
     BIG_DECIMAL_ZERO,
@@ -62,6 +63,7 @@ const {
     tt,
     getAllMinWeekdayNames,
     formatDateTimeToLongDate,
+    formatAmountToLocalizedNumeralsWithCurrency,
     formatChartValueToLocalizedNumerals
 } = useI18n();
 
@@ -134,14 +136,18 @@ const chartOptions = computed<object>(() => {
                 color: isDarkMode.value ? '#eee' : '#333'
             },
             formatter: (params: CallbackDataParams) => {
-                if (!props.showValue) {
-                    return '';
-                }
-
                 const dataItem = params.data as [string, number];
                 const dateTime = dataItem && dataItem[0] ? parseDateTimeFromKnownDateTimeFormat(dataItem[0], KnownDateTimeFormat.DefaultDate) : '';
                 const value: BigDecimal | undefined = dataItem && dataItem[0] ? heatMapData.value.allOriginalDataMap[dataItem[0]] : undefined;
-                const displayValue: string = value ? formatChartValueToLocalizedNumerals(value, props.valueType, props.defaultCurrency) : '';
+                let displayValue: string = '';
+
+                if (props.showValue && value) {
+                    displayValue = formatChartValueToLocalizedNumerals(value, props.valueType, props.defaultCurrency);
+                } else if (!props.showValue) {
+                    displayValue = formatAmountToLocalizedNumeralsWithCurrency(DISPLAY_HIDDEN_AMOUNT, props.defaultCurrency);
+                } else {
+                    displayValue = '';
+                }
 
                 return (dateTime ? `<div class="d-inline-flex">${formatDateTimeToLongDate(dateTime)}</div><br/>` : '')
                     + `<div><span class="chart-pointer" style="background-color: ${params.color}"></span>`

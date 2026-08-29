@@ -101,9 +101,7 @@
                         <span>{{ tt('All') }}</span>
                     </div>
                     <div class="text-body-large text-wrap" v-if="startTime || endTime">
-                        <span>{{ displayStartDateTime }}</span>
-                        <span> - </span>
-                        <span>{{ displayEndDateTime }}</span>
+                        <span>{{ formatRange(displayStartDateTime, displayEndDateTime) }}</span>
                     </div>
 
                     <div class="d-flex align-center mt-1 overflow-x-auto">
@@ -386,6 +384,7 @@ const emit = defineEmits<{
 
 const {
     tt,
+    formatRange,
     formatNumberToLocalizedNumerals,
     getTablePageOptions
 } = useI18n();

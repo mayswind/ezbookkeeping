@@ -5,7 +5,7 @@
             <amount-input class="flex-1-1-0" :currency="defaultCurrency" :show-currency="false"
                           :label="filterTypeAndAmounts?.filterType?.paramCount === 2 ? tt('Minimum Amount') : tt('Amount')"
                           v-model="amount1" v-if="filterTypeAndAmounts?.filterType" />
-            <span v-if="filterTypeAndAmounts?.filterType?.paramCount === 2">-</span>
+            <span v-if="filterTypeAndAmounts?.filterType?.paramCount === 2">{{ tt('format.misc.rangeSeparator') }}</span>
             <amount-input class="flex-1-1-0" :currency="defaultCurrency" :show-currency="false"
                           :label="filterTypeAndAmounts?.filterType?.paramCount === 2 ? tt('Maximum Amount') : tt('Amount')"
                           v-model="amount2" v-if="filterTypeAndAmounts?.filterType?.paramCount === 2" />

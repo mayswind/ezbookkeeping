@@ -9,9 +9,7 @@
             <div class="padding-horizontal padding-bottom">
                 <p class="no-margin-top" v-if="hint">{{ hint }}</p>
                 <p class="no-margin-top margin-bottom" v-if="beginDateTime && endDateTime">
-                    <span>{{ beginDateTime }}</span>
-                    <span> - </span>
-                    <span>{{ endDateTime }}</span>
+                    <span>{{ formatRange(beginDateTime, endDateTime) }}</span>
                 </p>
                 <slot></slot>
                 <date-time-picker ref="datetimepicker"
@@ -53,7 +51,7 @@ const emit = defineEmits<{
     (e: 'dateRange:change', minUnixTime: number, maxUnixTime: number): void;
 }>();
 
-const { tt } = useI18n();
+const { tt, formatRange } = useI18n();
 const { showToast } = useI18nUIComponents();
 const {
     dateRange,

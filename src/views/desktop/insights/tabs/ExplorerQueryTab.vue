@@ -254,7 +254,7 @@
                                                     />
                                                     <span class="ms-2 me-2"
                                                           v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetBetween.value ||
-                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetNotBetween.value">~</span>
+                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.MinuteOffsetNotBetween.value">{{ tt('format.misc.rangeSeparator') }}</span>
                                                     <number-input density="compact"
                                                                   :disabled="loading || disabled || !!editingQuery"
                                                                   :min-value="WESTERNMOST_TIMEZONE_UTC_OFFSET"
@@ -344,7 +344,7 @@
                                                     />
                                                     <span class="ms-2 me-2"
                                                           v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.Between.value ||
-                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.NotBetween.value">~</span>
+                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.NotBetween.value">{{ tt('format.misc.rangeSeparator') }}</span>
                                                     <amount-input density="compact"
                                                                   :currency="defaultCurrency"
                                                                   :disabled="loading || disabled || !!editingQuery"
@@ -385,7 +385,7 @@
                                                           v-if="conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeBetween.value ||
                                                                 conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LatitudeNotBetween.value ||
                                                                 conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeBetween.value ||
-                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeNotBetween.value">~</span>
+                                                                conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.LongitudeNotBetween.value">{{ tt('format.misc.rangeSeparator') }}</span>
                                                     <number-input density="compact"
                                                                   :disabled="loading || disabled || !!editingQuery"
                                                                   :min-value="TransactionExplorerGeoLocationCondition.MIN_LATITUDE"

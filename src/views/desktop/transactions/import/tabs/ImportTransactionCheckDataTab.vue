@@ -369,7 +369,7 @@
                     <amount-input :currency="defaultCurrency"
                                   v-model="currentAmountFilterValue1"/>
                     <div class="ms-2 me-2 d-flex flex-column justify-center" v-if="currentAmountFilterType && currentAmountFilterType.paramCount === 2">
-                        ~
+                        {{ tt('format.misc.rangeSeparator') }}
                     </div>
                     <amount-input :currency="defaultCurrency"
                                   v-model="currentAmountFilterValue2"
@@ -532,6 +532,7 @@ const props = defineProps<{
 
 const {
     tt,
+    formatRange,
     formatDateTimeToLongDateTime,
     formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
@@ -1218,7 +1219,7 @@ const displayFilterCustomDateRange = computed<string>(() => {
     const minDisplayTime = formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(filters.value.minDatetime));
     const maxDisplayTime = formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(filters.value.maxDatetime));
 
-    return `${minDisplayTime} - ${maxDisplayTime}`
+    return formatRange(minDisplayTime, maxDisplayTime);
 });
 
 function isTransactionDisplayed(transaction: ImportTransaction): boolean {

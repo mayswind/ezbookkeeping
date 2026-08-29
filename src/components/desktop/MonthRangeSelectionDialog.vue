@@ -9,9 +9,7 @@
 
             <template #content>
                 <div class="text-body-large" v-if="beginDateTime && endDateTime">
-                    <span>{{ beginDateTime }}</span>
-                    <span> - </span>
-                    <span>{{ endDateTime }}</span>
+                    <span>{{ formatRange(beginDateTime, endDateTime) }}</span>
                 </div>
 
                 <div class="text-body-large text-wrap mt-3" v-if="hint">
@@ -57,7 +55,7 @@ const emit = defineEmits<{
 
 const theme = useTheme();
 
-const { tt } = useI18n();
+const { tt, formatRange } = useI18n();
 const { dateRange, beginDateTime, endDateTime, getFinalMonthRange } = useMonthRangeSelectionBase(props);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);

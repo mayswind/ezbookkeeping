@@ -110,6 +110,8 @@ function isFrontendAlwaysTranslatedKey(key) {
         if (key.startsWith('format.misc.')) {
             if (key === 'format.misc.startEndRange') {
                 return true;
+            } else if (key === 'format.misc.rangeSeparator') {
+                return true;
             } else if (key === 'format.misc.multiTextJoinSeparator') {
                 return true;
             } else if (key === 'format.misc.eachMonthDayInMonthDays') {

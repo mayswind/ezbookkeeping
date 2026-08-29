@@ -147,7 +147,7 @@
                                            @click="shiftDateRange(query.minTime, query.maxTime, -1)">
                                         <v-icon :icon="mdiArrowLeft" size="14" />
                                     </v-btn>
-                                    <span class="text-body-medium mx-1">{{ `${queryMinTime} - ${queryMaxTime}` }}</span>
+                                    <span class="text-body-medium mx-1">{{ formatRange(queryMinTime, queryMaxTime) }}</span>
                                     <v-btn class="button-icon-with-direction" size="small"
                                            density="compact" color="default" variant="outlined"
                                            :icon="true" :disabled="loading"
@@ -366,7 +366,7 @@
                                                                           :currency="selectedAccountDefaultCurrency"
                                                                           v-model="currentAmountFilterValue1"
                                                                           v-if="currentAmountFilterType === filterType.type"/>
-                                                            <span class="ms-2 me-2" v-if="currentAmountFilterType === filterType.type && filterType.paramCount === 2">~</span>
+                                                            <span class="ms-2 me-2" v-if="currentAmountFilterType === filterType.type && filterType.paramCount === 2">{{ tt('format.misc.rangeSeparator') }}</span>
                                                             <amount-input class="transaction-amount-filter-value" density="compact"
                                                                           :currency="selectedAccountDefaultCurrency"
                                                                           v-model="currentAmountFilterValue2"
@@ -847,6 +847,7 @@ const theme = useTheme();
 
 const {
     tt,
+    formatRange,
     getAllRecentMonthDateRanges,
     getWeekdayLongName,
     getTablePageOptions

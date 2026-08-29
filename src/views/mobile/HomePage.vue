@@ -91,7 +91,7 @@ import { isFunction } from '@/lib/common.ts';
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
-    getOverviewRecentTransactionCount,
+    getOverviewRecentTransactionsQueries,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
     getOverviewTransactionCategoryStatisticDateTypes,
@@ -229,7 +229,7 @@ function reloadOverviewData(force: boolean): Promise<unknown>[] {
     if (requirements.includes(OverviewWidgetDataRequirement.RecentTransactions)) {
         promises.push(overviewStore.loadRecentTransactions({
             force: force,
-            count: getOverviewRecentTransactionCount(layout.value)
+            queries: getOverviewRecentTransactionsQueries(layout.value)
         }));
     }
 

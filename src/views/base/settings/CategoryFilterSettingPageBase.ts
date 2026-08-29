@@ -23,7 +23,7 @@ import {
 
 export type CategoryFilterType = 'statisticsDefault' | 'statisticsCurrent' | 'homePageOverview' | 'transactionListCurrent' | 'custom';
 
-export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allowCategoryTypesStr?: string, selectedCategoryIds?: string[]) {
+export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allowCategoryTypesStr?: string) {
     const { tt } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -101,7 +101,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
         }
     }
 
-    function loadFilterCategoryIds(): boolean {
+    function loadFilterCategoryIds(selectedCategoryIds?: string[]): boolean {
         const allCategoryIds: Record<string, boolean> = {};
 
         for (const category of values(transactionCategoriesStore.allTransactionCategoriesMap)) {
@@ -112,7 +112,7 @@ export function useCategoryFilterSettingPageBase(type?: CategoryFilterType, allo
             if (type === 'transactionListCurrent' && transactionsStore.allFilterCategoryIdsCount > 0) {
                 allCategoryIds[category.id] = true;
             } else if (type === 'custom') {
-                allCategoryIds[category.id] = true;
+                allCategoryIds[category.id] = !!selectedCategoryIds;
             } else {
                 allCategoryIds[category.id] = false;
             }

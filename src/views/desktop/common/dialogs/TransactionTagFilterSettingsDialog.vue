@@ -158,12 +158,13 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     type: string;
+    tagFilter?: string;
     autoSave?: boolean;
     show: boolean;
 }>();
 
 const emit = defineEmits<{
-    (e: 'settings:change', changed: boolean): void;
+    (e: 'settings:change', changed: boolean, tagFilter?: string): void;
     (e: 'update:show', value: boolean): void;
 }>();
 
@@ -205,7 +206,7 @@ function init(): void {
         loading.value = false;
         expandTagGroups.value = allVisibleTagGroupIds.value;
 
-        if (!loadFilterTagIds()) {
+        if (!loadFilterTagIds(props.tagFilter)) {
             snackbar.value?.showError('Parameter Invalid');
         }
     }).catch(error => {
@@ -266,8 +267,8 @@ function setAllTagsState(value: TransactionTagFilterState): void {
 }
 
 function save(): void {
-    const changed = saveFilterTagIds();
-    emit('settings:change', changed);
+    const [changed, textualTagFilter] = saveFilterTagIds();
+    emit('settings:change', changed, textualTagFilter);
 }
 
 function cancel(): void {
@@ -276,7 +277,7 @@ function cancel(): void {
 
 watch(() => props.show, (newValue) => {
     if (newValue) {
-        loadFilterTagIds();
+        loadFilterTagIds(props.tagFilter);
         showHidden.value = false;
         filterContent.value = '';
     }

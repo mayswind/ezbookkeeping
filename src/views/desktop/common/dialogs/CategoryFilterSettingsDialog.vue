@@ -186,7 +186,7 @@ const {
     getCategoryTypeName,
     loadFilterCategoryIds,
     saveFilterCategoryIds
-} = useCategoryFilterSettingPageBase(props.type, props.categoryTypes, props.selectedCategoryIds);
+} = useCategoryFilterSettingPageBase(props.type, props.categoryTypes);
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
@@ -209,7 +209,7 @@ function init(): void {
     }).then(() => {
         loading.value = false;
 
-        if (!loadFilterCategoryIds()) {
+        if (!loadFilterCategoryIds(props.selectedCategoryIds)) {
             snackbar.value?.showError('Parameter Invalid');
         }
     }).catch(error => {
@@ -276,7 +276,7 @@ function cancel(): void {
 
 watch(() => props.show, (newValue) => {
     if (newValue) {
-        loadFilterCategoryIds();
+        loadFilterCategoryIds(props.selectedCategoryIds);
         showHidden.value = false;
         filterContent.value = '';
     }

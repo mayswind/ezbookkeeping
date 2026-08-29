@@ -81,7 +81,7 @@ import {
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
-    getOverviewRecentTransactionCount,
+    getOverviewRecentTransactionsQueries,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
     getOverviewTransactionCategoryStatisticDateTypes,
@@ -186,7 +186,7 @@ function reload(force: boolean): void {
     if (requirements.includes(OverviewWidgetDataRequirement.RecentTransactions)) {
         promises.push(overviewStore.loadRecentTransactions({
             force: force,
-            count: getOverviewRecentTransactionCount(draftLayout.value)
+            queries: getOverviewRecentTransactionsQueries(draftLayout.value)
         }));
     }
 

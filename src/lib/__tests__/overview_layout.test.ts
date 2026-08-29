@@ -13,7 +13,6 @@ import {
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
-    getOverviewRecentTransactionCount,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
     getOverviewTransactionCategoryStatisticDateTypes,
@@ -66,7 +65,6 @@ describe('desktop overview layout', () => {
         });
 
         expect(getOverviewTransactionOverviewMonths(layout)).toBe(2);
-        expect(getOverviewRecentTransactionCount(layout)).toBe(10);
         expect(getOverviewAssetTrendMonths(layout)).toBe(12);
         expect(getOverviewCalendarHeatmapMonths(layout)).toBe(6);
     });

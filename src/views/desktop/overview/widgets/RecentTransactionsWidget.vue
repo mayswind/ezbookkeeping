@@ -60,6 +60,7 @@ import { useOverviewStore } from '@/stores/overview.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
+import type { OverviewRecentTransactionsQuery } from '@/core/overview_layout.ts';
 
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import { type TransactionInfoResponse, Transaction } from '@/models/transaction.ts';
@@ -67,6 +68,7 @@ import { type TransactionInfoResponse, Transaction } from '@/models/transaction.
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
+import { getOverviewRecentTransactionsQuery } from '@/lib/overview_layout.ts';
 
 import {
     mdiHistory,
@@ -79,8 +81,13 @@ type EditDialogType = InstanceType<typeof EditDialog>;
 const props = defineProps<{
     loading: boolean;
     title?: string;
+    editing?: boolean;
     itemCount: number;
-    editing?: boolean
+    accountIds?: string[];
+    categoryIds?: string[];
+    tagFilter?: string;
+    amountFilter?: string;
+    keyword?: string;
 }>();
 
 const emit = defineEmits<{
@@ -98,7 +105,14 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const showAmountInHomePage = computed<boolean>(() => settingsStore.appSettings.showAmountInHomePage);
-const transactions = computed<TransactionInfoResponse[]>(() => overviewStore.recentTransactions.slice(0, props.itemCount));
+const recentTransactionsQuery = computed<OverviewRecentTransactionsQuery>(() => getOverviewRecentTransactionsQuery({
+    accountIds: props.accountIds ?? [],
+    categoryIds: props.categoryIds ?? [],
+    tagFilter: props.tagFilter ?? '',
+    amountFilter: props.amountFilter ?? '',
+    keyword: props.keyword ?? ''
+}));
+const transactions = computed<TransactionInfoResponse[]>(() => overviewStore.getRecentTransactions(recentTransactionsQuery.value).slice(0, props.itemCount));
 
 function getDisplayDescription(transaction: TransactionInfoResponse): string {
     const accountName = accountsStore.allAccountsMap[transaction.sourceAccountId]?.name ?? '';

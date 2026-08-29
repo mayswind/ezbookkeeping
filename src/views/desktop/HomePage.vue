@@ -27,7 +27,7 @@ import { getShareCacheImageBlob } from '@/lib/cache.ts';
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
-    getOverviewRecentTransactionCount,
+    getOverviewRecentTransactionsQueries,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
     getOverviewTransactionCategoryStatisticDateTypes,
@@ -98,7 +98,7 @@ function reload(force: boolean): void {
     if (requirements.includes(OverviewWidgetDataRequirement.RecentTransactions)) {
         promises.push(overviewStore.loadRecentTransactions({
             force: force,
-            count: getOverviewRecentTransactionCount(layout.value)
+            queries: getOverviewRecentTransactionsQueries(layout.value)
         }));
     }
 

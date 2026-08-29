@@ -22,6 +22,7 @@ export const DESKTOP_OVERVIEW_LAYOUT_COLUMNS: number = 12;
 export const DESKTOP_OVERVIEW_LAYOUT_MAX_WIDGETS: number = 100;
 export const DESKTOP_OVERVIEW_LAYOUT_MAX_ROWS: number = 1000;
 export const MOBILE_OVERVIEW_LAYOUT_MAX_WIDGETS: number = 100;
+export const RECENT_TRANSACTIONS_WIDGET_DEFAULT_ITEM_COUNT: number = 3;
 
 const WIDGET_TITLE_SETTING: OverviewWidgetTextboxSettingItem = {
     settingType: 'textbox',
@@ -345,10 +346,42 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
                 settingName: 'itemCount',
                 displayName: 'Item Count',
                 itemCountValues: [3, 4, 5, 6, 7, 8, 9, 10]
+            },
+            {
+
+                settingType: 'accountSelect',
+                settingName: 'accountIds',
+                displayName: 'Account'
+            },
+            {
+                settingType: 'categorySelect',
+                settingName: 'categoryIds',
+                displayName: 'Category'
+            },
+            {
+                settingType: 'tagSelect',
+                settingName: 'tagFilter',
+                displayName: 'Tags'
+            },
+            {
+                settingType: 'amount',
+                settingName: 'amountFilter',
+                displayName: 'Amount'
+            },
+            {
+                settingType: 'textbox',
+                settingName: 'keyword',
+                displayName: 'Description',
+                placeholder: 'Filter Description'
             }
         ],
         defaultSettings: {
-            itemCount: 3
+            itemCount: RECENT_TRANSACTIONS_WIDGET_DEFAULT_ITEM_COUNT,
+            accountIds: [],
+            categoryIds: [],
+            tagFilter: '',
+            amountFilter: '',
+            keyword: ''
         },
         defaultWidth: 3,
         defaultHeight: 3,

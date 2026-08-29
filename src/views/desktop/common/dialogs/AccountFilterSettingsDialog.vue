@@ -184,7 +184,7 @@ const {
     isAccountChecked,
     loadFilterAccountIds,
     saveFilterAccountIds
-} = useAccountFilterSettingPageBase(props.type, props.selectedAccountIds);
+} = useAccountFilterSettingPageBase(props.type);
 
 const accountsStore = useAccountsStore();
 
@@ -203,7 +203,7 @@ function init(): void {
     }).then(() => {
         loading.value = false;
 
-        if (!loadFilterAccountIds()) {
+        if (!loadFilterAccountIds(props.selectedAccountIds)) {
             snackbar.value?.showError('Parameter Invalid');
         }
     }).catch(error => {
@@ -266,7 +266,7 @@ function cancel(): void {
 
 watch(() => props.show, (newValue) => {
     if (newValue) {
-        loadFilterAccountIds();
+        loadFilterAccountIds(props.selectedAccountIds);
         showHidden.value = false;
         filterContent.value = '';
     }

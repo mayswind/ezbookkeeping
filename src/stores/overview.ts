@@ -7,15 +7,17 @@ import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
-import { keys } from '@/core/base.ts';
+import { itemAndIndex, entries, keys } from '@/core/base.ts';
 import { type StartEndTime, type WritableStartEndTime, DateRange} from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { KeywordMatchMode } from '@/core/text.ts';
 import type { TransactionType } from '@/core/transaction.ts';
+import type { OverviewRecentTransactionsQuery } from '@/core/overview_layout.ts';
 
 import type {
     TransactionAmountsRequestType,
     TransactionAmountsRequestParams,
+    TransactionInfoPageWrapperResponse,
     TransactionAmountsResponse,
     TransactionOverviewData,
     TransactionStatisticResponse,
@@ -34,7 +36,9 @@ import {
     isEquals,
     isObjectEmpty,
     normalizeInteger,
-    objectFieldWithValueToArrayItem
+    getObjectOwnFieldCount,
+    objectFieldWithValueToArrayItem,
+    objectValueToArrayItem
 } from '@/lib/common.ts';
 import {
     BIG_DECIMAL_ZERO,
@@ -55,8 +59,8 @@ import {
 
 import { getFinalAccountIdsByFilteredAccountIds } from '@/lib/account.ts';
 import { getFinalCategoryIdsByFilteredCategoryIds } from '@/lib/category.ts';
+import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
-import services from '@/lib/services.ts';
 
 interface TransactionDataRange extends Record<TransactionAmountsRequestType, WritableStartEndTime> {
     today: {
@@ -144,8 +148,8 @@ export const useOverviewStore = defineStore('overview', () => {
     const transactionCategoryStatisticsStateInvalid = ref<Record<number, boolean>>({});
     const transactionAssetTrendsData = ref<TransactionStatisticAssetTrendsResponseItem[]>([]);
     const transactionAssetTrendsStateInvalid = ref<boolean>(true);
-    const recentTransactions = ref<TransactionInfoResponse[]>([]);
-    const recentTransactionsStateInvalid = ref<boolean>(true);
+    const recentTransactions = ref<Record<string, TransactionInfoResponse[]>>({});
+    const recentTransactionsStateInvalid = ref<Record<string, boolean>>({});
     const transactionDailyAmountsData = ref<TransactionDailyAmountsResponseItem[]>([]);
     const transactionDailyAmountsStateInvalid = ref<boolean>(true);
 
@@ -239,6 +243,11 @@ export const useOverviewStore = defineStore('overview', () => {
         return dateRange;
     }
 
+    function getRecentTransactionsQueryCacheKey(query: OverviewRecentTransactionsQuery): string {
+        const normalizedQuery = {...query, count: 0 };
+        return JSON.stringify(normalizedQuery);
+    }
+
     function initTransactionDateRange(dateRange: TransactionDataRange): void {
         dateRange.today.startTime = getTodayFirstUnixTime();
         dateRange.today.endTime = getTodayLastUnixTime();
@@ -279,7 +288,11 @@ export const useOverviewStore = defineStore('overview', () => {
         }
 
         transactionAssetTrendsStateInvalid.value = invalidState;
-        recentTransactionsStateInvalid.value = invalidState;
+
+        for (const query of keys(recentTransactions.value)) {
+            recentTransactionsStateInvalid.value[query] = invalidState;
+        }
+
         transactionDailyAmountsStateInvalid.value = invalidState;
     }
 
@@ -292,8 +305,8 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionCategoryStatisticsStateInvalid.value = {};
         transactionAssetTrendsData.value = [];
         transactionAssetTrendsStateInvalid.value = true;
-        recentTransactions.value = [];
-        recentTransactionsStateInvalid.value = true;
+        recentTransactions.value = {};
+        recentTransactionsStateInvalid.value = {};
         transactionDailyAmountsData.value = [];
         transactionDailyAmountsStateInvalid.value = true;
     }
@@ -486,44 +499,116 @@ export const useOverviewStore = defineStore('overview', () => {
         });
     }
 
-    function loadRecentTransactions({ force, count }: { force: boolean, count: number }): Promise<TransactionInfoResponse[]> {
-        if (!force && !recentTransactionsStateInvalid.value && recentTransactions.value.length >= count) {
-            return Promise.resolve(recentTransactions.value);
+    function loadRecentTransactions({ force, queries }: { force: boolean, queries: Record<string, OverviewRecentTransactionsQuery> }): Promise<Record<string, TransactionInfoResponse[]>> {
+        const widetIdCacheKeyMap: Record<string, string> = {};
+        const cacheKeyQueryMap: Record<string, OverviewRecentTransactionsQuery> = {};
+
+        for (const [widgetId, query] of entries(queries)) {
+            const cacheKey = getRecentTransactionsQueryCacheKey(query);
+            widetIdCacheKeyMap[widgetId] = cacheKey;
+
+            const existsQuery = cacheKeyQueryMap[cacheKey];
+
+            if (!existsQuery || existsQuery.count < query.count) {
+                cacheKeyQueryMap[cacheKey] = query;
+            }
         }
 
-        const accountIds = isObjectEmpty(settingsStore.appSettings.overviewAccountFilterInHomePage) ? '' : getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, settingsStore.appSettings.overviewAccountFilterInHomePage);
-        const categoryIds = isObjectEmpty(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage) ? '' : getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage);
+        const result: Record<string, TransactionInfoResponse[]> = {};
+        let missedCacheKeyQueryMap: Record<string, OverviewRecentTransactionsQuery> = {};
+
+        if (!force) {
+            for (const [widgetId, query] of entries(queries)) {
+                const cacheKey = widetIdCacheKeyMap[widgetId];
+
+                if (!cacheKey) {
+                    continue;
+                }
+
+                const cachedTransactions = recentTransactions.value[cacheKey];
+
+                if (cachedTransactions && cachedTransactions.length >= query.count) {
+                    result[widgetId] = cachedTransactions;
+                } else {
+                    missedCacheKeyQueryMap[cacheKey] = cacheKeyQueryMap[cacheKey] ?? query;
+                }
+            }
+        } else {
+            missedCacheKeyQueryMap = cacheKeyQueryMap;
+        }
+
+        if (getObjectOwnFieldCount(missedCacheKeyQueryMap) < 1) {
+            return Promise.resolve(result);
+        }
+
+        const promises: ApiResponsePromise<TransactionInfoPageWrapperResponse>[] = [];
+        const missedQueries: OverviewRecentTransactionsQuery[] = objectValueToArrayItem(missedCacheKeyQueryMap);
 
         return new Promise((resolve, reject) => {
-            services.getTransactions({
-                maxTime: 0,
-                minTime: 0,
-                count: count,
-                page: 1,
-                withCount: false,
-                withPictures: false,
-                mustHavePictures: false,
-                type: 0,
-                categoryIds: categoryIds,
-                accountIds: accountIds,
-                tagFilter: '',
-                amountFilter: '',
-                keyword: '',
-                matchMode: KeywordMatchMode.Default.type
-            }).then(response => {
-                const data = response.data;
+            for (const query of missedQueries) {
+                promises.push(services.getTransactions({
+                    maxTime: 0,
+                    minTime: 0,
+                    count: query.count,
+                    page: 1,
+                    withCount: false,
+                    withPictures: false,
+                    mustHavePictures: false,
+                    type: 0,
+                    categoryIds: query.categoryIds.join(','),
+                    accountIds: query.accountIds.join(','),
+                    tagFilter: query.tagFilter,
+                    amountFilter: query.amountFilter,
+                    keyword: query.keyword,
+                    matchMode: KeywordMatchMode.Default.type
+                }));
+            }
 
-                if (!data || !data.success || !data.result) {
+            Promise.all(promises).then(responses => {
+                let hasError = false;
+
+                for (const [response, index] of itemAndIndex(responses)) {
+                    const query = missedQueries[index];
+
+                    if (!query) {
+                        continue;
+                    }
+
+                    const cacheKey = getRecentTransactionsQueryCacheKey(query);
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        hasError = true;
+                        continue;
+                    }
+
+                    if (recentTransactionsStateInvalid.value[cacheKey]) {
+                        recentTransactionsStateInvalid.value[cacheKey] = false;
+                    }
+
+                    recentTransactions.value[cacheKey] = data.result.items;
+                }
+
+                if (hasError) {
                     reject({ message: 'Unable to retrieve transaction list' });
+                    return;
                 }
 
-                if (recentTransactionsStateInvalid.value) {
-                    recentTransactionsStateInvalid.value = false;
+                for (const [widgetId, query] of entries(queries)) {
+                    const cacheKey = widetIdCacheKeyMap[widgetId];
+
+                    if (!cacheKey) {
+                        continue;
+                    }
+
+                    const cachedTransactions = recentTransactions.value[cacheKey];
+
+                    if (cachedTransactions && cachedTransactions.length >= query.count) {
+                        result[widgetId] = cachedTransactions;
+                    }
                 }
 
-                recentTransactions.value = response.data.result.items;
-
-                resolve(recentTransactions.value);
+                resolve(result);
             }).catch(error => {
                 logger.error('failed to retrieve transaction list', error);
 
@@ -569,6 +654,11 @@ export const useOverviewStore = defineStore('overview', () => {
             transactionDailyAmountsStateInvalid.value = false;
             return response.data.result;
         });
+    }
+
+    function getRecentTransactions(query: OverviewRecentTransactionsQuery): TransactionInfoResponse[] {
+        const cacheKey = getRecentTransactionsQueryCacheKey(query);
+        return recentTransactions.value[cacheKey] ?? [];
     }
 
     function getTransactionListPageParams({ type, dateType, minTime, maxTime }: { type?: TransactionType, dateType?: number, minTime?: number, maxTime?: number }): string {
@@ -623,6 +713,7 @@ export const useOverviewStore = defineStore('overview', () => {
         loadTransactionAssetTrends,
         loadRecentTransactions,
         loadTransactionDailyAmounts,
+        getRecentTransactions,
         getTransactionListPageParams
     };
 });

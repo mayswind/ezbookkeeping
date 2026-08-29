@@ -29,7 +29,7 @@ export enum OverviewWidgetDataRequirement {
 export type OverviewWidgetSettingValue = string | number | boolean | (string | number)[];
 
 interface OverviewWidgetSettingItemBase {
-    settingType: 'itemCountSelect' | 'monthSelect' | 'customSelect' | 'switch' | 'color' | 'textbox';
+    settingType: 'itemCountSelect' | 'monthSelect' | 'accountSelect' | 'categorySelect' | 'tagSelect' | 'customSelect' | 'switch' | 'color' | 'amount' | 'textbox';
     settingName: string;
     displayName: string;
 }
@@ -42,6 +42,18 @@ export interface OverviewWidgetItemCountSelectSettingItem extends OverviewWidget
 export interface OverviewWidgetMonthSelectSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'monthSelect';
     monthValues: number[];
+}
+
+export interface OverviewWidgetAccountSelectSettingItem extends OverviewWidgetSettingItemBase {
+    settingType: 'accountSelect';
+}
+
+export interface OverviewWidgetCategorySelectSettingItem extends OverviewWidgetSettingItemBase {
+    settingType: 'categorySelect';
+}
+
+export interface OverviewWidgetTagSelectSettingItem extends OverviewWidgetSettingItemBase {
+    settingType: 'tagSelect';
 }
 
 export interface OverviewWidgetCustomSelectSettingItem extends OverviewWidgetSettingItemBase {
@@ -60,6 +72,10 @@ export interface OverviewWidgetColorSettingItem extends OverviewWidgetSettingIte
     settingType: 'color';
 }
 
+export interface OverviewWidgetAmountSettingItem extends OverviewWidgetSettingItemBase {
+    settingType: 'amount';
+}
+
 export interface OverviewWidgetTextboxSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'textbox';
     placeholder?: string;
@@ -67,10 +83,23 @@ export interface OverviewWidgetTextboxSettingItem extends OverviewWidgetSettingI
 
 export type OverviewWidgetSettingItem = OverviewWidgetItemCountSelectSettingItem |
     OverviewWidgetMonthSelectSettingItem |
+    OverviewWidgetAccountSelectSettingItem |
+    OverviewWidgetCategorySelectSettingItem |
+    OverviewWidgetTagSelectSettingItem |
     OverviewWidgetCustomSelectSettingItem |
     OverviewWidgetSwitchSettingItem |
     OverviewWidgetColorSettingItem |
+    OverviewWidgetAmountSettingItem |
     OverviewWidgetTextboxSettingItem;
+
+export interface OverviewRecentTransactionsQuery {
+    count: number;
+    accountIds: string[];
+    categoryIds: string[];
+    tagFilter: string;
+    amountFilter: string;
+    keyword: string;
+}
 
 export interface OverviewWidgetDefinitionBase {
     type: OverviewWidgetType;

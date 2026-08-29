@@ -43,6 +43,11 @@
 
     <recent-transactions-widget :loading="loading" :editing="editing" :title="widgetTitle"
                                 :item-count="widget.settings['itemCount'] as number"
+                                :account-ids="widget.settings['accountIds'] as string[]"
+                                :category-ids="widget.settings['categoryIds'] as string[]"
+                                :tag-filter="widget.settings['tagFilter'] as string"
+                                :amount-filter="widget.settings['amountFilter'] as string"
+                                :keyword="widget.settings['keyword'] as string"
                                 @refresh="$emit('refresh')"
                                 v-else-if="widget.type === OverviewWidgetType.RecentTransactions" />
 

@@ -474,6 +474,16 @@ export function objectFieldWithValueToArrayItem<T>(object: Record<string, T>, va
     return ret;
 }
 
+export function objectValueToArrayItem<T>(object: Record<string, T>): T[] {
+    const ret: T[] = [];
+
+    for (const value of values(object)) {
+        ret.push(value);
+    }
+
+    return ret;
+}
+
 export function arrayItemToObjectField<T>(array: string[], value: T): Record<string, T> {
     const ret: Record<string, T> = {};
 

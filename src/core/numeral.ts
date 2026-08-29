@@ -547,6 +547,41 @@ export class AmountFilterType {
         }
     }
 
+    public static parseTextualFilter(filter: string): { filterType: AmountFilterType, params: number[] } | undefined {
+        const parts = filter.split(':');
+
+        if (parts.length < 2) {
+            return undefined;
+        }
+
+        const filterType = AmountFilterType.valueOf(parts[0] as string);
+
+        if (!filterType) {
+            return undefined;
+        }
+
+        if (parts.length - 1 !== filterType.paramCount) {
+            return undefined;
+        }
+
+        const params: number[] = [];
+
+        for (let i = 1; i < parts.length; i++) {
+            const param = parseInt(parts[i] as string);
+
+            if (Number.isNaN(param)) {
+                return undefined;
+            }
+
+            params.push(param);
+        }
+
+        return {
+            filterType: filterType,
+            params: params
+        };
+    }
+
     public static match(filter: string, amount: number): boolean {
         const parts = filter.split(':');
 

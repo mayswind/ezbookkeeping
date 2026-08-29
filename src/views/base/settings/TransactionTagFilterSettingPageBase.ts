@@ -145,13 +145,15 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
         return false;
     });
 
-    function loadFilterTagIds(): boolean {
+    function loadFilterTagIds(customTagFilter?: string): boolean {
         let tagFilters: TransactionTagFilter[] = [];
 
         if (type === 'statisticsCurrent') {
             tagFilters = TransactionTagFilter.parse(statisticsStore.transactionStatisticsFilter.tagFilter);
         } else if (type === 'transactionListCurrent') {
             tagFilters = TransactionTagFilter.parse(transactionsStore.transactionsFilter.tagFilter);
+        } else if (type === 'custom') {
+            tagFilters = TransactionTagFilter.parse(customTagFilter ?? '');
         } else {
             return false;
         }
@@ -200,8 +202,9 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
         return true;
     }
 
-    function saveFilterTagIds(): boolean {
+    function saveFilterTagIds(): [boolean, string] {
         const tagFilters: TransactionTagFilter[] = [];
+        let textualTagFilter: string = '';
         let changed = true;
 
         for (const [groupId, tags] of entries(transactionTagsStore.allTransactionTagsByGroupMap)) {
@@ -233,9 +236,11 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
             }
         }
 
+        textualTagFilter = TransactionTagFilter.toTextualTagFilters(tagFilters);
+
         if (type === 'statisticsCurrent') {
             changed = statisticsStore.updateTransactionStatisticsFilter({
-                tagFilter: TransactionTagFilter.toTextualTagFilters(tagFilters)
+                tagFilter: textualTagFilter
             });
 
             if (changed) {
@@ -243,7 +248,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
             }
         } else if (type === 'transactionListCurrent') {
             changed = transactionsStore.updateTransactionListFilter({
-                tagFilter: TransactionTagFilter.toTextualTagFilters(tagFilters)
+                tagFilter: textualTagFilter
             });
 
             if (changed) {
@@ -251,7 +256,7 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
             }
         }
 
-        return changed;
+        return [changed, textualTagFilter];
     }
 
     return {

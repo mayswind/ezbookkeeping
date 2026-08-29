@@ -24,6 +24,8 @@
                                                  @click="$emit('configure', widget)" />
                                     <v-divider class="my-2" />
                                 </template>
+                                <v-list-item :prepend-icon="mdiContentDuplicate" :title="tt('Duplicate')"
+                                             @click="$emit('duplicate', widget)" />
                                 <v-list-item :prepend-icon="mdiDeleteOutline" :title="tt('Delete')"
                                              @click="$emit('remove', widget.id)" />
                             </v-list>
@@ -69,6 +71,7 @@ import {
 
 import {
     mdiCogOutline,
+    mdiContentDuplicate,
     mdiDeleteOutline,
     mdiDotsVertical,
     mdiResizeBottomRight,
@@ -105,8 +108,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (e: 'update:layout', value: DesktopOverviewLayout): void;
-    (e: 'configure', value: DesktopOverviewWidgetLayout): void;
     (e: 'add'): void;
+    (e: 'configure', value: DesktopOverviewWidgetLayout): void;
+    (e: 'duplicate', value: DesktopOverviewWidgetLayout): void;
     (e: 'remove', value: string): void;
     (e: 'refresh'): void;
 }>();

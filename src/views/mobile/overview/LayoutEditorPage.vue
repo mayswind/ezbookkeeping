@@ -28,6 +28,7 @@
             <f7-actions-group>
                 <f7-actions-label v-if="selectedWidget">{{ tt(getMobileWidgetName(selectedWidget.type)) }}</f7-actions-label>
                 <f7-actions-button @click="showConfigureWidgetPopup = true" v-if="selectedWidget && hasWidgetSettings(selectedWidget.type)">{{ tt('Settings') }}</f7-actions-button>
+                <f7-actions-button @click="duplicateSelectedWidget">{{ tt('Duplicate') }}</f7-actions-button>
                 <f7-actions-button color="red" @click="removeSelectedWidget">{{ tt('Delete') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
@@ -138,6 +139,7 @@ import {
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS, DEFAULT_MOBILE_OVERVIEW_LAYOUT } from '@/consts/overview_layout.ts';
 
 import {
+    cloneWidget,
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
     getOverviewRecentTransactionsQueries,
@@ -297,6 +299,25 @@ function removeWidget(id: string): void {
 function showWidgetActions(widget: MobileOverviewWidgetLayout): void {
     selectedWidget.value = widget;
     showWidgetActionSheet.value = true;
+}
+
+function duplicateSelectedWidget(): void {
+    const widget = selectedWidget.value;
+
+    if (!widget) {
+        return;
+    }
+
+    for (const [currentWidget, index] of itemAndIndex(draftLayout.value.widgets)) {
+        if (currentWidget.id === widget.id) {
+            draftLayout.value.widgets.splice(index + 1, 0, {
+                ...cloneWidget(widget),
+                id: generateRandomUUID()
+            });
+            reload(false);
+            break;
+        }
+    }
 }
 
 function removeSelectedWidget(): void {

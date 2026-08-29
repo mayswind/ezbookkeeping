@@ -18,6 +18,7 @@ import {
     getOverviewTransactionCategoryStatisticDateTypes,
     resolveDesktopOverviewWidgetCollisions,
     findDesktopOverviewWidgetPosition,
+    findDesktopOverviewWidgetDuplicatePosition,
     normalizeDesktopOverviewLayout,
     compactDesktopOverviewWidgets,
     isDefaultDesktopOverviewLayout,
@@ -165,6 +166,18 @@ describe('desktop overview layout', () => {
             { id: 'one', type: OverviewWidgetType.AssetSummary, x: 0, y: 0, w: 12, h: 3, settings: {} }
         ], 4, 3);
         expect(position).toEqual({ x: 0, y: 3 });
+    });
+
+    test('places a duplicated widget on the right when possible, otherwise below', () => {
+        const source = { id: 'source', type: OverviewWidgetType.AssetSummary, x: 0, y: 0, w: 4, h: 3, settings: {} };
+
+        expect(findDesktopOverviewWidgetDuplicatePosition([source], source)).toEqual({ x: 4, y: 0 });
+
+        const rightWidget = { id: 'right', type: OverviewWidgetType.AssetSummary, x: 4, y: 0, w: 4, h: 3, settings: {} };
+        expect(findDesktopOverviewWidgetDuplicatePosition([source, rightWidget], source)).toEqual({ x: 0, y: 3 });
+
+        const rightEdgeWidget = { ...source, x: 8 };
+        expect(findDesktopOverviewWidgetDuplicatePosition([rightEdgeWidget], rightEdgeWidget)).toEqual({ x: 8, y: 3 });
     });
 
     test('round trips serialized layout', () => {

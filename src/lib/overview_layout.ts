@@ -333,6 +333,18 @@ export function findDesktopOverviewWidgetPosition(widgets: DesktopOverviewWidget
     return { x: 0, y: Math.max(0, ...widgets.map(widget => widget.y + widget.h)) };
 }
 
+export function findDesktopOverviewWidgetDuplicatePosition(widgets: DesktopOverviewWidgetLayout[], widget: DesktopOverviewWidgetLayout): { x: number; y: number } {
+    const rightPosition = { x: widget.x + widget.w, y: widget.y };
+    const rightCandidate = { ...widget, ...rightPosition };
+
+    if (rightCandidate.x + rightCandidate.w <= DESKTOP_OVERVIEW_LAYOUT_COLUMNS &&
+        !widgets.some(currentWidget => isDesktopWidgetsOverlap(rightCandidate, currentWidget))) {
+        return rightPosition;
+    }
+
+    return { x: widget.x, y: widget.y + widget.h };
+}
+
 export function isDefaultDesktopOverviewLayout(layout: DesktopOverviewLayout): boolean {
     return serializeDesktopOverviewLayout(layout) === serializeDesktopOverviewLayout(DEFAULT_DESKTOP_OVERVIEW_LAYOUT);
 }

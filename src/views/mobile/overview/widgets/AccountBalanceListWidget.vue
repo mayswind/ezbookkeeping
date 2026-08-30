@@ -4,7 +4,7 @@
             <small>{{ title || tt('Account Balance List') }}</small>
         </f7-list-item>
         <f7-list-item :key="account.id" :title="account.name"
-                      :after="accountBalance(account, undefined, showAmount) || ''"
+                      :after="accountBalance(account, undefined, showAmount, accountIds) || ''"
                       :link="`/transaction/list?accountIds=${account.id}&dateType=${DateRange.All.type}`"
                       v-for="account in displayAccounts">
             <template #media>
@@ -39,7 +39,7 @@ import { getAccountIconType } from '@/lib/icon.ts';
 const props = defineProps<{
     loading: boolean;
     title?: string;
-    accountCategories: number[];
+    accountIds: string[];
     itemCount: number;
     sortBy: string;
     alwaysShowAmount: boolean;
@@ -53,5 +53,5 @@ const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 
 const showAmount = computed<boolean>(() => !!props.alwaysShowAmount || settingsStore.appSettings.showAmountInHomePage);
-const displayAccounts = computed<Account[]>(() => accountsStore.getSortedAccounts(props.accountCategories, props.sortBy, props.itemCount));
+const displayAccounts = computed<Account[]>(() => accountsStore.getSortedAccounts(props.accountIds, props.sortBy, props.itemCount));
 </script>

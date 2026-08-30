@@ -18,7 +18,7 @@ import {
     Account
 } from '@/models/account.ts';
 
-import { isArray, isEquals } from '@/lib/common.ts';
+import { isArray, isEquals, arrayItemToObjectField } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.ts';
 import services from '@/lib/services.ts';
@@ -642,7 +642,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
     }
 
-    function getAccountSubAccountBalance(showAccountBalance: boolean, showHidden: boolean, account: Account, subAccountId?: string): AccountDisplayBalance | null {
+    function getAccountSubAccountBalance(showAccountBalance: boolean, showHidden: boolean, account: Account, subAccountId?: string, onlyShowSelectedAccountIds?: string[]): AccountDisplayBalance | null {
         if (account.type !== AccountType.MultiSubAccounts.type) {
             return null;
         }
@@ -656,6 +656,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             };
         }
 
+        const selectedAccountIds: Record<string, boolean> = isArray(onlyShowSelectedAccountIds) ? arrayItemToObjectField(onlyShowSelectedAccountIds, true) : {};
         const allSubAccountCurrenciesMap: Record<string, boolean> = {};
         const allSubAccountCurrencies: string[] = [];
         let totalBalance: BigDecimal = BIG_DECIMAL_ZERO;
@@ -696,6 +697,10 @@ export const useAccountsStore = defineStore('accounts', () => {
                         currency: subAccount.currency
                     };
                 }
+            }
+
+            if (onlyShowSelectedAccountIds && onlyShowSelectedAccountIds.length > 0 && !selectedAccountIds[subAccount.id]) {
+                continue;
             }
 
             if (subAccount.currency === resultCurrency) {
@@ -739,13 +744,22 @@ export const useAccountsStore = defineStore('accounts', () => {
         };
     }
 
-    function getSortedAccounts(accountCategories: number[] | undefined, sortBy: 'displayOrder' | 'balance' | string, count: number): Account[] {
+    function getSortedAccounts(accountIds: string[] | undefined, sortBy: 'displayOrder' | 'balance' | string, count: number): Account[] {
+        const selectedAccountIds: Record<string, boolean> = isArray(accountIds) ? arrayItemToObjectField(accountIds, true) : {};
         const accounts: Account[] = allAccounts.value.filter(account => {
             if (account.hidden) {
                 return false;
             }
 
-            return isArray(accountCategories) && (accountCategories.includes(0) || accountCategories.includes(account.category));
+            if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
+                for (const subAccount of account.subAccounts) {
+                    if (!subAccount.hidden && selectedAccountIds[subAccount.id]) {
+                        return true;
+                    }
+                }
+            }
+
+            return !accountIds || accountIds.length < 1 || !!selectedAccountIds[account.id];
         });
 
         if (sortBy === 'balance') {
@@ -766,6 +780,10 @@ export const useAccountsStore = defineStore('accounts', () => {
                     }
                 } else if (account.type === AccountType.MultiSubAccounts.type && account.subAccounts) {
                     for (const subAccount of account.subAccounts) {
+                        if (!selectedAccountIds[subAccount.id]) {
+                            continue;
+                        }
+
                         let subAccountBalance = parseBigDecimal(subAccount.balance);
 
                         if (subAccount.currency !== userStore.currentUserDefaultCurrency) {

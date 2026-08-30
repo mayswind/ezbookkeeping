@@ -67,7 +67,7 @@ export function useAccountListPageBase() {
         return formatAmountToLocalizedNumeralsWithCurrency(totalBalance, defaultCurrency.value);
     }
 
-    function accountBalance(account: Account, currentSubAccountId: string | undefined, showBalance: boolean): string | null {
+    function accountBalance(account: Account, currentSubAccountId: string | undefined, showBalance: boolean, onlyShowSelectedAccountIds?: string[]): string | null {
         if (account.type === AccountType.SingleAccount.type) {
             const balance: BigDecimal | HiddenAmount | null = accountsStore.getAccountBalance(showBalance, account);
 
@@ -77,7 +77,7 @@ export function useAccountListPageBase() {
                 return '';
             }
         } else if (account.type === AccountType.MultiSubAccounts.type) {
-            const balanceResult = accountsStore.getAccountSubAccountBalance(showBalance, showHidden.value, account, currentSubAccountId);
+            const balanceResult = accountsStore.getAccountSubAccountBalance(showBalance, showHidden.value, account, currentSubAccountId, onlyShowSelectedAccountIds);
 
             if (!isObject(balanceResult)) {
                 return '';

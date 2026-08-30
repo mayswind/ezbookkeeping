@@ -1,7 +1,7 @@
 <template>
     <f7-page with-subnavbar @page:beforein="onPageBeforeIn" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')" v-if="!isCustomSelection"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableAccount }" @click="showMoreActionSheet = true"></f7-link>
@@ -136,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -150,6 +150,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
 
+import { isDefined } from '@/lib/common.ts';
 import { getAccountIconType } from '@/lib/icon.ts';
 import {
     selectAccountOrSubAccounts,
@@ -165,11 +166,16 @@ interface CollapseState {
 }
 
 const props = defineProps<{
-    f7route: Router.Route;
-    f7router: Router.Router;
+    f7route?: Router.Route;
+    f7router?: Router.Router;
+    customSelectedAccountIds?: string[];
+    disableHiddenAccount?: boolean;
 }>();
 
-const query = props.f7route.query;
+const emit = defineEmits<{
+    (e: 'update:customSelectedAccountIds', value: string[]): void;
+    (e: 'save'): void;
+}>();
 
 const { tt } = useI18n();
 const { showToast, routeBackOnError } = useI18nUIComponents();
@@ -189,13 +195,15 @@ const {
     isAccountChecked,
     loadFilterAccountIds,
     saveFilterAccountIds
-} = useAccountFilterSettingPageBase(query['type'] as AccountFilterType);
+} = useAccountFilterSettingPageBase(props.f7route?.query?.['type'] ? props.f7route?.query?.['type'] as AccountFilterType : 'custom', computed(() => props.disableHiddenAccount));
 
 const accountsStore = useAccountsStore();
 
 const collapseStates = ref<Record<number, CollapseState>>(getCollapseStates());
 const loadingError = ref<unknown | null>(null);
 const showMoreActionSheet = ref<boolean>(false);
+
+const isCustomSelection = computed<boolean>(() => !props.f7route?.query?.['type'] && isDefined(props.customSelectedAccountIds));
 
 function getCollapseStates(): Record<number, CollapseState> {
     const collapseStates: Record<number, CollapseState> = {};
@@ -216,7 +224,7 @@ function init(): void {
     }).then(() => {
         loading.value = false;
 
-        if (!loadFilterAccountIds()) {
+        if (!loadFilterAccountIds(props.customSelectedAccountIds)) {
             showToast('Parameter Invalid');
             loadingError.value = 'Parameter Invalid';
         }
@@ -267,8 +275,14 @@ function selectInvertAccounts(): void {
 }
 
 function save(): void {
-    saveFilterAccountIds();
-    props.f7router.back();
+    const [, selectedAccountIds] = saveFilterAccountIds();
+
+    if (isCustomSelection.value) {
+        emit('update:customSelectedAccountIds', selectedAccountIds);
+        emit('save');
+    } else {
+        props.f7router?.back();
+    }
 }
 
 function onPageBeforeIn(): void {
@@ -276,8 +290,16 @@ function onPageBeforeIn(): void {
 }
 
 function onPageAfterIn(): void {
-    routeBackOnError(props.f7router, loadingError);
+    if (props.f7router) {
+        routeBackOnError(props.f7router, loadingError);
+    }
 }
+
+watch(() => props.customSelectedAccountIds, (newValue) => {
+    if (isCustomSelection.value && !loading.value) {
+        loadFilterAccountIds(newValue);
+    }
+});
 
 init();
 </script>

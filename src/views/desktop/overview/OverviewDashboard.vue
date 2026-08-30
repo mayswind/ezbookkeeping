@@ -14,7 +14,7 @@
                      @pointerdown="startPointerAction($event, widget, 'move')"></div>
                 <div class="overview-dashboard-editor-toolbar">
                     <v-btn density="comfortable" color="default" variant="text" class="ma-1" :icon="true"
-                           :aria-label="tt('More')">
+                           :disabled="loading" :aria-label="tt('More')">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-tooltip activator="parent">{{ tt('More') }}</v-tooltip>
                         <v-menu activator="parent">
@@ -161,11 +161,15 @@ function getWidgetStyle(widget: DesktopOverviewWidgetLayout): Record<string, str
         style['height'] = `${preview.height}px`;
     }
 
+    if (props.loading) {
+        style['pointerEvents'] = 'none';
+    }
+
     return style;
 }
 
 function startPointerAction(event: PointerEvent, widget: DesktopOverviewWidgetLayout, action: 'move' | 'resize'): void {
-    if (!props.editing || !grid.value) {
+    if (props.loading || !props.editing || !grid.value) {
         return;
     }
 

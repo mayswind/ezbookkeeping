@@ -5,7 +5,7 @@
                           v-if="widget.type === OverviewWidgetType.AssetSummary" />
 
     <account-balance-list-widget :loading="loading" :title="widgetTitle"
-                                 :account-categories="widget.settings['accountCategories'] as number[]"
+                                 :account-ids="widget.settings['accountIds'] as string[]"
                                  :item-count="widget.settings['itemCount'] as number"
                                  :sort-by="widget.settings['sortBy'] as string"
                                  :always-show-amount="widget.settings['alwaysShowAmount'] as boolean"

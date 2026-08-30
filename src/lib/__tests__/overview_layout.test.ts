@@ -132,7 +132,7 @@ describe('desktop overview layout', () => {
             widgets: [
                 { id: 'one', type: OverviewWidgetType.PeriodIncomeExpense, x: -2, y: -1, w: 1, h: 1, settings: { dateRange: 'invalid' } },
                 { id: 'ranking', type: OverviewWidgetType.ExpenseCategoryRanking, x: 0, y: 0, w: 4, h: 6, settings: { dateRange: 'invalid', categoryLevel: 'invalid', itemCount: 100 } },
-                { id: 'accounts', type: OverviewWidgetType.AccountBalanceList, x: 4, y: 0, w: 4, h: 6, settings: { accountCategories: [1, 2, 3, 999, 2], itemCount: 10, sortBy: 'balance' } },
+                { id: 'accounts', type: OverviewWidgetType.AccountBalanceList, x: 4, y: 0, w: 4, h: 6, settings: { accountIds: ['1', '2', 3, '2'], accountCategories: [1, 2, 3], itemCount: 10, sortBy: 'balance' } },
                 { id: 'income-trend', type: OverviewWidgetType.IncomeExpenseTrend, x: 0, y: 0, w: 6, h: 6, settings: { months: 6, showXAxisLabels: false, showLegend: false } },
                 { id: 'assets-trend', type: OverviewWidgetType.NetAssetsTrend, x: 6, y: 0, w: 6, h: 6, settings: { months: 12, showXAxisLabels: false, showLegend: false } },
                 { id: 'default-trend', type: OverviewWidgetType.NetAssetsTrend, x: 0, y: 6, w: 6, h: 6, settings: { months: 12 } }
@@ -143,7 +143,8 @@ describe('desktop overview layout', () => {
         expect(layout.widgets[0]).toMatchObject({ id: 'income-trend', type: OverviewWidgetType.IncomeExpenseTrend, x: 0, y: 0, w: 6, h: 6, settings: { months: 6, showXAxisLabels: false, showLegend: false } });
         expect(layout.widgets[1]).toMatchObject({ id: 'assets-trend', type: OverviewWidgetType.NetAssetsTrend, x: 6, y: 0, w: 6, h: 6, settings: { months: 12, showXAxisLabels: false, showLegend: false } });
         expect(layout.widgets[2]).toMatchObject({ id: 'one', type: OverviewWidgetType.PeriodIncomeExpense, x: 0, y: 6, w: 2, h: 3, settings: { dateRange: DateRange.Today.type } });
-        expect(layout.widgets[3]).toMatchObject({ id: 'accounts', type: OverviewWidgetType.AccountBalanceList, x: 4, y: 6, w: 4, h: 6, settings: { accountCategories: [1, 2, 3], itemCount: 10, sortBy: 'balance' } });
+        expect(layout.widgets[3]).toMatchObject({ id: 'accounts', type: OverviewWidgetType.AccountBalanceList, x: 4, y: 6, w: 4, h: 6, settings: { accountIds: ['1', '2', '2'], itemCount: 10, sortBy: 'balance' } });
+        expect(layout.widgets[3]?.settings).not.toHaveProperty('accountCategories');
         expect(layout.widgets[4]).toMatchObject({ id: 'ranking', type: OverviewWidgetType.ExpenseCategoryRanking, x: 0, y: 9, w: 4, h: 6, settings: { dateRange: DateRange.ThisMonth.type, categoryLevel: 'primary', itemCount: 3 } });
         expect(layout.widgets[5]).toMatchObject({ id: 'default-trend', type: OverviewWidgetType.NetAssetsTrend, x: 0, y: 15, w: 6, h: 6, settings: { months: 12, showXAxisLabels: true, showLegend: true } });
     });
@@ -218,7 +219,7 @@ describe('mobile overview layout', () => {
             {
                 id: 'accounts',
                 type: OverviewWidgetType.AccountBalanceList,
-                settings: { accountCategories: [0], itemCount: 4, sortBy: 'displayOrder', alwaysShowAmount: false }
+                settings: { accountIds: [], itemCount: 4, sortBy: 'displayOrder', alwaysShowAmount: false }
             },
             {
                 id: 'month',

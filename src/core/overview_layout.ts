@@ -46,6 +46,7 @@ export interface OverviewWidgetMonthSelectSettingItem extends OverviewWidgetSett
 
 export interface OverviewWidgetAccountSelectSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'accountSelect';
+    disableHiddenAccounts?: boolean;
 }
 
 export interface OverviewWidgetCategorySelectSettingItem extends OverviewWidgetSettingItemBase {
@@ -62,7 +63,6 @@ export interface OverviewWidgetCustomSelectSettingItem extends OverviewWidgetSet
     multiple?: boolean;
     minSelections?: number;
     allValue?: string | number;
-    selectValueSource?: 'accountCategories';
 }
 
 export interface OverviewWidgetSwitchSettingItem extends OverviewWidgetSettingItemBase {

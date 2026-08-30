@@ -1,6 +1,6 @@
 <template>
     <f7-popup push swipe-to-close :opened="show" @popup:open="onPopupOpen" @popup:closed="onPopupClosed">
-        <f7-page>
+        <f7-page v-show="!showFilterAccountsPopup">
             <f7-navbar>
                 <f7-nav-left>
                     <f7-link popup-close icon-f7="xmark"></f7-link>
@@ -11,7 +11,7 @@
                 </f7-nav-right>
             </f7-navbar>
 
-            <f7-list strong inset dividers class="settings-list margin-top-half">
+            <f7-list strong inset dividers class="settings-list margin-top-half" :class="{ 'disabled': loading }" >
                 <template :key="setting.settingName" v-for="setting in supportsSettings">
                     <template v-if="setting.settingType === 'customSelect' && setting.multiple">
                         <f7-list-item group-title>
@@ -66,7 +66,7 @@
                                    v-else-if="setting.settingType === 'textbox'"></f7-list-input>
 
                     <f7-list-item class="item-truncate-after-text"
-                                  link="#"
+                                  link="#" :disabled="isSettingDisabled(setting)"
                                   @click="openSettingSelection(setting, $event)"
                                   v-else>
                         <template #after-title>
@@ -75,7 +75,8 @@
                             </div>
                         </template>
                         <template #after>
-                            <div>{{ getSingleSettingDisplayName(setting) }}</div>
+                            <f7-preloader v-if="loading && (setting.settingType === 'accountSelect' || setting.settingType === 'categorySelect' || setting.settingType === 'tagSelect')" />
+                            <div v-else>{{ getSingleSettingDisplayName(setting) }}</div>
                         </template>
                     </f7-list-item>
                 </template>
@@ -96,15 +97,25 @@
                 </f7-list>
             </f7-popover>
         </f7-page>
+
+        <account-filter-settings-page disable-hidden-account
+                                      v-model:custom-selected-account-ids="customSelectedAccountIds"
+                                      @save="updateAccountValue"
+                                      v-if="showFilterAccountsPopup" />
     </f7-popup>
 </template>
 
 <script setup lang="ts">
+import AccountFilterSettingsPage from '@/views/mobile/settings/AccountFilterSettingsPage.vue';
+
 import { ref, computed, nextTick } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+import { type Framework7Dom, openPopover, useI18nUIComponents } from '@/lib/ui/mobile.ts';
 
-import { useSettingsStore } from '@/stores/setting.ts';
+import { useAccountsStore } from '@/stores/account.ts';
+import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import type { GenericNameValue } from '@/core/base.ts';
 
@@ -116,11 +127,11 @@ import {
 } from '@/core/overview_layout.ts';
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
 
-import { isDefined, isArray } from '@/lib/common.ts';
+import { isDefined, isArray, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
 import { getDisplayColor } from '@/lib/color.ts';
+import { isAllAccountsChecked } from '@/lib/account.ts';
 import { cloneWidget } from '@/lib/overview_layout.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
-import { type Framework7Dom, openPopover } from '@/lib/ui/mobile.ts';
 
 const props = defineProps<{
     modelValue: MobileOverviewWidgetLayout | null;
@@ -134,19 +145,43 @@ const emit = defineEmits<{
 
 const {
     tt,
-    getAllAccountCategories,
     formatNumberToLocalizedNumerals,
     getTablePageOptions
 } = useI18n();
+const { showToast } = useI18nUIComponents();
 
-const settingsStore = useSettingsStore();
+const accountsStore = useAccountsStore();
+const transactionCategoriesStore = useTransactionCategoriesStore();
+const transactionTagsStore = useTransactionTagsStore();
 
+const loading = ref<boolean>(false);
 const widget = ref<MobileOverviewWidgetLayout | null>(null);
-const selectedSetting = ref<OverviewWidgetSettingItem | null>(null);
+const currentSettingItem = ref<OverviewWidgetSettingItem | undefined>(undefined);
+const showFilterAccountsPopup = ref<boolean>(false);
+const customSelectedAccountIds = ref<string[]>([]);
+
+const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
+const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
+const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
+const hasAnyAvailableTag = computed<boolean>(() => transactionTagsStore.allAvailableTagsCount > 0);
 
 const supportsSettings = computed<OverviewWidgetSettingItem[]>(() => widget.value ? MOBILE_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.supportsSettings ?? [] : []);
-const selectedSettingOptions = computed<GenericNameValue<string | number>[]>(() => selectedSetting.value ? getSettingOptions(selectedSetting.value) : []);
-const selectedSettingValue = computed<OverviewWidgetSettingValue | undefined>(() => selectedSetting.value ? getSettingValue(selectedSetting.value.settingName) : undefined);
+const selectedSettingOptions = computed<GenericNameValue<string | number>[]>(() => currentSettingItem.value ? getSettingOptions(currentSettingItem.value) : []);
+const selectedSettingValue = computed<OverviewWidgetSettingValue | undefined>(() => currentSettingItem.value ? getSettingValue(currentSettingItem.value.settingName) : undefined);
+
+function isSettingDisabled(setting: OverviewWidgetSettingItem): boolean {
+    if (setting.settingType === 'accountSelect' && setting.disableHiddenAccounts) {
+        return !hasAnyVisibleAccount.value;
+    } else if (setting.settingType === 'accountSelect' && !setting.disableHiddenAccounts) {
+        return !hasAnyAccount.value;
+    } else if (setting.settingType === 'categorySelect') {
+        return !hasAnyTransactionCategory.value;
+    } else if (setting.settingType === 'tagSelect') {
+        return !hasAnyAvailableTag.value;
+    }
+
+    return false;
+}
 
 function getSettingOptions(setting: OverviewWidgetSettingItem): GenericNameValue<string | number>[] {
     if (setting.settingType === 'itemCountSelect') {
@@ -157,13 +192,6 @@ function getSettingOptions(setting: OverviewWidgetSettingItem): GenericNameValue
             value: value
         }));
     } else if (setting.settingType === 'customSelect') {
-        if (setting.selectValueSource === 'accountCategories') {
-            return [
-                { name: tt('All'), value: 0 },
-                ...getAllAccountCategories(settingsStore.appSettings.accountCategoryOrders).map(category => ({ name: category.displayName, value: category.type }))
-            ];
-        }
-
         return setting.selectValues.map(option => ({ name: tt(option.name), value: option.value }));
     }
 
@@ -188,6 +216,15 @@ function updateColorSettingValue(settingName: string, value: { hex: string }): v
 
 function getSingleSettingDisplayName(setting: OverviewWidgetSettingItem): string {
     const value = getSettingValue(setting.settingName);
+
+    if (setting.settingType === 'accountSelect') {
+        if (!isArray(value) || value.length < 1) {
+            return tt('All');
+        }
+
+        return isAllAccountsChecked(accountsStore.allVisiblePlainAccounts, arrayItemToObjectField(value as string[], true)) ? tt('All') : tt('Partial');
+    }
+
     return getSettingOptions(setting).find(option => option.value === value)?.name ?? '';
 }
 
@@ -233,17 +270,37 @@ function updateMultipleValue(setting: OverviewWidgetCustomSelectSettingItem, val
 }
 
 function openSettingSelection(setting: OverviewWidgetSettingItem, event: MouseEvent): void {
-    selectedSetting.value = setting;
+    if (loading.value) {
+        return;
+    }
 
-    nextTick(() => {
-        openPopover('.widget-setting-selection-popover', event.currentTarget as HTMLElement);
-    });
+    currentSettingItem.value = setting;
+
+    if (setting.settingType === 'accountSelect') {
+        const selectedAccountIds = getSettingValue(setting.settingName);
+        customSelectedAccountIds.value = isArray(selectedAccountIds) ? [...selectedAccountIds] as string[] : [];
+        showFilterAccountsPopup.value = true;
+    } else {
+        nextTick(() => {
+            openPopover('.widget-setting-selection-popover', event.currentTarget as HTMLElement);
+        });
+    }
 }
 
 function updateSelectedSettingValue(value: string | number): void {
-    if (selectedSetting.value) {
-        updateSettingValue(selectedSetting.value.settingName, value);
+    if (currentSettingItem.value) {
+        updateSettingValue(currentSettingItem.value.settingName, value);
     }
+}
+
+function updateAccountValue(): void {
+    if (currentSettingItem.value && currentSettingItem.value.settingType === 'accountSelect') {
+        updateSettingValue(currentSettingItem.value.settingName, customSelectedAccountIds.value);
+    }
+
+    currentSettingItem.value = undefined;
+    customSelectedAccountIds.value = [];
+    showFilterAccountsPopup.value = false;
 }
 
 function confirm(): void {
@@ -269,17 +326,48 @@ function onPopupOpen(): void {
     }
 
     widget.value = cloneWidget(props.modelValue);
-    selectedSetting.value = null;
+    currentSettingItem.value = undefined;
+    customSelectedAccountIds.value = [];
 
     if (MOBILE_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]) {
         const defaultSettings = MOBILE_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.defaultSettings ?? {};
         widget.value.settings = { ...defaultSettings, ...widget.value.settings };
     }
+
+    const promises: Promise<unknown>[] = [];
+
+    if (supportsSettings.value.some(setting => setting.settingType === 'accountSelect')) {
+        promises.push(accountsStore.loadAllAccounts({ force: false }));
+    }
+
+    if (supportsSettings.value.some(setting => setting.settingType === 'categorySelect')) {
+        promises.push(transactionCategoriesStore.loadAllCategories({ force: false }));
+    }
+
+    if (supportsSettings.value.some(setting => setting.settingType === 'tagSelect')) {
+        promises.push(transactionTagsStore.loadAllTags({ force: false }));
+    }
+
+    if (promises.length > 0) {
+        loading.value = true;
+
+        Promise.all(promises).then(() => {
+            loading.value = false;
+        }).catch(error => {
+            loading.value = false;
+
+            if (!error.processed) {
+                showToast(error.message || error);
+            }
+        });
+    }
 }
 
 function onPopupClosed(): void {
     widget.value = null;
-    selectedSetting.value = null;
+    currentSettingItem.value = undefined;
+    showFilterAccountsPopup.value = false;
+    customSelectedAccountIds.value = [];
     close();
 }
 </script>

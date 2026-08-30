@@ -1,6 +1,5 @@
 import type { PartialRecord } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
-import { AccountCategory } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TrendChartType } from '@/core/statistics.ts';
 import {
@@ -67,19 +66,10 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
         supportsSettings: [
             WIDGET_TITLE_SETTING,
             {
-                settingType: 'customSelect',
-                settingName: 'accountCategories',
-                displayName: 'Account Category',
-                selectValues: [
-                    { name: 'All', value: 0 },
-                    ...AccountCategory.values().map(category => ({
-                        name: category.name,
-                        value: category.type
-                    }))
-                ],
-                multiple: true,
-                allValue: 0,
-                selectValueSource: 'accountCategories'
+                settingType: 'accountSelect',
+                settingName: 'accountIds',
+                displayName: 'Account',
+                disableHiddenAccounts: true
             },
             {
                 settingType: 'itemCountSelect',
@@ -109,7 +99,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             }
         ],
         defaultSettings: {
-            accountCategories: [0],
+            accountIds: [],
             itemCount: 4,
             sortBy: 'displayOrder',
             alwaysShowAmount: false
@@ -581,6 +571,12 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         supportsSettings: [
             WIDGET_TITLE_SETTING,
             {
+                settingType: 'accountSelect',
+                settingName: 'accountIds',
+                displayName: 'Account',
+                disableHiddenAccounts: true
+            },
+            {
                 settingType: 'itemCountSelect',
                 settingName: 'itemCount',
                 displayName: 'Item Count',
@@ -602,28 +598,13 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                 ]
             },
             {
-                settingType: 'customSelect',
-                settingName: 'accountCategories',
-                displayName: 'Account Category',
-                selectValues: [
-                    { name: 'All', value: 0 },
-                    ...AccountCategory.values().map(category => ({
-                        name: category.name,
-                        value: category.type
-                    }))
-                ],
-                multiple: true,
-                allValue: 0,
-                selectValueSource: 'accountCategories'
-            },
-            {
                 settingType: 'switch',
                 settingName: 'alwaysShowAmount',
                 displayName: 'Always Show Amount'
             }
         ],
         defaultSettings: {
-            accountCategories: [0],
+            accountIds: [],
             itemCount: 4,
             sortBy: 'displayOrder',
             alwaysShowAmount: false

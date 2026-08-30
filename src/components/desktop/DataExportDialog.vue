@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="1000" v-model="showState">
+    <v-dialog content-class="data-export-dialog-content" width="1000" height="600" v-model="showState">
         <one-column-dialog-layout content-class="pa-0"
                                   :title="tt('Export Results')"
                                   :cancel-button-title="tt('Close')"
@@ -65,8 +65,9 @@
             </template>
 
             <template #content>
-                <div class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 530px">
+                <div class="d-flex flex-column flex-md-row flex-grow-1 h-100 overflow-y-auto">
                     <v-data-table
+                        class="h-100"
                         fixed-header
                         fixed-footer
                         multi-sort
@@ -318,3 +319,12 @@ defineExpose({
     open
 });
 </script>
+
+<style>
+.data-export-dialog-content {
+    min-width: min(560px, calc(100% - 48px));
+    min-height: 150px;
+    overflow: hidden;
+    resize: both;
+}
+</style>

@@ -195,7 +195,7 @@
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <json-import-dialog ref="queryImportDialog" :title="tt('Import Queries')" :sample-json="sampleQueryJson" :on-import="onImportQueries" />
     <json-export-dialog ref="queryExportDialog" :title="tt('Export Queries')" :file-name="queryExportFileName" />
-    <export-dialog ref="exportDialog" />
+    <data-export-dialog ref="dataExportDialog" />
 
     <rename-dialog ref="renameDialog"
                    :default-title="tt('Rename Exploration')"
@@ -208,6 +208,7 @@
 import RenameDialog from '@/components/desktop/RenameDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import DataExportDialog from '@/components/desktop/DataExportDialog.vue';
 import JsonImportDialog from '@/components/desktop/JsonImportDialog.vue';
 import JsonExportDialog from '@/components/desktop/JsonExportDialog.vue';
 import ExplorerQueryTab from '@/views/desktop/insights/tabs/ExplorerQueryTab.vue';
@@ -216,7 +217,6 @@ import ExplorerEditableDataTableTab from '@/views/desktop/insights/tabs/Explorer
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
 import ExplorerChangeDisplayOrderDialog from '@/views/desktop/insights/dialogs/ExplorerChangeDisplayOrderDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
-import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
@@ -284,13 +284,13 @@ type ExplorerPageTabType = 'query' | 'table' | 'chart';
 type RenameDialogType = InstanceType<typeof RenameDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
+type DataExportDialogType = InstanceType<typeof DataExportDialog>;
 type JsonImportDialogType = InstanceType<typeof JsonImportDialog>;
 type JsonExportDialogType = InstanceType<typeof JsonExportDialog>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
 type ExplorerChangeDisplayOrderDialogType = InstanceType<typeof ExplorerChangeDisplayOrderDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
-type ExportDialogType = InstanceType<typeof ExportDialog>;
 
 const router = useRouter();
 const {
@@ -315,12 +315,12 @@ const timezoneTypeIconMap = {
 const renameDialog = useTemplateRef<RenameDialogType>('renameDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const dataExportDialog = useTemplateRef<DataExportDialogType>('dataExportDialog');
 const queryImportDialog = useTemplateRef<JsonImportDialogType>('queryImportDialog');
 const queryExportDialog = useTemplateRef<JsonExportDialogType>('queryExportDialog');
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
 const explorerChangeDisplayOrderDialog = useTemplateRef<ExplorerChangeDisplayOrderDialogType>('explorerChangeDisplayOrderDialog');
-const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const loading = ref<boolean>(true);
@@ -713,13 +713,13 @@ function exportResults(): void {
         const results = explorerDataTableTab.value?.buildExportResults();
 
         if (results) {
-            exportDialog.value?.open(results);
+            dataExportDialog.value?.open(results);
         }
     } else if (activeTab.value === 'chart') {
         const results = explorerChartTab.value?.buildExportResults();
 
         if (results) {
-            exportDialog.value?.open(results);
+            dataExportDialog.value?.open(results);
         }
     }
 }

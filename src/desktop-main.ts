@@ -117,6 +117,7 @@ import TransactionTagAutoComplete from '@/components/desktop/TransactionTagAutoC
 import ScheduleFrequencySelect from '@/components/desktop/ScheduleFrequencySelect.vue';
 import StepsBar from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import DataExportDialog from '@/components/desktop/DataExportDialog.vue';
 import JsonImportDialog from '@/components/desktop/JsonImportDialog.vue';
 import JsonExportDialog from '@/components/desktop/JsonExportDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
@@ -588,6 +589,7 @@ app.component('TransactionTagAutoComplete', TransactionTagAutoComplete);
 app.component('ScheduleFrequencySelect', ScheduleFrequencySelect);
 app.component('StepsBar', StepsBar);
 app.component('ConfirmDialog', ConfirmDialog);
+app.component('DataExportDialog', DataExportDialog);
 app.component('JsonImportDialog', JsonImportDialog);
 app.component('JsonExportDialog', JsonExportDialog);
 app.component('SnackBar', SnackBar);

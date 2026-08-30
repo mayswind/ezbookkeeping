@@ -464,7 +464,7 @@
                                             v-model:show="showFilterTagDialog"
                                             @settings:change="setTagFilter" />
 
-    <export-dialog ref="exportDialog" />
+    <data-export-dialog ref="dataExportDialog" />
 
     <snack-bar ref="snackbar" />
 </template>
@@ -472,10 +472,10 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import TrendsChart from '@/components/desktop/TrendsChart.vue';
+import DataExportDialog from '@/components/desktop/DataExportDialog.vue';
 import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
 import CategoryFilterSettingsDialog from '@/views/desktop/common/dialogs/CategoryFilterSettingsDialog.vue';
 import TransactionTagFilterSettingsDialog from '@/views/desktop/common/dialogs/TransactionTagFilterSettingsDialog.vue';
-import ExportDialog from '@/views/desktop/statistics/transaction/dialogs/ExportDialog.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter, onBeforeRouteUpdate } from 'vue-router';
@@ -540,7 +540,7 @@ import {
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 type TrendsChartType = InstanceType<typeof TrendsChart>;
-type ExportDialogType = InstanceType<typeof ExportDialog>;
+type DataExportDialogType = InstanceType<typeof DataExportDialog>;
 
 interface TransactionStatisticsProps {
     initAnalysisType?: string,
@@ -619,7 +619,7 @@ const statisticsStore = useStatisticsStore();
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const monthlyTrendsChart = useTemplateRef<TrendsChartType>('monthlyTrendsChart');
 const dailyTrendsChart = useTemplateRef<TrendsChartType>('dailyTrendsChart');
-const exportDialog = useTemplateRef<ExportDialogType>('exportDialog');
+const dataExportDialog = useTemplateRef<DataExportDialogType>('dataExportDialog');
 
 const activeTab = ref<string>('statisticsPage');
 const initing = ref<boolean>(true);
@@ -1223,7 +1223,7 @@ function exportResults(): void {
             supportedMermaidCharts = [ ExportMermaidChartType.PieChart ];
         }
 
-        exportDialog.value?.open({
+        dataExportDialog.value?.open({
             headers: [
                 tt('Name'),
                 tt('Amount') + ` (${defaultCurrency.value})`,
@@ -1248,7 +1248,7 @@ function exportResults(): void {
             supportedMermaidCharts = [ ExportMermaidChartType.XYChartLine ];
         }
 
-        exportDialog.value?.open({
+        dataExportDialog.value?.open({
             headers: exportData.headers || [],
             data: exportData.data || [],
             supportedMermaidCharts: supportedMermaidCharts
@@ -1263,7 +1263,7 @@ function exportResults(): void {
             supportedMermaidCharts = [ ExportMermaidChartType.XYChartLine ];
         }
 
-        exportDialog.value?.open({
+        dataExportDialog.value?.open({
             headers: exportData.headers || [],
             data: exportData.data || [],
             supportedMermaidCharts: supportedMermaidCharts

@@ -2,7 +2,7 @@ import moment from 'moment-timezone';
 import { type unitOfTime } from 'moment/moment';
 import 'moment-timezone/moment-timezone-utils';
 
-import jalaali, { type JalaaliDateObject } from 'jalaali-js';
+import { type JalaaliDate, toJalaali } from 'jalaali-js';
 
 import {
     itemAndIndex
@@ -127,7 +127,7 @@ class MomentDateTime implements DateTime {
 
     private readonly instance: moment.Moment;
     private chineseDateInfo?: ChineseYearMonthDayInfo | undefined = undefined;
-    private persianDateInfo?: JalaaliDateObject | undefined = undefined;
+    private persianDateInfo?: JalaaliDate | undefined = undefined;
 
     private constructor(instance: moment.Moment) {
         this.instance = instance;
@@ -434,9 +434,9 @@ class MomentDateTime implements DateTime {
         return this.chineseDateInfo;
     }
 
-    private getPersianDateInfo(): JalaaliDateObject {
+    private getPersianDateInfo(): JalaaliDate {
         if (!this.persianDateInfo) {
-            this.persianDateInfo = jalaali.toJalaali(this.instance.year(), this.instance.month() + 1, this.instance.date());
+            this.persianDateInfo = toJalaali(this.instance.year(), this.instance.month() + 1, this.instance.date());
         }
 
         return this.persianDateInfo;

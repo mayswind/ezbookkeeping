@@ -1,25 +1,5 @@
 /** Fixing framework7 issues **/
 
-/** https://github.com/framework7io/framework7/pull/4400 **/
-html[dir="rtl"].ios {
-    .toggle-icon {
-        transform: translateX(calc(var(--f7-toggle-knob-tx) * -1)) scale(1) !important;
-    }
-
-    .toggle-active-state .toggle-icon {
-        transform: translateX(calc(var(--f7-toggle-knob-tx) * -1)) scale(1.4);
-    }
-}
-
-/** https://github.com/framework7io/framework7/pull/4403 **/
-html[dir="rtl"].ios {
-    .segmented-strong .segmented-highlight {
-        left: unset;
-        right: var(--f7-segmented-strong-padding);
-        transform: translateX(calc(var(--f7-segmented-highlight-active) * -100% - var(--f7-segmented-highlight-active) * var(--f7-segmented-highlight-between)));
-    }
-}
-
 /** Replacing the default style of framework7 **/
 .ios .navbar-inner {
     padding-top: calc(8px + var(--f7-safe-area-top));

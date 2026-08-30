@@ -638,6 +638,15 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             OverviewWidgetDataRequirement.TransactionOverview
         ]
     },
+    [OverviewWidgetType.CurrentMonthExpenseProgress]: {
+        type: OverviewWidgetType.CurrentMonthExpenseProgress,
+        name: 'This Month\'s Expense Progress',
+        supportsSettings: [],
+        defaultSettings: {},
+        dataRequirements: [
+            OverviewWidgetDataRequirement.TransactionOverviewLast2Months
+        ]
+    },
     [OverviewWidgetType.PeriodIncomeExpense]: {
         type: OverviewWidgetType.PeriodIncomeExpense,
         name: 'Period Income and Expense',
@@ -665,6 +674,30 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                 DateRange.ThisMonth.type,
                 DateRange.ThisYear.type
             ]
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.TransactionOverview
+        ]
+    },
+    [OverviewWidgetType.PeriodNetIncomeAndSavingsRate]: {
+        type: OverviewWidgetType.PeriodNetIncomeAndSavingsRate,
+        name: 'Period Net Income and Savings Rate',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            {
+                settingType: 'customSelect',
+                settingName: 'dateRange',
+                displayName: 'Date Range',
+                selectValues: [
+                    DateRange.Today,
+                    DateRange.ThisWeek,
+                    DateRange.ThisMonth,
+                    DateRange.ThisYear
+                ].map(dateRange => ({ name: dateRange.name, value: dateRange.type }))
+            }
+        ],
+        defaultSettings: {
+            dateRange: DateRange.ThisMonth.type
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.TransactionOverview

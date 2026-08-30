@@ -15,6 +15,12 @@
     pointer-events: none !important;
 }
 
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .margin-inline-start {
     margin-inline-start: var(--f7-typography-margin) !important;
 }

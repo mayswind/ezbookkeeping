@@ -410,6 +410,7 @@ reload(false);
     --f7-list-bg-color: transparent;
     --f7-sortable-sorting-item-bg-color: transparent;
     --f7-sortable-sorting-item-box-shadow: none;
+    --f7-sortable-handler-width: var(--f7-list-item-padding-horizontal);
 
     .overview-widget-drag-area {
         position: absolute;

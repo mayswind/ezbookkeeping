@@ -19,15 +19,18 @@
                 <div class="period-income-expense-widget__metrics">
                     <div class="overview-widget__stat">
                         <span class="overview-widget__caption"><span class="overview-widget__dot bg-income"></span>{{ tt('Income') }}</span>
-                        <div class="overview-widget__amount text-headline-small text-income text-truncate" v-if="!loading || currentDisplayIncomeAmount">{{ currentDisplayIncomeAmount || '-' }}</div>
+                        <div class="overview-widget__amount text-headline-small text-truncate"
+                             :class="{ 'text-income': !!currentDisplayIncomeAmount, 'text-medium-emphasis': !currentDisplayIncomeAmount }"
+                             v-if="!loading || currentDisplayIncomeAmount">{{ currentDisplayIncomeAmount || tt('No data') }}</div>
                         <v-skeleton-loader class="skeleton-no-margin my-2" type="text" width="120px" :loading="true" v-else></v-skeleton-loader>
                     </div>
                     <div class="overview-widget__stat">
                         <span class="overview-widget__caption"><span class="overview-widget__dot bg-expense"></span>{{ tt('Expense') }}</span>
-                        <div class="overview-widget__amount text-headline-small text-expense text-truncate" v-if="!loading || currentDisplayExpenseAmount">{{ currentDisplayExpenseAmount || '-' }}</div>
+                        <div class="overview-widget__amount text-headline-small text-truncate"
+                             :class="{ 'text-expense': !!currentDisplayExpenseAmount, 'text-medium-emphasis': !currentDisplayExpenseAmount }"
+                             v-if="!loading || currentDisplayExpenseAmount">{{ currentDisplayExpenseAmount || tt('No data') }}</div>
                         <v-skeleton-loader class="skeleton-no-margin my-2" type="text" width="120px" :loading="true" v-else></v-skeleton-loader>
                     </div>
-                    <div class="overview-widget__caption" v-if="!loading && !currentDisplayIncomeAmount && !currentDisplayExpenseAmount">{{ tt('No data') }}</div>
                 </div>
                 <svg class="period-income-expense-widget__illustration img-with-direction mt-2" viewBox="0 0 144 112"
                      fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">

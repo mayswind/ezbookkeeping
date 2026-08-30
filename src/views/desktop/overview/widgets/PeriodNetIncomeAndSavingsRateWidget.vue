@@ -17,22 +17,22 @@
         <v-card-text class="overview-widget__body savings-rate-widget__body">
             <div class="overview-widget__caption">{{ tt('Net Income') }}</div>
             <div class="overview-widget__amount text-headline-small font-weight-medium text-truncate"
-                 :class="{ 'text-expense': !!currentDisplayNetIncomeAmount && currentNetIncomeAmount.isNegative(), 'text-income': !!currentDisplayNetIncomeAmount && !currentNetIncomeAmount.isNegative() }"
+                 :class="{ 'text-expense': !!currentDisplayNetIncomeAmount && currentNetIncomeAmount.isNegative(), 'text-income': !!currentDisplayNetIncomeAmount && !currentNetIncomeAmount.isNegative(), 'text-medium-emphasis': !currentDisplayNetIncomeAmount }"
                  v-if="!loading || currentDisplayNetIncomeAmount">{{ currentDisplayNetIncomeAmount !== '' ? currentDisplayNetIncomeAmount : tt('No data') }}</div>
             <v-skeleton-loader class="skeleton-no-margin mt-3 mb-6" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayNetIncomeAmount"></v-skeleton-loader>
             <div class="d-flex justify-space-between align-center my-3">
                 <span class="text-body-medium">{{ tt('Savings Rate') }}</span>
-                <span class="text-title-medium text-primary" v-if="!loading || currentDisplayNetIncomeAmount">{{ currentDisplaySavingsRate }}</span>
+                <span class="text-title-medium text-primary" v-if="!loading || currentDisplayNetIncomeAmount">{{ currentDisplaySavingsRate || '-' }}</span>
                 <v-skeleton-loader class="skeleton-no-margin pb-3" type="text" width="80px" :loading="true" v-else-if="loading && !currentDisplayNetIncomeAmount"></v-skeleton-loader>
             </div>
             <div class="savings-rate-widget__breakdown" v-if="!loading || currentDisplayNetIncomeAmount">
-                <div v-if="currentDisplayIncomeAmount">
+                <div>
                     <span class="overview-widget__caption">{{ tt('Income') }}</span>
-                    <span class="overview-widget__amount text-income text-truncate">{{ currentDisplayIncomeAmount }}</span>
+                    <span class="overview-widget__amount text-income text-truncate">{{ currentDisplayIncomeAmount ? currentDisplayIncomeAmount : '-' }}</span>
                 </div>
-                <div v-if="currentDisplayExpenseAmount">
+                <div>
                     <span class="overview-widget__caption">{{ tt('Expense') }}</span>
-                    <span class="overview-widget__amount text-expense text-truncate">{{ currentDisplayExpenseAmount }}</span>
+                    <span class="overview-widget__amount text-expense text-truncate">{{ currentDisplayExpenseAmount ? currentDisplayExpenseAmount : '-' }}</span>
                 </div>
             </div>
             <div class="savings-rate-widget__breakdown" v-if="loading && !currentDisplayNetIncomeAmount">

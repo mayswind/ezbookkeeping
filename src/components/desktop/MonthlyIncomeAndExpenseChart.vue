@@ -288,6 +288,7 @@ const chartOptions = computed<object>(() => {
                 yAxisIndex: 0,
                 stack: props.chartType === TrendChartType.Column.type && showIncomeAndExpense.value ? 'Total' : undefined,
                 areaStyle: props.chartType === TrendChartType.Area.type ? {} : undefined,
+                showSymbol: false,
                 itemStyle: {
                     color: expenseIncomeAmountColor.incomeAmountColor,
                     borderRadius: props.chartType === TrendChartType.Area.type ? undefined : 16
@@ -308,6 +309,7 @@ const chartOptions = computed<object>(() => {
                 yAxisIndex: props.chartType === TrendChartType.Column.type && showIncomeAndExpense.value ? 1 : 0,
                 stack: props.chartType === TrendChartType.Column.type && showIncomeAndExpense.value ? 'Total' : undefined,
                 areaStyle: props.chartType === TrendChartType.Area.type ? {} : undefined,
+                showSymbol: false,
                 itemStyle: {
                     color: expenseIncomeAmountColor.expenseAmountColor,
                     borderRadius: props.chartType === TrendChartType.Area.type ? undefined : 16

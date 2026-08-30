@@ -4,7 +4,7 @@
             <overview-widget-header :title="title || tt('Net Assets Trends')" :icon="mdiChartTimelineVariant" />
         </template>
 
-        <trends-chart hide-x-axis-line hide-y-axis-labels hide-horizontal-grid-lines
+        <trends-chart hide-x-axis-line hide-y-axis-labels hide-horizontal-grid-lines hide-line-symbols
                       class="mb-2" chart-mode="daily" :type="TrendChartType.Area.type"
                       :start-time="startTime" :end-time="endTime"
                       :start-year-month="undefined" :end-year-month="undefined"

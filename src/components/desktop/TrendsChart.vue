@@ -9,6 +9,7 @@
                 :hide-x-axis-labels="hideXAxisLabels" :hide-x-axis-line="hideXAxisLine"
                 :hide-y-axis-labels="hideYAxisLabels"
                 :hide-horizontal-grid-lines="hideHorizontalGridLines"
+                :hide-line-symbols="hideLineSymbols"
                 :translate-name="translateName"
                 :default-currency="defaultCurrency" :use-custom-color="useCustomColor"
                 :enable-click-item="enableClickItem"
@@ -97,6 +98,7 @@ interface DesktopTrendsChartProps<T extends TrendsChartDateType> extends CommonT
     hideXAxisLine?: boolean;
     hideYAxisLabels?: boolean;
     hideHorizontalGridLines?: boolean;
+    hideLineSymbols?: boolean;
     hideLegend?: boolean;
     legendPosition?: 'top' | 'bottom';
 }

@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col cols="12">
-            <v-card :title="tt('Basic Settings')">
+            <v-card :title="tt('General Settings')">
                 <v-form>
                     <v-card-text>
                         <v-row>
@@ -36,35 +36,28 @@
                                     item-title="displayName"
                                     item-value="value"
                                     persistent-placeholder
-                                    :label="tt('Auto-update Exchange Rates Data')"
-                                    :placeholder="tt('Auto-update Exchange Rates Data')"
-                                    :items="enableDisableOptions"
-                                    v-model="isAutoUpdateExchangeRatesData"
-                                />
-                            </v-col>
-
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
                                     :label="tt('Show Account Balance')"
                                     :placeholder="tt('Show Account Balance')"
                                     :items="enableDisableOptions"
                                     v-model="showAccountBalance"
                                 />
                             </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-form>
-            </v-card>
-        </v-col>
 
-        <v-col cols="12">
-            <v-card :title="tt('General Settings')">
-                <v-form>
-                    <v-card-text>
-                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    class="always-cursor-pointer"
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :readonly="true"
+                                    :label="tt('Account Category Order')"
+                                    :placeholder="tt('Account Category Order')"
+                                    :model-value="accountCategorysDisplayOrderContent"
+                                    @pointerdown.prevent
+                                    @click="accountCategorysDisplayOrderDialog?.open().catch(()=>{})"
+                                />
+                            </v-col>
+
                             <v-col cols="12" md="6">
                                 <v-text-field
                                     class="always-cursor-pointer"
@@ -75,6 +68,18 @@
                                     :model-value="chartColorSchemeContent"
                                     @pointerdown.prevent
                                     @click="chartColorSchemeDialog?.open().catch(()=>{})"
+                                />
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="tt('Auto-update Exchange Rates Data')"
+                                    :placeholder="tt('Auto-update Exchange Rates Data')"
+                                    :items="enableDisableOptions"
+                                    v-model="isAutoUpdateExchangeRatesData"
                                 />
                             </v-col>
                         </v-row>
@@ -405,20 +410,6 @@
                                     :model-value="accountsIncludedInTotalDisplayContent"
                                     @pointerdown.prevent
                                     @click="showAccountsIncludedInTotalDialog = true"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :readonly="true"
-                                    :label="tt('Account Category Order')"
-                                    :placeholder="tt('Account Category Order')"
-                                    :model-value="accountCategorysDisplayOrderContent"
-                                    @pointerdown.prevent
-                                    @click="accountCategorysDisplayOrderDialog?.open().catch(()=>{})"
                                 />
                             </v-col>
                             <v-col cols="12" md="6">

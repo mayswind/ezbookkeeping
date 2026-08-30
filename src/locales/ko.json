@@ -2513,6 +2513,7 @@
     "Unable to retrieve user profile": "사용자 프로필을 가져올 수 없습니다.",
     "Basic": "기본",
     "Security": "보안",
+    "Preferences": "Preferences",
     "Basic Settings": "기본 설정",
     "Security Settings": "보안 설정",
     "Two-Factor Authentication Settings": "2단계 인증 설정",

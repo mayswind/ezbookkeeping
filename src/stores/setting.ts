@@ -147,7 +147,7 @@ export const useSettingsStore = defineStore('settings', () => {
         });
     }
 
-    // Basic Settings
+    // General Settings
     function setTheme(value: string): void {
         updateApplicationSettingsValue('theme', value);
         appSettings.value.theme = value;
@@ -175,6 +175,18 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('showAccountBalance', value);
     }
 
+    function setAccountCategoryOrders(value: string): void {
+        updateApplicationSettingsValue('accountCategoryOrders', value);
+        appSettings.value.accountCategoryOrders = value;
+        updateUserApplicationCloudSettingValue('accountCategoryOrders', value);
+    }
+
+    function setChartColors(value: string): void {
+        updateApplicationSettingsValue('chartColors', value);
+        appSettings.value.chartColors = value;
+        updateUserApplicationCloudSettingValue('chartColors', value);
+    }
+
     function setEnableSwipeBack(value: boolean): void {
         updateApplicationSettingsValue('swipeBack', value);
         appSettings.value.swipeBack = value;
@@ -194,13 +206,6 @@ export const useSettingsStore = defineStore('settings', () => {
     function setEnableApplicationLockWebAuthn(value: boolean): void {
         updateApplicationSettingsValue('applicationLockWebAuthn', value);
         appSettings.value.applicationLockWebAuthn = value;
-    }
-
-    // General Settings
-    function setChartColors(value: string): void {
-        updateApplicationSettingsValue('chartColors', value);
-        appSettings.value.chartColors = value;
-        updateUserApplicationCloudSettingValue('chartColors', value);
     }
 
     // Navigation Bar
@@ -362,12 +367,6 @@ export const useSettingsStore = defineStore('settings', () => {
         updateApplicationSettingsValue('totalAmountExcludeAccountIds', value);
         appSettings.value.totalAmountExcludeAccountIds = value;
         updateUserApplicationCloudSettingValue('totalAmountExcludeAccountIds', value);
-    }
-
-    function setAccountCategoryOrders(value: string): void {
-        updateApplicationSettingsValue('accountCategoryOrders', value);
-        appSettings.value.accountCategoryOrders = value;
-        updateUserApplicationCloudSettingValue('accountCategoryOrders', value);
     }
 
     function setHideCategoriesWithoutAccounts(value: boolean): void {
@@ -598,19 +597,19 @@ export const useSettingsStore = defineStore('settings', () => {
         accountCategoryDisplayOrders,
         chartColorList,
         // functions
-        // -- Basic Settings
+        // -- General Settings
         setTheme,
         setFontSize,
         setTimeZone,
         setAutoUpdateExchangeRatesData,
         setShowAccountBalance,
+        setAccountCategoryOrders,
+        setChartColors,
         setEnableSwipeBack,
         setEnableAnimate,
         // -- Application Lock
         setEnableApplicationLock,
         setEnableApplicationLockWebAuthn,
-        // -- General Settings
-        setChartColors,
         // -- Navigation Bar
         setShowAddTransactionButtonInDesktopNavbar,
         // -- Overview Page
@@ -644,7 +643,6 @@ export const useSettingsStore = defineStore('settings', () => {
         setShowTagInInsightsExplorerPage,
         // -- Account List Page
         setTotalAmountExcludeAccountIds,
-        setAccountCategoryOrders,
         setHideCategoriesWithoutAccounts,
         setReconciliationStatementButtonDefaultDateRangeTypeInDesktop,
         setReconciliationStatementPageDefaultDateRangeTypeInMobile,

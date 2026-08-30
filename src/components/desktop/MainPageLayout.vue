@@ -139,7 +139,7 @@
                                                  to="/user/settings/basic"></v-list-item>
                                     <v-list-item :prepend-icon="mdiCogOutline"
                                                  :title="tt('Application Settings')"
-                                                 to="/app/settings/basic"></v-list-item>
+                                                 to="/app/settings/preferences"></v-list-item>
                                     <v-divider class="my-1"/>
                                     <v-list-item :prepend-icon="mdiInformationOutline"
                                                  :title="tt('About')"

@@ -14,11 +14,11 @@ const (
 )
 
 var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationCloudSettingType{
-	// Basic Settings
-	"showAccountBalance":          USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
-	"autoUpdateExchangeRatesData": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// General Settings
-	"chartColors": USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
+	"showAccountBalance":          USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"accountCategoryOrders":       USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
+	"autoUpdateExchangeRatesData": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"chartColors":                 USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	// Navigation Bar
 	"showAddTransactionButtonInDesktopNavbar": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Overview Page
@@ -52,7 +52,6 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"showTagInInsightsExplorerPage":        USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	// Account List Page
 	"totalAmountExcludeAccountIds":                               USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
-	"accountCategoryOrders":                                      USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	"hideCategoriesWithoutAccounts":                              USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"reconciliationStatementButtonDefaultDateRangeTypeInDesktop": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"reconciliationStatementPageDefaultDateRangeTypeInMobile":    USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,

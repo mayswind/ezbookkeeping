@@ -21,16 +21,12 @@ export interface ApplicationCloudSettingItem {
 
 export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingItems[] = [
     {
-        categoryName: 'Basic Settings',
-        items: [
-            { settingKey: 'showAccountBalance', settingName: 'Show Account Balance', mobile: true, desktop: true },
-            { settingKey: 'autoUpdateExchangeRatesData', settingName: 'Auto-update Exchange Rates Data', mobile: true, desktop: true }
-        ]
-    },
-    {
         categoryName: 'General Settings',
         items: [
-            { settingKey: 'chartColors', settingName: 'Chart Color Scheme', mobile: true, desktop: true }
+            { settingKey: 'showAccountBalance', settingName: 'Show Account Balance', mobile: true, desktop: true },
+            { settingKey: 'accountCategoryOrders', settingName: 'Account Category Order', mobile: true, desktop: true },
+            { settingKey: 'chartColors', settingName: 'Chart Color Scheme', mobile: true, desktop: true },
+            { settingKey: 'autoUpdateExchangeRatesData', settingName: 'Auto-update Exchange Rates Data', mobile: true, desktop: true }
         ]
     },
     {
@@ -99,7 +95,6 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         categoryName: 'Account List Page',
         items: [
             { settingKey: 'totalAmountExcludeAccountIds', settingName: 'Accounts Included in Total', mobile: true, desktop: true },
-            { settingKey: 'accountCategoryOrders', settingName: 'Account Category Order', mobile: true, desktop: true },
             { settingKey: 'hideCategoriesWithoutAccounts', settingName: 'Hide Categories Without Accounts', mobile: false, desktop: true },
             { settingKey: 'reconciliationStatementButtonDefaultDateRangeTypeInDesktop', settingName: 'Default Date Range for Reconciliation Statement Button', mobile: false, desktop: true },
             { settingKey: 'reconciliationStatementPageDefaultDateRangeTypeInMobile', settingName: 'Default Date Range for Reconciliation Statement Page', mobile: true, desktop: false }

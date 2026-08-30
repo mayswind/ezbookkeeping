@@ -7,9 +7,9 @@
                 </div>
             </li>
             <li class="nav-link">
-                <router-link to="/app/settings/basic">
+                <router-link to="/app/settings/preferences">
                     <v-icon class="nav-item-icon" :icon="mdiCogOutline"/>
-                    <span class="nav-item-title">{{ tt('Basic Settings') }}</span>
+                    <span class="nav-item-title">{{ tt('Preferences') }}</span>
                 </router-link>
             </li>
             <li class="nav-link">

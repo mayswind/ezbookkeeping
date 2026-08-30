@@ -2513,6 +2513,7 @@
     "Unable to retrieve user profile": "Не вдалося отримати профіль користувача",
     "Basic": "Основні",
     "Security": "Безпека",
+    "Preferences": "Preferences",
     "Basic Settings": "Основні налаштування",
     "Security Settings": "Налаштування безпеки",
     "Two-Factor Authentication Settings": "Налаштування двофакторної автентифікації",

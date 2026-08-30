@@ -2513,6 +2513,7 @@
     "Unable to retrieve user profile": "Uporabniškega profila ni mogoče pridobiti",
     "Basic": "Osnovno",
     "Security": "Varnost",
+    "Preferences": "Preferences",
     "Basic Settings": "Osnovne nastavitve",
     "Security Settings": "Varnostne nastavitve",
     "Two-Factor Authentication Settings": "Nastavitve dvofaktorske avtentikacije",

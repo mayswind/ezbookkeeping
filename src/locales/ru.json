@@ -2513,6 +2513,7 @@
     "Unable to retrieve user profile": "Не удалось получить профиль пользователя",
     "Basic": "Основные",
     "Security": "Безопасность",
+    "Preferences": "Preferences",
     "Basic Settings": "Основные настройки",
     "Security Settings": "Настройки безопасности",
     "Two-Factor Authentication Settings": "Настройки двухфакторной аутентификации",

@@ -1,9 +1,29 @@
 <template>
     <f7-page>
-        <f7-navbar :title="tt('Page Settings')" :back-link="tt('Back')"></f7-navbar>
+        <f7-navbar :title="tt('Preferences')" :back-link="tt('Back')"></f7-navbar>
 
         <f7-block-title class="margin-top">{{ tt('General Settings') }}</f7-block-title>
         <f7-list strong inset dividers class="settings-list">
+            <f7-list-item>
+                <template #after-title>
+                    {{ tt('Show Account Balance') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="showAccountBalance" @toggle:change="showAccountBalance = $event"></f7-toggle>
+                </template>
+            </f7-list-item>
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="/settings/account_category_display_order">
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Account Category Order') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <div>{{ accountCategorysDisplayOrderContent }}</div>
+                </template>
+            </f7-list-item>
             <f7-list-item
                 class="item-truncate-after-text"
                 link="/settings/chart_color_scheme">
@@ -14,6 +34,14 @@
                 </template>
                 <template #after>
                     <div>{{ chartColorSchemeContent }}</div>
+                </template>
+            </f7-list-item>
+            <f7-list-item>
+                <template #after-title>
+                    {{ tt('Auto-update Exchange Rates Data') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="isAutoUpdateExchangeRatesData" @toggle:change="isAutoUpdateExchangeRatesData = $event"></f7-toggle>
                 </template>
             </f7-list-item>
         </f7-list>
@@ -310,18 +338,6 @@
             </f7-list-item>
             <f7-list-item
                 class="item-truncate-after-text"
-                link="/settings/account_category_display_order">
-                <template #after-title>
-                    <div class="item-actual-title">
-                        <span>{{ tt('Account Category Order') }}</span>
-                    </div>
-                </template>
-                <template #after>
-                    <div>{{ accountCategorysDisplayOrderContent }}</div>
-                </template>
-            </f7-list-item>
-            <f7-list-item
-                class="item-truncate-after-text"
                 link="#"
                 @click="showReconciliationStatementDefaultDateRangePopup = true"
             >
@@ -415,6 +431,8 @@ const {
     allAutoSaveTransactionDraftTypes,
     allImageUploadQualityTypes,
     allReconciliationStatementDateRanges,
+    isAutoUpdateExchangeRatesData,
+    showAccountBalance,
     showAmountInHomePage,
     timezoneUsedForStatisticsInHomePage,
     showTotalAmountInTransactionListPage,

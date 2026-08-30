@@ -38,7 +38,7 @@ import UserTwoFactorAuthSettingPage from '@/views/desktop/user/UserTwoFactorAuth
 import UserDataManagementSettingPage from '@/views/desktop/user/UserDataManagementSettingPage.vue';
 
 import AppSettingsPageLayout from '@/views/desktop/app/AppSettingsPageLayout.vue';
-import AppBasicSettingPage from '@/views/desktop/app/AppBasicSettingPage.vue';
+import AppPreferencesSettingPage from '@/views/desktop/app/AppPreferencesSettingPage.vue';
 import AppLockSettingPage from '@/views/desktop/app/AppLockSettingPage.vue';
 import AppStatisticsSettingPage from '@/views/desktop/app/AppStatisticsSettingPage.vue';
 import AppCloudSyncSettingPage from '@/views/desktop/app/AppCloudSyncSettingPage.vue';
@@ -233,8 +233,8 @@ const router = createRouter({
             beforeEnter: checkLogin,
             children: [
                 {
-                    path: '/app/settings/basic',
-                    component: AppBasicSettingPage,
+                    path: '/app/settings/preferences',
+                    component: AppPreferencesSettingPage,
                     beforeEnter: checkLogin
                 },
                 {

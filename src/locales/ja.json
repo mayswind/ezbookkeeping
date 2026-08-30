@@ -2513,6 +2513,7 @@
     "Unable to retrieve user profile": "ユーザープロフィールを取得できません",
     "Basic": "基本",
     "Security": "セキュリティ",
+    "Preferences": "Preferences",
     "Basic Settings": "基本設定",
     "Security Settings": "セキュリティ設定",
     "Two-Factor Authentication Settings": "二要素認証設定",

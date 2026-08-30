@@ -9,7 +9,7 @@
             <li class="nav-link">
                 <router-link to="/user/settings/basic">
                     <v-icon class="nav-item-icon" :icon="mdiAccountOutline"/>
-                    <span class="nav-item-title">{{ tt('Basic Settings') }}</span>
+                    <span class="nav-item-title">{{ tt('User Profile') }}</span>
                 </router-link>
             </li>
             <li class="nav-link">
@@ -23,6 +23,11 @@
                     <v-icon class="nav-item-icon" :icon="mdiOnepassword"/>
                     <span class="nav-item-title">{{ tt('Two-Factor Authentication') }}</span>
                 </router-link>
+            </li>
+            <li class="nav-section-title">
+                <div class="title-wrapper">
+                    <span class="title-text">{{ tt('Basis Data') }}</span>
+                </div>
             </li>
             <li class="nav-link">
                 <router-link to="/category/list">

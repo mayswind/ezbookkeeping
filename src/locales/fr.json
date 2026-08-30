@@ -2513,6 +2513,7 @@
     "Unable to retrieve user profile": "Impossible de récupérer le profil utilisateur",
     "Basic": "Basique",
     "Security": "Sécurité",
+    "Preferences": "Preferences",
     "Basic Settings": "Paramètres de base",
     "Security Settings": "Paramètres de sécurité",
     "Two-Factor Authentication Settings": "Paramètres d'authentification à deux facteurs",

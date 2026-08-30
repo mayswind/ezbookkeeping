@@ -39,14 +39,14 @@
         "copyright": "Copyright (c) 2014 Simon Eskildsen",
         "url": "https://github.com/sirupsen/logrus",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/sirupsen/logrus/blob/v1.9.4/LICENSE"
+        "licenseUrl": "https://github.com/sirupsen/logrus/blob/v1.10.2/LICENSE"
     },
     {
         "name": "cli",
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.10.1/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.11.0/LICENSE"
     },
     {
         "name": "INI",
@@ -93,28 +93,28 @@
         "copyright": "Copyright (c) 2014 Yasuhiro Matsumoto",
         "url": "https://github.com/mattn/go-sqlite3",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.49/LICENSE"
+        "licenseUrl": "https://github.com/mattn/go-sqlite3/blob/v1.14.50/LICENSE"
     },
     {
         "name": "Go Cryptography",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.54.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.55.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.57.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.58.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.40.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.41.0:LICENSE"
     },
     {
         "name": "Go OAuth2",
@@ -142,7 +142,7 @@
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.2.1/LICENSE"
+        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.3.0/LICENSE"
     },
     {
         "name": "gocron",
@@ -196,7 +196,7 @@
         "copyright": "Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.",
         "url": "https://github.com/stretchr/testify",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.11.1/LICENSE"
+        "licenseUrl": "https://github.com/stretchr/testify/blob/v1.12.1/LICENSE"
     },
     {
         "name": "vuejs/core",

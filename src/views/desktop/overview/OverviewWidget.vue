@@ -25,6 +25,8 @@
                                                v-else-if="widget.type === OverviewWidgetType.PeriodNetIncomeAndSavingsRate" />
 
     <income-expense-trend-widget :loading="loading" :title="widgetTitle"
+                                 :chart-type="widget.settings['chartType'] as number"
+                                 :transaction-types="widget.settings['transactionTypes'] as number[]"
                                  :months="widget.settings['months'] as number"
                                  :show-x-axis-labels="widget.settings['showXAxisLabels'] as boolean"
                                  :show-legend="widget.settings['showLegend'] as boolean"

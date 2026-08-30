@@ -60,6 +60,7 @@ export interface OverviewWidgetCustomSelectSettingItem extends OverviewWidgetSet
     settingType: 'customSelect';
     selectValues: GenericNameValue<string | number>[];
     multiple?: boolean;
+    minSelections?: number;
     allValue?: string | number;
     selectValueSource?: 'accountCategories';
 }

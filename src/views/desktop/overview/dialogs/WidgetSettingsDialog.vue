@@ -218,6 +218,10 @@ function updateSettingValue(setting: OverviewWidgetSettingItem, value: OverviewW
             const selectedValues = value.filter(item => item !== allValue);
             widget.value.settings[setting.settingName] = selectedValues.length ? selectedValues : [allValue];
         }
+    } else if (setting.settingType === 'customSelect' && setting.multiple && isArray(value)) {
+        if (value.length >= (setting.minSelections ?? 0)) {
+            widget.value.settings[setting.settingName] = value;
+        }
     } else {
         widget.value.settings[setting.settingName] = value;
     }

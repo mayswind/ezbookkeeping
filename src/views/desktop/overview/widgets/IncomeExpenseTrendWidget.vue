@@ -6,6 +6,8 @@
 
         <monthly-income-and-expense-chart :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode" :title="title"
                                           :loading="loading" :disabled="loading" :enable-click-item="true"
+                                          :chart-type="chartType"
+                                          :transaction-types="transactionTypes"
                                           :hide-x-axis-labels="!showXAxisLabels" :hide-legend="!showLegend"
                                           @click="clickMonthlyIncomeOrExpense" />
     </v-card>
@@ -41,6 +43,8 @@ import {
 const props = defineProps<{
     loading: boolean;
     title?: string;
+    chartType: number;
+    transactionTypes: number[];
     months: number;
     showXAxisLabels: boolean;
     showLegend: boolean;

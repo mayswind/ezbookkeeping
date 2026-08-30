@@ -2,6 +2,7 @@ import type { PartialRecord } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { AccountCategory } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { TrendChartType } from '@/core/statistics.ts';
 import {
     type OverviewWidgetColorSettingItem,
     type OverviewWidgetTextboxSettingItem,
@@ -217,6 +218,38 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
         supportsSettings: [
             WIDGET_TITLE_SETTING,
             {
+                settingType: 'customSelect',
+                settingName: 'transactionTypes',
+                displayName: 'Transaction Type',
+                selectValues: [
+                    {
+                        name: 'Income',
+                        value: TransactionType.Income
+                    },
+                    {
+                        name: 'Expense',
+                        value: TransactionType.Expense
+                    }
+                ],
+                multiple: true,
+                minSelections: 1
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'chartType',
+                displayName: 'Chart Type',
+                selectValues: [
+                    {
+                        name: TrendChartType.Column.name,
+                        value: TrendChartType.Column.type
+                    },
+                    {
+                        name: TrendChartType.Area.name,
+                        value: TrendChartType.Area.type
+                    }
+                ]
+            },
+            {
                 settingType: 'monthSelect',
                 settingName: 'months',
                 displayName: 'Date Range',
@@ -234,6 +267,8 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             }
         ],
         defaultSettings: {
+            chartType: TrendChartType.Column.type,
+            transactionTypes: [TransactionType.Income, TransactionType.Expense],
             months: 12,
             showXAxisLabels: true,
             showLegend: true
@@ -504,6 +539,8 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
             w: 6,
             h: 6,
             settings: {
+                chartType: TrendChartType.Column.type,
+                transactionTypes: [TransactionType.Income, TransactionType.Expense],
                 months: 12,
                 showXAxisLabels: true,
                 showLegend: true

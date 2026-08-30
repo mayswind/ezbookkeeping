@@ -101,7 +101,7 @@ function normalizeOverviewWidgetSetting(setting: OverviewWidgetSettingItem, valu
                 }
             }
 
-            return selectedValues.length ? selectedValues : undefined;
+            return selectedValues.length >= (setting.minSelections ?? 1) ? selectedValues : undefined;
         } else {
             return undefined;
         }

@@ -7,7 +7,7 @@
         <v-card-text class="overview-widget__body">
             <div class="expense-progress-widget__amount text-truncate">
                 <span class="overview-widget__amount text-headline-small" :class="{ 'text-expense': !!currentDisplayExpenseAmount }" v-if="!loading || currentDisplayExpenseAmount">{{ currentDisplayExpenseAmount !== '' ? currentDisplayExpenseAmount : tt('No data') }}</span>
-                <v-skeleton-loader class="skeleton-no-margin mt-2 mb-4" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
+                <v-skeleton-loader class="skeleton-no-margin mt-h1 pt-2 mb-2" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
             </div>
             <div class="overview-widget__caption d-flex justify-space-between mt-2">
                 <span>{{ tt('Month elapsed') }}</span>

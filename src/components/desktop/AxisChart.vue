@@ -67,6 +67,7 @@ const props = defineProps<{
     hideLegend?: boolean;
     legendPosition?: 'top' | 'bottom';
     hideXAxisLabels?: boolean;
+    hideXAxisLine?: boolean;
     hideYAxisLabels?: boolean;
     hideHorizontalGridLines?: boolean;
     oneHundredPercentStacked?: boolean;
@@ -445,6 +446,12 @@ const chartOptions = computed<object>(() => {
                 data: props.allCategoryNames,
                 boundaryGap: !props.hideYAxisLabels,
                 inverse: textDirection.value === TextDirection.RTL,
+                axisLine: {
+                    show: !props.hideXAxisLine
+                },
+                axisTick: {
+                    show: !props.hideXAxisLine
+                },
                 axisLabel: {
                     show: !props.hideXAxisLabels,
                     color: isDarkMode.value ? '#888' : '#666'

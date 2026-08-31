@@ -15,14 +15,17 @@
                       :value-type="ChartValueType.Amount" :show-value="showAmountInHomePage"
                       :default-currency="defaultCurrency"
                       :hide-legend="!showLegend" legend-position="bottom"
-                      :hide-x-axis-labels="!showXAxisLabels" />
+                      :hide-x-axis-labels="!showXAxisLabels" :enable-click-item="true"
+                      @click="clickMonth" />
     </v-card>
 </template>
 
 <script setup lang="ts">
 import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
+import type { TrendsBarChartClickEvent } from '@/components/base/TrendsChartBase.ts';
 
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -52,6 +55,8 @@ const props = defineProps<{
     showLegend: boolean;
     showXAxisLabels: boolean;
 }>();
+
+const router = useRouter();
 
 const { tt } = useI18n();
 
@@ -128,6 +133,14 @@ const items = computed<TransactionAssetTrendsAnalysisDataItem[]>(() => {
         items: amounts
     }];
 });
+
+function clickMonth(e: TrendsBarChartClickEvent): void {
+    router.push(`/transaction/list?${overviewStore.getTransactionListPageParams({
+        dateType: e.dateRange.dateType,
+        minTime: e.dateRange.minTime,
+        maxTime: e.dateRange.maxTime
+    })}`);
+}
 </script>
 
 <style scoped>

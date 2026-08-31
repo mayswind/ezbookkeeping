@@ -54,7 +54,6 @@ const props = defineProps<{
     chartType: number;
     transactionTypes: number[];
     disabled: boolean;
-    title?: string;
     isDarkMode?: boolean;
     enableClickItem?: boolean;
     hideLegend?: boolean;

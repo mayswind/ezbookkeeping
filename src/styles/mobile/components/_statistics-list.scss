@@ -14,12 +14,19 @@
 }
 
 .statistics-list-item .item-content {
-    margin-top: 8px;
+    margin-top: 0;
     margin-bottom: 12px;
 }
 
-.statistics-list-item-non-stacked .item-inner > .item-title {
-    width: 100%;
+.statistics-list-item-non-stacked {
+    .item-inner {
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        > .item-title {
+            width: 100%;
+        }
+    }
 }
 
 .statistics-icon {

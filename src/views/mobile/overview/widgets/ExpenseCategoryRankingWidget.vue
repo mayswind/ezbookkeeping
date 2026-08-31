@@ -1,5 +1,5 @@
 <template>
-    <f7-list strong inset dividers class="overview-widget-list expense-ranking-widget no-margin-top margin-bottom">
+    <f7-list strong inset dividers class="overview-widget-list no-margin-top margin-bottom">
         <f7-list-item group-title v-if="showTitle">
             <small>{{ title || tt('Expense Category Ranking') }}</small>
         </f7-list-item>
@@ -96,11 +96,3 @@ const {
     getTransactionItemLinkUrl
 } = useExpenseCategoryRankingWidgetBase(props);
 </script>
-
-<style>
-.expense-ranking-widget {
-    .statistics-list-item .item-content {
-        margin-top: 0;
-    }
-}
-</style>

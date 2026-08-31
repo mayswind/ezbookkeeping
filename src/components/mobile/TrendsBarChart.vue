@@ -1,6 +1,6 @@
 <template>
-    <f7-list class="skeleton-text" v-if="loading">
-        <f7-list-item class="statistics-list-item" link="#" :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]">
+    <f7-list strong inset dividers class="skeleton-text" v-if="loading">
+        <f7-list-item class="statistics-list-item item-no-divider" link="#" :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]">
             <template #media>
                 <div class="display-flex no-padding-horizontal">
                     <div class="display-flex align-items-center statistics-icon">
@@ -26,12 +26,13 @@
         </f7-list-item>
     </f7-list>
 
-    <f7-list v-else-if="!loading && (!allDisplayDataItems || !allDisplayDataItems.data || !allDisplayDataItems.data.length)">
+    <f7-list strong inset dividers v-else-if="!loading && (!allDisplayDataItems || !allDisplayDataItems.data || !allDisplayDataItems.data.length)">
         <f7-list-item :title="tt('No transaction data')"></f7-list-item>
     </f7-list>
 
-    <f7-list v-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
-        <f7-list-item v-if="allDisplayDataItems.legends && allDisplayDataItems.legends.length > 1">
+    <f7-list strong inset dividers v-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
+        <f7-list-item class="item-no-divider display-none"></f7-list-item>
+        <f7-list-item class="item-no-divider" v-if="allDisplayDataItems.legends && allDisplayDataItems.legends.length > 1">
             <div class="display-flex" style="flex-wrap: wrap">
                 <div class="trends-bar-chart-legend display-flex align-items-center"
                      :class="{ 'trends-bar-chart-legend-unselected': !!unselectedLegends[legend.id] }"
@@ -45,11 +46,12 @@
         </f7-list-item>
     </f7-list>
 
-    <f7-list :key="`trends-bar-chart-${allDisplayDataItemsVersion}`"
+    <f7-list strong inset dividers :key="`trends-bar-chart-${allDisplayDataItemsVersion}`"
              :virtual-list="useVirtualList"
              :virtual-list-params="useVirtualList ? { items: allDisplayDataItems.data, renderExternal, height: 'auto' } : undefined"
              v-if="!loading && allDisplayDataItems && allDisplayDataItems.data && allDisplayDataItems.data.length">
-        <f7-list-item link="#"
+        <f7-list-item class="item-no-divider display-none"></f7-list-item>
+        <f7-list-item class="item-no-divider" link="#"
                       :key="item.index"
                       :class="{ 'statistics-list-item': true, 'statistics-list-item-stacked': stacked, 'statistics-list-item-non-stacked': !stacked }"
                       :style="useVirtualList ? `top: ${virtualDataItems.topPosition}px` : undefined"

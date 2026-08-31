@@ -1652,6 +1652,8 @@
     "Longitude is between": "Longitudinea se află între",
     "Longitude is not between": "Longitudinea nu se află între",
     "Pie Chart": "Grafic de tip plăcintă (Pie)",
+    "Donut Chart": "Donut Chart",
+    "Nightingale Rose Chart": "Nightingale Rose Chart",
     "Bar Chart": "Grafic cu bare (Bar)",
     "Radar Chart": "Grafic de tip radar",
     "Area Chart": "Grafic de tip arie (Area)",

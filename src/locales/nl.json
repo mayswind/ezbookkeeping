@@ -1652,6 +1652,8 @@
     "Longitude is between": "Longitude is between",
     "Longitude is not between": "Longitude is not between",
     "Pie Chart": "Cirkeldiagram",
+    "Donut Chart": "Donut Chart",
+    "Nightingale Rose Chart": "Nightingale Rose Chart",
     "Bar Chart": "Balkdiagram",
     "Radar Chart": "Radar Chart",
     "Area Chart": "Vlakdiagram",

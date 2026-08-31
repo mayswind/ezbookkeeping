@@ -1652,6 +1652,8 @@
     "Longitude is between": "经度介于",
     "Longitude is not between": "经度不介于",
     "Pie Chart": "饼图",
+    "Donut Chart": "圆环图",
+    "Nightingale Rose Chart": "南丁格尔玫瑰图",
     "Bar Chart": "条形图",
     "Radar Chart": "雷达图",
     "Area Chart": "面积图",

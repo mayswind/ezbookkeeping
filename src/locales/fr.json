@@ -1652,6 +1652,8 @@
     "Longitude is between": "Longitude is between",
     "Longitude is not between": "Longitude is not between",
     "Pie Chart": "Graphique en secteurs",
+    "Donut Chart": "Donut Chart",
+    "Nightingale Rose Chart": "Nightingale Rose Chart",
     "Bar Chart": "Graphique en barres",
     "Radar Chart": "Radar Chart",
     "Area Chart": "Graphique en aires",

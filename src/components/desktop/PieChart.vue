@@ -21,6 +21,8 @@ import { ThemeType } from '@/core/theme.ts';
 import { getObjectOwnFieldCount } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 
+type PieChartStyleType = 'pie' | 'donut' | 'nightingaleRose';
+
 interface DesktopPieChartDataItem extends CommonPieChartDataItem {
     itemStyle: {
         color: ColorStyleValue;
@@ -28,7 +30,11 @@ interface DesktopPieChartDataItem extends CommonPieChartDataItem {
     selected: boolean;
 }
 
-const props = defineProps<CommonPieChartProps>();
+interface DesktopPieChartProps extends CommonPieChartProps {
+    styleType?: PieChartStyleType;
+}
+
+const props = defineProps<DesktopPieChartProps>();
 
 const emit = defineEmits<{
     (e: 'click', value: Record<string, unknown>): void;
@@ -41,6 +47,14 @@ const { selectedIndex, validItems, allItemsMap } = usePieChartBase(props);
 const selectedLegends = ref<Record<string, boolean>>({});
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+
+const seriesRadius = computed<[number | string, string]>(() => {
+    if (props.styleType === 'donut') {
+        return ['40%', '75%'];
+    }
+
+    return [0, '75%'];
+});
 
 const seriesData = computed<DesktopPieChartDataItem[]>(() => {
     const ret: DesktopPieChartDataItem[] = [];
@@ -162,7 +176,8 @@ const chartOptions = computed<object>(() => {
                 data: seriesData.value,
                 top: 50,
                 startAngle: -90 + firstItemAndHalfCurrentItemTotalPercent.value * 360,
-                radius: [0, '75%'],
+                radius: seriesRadius.value,
+                roseType: props.styleType === 'nightingaleRose' ? 'radius' : undefined,
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,

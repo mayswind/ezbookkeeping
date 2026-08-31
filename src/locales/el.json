@@ -1652,6 +1652,8 @@
     "Longitude is between": "Το γεωγραφικό μήκος είναι μεταξύ",
     "Longitude is not between": "Το γεωγραφικό μήκος δεν είναι μεταξύ",
     "Pie Chart": "Γράφημα πίτας",
+    "Donut Chart": "Donut Chart",
+    "Nightingale Rose Chart": "Nightingale Rose Chart",
     "Bar Chart": "Γράφημα ράβδων",
     "Radar Chart": "Γράφημα ραντάρ",
     "Area Chart": "Γράφημα περιοχής",

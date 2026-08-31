@@ -1652,6 +1652,8 @@
     "Longitude is between": "Longitude is between",
     "Longitude is not between": "Longitude is not between",
     "Pie Chart": "원형 차트",
+    "Donut Chart": "Donut Chart",
+    "Nightingale Rose Chart": "Nightingale Rose Chart",
     "Bar Chart": "막대 차트",
     "Radar Chart": "레이더 차트",
     "Area Chart": "영역 차트",

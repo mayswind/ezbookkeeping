@@ -1652,6 +1652,8 @@
     "Longitude is between": "経度が範囲内",
     "Longitude is not between": "経度が範囲外",
     "Pie Chart": "円グラフ",
+    "Donut Chart": "Donut Chart",
+    "Nightingale Rose Chart": "Nightingale Rose Chart",
     "Bar Chart": "棒グラフ",
     "Radar Chart": "レーダーチャート",
     "Area Chart": "エリアチャート",

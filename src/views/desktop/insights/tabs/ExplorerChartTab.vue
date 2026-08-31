@@ -86,7 +86,7 @@
             </v-col>
         </v-row>
     </v-card-text>
-    <v-card-text :class="{ 'readonly': loading }" v-if="currentExploration.chartType === TransactionExplorerChartType.Pie.value">
+    <v-card-text :class="{ 'readonly': loading }" v-if="currentExploration.chartType === TransactionExplorerChartType.Pie.value || currentExploration.chartType === TransactionExplorerChartType.Donut.value || currentExploration.chartType === TransactionExplorerChartType.NightingaleRose.value">
         <pie-chart
             :items="[
                 { id: '1', name: '---', value: parseBigDecimal(60), color: '7c7c7f' },
@@ -94,6 +94,7 @@
                 { id: '3', name: '---', value: parseBigDecimal(20), color: 'c5c5c9' }
             ]"
             :value-type="ChartValueType.Amount"
+            :style-type="currentExploration.chartType"
             :skeleton="true"
             :use-custom-color="true"
             v-if="loading"
@@ -101,6 +102,7 @@
         <pie-chart
             :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
             :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
+            :style-type="currentExploration.chartType"
             :show-value="true"
             :show-percent="true"
             :enable-click-item="true"
@@ -375,6 +377,8 @@ const allAmountRangeCounts = computed<NameNumeralValue[]>(() => {
 
 const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[]>(() => {
     if (currentExploration.value.chartType !== TransactionExplorerChartType.Pie.value
+        && currentExploration.value.chartType !== TransactionExplorerChartType.Donut.value
+        && currentExploration.value.chartType !== TransactionExplorerChartType.NightingaleRose.value
         && currentExploration.value.chartType !== TransactionExplorerChartType.Radar.value
         && currentExploration.value.chartType !== TransactionExplorerChartType.CalendarHeatmap.value) {
         return [];
@@ -988,7 +992,11 @@ function onClickTransaction(transaction: TransactionInsightDataItem): void {
 }
 
 function buildExportResults(): { headers: string[], data: string[][], supportedMermaidCharts?: ExportMermaidChartType[] } | undefined {
-    if (currentExploration.value.chartType === TransactionExplorerChartType.Pie.value || currentExploration.value.chartType === TransactionExplorerChartType.Radar.value || currentExploration.value.chartType === TransactionExplorerChartType.CalendarHeatmap.value) {
+    if (currentExploration.value.chartType === TransactionExplorerChartType.Pie.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.Donut.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.NightingaleRose.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.Radar.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.CalendarHeatmap.value) {
         const valueMetric = TransactionExplorerValueMetric.valueOf(currentExploration.value.valueMetric);
         let supportedMermaidCharts: ExportMermaidChartType[] | undefined = undefined;
 

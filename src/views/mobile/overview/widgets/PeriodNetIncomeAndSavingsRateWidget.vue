@@ -1,6 +1,6 @@
 <template>
     <f7-list strong inset dividers class="overview-transaction-list no-margin-top margin-bottom">
-        <f7-list-item group-title>
+        <f7-list-item group-title v-if="showTitle">
             <small>{{ title || currentPeriodTitle }}</small>
         </f7-list-item>
         <f7-list-item class="combined-item item-no-divider">
@@ -49,6 +49,7 @@ import { usePeriodStatisticsWidgetBase } from '@/views/base/overview/PeriodStati
 const props = defineProps<{
     loading: boolean;
     title?: string;
+    showTitle: boolean;
     dateType: number;
 }>();
 

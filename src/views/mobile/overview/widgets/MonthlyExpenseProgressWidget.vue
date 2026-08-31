@@ -1,5 +1,8 @@
 <template>
     <f7-list strong inset dividers class="overview-transaction-list no-margin-top margin-bottom">
+        <f7-list-item group-title v-if="showTitle">
+            <small>{{ title || tt('Monthly Expense Progress') }}</small>
+        </f7-list-item>
         <f7-list-item class="item-title-full-line">
             <template #title>
                 <div class="overview-widget-primary-amount skeleton-text" v-if="loading">0.00 USD</div>
@@ -47,6 +50,7 @@ import { getCurrentDateTime } from '@/lib/datetime.ts';
 defineProps<{
     loading: boolean;
     title?: string;
+    showTitle: boolean;
 }>();
 
 const { tt, formatPercentToLocalizedNumerals } = useI18n();

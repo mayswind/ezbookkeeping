@@ -3,6 +3,7 @@ import { DateRange } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TrendChartType } from '@/core/statistics.ts';
 import {
+    type OverviewWidgetSwitchSettingItem,
     type OverviewWidgetColorSettingItem,
     type OverviewWidgetTextboxSettingItem,
     type DesktopOverviewLayout,
@@ -29,6 +30,12 @@ const WIDGET_TITLE_SETTING: OverviewWidgetTextboxSettingItem = {
     settingName: 'title',
     displayName: 'Widget Title',
     placeholder: 'Widget Title'
+};
+
+const WIDGET_SHOW_TITLE_SETTING: OverviewWidgetSwitchSettingItem = {
+    settingType: 'switch',
+    settingName: 'showTitle',
+    displayName: 'Show Title'
 };
 
 const WIDGET_BACKGROUND_COLOR_SETTINGS: OverviewWidgetColorSettingItem[] = [
@@ -570,6 +577,7 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         name: 'Account Balance List',
         supportsSettings: [
             WIDGET_TITLE_SETTING,
+            WIDGET_SHOW_TITLE_SETTING,
             {
                 settingType: 'accountSelect',
                 settingName: 'accountIds',
@@ -604,6 +612,7 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             }
         ],
         defaultSettings: {
+            showTitle: false,
             accountIds: [],
             itemCount: 4,
             sortBy: 'displayOrder',
@@ -641,8 +650,13 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
     [OverviewWidgetType.CurrentMonthExpenseProgress]: {
         type: OverviewWidgetType.CurrentMonthExpenseProgress,
         name: 'This Month\'s Expense Progress',
-        supportsSettings: [],
-        defaultSettings: {},
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            WIDGET_SHOW_TITLE_SETTING
+        ],
+        defaultSettings: {
+            showTitle: false
+        },
         dataRequirements: [
             OverviewWidgetDataRequirement.TransactionOverviewLast2Months
         ]
@@ -684,6 +698,7 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         name: 'Period Net Income and Savings Rate',
         supportsSettings: [
             WIDGET_TITLE_SETTING,
+            WIDGET_SHOW_TITLE_SETTING,
             {
                 settingType: 'customSelect',
                 settingName: 'dateRange',
@@ -697,6 +712,7 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             }
         ],
         defaultSettings: {
+            showTitle: false,
             dateRange: DateRange.ThisMonth.type
         },
         dataRequirements: [

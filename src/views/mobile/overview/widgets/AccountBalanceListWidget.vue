@@ -1,6 +1,6 @@
 <template>
     <f7-list strong inset dividers class="overview-widget-list no-margin-top margin-bottom" :class="{ 'skeleton-text': loading }">
-        <f7-list-item group-title>
+        <f7-list-item group-title v-if="showTitle">
             <small>{{ title || tt('Account Balance List') }}</small>
         </f7-list-item>
         <f7-list-item :key="account.id" :title="account.name"
@@ -39,6 +39,7 @@ import { getAccountIconType } from '@/lib/icon.ts';
 const props = defineProps<{
     loading: boolean;
     title?: string;
+    showTitle: boolean;
     accountIds: string[];
     itemCount: number;
     sortBy: string;

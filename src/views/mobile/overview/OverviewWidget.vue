@@ -5,6 +5,7 @@
                           v-if="widget.type === OverviewWidgetType.AssetSummary" />
 
     <account-balance-list-widget :loading="loading" :title="widgetTitle"
+                                 :show-title="widget.settings['showTitle'] as boolean"
                                  :account-ids="widget.settings['accountIds'] as string[]"
                                  :item-count="widget.settings['itemCount'] as number"
                                  :sort-by="widget.settings['sortBy'] as string"
@@ -17,12 +18,14 @@
                                      v-else-if="widget.type === OverviewWidgetType.CurrentMonthOverview" />
 
     <monthly-expense-progress-widget :loading="loading" :title="widgetTitle"
+                                     :show-title="widget.settings['showTitle'] as boolean"
                                      v-else-if="widget.type === OverviewWidgetType.CurrentMonthExpenseProgress" />
 
     <period-income-expense-widget :loading="loading" :date-ranges="widget.settings['dateRanges'] as number[]"
                                   v-else-if="widget.type === OverviewWidgetType.PeriodIncomeExpense" />
 
     <period-net-income-and-savings-rate-widget :loading="loading" :title="widgetTitle"
+                                               :show-title="widget.settings['showTitle'] as boolean"
                                                :date-type="widget.settings['dateRange'] as number"
                                                v-else-if="widget.type === OverviewWidgetType.PeriodNetIncomeAndSavingsRate" />
 </template>

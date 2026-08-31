@@ -718,6 +718,58 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         dataRequirements: [
             OverviewWidgetDataRequirement.TransactionOverview
         ]
+    },
+    [OverviewWidgetType.ExpenseCategoryRanking]: {
+        type: OverviewWidgetType.ExpenseCategoryRanking,
+        name: 'Expense Category Ranking',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            WIDGET_SHOW_TITLE_SETTING,
+            {
+                settingType: 'customSelect',
+                settingName: 'dateRange',
+                displayName: 'Date Range',
+                selectValues: [
+                    DateRange.ThisMonth,
+                    DateRange.ThisYear
+                ].map(dateRange => ({
+                    name: dateRange.name,
+                    value: dateRange.type
+                }))
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'categoryLevel',
+                displayName: 'Category Level',
+                selectValues: [
+                    {
+                        name: 'Primary Category',
+                        value: 'primary'
+                    },
+                    {
+                        name: 'Secondary Category',
+                        value: 'secondary'
+                    }
+                ]
+            },
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'itemCount',
+                displayName: 'Item Count',
+                itemCountValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            }
+        ],
+        defaultSettings: {
+            showTitle: false,
+            dateRange: DateRange.ThisMonth.type,
+            categoryLevel: 'primary',
+            itemCount: 4
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.Accounts,
+            OverviewWidgetDataRequirement.TransactionCategories,
+            OverviewWidgetDataRequirement.TransactionCategoryStatistics
+        ]
     }
 };
 

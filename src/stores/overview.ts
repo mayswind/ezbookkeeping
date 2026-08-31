@@ -661,7 +661,7 @@ export const useOverviewStore = defineStore('overview', () => {
         return recentTransactions.value[cacheKey] ?? [];
     }
 
-    function getTransactionListPageParams({ type, dateType, minTime, maxTime }: { type?: TransactionType, dateType?: number, minTime?: number, maxTime?: number }): string {
+    function getTransactionListPageParams({ type, dateType, minTime, maxTime, categoryIds }: { type?: TransactionType, dateType?: number, minTime?: number, maxTime?: number, categoryIds?: string[] }): string {
         const querys: string[] = [];
 
         if (isDefined(type)) {
@@ -682,7 +682,9 @@ export const useOverviewStore = defineStore('overview', () => {
             }
         }
 
-        if (!isObjectEmpty(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage)) {
+        if (categoryIds && categoryIds.length > 0) {
+            querys.push('categoryIds=' + categoryIds.join(','));
+        } else if (!isObjectEmpty(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage)) {
             querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage));
         }
 

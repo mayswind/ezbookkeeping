@@ -28,6 +28,13 @@
                                                :show-title="widget.settings['showTitle'] as boolean"
                                                :date-type="widget.settings['dateRange'] as number"
                                                v-else-if="widget.type === OverviewWidgetType.PeriodNetIncomeAndSavingsRate" />
+
+    <expense-category-ranking-widget :loading="loading" :title="widgetTitle"
+                                     :show-title="widget.settings['showTitle'] as boolean"
+                                     :date-type="widget.settings['dateRange'] as number"
+                                     :category-level="widget.settings['categoryLevel'] as string"
+                                     :item-count="widget.settings['itemCount'] as number"
+                                     v-else-if="widget.type === OverviewWidgetType.ExpenseCategoryRanking" />
 </template>
 
 <script setup lang="ts">
@@ -39,6 +46,7 @@ import MonthlyExpenseOverviewWidget from './widgets/MonthlyExpenseOverviewWidget
 import MonthlyExpenseProgressWidget from './widgets/MonthlyExpenseProgressWidget.vue';
 import PeriodIncomeExpenseWidget from './widgets/PeriodIncomeExpenseWidget.vue';
 import PeriodNetIncomeAndSavingsRateWidget from './widgets/PeriodNetIncomeAndSavingsRateWidget.vue';
+import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
 
 import type { ColorValue } from '@/core/color.ts';
 import { type MobileOverviewWidgetLayout, OverviewWidgetType } from '@/core/overview_layout.ts';

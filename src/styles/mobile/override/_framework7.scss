@@ -348,7 +348,7 @@ html[dir="rtl"] .list .item-content > .item-inner > .item-after .list-item-check
     > .item-content {
         > .item-inner {
             &:after {
-                background-color: transparent;
+                --f7-list-item-border-color: transparent;
             }
         }
     }

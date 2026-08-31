@@ -469,13 +469,13 @@ export const useAccountsStore = defineStore('accounts', () => {
         return null;
     }
 
-    function getNetAssets(showAccountBalance: boolean): BigDecimal | HiddenAmount | BigDecimalWithSuffix {
+    function getNetAssets(showAccountBalance: boolean, excludedAccountIds: Record<string, boolean>): BigDecimal | HiddenAmount | BigDecimalWithSuffix {
         if (!showAccountBalance) {
             return DISPLAY_HIDDEN_AMOUNT;
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
-            account => !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
+            account => !(account.type === AccountType.SingleAccount.type && excludedAccountIds[account.id])
         );
         let netAssets: BigDecimal = BIG_DECIMAL_ZERO;
         let hasUnCalculatedAmount = false;
@@ -505,13 +505,13 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
     }
 
-    function getTotalAssets(showAccountBalance: boolean): BigDecimal | HiddenAmount | BigDecimalWithSuffix {
+    function getTotalAssets(showAccountBalance: boolean, excludedAccountIds: Record<string, boolean>): BigDecimal | HiddenAmount | BigDecimalWithSuffix {
         if (!showAccountBalance) {
             return DISPLAY_HIDDEN_AMOUNT;
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
-            account => (account.isAsset || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
+            account => (account.isAsset || false) && !(account.type === AccountType.SingleAccount.type && excludedAccountIds[account.id])
         );
         let totalAssets: BigDecimal = BIG_DECIMAL_ZERO;
         let hasUnCalculatedAmount = false;
@@ -541,13 +541,13 @@ export const useAccountsStore = defineStore('accounts', () => {
         }
     }
 
-    function getTotalLiabilities(showAccountBalance: boolean): BigDecimal | HiddenAmount | BigDecimalWithSuffix {
+    function getTotalLiabilities(showAccountBalance: boolean, excludedAccountIds: Record<string, boolean>): BigDecimal | HiddenAmount | BigDecimalWithSuffix {
         if (!showAccountBalance) {
             return DISPLAY_HIDDEN_AMOUNT;
         }
 
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
-            account => (account.isLiability || false) && !(account.type === AccountType.SingleAccount.type && settingsStore.appSettings.totalAmountExcludeAccountIds[account.id])
+            account => (account.isLiability || false) && !(account.type === AccountType.SingleAccount.type && excludedAccountIds[account.id])
         );
         let totalLiabilities: BigDecimal = BIG_DECIMAL_ZERO;
         let hasUnCalculatedAmount = false;

@@ -26,17 +26,17 @@ export function useAssetSummaryWidgetBase() {
     const allAccounts = computed<Account[]>(() => accountsStore.allAccounts);
 
     const netAssets = computed<string>(() => {
-        const netAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getNetAssets(showAmountInHomePage.value);
+        const netAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getNetAssets(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
         return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
     });
 
     const totalAssets = computed<string>(() => {
-        const totalAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalAssets(showAmountInHomePage.value);
+        const totalAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalAssets(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
         return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
     });
 
     const totalLiabilities = computed<string>(() => {
-        const totalLiabilities: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalLiabilities(showAmountInHomePage.value);
+        const totalLiabilities: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalLiabilities(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
         return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
     });
 

@@ -48,6 +48,14 @@ const props = defineProps<{
     darkBackgroundColor?: ColorValue;
 }>();
 
+const { tt } = useI18n();
+
+const {
+    netAssets,
+    totalAssets,
+    totalLiabilities
+} = useAssetSummaryWidgetBase();
+
 const environmentsStore = useEnvironmentsStore();
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
@@ -76,12 +84,4 @@ const cardHeaderStyle = computed<Record<string, string>>(() => {
 
     return finalStyle;
 });
-
-const { tt } = useI18n();
-
-const {
-    netAssets,
-    totalAssets,
-    totalLiabilities
-} = useAssetSummaryWidgetBase();
 </script>

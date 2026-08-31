@@ -31,18 +31,16 @@ import UserCustomIconListPage from '@/views/desktop/customicons/ListPage.vue';
 
 import OverviewLayoutEditorPage from '@/views/desktop/overview/LayoutEditorPage.vue';
 
-import UserSettingsPageLayout from '@/views/desktop/user/UserSettingsPageLayout.vue';
-import UserBasicSettingPage from '@/views/desktop/user/UserBasicSettingPage.vue';
-import UserSecuritySettingPage from '@/views/desktop/user/UserSecuritySettingPage.vue';
-import UserTwoFactorAuthSettingPage from '@/views/desktop/user/UserTwoFactorAuthSettingPage.vue';
-import UserDataManagementSettingPage from '@/views/desktop/user/UserDataManagementSettingPage.vue';
-
-import AppSettingsPageLayout from '@/views/desktop/app/AppSettingsPageLayout.vue';
-import AppPreferencesSettingPage from '@/views/desktop/app/AppPreferencesSettingPage.vue';
-import AppLockSettingPage from '@/views/desktop/app/AppLockSettingPage.vue';
-import AppStatisticsSettingPage from '@/views/desktop/app/AppStatisticsSettingPage.vue';
-import AppCloudSyncSettingPage from '@/views/desktop/app/AppCloudSyncSettingPage.vue';
-import AppBrowserCacheSettingPage from '@/views/desktop/app/AppBrowserCacheSettingPage.vue';
+import SettingsPageLayout from '@/views/desktop/settings/SettingsPageLayout.vue';
+import UserBasicSettingPage from '@/views/desktop/users/UserBasicSettingPage.vue';
+import UserSecuritySettingPage from '@/views/desktop/users/UserSecuritySettingPage.vue';
+import TwoFactorAuthPage from '@/views/desktop/users/TwoFactorAuthPage.vue';
+import DataManagementPage from '@/views/desktop/users/DataManagementPage.vue';
+import PreferencesSettingsPage from '@/views/desktop/settings/PreferencesSettingsPage.vue';
+import ApplicationLockPage from '@/views/desktop/settings/ApplicationLockPage.vue';
+import StatisticsSettingPage from '@/views/desktop/settings/StatisticsSettingPage.vue';
+import ApplicationCloudSyncSettingsPage from '@/views/desktop/settings/ApplicationCloudSyncSettingsPage.vue';
+import BrowserCacheSettingPage from '@/views/desktop/settings/BrowserCacheSettingPage.vue';
 
 import ExchangeRatesListPage from '@/views/desktop/exchangerates/ListPage.vue';
 
@@ -166,7 +164,7 @@ const router = createRouter({
         },
         {
             path: '/',
-            component: UserSettingsPageLayout,
+            component: SettingsPageLayout,
             beforeEnter: checkLogin,
             children: [
                 {
@@ -201,60 +199,48 @@ const router = createRouter({
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/user/settings/basic',
+                    path: '/settings/user/basic',
                     component: UserBasicSettingPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/user/settings/security',
+                    path: '/settings/user/security',
                     component: UserSecuritySettingPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/user/settings/two_factor',
-                    component: UserTwoFactorAuthSettingPage,
+                    path: '/settings/user/two_factor',
+                    component: TwoFactorAuthPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/user/settings/data_management',
-                    component: UserDataManagementSettingPage,
-                    beforeEnter: checkLogin
-                }
-            ]
-        },
-        {
-            path: '/overview/edit',
-            component: OverviewLayoutEditorPage,
-            beforeEnter: checkLogin
-        },
-        {
-            path: '/',
-            component: AppSettingsPageLayout,
-            beforeEnter: checkLogin,
-            children: [
-                {
-                    path: '/app/settings/preferences',
-                    component: AppPreferencesSettingPage,
+                    path: '/settings/user/data_management',
+                    component: DataManagementPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/app/settings/application_lock',
-                    component: AppLockSettingPage,
+                    path: '/settings/preferences',
+                    component: PreferencesSettingsPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/app/settings/statistics',
-                    component: AppStatisticsSettingPage,
+                    path: '/settings/application_lock',
+                    component: ApplicationLockPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/app/settings/cloud_sync',
-                    component: AppCloudSyncSettingPage,
+                    path: '/settings/statistics',
+                    component: StatisticsSettingPage,
                     beforeEnter: checkLogin
                 },
                 {
-                    path: '/app/settings/browser_cache',
-                    component: AppBrowserCacheSettingPage,
+                    path: '/settings/cloud_sync',
+                    component: ApplicationCloudSyncSettingsPage,
+                    beforeEnter: checkLogin
+                },
+                {
+                    path: '/settings/browser_cache',
+                    component: BrowserCacheSettingPage,
                     beforeEnter: checkLogin
                 },
                 {
@@ -263,6 +249,11 @@ const router = createRouter({
                     beforeEnter: checkLogin
                 }
             ]
+        },
+        {
+            path: '/overview/edit',
+            component: OverviewLayoutEditorPage,
+            beforeEnter: checkLogin
         },
         {
             path: '/login',

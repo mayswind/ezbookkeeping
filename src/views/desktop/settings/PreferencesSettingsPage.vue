@@ -486,8 +486,8 @@
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
 import CategoryFilterSettingsDialog from '@/views/desktop/common/dialogs/CategoryFilterSettingsDialog.vue';
-import ChartColorSchemeDialog from '@/views/desktop/app/settings/dialogs/ChartColorSchemeDialog.vue';
-import AccountCategoryDisplayOrderDialog from '@/views/desktop/app/settings/dialogs/AccountCategoryDisplayOrderDialog.vue';
+import ChartColorSchemeDialog from './dialogs/ChartColorSchemeDialog.vue';
+import AccountCategoryDisplayOrderDialog from './dialogs/AccountCategoryDisplayOrderDialog.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';

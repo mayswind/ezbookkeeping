@@ -201,10 +201,10 @@
 
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
-import UnlinkThirdPartyLoginDialog from '@/views/desktop/user/settings/dialogs/UnlinkThirdPartyLoginDialog.vue';
-import UserGenerateTokenDialog from '@/views/desktop/user/settings/dialogs/UserGenerateTokenDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import UnlinkThirdPartyLoginDialog from './settings/dialogs/UnlinkThirdPartyLoginDialog.vue';
+import UserGenerateTokenDialog from './settings/dialogs/UserGenerateTokenDialog.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 

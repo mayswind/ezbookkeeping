@@ -134,13 +134,9 @@
                                         </v-list-item-title>
                                     </v-list-item>
                                     <v-divider class="my-1"/>
-                                    <v-list-item :prepend-icon="mdiAccountCogOutline"
-                                                 :title="tt('User Settings')"
-                                                 to="/user/settings/basic"></v-list-item>
                                     <v-list-item :prepend-icon="mdiCogOutline"
-                                                 :title="tt('Application Settings')"
-                                                 to="/app/settings/preferences"></v-list-item>
-                                    <v-divider class="my-1"/>
+                                                 :title="tt('Settings')"
+                                                 to="/settings/preferences"></v-list-item>
                                     <v-list-item :prepend-icon="mdiInformationOutline"
                                                  :title="tt('About')"
                                                  @click="showAboutDialog = true"></v-list-item>
@@ -218,7 +214,6 @@ import {
     mdiWeatherSunny,
     mdiWeatherNight,
     mdiAccount,
-    mdiAccountCogOutline,
     mdiCogOutline,
     mdiInformationOutline,
     mdiLockOutline,

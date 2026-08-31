@@ -14,6 +14,7 @@
                       :fiscal-year-start="fiscalYearStart" :items="items"
                       :value-type="ChartValueType.Amount" :show-value="showAmountInHomePage"
                       :default-currency="defaultCurrency"
+                      :smooth-curve="smoothCurve"
                       :hide-legend="!showLegend" legend-position="bottom"
                       :hide-x-axis-labels="!showXAxisLabels" :enable-click-item="true"
                       @click="clickMonth" />
@@ -52,6 +53,7 @@ const props = defineProps<{
     loading: boolean;
     title?: string;
     months: number;
+    smoothCurve: boolean;
     showLegend: boolean;
     showXAxisLabels: boolean;
 }>();

@@ -46,6 +46,7 @@ interface AxisChartDataItem {
     type: string;
     areaStyle?: object;
     stack?: string;
+    smooth?: boolean;
     showSymbol?: boolean;
     symbolSize?: (data: number) => number;
     animation: boolean;
@@ -72,6 +73,7 @@ const props = defineProps<{
     hideYAxisLabels?: boolean;
     hideHorizontalGridLines?: boolean;
     hideLineSymbols?: boolean;
+    smoothCurve?: boolean;
     oneHundredPercentStacked?: boolean;
     sortingType: number;
     showValue?: boolean;
@@ -193,6 +195,7 @@ const axisChartData = computed<AxisChartData>(() => {
             },
             selected: true,
             type: 'line',
+            smooth: props.smoothCurve,
             showSymbol: !props.hideLineSymbols,
             animation: !props.skeleton,
             data: allAmounts.map(amount => amount.toDoubleNumber())

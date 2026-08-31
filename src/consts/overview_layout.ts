@@ -254,6 +254,11 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             },
             {
                 settingType: 'switch',
+                settingName: 'smoothCurve',
+                displayName: 'Smooth Curve'
+            },
+            {
+                settingType: 'switch',
                 settingName: 'showXAxisLabels',
                 displayName: 'Show Horizontal Axis Labels'
             },
@@ -267,6 +272,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             chartType: TrendChartType.Column.type,
             transactionTypes: [TransactionType.Income, TransactionType.Expense],
             months: 12,
+            smoothCurve: false,
             showXAxisLabels: true,
             showLegend: true
         },
@@ -291,6 +297,11 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             },
             {
                 settingType: 'switch',
+                settingName: 'smoothCurve',
+                displayName: 'Smooth Curve'
+            },
+            {
+                settingType: 'switch',
                 settingName: 'showXAxisLabels',
                 displayName: 'Show Horizontal Axis Labels'
             },
@@ -302,6 +313,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
         ],
         defaultSettings: {
             months: 12,
+            smoothCurve: false,
             showXAxisLabels: true,
             showLegend: true
         },
@@ -539,6 +551,7 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
                 chartType: TrendChartType.Column.type,
                 transactionTypes: [TransactionType.Income, TransactionType.Expense],
                 months: 12,
+                smoothCurve: false,
                 showXAxisLabels: true,
                 showLegend: true
             }

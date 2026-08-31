@@ -8,6 +8,7 @@
                                           :loading="loading" :disabled="loading" :enable-click-item="true"
                                           :chart-type="chartType"
                                           :transaction-types="transactionTypes"
+                                          :smooth-curve="smoothCurve"
                                           :hide-x-axis-labels="!showXAxisLabels" :hide-legend="!showLegend"
                                           @click="clickMonthlyIncomeOrExpense" />
     </v-card>
@@ -46,6 +47,7 @@ const props = defineProps<{
     chartType: number;
     transactionTypes: number[];
     months: number;
+    smoothCurve: boolean;
     showXAxisLabels: boolean;
     showLegend: boolean;
 }>();

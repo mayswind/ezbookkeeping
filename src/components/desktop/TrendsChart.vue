@@ -10,6 +10,7 @@
                 :hide-y-axis-labels="hideYAxisLabels"
                 :hide-horizontal-grid-lines="hideHorizontalGridLines"
                 :hide-line-symbols="hideLineSymbols"
+                :smooth-curve="smoothCurve"
                 :translate-name="translateName"
                 :default-currency="defaultCurrency" :use-custom-color="useCustomColor"
                 :enable-click-item="enableClickItem"
@@ -99,6 +100,7 @@ interface DesktopTrendsChartProps<T extends TrendsChartDateType> extends CommonT
     hideYAxisLabels?: boolean;
     hideHorizontalGridLines?: boolean;
     hideLineSymbols?: boolean;
+    smoothCurve?: boolean;
     hideLegend?: boolean;
     legendPosition?: 'top' | 'bottom';
 }

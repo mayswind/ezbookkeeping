@@ -1,0 +1,197 @@
+name: ezBookkeeping PostgreSQL Daily Backup
+
+on:
+  schedule:
+    # 06:30 UTC = 12:00 PM IST
+    - cron: '30 6 * * *'
+
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: Backup ezBookkeeping Supabase PostgreSQL
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Supabase may run a newer PostgreSQL server than the Ubuntu
+      # runner's default pg_dump client.
+      - name: Install PostgreSQL client 17
+        run: |
+          set -o pipefail
+
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            curl \
+            ca-certificates \
+            gnupg
+
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /usr/share/keyrings/postgresql.gpg
+
+          echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+
+          sudo apt-get update
+
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Resolve PostgreSQL client binary
+        run: |
+          set -o pipefail
+
+          PG_VERSION=$(ls -1 /usr/lib/postgresql 2>/dev/null | sort -V | tail -1)
+
+          if [ -z "$PG_VERSION" ]; then
+            echo "::error::No PostgreSQL client found under /usr/lib/postgresql."
+            exit 1
+          fi
+
+          PG_DUMP="/usr/lib/postgresql/${PG_VERSION}/bin/pg_dump"
+
+          if [ ! -x "$PG_DUMP" ]; then
+            echo "::error::Expected pg_dump at ${PG_DUMP}, but it is not executable."
+            exit 1
+          fi
+
+          echo "Installed client versions:"
+          ls -1 /usr/lib/postgresql | sort -V
+
+          echo "PATH pg_dump:"
+          pg_dump --version
+
+          echo "Using:"
+          "$PG_DUMP" --version
+
+          echo "PG_DUMP=${PG_DUMP}" >> "$GITHUB_ENV"
+
+      - name: Create backup directory
+        run: |
+          mkdir -p backup
+
+      - name: Create ezBookkeeping PostgreSQL backup
+        env:
+          SUPABASE_DATABASE_URL: ${{ secrets.EZBOOKKEEPING_SUPABASE_DATABASE_URL }}
+        run: |
+          set -o pipefail
+
+          if [ -z "$SUPABASE_DATABASE_URL" ]; then
+            echo "::error::EZBOOKKEEPING_SUPABASE_DATABASE_URL secret is not configured."
+            exit 1
+          fi
+
+          # pg_dump cannot use Supabase transaction pooler.
+          case "$SUPABASE_DATABASE_URL" in
+            *:6543* | *pgbouncer=true*)
+              echo "::error::Transaction pooler detected."
+              echo "Use Supabase Session Pooler on port 5432."
+              exit 1
+              ;;
+          esac
+
+          # Direct Supabase connection is IPv6-only on Free tier.
+          # GitHub-hosted runners may not have IPv6 connectivity.
+          case "$SUPABASE_DATABASE_URL" in
+            *db.*.supabase.co*)
+              echo "::error::Direct Supabase connection detected."
+              echo "Use the Session Pooler connection instead."
+              exit 1
+              ;;
+          esac
+
+          TIMESTAMP=$(date -u +"%Y-%m-%d_%H-%M-%S")
+
+          BACKUP_FILE="backup/ezbookkeeping_postgres_${TIMESTAMP}.sql.gz"
+
+          echo "Creating ezBookkeeping PostgreSQL backup..."
+          echo "Backup file: ${BACKUP_FILE}"
+
+          "$PG_DUMP" \
+            --dbname="$SUPABASE_DATABASE_URL" \
+            --schema=public \
+            --no-owner \
+            --no-privileges \
+            --format=plain \
+            | gzip > "$BACKUP_FILE"
+
+          # Verify that the compressed file contains meaningful data.
+          UNCOMPRESSED=$(gzip -l "$BACKUP_FILE" | awk 'NR==2 {print $2}')
+
+          echo "Uncompressed size: ${UNCOMPRESSED} bytes"
+
+          if [ -z "$UNCOMPRESSED" ] || [ "$UNCOMPRESSED" -lt 1024 ]; then
+            echo "::error::Backup appears to be empty or invalid."
+            exit 1
+          fi
+
+          echo "BACKUP_FILE=${BACKUP_FILE}" >> "$GITHUB_ENV"
+
+          echo "Backup created successfully."
+          ls -lh "$BACKUP_FILE"
+
+      - name: Verify backup
+        run: |
+          set -e
+
+          echo "Validating gzip integrity..."
+
+          gzip -t "$BACKUP_FILE"
+
+          echo "Checking PostgreSQL dump..."
+
+          if ! zgrep -qE '^CREATE TABLE ' "$BACKUP_FILE"; then
+            echo "::error::Backup contains no CREATE TABLE statements."
+            echo "--- First 60 lines ---"
+            zcat "$BACKUP_FILE" | head -60
+            exit 1
+          fi
+
+          if ! zgrep -qE '^CREATE (TYPE|SEQUENCE|TABLE|INDEX|FUNCTION)' "$BACKUP_FILE"; then
+            echo "::error::Backup does not appear to contain PostgreSQL schema."
+            exit 1
+          fi
+
+          echo "PostgreSQL backup validation successful."
+
+          ls -lh "$BACKUP_FILE"
+
+      - name: Upload backup to Google Drive and apply retention
+        env:
+          BACKUP_FILE: ${{ env.BACKUP_FILE }}
+
+          GOOGLE_DRIVE_CLIENT_ID: ${{ secrets.GOOGLE_DRIVE_CLIENT_ID }}
+          GOOGLE_DRIVE_CLIENT_SECRET: ${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
+          GOOGLE_DRIVE_REFRESH_TOKEN: ${{ secrets.GOOGLE_DRIVE_REFRESH_TOKEN }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+
+          # Keep backups for 90 days.
+          BACKUP_RETENTION_DAYS: '90'
+
+        run: |
+          node scripts/upload-backup-to-drive.mjs
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf backup
+
+          echo "Temporary backup files removed."

@@ -10,6 +10,7 @@
                                           :transaction-types="transactionTypes"
                                           :smooth-curve="smoothCurve"
                                           :hide-x-axis-labels="!showXAxisLabels" :hide-legend="!showLegend"
+                                          :no-margin="!showLegend && !showXAxisLabels"
                                           @click="clickMonthlyIncomeOrExpense" />
     </v-card>
 </template>

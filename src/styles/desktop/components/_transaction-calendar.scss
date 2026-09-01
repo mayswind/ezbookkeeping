@@ -1,0 +1,78 @@
+.transaction-calendar-container {
+    .dp--main {
+        &.transaction-calendar-with-alternate-date .dp--calendar .dp--calendar-row {
+            --dp-cell-size: 90px;
+        }
+
+        .dp--menu {
+            --dp-border-radius: 6px;
+            --dp-menu-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+        }
+
+        .dp--calendar {
+            --dp-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
+
+            .dp--calendar-header {
+                --dp-cell-size: 32px;
+            }
+
+            .dp--calendar-row {
+                --dp-cell-size: 76px;
+                --dp-primary-color: rgba(var(--v-theme-primary), var(--v-activated-opacity));
+                --dp-primary-text-color: rgb(var(--v-theme-primary));
+
+                > .dp--calendar-item {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    .transaction-calendar-daily-amounts {
+                        width: 100%;
+
+                        > span.transaction-calendar-alternate-date,
+                        > span.transaction-calendar-daily-amount{
+                            font-size: 0.9rem;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        &.auto-height-calendar {
+            height: 100%;
+
+            .dp--outer-menu-wrap,
+            .dp--menu,
+            .dp--menu > div:not(.dp--menu-unclickable),
+            .dp--instance-calendar,
+            .dp--menu-inner,
+            .dp--menu-inner > div,
+            .dp--calendar,
+            .dp--calendar > [role='grid'] {
+                height: 100%;
+                min-height: 0;
+            }
+
+            .dp--calendar > [role='grid'] {
+                display: flex;
+                flex-direction: column;
+
+                > .dp--calendar[role='rowgroup'] {
+                    display: grid;
+                    flex: 1;
+                    grid-auto-rows: minmax(0, 1fr);
+                }
+            }
+
+            .dp--calendar-row {
+                --dp-cell-size: auto;
+
+                > .dp--calendar-item,
+                > .dp--calendar-item > .dp--cell-inner {
+                    height: 100%;
+                }
+            }
+        }
+    }
+}

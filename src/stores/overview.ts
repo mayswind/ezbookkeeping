@@ -5,13 +5,14 @@ import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
 import { useAccountsStore } from './account.ts';
 import { useTransactionCategoriesStore } from './transactionCategory.ts';
+import { type TransactionTotalAmount, useTransactionsStore } from './transaction.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { itemAndIndex, entries, keys } from '@/core/base.ts';
 import { type StartEndTime, type WritableStartEndTime, DateRange} from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { KeywordMatchMode } from '@/core/text.ts';
-import type { TransactionType } from '@/core/transaction.ts';
+import { TransactionType } from '@/core/transaction.ts';
 import type { OverviewRecentTransactionsQuery } from '@/core/overview_layout.ts';
 
 import type {
@@ -45,6 +46,7 @@ import {
     parseBigDecimal
 } from '@/lib/numeral.ts';
 import {
+    parseDateTimeFromUnixTime,
     getUnixTimeBeforeUnixTime,
     getUnixTimeAfterUnixTime,
     getTodayFirstUnixTime,
@@ -134,6 +136,7 @@ export const useOverviewStore = defineStore('overview', () => {
     const userStore = useUserStore();
     const accountsStore = useAccountsStore();
     const transactionCategoriesStore = useTransactionCategoriesStore();
+    const transactionsStore = useTransactionsStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
     const transactionDataRange = ref<TransactionDataRange>(getTransactionDateRange());
@@ -150,6 +153,9 @@ export const useOverviewStore = defineStore('overview', () => {
     const transactionAssetTrendsStateInvalid = ref<boolean>(true);
     const recentTransactions = ref<Record<string, TransactionInfoResponse[]>>({});
     const recentTransactionsStateInvalid = ref<Record<string, boolean>>({});
+    const currentMonthTransactions = ref<TransactionInfoResponse[]>([]);
+    const currentMonthTransactionDailyTotalAmounts = ref<Record<string, TransactionTotalAmount>>({});
+    const currentMonthTransactionsStateInvalid = ref<boolean>(true);
     const transactionDailyAmountsData = ref<TransactionDailyAmountsResponseItem[]>([]);
     const transactionDailyAmountsStateInvalid = ref<boolean>(true);
 
@@ -293,6 +299,7 @@ export const useOverviewStore = defineStore('overview', () => {
             recentTransactionsStateInvalid.value[query] = invalidState;
         }
 
+        currentMonthTransactionsStateInvalid.value = invalidState;
         transactionDailyAmountsStateInvalid.value = invalidState;
     }
 
@@ -307,6 +314,9 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionAssetTrendsStateInvalid.value = true;
         recentTransactions.value = {};
         recentTransactionsStateInvalid.value = {};
+        currentMonthTransactions.value = [];
+        currentMonthTransactionDailyTotalAmounts.value = {};
+        currentMonthTransactionsStateInvalid.value = true;
         transactionDailyAmountsData.value = [];
         transactionDailyAmountsStateInvalid.value = true;
     }
@@ -639,20 +649,124 @@ export const useOverviewStore = defineStore('overview', () => {
         const endTime = transactionDataRange.value.today.endTime;
         const startTime = getUnixTimeAfterUnixTime(getUnixTimeBeforeUnixTime(transactionDataRange.value.today.startTime, Math.max(1, months), 'months'), 1, 'days');
 
-        return services.getTransactionDailyAmounts({
-            startTime,
-            endTime,
-            useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage === TimezoneTypeForStatistics.TransactionTimezone.type,
-            excludeAccountIds,
-            excludeCategoryIds
-        }).then(response => {
-            if (!response.data?.success || !response.data.result) {
-                throw { message: 'Unable to retrieve transaction overview' };
-            }
+        return new Promise((resolve, reject) => {
+            services.getTransactionDailyAmounts({
+                startTime: startTime,
+                endTime: endTime,
+                useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage === TimezoneTypeForStatistics.TransactionTimezone.type,
+                excludeAccountIds: excludeAccountIds,
+                excludeCategoryIds: excludeCategoryIds
+            }).then(response => {
+                const data = response.data;
 
-            transactionDailyAmountsData.value = response.data.result;
-            transactionDailyAmountsStateInvalid.value = false;
-            return response.data.result;
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to retrieve transaction overview' });
+                    return;
+                }
+
+                if (transactionDailyAmountsStateInvalid.value) {
+                    transactionDailyAmountsStateInvalid.value = false;
+                }
+
+                if (force && data.result && isEquals(transactionDailyAmountsData.value, data.result)) {
+                    reject({ message: 'Data is up to date', isUpToDate: true });
+                    return;
+                }
+
+                transactionDailyAmountsData.value = data.result;
+
+                resolve(data.result);
+            }).catch(error => {
+                logger.error('failed to retrieve transaction overview', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve transaction overview' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function loadCurrentMonthTransactions({ force }: { force: boolean }): Promise<Record<string, TransactionTotalAmount>> {
+        if (transactionDataRange.value.today.startTime !== getTodayFirstUnixTime()) {
+            updateTransactionDateRange();
+            currentMonthTransactions.value = [];
+            currentMonthTransactionDailyTotalAmounts.value = {};
+            currentMonthTransactionsStateInvalid.value = true;
+        }
+
+        if (!force && !currentMonthTransactionsStateInvalid.value) {
+            return Promise.resolve(currentMonthTransactionDailyTotalAmounts.value);
+        }
+
+        return new Promise((resolve, reject) => {
+            Promise.all([
+                accountsStore.loadAllAccounts({ force: false }),
+                transactionCategoriesStore.loadAllCategories({ force: false })
+            ]).then(() => {
+                const currentMonth = parseDateTimeFromUnixTime(transactionDataRange.value.thisMonth.startTime);
+                let accountIds = '';
+                let categoryIds = '';
+
+                if (!isObjectEmpty(settingsStore.appSettings.overviewAccountFilterInHomePage)) {
+                    accountIds = getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, settingsStore.appSettings.overviewAccountFilterInHomePage);
+                }
+
+                if (!isObjectEmpty(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage)) {
+                    categoryIds = getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage);
+                }
+
+                services.getAllTransactionsByMonth({
+                    year: currentMonth.getGregorianCalendarYear(),
+                    month: currentMonth.getGregorianCalendarMonth(),
+                    type: 0,
+                    categoryIds: categoryIds,
+                    accountIds: accountIds,
+                    tagFilter: '',
+                    amountFilter: '',
+                    keyword: '',
+                    matchMode: KeywordMatchMode.Default.type,
+                    mustHavePictures: false,
+                    withPictures: false
+                }).then(response => {
+                    const data = response.data;
+
+                    if (!data || !data.success || !data.result) {
+                        reject({ message: 'Unable to retrieve transaction list' });
+                        return;
+                    }
+
+                    if (currentMonthTransactionsStateInvalid.value) {
+                        currentMonthTransactionsStateInvalid.value = false;
+                    }
+
+                    if (force && data.result && isEquals(currentMonthTransactions.value, data.result.items)) {
+                        reject({ message: 'Data is up to date', isUpToDate: true });
+                        return;
+                    }
+
+                    currentMonthTransactions.value = data.result.items;
+                    currentMonthTransactionDailyTotalAmounts.value = transactionsStore.getCurrentMonthTransactionDailyTotalAmounts(currentMonthTransactions.value, accountIds);
+
+                    resolve(currentMonthTransactionDailyTotalAmounts.value);
+                }).catch(error => {
+                    logger.error('failed to retrieve transaction list', error);
+
+                    if (error.response && error.response.data && error.response.data.errorMessage) {
+                        reject({ error: error.response.data });
+                    } else if (!error.processed) {
+                        reject({ message: 'Unable to retrieve transaction list' });
+                    } else {
+                        reject(error);
+                    }
+                });
+            }).catch(error => {
+                logger.error('failed to load accounts or categories', error);
+                reject(error);
+            });
         });
     }
 
@@ -704,6 +818,8 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionCategoryStatisticsData,
         transactionAssetTrendsData,
         recentTransactions,
+        currentMonthTransactionDailyTotalAmounts,
+        currentMonthTransactionsStateInvalid,
         transactionDailyAmountsData,
         // computed states,
         transactionOverview,
@@ -714,6 +830,7 @@ export const useOverviewStore = defineStore('overview', () => {
         loadTransactionCategoryStatistics,
         loadTransactionAssetTrends,
         loadRecentTransactions,
+        loadCurrentMonthTransactions,
         loadTransactionDailyAmounts,
         getRecentTransactions,
         getTransactionListPageParams

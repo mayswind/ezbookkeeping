@@ -35,6 +35,11 @@
                                      :category-level="widget.settings['categoryLevel'] as string"
                                      :item-count="widget.settings['itemCount'] as number"
                                      v-else-if="widget.type === OverviewWidgetType.ExpenseCategoryRanking" />
+
+    <transaction-calendar-widget :loading="loading" :editing="editing"
+                                 :transaction-types="widget.settings['transactionTypes'] as number[]"
+                                 :show-alternate-date="widget.settings['showAlternateDate'] as boolean"
+                                 v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
 </template>
 
 <script setup lang="ts">
@@ -47,6 +52,7 @@ import MonthlyExpenseProgressWidget from './widgets/MonthlyExpenseProgressWidget
 import PeriodIncomeExpenseWidget from './widgets/PeriodIncomeExpenseWidget.vue';
 import PeriodNetIncomeAndSavingsRateWidget from './widgets/PeriodNetIncomeAndSavingsRateWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
+import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 
 import type { ColorValue } from '@/core/color.ts';
 import { type MobileOverviewWidgetLayout, OverviewWidgetType } from '@/core/overview_layout.ts';
@@ -54,6 +60,7 @@ import { type MobileOverviewWidgetLayout, OverviewWidgetType } from '@/core/over
 const props = defineProps<{
     widget: MobileOverviewWidgetLayout;
     loading: boolean;
+    editing?: boolean;
 }>();
 
 const widgetTitle = computed<string>(() => {

@@ -182,7 +182,8 @@
                         </v-card-text>
 
                         <v-card-text class="transaction-calendar-container pt-0" v-if="pageType === TransactionListPageType.Calendar.type">
-                            <transaction-calendar day-has-transaction-class="font-weight-bold"
+                            <transaction-calendar show-amount show-income-amount show-expense-amount show-alternate-date
+                                                  day-has-transaction-class="font-weight-bold"
                                                   :readonly="loading" :is-dark-mode="isDarkMode"
                                                   :default-currency="selectedAccountDefaultCurrency"
                                                   :min-date="transactionCalendarMinDate"
@@ -1971,43 +1972,6 @@ init(props);
 .transaction-account-menu .item-in-multiple-selection span,
 .transaction-tag-menu .item-in-multiple-selection span {
     font-weight: bold;
-}
-
-.transaction-calendar-container .dp--main {
-    &.transaction-calendar-with-alternate-date .dp--calendar .dp--calendar-row {
-        --dp-cell-size: 90px;
-    }
-
-    .dp--menu {
-        --dp-border-radius: 6px;
-        --dp-menu-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
-    }
-
-    .dp--calendar {
-        --dp-border-color: rgba(var(--v-border-color), var(--v-border-opacity));
-
-        .dp--calendar-header {
-            --dp-cell-size: 32px;
-        }
-
-        .dp--calendar-row {
-            --dp-cell-size: 76px;
-            --dp-primary-color: rgba(var(--v-theme-primary), var(--v-activated-opacity));
-            --dp-primary-text-color: rgb(var(--v-theme-primary));
-
-            > .dp--calendar-item {
-                overflow: hidden;
-
-                .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date {
-                    font-size: 0.9rem;
-                }
-
-                .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
-                    font-size: 0.95rem;
-                }
-            }
-        }
-    }
 }
 
 .transaction-gallery-container {

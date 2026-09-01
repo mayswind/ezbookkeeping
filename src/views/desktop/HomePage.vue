@@ -102,6 +102,12 @@ function reload(force: boolean): void {
         }));
     }
 
+    if (requirements.includes(OverviewWidgetDataRequirement.CurrentMonthTransactions)) {
+        promises.push(overviewStore.loadCurrentMonthTransactions({
+            force: force
+        }));
+    }
+
     if (requirements.includes(OverviewWidgetDataRequirement.DailyTransactionAmounts)) {
         promises.push(overviewStore.loadTransactionDailyAmounts({
             force: force,

@@ -1,0 +1,81 @@
+.transaction-calendar-container {
+    .dp--theme-light,
+    .dp--theme-dark {
+        --dp-background-color: var(--f7-list-strong-bg-color);
+    }
+
+    .dp--main {
+        .dp--menu {
+            --dp-border-radius: var(--f7-list-inset-border-radius);
+            --dp-menu-padding: 4px 6px;
+            --dp-menu-border-color: transparent;
+
+            &.dp--theme-dark {
+                --dp-background-color: var(--f7-list-strong-bg-color);
+            }
+        }
+
+        .dp--calendar {
+            .dp--calendar-row {
+                --dp-cell-size: var(--ebk-transaction-calendar-daily-amounts-height);
+                --dp-cell-padding: 1px;
+                --dp-primary-text-color: var(--f7-theme-color);
+
+                > .dp--calendar-item {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    .transaction-calendar-daily-amounts {
+                        width: 100%;
+                        height: 100%;
+                        background-color: var(--f7-list-group-title-bg-color);
+                        border-radius: 6px;
+
+                        > span.transaction-calendar-alternate-date {
+                            font-size: var(--ebk-transaction-calendar-alternate-date-font-size);
+                        }
+
+                        > span.transaction-calendar-daily-amount {
+                            font-size: var(--ebk-transaction-calendar-amount-font-size);
+                        }
+                    }
+
+                    > .dp--active {
+                        background-color: transparent;
+
+                        .transaction-calendar-daily-amounts {
+                            background-color: rgba(var(--ebk-primary-color), 0.16);
+                        }
+                    }
+
+                    > .dp--today {
+                        border: inherit;
+
+                        .transaction-calendar-daily-amounts {
+                            border: 1px solid var(--dp-primary-color);
+                        }
+                    }
+
+                    > .dp--date-hoverable-end:hover,
+                    > .dp--date-hoverable-start:hover,
+                    > .dp--date-hoverable:hover {
+                        background-color: transparent;
+
+                        .transaction-calendar-daily-amounts {
+                            background: var(--dp-hover-color);
+                        }
+                    }
+                }
+            }
+        }
+
+        &.transaction-calendar-with-alternate-date {
+            .dp--calendar {
+                .dp--calendar-row {
+                    --dp-cell-size: var(--ebk-transaction-calendar-with-alternate-date-daily-amounts-height);
+                }
+            }
+        }
+    }
+}

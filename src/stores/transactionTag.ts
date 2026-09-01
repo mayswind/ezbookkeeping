@@ -22,6 +22,8 @@ import logger from '@/lib/logger.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 
 export const useTransactionTagsStore = defineStore('transactionTags', () => {
+    let loadingPromise: Promise<TransactionTag[]> | null = null;
+
     const allTransactionTagGroups = ref<TransactionTagGroup[]>([]);
     const allTransactionTagGroupsMap = ref<Record<string, TransactionTagGroup>>({});
     const allTransactionTags = ref<TransactionTag[]>([]);
@@ -295,6 +297,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
     }
 
     function resetTransactionTags(): void {
+        loadingPromise = null;
         allTransactionTagGroups.value = [];
         allTransactionTagGroupsMap.value = {};
         allTransactionTags.value = [];
@@ -344,13 +347,17 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
     }
 
     function loadAllTags({ force }: { force?: boolean }): Promise<TransactionTag[]> {
+        if (loadingPromise) {
+            return loadingPromise;
+        }
+
         if (!force && !transactionTagGroupListStateInvalid.value && !transactionTagListStateInvalid.value) {
             return new Promise((resolve) => {
                 resolve(allTransactionTags.value);
             });
         }
 
-        return new Promise((resolve, reject) => {
+        const currentPromise = loadingPromise = new Promise((resolve, reject) => {
             services.getAllTransactionTagGroups().then(response => {
                 const data = response.data;
 
@@ -369,7 +376,14 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
 
                 return services.getAllTransactionTags();
             }).then(response => {
+                if (!loadingPromise || loadingPromise !== currentPromise) {
+                    logger.error('loadingPromise is invalid after retrieving tag list');
+                    reject({ message: 'An error occurred' });
+                    return;
+                }
+
                 if (!response) {
+                    loadingPromise = null;
                     reject({ message: 'Unable to retrieve tag list' });
                     return;
                 }
@@ -377,6 +391,7 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
+                    loadingPromise = null;
                     reject({ message: 'Unable to retrieve tag list' });
                     return;
                 }
@@ -388,14 +403,20 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                 const transactionTags = TransactionTag.ofMulti(data.result);
 
                 if (force && data.result && isEquals(allTransactionTags.value, transactionTags)) {
+                    loadingPromise = null;
                     reject({ message: 'Tag list is up to date', isUpToDate: true });
                     return;
                 }
 
                 loadTransactionTagList(transactionTags);
+                loadingPromise = null;
 
                 resolve(transactionTags);
             }).catch(error => {
+                if (loadingPromise === currentPromise) {
+                    loadingPromise = null;
+                }
+
                 if (force) {
                     logger.error('failed to force load tag list', error);
                 } else {
@@ -411,6 +432,8 @@ export const useTransactionTagsStore = defineStore('transactionTags', () => {
                 }
             });
         });
+
+        return loadingPromise;
     }
 
     function saveTagGroup({ tagGroup }: { tagGroup: TransactionTagGroup }): Promise<TransactionTagGroup> {

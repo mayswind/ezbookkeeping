@@ -15,7 +15,7 @@
                  :class="{ 'disabled': loadingOverview }"
                  :sortable-move-elements="false" @sortable:sort="onSort" v-if="draftLayout.widgets.length">
             <li class="cursor-pointer" :key="widget.id" v-for="widget in draftLayout.widgets">
-                <overview-widget class="overview-widget-editor-content" :widget="widget" :loading="loadingOverview" />
+                <overview-widget editing class="overview-widget-editor-content" :widget="widget" :loading="loadingOverview" />
                 <div class="overview-widget-drag-area" @click="showWidgetActions(widget)"></div>
             </li>
         </f7-list>
@@ -246,6 +246,12 @@ function reload(force: boolean): void {
         promises.push(overviewStore.loadRecentTransactions({
             force: force,
             queries: getOverviewRecentTransactionsQueries(draftLayout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.CurrentMonthTransactions)) {
+        promises.push(overviewStore.loadCurrentMonthTransactions({
+            force: force
         }));
     }
 

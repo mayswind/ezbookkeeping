@@ -55,6 +55,11 @@
                                 @refresh="$emit('refresh')"
                                 v-else-if="widget.type === OverviewWidgetType.RecentTransactions" />
 
+    <transaction-calendar-widget :loading="loading" :editing="editing" :title="widgetTitle"
+                                 :transaction-types="widget.settings['transactionTypes'] as number[]"
+                                 :show-alternate-date="widget.settings['showAlternateDate'] as boolean"
+                                 v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
+
     <transaction-calendar-heatmap-widget :loading="loading" :editing="editing" :title="widgetTitle"
                                          :transaction-type="widget.settings['transactionType'] as TransactionType"
                                          :months="widget.settings['months'] as number"
@@ -74,6 +79,7 @@ import NetAssetsTrendWidget from './widgets/NetAssetsTrendWidget.vue';
 import AccountBalanceListWidget from './widgets/AccountBalanceListWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
 import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
+import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 import TransactionCalendarHeatmapWidget from './widgets/TransactionCalendarHeatmapWidget.vue';
 
 import { TransactionType } from '@/core/transaction.ts';

@@ -71,7 +71,8 @@
 
         <f7-block class="transaction-calendar-container" :class="{ 'margin-vertical': showSearchbar, 'margin-vertical-half': !showSearchbar }"
                   v-if="pageType === TransactionListPageType.Calendar.type">
-            <transaction-calendar calendar-class="justify-content-center" week-day-name-type="short"
+            <transaction-calendar show-amount show-income-amount show-expense-amount show-alternate-date
+                                  calendar-class="justify-content-center" week-day-name-type="short"
                                   :readonly="loading" :is-dark-mode="isDarkMode"
                                   :default-currency="false"
                                   :min-date="transactionCalendarMinDate"
@@ -1690,80 +1691,6 @@ html[dir="rtl"] .list.transaction-info-list li.transaction-info .transaction-foo
         overflow: hidden;
         text-overflow: ellipsis;
     }
-}
-
-.transaction-calendar-container .dp--theme-light,
-.transaction-calendar-container .dp--theme-dark {
-    --dp-background-color: var(--f7-list-strong-bg-color);
-}
-
-.transaction-calendar-container .dp--main .dp--menu {
-    --dp-border-radius: var(--f7-list-inset-border-radius);
-    --dp-menu-padding: 4px 6px;
-    --dp-menu-border-color: transparent;
-}
-
-.transaction-calendar-container .dp--main .dp--menu.dp--theme-dark {
-    --dp-background-color: var(--f7-list-strong-bg-color);
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row {
-    --dp-cell-size: var(--ebk-transaction-calendar-daily-amounts-height);
-    --dp-cell-padding: 1px;
-    --dp-primary-text-color: var(--f7-theme-color);
-}
-
-.transaction-calendar-container .dp--main.transaction-calendar-with-alternate-date .dp--calendar .dp--calendar-row {
-    --dp-cell-size: var(--ebk-transaction-calendar-with-alternate-date-daily-amounts-height);
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item .transaction-calendar-daily-amounts {
-    width: 100%;
-    height: 100%;
-    background-color: var(--f7-list-group-title-bg-color);
-    border-radius: 6px;
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--active {
-    background-color: transparent;
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--today {
-    border: inherit;
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--date-hoverable-end:hover,
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--date-hoverable-start:hover,
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--date-hoverable:hover {
-    background-color: transparent;
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--active .transaction-calendar-daily-amounts {
-    background-color: rgba(var(--ebk-primary-color), 0.16);
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--today .transaction-calendar-daily-amounts {
-    border: 1px solid var(--dp-primary-color);
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--date-hoverable-end:hover .transaction-calendar-daily-amounts,
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--date-hoverable-start:hover .transaction-calendar-daily-amounts,
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item > .dp--date-hoverable:hover .transaction-calendar-daily-amounts {
-    background: var(--dp-hover-color);
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item .transaction-calendar-daily-amounts > span.transaction-calendar-alternate-date {
-    font-size: var(--ebk-transaction-calendar-alternate-date-font-size);
-}
-
-.transaction-calendar-container .dp--main .dp--calendar .dp--calendar-row > .dp--calendar-item .transaction-calendar-daily-amounts > span.transaction-calendar-daily-amount {
-    font-size: var(--ebk-transaction-calendar-amount-font-size);
 }
 
 .transaction-gallery-list.list > ul {

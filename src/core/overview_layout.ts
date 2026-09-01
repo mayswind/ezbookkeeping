@@ -11,6 +11,7 @@ export enum OverviewWidgetType {
     NetAssetsTrend = 'net-assets-trend',
     ExpenseCategoryRanking = 'expense-category-ranking',
     RecentTransactions = 'recent-transactions',
+    TransactionCalendar = 'transaction-calendar',
     TransactionCalendarHeatmap = 'transaction-calendar-heatmap'
 }
 
@@ -23,6 +24,7 @@ export enum OverviewWidgetDataRequirement {
     TransactionCategoryStatistics = 'transactionCategoryStatistics',
     AssetTrends = 'assetTrends',
     RecentTransactions = 'recentTransactions',
+    CurrentMonthTransactions = 'currentMonthTransactions',
     DailyTransactionAmounts = 'dailyTransactionAmounts'
 }
 

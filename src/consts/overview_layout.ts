@@ -3,6 +3,7 @@ import { DateRange } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TrendChartType } from '@/core/statistics.ts';
 import {
+    type OverviewWidgetSettingValue,
     type OverviewWidgetSwitchSettingItem,
     type OverviewWidgetColorSettingItem,
     type OverviewWidgetTextboxSettingItem,
@@ -255,7 +256,10 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             {
                 settingType: 'switch',
                 settingName: 'smoothCurve',
-                displayName: 'Smooth Curve'
+                displayName: 'Smooth Curve',
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['chartType'] === TrendChartType.Area.type;
+                }
             },
             {
                 settingType: 'switch',

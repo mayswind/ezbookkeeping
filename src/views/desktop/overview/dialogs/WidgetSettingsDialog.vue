@@ -13,13 +13,13 @@
                                   :label="tt(setting.displayName)" :items="getItemCountOptions(setting.itemCountValues)"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-if="setting.settingType === 'itemCountSelect'" />
+                                  v-if="setting.settingType === 'itemCountSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
                                   :label="tt(setting.displayName)" :items="getMonthOptions(setting.monthValues)"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-else-if="setting.settingType === 'monthSelect'" />
+                                  v-else-if="setting.settingType === 'monthSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field class="always-cursor-pointer text-field-truncate"
                                       :class="{ 'mt-4': index > 0 }"
@@ -32,7 +32,7 @@
                                       :placeholder="tt('Default')"
                                       :model-value="getFilteredAccountsDisplayContent(setting)"
                                       @click="currentSettingItem = setting; showFilterAccountsDialog = true"
-                                      v-else-if="setting.settingType === 'accountSelect'" />
+                                      v-else-if="setting.settingType === 'accountSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field class="always-cursor-pointer text-field-truncate"
                                       :class="{ 'mt-4': index > 0 }"
@@ -45,7 +45,7 @@
                                       :placeholder="tt('Default')"
                                       :model-value="getFilteredTransactionCategoriesDisplayContent(setting)"
                                       @click="currentSettingItem = setting; showFilterTransactionCategoriesDialog = true"
-                                      v-else-if="setting.settingType === 'categorySelect'" />
+                                      v-else-if="setting.settingType === 'categorySelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field class="always-cursor-pointer text-field-truncate"
                                       :class="{ 'mt-4': index > 0 }"
@@ -58,31 +58,31 @@
                                       :placeholder="tt('Default')"
                                       :model-value="getSettingValue(setting.settingName) ? tt('Custom') : tt('Default')"
                                       @click="currentSettingItem = setting; showFilterTransactionTagsDialog = true"
-                                      v-else-if="setting.settingType === 'tagSelect'" />
+                                      v-else-if="setting.settingType === 'tagSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
                                   :label="tt(setting.displayName)" :items="getCustomSelectOptions(setting)"
                                   :multiple="setting.multiple" :chips="setting.multiple" :closable-chips="setting.multiple"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-else-if="setting.settingType === 'customSelect'" />
+                                  v-else-if="setting.settingType === 'customSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-switch :class="{ 'mt-2': index > 0 }" :label="tt(setting.displayName)"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-else-if="setting.settingType === 'switch'" />
+                                  v-else-if="setting.settingType === 'switch' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <amount-filter-input :class="{ 'mt-4': index > 0 }" :label="tt(setting.displayName)"
                                              :model-value="getSettingValue(setting.settingName) as string || ''"
                                              @update:model-value="updateSettingValue(setting, $event)"
-                                             v-else-if="setting.settingType === 'amount'" />
+                                             v-else-if="setting.settingType === 'amount' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field :class="{ 'mt-4': index > 0 }" :label="tt(setting.displayName)"
                                       :placeholder="setting.placeholder ? tt(setting.placeholder) : undefined"
                                       :persistent-placeholder="!!setting.placeholder"
                                       :model-value="getSettingValue(setting.settingName)"
                                       @update:model-value="updateSettingValue(setting, $event)"
-                                      v-else-if="setting.settingType === 'textbox'" />
+                                      v-else-if="setting.settingType === 'textbox' && (!setting.condition || setting.condition(widget?.settings))" />
                     </template>
                 </div>
 

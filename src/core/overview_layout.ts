@@ -34,6 +34,7 @@ interface OverviewWidgetSettingItemBase {
     settingType: 'itemCountSelect' | 'monthSelect' | 'accountSelect' | 'categorySelect' | 'tagSelect' | 'customSelect' | 'switch' | 'color' | 'amount' | 'textbox';
     settingName: string;
     displayName: string;
+    condition?: (settings?: Record<string, OverviewWidgetSettingValue>) => boolean;
 }
 
 export interface OverviewWidgetItemCountSelectSettingItem extends OverviewWidgetSettingItemBase {

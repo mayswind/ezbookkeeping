@@ -85,6 +85,7 @@
                         <f7-list-input
                             type="textarea"
                             class="import-chart-color-scheme-textarea code-textarea"
+                            :placeholder="layoutJsonPlaceholder"
                             :value="importText"
                             @input="importText = $event.target.value"
                         ></f7-list-input>
@@ -169,6 +170,16 @@ const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
+
+const layoutJsonPlaceholder: string = `{
+    "widgets": [
+        {
+            "id": "widget-id",
+            "type": "widget-type",
+            "settings": {}
+        }
+    ]
+}`;
 
 const widgetSettingsPopup = useTemplateRef<WidgetSettingsPopupType>('widgetSettingsPopup');
 

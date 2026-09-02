@@ -40,6 +40,7 @@
                                  :transaction-types="widget.settings['transactionTypes'] as number[]"
                                  :show-alternate-date="widget.settings['showAlternateDate'] as boolean"
                                  :show-amount="widget.settings['showAmount'] as boolean"
+                                 @navigate="onNavigate"
                                  v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
 </template>
 
@@ -64,10 +65,18 @@ const props = defineProps<{
     editing?: boolean;
 }>();
 
+const emit = defineEmits<{
+    (e: 'navigate', path: string): void;
+}>();
+
 const widgetTitle = computed<string>(() => {
     const title = props.widget.settings['title'];
     return typeof title === 'string' ? title.trim() : '';
 });
+
+function onNavigate(path: string): void {
+    emit('navigate', path);
+}
 </script>
 
 <style>

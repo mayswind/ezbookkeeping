@@ -4,7 +4,7 @@
             <f7-nav-title :title="tt('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
-        <overview-dashboard :layout="layout" :loading="loading" />
+        <overview-dashboard :layout="layout" :loading="loading" @navigate="onNavigate" />
 
         <f7-toolbar tabbar icons bottom class="main-tabbar">
             <f7-link class="link" href="/transaction/list">
@@ -323,6 +323,12 @@ function onReceiptRecognitionChanged(result: AIImageRecognitionResult): void {
             autoUploadPicture: autoUploadRecognizedImage ? result.imageFile : undefined,
         }
     });
+}
+
+function onNavigate(path: string): void {
+    if (path) {
+        props.f7router.navigate(path);
+    }
 }
 
 function onPageAfterIn(): void {

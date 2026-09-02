@@ -34,6 +34,10 @@ const props = defineProps<{
     showAmount: boolean;
 }>();
 
+const emit = defineEmits<{
+    (e: 'navigate', path: string): void;
+}>();
+
 const environmentsStore = useEnvironmentsStore();
 
 const {
@@ -54,7 +58,7 @@ function selectDate(date: TextualYearMonthDay): void {
     const url = getTransactionListUrl(date);
 
     if (url) {
-
+        emit('navigate', url);
     }
 }
 </script>

@@ -22,6 +22,7 @@ import {
 
 export interface CommonTransactionCalendarWidgetProps {
     transactionTypes: number[];
+    showAmount: boolean;
 }
 
 export function useTransactionCalendarWidgetBase(props: CommonTransactionCalendarWidgetProps) {
@@ -29,7 +30,7 @@ export function useTransactionCalendarWidgetBase(props: CommonTransactionCalenda
     const userStore = useUserStore();
     const overviewStore = useOverviewStore();
 
-    const showAmountInHomePage = computed<boolean>(() => settingsStore.appSettings.showAmountInHomePage);
+    const showAmountInCalendar = computed<boolean>(() => props.showAmount && settingsStore.appSettings.showAmountInHomePage);
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 
     const showIncome = computed<boolean>(() => props.transactionTypes.includes(TransactionType.Income));
@@ -61,7 +62,7 @@ export function useTransactionCalendarWidgetBase(props: CommonTransactionCalenda
     return {
         // computed states
         currentCalendarDate,
-        showAmountInHomePage,
+        showAmountInCalendar,
         showIncome,
         showExpense,
         defaultCurrency,

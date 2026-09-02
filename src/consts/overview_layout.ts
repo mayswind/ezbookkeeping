@@ -468,6 +468,11 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
                 settingType: 'switch',
                 settingName: 'showAlternateDate',
                 displayName: 'Show Alternate Date'
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAmount',
+                displayName: 'Show Amount'
             }
         ],
         defaultSettings: {
@@ -475,7 +480,8 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
                 TransactionType.Income,
                 TransactionType.Expense
             ],
-            showAlternateDate: true
+            showAlternateDate: true,
+            showAmount: true
         },
         defaultWidth: 6,
         defaultHeight: 6,
@@ -862,6 +868,11 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                 settingType: 'switch',
                 settingName: 'showAlternateDate',
                 displayName: 'Show Alternate Date'
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAmount',
+                displayName: 'Show Amount'
             }
         ],
         defaultSettings: {
@@ -869,7 +880,8 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                 TransactionType.Income,
                 TransactionType.Expense
             ],
-            showAlternateDate: true
+            showAlternateDate: true,
+            showAmount: true
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.CurrentMonthTransactions

@@ -8,8 +8,8 @@
                 <f7-link sheet-close icon-f7="xmark"></f7-link>
             </div>
             <f7-segmented strong round class="width-100">
-                <f7-button :active="currentTab === 'system'" @click="showSystemColors">{{ tt('System Colors') }}</f7-button>
-                <f7-button :active="currentTab === 'custom'" @click="showCustomColor">{{ tt('Custom Color') }}</f7-button>
+                <f7-button round :active="currentTab === 'system'" @click="showSystemColors">{{ tt('System Colors') }}</f7-button>
+                <f7-button round :active="currentTab === 'custom'" @click="showCustomColor">{{ tt('Custom Color') }}</f7-button>
             </f7-segmented>
         </f7-toolbar>
         <f7-page-content>

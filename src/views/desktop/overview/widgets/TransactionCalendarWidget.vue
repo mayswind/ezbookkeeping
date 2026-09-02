@@ -92,11 +92,11 @@ function selectDate(date: TextualYearMonthDay): void {
                     .dp--calendar-row {
                         > .dp--calendar-item {
                             .transaction-calendar-daily-amounts {
-                            > span.transaction-calendar-alternate-date,
-                            > span.transaction-calendar-daily-amount {
-                                font-size: 0.8125rem;
-                            }
+                                > span.transaction-calendar-alternate-date,
+                                > span.transaction-calendar-daily-amount {
+                                    font-size: 0.8125rem;
                                 }
+                            }
                         }
                     }
                 }

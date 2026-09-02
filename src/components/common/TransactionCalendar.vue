@@ -23,8 +23,8 @@
                 <span class="transaction-calendar-daily-amount text-income" v-if="showAmount && showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].income, defaultCurrency, '', dailyTotalAmounts[day].incompleteIncome) }}</span>
                 <span class="transaction-calendar-daily-amount text-expense" v-if="showAmount && showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].expense, defaultCurrency, '', dailyTotalAmounts[day].incompleteExpense) }}</span>
                 <span class="transaction-calendar-daily-amount" v-if="!showAmount">
-                    <span class="text-income" v-if="showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()">●</span>
-                    <span class="text-expense" style="margin-inline-start: 2px" v-if="showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()">●</span>
+                    <span class="transaction-calendar-daily-amount-dot text-income" v-if="showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()">●</span>
+                    <span class="transaction-calendar-daily-amount-dot text-expense" style="margin-inline-start: 2px" v-if="showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()">●</span>
                 </span>
             </div>
         </template>

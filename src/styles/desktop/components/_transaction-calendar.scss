@@ -29,15 +29,21 @@
                     .transaction-calendar-daily-amounts {
                         width: 100%;
 
-                        > span.transaction-calendar-alternate-date,
-                        > span.transaction-calendar-daily-amount{
+                        > span.transaction-calendar-alternate-date {
                             font-size: 0.9rem;
+                        }
+
+                        > span.transaction-calendar-daily-amount {
+                            font-size: 0.9rem;
+
+                            .transaction-calendar-daily-amount-dot {
+                                font-size: 0.75rem;
+                            }
                         }
                     }
                 }
             }
         }
-
 
         &.auto-height-calendar {
             height: 100%;

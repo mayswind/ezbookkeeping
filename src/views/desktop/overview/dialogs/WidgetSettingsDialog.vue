@@ -67,7 +67,7 @@
                                   @update:model-value="updateSettingValue(setting, $event)"
                                   v-else-if="setting.settingType === 'customSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
-                        <v-switch :class="{ 'mt-2': index > 0 }" :label="tt(setting.displayName)"
+                        <v-switch :class="{ 'mt-2': index > 0 && supportsSettings[index - 1]?.settingType !== 'switch' }" :label="tt(setting.displayName)"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
                                   v-else-if="setting.settingType === 'switch' && (!setting.condition || setting.condition(widget?.settings))" />

@@ -95,12 +95,13 @@ const props = defineProps<{
     editing?: boolean
 }>();
 
+defineEmits<{
+    (e: 'refresh'): void
+}>();
+
 const widgetTitle = computed<string>(() => {
     const title = props.widget.settings['title'];
     return typeof title === 'string' ? title.trim() : '';
 });
 
-defineEmits<{
-    (e: 'refresh'): void
-}>();
 </script>

@@ -1,7 +1,7 @@
 <template>
     <f7-page with-subnavbar @page:beforein="onPageBeforeIn" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')" v-if="!isCustomSelection"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableTag }" @click="showMoreActionSheet = true"></f7-link>
@@ -172,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -187,16 +187,22 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { values } from '@/core/base.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
 
+import { isDefined } from '@/lib/common.ts';
+
 interface CollapseState {
     opened: boolean;
 }
 
 const props = defineProps<{
-    f7route: Router.Route;
-    f7router: Router.Router;
+    f7route?: Router.Route;
+    f7router?: Router.Router;
+    customTagFilter?: string;
 }>();
 
-const query = props.f7route.query;
+const emit = defineEmits<{
+    (e: 'update:customTagFilter', value: string): void;
+    (e: 'save'): void;
+}>();
 
 const { tt } = useI18n();
 const { showToast, routeBackOnError } = useI18nUIComponents();
@@ -216,7 +222,7 @@ const {
     hasAnyVisibleTag,
     loadFilterTagIds,
     saveFilterTagIds
-} = useTransactionTagFilterSettingPageBase(query['type']);
+} = useTransactionTagFilterSettingPageBase(props.f7route?.query?.['type'] ?? 'custom');
 
 const transactionTagsStore = useTransactionTagsStore();
 
@@ -224,6 +230,8 @@ const loadingError = ref<unknown | null>(null);
 const currentTransactionTagGroupId = ref<string>('');
 const currentTransactionTagId = ref<string>('');
 const showMoreActionSheet = ref<boolean>(false);
+
+const isCustomSelection = computed<boolean>(() => !props.f7route?.query?.['type'] && isDefined(props.customTagFilter));
 
 const collapseStates = ref<Record<string, CollapseState>>(getInitCollapseState(allVisibleTagGroupIds.value));
 
@@ -246,7 +254,7 @@ function init(): void {
         loading.value = false;
         collapseStates.value = getInitCollapseState(allVisibleTagGroupIds.value);
 
-        if (!loadFilterTagIds()) {
+        if (!loadFilterTagIds(props.customTagFilter)) {
             showToast('Parameter Invalid');
             loadingError.value = 'Parameter Invalid';
         }
@@ -294,8 +302,14 @@ function setAllTagsState(value: TransactionTagFilterState): void {
 }
 
 function save(): void {
-    saveFilterTagIds();
-    props.f7router.back();
+    const [, tagFilter] = saveFilterTagIds();
+
+    if (isCustomSelection.value) {
+        emit('update:customTagFilter', tagFilter);
+        emit('save');
+    } else {
+        props.f7router?.back();
+    }
 }
 
 function onPageBeforeIn(): void {
@@ -303,8 +317,16 @@ function onPageBeforeIn(): void {
 }
 
 function onPageAfterIn(): void {
-    routeBackOnError(props.f7router, loadingError);
+    if (props.f7router) {
+        routeBackOnError(props.f7router, loadingError);
+    }
 }
+
+watch(() => props.customTagFilter, (newValue) => {
+    if (isCustomSelection.value && !loading.value) {
+        loadFilterTagIds(newValue);
+    }
+});
 
 init();
 </script>

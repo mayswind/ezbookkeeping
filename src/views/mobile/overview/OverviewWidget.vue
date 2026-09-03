@@ -36,6 +36,16 @@
                                      :item-count="widget.settings['itemCount'] as number"
                                      v-else-if="widget.type === OverviewWidgetType.ExpenseCategoryRanking" />
 
+    <recent-transactions-widget :loading="loading" :editing="editing" :title="widgetTitle"
+                                :show-title="widget.settings['showTitle'] as boolean"
+                                :item-count="widget.settings['itemCount'] as number"
+                                :account-ids="widget.settings['accountIds'] as string[]"
+                                :category-ids="widget.settings['categoryIds'] as string[]"
+                                :tag-filter="widget.settings['tagFilter'] as string"
+                                :amount-filter="widget.settings['amountFilter'] as string"
+                                :keyword="widget.settings['keyword'] as string"
+                                v-else-if="widget.type === OverviewWidgetType.RecentTransactions" />
+
     <transaction-calendar-widget :loading="loading" :editing="editing"
                                  :transaction-types="widget.settings['transactionTypes'] as number[]"
                                  :show-alternate-date="widget.settings['showAlternateDate'] as boolean"
@@ -54,6 +64,7 @@ import MonthlyExpenseProgressWidget from './widgets/MonthlyExpenseProgressWidget
 import PeriodIncomeExpenseWidget from './widgets/PeriodIncomeExpenseWidget.vue';
 import PeriodNetIncomeAndSavingsRateWidget from './widgets/PeriodNetIncomeAndSavingsRateWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
+import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
 import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 
 import type { ColorValue } from '@/core/color.ts';

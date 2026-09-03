@@ -106,6 +106,7 @@ const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const showAmountInHomePage = computed<boolean>(() => settingsStore.appSettings.showAmountInHomePage);
 const recentTransactionsQuery = computed<OverviewRecentTransactionsQuery>(() => getOverviewRecentTransactionsQuery({
+    itemCount: props.itemCount,
     accountIds: props.accountIds ?? [],
     categoryIds: props.categoryIds ?? [],
     tagFilter: props.tagFilter ?? '',

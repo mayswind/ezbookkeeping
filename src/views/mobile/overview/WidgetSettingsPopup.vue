@@ -1,6 +1,6 @@
 <template>
     <f7-popup push swipe-to-close :opened="show" @popup:open="onPopupOpen" @popup:closed="onPopupClosed">
-        <f7-page v-show="!showFilterAccountsPopup">
+        <f7-page v-show="!showFilterAccountsPopup && !showFilterCategoriesPopup && !showFilterTagsPopup && !showAmountFilterPopup">
             <f7-navbar>
                 <f7-nav-left>
                     <f7-link popup-close icon-f7="xmark"></f7-link>
@@ -102,11 +102,27 @@
                                       v-model:custom-selected-account-ids="customSelectedAccountIds"
                                       @save="updateAccountValue"
                                       v-if="showFilterAccountsPopup" />
+
+        <category-filter-settings-page v-model:custom-selected-category-ids="customSelectedCategoryIds"
+                                       @save="updateCategoryValue"
+                                       v-if="showFilterCategoriesPopup" />
+
+        <transaction-tag-filter-settings-page v-model:custom-tag-filter="customTagFilter"
+                                              @save="updateTagValue"
+                                              v-if="showFilterTagsPopup" />
+
+        <transaction-amount-filter-page show-all-option
+                                        v-model:custom-amount-filter="customAmountFilter"
+                                        @save="updateAmountValue"
+                                        v-if="showAmountFilterPopup" />
     </f7-popup>
 </template>
 
 <script setup lang="ts">
 import AccountFilterSettingsPage from '@/views/mobile/settings/AccountFilterSettingsPage.vue';
+import CategoryFilterSettingsPage from '@/views/mobile/settings/CategoryFilterSettingsPage.vue';
+import TransactionTagFilterSettingsPage from '@/views/mobile/settings/TransactionTagFilterSettingsPage.vue';
+import TransactionAmountFilterPage from '@/views/mobile/transactions/AmountFilterPage.vue';
 
 import { ref, computed, nextTick } from 'vue';
 
@@ -127,9 +143,10 @@ import {
 } from '@/core/overview_layout.ts';
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
 
-import { isDefined, isArray, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
+import { isDefined, isArray, isString, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 import { isAllAccountsChecked } from '@/lib/account.ts';
+import { isAllCategoriesChecked } from '@/lib/category.ts';
 import { cloneWidget } from '@/lib/overview_layout.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 
@@ -158,7 +175,13 @@ const loading = ref<boolean>(false);
 const widget = ref<MobileOverviewWidgetLayout | null>(null);
 const currentSettingItem = ref<OverviewWidgetSettingItem | undefined>(undefined);
 const showFilterAccountsPopup = ref<boolean>(false);
+const showFilterCategoriesPopup = ref<boolean>(false);
+const showFilterTagsPopup = ref<boolean>(false);
+const showAmountFilterPopup = ref<boolean>(false);
 const customSelectedAccountIds = ref<string[]>([]);
+const customSelectedCategoryIds = ref<string[]>([]);
+const customTagFilter = ref<string>('');
+const customAmountFilter = ref<string>('');
 
 const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
 const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
@@ -223,6 +246,14 @@ function getSingleSettingDisplayName(setting: OverviewWidgetSettingItem): string
         }
 
         return isAllAccountsChecked(accountsStore.allVisiblePlainAccounts, arrayItemToObjectField(value as string[], true)) ? tt('All') : tt('Partial');
+    } else if (setting.settingType === 'categorySelect') {
+        if (!isArray(value) || value.length < 1) {
+            return tt('All');
+        }
+
+        return isAllCategoriesChecked(transactionCategoriesStore.allTransactionCategories, arrayItemToObjectField(value as string[], true)) ? tt('All') : tt('Partial');
+    } else if (setting.settingType === 'tagSelect' || setting.settingType === 'amount') {
+        return value ? tt('Custom') : tt('All');
     }
 
     return getSettingOptions(setting).find(option => option.value === value)?.name ?? '';
@@ -280,6 +311,18 @@ function openSettingSelection(setting: OverviewWidgetSettingItem, event: MouseEv
         const selectedAccountIds = getSettingValue(setting.settingName);
         customSelectedAccountIds.value = isArray(selectedAccountIds) ? [...selectedAccountIds] as string[] : [];
         showFilterAccountsPopup.value = true;
+    } else if (setting.settingType === 'categorySelect') {
+        const selectedCategoryIds = getSettingValue(setting.settingName);
+        customSelectedCategoryIds.value = isArray(selectedCategoryIds) ? [...selectedCategoryIds] as string[] : [];
+        showFilterCategoriesPopup.value = true;
+    } else if (setting.settingType === 'tagSelect') {
+        const tagFilter = getSettingValue(setting.settingName);
+        customTagFilter.value = isString(tagFilter) ? tagFilter : '';
+        showFilterTagsPopup.value = true;
+    } else if (setting.settingType === 'amount') {
+        const amountFilter = getSettingValue(setting.settingName);
+        customAmountFilter.value = isString(amountFilter) ? amountFilter : '';
+        showAmountFilterPopup.value = true;
     } else {
         nextTick(() => {
             openPopover('.widget-setting-selection-popover', event.currentTarget as HTMLElement);
@@ -301,6 +344,36 @@ function updateAccountValue(): void {
     currentSettingItem.value = undefined;
     customSelectedAccountIds.value = [];
     showFilterAccountsPopup.value = false;
+}
+
+function updateCategoryValue(): void {
+    if (currentSettingItem.value && currentSettingItem.value.settingType === 'categorySelect') {
+        updateSettingValue(currentSettingItem.value.settingName, customSelectedCategoryIds.value);
+    }
+
+    currentSettingItem.value = undefined;
+    customSelectedCategoryIds.value = [];
+    showFilterCategoriesPopup.value = false;
+}
+
+function updateTagValue(): void {
+    if (currentSettingItem.value && currentSettingItem.value.settingType === 'tagSelect') {
+        updateSettingValue(currentSettingItem.value.settingName, customTagFilter.value);
+    }
+
+    currentSettingItem.value = undefined;
+    customTagFilter.value = '';
+    showFilterTagsPopup.value = false;
+}
+
+function updateAmountValue(): void {
+    if (currentSettingItem.value && currentSettingItem.value.settingType === 'amount') {
+        updateSettingValue(currentSettingItem.value.settingName, customAmountFilter.value);
+    }
+
+    currentSettingItem.value = undefined;
+    customAmountFilter.value = '';
+    showAmountFilterPopup.value = false;
 }
 
 function confirm(): void {
@@ -328,6 +401,9 @@ function onPopupOpen(): void {
     widget.value = cloneWidget(props.modelValue);
     currentSettingItem.value = undefined;
     customSelectedAccountIds.value = [];
+    customSelectedCategoryIds.value = [];
+    customTagFilter.value = '';
+    customAmountFilter.value = '';
 
     if (MOBILE_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]) {
         const defaultSettings = MOBILE_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.defaultSettings ?? {};
@@ -367,7 +443,13 @@ function onPopupClosed(): void {
     widget.value = null;
     currentSettingItem.value = undefined;
     showFilterAccountsPopup.value = false;
+    showFilterCategoriesPopup.value = false;
+    showFilterTagsPopup.value = false;
+    showAmountFilterPopup.value = false;
     customSelectedAccountIds.value = [];
+    customSelectedCategoryIds.value = [];
+    customTagFilter.value = '';
+    customAmountFilter.value = '';
     close();
 }
 </script>

@@ -3,6 +3,7 @@ import { DateRange } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TrendChartType } from '@/core/statistics.ts';
 import {
+    type OverviewWidgetSettingValue,
     type OverviewWidgetSwitchSettingItem,
     type OverviewWidgetColorSettingItem,
     type OverviewWidgetTextboxSettingItem,
@@ -255,7 +256,10 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             {
                 settingType: 'switch',
                 settingName: 'smoothCurve',
-                displayName: 'Smooth Curve'
+                displayName: 'Smooth Curve',
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['chartType'] === TrendChartType.Area.type;
+                }
             },
             {
                 settingType: 'switch',
@@ -270,7 +274,10 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
         ],
         defaultSettings: {
             chartType: TrendChartType.Column.type,
-            transactionTypes: [TransactionType.Income, TransactionType.Expense],
+            transactionTypes: [
+                TransactionType.Income,
+                TransactionType.Expense
+            ],
             months: 12,
             smoothCurve: false,
             showXAxisLabels: true,
@@ -435,6 +442,55 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             OverviewWidgetDataRequirement.RecentTransactions
         ]
     },
+    [OverviewWidgetType.TransactionCalendar]: {
+        type: OverviewWidgetType.TransactionCalendar,
+        name: 'Transaction Calendar',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            {
+                settingType: 'customSelect',
+                settingName: 'transactionTypes',
+                displayName: 'Transaction Type',
+                selectValues: [
+                    {
+                        name: 'Income',
+                        value: TransactionType.Income
+                    },
+                    {
+                        name: 'Expense',
+                        value: TransactionType.Expense
+                    }
+                ],
+                multiple: true,
+                minSelections: 1
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAlternateDate',
+                displayName: 'Show Alternate Date'
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAmount',
+                displayName: 'Show Amount'
+            }
+        ],
+        defaultSettings: {
+            transactionTypes: [
+                TransactionType.Income,
+                TransactionType.Expense
+            ],
+            showAlternateDate: true,
+            showAmount: true
+        },
+        defaultWidth: 6,
+        defaultHeight: 6,
+        minWidth: 3,
+        minHeight: 6,
+        dataRequirements: [
+            OverviewWidgetDataRequirement.CurrentMonthTransactions
+        ]
+    },
     [OverviewWidgetType.TransactionCalendarHeatmap]: {
         type: OverviewWidgetType.TransactionCalendarHeatmap,
         name: 'Transaction Calendar Heatmap',
@@ -549,7 +605,10 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
             h: 6,
             settings: {
                 chartType: TrendChartType.Column.type,
-                transactionTypes: [TransactionType.Income, TransactionType.Expense],
+                transactionTypes: [
+                    TransactionType.Income,
+                    TransactionType.Expense
+                ],
                 months: 12,
                 smoothCurve: false,
                 showXAxisLabels: true,
@@ -782,6 +841,50 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             OverviewWidgetDataRequirement.Accounts,
             OverviewWidgetDataRequirement.TransactionCategories,
             OverviewWidgetDataRequirement.TransactionCategoryStatistics
+        ]
+    },
+    [OverviewWidgetType.TransactionCalendar]: {
+        type: OverviewWidgetType.TransactionCalendar,
+        name: 'Transaction Calendar',
+        supportsSettings: [
+            {
+                settingType: 'customSelect',
+                settingName: 'transactionTypes',
+                displayName: 'Transaction Type',
+                selectValues: [
+                    {
+                        name: 'Income',
+                        value: TransactionType.Income
+                    },
+                    {
+                        name: 'Expense',
+                        value: TransactionType.Expense
+                    }
+                ],
+                multiple: true,
+                minSelections: 1
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAlternateDate',
+                displayName: 'Show Alternate Date'
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAmount',
+                displayName: 'Show Amount'
+            }
+        ],
+        defaultSettings: {
+            transactionTypes: [
+                TransactionType.Income,
+                TransactionType.Expense
+            ],
+            showAlternateDate: true,
+            showAmount: true
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.CurrentMonthTransactions
         ]
     }
 };

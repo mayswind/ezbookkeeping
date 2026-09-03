@@ -13,7 +13,7 @@
 
             <f7-list strong inset dividers class="settings-list margin-top-half" :class="{ 'disabled': loading }" >
                 <template :key="setting.settingName" v-for="setting in supportsSettings">
-                    <template v-if="setting.settingType === 'customSelect' && setting.multiple">
+                    <template v-if="setting.settingType === 'customSelect' && setting.multiple && (!setting.condition || setting.condition(widget?.settings))">
                         <f7-list-item group-title>
                             <small>{{ tt(setting.displayName) }}</small>
                         </f7-list-item>
@@ -26,7 +26,7 @@
                                       @change="updateMultipleValue(setting, option.value, $event.target.checked)"></f7-list-item>
                     </template>
 
-                    <f7-list-item v-else-if="setting.settingType === 'switch'">
+                    <f7-list-item v-else-if="setting.settingType === 'switch' && (!setting.condition || setting.condition(widget?.settings))">
                         <template #after-title>
                             {{ tt(setting.displayName) }}
                         </template>
@@ -44,7 +44,7 @@
                                    }"
                                    :value="{ hex: getDisplayColor(getSettingValue(setting.settingName) as string) }"
                                    @colorpicker:change="updateColorSettingValue(setting.settingName, $event)"
-                                   v-else-if="setting.settingType === 'color'">
+                                   v-else-if="setting.settingType === 'color' && (!setting.condition || setting.condition(widget?.settings))">
                         <template #inner-start>
                             <div class="item-actual-title">
                                 <span>{{ tt(setting.displayName) }}</span>
@@ -63,7 +63,7 @@
                                    :placeholder="setting.placeholder ? tt(setting.placeholder) : undefined"
                                    :value="getSettingValue(setting.settingName) as string"
                                    @input="updateSettingValue(setting.settingName, $event.target.value)"
-                                   v-else-if="setting.settingType === 'textbox'"></f7-list-input>
+                                   v-else-if="setting.settingType === 'textbox' && (!setting.condition || setting.condition(widget?.settings))"></f7-list-input>
 
                     <f7-list-item class="item-truncate-after-text"
                                   link="#" :disabled="isSettingDisabled(setting)"
@@ -75,7 +75,7 @@
                             </div>
                         </template>
                         <template #after>
-                            <f7-preloader v-if="loading && (setting.settingType === 'accountSelect' || setting.settingType === 'categorySelect' || setting.settingType === 'tagSelect')" />
+                            <f7-preloader v-if="loading && (setting.settingType === 'accountSelect' || setting.settingType === 'categorySelect' || setting.settingType === 'tagSelect') && (!setting.condition || setting.condition(widget?.settings))" />
                             <div v-else>{{ getSingleSettingDisplayName(setting) }}</div>
                         </template>
                     </f7-list-item>

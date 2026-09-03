@@ -11,6 +11,7 @@ export enum OverviewWidgetType {
     NetAssetsTrend = 'net-assets-trend',
     ExpenseCategoryRanking = 'expense-category-ranking',
     RecentTransactions = 'recent-transactions',
+    TransactionCalendar = 'transaction-calendar',
     TransactionCalendarHeatmap = 'transaction-calendar-heatmap'
 }
 
@@ -23,6 +24,7 @@ export enum OverviewWidgetDataRequirement {
     TransactionCategoryStatistics = 'transactionCategoryStatistics',
     AssetTrends = 'assetTrends',
     RecentTransactions = 'recentTransactions',
+    CurrentMonthTransactions = 'currentMonthTransactions',
     DailyTransactionAmounts = 'dailyTransactionAmounts'
 }
 
@@ -32,6 +34,7 @@ interface OverviewWidgetSettingItemBase {
     settingType: 'itemCountSelect' | 'monthSelect' | 'accountSelect' | 'categorySelect' | 'tagSelect' | 'customSelect' | 'switch' | 'color' | 'amount' | 'textbox';
     settingName: string;
     displayName: string;
+    condition?: (settings?: Record<string, OverviewWidgetSettingValue>) => boolean;
 }
 
 export interface OverviewWidgetItemCountSelectSettingItem extends OverviewWidgetSettingItemBase {

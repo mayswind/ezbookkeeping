@@ -11,7 +11,7 @@
             <template #content>
                 <div class="w-100 h-100">
                     <v-textarea no-resize class="w-100 h-100 ps-3 code-textarea always-cursor-text"
-                                density="compact" variant="plain" :rounded="false"
+                                density="compact" variant="plain" :rounded="false" :placeholder="placeholder"
                                 v-model="json"></v-textarea>
                 </div>
             </template>
@@ -27,6 +27,7 @@ import { useI18n } from '@/locales/helpers.ts';
 const props = defineProps<{
     title: string;
     sampleJson?: string;
+    placeholder?: string;
     onImport: (value: string) => boolean;
 }>();
 

@@ -1,5 +1,5 @@
 # Build backend binary file
-FROM golang:1.26.4-alpine3.24 AS be-builder
+FROM golang:1.27.1-alpine3.24 AS be-builder
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ARG BUILD_UNIXTIME
@@ -19,7 +19,7 @@ RUN apk add git gcc g++ libc-dev
 RUN ./build.sh backend
 
 # Build frontend files
-FROM --platform=$BUILDPLATFORM node:24.18.0-alpine3.24 AS fe-builder
+FROM --platform=$BUILDPLATFORM node:26.8.1-alpine3.24 AS fe-builder
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ARG BUILD_UNIXTIME

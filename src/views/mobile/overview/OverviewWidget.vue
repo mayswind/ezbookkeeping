@@ -35,6 +35,13 @@
                                      :category-level="widget.settings['categoryLevel'] as string"
                                      :item-count="widget.settings['itemCount'] as number"
                                      v-else-if="widget.type === OverviewWidgetType.ExpenseCategoryRanking" />
+
+    <transaction-calendar-widget :loading="loading" :editing="editing"
+                                 :transaction-types="widget.settings['transactionTypes'] as number[]"
+                                 :show-alternate-date="widget.settings['showAlternateDate'] as boolean"
+                                 :show-amount="widget.settings['showAmount'] as boolean"
+                                 @navigate="onNavigate"
+                                 v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
 </template>
 
 <script setup lang="ts">
@@ -47,6 +54,7 @@ import MonthlyExpenseProgressWidget from './widgets/MonthlyExpenseProgressWidget
 import PeriodIncomeExpenseWidget from './widgets/PeriodIncomeExpenseWidget.vue';
 import PeriodNetIncomeAndSavingsRateWidget from './widgets/PeriodNetIncomeAndSavingsRateWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
+import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 
 import type { ColorValue } from '@/core/color.ts';
 import { type MobileOverviewWidgetLayout, OverviewWidgetType } from '@/core/overview_layout.ts';
@@ -54,12 +62,21 @@ import { type MobileOverviewWidgetLayout, OverviewWidgetType } from '@/core/over
 const props = defineProps<{
     widget: MobileOverviewWidgetLayout;
     loading: boolean;
+    editing?: boolean;
+}>();
+
+const emit = defineEmits<{
+    (e: 'navigate', path: string): void;
 }>();
 
 const widgetTitle = computed<string>(() => {
     const title = props.widget.settings['title'];
     return typeof title === 'string' ? title.trim() : '';
 });
+
+function onNavigate(path: string): void {
+    emit('navigate', path);
+}
 </script>
 
 <style>

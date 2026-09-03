@@ -19,6 +19,8 @@ import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
 export const useTransactionCategoriesStore = defineStore('transactionCategories', () =>{
+    let loadingPromise: Promise<Record<number, TransactionCategory[]>> | null = null;
+
     const allTransactionCategories = ref<Record<number, TransactionCategory[]>>({});
     const allTransactionCategoriesMap = ref<Record<string, TransactionCategory>>({});
     const transactionCategoryListStateInvalid = ref<boolean>(true);
@@ -199,23 +201,35 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
     }
 
     function resetTransactionCategories(): void {
+        loadingPromise = null;
         allTransactionCategories.value = {};
         allTransactionCategoriesMap.value = {};
         transactionCategoryListStateInvalid.value = true;
     }
 
     function loadAllCategories({ force }: { force?: boolean }): Promise<Record<number, TransactionCategory[]>> {
+        if (loadingPromise) {
+            return loadingPromise;
+        }
+
         if (!force && !transactionCategoryListStateInvalid.value) {
             return new Promise((resolve) => {
                 resolve(allTransactionCategories.value);
             });
         }
 
-        return new Promise((resolve, reject) => {
+        const currentPromise = loadingPromise = new Promise((resolve, reject) => {
             services.getAllTransactionCategories().then(response => {
+                if (!loadingPromise || loadingPromise !== currentPromise) {
+                    logger.error('loadingPromise is invalid after retrieving category list');
+                    reject({ message: 'An error occurred' });
+                    return;
+                }
+
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
+                    loadingPromise = null;
                     reject({ message: 'Unable to retrieve category list' });
                     return;
                 }
@@ -239,14 +253,20 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 const transactionCategories = TransactionCategory.ofMap(data.result);
 
                 if (force && data.result && isEquals(allTransactionCategories.value, transactionCategories)) {
+                    loadingPromise = null;
                     reject({ message: 'Category list is up to date', isUpToDate: true });
                     return;
                 }
 
                 loadTransactionCategoryList(transactionCategories);
+                loadingPromise = null;
 
                 resolve(transactionCategories);
             }).catch(error => {
+                if (loadingPromise === currentPromise) {
+                    loadingPromise = null;
+                }
+
                 if (force) {
                     logger.error('failed to force load category list', error);
                 } else {
@@ -262,6 +282,8 @@ export const useTransactionCategoriesStore = defineStore('transactionCategories'
                 }
             });
         });
+
+        return loadingPromise;
     }
 
     function getCategory({ categoryId }: { categoryId: string }): Promise<TransactionCategory> {

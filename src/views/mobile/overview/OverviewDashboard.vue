@@ -1,7 +1,7 @@
 <template>
     <div class="mobile-overview-dashboard">
         <div class="mobile-overview-dashboard-item" :key="widget.id" v-for="widget in layout.widgets">
-            <overview-widget :widget="widget" :loading="loading" />
+            <overview-widget :widget="widget" :loading="loading" @navigate="onNavigate" />
         </div>
 
         <f7-block class="text-align-center text-color-gray padding-vertical" v-if="!layout.widgets.length">
@@ -22,7 +22,15 @@ defineProps<{
     loading: boolean;
 }>();
 
+const emit = defineEmits<{
+    (e: 'navigate', path: string): void;
+}>();
+
 const { tt } = useI18n();
+
+function onNavigate(path: string): void {
+    emit('navigate', path);
+}
 </script>
 
 <style>

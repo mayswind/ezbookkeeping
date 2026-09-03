@@ -15,7 +15,7 @@
                  :class="{ 'disabled': loadingOverview }"
                  :sortable-move-elements="false" @sortable:sort="onSort" v-if="draftLayout.widgets.length">
             <li class="cursor-pointer" :key="widget.id" v-for="widget in draftLayout.widgets">
-                <overview-widget class="overview-widget-editor-content" :widget="widget" :loading="loadingOverview" />
+                <overview-widget editing class="overview-widget-editor-content" :widget="widget" :loading="loadingOverview" />
                 <div class="overview-widget-drag-area" @click="showWidgetActions(widget)"></div>
             </li>
         </f7-list>
@@ -85,6 +85,7 @@
                         <f7-list-input
                             type="textarea"
                             class="import-chart-color-scheme-textarea code-textarea"
+                            :placeholder="layoutJsonPlaceholder"
                             :value="importText"
                             @input="importText = $event.target.value"
                         ></f7-list-input>
@@ -170,6 +171,16 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
 
+const layoutJsonPlaceholder: string = `{
+    "widgets": [
+        {
+            "id": "widget-id",
+            "type": "widget-type",
+            "settings": {}
+        }
+    ]
+}`;
+
 const widgetSettingsPopup = useTemplateRef<WidgetSettingsPopupType>('widgetSettingsPopup');
 
 const loadingOverview = ref<boolean>(true);
@@ -246,6 +257,12 @@ function reload(force: boolean): void {
         promises.push(overviewStore.loadRecentTransactions({
             force: force,
             queries: getOverviewRecentTransactionsQueries(draftLayout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.CurrentMonthTransactions)) {
+        promises.push(overviewStore.loadCurrentMonthTransactions({
+            force: force
         }));
     }
 

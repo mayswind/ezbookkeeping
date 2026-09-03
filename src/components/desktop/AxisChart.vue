@@ -64,6 +64,7 @@ interface AxisChartTooltipItem extends SortableTransactionStatisticDataItem {
 const props = defineProps<{
     class?: string;
     skeleton?: boolean;
+    noAnimation?: boolean;
     type: AxisChartDisplayType;
     stacked?: boolean;
     hideLegend?: boolean;
@@ -73,6 +74,7 @@ const props = defineProps<{
     hideYAxisLabels?: boolean;
     hideHorizontalGridLines?: boolean;
     hideLineSymbols?: boolean;
+    noMargin?: boolean;
     smoothCurve?: boolean;
     oneHundredPercentStacked?: boolean;
     sortingType: number;
@@ -197,7 +199,7 @@ const axisChartData = computed<AxisChartData>(() => {
             type: 'line',
             smooth: props.smoothCurve,
             showSymbol: !props.hideLineSymbols,
-            animation: !props.skeleton,
+            animation: props.noAnimation ? false : !props.skeleton,
             data: allAmounts.map(amount => amount.toDoubleNumber())
         };
 
@@ -432,7 +434,7 @@ const chartOptions = computed<object>(() => {
             orient: 'horizontal',
             type: 'scroll',
             top: (!props.legendPosition || props.legendPosition === 'top') ? 0 : undefined,
-            bottom: props.legendPosition === 'bottom' ? 0 : undefined,
+            bottom: props.legendPosition === 'bottom' ? 5 : undefined,
             data: axisChartData.value.allSeries.map(item => item.name),
             selected: selectedLegends.value,
             textStyle: {
@@ -441,10 +443,10 @@ const chartOptions = computed<object>(() => {
             formatter: (id: string) => allItemsMap.value[id] ? getItemName(allItemsMap.value[id].name) : id
         },
         grid: {
-            left: props.hideYAxisLabels ? 20 : yAxisWidth.value,
-            top: !props.hideLegend && (!props.legendPosition || props.legendPosition === 'top') ? 50 : 5,
-            right: 20,
-            bottom: (props.hideXAxisLabels ? 10 : 30) + (!props.hideLegend && props.legendPosition === 'bottom' ? 30 : 0),
+            left: props.noMargin ? 0 : (props.hideYAxisLabels ? 10 : yAxisWidth.value),
+            top: props.noMargin ? 0 : (!props.hideLegend && (!props.legendPosition || props.legendPosition === 'top') ? 50 : 5),
+            right: props.noMargin ? 0 : 10,
+            bottom: props.noMargin ? 0 : ((props.hideXAxisLabels ? 10 : 30) + (!props.hideLegend && props.legendPosition === 'bottom' ? 25 : 0)),
         },
         xAxis: [
             {

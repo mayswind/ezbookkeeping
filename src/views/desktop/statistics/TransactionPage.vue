@@ -174,7 +174,7 @@
                                                          @click="exportResults"
                                                          v-if="!isQuerySpecialChartType"></v-list-item>
                                             <v-divider class="my-2"/>
-                                            <v-list-item to="/app/settings/statistics"
+                                            <v-list-item to="/settings/statistics"
                                                          :prepend-icon="mdiFilterCogOutline"
                                                          :title="tt('Settings')"></v-list-item>
                                         </v-list>

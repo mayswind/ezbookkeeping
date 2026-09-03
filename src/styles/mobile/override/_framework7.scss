@@ -6,6 +6,11 @@
     padding-bottom: 8px;
 }
 
+.ios .navbar-bg::before {
+    /** the original "--f7-navbar-height" is 76px, but ezBookkkeeping changed "--f7-navbar-height", so the gradient should be adjusted accordingly **/
+    mask-image: linear-gradient(to bottom, black calc(50% + min(calc(var(--f7-navbar-height) - (76px - var(--f7-safe-area-top, 0px))), var(--f7-safe-area-top, 0px))), transparent 100%);
+}
+
 .ios .subnavbar {
     padding-top: calc(var(--f7-typography-margin) / 2);
 }

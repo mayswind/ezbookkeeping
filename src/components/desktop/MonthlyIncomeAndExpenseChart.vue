@@ -58,6 +58,7 @@ const props = defineProps<{
     enableClickItem?: boolean;
     hideLegend?: boolean;
     hideXAxisLabels?: boolean;
+    noMargin?: boolean;
     smoothCurve?: boolean;
 }>();
 
@@ -203,7 +204,7 @@ const chartOptions = computed<object>(() => {
         },
         legend: {
             show: !props.hideLegend,
-            bottom: 10,
+            bottom: 5,
             itemWidth: 14,
             itemHeight: 14,
             textStyle: {
@@ -216,12 +217,12 @@ const chartOptions = computed<object>(() => {
             ]
         },
         grid: {
-            left: 10,
-            right: 10,
-            top: (showIncomeAndExpense.value ? 10 : 5),
+            left: props.noMargin ? 0 : 10,
+            right: props.noMargin ? 0 : 10,
+            top: props.noMargin ? 0 : (showIncomeAndExpense.value ? 10 : 5),
             bottom: props.chartType === TrendChartType.Area.type
-                ? (!props.hideXAxisLabels ? 30 : 10) + (!props.hideLegend ? 30 : 0) + 10
-                : (!props.hideXAxisLabels ? 30 : 0) + (!props.hideLegend ? 30 : 0) + (showIncomeAndExpense.value ? 20 : 10),
+                ? props.noMargin ? 0 : (!props.hideXAxisLabels ? 30 : 10) + (!props.hideLegend ? 25 : 0)
+                : (!props.hideXAxisLabels ? 20 : 0) + (!props.hideLegend ? 25 : 0) + (showIncomeAndExpense.value ? 20 : 10),
         },
         xAxis: [
             {

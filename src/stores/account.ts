@@ -29,6 +29,8 @@ export const useAccountsStore = defineStore('accounts', () => {
     const userStore = useUserStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
+    let loadingPromise: Promise<Account[]> | null = null;
+
     const allAccounts = ref<Account[]>([]);
     const allAccountsMap = ref<Record<string, Account>>({});
     const allCategorizedAccountsMap = ref<Record<number, CategorizedAccount>>({});
@@ -352,6 +354,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
 
     function resetAccounts(): void {
+        loadingPromise = null;
         allAccounts.value = [];
         allAccountsMap.value = {};
         allCategorizedAccountsMap.value = {};
@@ -844,19 +847,30 @@ export const useAccountsStore = defineStore('accounts', () => {
     }
 
     function loadAllAccounts({ force }: { force: boolean }): Promise<Account[]> {
+        if (loadingPromise) {
+            return loadingPromise;
+        }
+
         if (!force && !accountListStateInvalid.value) {
             return new Promise((resolve) => {
                 resolve(allAccounts.value);
             });
         }
 
-        return new Promise((resolve, reject) => {
+        const currentPromise = loadingPromise = new Promise((resolve, reject) => {
             services.getAllAccounts({
                 visibleOnly: false
             }).then(response => {
+                if (!loadingPromise || loadingPromise !== currentPromise) {
+                    logger.error('loadingPromise is invalid after retrieving account list');
+                    reject({ message: 'An error occurred' });
+                    return;
+                }
+
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
+                    loadingPromise = null;
                     reject({ message: 'Unable to retrieve account list' });
                     return;
                 }
@@ -868,14 +882,20 @@ export const useAccountsStore = defineStore('accounts', () => {
                 const accounts = Account.sortAccounts(Account.ofMulti(data.result), settingsStore.accountCategoryDisplayOrders);
 
                 if (force && data.result && isEquals(allAccounts.value, accounts)) {
+                    loadingPromise = null;
                     reject({ message: 'Account list is up to date', isUpToDate: true });
                     return;
                 }
 
                 loadAccountList(accounts);
+                loadingPromise = null;
 
                 resolve(accounts);
             }).catch(error => {
+                if (loadingPromise === currentPromise) {
+                    loadingPromise = null;
+                }
+
                 if (force) {
                     logger.error('failed to force load account list', error);
                 } else {
@@ -891,6 +911,8 @@ export const useAccountsStore = defineStore('accounts', () => {
                 }
             });
         });
+
+        return loadingPromise;
     }
 
     function getAccount({ accountId }: { accountId: string }): Promise<Account> {

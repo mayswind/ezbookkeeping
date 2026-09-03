@@ -137,6 +137,7 @@ const gridStyle = computed<Record<string, string>>(() => ({
 function isFixedHeightWidget(widget: DesktopOverviewWidgetLayout): boolean {
     return widget.type === OverviewWidgetType.IncomeExpenseTrend ||
         widget.type === OverviewWidgetType.NetAssetsTrend ||
+        widget.type === OverviewWidgetType.TransactionCalendar ||
         widget.type === OverviewWidgetType.TransactionCalendarHeatmap;
 }
 

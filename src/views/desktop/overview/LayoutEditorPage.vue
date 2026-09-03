@@ -331,7 +331,7 @@ function save(): void {
 function cancel(): void {
     const leave = () => {
         leavingAfterAction.value = true;
-        router.push('/app/settings/preferences');
+        router.push('/settings/preferences');
     };
 
     if (!isModified.value) {

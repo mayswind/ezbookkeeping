@@ -1,7 +1,7 @@
 <template>
     <f7-page with-subnavbar @page:beforein="onPageBeforeIn" @page:afterin="onPageAfterIn">
         <f7-navbar>
-            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')" v-if="!isCustomSelection"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableCategory }" @click="showMoreActionSheet = true"></f7-link>
@@ -148,7 +148,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -162,6 +162,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { CategoryType } from '@/core/category.ts';
 
+import { isDefined } from '@/lib/common.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import {
     selectAllSubCategories,
@@ -177,11 +178,15 @@ interface CollapseState {
 }
 
 const props = defineProps<{
-    f7route: Router.Route;
-    f7router: Router.Router;
+    f7route?: Router.Route;
+    f7router?: Router.Router;
+    customSelectedCategoryIds?: string[];
 }>();
 
-const query = props.f7route.query;
+const emit = defineEmits<{
+    (e: 'update:customSelectedCategoryIds', value: string[]): void;
+    (e: 'save'): void;
+}>();
 
 const { tt } = useI18n();
 const { showToast, routeBackOnError } = useI18nUIComponents();
@@ -200,12 +205,14 @@ const {
     getCategoryTypeName,
     loadFilterCategoryIds,
     saveFilterCategoryIds
-} = useCategoryFilterSettingPageBase(query['type'] as CategoryFilterType, query['allowCategoryTypes']);
+} = useCategoryFilterSettingPageBase(props.f7route?.query?.['type'] ? props.f7route?.query['type'] as CategoryFilterType : 'custom', props.f7route?.query?.['allowCategoryTypes']);
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const loadingError = ref<unknown | null>(null);
 const showMoreActionSheet = ref<boolean>(false);
+
+const isCustomSelection = computed<boolean>(() => !props.f7route?.query?.['type'] && isDefined(props.customSelectedCategoryIds));
 
 const collapseStates = ref<Record<string, CollapseState>>({
     [CategoryType.Income.toString()]: {
@@ -225,7 +232,7 @@ function init(): void {
     }).then(() => {
         loading.value = false;
 
-        if (!loadFilterCategoryIds()) {
+        if (!loadFilterCategoryIds(props.customSelectedCategoryIds)) {
             showToast('Parameter Invalid');
             loadingError.value = 'Parameter Invalid';
         }
@@ -272,8 +279,14 @@ function selectInvertCategories(): void {
 }
 
 function save(): void {
-    saveFilterCategoryIds();
-    props.f7router.back();
+    const [, selectedCategoryIds] = saveFilterCategoryIds();
+
+    if (isCustomSelection.value) {
+        emit('update:customSelectedCategoryIds', selectedCategoryIds);
+        emit('save');
+    } else {
+        props.f7router?.back();
+    }
 }
 
 function onPageBeforeIn(): void {
@@ -281,8 +294,16 @@ function onPageBeforeIn(): void {
 }
 
 function onPageAfterIn(): void {
-    routeBackOnError(props.f7router, loadingError);
+    if (props.f7router) {
+        routeBackOnError(props.f7router, loadingError);
+    }
 }
+
+watch(() => props.customSelectedCategoryIds, (newValue) => {
+    if (isCustomSelection.value && !loading.value) {
+        loadFilterCategoryIds(newValue);
+    }
+});
 
 init();
 </script>

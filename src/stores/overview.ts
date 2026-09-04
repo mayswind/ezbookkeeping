@@ -537,7 +537,7 @@ export const useOverviewStore = defineStore('overview', () => {
 
                 const cachedTransactions = recentTransactions.value[cacheKey];
 
-                if (cachedTransactions && cachedTransactions.length >= query.count) {
+                if (cachedTransactions && cachedTransactions.length >= query.count && !recentTransactionsStateInvalid.value[cacheKey]) {
                     result[widgetId] = cachedTransactions;
                 } else {
                     missedCacheKeyQueryMap[cacheKey] = cacheKeyQueryMap[cacheKey] ?? query;

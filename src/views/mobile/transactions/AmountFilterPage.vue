@@ -1,14 +1,14 @@
 <template>
     <f7-page>
         <f7-navbar>
-            <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
+            <f7-nav-left :back-link="tt('Back')" v-if="!isCustomSelection"></f7-nav-left>
             <f7-nav-title :title="tt('Filter Amount')"></f7-nav-title>
             <f7-nav-right>
                 <f7-link icon-f7="checkmark_alt" @click="confirm"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list form strong inset dividers class="margin-vertical-half">
+        <f7-list form strong inset dividers class="margin-vertical-half" v-if="!showAllOption || type">
             <f7-list-item
                 class="amount-filter-amount"
                 link="#" no-chevron
@@ -42,6 +42,14 @@
         </f7-list>
 
         <f7-list form strong inset dividers class="margin-vertical">
+            <f7-list-item :title="tt('All')"
+                          @click="type = ''"
+                          v-if="props.showAllOption">
+                <template #after>
+                    <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="type === ''"></f7-icon>
+                </template>
+            </f7-list-item>
+
             <f7-list-item :key="filterType.type" :title="tt(filterType.name)"
                           v-for="filterType in AmountFilterType.values()"
                           @click="type = filterType.type">
@@ -64,13 +72,20 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { AmountFilterType } from '@/core/numeral.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
-import { isString } from '@/lib/common.ts';
+import { isDefined, isString } from '@/lib/common.ts';
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import logger from '@/lib/logger.ts';
 
 const props = defineProps<{
-    f7route: Router.Route;
-    f7router: Router.Router;
+    f7route?: Router.Route;
+    f7router?: Router.Router;
+    showAllOption?: boolean;
+    customAmountFilter?: string;
+}>();
+
+const emit = defineEmits<{
+    (e: 'update:customAmountFilter', value: string): void;
+    (e: 'save'): void;
 }>();
 
 const type = ref<string>('');
@@ -85,6 +100,8 @@ const { showToast } = useI18nUIComponents();
 const transactionsStore = useTransactionsStore();
 
 const amountCount = computed<number>(() => getAmountFilterParameterCount(type.value));
+
+const isCustomSelection = computed<boolean>(() => !props.f7route?.query?.['type'] && isDefined(props.customAmountFilter));
 
 const amountFontSizeClass = computed<string>(() => {
     if (amount1.value >= 10000000000 || amount1.value <= -10000000000 || amount2.value >= 10000000000 || amount2.value <= -10000000000) {
@@ -122,15 +139,20 @@ function getAmountFilterParameterCount(filterType: string): number {
 }
 
 function init(): void {
-    const query = props.f7route.query;
-    type.value = query['type'] || '';
+    const query = props.f7route?.query;
+    type.value = query?.['type'] || '';
+    const amountFilterValue = isCustomSelection.value ? props.customAmountFilter : query?.['value'];
 
     let queryAmount1 = 0, queryAmount2 = 0;
 
-    if (isString(query['value'])) {
+    if (isString(amountFilterValue)) {
         try {
-            const filterItems = query['value'].split(':');
+            const filterItems = amountFilterValue.split(':');
             const amountCount = getAmountFilterParameterCount(filterItems[0] as string);
+
+            if (filterItems.length > 0 && !type.value) {
+                type.value = filterItems[0] as string;
+            }
 
             if (filterItems.length === 2 && amountCount === 1) {
                 queryAmount1 = parseInt(filterItems[1] as string);
@@ -139,7 +161,7 @@ function init(): void {
                 queryAmount2 = parseInt(filterItems[2] as string);
             }
         } catch (ex) {
-            logger.warn('cannot parse amount from filter value, original value is ' + query['value'], ex);
+            logger.warn('cannot parse amount from filter value, original value is ' + amountFilterValue, ex);
         }
     }
 
@@ -148,7 +170,6 @@ function init(): void {
 }
 
 function confirm(): void {
-    const router = props.f7router;
     let amountFilter = type.value;
 
     if (amountCount.value === 1) {
@@ -161,7 +182,18 @@ function confirm(): void {
 
         amountFilter += ':' + amount1.value + ':' + amount2.value;
     } else {
-        router.back();
+        if (isCustomSelection.value) {
+            emit('update:customAmountFilter', '');
+            emit('save');
+        } else {
+            props.f7router?.back();
+        }
+        return;
+    }
+
+    if (isCustomSelection.value) {
+        emit('update:customAmountFilter', amountFilter);
+        emit('save');
         return;
     }
 
@@ -173,7 +205,7 @@ function confirm(): void {
         transactionsStore.updateTransactionListInvalidState(true);
     }
 
-    router.back();
+    props.f7router?.back();
 }
 
 init();

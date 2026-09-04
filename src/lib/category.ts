@@ -489,3 +489,25 @@ export function isSubCategoriesHasButNotAllChecked(category: TransactionCategory
 
     return checkedCount > 0 && checkedCount < category.subCategories.length;
 }
+
+export function isAllCategoriesChecked(allCategories: Record<number, TransactionCategory[]>, includeCategoryIds: Record<string, boolean>): boolean {
+    if (!allCategories) {
+        return true;
+    }
+
+    for (const categories of values(allCategories)) {
+        for (const category of categories) {
+            if (!category.subCategories || category.subCategories.length < 1) {
+                continue;
+            }
+
+            for (const subCategory of category.subCategories) {
+                if (!includeCategoryIds[subCategory.id]) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}

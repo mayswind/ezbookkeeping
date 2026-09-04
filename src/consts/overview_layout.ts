@@ -843,6 +843,58 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             OverviewWidgetDataRequirement.TransactionCategoryStatistics
         ]
     },
+    [OverviewWidgetType.RecentTransactions]: {
+        type: OverviewWidgetType.RecentTransactions,
+        name: 'Recent Transactions',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            WIDGET_SHOW_TITLE_SETTING,
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'itemCount',
+                displayName: 'Item Count',
+                itemCountValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            },
+            {
+                settingType: 'accountSelect',
+                settingName: 'accountIds',
+                displayName: 'Account'
+            },
+            {
+                settingType: 'categorySelect',
+                settingName: 'categoryIds',
+                displayName: 'Category'
+            },
+            {
+                settingType: 'tagSelect',
+                settingName: 'tagFilter',
+                displayName: 'Tags'
+            },
+            {
+                settingType: 'amount',
+                settingName: 'amountFilter',
+                displayName: 'Amount'
+            },
+            {
+                settingType: 'textbox',
+                settingName: 'keyword',
+                displayName: 'Description',
+                placeholder: 'Filter Description'
+            }
+        ],
+        defaultSettings: {
+            showTitle: false,
+            itemCount: RECENT_TRANSACTIONS_WIDGET_DEFAULT_ITEM_COUNT,
+            accountIds: [],
+            categoryIds: [],
+            tagFilter: '',
+            amountFilter: '',
+            keyword: ''
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.RecentTransactions
+        ]
+    },
     [OverviewWidgetType.TransactionCalendar]: {
         type: OverviewWidgetType.TransactionCalendar,
         name: 'Transaction Calendar',

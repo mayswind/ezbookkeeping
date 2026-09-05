@@ -5,7 +5,7 @@
         <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link sheet-close icon-f7="xmark"></f7-link>
+                <f7-link sheet-close icon-f7="xmark" :aria-label="tt('Close')"></f7-link>
             </div>
             <f7-searchbar ref="searchbar" custom-searchs
                           :value="tagSearchContent"
@@ -16,9 +16,9 @@
                           @focus="onSearchBarFocus">
             </f7-searchbar>
             <div class="right">
-                <f7-button round fill icon-f7="checkmark_alt" @click="save"
+                <f7-button round fill icon-f7="checkmark_alt" :aria-label="tt('Save')" @click="save"
                            v-if="filteredTagsWithGroupHeader && filteredTagsWithGroupHeader.length > 0"></f7-button>
-                <f7-link icon-f7="plus" :class="{'disabled': newTag}" @click="addNewTag"
+                <f7-link icon-f7="plus" :class="{'disabled': newTag}" :aria-label="tt('Add')" @click="addNewTag"
                          v-if="!filteredTagsWithGroupHeader || filteredTagsWithGroupHeader.length < 1"></f7-link>
             </div>
         </f7-toolbar>
@@ -55,16 +55,14 @@
                                 </div>
                             </template>
                             <template #after>
-                                <f7-button :class="{ 'no-padding': true, 'disabled': !newTag || !newTag.name }"
-                                           raised fill
-                                           icon-f7="checkmark_alt"
-                                           color="blue"
+                                <f7-button raised fill icon-f7="checkmark_alt" color="blue"
+                                           :class="{ 'no-padding': true, 'disabled': !newTag || !newTag.name }"
+                                           :aria-label="tt('Save')"
                                            @click="saveNewTag()">
                                 </f7-button>
-                                <f7-button class="no-padding margin-inline-start-half"
-                                           raised fill
-                                           icon-f7="xmark"
-                                           color="gray"
+                                <f7-button raised fill icon-f7="xmark" color="gray"
+                                           class="no-padding margin-inline-start-half"
+                                           :aria-label="tt('Cancel')"
                                            @click="cancelSaveNewTag()">
                                 </f7-button>
                             </template>

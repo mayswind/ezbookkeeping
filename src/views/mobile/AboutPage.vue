@@ -5,7 +5,7 @@
             <f7-nav-title :title="tt('About')"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-hidden-icon': clientVersionMatchServerVersion && !forceShowRefreshBrowserCacheMenu }">
                 <f7-link icon-f7="" v-if="clientVersionMatchServerVersion && !forceShowRefreshBrowserCacheMenu"/>
-                <f7-link icon-f7="ellipsis" @click="showDiagnosisActionSheet = true"
+                <f7-link icon-f7="ellipsis" :aria-label="tt('More')" @click="showDiagnosisActionSheet = true"
                          v-else-if="!clientVersionMatchServerVersion || forceShowRefreshBrowserCacheMenu"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -122,11 +122,11 @@
             <f7-page>
                 <f7-navbar>
                     <f7-nav-left>
-                        <f7-link popup-close icon-f7="xmark"></f7-link>
+                        <f7-link popup-close icon-f7="xmark" :aria-label="tt('Close')"></f7-link>
                     </f7-nav-left>
                     <f7-nav-title class="license-title">{{ tt('Documentation') }}</f7-nav-title>
                     <f7-nav-right class="navbar-compact-icons">
-                        <f7-link icon-f7="globe" @click="openExternalUrl(documentIframe?.src || documentUrl)"></f7-link>
+                        <f7-link icon-f7="globe" :aria-label="tt('Open in Browser')" @click="openExternalUrl(documentIframe?.src || documentUrl)"></f7-link>
                     </f7-nav-right>
                 </f7-navbar>
                 <iframe ref="documentIframe" class="document-iframe" src="about:blank" :style="documentLoading ? 'display: none' : ''"></iframe>

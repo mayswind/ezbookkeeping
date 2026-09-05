@@ -14,7 +14,7 @@
                        :disabled="!hasAnyAvailableTag" @click="save">{{ tt(applyText) }}</v-btn>
 
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :disabled="loading || !hasAnyAvailableTag" :icon="true">
+                       :aria-label="tt('More')" :disabled="loading || !hasAnyAvailableTag" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>

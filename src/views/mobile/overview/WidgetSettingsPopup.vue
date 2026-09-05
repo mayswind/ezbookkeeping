@@ -3,11 +3,11 @@
         <f7-page v-show="!showFilterAccountsPopup && !showFilterCategoriesPopup && !showFilterTagsPopup && !showAmountFilterPopup">
             <f7-navbar>
                 <f7-nav-left>
-                    <f7-link popup-close icon-f7="xmark"></f7-link>
+                    <f7-link popup-close icon-f7="xmark" :aria-label="tt('Cancel')"></f7-link>
                 </f7-nav-left>
                 <f7-nav-title :title="tt('Widget Settings')"></f7-nav-title>
                 <f7-nav-right>
-                    <f7-link icon-f7="checkmark_alt" @click="confirm"></f7-link>
+                    <f7-link icon-f7="checkmark_alt" :aria-label="tt('Apply')" @click="confirm"></f7-link>
                 </f7-nav-right>
             </f7-navbar>
 

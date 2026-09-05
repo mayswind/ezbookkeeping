@@ -17,6 +17,7 @@
                 <span class="month-expense" v-if="loading">0.00 USD</span>
                 <span class="month-expense" v-else>{{ transactionOverview?.thisMonth ? getDisplayExpenseAmount(transactionOverview.thisMonth) : '-' }}</span>
                 <f7-link class="display-inline-flex margin-inline-start-half" :style="iconStyle"
+                         :aria-label="showAmountInHomePage ? tt('Hide Amount') : tt('Show Amount')"
                          @click="showAmountInHomePage = !showAmountInHomePage">
                     <f7-icon class="ebk-hide-icon" :f7="showAmountInHomePage ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
                 </f7-link>

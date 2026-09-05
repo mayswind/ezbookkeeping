@@ -8,7 +8,7 @@
                     <span class="text-medium-emphasis font-weight-bold text-title-small">{{ tt('Expense') }}</span>
                 </div>
                 <v-btn class="ms-2" density="compact" color="default" variant="text"
-                       :icon="true" :loading="loading" @click="$emit('refresh')">
+                       :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="$emit('refresh')">
                     <template #loader>
                         <v-progress-circular indeterminate size="20" />
                     </template>
@@ -26,6 +26,7 @@
                         <v-skeleton-loader class="d-inline-block skeleton-no-margin mt-3 pb-1" width="120px" type="text" :loading="true" v-else-if="loading && (!transactionOverview || !transactionOverview.thisMonth || !transactionOverview.thisMonth.valid)"></v-skeleton-loader>
                     </span>
                     <v-btn class="ms-1" density="compact" color="primary" variant="text"
+                           :aria-label="showAmountInHomePage ? tt('Hide Amount') : tt('Show Amount')"
                            :icon="true" @click="showAmountInHomePage = !showAmountInHomePage">
                         <v-icon :icon="showAmountInHomePage ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
                     </v-btn>

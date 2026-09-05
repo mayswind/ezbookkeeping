@@ -9,7 +9,7 @@
                 <template :key="item.id" v-for="item in rankingItems">
                     <v-list-item class="px-0 py-1 mb-1 no-min-height" density="compact">
                         <template #prepend>
-                            <router-link class="overview-widget__item-icon" :to="getTransactionItemLinkUrl(item.id)" :aria-label="item.name">
+                            <router-link class="overview-widget__item-icon" :to="getTransactionItemLinkUrl(item.id)">
                                 <ItemIcon size="28px" :icon-type="getCategoryIconType(item.iconType)"
                                           :icon-id="item.icon" :color="item.color" />
                             </router-link>

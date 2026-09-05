@@ -4,8 +4,8 @@
                                   :title="tt('Change Group Display Order')" :cancel-button-title="tt('Close')"
                                   @cancel="close">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text"
-                       class="ms-2" :icon="true" :disabled="loading || updating"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :aria-label="tt('Refresh')" :icon="true" :disabled="loading || updating"
                        :loading="loading" @click="reload">
                     <template #loader>
                         <v-progress-circular indeterminate size="20"/>
@@ -14,7 +14,7 @@
                     <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                 </v-btn>
                 <v-btn density="compact" color="primary" variant="text" class="ms-1" :icon="true"
-                       :disabled="loading || updating || !displayOrderModified" @click="saveDisplayOrder">
+                       :aria-label="tt('Save Display Order')" :disabled="loading || updating || !displayOrderModified" @click="saveDisplayOrder">
                     <v-icon :icon="mdiCheck" size="22" />
                     <v-tooltip activator="parent">{{ tt('Save Display Order') }}</v-tooltip>
                 </v-btn>
@@ -54,7 +54,7 @@
 
                                         <span class="ms-2">
                                             <v-icon :class="!loading && !updating && allTagGroups && allTagGroups.length > 0 ? 'drag-handle' : 'disabled'"
-                                                    :icon="mdiDrag"/>
+                                                    :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
                                             <v-tooltip activator="parent" v-if="!loading && !updating && allTagGroups && allTagGroups.length > 0">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                     </div>

@@ -110,8 +110,8 @@
                                         </v-list>
                                     </v-menu>
                                 </v-btn>
-                                <v-btn density="compact" color="default" variant="text"
-                                       class="ms-2" :icon="true" :loading="loading" @click="reload(true, false)">
+                                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                                       :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="reload(true, false)">
                                     <template #loader>
                                         <v-progress-circular indeterminate size="20"/>
                                     </template>
@@ -143,14 +143,14 @@
                                       v-else-if="query.minTime || query.maxTime">
                                     <v-btn class="button-icon-with-direction" size="small"
                                            density="compact" color="default" variant="outlined"
-                                           :icon="true" :disabled="loading"
+                                           :aria-label="tt('Previous Period')" :disabled="loading" :icon="true"
                                            @click="shiftDateRange(query.minTime, query.maxTime, -1)">
                                         <v-icon :icon="mdiArrowLeft" size="14" />
                                     </v-btn>
                                     <span class="text-body-medium mx-1">{{ formatRange(queryMinTime, queryMaxTime) }}</span>
                                     <v-btn class="button-icon-with-direction" size="small"
                                            density="compact" color="default" variant="outlined"
-                                           :icon="true" :disabled="loading"
+                                           :aria-label="tt('Next Period')" :disabled="loading" :icon="true"
                                            @click="shiftDateRange(query.minTime, query.maxTime, 1)">
                                         <v-icon :icon="mdiArrowRight" size="14" />
                                     </v-btn>

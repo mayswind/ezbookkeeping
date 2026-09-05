@@ -5,12 +5,12 @@
                                   @cancel="cancel">
             <template #after-title>
                 <div ref="buttonContainer">
-                    <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                    <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('Copy')" :icon="true"
                            :disabled="!json" @click="copy">
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>
-                    <v-btn density="compact" color="default" variant="text" class="ms-1" :icon="true"
+                    <v-btn density="compact" color="default" variant="text" class="ms-1" :aria-label="tt('Save')" :icon="true"
                            :disabled="!json" @click="save">
                         <v-icon :icon="mdiContentSaveOutline" size="22" />
                         <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>

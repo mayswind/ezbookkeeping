@@ -13,7 +13,7 @@
                               :is-dark-mode="isDarkMode" v-model="monthValue"></month-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !monthValue }"
-                           :text="tt('Continue')"
+                           :text="tt('Apply')"
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">

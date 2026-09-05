@@ -5,7 +5,7 @@
         <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link sheet-close icon-f7="xmark"></f7-link>
+                <f7-link sheet-close icon-f7="xmark" :aria-label="tt('Close')"></f7-link>
             </div>
             <f7-segmented strong round class="width-100">
                 <f7-button round :active="currentTab === 'system'" @click="showSystemColors">{{ tt('System Colors') }}</f7-button>
@@ -19,7 +19,8 @@
                      :style="`grid-template-columns: repeat(${itemPerRow}, minmax(0, 1fr));`"
                      :key="idx" v-for="(row, idx) in allColorRows">
                     <div class="text-align-center" :key="colorInfo.color" v-for="colorInfo in row">
-                        <ItemIcon icon-type="fixed-f7" icon-id="app_fill" :color="colorInfo.color" @click="onColorClicked(colorInfo)">
+                        <ItemIcon icon-type="fixed-f7" icon-id="app_fill" :color="colorInfo.color"
+                                  :aria-label="`#${colorInfo.color}`" @click="onColorClicked(colorInfo)">
                             <f7-badge color="default" class="right-bottom-icon" v-if="currentValue && currentValue === colorInfo.color">
                                 <f7-icon f7="checkmark_alt"></f7-icon>
                             </f7-badge>

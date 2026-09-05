@@ -4,8 +4,8 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Account Category Order')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons">
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !isDisplayOrderModified() }" @click="saveDisplayOrder"></f7-link>
+                <f7-link icon-f7="ellipsis" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !isDisplayOrderModified() }" :aria-label="tt('Save')" @click="saveDisplayOrder"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 

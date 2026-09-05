@@ -36,7 +36,7 @@
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
-                                                   :ripple="false" :icon="true" @click="showNav = !showNav">
+                                                   :aria-label="tt('Open Menu')" :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Transaction Categories') }}</span>
@@ -45,8 +45,8 @@
                                             <v-btn class="ms-3" color="primary" variant="tonal"
                                                    :disabled="loading || updating" @click="saveSortResult"
                                                    v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ms-2" :icon="true" :loading="loading || updating" @click="reload(true)">
+                                            <v-btn density="compact" color="default" variant="text" class="ms-2"
+                                                   :aria-label="tt('Refresh')" :icon="true" :loading="loading || updating" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>
@@ -55,7 +55,7 @@
                                             </v-btn>
                                             <v-spacer/>
                                             <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                                   :disabled="loading || updating" :icon="true">
+                                                   :aria-label="tt('More')" :disabled="loading || updating" :icon="true">
                                                 <v-icon :icon="mdiDotsVertical" />
                                                 <v-menu activator="parent">
                                                     <v-list>
@@ -167,7 +167,7 @@
 
                                                             <span class="ms-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
-                                                                        :icon="mdiDrag"/>
+                                                                        :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
                                                                 <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1 && hoveredCategoryId === element.id">{{ tt('Drag to Reorder') }}</v-tooltip>
                                                             </span>
                                                         </div>

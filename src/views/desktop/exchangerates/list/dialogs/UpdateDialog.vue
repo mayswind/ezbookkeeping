@@ -7,7 +7,7 @@
                 <v-btn class="mx-2" density="comfortable" variant="outlined"
                        :disabled="submitting || !defaultCurrencyAmount || !currency || !targetCurrencyAmount"
                        @click="confirm">
-                    {{ tt('OK') }}
+                    {{ tt('Save') }}
                     <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
             </template>

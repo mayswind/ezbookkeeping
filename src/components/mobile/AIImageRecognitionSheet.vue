@@ -5,11 +5,13 @@
             <div class="swipe-handler"></div>
             <div class="left">
                 <f7-link icon-f7="xmark" :class="{ 'disabled': loading || recognizing }"
+                         :aria-label="tt('Cancel')"
                          @click="cancel"></f7-link>
             </div>
             <div class="right">
                 <f7-button round fill icon-f7="checkmark_alt"
                            :class="{ 'disabled': loading || recognizing || !imageFile }"
+                           :aria-label="tt('Confirm')"
                            @click="confirm"></f7-button>
             </div>
         </f7-toolbar>

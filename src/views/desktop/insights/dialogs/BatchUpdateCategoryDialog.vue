@@ -4,8 +4,8 @@
                                   :title="title" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text"
-                       class="ms-2" :icon="true" :disabled="loading || submitting"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :aria-label="tt('Refresh')" :icon="true" :disabled="loading || submitting"
                        :loading="loading" @click="reload">
                     <template #loader>
                         <v-progress-circular indeterminate size="20"/>
@@ -75,7 +75,7 @@
                 <v-btn color="secondary" variant="tonal" :disabled="loading || submitting" @click="cancel">{{ tt('Cancel') }}</v-btn>
                 <v-spacer/>
                 <v-btn :disabled="loading || submitting || updateIds.length < 1 || !categoryId" @click="confirm">
-                    {{ tt('OK') }}
+                    {{ tt('Save') }}
                     <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
             </template>

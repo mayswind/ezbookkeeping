@@ -7,7 +7,7 @@
                 <f7-link :text="tt('Clear')" @click="clear"></f7-link>
             </div>
             <div class="right">
-                <f7-button round fill icon-f7="checkmark_alt" @click="confirm"></f7-button>
+                <f7-button round fill icon-f7="checkmark_alt" :aria-label="tt('Apply')" @click="confirm"></f7-button>
             </div>
         </f7-toolbar>
         <f7-page-content class="margin-top">

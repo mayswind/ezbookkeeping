@@ -72,8 +72,8 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ tt('Third-Party Login') }}</span>
-                        <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ms-2" :icon="true" :loading="loadingExternalAuth" @click="reloadExternalAuth(false)">
+                        <v-btn density="compact" color="default" variant="text" size="24" class="ms-2"
+                               :aria-label="tt('Refresh')" :icon="true" :loading="loadingExternalAuth" @click="reloadExternalAuth(false)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -137,8 +137,8 @@
                         <span>{{ tt('Device & Sessions') }}</span>
                         <v-btn class="ms-3" density="compact" color="default" variant="outlined"
                                @click="generateToken" v-if="isAPITokenEnabled() || isMCPServerEnabled()">{{ tt('Generate Token') }}</v-btn>
-                        <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ms-2" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
+                        <v-btn density="compact" color="default" variant="text" size="24" class="ms-2"
+                               :aria-label="tt('Refresh')" :icon="true" :loading="loadingSession" @click="reloadSessions(false)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>

@@ -35,8 +35,8 @@
                              :class="{ 'app-top-toolbar-without-navbar': noNavbar }">
                             <slot name="top-toolbar">
                                 <router-link to="/">
-                                    <v-btn class="top-navigation-button" density="comfortable" variant="text" :icon="true"
-                                           :aria-label="tt('Overview')"
+                                    <v-btn class="top-navigation-button" density="comfortable" variant="text"
+                                           :aria-label="tt('Overview')" :icon="true"
                                            :active="isTopNavigationActive('/')"
                                            :color="isTopNavigationActive('/') ? 'primary' : 'default'">
                                         <v-icon :icon="isTopNavigationActive('/') ? mdiHome : mdiHomeOutline" size="24" />
@@ -45,8 +45,8 @@
                                 </router-link>
 
                                 <router-link to="/transaction/list?pageType=0&dateType=7">
-                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                           :aria-label="tt('Transaction Details')"
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                                           :aria-label="tt('Transaction Details')" :icon="true"
                                            :active="isTopNavigationActive('/transaction/list')"
                                            :color="isTopNavigationActive('/transaction/list') ? 'primary' : 'default'">
                                         <v-icon :icon="isTopNavigationActive('/transaction/list') ? mdiListBox : mdiListBoxOutline" size="24" />
@@ -55,8 +55,8 @@
                                 </router-link>
 
                                 <router-link to="/statistics/transaction">
-                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                           :aria-label="tt('Statistics & Analysis')"
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                                           :aria-label="tt('Statistics & Analysis')" :icon="true"
                                            :active="isTopNavigationActive('/statistics/transaction')"
                                            :color="isTopNavigationActive('/statistics/transaction') ? 'primary' : 'default'">
                                         <v-icon :icon="isTopNavigationActive('/statistics/transaction') ? mdiChartPie : mdiChartPieOutline" size="24" />
@@ -65,8 +65,8 @@
                                 </router-link>
 
                                 <router-link to="/insights/explorer">
-                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                           :aria-label="tt('Insights Explorer')"
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                                           :aria-label="tt('Insights Explorer')" :icon="true"
                                            :active="isTopNavigationActive('/insights/explorer')"
                                            :color="isTopNavigationActive('/insights/explorer') ? 'primary' : 'default'">
                                         <v-icon :icon="isTopNavigationActive('/insights/explorer') ? mdiCompass : mdiCompassOutline" size="24" />
@@ -75,8 +75,8 @@
                                 </router-link>
 
                                 <router-link to="/account/list">
-                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                                           :aria-label="tt('Accounts')"
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                                           :aria-label="tt('Accounts')" :icon="true"
                                            :active="isTopNavigationActive('/account/list')"
                                            :color="isTopNavigationActive('/account/list') ? 'primary' : 'default'">
                                         <v-icon :icon="isTopNavigationActive('/account/list') ? mdiCreditCard : mdiCreditCardOutline" size="24" />
@@ -97,14 +97,14 @@
                         </div>
                         <v-spacer />
                         <v-btn class="ms-2" color="primary" variant="text" density="comfortable"
-                               :aria-label="tt('Use on Mobile Device')"
-                               :icon="true" @click="showMobileQrCode = true">
+                               :aria-label="tt('Use on Mobile Device')" :icon="true"
+                               @click="showMobileQrCode = true">
                             <v-icon :icon="mdiCellphone" size="24" />
                             <v-tooltip activator="parent">{{ tt('Use on Mobile Device') }}</v-tooltip>
                         </v-btn>
                         <v-btn class="ms-2" color="primary" variant="text" density="comfortable"
-                               :aria-label="tt('Theme')"
-                               :icon="true" @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
+                               :aria-label="tt('Theme')" :icon="true"
+                               @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
                             <v-icon :icon="(currentTheme === 'light' ? mdiWeatherSunny : (currentTheme === 'dark' ? mdiWeatherNight : mdiThemeLightDark))" size="24" />
                         </v-btn>
                         <v-avatar class="cursor-pointer ms-3" variant="tonal"

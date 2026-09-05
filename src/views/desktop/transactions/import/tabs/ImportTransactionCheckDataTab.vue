@@ -73,11 +73,12 @@
             </template>
             <template #item.valid="{ item }">
                 <v-icon size="small" :class="{ 'text-error': !item.valid }"
+                        :aria-label="editingTransaction === item ? tt('Apply') : tt('Edit')"
                         :disabled="!!disabled"
                         :icon="editingTransaction === item ? mdiCheck : mdiPencilOutline"
                         @click="editTransaction(item)">
                 </v-icon>
-                <v-tooltip activator="parent" v-if="!disabled">{{ tt('Edit') }}</v-tooltip>
+                <v-tooltip activator="parent" v-if="!disabled">{{ editingTransaction === item ? tt('Apply') : tt('Edit') }}</v-tooltip>
             </template>
             <template #item.time="{ item }">
                 <span>{{ getDisplayDateTime(item) }}</span>
@@ -358,7 +359,7 @@
                                   @cancel="showCustomAmountFilterDialog = false">
             <template #toolbar>
                 <v-btn class="mx-2" density="comfortable" variant="outlined"
-                       @click="showCustomAmountFilterDialog = false; filters.amount = currentAmountFilterType?.toTextualFilter(currentAmountFilterValue1, currentAmountFilterValue2) ?? null">{{ tt('OK') }}</v-btn>
+                       @click="showCustomAmountFilterDialog = false; filters.amount = currentAmountFilterType?.toTextualFilter(currentAmountFilterValue1, currentAmountFilterValue2) ?? null">{{ tt('Apply') }}</v-btn>
             </template>
 
             <template #content>
@@ -385,7 +386,7 @@
             <template #toolbar>
                 <v-btn class="mx-2" density="comfortable" variant="outlined"
                        :disabled="!currentDescriptionFilterValue"
-                       @click="showCustomDescriptionDialog = false; filters.description = currentDescriptionFilterValue">{{ tt('OK') }}</v-btn>
+                       @click="showCustomDescriptionDialog = false; filters.description = currentDescriptionFilterValue">{{ tt('Apply') }}</v-btn>
             </template>
 
             <template #content>

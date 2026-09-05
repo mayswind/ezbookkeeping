@@ -66,7 +66,7 @@
                 <f7-button class="numpad-button numpad-button-num" @pointerup="inputNum(0)">
                     <span class="numpad-button-text numpad-button-text-normal">{{ digits[0] }}</span>
                 </f7-button>
-                <f7-button class="numpad-button numpad-button-num" @pointerup="backspace" @taphold="clear()">
+                <f7-button class="numpad-button numpad-button-num" :aria-label="tt('Delete')" @pointerup="backspace" @taphold="clear()">
                     <span class="numpad-button-text numpad-button-text-normal">
                         <f7-icon class="icon-with-direction" f7="delete_left"></f7-icon>
                     </span>

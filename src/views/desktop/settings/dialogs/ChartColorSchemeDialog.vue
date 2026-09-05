@@ -4,12 +4,12 @@
                                   :title="tt('Chart Color Scheme')" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('Add')" :icon="true"
                        @click="addNewColor()">
                     <v-icon :icon="mdiPlus" size="22" />
                     <v-tooltip activator="parent">{{ tt('Add') }}</v-tooltip>
                 </v-btn>
-                <v-btn density="compact" color="primary" variant="text" class="ms-1" :icon="true"
+                <v-btn density="compact" color="primary" variant="text" class="ms-1" :aria-label="tt('Save')" :icon="true"
                        :disabled="!canSaveColorScheme" @click="saveChartColors()">
                     <v-icon :icon="mdiCheck" size="22" />
                     <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
@@ -20,7 +20,7 @@
                 <toggle-button class="ms-2" :false-name="tt('List')" :true-name="tt('Raw Data')"
                                v-model="showRawData"/>
 
-                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true">
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('More')" :icon="true">
                     <v-icon :icon="mdiDotsVertical" size="22" />
                     <v-menu activator="parent">
                         <v-list>
@@ -63,7 +63,7 @@
                                             </template>
 
                                             <span class="ms-1">
-                                            <v-icon class="drag-handle" :icon="mdiDrag"/>
+                                            <v-icon class="drag-handle" :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
                                             <v-tooltip activator="parent">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                         </div>

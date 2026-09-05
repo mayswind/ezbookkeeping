@@ -1,20 +1,20 @@
 <template>
     <main-page-layout no-navbar>
         <template #top-toolbar>
-            <v-btn class="top-navigation-button" density="comfortable" variant="text" :icon="true" :disabled="loadingOverview"
-                   color="primary" :aria-label="tt('Save')" @click="save">
+            <v-btn class="top-navigation-button" density="comfortable" variant="text" color="primary"
+                   :aria-label="tt('Save')" :disabled="loadingOverview" :icon="true" @click="save">
                 <v-icon :icon="mdiContentSaveOutline" size="24" />
                 <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
             </v-btn>
 
-            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true" :disabled="loadingOverview"
-                   :aria-label="tt('Cancel')" @click="cancel">
+            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                   :aria-label="tt('Cancel')" :disabled="loadingOverview" :icon="true" @click="cancel">
                 <v-icon :icon="mdiClose" size="24" />
                 <v-tooltip activator="parent">{{ tt('Cancel') }}</v-tooltip>
             </v-btn>
 
-            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true" :disabled="loadingOverview"
-                   :aria-label="tt('More')">
+            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                   :aria-label="tt('More')" :disabled="loadingOverview" :icon="true">
                 <v-icon :icon="mdiDotsVertical" size="24" />
                 <v-tooltip activator="parent">{{ tt('More') }}</v-tooltip>
                 <v-menu activator="parent">

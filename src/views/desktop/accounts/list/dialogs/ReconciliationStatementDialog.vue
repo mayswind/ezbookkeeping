@@ -7,8 +7,8 @@
                                   :title="tt('Reconciliation Statement')" :cancel-button-title="tt('Close')"
                                   @cancel="close">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text"
-                       class="ms-2" :icon="true" :disabled="updatingLastReconciledTime"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :aria-label="tt('Refresh')" :icon="true" :disabled="updatingLastReconciledTime"
                        :loading="loading" @click="reload(true)">
                     <template #loader>
                         <v-progress-circular indeterminate size="20"/>
@@ -30,7 +30,7 @@
                                :false-name="tt('Transaction List')" :true-name="tt('Account Balance Trends')"
                                v-model="showAccountBalanceTrendsCharts"/>
 
-                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('Settings')"
                        :icon="true" :disabled="loading || updatingLastReconciledTime || !showAccountBalanceTrendsCharts">
                     <v-icon :icon="mdiTuneVertical" size="22" />
                     <v-menu activator="parent">
@@ -61,7 +61,7 @@
                         </v-list>
                     </v-menu>
                 </v-btn>
-                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('More')"
                        :icon="true" :disabled="loading || updatingLastReconciledTime">
                     <v-icon :icon="mdiDotsVertical" size="22" />
                     <v-menu activator="parent">

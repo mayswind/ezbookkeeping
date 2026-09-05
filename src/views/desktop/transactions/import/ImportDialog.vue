@@ -16,8 +16,8 @@
                     </a>
                 </div>
 
-                <v-btn density="compact" color="default" variant="text"
-                       class="ms-2" :icon="true" :disabled="loading"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :aria-label="tt('Refresh Accounts, Categories and Tags')" :icon="true" :disabled="loading"
                        :loading="loading"
                        @click="reloadBasisData"
                        v-if="currentStep === 'checkData'">
@@ -51,7 +51,7 @@
                     <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :icon="true" :disabled="loading || submitting"
+                       :aria-label="tt('More')" :disabled="loading || submitting" :icon="true"
                        v-if="currentStep === 'defineColumn' && importTransactionDefineColumnTab?.menus">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent" max-height="500">
@@ -66,7 +66,7 @@
                     </v-menu>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :icon="true" :disabled="loading || submitting"
+                       :aria-label="tt('More')" :disabled="loading || submitting" :icon="true"
                        v-if="currentStep === 'executeCustomScript' && importTransactionExecuteCustomScriptTab?.menus">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent" max-height="500">
@@ -81,7 +81,7 @@
                     </v-menu>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :icon="true" :disabled="loading || submitting"
+                       :aria-label="tt('Filter')" :icon="true" :disabled="loading || submitting"
                        v-if="currentStep === 'checkData' && importTransactionCheckDataTab?.filterMenus">
                     <v-icon :icon="mdiFilterOutline" />
                     <v-menu activator="parent" max-height="500">
@@ -102,7 +102,7 @@
                     </v-menu>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :icon="true" :disabled="loading || submitting"
+                       :aria-label="tt('More')" :icon="true" :disabled="loading || submitting"
                        v-if="currentStep === 'checkData' && importTransactionCheckDataTab?.toolMenus">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent" max-height="500">
@@ -265,7 +265,7 @@
                                                       color="rgba(0,0,0,0)" @click="removeImportImageFile(picIdx)">
                                                 <v-img :src="imageItem.previewUrl"></v-img>
                                                 <div class="picture-control-icon">
-                                                    <v-icon size="48" :icon="mdiTrashCanOutline" />
+                                                    <v-icon size="48" :aria-label="tt('Remove Picture')" :icon="mdiTrashCanOutline" />
                                                 </div>
                                             </v-avatar>
                                         </div>
@@ -275,7 +275,7 @@
                                                       :class="{ 'enabled': !submitting, 'cursor-pointer': !submitting }"
                                                       color="rgba(0,0,0,0)" @click="showOpenFileDialog">
                                                 <v-tooltip activator="parent" v-if="!submitting">{{ tt('Add Picture') }}</v-tooltip>
-                                                <v-icon class="import-image-add-icon" size="48" :icon="mdiImagePlusOutline" />
+                                                <v-icon class="import-image-add-icon" size="48" :aria-label="tt('Add Picture')" :icon="mdiImagePlusOutline" />
                                             </v-avatar>
                                         </div>
                                     </div>

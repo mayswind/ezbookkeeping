@@ -6,12 +6,12 @@
                                   @cancel="cancel">
             <template #after-title>
                 <div ref="buttonContainer">
-                    <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                    <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('Copy')" :icon="true"
                            :disabled="!exportedData" @click="copy">
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>
-                    <v-btn density="compact" color="default" variant="text" class="ms-1" :icon="true"
+                    <v-btn density="compact" color="default" variant="text" class="ms-1" :aria-label="tt('Save')" :icon="true"
                            @click="save()">
                         <v-icon :icon="mdiContentSaveOutline" size="22" />
                         <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
@@ -23,7 +23,7 @@
                 <toggle-button class="ms-2" :false-name="tt('Table')" :true-name="tt('Raw Data')"
                                v-model="showRawData"/>
 
-                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true">
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('More')" :icon="true">
                     <v-icon :icon="mdiDotsVertical" size="22" />
                     <v-menu activator="parent">
                         <v-list>

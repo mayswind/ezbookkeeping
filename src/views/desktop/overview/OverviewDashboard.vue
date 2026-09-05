@@ -13,8 +13,8 @@
                 <div class="overview-dashboard-title-drag-area" :aria-label="tt('Move')"
                      @pointerdown="startPointerAction($event, widget, 'move')"></div>
                 <div class="overview-dashboard-editor-toolbar">
-                    <v-btn density="comfortable" color="default" variant="text" class="ma-1" :icon="true"
-                           :disabled="loading" :aria-label="tt('More')">
+                    <v-btn density="comfortable" color="default" variant="text" class="ma-1"
+                           :aria-label="tt('More')" :disabled="loading" :icon="true">
                         <v-icon :icon="mdiDotsVertical" />
                         <v-tooltip activator="parent">{{ tt('More') }}</v-tooltip>
                         <v-menu activator="parent">

@@ -14,8 +14,7 @@
                     <small class="margin-left-half text-truncate skeleton-text" v-if="loading">100.0</small>
                     <small v-else-if="!loading">{{ displayElapsedPercent }}</small>
                 </div>
-                <f7-progressbar class="margin-top-half" :progress="currentMonthElapsedPercent * 100"
-                                :aria-label="tt('Month elapsed')"></f7-progressbar>
+                <f7-progressbar class="margin-top-half" :progress="currentMonthElapsedPercent * 100"></f7-progressbar>
             </template>
         </f7-list-item>
         <f7-list-item class="item-title-full-line">

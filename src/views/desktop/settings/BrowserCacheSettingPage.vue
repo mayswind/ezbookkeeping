@@ -5,8 +5,8 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ tt('File Cache') }}</span>
-                        <v-btn density="compact" color="default" variant="text"
-                               class="ms-2" :icon="true" :loading="loading" @click="loadCacheStatistics(true)">
+                        <v-btn density="compact" color="default" variant="text" class="ms-2"
+                               :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="loadCacheStatistics(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>

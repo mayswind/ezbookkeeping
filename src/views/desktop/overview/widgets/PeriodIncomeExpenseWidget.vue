@@ -2,7 +2,7 @@
     <v-card class="overview-widget period-income-expense-widget h-100" :class="{ 'disabled': loading }">
         <template #title>
             <overview-widget-header :title="title || currentPeriodTitle" :icon="currentPeriodIcon">
-                <v-btn density="compact" color="default" variant="text" :icon="true" :aria-label="tt('More')" v-if="!editing">
+                <v-btn density="compact" color="default" variant="text" :aria-label="tt('More')" :icon="true" v-if="!editing">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>

@@ -3,13 +3,13 @@
         <f7-navbar>
             <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')" v-if="!sortable"></f7-nav-left>
             <f7-nav-left v-else-if="sortable">
-                <f7-link icon-f7="xmark" :class="{ 'disabled': displayOrderSaving }" @click="cancelSort"></f7-link>
+                <f7-link icon-f7="xmark" :class="{ 'disabled': displayOrderSaving }" :aria-label="tt('Cancel')" @click="cancelSort"></f7-link>
             </f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }">
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !categories.length || sortable }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="plus" :href="'/category/add?type=' + categoryType + '&parentId=' + primaryCategoryId + (currentPrimaryCategory ? `&color=${currentPrimaryCategory.color}&icon=${currentPrimaryCategory.icon}` : '')" v-if="!sortable"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': displayOrderSaving || !displayOrderModified }" @click="saveSortResult" v-else-if="sortable"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !categories.length || sortable }" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="plus" :aria-label="tt('Add')" :href="'/category/add?type=' + categoryType + '&parentId=' + primaryCategoryId + (currentPrimaryCategory ? `&color=${currentPrimaryCategory.color}&icon=${currentPrimaryCategory.icon}` : '')" v-if="!sortable"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': displayOrderSaving || !displayOrderModified }" :aria-label="tt('Save')" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -54,8 +54,10 @@
                 <f7-swipeout-actions :left="textDirection === TextDirection.LTR"
                                      :right="textDirection === TextDirection.RTL"
                                      v-if="sortable">
-                    <f7-swipeout-button :color="category.hidden ? 'blue' : 'gray'" class="padding-horizontal"
-                                        overswipe close @click="hide(category, !category.hidden)">
+                    <f7-swipeout-button class="padding-horizontal" overswipe close
+                                        :aria-label="category.hidden ? tt('Show') : tt('Hide')"
+                                        :color="category.hidden ? 'blue' : 'gray'"
+                                        @click="hide(category, !category.hidden)">
                         <f7-icon :f7="category.hidden ? 'eye' : 'eye_slash'"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>
@@ -63,7 +65,7 @@
                                      :right="textDirection === TextDirection.LTR"
                                      v-if="!sortable">
                     <f7-swipeout-button color="orange" close :text="tt('Edit')" @click="edit(category)"></f7-swipeout-button>
-                    <f7-swipeout-button color="red" class="padding-horizontal" @click="remove(category, false)">
+                    <f7-swipeout-button color="red" class="padding-horizontal" :aria-label="tt('Delete')" @click="remove(category, false)">
                         <f7-icon f7="trash"></f7-icon>
                     </f7-swipeout-button>
                 </f7-swipeout-actions>

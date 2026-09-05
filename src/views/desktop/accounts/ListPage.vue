@@ -59,8 +59,8 @@
                                 <v-btn class="ms-3" color="primary" variant="tonal"
                                        :disabled="loading" @click="saveSortResult"
                                        v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
-                                <v-btn density="compact" color="default" variant="text"
-                                       class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
+                                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                                       :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="reload(true)">
                                     <template #loader>
                                         <v-progress-circular indeterminate size="20"/>
                                     </template>
@@ -69,7 +69,7 @@
                                 </v-btn>
                                 <v-spacer/>
                                 <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                       :disabled="loading" :icon="true">
+                                       :aria-label="tt('More')" :disabled="loading" :icon="true">
                                     <v-icon :icon="mdiDotsVertical" />
                                     <v-menu activator="parent">
                                         <v-list>
@@ -94,6 +94,7 @@
                             <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
                             <span class="accounts-overview-amount ms-3" v-else-if="!loading || !activeAccountCategory || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
                             <v-btn class="ms-2" density="compact" color="default" variant="text"
+                                   :aria-label="showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance')"
                                    :icon="true" :disabled="loading"
                                    @click="showAccountBalance = !showAccountBalance">
                                 <v-icon :icon="showAccountBalance ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
@@ -167,7 +168,7 @@
                                                         <v-spacer/>
                                                         <span class="align-self-center">
                                                             <v-icon :class="!loading && activeAccountCategoryVisibleAccountCount > 1 ? 'drag-handle' : 'disabled'"
-                                                                    :icon="mdiDrag"/>
+                                                                    :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
                                                             <v-tooltip activator="parent" v-if="!loading && activeAccountCategoryVisibleAccountCount > 1">{{ tt('Drag to Reorder') }}</v-tooltip>
                                                         </span>
                                                     </div>

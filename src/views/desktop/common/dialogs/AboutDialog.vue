@@ -10,8 +10,8 @@
                             <template #title>
                                 <div class="d-flex align-center">
                                     <span>{{ tt('global.app.title') }}</span>
-                                    <v-btn density="compact" color="default" variant="text"
-                                           class="ms-2" :icon="true" @click="refreshBrowserCache"
+                                    <v-btn density="compact" color="default" variant="text" class="ms-2"
+                                           :aria-label="tt('Refresh Browser Cache')" :icon="true" @click="refreshBrowserCache"
                                            v-if="!clientVersionMatchServerVersion">
                                         <v-icon :icon="mdiWebRefresh" size="24" />
                                         <v-tooltip activator="parent">{{ tt('Refresh Browser Cache') }}</v-tooltip>

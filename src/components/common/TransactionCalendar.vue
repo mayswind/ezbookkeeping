@@ -23,8 +23,8 @@
                 <span class="transaction-calendar-daily-amount text-income" v-if="showAmount && showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].income, defaultCurrency, '', dailyTotalAmounts[day].incompleteIncome) }}</span>
                 <span class="transaction-calendar-daily-amount text-expense" v-if="showAmount && showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].expense, defaultCurrency, '', dailyTotalAmounts[day].incompleteExpense) }}</span>
                 <span class="transaction-calendar-daily-amount" v-if="!showAmount">
-                    <span class="transaction-calendar-daily-amount-dot text-income" v-if="showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()">●</span>
-                    <span class="transaction-calendar-daily-amount-dot text-expense" style="margin-inline-start: 2px" v-if="showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()">●</span>
+                    <span class="transaction-calendar-daily-amount-dot text-income" v-if="showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()"></span>
+                    <span class="transaction-calendar-daily-amount-dot text-expense" v-if="showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()"></span>
                 </span>
             </div>
         </template>
@@ -145,6 +145,19 @@ function getDisplayDay(date: Date): string {
 .transaction-calendar-alternate-date {
     margin-top: -3px;
     opacity: 0.6;
+}
+
+.transaction-calendar-daily-amount-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: currentColor;
+    vertical-align: middle;
+}
+
+.transaction-calendar-daily-amount-dot + .transaction-calendar-daily-amount-dot {
+    margin-inline-start: 2px;
 }
 
 .dp--cell-disabled .transaction-calendar-alternate-date {

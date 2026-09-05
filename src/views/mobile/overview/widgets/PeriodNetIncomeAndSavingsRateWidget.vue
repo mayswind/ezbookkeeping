@@ -10,7 +10,7 @@
             <template #title>
                 <span class="overview-widget-primary-amount skeleton-text" v-if="loading">0.00 USD</span>
                 <span class="overview-widget-primary-amount"
-                      :class="{ 'text-expense': !!currentDisplayNetIncomeAmount && currentNetIncomeAmount.isNegative(), 'text-income': !!currentDisplayNetIncomeAmount && !currentNetIncomeAmount.isNegative() }"
+                      :class="{ 'text-income': !!currentDisplayNetIncomeAmount }"
                       v-else-if="!loading">
                     {{ currentDisplayNetIncomeAmount || tt('No data') }}
                 </span>
@@ -56,7 +56,6 @@ const props = defineProps<{
 const { tt } = useI18n();
 const {
     currentPeriodTitle,
-    currentNetIncomeAmount,
     currentDisplayIncomeAmount,
     currentDisplayExpenseAmount,
     currentDisplayNetIncomeAmount,

@@ -441,6 +441,7 @@ const transactionsStore = useTransactionsStore();
 const chartTypeIconMap = {
     [AccountBalanceTrendChartType.Column.type]: mdiChartBar,
     [AccountBalanceTrendChartType.Area.type]: mdiChartAreasplineVariant,
+    [AccountBalanceTrendChartType.SmoothArea.type]: mdiChartAreasplineVariant,
     [AccountBalanceTrendChartType.Boxplot.type]: mdiChartWaterfall,
     [AccountBalanceTrendChartType.Candlestick.type]: mdiChartWaterfall,
 };

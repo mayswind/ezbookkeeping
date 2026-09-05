@@ -1661,6 +1661,7 @@
     "Bar Chart": "Гистограмма",
     "Radar Chart": "Лепестковая диаграмма",
     "Area Chart": "Диаграмма с областями",
+    "Smooth Area Chart": "Smooth Area Chart",
     "Column Chart": "Столбчатая диаграмма",
     "Bubble Chart": "Пузырьковая диаграмма",
     "Boxplot Chart": "Boxplot Chart",

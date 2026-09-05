@@ -1661,6 +1661,7 @@
     "Bar Chart": "Grafic cu bare (Bar)",
     "Radar Chart": "Grafic de tip radar",
     "Area Chart": "Grafic de tip arie (Area)",
+    "Smooth Area Chart": "Smooth Area Chart",
     "Column Chart": "Grafic cu coloane (Column)",
     "Bubble Chart": "Grafic cu bule (Bubble)",
     "Boxplot Chart": "Grafic boxplot",

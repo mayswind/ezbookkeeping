@@ -1661,6 +1661,7 @@
     "Bar Chart": "条形图",
     "Radar Chart": "雷达图",
     "Area Chart": "面积图",
+    "Smooth Area Chart": "平滑面积图",
     "Column Chart": "柱状图",
     "Bubble Chart": "气泡图",
     "Boxplot Chart": "箱线图",

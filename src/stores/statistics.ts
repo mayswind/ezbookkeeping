@@ -103,6 +103,8 @@ interface WritableTransactionCategoricalAnalysisDataItem extends Record<string, 
     hidden: boolean;
     displayOrders: number[];
     value: BigDecimal;
+    originalValue?: BigDecimal;
+    originalCurrency?: string;
     percent?: number;
 }
 
@@ -608,6 +610,97 @@ export const useStatisticsStore = defineStore('statistics', () => {
         };
     });
 
+    const currencyTotalAmountAnalysisData = computed<WritableTransactionCategoricalAnalysisData | null>(() => {
+        if (!accountsStore.allPlainAccounts) {
+            return null;
+        }
+
+        const allDataItems: Record<string, WritableTransactionCategoricalAnalysisDataItem> = {};
+        let totalAmount: BigDecimal = BIG_DECIMAL_ZERO;
+        let totalNonNegativeAmount: BigDecimal = BIG_DECIMAL_ZERO;
+
+        for (const account of accountsStore.allPlainAccounts) {
+            if (transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type) {
+                if (!account.isAsset) {
+                    continue;
+                }
+            } else if (transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
+                if (!account.isLiability) {
+                    continue;
+                }
+            }
+
+            if (account.hidden) {
+                continue;
+            }
+
+            if (transactionStatisticsFilter.value.filterAccountIds && transactionStatisticsFilter.value.filterAccountIds[account.id]) {
+                continue;
+            }
+
+            let primaryAccount = accountsStore.allAccountsMap[account.parentId];
+
+            if (!primaryAccount) {
+                primaryAccount = account;
+            }
+
+            let originalAmount: BigDecimal = parseBigDecimal(account.balance);
+            let amount: BigDecimal = originalAmount;
+
+            if (account.currency !== userStore.currentUserDefaultCurrency) {
+                const finalAmount = exchangeRatesStore.getExchangedAmount(amount, account.currency, userStore.currentUserDefaultCurrency);
+
+                if (!finalAmount) {
+                    continue;
+                }
+
+                amount = finalAmount.truncate();
+            }
+
+            if (account.isLiability) {
+                originalAmount = originalAmount.negate();
+                amount = amount.negate();
+            }
+
+            let data = allDataItems[account.currency];
+
+            if (data) {
+                data.value = data.value.add(amount);
+                data.originalValue = data.originalValue?.add(originalAmount) || originalAmount;
+            } else {
+                data = {
+                    name: account.currency,
+                    type: 'total',
+                    id: account.currency,
+                    icon: DEFAULT_ACCOUNT_ICON.icon,
+                    iconType: IconType.System,
+                    color: DEFAULT_ACCOUNT_COLOR,
+                    hidden: false,
+                    displayOrders: [],
+                    value: amount,
+                    originalValue: originalAmount,
+                    originalCurrency: account.currency
+                };
+            }
+
+            totalAmount = totalAmount.add(amount);
+
+            allDataItems[account.currency] = data;
+        }
+
+        for (const dataItem of values(allDataItems)) {
+            if (dataItem.value.isPositive()) {
+                totalNonNegativeAmount = totalNonNegativeAmount.add(dataItem.value);
+            }
+        }
+
+        return {
+            value: totalAmount,
+            totalNonNegativeAmount: totalNonNegativeAmount,
+            items: allDataItems
+        };
+    });
+
     const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => {
         let combinedData: WritableTransactionCategoricalAnalysisData | null = null;
 
@@ -623,6 +716,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
         } else if (transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
             combinedData = accountTotalAmountAnalysisData.value;
+        } else if (transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
+            combinedData = currencyTotalAmountAnalysisData.value;
         }
 
         const allStatisticsItems: TransactionCategoricalAnalysisDataItem[] = [];
@@ -672,7 +768,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     hidden: dataItem.hidden,
                     displayOrders: dataItem.displayOrders,
                     value: dataItem.value,
-                    percent: percent
+                    percent: percent,
+                    originalValue: dataItem.originalValue,
+                    originalCurrency: dataItem.originalCurrency
                 };
 
                 allStatisticsItems.push(statisticDataItem);
@@ -1804,6 +1902,26 @@ export const useStatisticsStore = defineStore('statistics', () => {
             if ((analysisType === StatisticsAnalysisType.CategoricalAnalysis || analysisType === StatisticsAnalysisType.TrendAnalysis) && !isObjectEmpty(transactionStatisticsFilter.value.filterCategoryIds)) {
                 querys.push('categoryIds=' + getFinalCategoryIdsByFilteredCategoryIds(transactionCategoriesStore.allTransactionCategoriesMap, transactionStatisticsFilter.value.filterCategoryIds));
             }
+        } else if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+            transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type)
+        ) {
+            const accountIds: string[] = [];
+
+            for (const account of accountsStore.allPlainAccounts) {
+                if (account.currency !== itemId || (transactionStatisticsFilter.value.filterAccountIds && transactionStatisticsFilter.value.filterAccountIds[account.id])) {
+                    continue;
+                }
+
+                if (transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type && !account.isAsset) {
+                    continue;
+                } else if (transactionStatisticsFilter.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type && !account.isLiability) {
+                    continue;
+                }
+
+                accountIds.push(account.id);
+            }
+
+            querys.push('accountIds=' + accountIds.join(','));
         } else if (itemId && (transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeByPrimaryCategory.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.IncomeBySecondaryCategory.type ||
             transactionStatisticsFilter.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type ||
@@ -1837,7 +1955,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
         if (analysisType === StatisticsAnalysisType.CategoricalAnalysis
             && transactionStatisticsFilter.value.chartDataType !== ChartDataType.AccountTotalAssets.type
-            && transactionStatisticsFilter.value.chartDataType !== ChartDataType.AccountTotalLiabilities.type) {
+            && transactionStatisticsFilter.value.chartDataType !== ChartDataType.AccountTotalLiabilities.type
+            && transactionStatisticsFilter.value.chartDataType !== ChartDataType.TotalAssetsByCurrency.type
+            && transactionStatisticsFilter.value.chartDataType !== ChartDataType.TotalLiabilitiesByCurrency.type) {
             querys.push('dateType=' + transactionStatisticsFilter.value.categoricalChartDateType);
 
             if (transactionStatisticsFilter.value.categoricalChartDateType === DateRange.Custom.type) {

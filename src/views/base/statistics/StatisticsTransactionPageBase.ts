@@ -29,6 +29,7 @@ import type {
 } from '@/models/transaction.ts';
 
 import { limitText, findNameByType, findDisplayNameByType } from '@/lib/common.ts';
+import { isBigDecimal } from '@/lib/numeral.ts';
 import {
     parseDateTimeFromUnixTime,
     getYearMonthFirstUnixTime,
@@ -45,6 +46,7 @@ export function useStatisticsTransactionPageBase() {
         formatDateTimeToLongDateTime,
         formatDateTimeToGregorianLikeLongYearMonth,
         formatDateRange,
+        formatAmountToLocalizedNumerals,
         formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
 
@@ -118,7 +120,9 @@ export function useStatisticsTransactionPageBase() {
     const queryDateRangeName = computed<string>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
-                query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+                query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+                query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+                query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
                 return tt(DateRange.All.name);
             }
 
@@ -148,7 +152,9 @@ export function useStatisticsTransactionPageBase() {
     const isQueryDateRangeChanged = computed<boolean>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
-                query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+                query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+                query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+                query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
                 return false;
             }
 
@@ -176,7 +182,8 @@ export function useStatisticsTransactionPageBase() {
 
     const canChangeDateRange = computed<boolean>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-            if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+            if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+                query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type || query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
                 return false;
             }
 
@@ -204,7 +211,8 @@ export function useStatisticsTransactionPageBase() {
 
     const canUseCategoryFilter = computed<boolean>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-            if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+            if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+                query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type || query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
                 return false;
             }
         } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
@@ -216,7 +224,8 @@ export function useStatisticsTransactionPageBase() {
 
     const canUseServerCustomFilter = computed<boolean>(() => {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
-            if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+            if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+                query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type || query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
                 return false;
             }
         } else if (analysisType.value === StatisticsAnalysisType.AssetTrends) {
@@ -237,7 +246,10 @@ export function useStatisticsTransactionPageBase() {
     const showAmountInChart = computed<boolean>(() => {
         if (!showAccountBalance.value) {
             if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis
-                && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)) {
+                && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
+                    query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+                    query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+                    query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type)) {
                 return false;
             }
         }
@@ -258,9 +270,9 @@ export function useStatisticsTransactionPageBase() {
             || query.value.chartDataType === ChartDataType.ExpenseByPrimaryCategory.type
             || query.value.chartDataType === ChartDataType.ExpenseBySecondaryCategory.type) {
             return tt('Total Expense');
-        } else if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type) {
+        } else if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type) {
             return tt('Total Assets');
-        } else if (query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+        } else if (query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type || query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
             return tt('Total Liabilities');
         }
 
@@ -301,7 +313,28 @@ export function useStatisticsTransactionPageBase() {
     });
 
     const categoricalOverviewAnalysisData = computed<TransactionCategoricalOverviewAnalysisData | null>(() => statisticsStore.categoricalOverviewAnalysisData);
-    const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => statisticsStore.categoricalAnalysisData);
+    const categoricalAnalysisData = computed<TransactionCategoricalAnalysisData>(() => {
+        const data = statisticsStore.categoricalAnalysisData;
+
+        if (query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+            query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
+            return {
+                value: data.value,
+                items: data.items.map(item => {
+                    if (!isBigDecimal(item.originalValue) || !item.originalCurrency) {
+                        return item;
+                    }
+
+                    return {
+                        ...item,
+                        name: `${item.name} ${formatAmountToLocalizedNumerals(item.originalValue, item.originalCurrency)}`
+                    };
+                })
+            };
+        } else {
+            return data;
+        }
+    });
     const trendsAnalysisData = computed<TransactionTrendsAnalysisData | null>(() => statisticsStore.trendsAnalysisData);
     const assetTrendsData = computed<TransactionAssetTrendsAnalysisData | null>(() => statisticsStore.assetTrendsData);
 
@@ -332,7 +365,10 @@ export function useStatisticsTransactionPageBase() {
 
         if (!showAccountBalance.value) {
             if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis
-                && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type || query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type)) {
+                && (query.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
+                    query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+                    query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+                    query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type)) {
                 return DISPLAY_HIDDEN_AMOUNT;
             }
         }

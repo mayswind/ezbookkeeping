@@ -2376,6 +2376,8 @@
     "Income By Secondary Category": "二级分类收入",
     "Account Total Assets": "账户总资产",
     "Account Total Liabilities": "账户总负债",
+    "Total Assets By Currency": "按币种的总资产",
+    "Total Liabilities By Currency": "按币种的总负债",
     "Statistics Settings": "统计设置",
     "Common Settings": "通用设置",
     "Categorical Analysis Settings": "分类分析设置",

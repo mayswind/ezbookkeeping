@@ -2376,6 +2376,8 @@
     "Income By Secondary Category": "รายได้ตามหมวดย่อย",
     "Account Total Assets": "สินทรัพย์รวมของบัญชี",
     "Account Total Liabilities": "หนี้สินรวมของบัญชี",
+    "Total Assets By Currency": "Total Assets By Currency",
+    "Total Liabilities By Currency": "Total Liabilities By Currency",
     "Statistics Settings": "การตั้งค่าสถิติ",
     "Common Settings": "การตั้งค่าทั่วไป",
     "Categorical Analysis Settings": "การตั้งค่าวิเคราะห์ตามหมวดหมู่",

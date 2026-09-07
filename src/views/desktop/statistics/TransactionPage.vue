@@ -884,7 +884,9 @@ function reload(force: boolean): Promise<unknown> | null {
             });
         }
     } else if (query.value.chartDataType === ChartDataType.AccountTotalAssets.type ||
-        query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type) {
+        query.value.chartDataType === ChartDataType.AccountTotalLiabilities.type ||
+        query.value.chartDataType === ChartDataType.TotalAssetsByCurrency.type ||
+        query.value.chartDataType === ChartDataType.TotalLiabilitiesByCurrency.type) {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             dispatchPromise = accountsStore.loadAllAccounts({
                 force: force

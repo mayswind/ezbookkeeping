@@ -968,6 +968,8 @@ export interface TransactionCategoricalAnalysisData {
 
 export interface TransactionCategoricalAnalysisDataItem extends Record<string, unknown>, TransactionStatisticDataItemBase {
     readonly percent: number;
+    readonly originalValue?: BigDecimal;
+    readonly originalCurrency?: string;
 }
 
 export interface TransactionTrendsAnalysisData {

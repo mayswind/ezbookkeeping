@@ -2376,6 +2376,8 @@
     "Income By Secondary Category": "二級分類收入",
     "Account Total Assets": "帳戶總資產",
     "Account Total Liabilities": "帳戶總負債",
+    "Total Assets By Currency": "按幣種的總資產",
+    "Total Liabilities By Currency": "按幣種的總負債",
     "Statistics Settings": "統計設定",
     "Common Settings": "一般設定",
     "Categorical Analysis Settings": "分類分析設定",

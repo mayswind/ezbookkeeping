@@ -125,6 +125,8 @@ export class ChartDataType implements TypeAndName {
     public static readonly IncomeBySecondaryCategory = new ChartDataType(5, 'Income By Secondary Category', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.TrendAnalysis);
     public static readonly AccountTotalAssets = new ChartDataType(6, 'Account Total Assets', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.AssetTrends);
     public static readonly AccountTotalLiabilities = new ChartDataType(7, 'Account Total Liabilities', false, false, StatisticsAnalysisType.CategoricalAnalysis, StatisticsAnalysisType.AssetTrends);
+    public static readonly TotalAssetsByCurrency = new ChartDataType(18, 'Total Assets By Currency', false, false, StatisticsAnalysisType.CategoricalAnalysis);
+    public static readonly TotalLiabilitiesByCurrency = new ChartDataType(19, 'Total Liabilities By Currency', false, false, StatisticsAnalysisType.CategoricalAnalysis);
     public static readonly TotalOutflows = new ChartDataType(13, 'Total Outflows', false, false, StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalExpense = new ChartDataType(8, 'Total Expense', false, false, StatisticsAnalysisType.TrendAnalysis);
     public static readonly TotalInflows = new ChartDataType(14, 'Total Inflows', false, false, StatisticsAnalysisType.TrendAnalysis);

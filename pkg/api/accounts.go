@@ -273,7 +273,7 @@ func (a *AccountsApi) AccountCreateHandler(c *core.WebContext) (any, *errs.Error
 
 	if !iconTypeValid {
 		log.Warnf(c, "[accounts.AccountCreateHandler] icon type invalid for user \"uid:%d\"", uid)
-		return nil, errs.ErrTransactionCategoryIconInvalid
+		return nil, errs.ErrAccountIconInvalid
 	}
 
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountCreateReq.ClientSessionId != "" {
@@ -561,7 +561,7 @@ func (a *AccountsApi) AccountModifyHandler(c *core.WebContext) (any, *errs.Error
 
 	if !iconTypeValid {
 		log.Warnf(c, "[accounts.AccountModifyHandler] icon type invalid for user \"uid:%d\"", uid)
-		return nil, errs.ErrTransactionCategoryIconInvalid
+		return nil, errs.ErrAccountIconInvalid
 	}
 
 	if len(toAddAccounts) > 0 && a.CurrentConfig().EnableDuplicateSubmissionsCheck && accountModifyReq.ClientSessionId != "" {

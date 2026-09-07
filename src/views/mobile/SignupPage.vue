@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Sign Up')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': inputIsEmpty || submitting }" @click="submit"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': inputIsEmpty || submitting }" :aria-label="tt('Sign Up')" @click="submit"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -144,11 +144,11 @@
             <f7-page>
                 <f7-navbar>
                     <f7-nav-left>
-                        <f7-link popup-close icon-f7="xmark"></f7-link>
+                        <f7-link popup-close icon-f7="xmark" :aria-label="tt('Close')"></f7-link>
                     </f7-nav-left>
                     <f7-nav-title :title="tt('Preset Categories')"></f7-nav-title>
                     <f7-nav-right class="navbar-compact-icons">
-                        <f7-link icon-f7="ellipsis" @click="showPresetCategoriesMoreActionSheet = true"></f7-link>
+                        <f7-link icon-f7="ellipsis" :aria-label="tt('More')" @click="showPresetCategoriesMoreActionSheet = true"></f7-link>
                         <f7-link close @click="usePresetCategories = true; showPresetCategories = false" v-if="!usePresetCategories">{{ tt('Enable') }}</f7-link>
                         <f7-link close @click="usePresetCategories = false; showPresetCategories = false" v-if="usePresetCategories">{{ tt('Disable') }}</f7-link>
                     </f7-nav-right>

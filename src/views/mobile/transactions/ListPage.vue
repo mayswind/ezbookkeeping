@@ -16,8 +16,8 @@
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }">
-                <f7-link icon-f7="search" @click="toggleSearchbar"></f7-link>
-                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" @click="add"></f7-link>
+                <f7-link icon-f7="search" :aria-label="tt('Search')" @click="toggleSearchbar"></f7-link>
+                <f7-link icon-f7="plus" :class="{ 'disabled': !canAddTransaction }" :aria-label="tt('Add')" @click="add"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :inner="false" v-if="showSearchbar">
@@ -49,13 +49,13 @@
         </f7-popover>
 
         <f7-toolbar tabbar bottom class="compact-tabbar toolbar-item-auto-size transaction-list-toolbar">
-            <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
+            <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" :aria-label="tt('Previous Period')" @click="shiftDateRange(query.minTime, query.maxTime, -1)">
                 <f7-icon class="icon-with-direction" f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link popover-open=".date-popover-menu" :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': loading }">
                 <span :class="{ 'tabbar-item-changed': query.dateType !== DateRange.All.type }">{{ queryDateRangeName }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
+            <f7-link :class="{ 'disabled': loading || query.dateType === DateRange.All.type }" :aria-label="tt('Next Period')" @click="shiftDateRange(query.minTime, query.maxTime, 1)">
                 <f7-icon class="icon-with-direction" f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link popover-open=".category-popover-menu" :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': loading || query.type === 1 }">
@@ -64,7 +64,7 @@
             <f7-link popover-open=".account-popover-menu" :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': loading }">
                 <span :class="{ 'tabbar-item-changed': query.accountIds }">{{ queryAccountName }}</span>
             </f7-link>
-            <f7-link popover-open=".more-popover-menu" :class="{ 'disabled': loading }">
+            <f7-link popover-open=".more-popover-menu" :class="{ 'disabled': loading }" :aria-label="tt('More')">
                 <f7-icon f7="ellipsis_vertical" :class="{ 'tabbar-item-changed': query.type > 0 || query.amountFilter || query.tagFilter }"></f7-icon>
             </f7-link>
         </f7-toolbar>
@@ -307,6 +307,7 @@
                                                     v-if="transaction.editable"
                                                     @click="edit(transaction)"></f7-swipeout-button>
                                 <f7-swipeout-button color="red" class="padding-horizontal"
+                                                    :aria-label="tt('Delete')"
                                                     v-if="transaction.editable"
                                                     @click="remove(transaction, false)">
                                     <f7-icon f7="trash"></f7-icon>

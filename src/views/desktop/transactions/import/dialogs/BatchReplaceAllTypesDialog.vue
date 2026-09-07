@@ -4,8 +4,8 @@
                                   :title="tt('Batch Replace Categories / Accounts / Tags')" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text"
-                       class="ms-2" :icon="true" :disabled="loading"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :aria-label="tt('Refresh')" :icon="true" :disabled="loading"
                        :loading="loading" @click="reload">
                     <template #loader>
                         <v-progress-circular indeterminate size="20"/>
@@ -17,10 +17,10 @@
 
             <template #toolbar>
                 <v-btn class="ms-2" density="comfortable" variant="outlined"
-                       :disabled="loading" @click="confirm">{{ tt('OK') }}</v-btn>
+                       :disabled="loading" @click="confirm">{{ tt('Apply') }}</v-btn>
 
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :icon="true" :disabled="loading">
+                       :aria-label="tt('More')" :disabled="loading" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent" max-height="500">
                         <v-list>

@@ -62,15 +62,15 @@
                                     <template #title>
                                         <div class="title-and-toolbar d-flex align-center">
                                             <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
-                                                   :ripple="false" :icon="true" @click="showNav = !showNav">
+                                                   :aria-label="tt('Open Menu')" :ripple="false" :icon="true" @click="showNav = !showNav">
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Exchange Rates Data') }}</span>
                                             <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading" @click="update"
                                                    v-if="isUserCustomExchangeRates">{{ tt('Update') }}</v-btn>
-                                            <v-btn density="compact" color="default" variant="text"
-                                                   class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
+                                            <v-btn density="compact" color="default" variant="text" class="ms-2"
+                                                   :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="reload(true)">
                                                 <template #loader>
                                                     <v-progress-circular indeterminate size="20"/>
                                                 </template>

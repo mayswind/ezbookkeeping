@@ -4,7 +4,7 @@
         <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link sheet-close icon-f7="xmark"></f7-link>
+                <f7-link sheet-close icon-f7="xmark" :aria-label="tt('Close')"></f7-link>
             </div>
             <f7-segmented strong round class="width-100">
                 <f7-button round :active="currentTab === 'system'" @click="currentTab = 'system'">{{ tt('System Icons') }}</f7-button>

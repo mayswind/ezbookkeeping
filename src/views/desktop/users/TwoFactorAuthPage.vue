@@ -83,8 +83,8 @@
             <v-card v-if="currentBackupCode">
                 <template #title>
                     <span>{{ tt('Backup Code') }}</span>
-                    <v-btn density="compact" color="default" variant="text" size="24"
-                           class="ms-2" :icon="true" @click="copyBackupCodes">
+                    <v-btn density="compact" color="default" variant="text" size="24" class="ms-2"
+                           :aria-label="tt('Copy')" :icon="true" @click="copyBackupCodes">
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>

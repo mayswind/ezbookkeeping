@@ -64,7 +64,7 @@
     $switch-inset-border-width: 1px,
 
     /* Chip */
-    $chip-font-size: 1rem,
+    $chip-font-size: 0.9375rem,
 
     /* Pagination */
     $pagination-item-margin: 0.1rem,
@@ -79,6 +79,7 @@
     $skeleton-loader-gutter: 12px,
 
     /* Tooltip */
+    $tooltip-font-size: 0.8125rem,
     $tooltip-background-color: rgb(var(--v-tooltip-background)),
     $tooltip-text-color: rgb(var(--v-tooltip-color)),
     $tooltip-padding: 3px 10px

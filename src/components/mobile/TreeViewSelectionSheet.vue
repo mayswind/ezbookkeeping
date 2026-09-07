@@ -4,7 +4,7 @@
         <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link sheet-close icon-f7="xmark"></f7-link>
+                <f7-link sheet-close icon-f7="xmark" :aria-label="tt('Close')"></f7-link>
             </div>
             <f7-searchbar ref="searchbar" custom-searchs
                           :value="filterContent"
@@ -73,7 +73,7 @@ const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
 }>();
 
-const { ti } = useI18n();
+const { tt, ti } = useI18n();
 
 const {
     filterContent,

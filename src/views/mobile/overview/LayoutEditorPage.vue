@@ -2,12 +2,12 @@
     <f7-page>
         <f7-navbar>
             <f7-nav-left :class="{ 'disabled': loadingOverview }">
-                <f7-link icon-f7="xmark" @click="cancel"></f7-link>
+                <f7-link icon-f7="xmark" :aria-label="tt('Cancel')" @click="cancel"></f7-link>
             </f7-nav-left>
             <f7-nav-title :title="tt('Home Page Layout')"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loadingOverview }">
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ disabled: !isModified }" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ disabled: !isModified }" :aria-label="tt('Save')" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 

@@ -4,8 +4,8 @@
             <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')" v-if="!isCustomSelection"></f7-nav-left>
             <f7-nav-title :title="tt(title)"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }">
-                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableTag }" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyAvailableTag }" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': !hasAnyAvailableTag }" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': !hasAnyAvailableTag }" :aria-label="tt('Apply')" @click="save"></f7-link>
             </f7-nav-right>
 
             <f7-subnavbar :inner="false">

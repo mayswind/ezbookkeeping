@@ -148,6 +148,7 @@
         <axis-chart
             ref="axisChart"
             :type="axisChartDisplayType"
+            :smooth-curve="axisChartSmoothCurve"
             :stacked="axisChartStacked"
             :one-hundred-percent-stacked="axisChart100PercentStacked"
             :sorting-type="currentExploration.chartSortingType"
@@ -580,10 +581,13 @@ const axisChartDisplayType = computed<AxisChartDisplayType | undefined>(() => {
         || currentExploration.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
         || currentExploration.value.chartType === TransactionExplorerChartType.ColumnGrouped.value) {
         return 'column';
-    } else if (currentExploration.value.chartType === TransactionExplorerChartType.LineGrouped.value) {
+    } else if (currentExploration.value.chartType === TransactionExplorerChartType.LineGrouped.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothLineGrouped.value) {
         return 'line';
     } else if (currentExploration.value.chartType === TransactionExplorerChartType.AreaStacked.value
-        || currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value) {
+        || currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothAreaStacked.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothArea100PercentStacked.value) {
         return 'area';
     } else if (currentExploration.value.chartType === TransactionExplorerChartType.BubbleGrouped.value) {
         return 'bubble';
@@ -602,16 +606,25 @@ const hierarchyChartDisplayType = computed<HierarchyChartDisplayType | undefined
     }
 });
 
+const axisChartSmoothCurve = computed<boolean>(() => {
+    return (currentExploration.value.chartType === TransactionExplorerChartType.SmoothLineGrouped.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothAreaStacked.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothArea100PercentStacked.value);
+});
+
 const axisChartStacked = computed<boolean>(() => {
     return (currentExploration.value.chartType === TransactionExplorerChartType.ColumnStacked.value
         || currentExploration.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
         || currentExploration.value.chartType === TransactionExplorerChartType.AreaStacked.value
-        || currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value);
+        || currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothAreaStacked.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothArea100PercentStacked.value);
 });
 
 const axisChart100PercentStacked = computed<boolean>(() => {
     return (currentExploration.value.chartType === TransactionExplorerChartType.Column100PercentStacked.value
-        || currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value);
+        || currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value
+        || currentExploration.value.chartType === TransactionExplorerChartType.SmoothArea100PercentStacked.value);
 });
 
 const axisChartShowYearOverYear = computed<boolean>(() => {
@@ -1035,11 +1048,14 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
         } else if (results.headers.length === 2 &&
             (
                 currentExploration.value.chartType === TransactionExplorerChartType.AreaStacked.value ||
-                currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value
+                currentExploration.value.chartType === TransactionExplorerChartType.Area100PercentStacked.value ||
+                currentExploration.value.chartType === TransactionExplorerChartType.SmoothAreaStacked.value ||
+                currentExploration.value.chartType === TransactionExplorerChartType.SmoothArea100PercentStacked.value
             )
         ) {
             supportedMermaidCharts = [ ExportMermaidChartType.XYChartLine ];
-        } else if (currentExploration.value.chartType === TransactionExplorerChartType.LineGrouped.value) {
+        } else if (currentExploration.value.chartType === TransactionExplorerChartType.LineGrouped.value
+            || currentExploration.value.chartType === TransactionExplorerChartType.SmoothLineGrouped.value) {
             supportedMermaidCharts = [ ExportMermaidChartType.XYChartLine ];
         }
 

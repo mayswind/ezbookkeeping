@@ -4,7 +4,7 @@
             <f7-nav-left :class="{ 'disabled': loading }" :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Exchange Rates Data')"></f7-nav-title>
             <f7-nav-right :class="{ 'disabled': loading }">
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -74,7 +74,7 @@
                                         :class="{ 'disabled': exchangeRate.currencyCode === baseCurrency }"
                                         @click="setAsBaseline(exchangeRate.currencyCode, getFinalConvertedAmount(exchangeRate, false)); settingBaseLine = true"
                                         v-if="settingBaseLine || exchangeRate.currencyCode !== baseCurrency"></f7-swipeout-button>
-                    <f7-swipeout-button color="red" class="padding-horizontal"
+                    <f7-swipeout-button color="red" class="padding-horizontal" :aria-label="tt('Delete')"
                                         @click="remove(exchangeRate, false)"
                                         v-if="exchangeRate.currencyCode !== defaultCurrency && isUserCustomExchangeRates">
                         <f7-icon f7="trash"></f7-icon>

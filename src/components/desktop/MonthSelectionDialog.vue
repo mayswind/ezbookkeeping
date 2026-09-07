@@ -5,7 +5,7 @@
                                   @cancel="cancel">
             <template #toolbar>
                 <v-btn class="mx-2" density="comfortable" variant="outlined"
-                       :disabled="!monthValue" @click="confirm">{{ tt('OK') }}</v-btn>
+                       :disabled="!monthValue" @click="confirm">{{ tt('Apply') }}</v-btn>
             </template>
 
             <template #content>

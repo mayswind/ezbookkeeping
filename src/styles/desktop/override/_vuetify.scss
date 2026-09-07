@@ -349,6 +349,15 @@
 
 .v-chip {
     border-radius: var(--ebk-radius-sm);
+
+    &.v-chip--size-x-small {
+        font-size: 0.75rem;
+    }
+
+    .v-chip__prepend .v-icon {
+        font-size: inherit;
+        margin-inline-end: 0.2em;
+    }
 }
 
 .v-switch {

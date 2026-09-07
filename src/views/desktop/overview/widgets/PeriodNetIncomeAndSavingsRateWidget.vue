@@ -2,7 +2,7 @@
     <v-card class="overview-widget savings-rate-widget h-100" :class="{ disabled: loading }">
         <template #title>
             <overview-widget-header :title="title || currentPeriodTitle" :icon="mdiPiggyBankOutline">
-                <v-btn density="compact" color="default" variant="text" :icon="true" :aria-label="tt('More')" v-if="!editing">
+                <v-btn density="compact" color="default" variant="text" :aria-label="tt('More')" :icon="true" v-if="!editing">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>
@@ -17,7 +17,7 @@
         <v-card-text class="overview-widget__body savings-rate-widget__body">
             <div class="overview-widget__caption">{{ tt('Net Income') }}</div>
             <div class="overview-widget__amount text-headline-small font-weight-medium text-truncate"
-                 :class="{ 'text-expense': !!currentDisplayNetIncomeAmount && currentNetIncomeAmount.isNegative(), 'text-income': !!currentDisplayNetIncomeAmount && !currentNetIncomeAmount.isNegative(), 'text-medium-emphasis': !currentDisplayNetIncomeAmount }"
+                 :class="{ 'text-income': !!currentDisplayNetIncomeAmount, 'text-medium-emphasis': !currentDisplayNetIncomeAmount }"
                  v-if="!loading || currentDisplayNetIncomeAmount">{{ currentDisplayNetIncomeAmount !== '' ? currentDisplayNetIncomeAmount : tt('No data') }}</div>
             <v-skeleton-loader class="skeleton-no-margin mt-3 mb-6" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayNetIncomeAmount"></v-skeleton-loader>
             <div class="d-flex justify-space-between align-center my-3">
@@ -72,7 +72,6 @@ const props = defineProps<PeriodNetIncomeAndSavingsRateWidgetProps>();
 const { tt } = useI18n();
 const {
     currentPeriodTitle,
-    currentNetIncomeAmount,
     currentDisplayIncomeAmount,
     currentDisplayExpenseAmount,
     currentDisplayNetIncomeAmount,

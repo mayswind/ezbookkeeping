@@ -52,6 +52,7 @@ interface AccountBalanceTrendsChartDataItem {
     selected: boolean;
     type: string;
     areaStyle?: object;
+    smooth?: boolean;
     stack: string;
     animation: boolean;
     data: (string | string[])[]; // only used for echarts rendering, the actual value is in seriesOriginalData
@@ -96,8 +97,10 @@ const trendsChartData = computed<AccountBalanceTrendsChartData>(() => {
     };
     const originalData: (BigDecimal | BigDecimal[])[] = [];
 
-    if (props.type === AccountBalanceTrendChartType.Area.type) {
+    if (props.type === AccountBalanceTrendChartType.Area.type
+        || props.type === AccountBalanceTrendChartType.SmoothArea.type) {
         series.areaStyle = {};
+        series.smooth = props.type === AccountBalanceTrendChartType.SmoothArea.type;
     } else if (props.type === AccountBalanceTrendChartType.Column.type) {
         series.type = 'bar';
     } else if (props.type === AccountBalanceTrendChartType.Boxplot.type) {

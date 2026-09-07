@@ -4,7 +4,7 @@
                                   :title="tt('Account Category Order')" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="primary" variant="text" class="ms-2" :icon="true"
+                <v-btn density="compact" color="primary" variant="text" class="ms-2" :aria-label="tt('Save')" :icon="true"
                        :disabled="!isDisplayOrderModified()" @click="saveDisplayOrder">
                     <v-icon :icon="mdiCheck" size="22" />
                     <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
@@ -12,7 +12,7 @@
             </template>
 
             <template #toolbar>
-                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true">
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('More')" :icon="true">
                     <v-icon :icon="mdiDotsVertical" size="22" />
                     <v-menu activator="parent">
                         <v-list>
@@ -43,7 +43,7 @@
                                             <v-spacer/>
 
                                             <span class="ms-2">
-                                            <v-icon class="drag-handle" :icon="mdiDrag"/>
+                                            <v-icon class="drag-handle" :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
                                             <v-tooltip activator="parent">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                         </div>

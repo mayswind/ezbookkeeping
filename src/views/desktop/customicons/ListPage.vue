@@ -10,8 +10,8 @@
                         <v-btn class="ms-3" color="primary" variant="tonal"
                                :disabled="loading || updating" @click="saveSortResult"
                                v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
-                        <v-btn density="compact" color="default" variant="text"
-                               class="ms-2" :icon="true" :disabled="loading || updating"
+                        <v-btn density="compact" color="default" variant="text" class="ms-2"
+                               :aria-label="tt('Refresh')" :icon="true" :disabled="loading || updating"
                                :loading="loading" @click="reload">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
@@ -29,7 +29,7 @@
                             <template #title>
                                 <div class="d-flex align-center">
                                     <v-btn density="compact" color="default" variant="text"
-                                           :icon="true" :disabled="true">
+                                           :aria-label="tt('Delete')" :icon="true" :disabled="true">
                                         <v-icon :icon="mdiDeleteOutline" size="22" />
                                     </v-btn>
                                     <v-spacer/>
@@ -61,7 +61,7 @@
                                 <template #title>
                                     <div class="d-flex align-center">
                                         <v-btn density="compact" color="default" variant="text"
-                                               :icon="true" :disabled="updating"
+                                               :aria-label="tt('Delete')" :icon="true" :disabled="updating"
                                                @click="deleteCustomIcon(element)">
                                             <v-icon :icon="mdiDeleteOutline" size="22" v-if="deletingCustomIconId !== element.id" />
                                             <v-progress-circular indeterminate size="20" v-else-if="deletingCustomIconId === element.id" />
@@ -70,7 +70,7 @@
                                         <v-spacer/>
                                         <span class="align-self-center">
                                             <v-icon :class="!loading && !updating && allCustomIcons.length > 1 ? 'drag-handle' : 'disabled'"
-                                                    :icon="mdiDrag"/>
+                                                    :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
                                             <v-tooltip activator="parent" v-if="!loading && !updating && allCustomIcons.length > 1 && hoveredIconId === element.id">{{ tt('Drag to Reorder') }}</v-tooltip>
                                         </span>
                                     </div>

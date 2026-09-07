@@ -8,8 +8,9 @@
                 <f7-link :text="tt('Now')" @click="setCurrentTime" v-if="!clearable"></f7-link>
             </div>
             <div class="right">
-                <f7-link :icon-f7="mode === 'time' ? 'calendar' : 'clock'" @click="switchMode"></f7-link>
-                <f7-button round fill icon-f7="checkmark_alt" @click="confirm"></f7-button>
+                <f7-link :aria-label="mode === 'time' ? tt('Date') : tt('Time')"
+                         :icon-f7="mode === 'time' ? 'calendar' : 'clock'" @click="switchMode"></f7-link>
+                <f7-button round fill icon-f7="checkmark_alt" :aria-label="tt('Apply')" @click="confirm"></f7-button>
             </div>
         </f7-toolbar>
         <f7-page-content class="margin-top">

@@ -1,11 +1,11 @@
 <template>
     <v-dialog width="600" :persistent="loading || (mode === 'replaceInvalidItems' && !!sourceItem) || !!targetItem" v-model="showState">
-        <one-column-dialog-layout :title="tt(title)" :cancel-button-title="tt('Cancel')"
+        <one-column-dialog-layout :title="title" :cancel-button-title="tt('Cancel')"
                                   :disabled="loading"
                                   @cancel="cancel">
             <template #after-title>
-                <v-btn density="compact" color="default" variant="text"
-                       class="ms-2" :icon="true" :disabled="loading" :loading="loading"
+                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                       :aria-label="tt('Refresh')" :icon="true" :disabled="loading" :loading="loading"
                        @click="reload"
                        v-if="type === 'expenseCategory' || type === 'incomeCategory' || type === 'transferCategory' || type === 'account' || type === 'destinationAccount' || type === 'tag'"
                 >
@@ -20,7 +20,7 @@
             <template #toolbar>
                 <v-btn class="mx-2" density="comfortable" variant="outlined"
                        :disabled="loading || ((mode === 'replaceInvalidItems' || (mode === 'batchReplace' && type === 'tag')) && !sourceItem && sourceItem !== '') || (!targetItem && targetItem !== '' && !removeTag)"
-                       @click="confirm">{{ tt('OK') }}</v-btn>
+                       @click="confirm">{{ tt('Apply') }}</v-btn>
             </template>
 
             <template #content>

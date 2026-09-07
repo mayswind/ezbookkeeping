@@ -14,7 +14,7 @@
             <div class="text-no-wrap" v-if="currency && appendText">{{ appendText }}</div>
             <v-tooltip :text="tt('Enter formula mode')">
                 <template v-slot:activator="{ props }">
-                    <v-icon class="ms-2" :icon="mdiCalculatorVariantOutline"
+                    <v-icon class="ms-2" :aria-label="tt('Enter formula mode')" :icon="mdiCalculatorVariantOutline"
                             @keydown.enter="enterFormulaMode" @keydown.space="enterFormulaMode" @click="enterFormulaMode"
                             v-bind="props" v-if="enableFormula && !formulaMode"></v-icon>
                 </template>
@@ -35,14 +35,14 @@
             <div class="text-no-wrap" v-if="currency && appendText">{{ appendText }}</div>
             <v-tooltip :text="tt('Calculate formula result')">
                 <template v-slot:activator="{ props }">
-                    <v-icon class="ms-2" color="primary" :icon="mdiCheck"
+                    <v-icon class="ms-2" color="primary" :aria-label="tt('Calculate formula result')" :icon="mdiCheck"
                             @click="calculateFormula" v-bind="props"
                             v-if="formulaMode"></v-icon>
                 </template>
             </v-tooltip>
             <v-tooltip :text="tt('Exit formula mode')">
                 <template v-slot:activator="{ props }">
-                    <v-icon class="ms-2" color="secondary" :icon="mdiClose"
+                    <v-icon class="ms-2" color="secondary" :aria-label="tt('Exit formula mode')" :icon="mdiClose"
                             @click="exitFormulaMode" v-bind="props"
                             v-if="formulaMode"></v-icon>
                 </template>

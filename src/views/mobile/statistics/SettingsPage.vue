@@ -57,9 +57,9 @@
             </f7-list-item>
 
             <f7-list-item
-                class="item-truncate-after-text"
                 link="#"
-                @click="showDefaultKeywordMatchModePopup = true"
+                class="item-truncate-after-text"
+                popover-open=".default-keyword-search-matching-mode-popover-menu"
             >
                 <template #after-title>
                     <div class="item-actual-title">
@@ -69,17 +69,20 @@
                 <template #after>
                     {{ findDisplayNameByType(allKeywordMatchModes, defaultKeywordMatchMode) }}
                 </template>
-                <list-item-selection-popup value-type="item"
-                                           key-field="type" value-field="type"
-                                           title-field="displayName"
-                                           :title="tt('Default Keyword Search Matching Mode')"
-                                           :enable-filter="true"
-                                           :filter-placeholder="tt('Matching Mode')"
-                                           :filter-no-items-text="tt('No results')"
-                                           :items="allKeywordMatchModes"
-                                           v-model:show="showDefaultKeywordMatchModePopup"
-                                           v-model="defaultKeywordMatchMode">
-                </list-item-selection-popup>
+                <f7-popover class="default-keyword-search-matching-mode-popover-menu">
+                    <f7-list dividers>
+                        <f7-list-item link="#" no-chevron popover-close
+                                      :title="option.displayName"
+                                      :class="{ 'list-item-selected': defaultKeywordMatchMode === option.type }"
+                                      :key="option.type"
+                                      v-for="option in allKeywordMatchModes"
+                                      @click="defaultKeywordMatchMode = option.type">
+                            <template #after>
+                                <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="defaultKeywordMatchMode === option.type"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-popover>
             </f7-list-item>
 
             <f7-list-item
@@ -113,9 +116,9 @@
             </f7-list-item>
 
             <f7-list-item
-                class="item-truncate-after-text"
                 link="#"
-                @click="showDefaultSortingTypePopup = true"
+                class="item-truncate-after-text"
+                popover-open=".default-sort-order-popover-menu"
             >
                 <template #after-title>
                     <div class="item-actual-title">
@@ -125,26 +128,29 @@
                 <template #after>
                     {{ findDisplayNameByType(allSortingTypes, defaultSortingType) }}
                 </template>
-                <list-item-selection-popup value-type="item"
-                                           key-field="type" value-field="type"
-                                           title-field="displayName"
-                                           :title="tt('Default Sort Order')"
-                                           :enable-filter="true"
-                                           :filter-placeholder="tt('Sort Order')"
-                                           :filter-no-items-text="tt('No results')"
-                                           :items="allSortingTypes"
-                                           v-model:show="showDefaultSortingTypePopup"
-                                           v-model="defaultSortingType">
-                </list-item-selection-popup>
+                <f7-popover class="default-sort-order-popover-menu">
+                    <f7-list dividers>
+                        <f7-list-item link="#" no-chevron popover-close
+                                      :title="option.displayName"
+                                      :class="{ 'list-item-selected': defaultSortingType === option.type }"
+                                      :key="option.type"
+                                      v-for="option in allSortingTypes"
+                                      @click="defaultSortingType = option.type">
+                            <template #after>
+                                <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="defaultSortingType === option.type"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-popover>
             </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ tt('Categorical Analysis Settings') }}</f7-block-title>
         <f7-list strong inset dividers class="settings-list">
             <f7-list-item
-                class="item-truncate-after-text"
                 link="#"
-                @click="showDefaultCategoricalChartTypePopup = true"
+                class="item-truncate-after-text"
+                popover-open=".default-categorical-chart-type-popover-menu"
             >
                 <template #after-title>
                     <div class="item-actual-title">
@@ -154,17 +160,20 @@
                 <template #after>
                     {{ findDisplayNameByType(allCategoricalChartTypes, defaultCategoricalChartType) }}
                 </template>
-                <list-item-selection-popup value-type="item"
-                                           key-field="type" value-field="type"
-                                           title-field="displayName"
-                                           :title="tt('Default Chart Type')"
-                                           :enable-filter="true"
-                                           :filter-placeholder="tt('Chart Type')"
-                                           :filter-no-items-text="tt('No results')"
-                                           :items="allCategoricalChartTypes"
-                                           v-model:show="showDefaultCategoricalChartTypePopup"
-                                           v-model="defaultCategoricalChartType">
-                </list-item-selection-popup>
+                <f7-popover class="default-categorical-chart-type-popover-menu">
+                    <f7-list dividers>
+                        <f7-list-item link="#" no-chevron popover-close
+                                      :title="option.displayName"
+                                      :class="{ 'list-item-selected': defaultCategoricalChartType === option.type }"
+                                      :key="option.type"
+                                      v-for="option in allCategoricalChartTypes"
+                                      @click="defaultCategoricalChartType = option.type">
+                            <template #after>
+                                <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="defaultCategoricalChartType === option.type"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-popover>
             </f7-list-item>
 
             <f7-list-item
@@ -296,9 +305,6 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const showDefaultChartDataTypePopup = ref<boolean>(false);
 const showDefaultTimezoneTypePopup = ref<boolean>(false);
-const showDefaultKeywordMatchModePopup = ref<boolean>(false);
-const showDefaultSortingTypePopup = ref<boolean>(false);
-const showDefaultCategoricalChartTypePopup = ref<boolean>(false);
 const showDefaultCategoricalChartDateRangePopup = ref<boolean>(false);
 const showDefaultTrendChartDateRangePopup = ref<boolean>(false);
 const showDefaultAssetTrendsChartDateRangePopup = ref<boolean>(false);

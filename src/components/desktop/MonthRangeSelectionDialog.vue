@@ -4,7 +4,7 @@
                                   @cancel="cancel">
             <template #toolbar>
                 <v-btn class="mx-2" density="comfortable" variant="outlined"
-                       :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ tt('OK') }}</v-btn>
+                       :disabled="!dateRange[0] || !dateRange[1]" @click="confirm">{{ tt('Apply') }}</v-btn>
             </template>
 
             <template #content>

@@ -15,7 +15,7 @@
                 <span>{{ tt('Month elapsed') }}</span>
                 <span class="font-weight-medium">{{ displayElapsedPercent }}</span>
             </div>
-            <v-progress-linear class="mt-2" color="primary" rounded height="6" :model-value="currentMonthElapsedPercent * 100" :aria-label="tt('Month elapsed')" />
+            <v-progress-linear class="mt-2" color="primary" rounded height="6" :model-value="currentMonthElapsedPercent * 100" />
             <div class="expense-progress-widget__projection mt-3 pt-3">
                 <div class="overview-widget__detail-row">
                     <span class="text-truncate">{{ tt('Estimated month-end expense') }}</span>

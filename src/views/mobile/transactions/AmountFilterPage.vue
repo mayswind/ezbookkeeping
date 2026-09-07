@@ -4,7 +4,7 @@
             <f7-nav-left :back-link="tt('Back')" v-if="!isCustomSelection"></f7-nav-left>
             <f7-nav-title :title="tt('Filter Amount')"></f7-nav-title>
             <f7-nav-right>
-                <f7-link icon-f7="checkmark_alt" @click="confirm"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :aria-label="tt('Apply')" @click="confirm"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 

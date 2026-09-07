@@ -65,7 +65,7 @@
                                 <span>{{ tt('Statistics & Analysis') }}</span>
                                 <v-btn-group class="ms-4" color="default" density="comfortable" variant="outlined" divided>
                                     <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
-                                           :disabled="loading || !canShiftDateRange"
+                                           :aria-label="tt('Previous Period')" :disabled="loading || !canShiftDateRange"
                                            @click="shiftDateRange(-1)"/>
                                     <v-menu location="bottom" max-height="500">
                                         <template #activator="{ props }">
@@ -92,7 +92,7 @@
                                         </v-list>
                                     </v-menu>
                                     <v-btn class="button-icon-with-direction" :icon="mdiArrowRight"
-                                           :disabled="loading || !canShiftDateRange"
+                                           :aria-label="tt('Next Period')" :disabled="loading || !canShiftDateRange"
                                            @click="shiftDateRange(1)"/>
                                 </v-btn-group>
 
@@ -128,8 +128,8 @@
                                     </v-list>
                                 </v-menu>
 
-                                <v-btn density="compact" color="default" variant="text"
-                                       class="ms-2" :icon="true" :loading="loading" @click="reload(true)">
+                                <v-btn density="compact" color="default" variant="text" class="ms-2"
+                                       :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="reload(true)">
                                     <template #loader>
                                         <v-progress-circular indeterminate size="20"/>
                                     </template>
@@ -149,7 +149,7 @@
                                     />
                                 </div>
                                 <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                       :disabled="loading" :icon="true">
+                                       :aria-label="tt('More')" :disabled="loading" :icon="true">
                                     <v-icon :icon="mdiDotsVertical" />
                                     <v-menu activator="parent">
                                         <v-list>

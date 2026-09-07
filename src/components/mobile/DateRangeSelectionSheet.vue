@@ -22,7 +22,7 @@
                 </date-time-picker>
                 <f7-button large fill
                            :class="{ 'disabled': !dateRange[0] || !dateRange[1] }"
-                           :text="tt('Continue')"
+                           :text="tt('Apply')"
                            @click="confirm">
                 </f7-button>
                 <div class="margin-top text-align-center">

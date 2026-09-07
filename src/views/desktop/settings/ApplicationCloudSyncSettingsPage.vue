@@ -29,7 +29,7 @@
                                         <span>{{ tt('Synchronized Settings') }}</span>
                                     </div>
                                     <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                           :disabled="loading || enabling || disabling" :icon="true">
+                                           :aria-label="tt('More')" :disabled="loading || enabling || disabling" :icon="true">
                                         <v-icon :icon="mdiDotsVertical" />
                                         <v-menu activator="parent">
                                             <v-list>

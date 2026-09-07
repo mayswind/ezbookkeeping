@@ -4,8 +4,8 @@
         <f7-toolbar class="toolbar-with-swipe-handler">
             <div class="swipe-handler"></div>
             <div class="left">
-                <f7-link icon-f7="minus" :class="{ 'disabled': !map?.allowZoomOut() }" @click="map?.zoomOut()"></f7-link>
-                <f7-link icon-f7="plus" :class="{ 'disabled': !map?.allowZoomIn() }" @click="map?.zoomIn()"></f7-link>
+                <f7-link icon-f7="minus" :class="{ 'disabled': !map?.allowZoomOut() }" :aria-label="tt('Zoom out')" @click="map?.zoomOut()"></f7-link>
+                <f7-link icon-f7="plus" :class="{ 'disabled': !map?.allowZoomIn() }" :aria-label="tt('Zoom in')" @click="map?.zoomIn()"></f7-link>
             </div>
             <div class="right map-sheet-toolbar-right">
                 <f7-link :text="tt('Disable Click to Set Location')" @click="switchSetGeoLocationByClickMap(false)" v-if="!readonly && isSupportGetGeoLocationByClick() && props.setGeoLocationByClickMap"></f7-link>

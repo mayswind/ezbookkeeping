@@ -9,7 +9,7 @@
                 </f7-link>
             </f7-nav-title>
             <f7-nav-right :class="{ 'disabled': loading }">
-                <f7-link icon-f7="ellipsis" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="ellipsis" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
@@ -282,13 +282,13 @@
         </f7-popover>
 
         <f7-toolbar tabbar bottom :class="{ 'compact-tabbar': true, 'toolbar-item-auto-size': true, 'disabled': loading }">
-            <f7-link :class="{ 'disabled': reloading || !canShiftDateRange }" @click="shiftDateRange(-1)">
+            <f7-link :class="{ 'disabled': reloading || !canShiftDateRange }" :aria-label="tt('Previous Period')" @click="shiftDateRange(-1)">
                 <f7-icon class="icon-with-direction" f7="arrow_left_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading || !canChangeDateRange }" popover-open=".date-popover-menu">
                 <span :class="{ 'tabbar-item-changed': isQueryDateRangeChanged }">{{ queryDateRangeName }}</span>
             </f7-link>
-            <f7-link :class="{ 'disabled': reloading || !canShiftDateRange }" @click="shiftDateRange(1)">
+            <f7-link :class="{ 'disabled': reloading || !canShiftDateRange }" :aria-label="tt('Next Period')" @click="shiftDateRange(1)">
                 <f7-icon class="icon-with-direction" f7="arrow_right_square"></f7-icon>
             </f7-link>
             <f7-link :class="{ 'tabbar-text-with-ellipsis': true, 'disabled': reloading }" popover-open=".date-aggregation-popover-menu"

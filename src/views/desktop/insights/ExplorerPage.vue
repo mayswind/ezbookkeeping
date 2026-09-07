@@ -34,7 +34,7 @@
                         <span>{{ tt('Insights Explorer') }}</span>
                         <v-btn-group class="ms-4" color="default" density="comfortable" variant="outlined" divided>
                             <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
-                                   :disabled="loading || updating || !canShiftDateRange || isCurrentDataTableEditable"
+                                   :aria-label="tt('Previous Period')" :disabled="loading || updating || !canShiftDateRange || isCurrentDataTableEditable"
                                    @click="shiftDateRange(-1)"/>
                             <v-menu location="bottom" max-height="500">
                                 <template #activator="{ props }">
@@ -61,12 +61,12 @@
                                 </v-list>
                             </v-menu>
                             <v-btn class="button-icon-with-direction" :icon="mdiArrowRight"
-                                   :disabled="loading || updating || !canShiftDateRange || isCurrentDataTableEditable"
+                                   :aria-label="tt('Next Period')" :disabled="loading || updating || !canShiftDateRange || isCurrentDataTableEditable"
                                    @click="shiftDateRange(1)"/>
                         </v-btn-group>
 
-                        <v-btn density="compact" color="default" variant="text"
-                               class="ms-2" :icon="true" :loading="loading" :disabled="updating" @click="reload(true)">
+                        <v-btn density="compact" color="default" variant="text" class="ms-2"
+                               :aria-label="tt('Refresh')" :icon="true" :loading="loading" :disabled="updating" @click="reload(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -92,7 +92,7 @@
                             </v-menu>
                         </v-btn>
                         <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                               :disabled="loading || updating" :icon="true">
+                               :aria-label="tt('More')" :disabled="loading || updating" :icon="true">
                             <v-icon :icon="mdiDotsVertical" />
                             <v-menu activator="parent">
                                 <v-list>

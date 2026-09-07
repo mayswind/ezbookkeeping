@@ -5,13 +5,16 @@
             <div class="swipe-handler"></div>
             <div class="left">
                 <f7-link icon-f7="xmark" :class="{ 'disabled': recognizing }"
+                         :aria-label="tt('Cancel')"
                          @click="cancel"></f7-link>
             </div>
             <div id="clipboard-text-recognition-sheet-toolbar-space"
-                 class="clipboard-text-recognition-sheet-toolbar-space" @click="onToolbarClick()"></div>
+                 class="clipboard-text-recognition-sheet-toolbar-space"
+                 :aria-label="tt('Paste')" @click="onToolbarClick()"></div>
             <div class="right">
                 <f7-button round fill icon-f7="checkmark_alt"
                            :class="{ 'disabled': !pastedText }"
+                           :aria-label="tt('Confirm')"
                            @click="confirm"></f7-button>
             </div>
         </f7-toolbar>

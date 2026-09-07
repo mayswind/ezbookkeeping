@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Überprüfungszeit kann nicht vor aktuellem Wert liegen",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "Transaktions-ID ist ungültig",
         "transaction not found": "Transaktion nicht gefunden",
         "transaction type is invalid": "Transaktionstyp ist ungültig",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "OK",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "Vermögensübersicht",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "Einlagen-Depot",
     "Balance": "Saldo",
     "Outstanding Balance": "Ausstehender Saldo",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "Kontoliste kann nicht abgerufen werden",
     "Account list is up to date": "Kontoliste ist aktuell",
     "Account list has been updated": "Kontoliste wurde aktualisiert",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Letzte Überprüfungszeit",
     "Sub-account Last Reconciled Time": "Teilkonto der letzten Überprüfungszeit",
     "Statement Date": "Abrechnungsdatum",
+    "Credit Limit": "Credit Limit",
     "Description": "Beschreibung",
     "Your account description (optional)": "Ihre Kontobeschreibung (optional)",
     "Your sub-account description (optional)": "Ihre Teilkontobeschreibung (optional)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "Kontokategorie-Reihenfolge gespeichert",
     "Unable to move account category": "Kontokategorie kann nicht verschoben werden",
     "Hide Categories Without Accounts": "Kategorien ohne Konten ausblenden",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Datumsbereich für Überprüfung-Zeitpunkt Schaltfläche",
     "Default Date Range for Reconciliation Statement Page": "Datumsbereich für Überprüfung-Zeitpunkt Seite",
     "Exchange Rates Data Page": "Wechselkursdatenseite",

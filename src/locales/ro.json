@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Nu se poate seta ultima dată a reconcilierii înainte de valoarea curentă",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "ID-ul tranzacției este nevalid",
         "transaction not found": "Tranzacția nu a fost găsită",
         "transaction type is invalid": "Tipul tranzacției este nevalid",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "OK",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "Rezumat active",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "Depozit la termen",
     "Balance": "Sold",
     "Outstanding Balance": "Sold restant",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "Nu s-a putut obține lista conturilor",
     "Account list is up to date": "Lista conturilor este la zi",
     "Account list has been updated": "Lista conturilor a fost actualizată",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Ultima dată a reconcilierii",
     "Sub-account Last Reconciled Time": "Ultima dată a reconcilierii subcontului",
     "Statement Date": "Data extrasului",
+    "Credit Limit": "Credit Limit",
     "Description": "Descriere",
     "Your account description (optional)": "Descrierea contului tău (opțional)",
     "Your sub-account description (optional)": "Descrierea subcontului tău (opțional)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "Ordinea categoriilor de conturi a fost salvată",
     "Unable to move account category": "Nu s-a putut muta categoria contului",
     "Hide Categories Without Accounts": "Ascunde categoriile fără conturi",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Interval implicit de date pentru butonul situației de reconciliere",
     "Default Date Range for Reconciliation Statement Page": "Interval implicit de date pentru pagina situației de reconciliere",
     "Exchange Rates Data Page": "Pagina datelor cursurilor de schimb",

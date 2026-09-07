@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "பரிவர்த்தனை ID தவறானது உள்ளது",
         "transaction not found": "பரிவர்த்தனை கிடைக்கவில்லை",
         "transaction type is invalid": "பரிவர்த்தனையின் வகை தவறானது உள்ளது",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "சரி",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "சொத்து சுருக்கம்",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "வைப்பு சான்றிதழ்",
     "Balance": "இருப்பு",
     "Outstanding Balance": "இருப்பு இருப்பு",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "கணக்குகளின் பட்டியல்யை பெற முடியவில்லை",
     "Account list is up to date": "கணக்குகளின் பட்டியல் புதுப்பிக்கப்பட்டது",
     "Account list has been updated": "கணக்குகளின் பட்டியல் புதுப்பிக்கப்பட்டது",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Last Reconciled Time",
     "Sub-account Last Reconciled Time": "Sub-account Last Reconciled Time",
     "Statement Date": "அறிக்கை தேதி",
+    "Credit Limit": "Credit Limit",
     "Description": "விளக்கம்",
     "Your account description (optional)": "உங்கள் கணக்கு விளக்கம் (விருப்பமான)",
     "Your sub-account description (optional)": "உங்கள் துணை-கணக்கு விளக்கம் (விருப்பமானது)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "கணக்கு வகை வரிசை சேமிக்கப்பட்டது",
     "Unable to move account category": "கணக்கு வகை நகர்த்த முடியவில்லை",
     "Hide Categories Without Accounts": "கணக்குகள் இல்லாத வகைகளை மறை",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Default Date Range for Reconciliation Statement Button",
     "Default Date Range for Reconciliation Statement Page": "Default Date Range for Reconciliation Statement Page",
     "Exchange Rates Data Page": "மாற்று விகிதம்களின் பக்கம்",

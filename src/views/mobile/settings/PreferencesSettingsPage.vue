@@ -351,6 +351,34 @@
                 </template>
             </f7-list-item>
             <f7-list-item
+                link="#"
+                class="item-truncate-after-text"
+                popover-open=".account-list-default-credit-card-amount-popover-menu"
+            >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Credit Card Amount') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allCreditCardAmountDisplayTypes, defaultCreditCardAmountDisplayTypeInMobile) }}
+                </template>
+                <f7-popover class="account-list-default-credit-card-amount-popover-menu">
+                    <f7-list dividers>
+                        <f7-list-item link="#" no-chevron popover-close
+                                      :title="option.displayName"
+                                      :class="{ 'list-item-selected': defaultCreditCardAmountDisplayTypeInMobile === option.type }"
+                                      :key="option.type"
+                                      v-for="option in allCreditCardAmountDisplayTypes"
+                                      @click="defaultCreditCardAmountDisplayTypeInMobile = option.type">
+                            <template #after>
+                                <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="defaultCreditCardAmountDisplayTypeInMobile === option.type"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-popover>
+            </f7-list-item>
+            <f7-list-item
                 class="item-truncate-after-text"
                 link="#"
                 @click="showReconciliationStatementDefaultDateRangePopup = true"
@@ -432,6 +460,7 @@ import { isDefaultMobileOverviewLayout, parseMobileOverviewLayout } from '@/lib/
 
 const {
     tt,
+    getAllCreditCardAmountDisplayTypes,
     getAllTransactionQuickSaveButtonStyles,
     getAllTransactionQuickAddButtonActionTypes
 } = useI18n();
@@ -479,6 +508,7 @@ const showReconciliationStatementDefaultDateRangePopup = ref<boolean>(false);
 
 const allTransactionQuickSaveButtonStyles = computed<TypeAndDisplayName[]>(() => getAllTransactionQuickSaveButtonStyles());
 const allTransactionQuickAddButtonActionTypes = computed<TypeAndDisplayName[]>(() => getAllTransactionQuickAddButtonActionTypes());
+const allCreditCardAmountDisplayTypes = computed<TypeAndDisplayName[]>(() => getAllCreditCardAmountDisplayTypes());
 
 const overviewPageLayoutDisplayContent = computed<string>(() => {
     try {
@@ -501,6 +531,11 @@ const quickAddButtonActionInMobileTransactionEditPage = computed<number>({
 const alwaysShowTransactionPicturesInMobileTransactionEditPage = computed<boolean>({
     get: () => settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage,
     set: (value) => settingsStore.setAlwaysShowTransactionPicturesInMobileTransactionEditPage(value)
+});
+
+const defaultCreditCardAmountDisplayTypeInMobile = computed<number>({
+    get: () => settingsStore.appSettings.defaultCreditCardAmountDisplayTypeInMobile,
+    set: (value: number) => settingsStore.setDefaultCreditCardAmountDisplayTypeInMobile(value)
 });
 
 const reconciliationStatementPageDefaultDateRangeTypeInMobile = computed<number>({

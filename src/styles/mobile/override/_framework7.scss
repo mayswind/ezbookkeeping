@@ -408,6 +408,13 @@ html[dir="rtl"] .list .item-content > .item-inner > .item-after .list-item-check
     }
 }
 
+.picker-chevron {
+    margin-inline-end: -6px;
+    color: rgba(0, 0, 0, 0.3);
+    font-size: var(--f7-list-chevron-icon-font-size);
+    transform: scaleX(0.6) scaleY(0.9);
+}
+
 .default-text-color {
     color: var(--f7-text-color);
 }

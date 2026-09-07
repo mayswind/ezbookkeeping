@@ -232,6 +232,10 @@ function getStringValue(value: BigDecimal, hideZero: boolean): string {
 
 function inputNum(num: number): void {
     if (!previousValue.value && currentSymbol.value === '−') {
+        if (isNumber(props.minValue) && props.minValue >= 0) {
+            return;
+        }
+
         currentValue.value = '-' + currentValue.value;
         currentSymbol.value = '';
     }

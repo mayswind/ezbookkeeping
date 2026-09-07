@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "不能将最后对账时间设置为早于当前值的时间",
         "account balance overflow": "账户余额将超出支持范围",
         "account icon is invalid": "账户图标无效",
+        "cannot set credit limit for non credit card account": "非信用卡账户不能设置信用额度",
+        "cannot set credit limit for sub account": "子账户不能设置信用额度",
+        "must set parent account currency when set credit limit": "设置信用额度时必须设置父账户货币",
         "transaction id is invalid": "交易ID无效",
         "transaction not found": "交易不存在",
         "transaction type is invalid": "交易类型无效",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[必填] 匹配内容（根据匹配类型可能为 字符串、字符串数组或数字数组）",
             "conditionRelationDescription": "[必填] 与上一个查询条件的逻辑关系",
             "additionalQueryDescription": "其他查询条件"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "未清余额",
+            "availableBalance": "可用额度"
         }
     },
     "OK": "确定",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "资产概要",
     "Account Balance List": "账户余额列表",
     "Always Show Amount": "总是显示金额",
+    "Show Available Credit for Credit Cards": "信用卡显示可用额度",
     "This Month's Income and Expense Overview": "本月收支概览",
     "This Month's Expense Progress": "本月支出进度",
     "Period Income and Expense": "周期收支概览",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "定期存款",
     "Balance": "余额",
     "Outstanding Balance": "未清余额",
+    "Available Credit": "可用额度",
     "Unable to retrieve account list": "无法获取账户列表",
     "Account list is up to date": "账户列表已是最新",
     "Account list has been updated": "账户列表已更新",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "最后对账时间",
     "Sub-account Last Reconciled Time": "子账户最后对账时间",
     "Statement Date": "账单日",
+    "Credit Limit": "信用额度",
     "Description": "描述",
     "Your account description (optional)": "你的账户描述 (可选)",
     "Your sub-account description (optional)": "你的子账户描述 (可选)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "账户分类顺序已保存",
     "Unable to move account category": "无法移动账户分类",
     "Hide Categories Without Accounts": "隐藏没有账户的分类",
+    "Default Credit Card Amount": "信用卡默认金额",
     "Default Date Range for Reconciliation Statement Button": "对账单按钮默认时间范围",
     "Default Date Range for Reconciliation Statement Page": "对账单页面默认时间范围",
     "Exchange Rates Data Page": "汇率数据页面",

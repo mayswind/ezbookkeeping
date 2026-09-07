@@ -98,6 +98,28 @@ export class AccountCategory implements TypeAndName {
     }
 }
 
+export class CreditCardAmountDisplayType implements TypeAndName {
+    private static readonly allInstances: CreditCardAmountDisplayType[] = [];
+
+    public static readonly OutstandingBalance = new CreditCardAmountDisplayType(0, 'Outstanding Balance');
+    public static readonly AvailableCredit = new CreditCardAmountDisplayType(1, 'Available Credit');
+
+    public static readonly Default = CreditCardAmountDisplayType.OutstandingBalance;
+
+    public readonly type: number;
+    public readonly name: string;
+
+    private constructor(type: number, name: string) {
+        this.type = type;
+        this.name = name;
+        CreditCardAmountDisplayType.allInstances.push(this);
+    }
+
+    public static values(): CreditCardAmountDisplayType[] {
+        return CreditCardAmountDisplayType.allInstances;
+    }
+}
+
 export interface LocalizedAccountCategory extends TypeAndDisplayName {
     readonly type: number;
     readonly displayName: string;

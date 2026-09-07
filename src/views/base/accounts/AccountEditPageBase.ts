@@ -8,9 +8,12 @@ import { useUserStore } from '@/stores/user.ts';
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { AccountCategory, AccountType } from '@/core/account.ts';
 import type { LocalizedAccountCategory } from '@/core/account.ts';
+import { ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
+
 import { Account } from '@/models/account.ts';
 
-import { isDefined } from '@/lib/common.ts';
+import { isDefined, isNumber } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import {
     getTimezoneOffsetMinutes,
     getSameDateTimeWithCurrentTimezone,
@@ -23,7 +26,8 @@ export function useAccountEditPageBase() {
         tt,
         getAvailableMonthDays,
         getAllAccountCategories,
-        getAllAccountTypes
+        getAllAccountTypes,
+        formatAmountToLocalizedNumeralsWithCurrency
     } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -93,8 +97,6 @@ export function useAccountEditPageBase() {
         return allAvailableDays;
     });
 
-    const isAccountSupportCreditCardStatementDate = computed<boolean>(() => account.value && account.value.category === AccountCategory.CreditCard.type);
-
     function getCurrentUnixTimeForNewAccount(): number {
         return getSameDateTimeWithCurrentTimezone(parseDateTimeFromUnixTimeWithBrowserTimezone(getCurrentUnixTime())).getUnixTime();
     }
@@ -108,6 +110,10 @@ export function useAccountEditPageBase() {
     }
 
     function getAccountCreditCardStatementDate(statementDate?: number): string | null {
+        if (!isDefined(statementDate)) {
+            return tt('Not set');
+        }
+
         for (const item of allAvailableMonthDays.value) {
             if (item.type === statementDate) {
                 return item.displayName;
@@ -115,6 +121,14 @@ export function useAccountEditPageBase() {
         }
 
         return null;
+    }
+
+    function getAccountCreditCardCreditLimitDisplayValue(creditLimit: number | undefined, currency: string): string {
+        if (!isNumber(creditLimit) || creditLimit <= 0 || !currency || currency === ACCOUNT_CURRENCY_NOT_SET_VALUE) {
+            return tt('Not set');
+        }
+
+        return formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(creditLimit), currency);
     }
 
     function updateAccountBalanceTime(account: Account, balanceTime: number): void {
@@ -197,6 +211,12 @@ export function useAccountEditPageBase() {
         account.value.setSuitableIcon(oldValue, newValue);
     });
 
+    watch(() => account.value.currency, (newValue) => {
+        if (account.value.category === AccountCategory.CreditCard.type && (!newValue || newValue === ACCOUNT_CURRENCY_NOT_SET_VALUE)) {
+            account.value.numericCreditCardLimit = 0;
+        }
+    });
+
     return {
         // constants
         defaultAccountCategory,
@@ -216,11 +236,11 @@ export function useAccountEditPageBase() {
         allAccountCategories,
         allAccountTypes,
         allAvailableMonthDays,
-        isAccountSupportCreditCardStatementDate,
         // functions
         getCurrentUnixTimeForNewAccount,
         getDefaultTimezoneOffsetMinutes,
         getAccountCreditCardStatementDate,
+        getAccountCreditCardCreditLimitDisplayValue,
         updateAccountBalanceTime,
         updateAccountLastReconciledTime,
         isNewAccount,

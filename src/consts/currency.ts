@@ -1285,4 +1285,4 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
 
 export const DEFAULT_CURRENCY_SYMBOL: string = '¤';
 export const DEFAULT_CURRENCY_CODE: string = (ALL_CURRENCIES['USD'] as CurrencyInfo).code;
-export const PARENT_ACCOUNT_CURRENCY_PLACEHOLDER: string = '---';
+export const ACCOUNT_CURRENCY_NOT_SET_VALUE: string = '---';

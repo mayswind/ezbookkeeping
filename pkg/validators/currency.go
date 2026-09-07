@@ -2,10 +2,9 @@ package validators
 
 import (
 	"github.com/go-playground/validator/v10"
-)
 
-// ParentAccountCurrencyPlaceholder represents the currency field of parent account stored in database
-const ParentAccountCurrencyPlaceholder = "---"
+	"github.com/mayswind/ezbookkeeping/pkg/core"
+)
 
 // AllCurrencyNames represents all currency name in ISO 4217
 // Reference: https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
@@ -174,7 +173,7 @@ var AllCurrencyNames = map[string]bool{
 // ValidCurrency returns whether the given currency is valid
 func ValidCurrency(fl validator.FieldLevel) bool {
 	if value, ok := fl.Field().Interface().(string); ok {
-		if value == ParentAccountCurrencyPlaceholder {
+		if value == core.AccountCurrencyNotSetValue {
 			return true
 		}
 

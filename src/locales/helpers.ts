@@ -131,7 +131,8 @@ import {
 import {
     type LocalizedAccountCategory,
     AccountType,
-    AccountCategory
+    AccountCategory,
+    CreditCardAmountDisplayType
 } from '@/core/account.ts';
 
 import {
@@ -187,7 +188,7 @@ import type { ErrorResponse } from '@/core/api.ts';
 
 import { AMOUNT_FACTOR, DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
-import { ALL_CURRENCIES } from '@/consts/currency.ts';
+import { ALL_CURRENCIES, ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
 import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
 import { OAUTH2_PROVIDER_DISPLAY_NAME } from '@/consts/oauth2.ts';
@@ -1066,7 +1067,7 @@ export function useI18n() {
         }];
     }
 
-    function getAllCurrencies(): LocalizedCurrencyInfo[] {
+    function getAllCurrencies(withNotSet?: boolean): LocalizedCurrencyInfo[] {
         const allCurrencies: LocalizedCurrencyInfo[] = [];
 
         for (const currencyCode of keys(ALL_CURRENCIES)) {
@@ -1081,6 +1082,13 @@ export function useI18n() {
         allCurrencies.sort(function (c1, c2) {
             return c1.displayName.localeCompare(c2.displayName);
         })
+
+        if (withNotSet) {
+            allCurrencies.splice(0, 0, {
+                currencyCode: ACCOUNT_CURRENCY_NOT_SET_VALUE,
+                displayName: t('Not set')
+            });
+        }
 
         return allCurrencies;
     }
@@ -1961,6 +1969,10 @@ export function useI18n() {
             return '';
         }
 
+        if (currencyCode === ACCOUNT_CURRENCY_NOT_SET_VALUE) {
+            return t('Not set');
+        }
+
         return t(`currency.name.${currencyCode}`);
     }
 
@@ -2669,6 +2681,7 @@ export function useI18n() {
         getAllIncomeAmountColors: () => getAllExpenseIncomeAmountColors(CategoryType.Income),
         getAllAccountCategories,
         getAllAccountTypes: () => getLocalizedDisplayNameAndType(AccountType.values()),
+        getAllCreditCardAmountDisplayTypes: () => getLocalizedDisplayNameAndType(CreditCardAmountDisplayType.values()),
         getAllCategoricalChartTypes: (withDesktopOnlyChart?: boolean) => getLocalizedDisplayNameAndType(CategoricalChartType.values(!!withDesktopOnlyChart)),
         getAllTrendChartTypes: () => getLocalizedDisplayNameAndType(TrendChartType.values()),
         getAllAccountBalanceTrendChartTypes: () => getLocalizedDisplayNameAndType(AccountBalanceTrendChartType.values()),

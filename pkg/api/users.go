@@ -15,7 +15,6 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
-	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
 // UsersApi represents user api
@@ -61,7 +60,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	if userRegisterReq.DefaultCurrency == validators.ParentAccountCurrencyPlaceholder {
+	if userRegisterReq.DefaultCurrency == core.AccountCurrencyNotSetValue {
 		log.Warnf(c, "[users.UserRegisterHandler] user default currency is invalid")
 		return nil, errs.ErrUserDefaultCurrencyIsInvalid
 	}

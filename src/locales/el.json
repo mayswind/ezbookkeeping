@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Η τελευταία συμφωνία δεν μπορεί να οριστεί πριν από την τρέχουσα τιμή",
         "account balance overflow": "Το υπόλοιπο του λογαριασμού θα υπερέβαινε το υποστηριζόμενο εύρος",
         "account icon is invalid": "Το εικονίδιο λογαριασμού δεν είναι έγκυρο",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "Το ID συναλλαγής δεν είναι έγκυρο",
         "transaction not found": "Η συναλλαγή δεν βρέθηκε",
         "transaction type is invalid": "Ο τύπος συναλλαγής δεν είναι έγκυρος",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[υποχρεωτικό] Τιμή ή τιμές αντιστοίχισης. Ανάλογα με τον τύπο αντιστοίχισης, μπορεί να είναι συμβολοσειρά, πίνακας συμβολοσειρών ή πίνακας αριθμών",
             "conditionRelationDescription": "[υποχρεωτικό] Λογική σχέση με την προηγούμενη συνθήκη",
             "additionalQueryDescription": "Πρόσθετες συνθήκες ερωτήματος"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "OK",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "Σύνοψη περιουσιακών στοιχείων",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Έσοδα και έξοδα περιόδου",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "Προθεσμιακή κατάθεση",
     "Balance": "Υπόλοιπο",
     "Outstanding Balance": "Ανεξόφλητο υπόλοιπο",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "Δεν είναι δυνατή η ανάκτηση της λίστας λογαριασμών",
     "Account list is up to date": "Η λίστα λογαριασμών είναι ενημερωμένη",
     "Account list has been updated": "Η λίστα λογαριασμών ενημερώθηκε",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Τελευταία συμφωνία",
     "Sub-account Last Reconciled Time": "Τελευταία συμφωνία υπολογαριασμού",
     "Statement Date": "Ημερομηνία εκκαθάρισης",
+    "Credit Limit": "Credit Limit",
     "Description": "Περιγραφή",
     "Your account description (optional)": "Η περιγραφή του λογαριασμού σας (προαιρετικό)",
     "Your sub-account description (optional)": "Η περιγραφή του υπολογαριασμού σας (προαιρετικό)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "Η σειρά κατηγοριών λογαριασμών αποθηκεύτηκε",
     "Unable to move account category": "Δεν είναι δυνατή η μετακίνηση της κατηγορίας λογαριασμών",
     "Hide Categories Without Accounts": "Απόκρυψη κατηγοριών χωρίς λογαριασμούς",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Προεπιλεγμένο εύρος ημερομηνιών για το κουμπί κατάστασης συμφωνίας",
     "Default Date Range for Reconciliation Statement Page": "Προεπιλεγμένο εύρος ημερομηνιών για τη σελίδα κατάστασης συμφωνίας",
     "Exchange Rates Data Page": "Σελίδα δεδομένων ισοτιμιών",

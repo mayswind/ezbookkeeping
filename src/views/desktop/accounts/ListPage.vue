@@ -36,7 +36,7 @@
                    @click="activeAccountCategoryType = accountCategory.type">
                     <ItemIcon icon-type="account" :icon-id="accountCategory.defaultAccountIconId" />
                     <div class="nav-item-title d-flex flex-column text-truncate">
-                        <small class="text-truncate text-start smaller" v-if="!loading || allAccountCount > 0">{{ accountCategoryTotalBalance(accountCategory) }}</small>
+                        <small class="text-truncate text-start smaller" v-if="!loading || allAccountCount > 0">{{ accountCategoryTotalBalance(accountCategory, false) }}</small>
                         <small class="text-truncate text-start smaller mb-1" v-else-if="loading && allAccountCount <= 0">
                             <v-skeleton-loader class="skeleton-no-margin"
                                                width="100px" height="16" type="text" :loading="true"></v-skeleton-loader>
@@ -90,16 +90,25 @@
                         </template>
 
                         <v-card-text class="accounts-overview-title text-truncate pt-0">
-                            <span class="accounts-overview-subtitle">{{ activeAccountCategory?.isLiability ? tt('Outstanding Balance') : tt('Balance') }}</span>
-                            <v-skeleton-loader class="skeleton-no-margin ms-3 mb-2" width="120px" type="text" :loading="true" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
-                            <span class="accounts-overview-amount ms-3" v-else-if="!loading || !activeAccountCategory || hasAccount(activeAccountCategory)">{{ activeAccountCategoryTotalBalance }}</span>
-                            <v-btn class="ms-2" density="compact" color="default" variant="text"
-                                   :aria-label="showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance')"
-                                   :icon="true" :disabled="loading"
-                                   @click="showAccountBalance = !showAccountBalance">
-                                <v-icon :icon="showAccountBalance ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
-                                <v-tooltip activator="parent">{{ showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance') }}</v-tooltip>
-                            </v-btn>
+                            <div class="d-flex align-center">
+                                <span class="accounts-overview-subtitle">{{ activeAccountCategory?.isLiability ? tt('Outstanding Balance') : tt('Balance') }}</span>
+                                <v-skeleton-loader class="skeleton-no-margin ms-3" width="120px" type="text" :loading="true" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)"></v-skeleton-loader>
+                                <template v-else-if="!loading || !activeAccountCategory || hasAccount(activeAccountCategory)">
+                                    <span class="accounts-overview-amount ms-3">{{ activeAccountCategoryTotalBalance }}</span>
+                                    <template v-if="activeAccountCategory?.type === AccountCategory.CreditCard.type && activeCreditCardTotalAvailabeCredit">
+                                        <v-divider vertical class="mx-3 my-1" />
+                                        <span class="accounts-overview-subtitle">{{ tt('Available Credit') }}</span>
+                                        <span class="accounts-overview-amount ms-3">{{ activeCreditCardTotalAvailabeCredit }}</span>
+                                    </template>
+                                </template>
+                                <v-btn class="ms-2" density="compact" color="default" variant="text"
+                                       :aria-label="showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance')"
+                                       :icon="true" :disabled="loading"
+                                       @click="showAccountBalance = !showAccountBalance">
+                                    <v-icon :icon="showAccountBalance ? mdiEyeOffOutline : mdiEyeOutline" size="20" />
+                                    <v-tooltip activator="parent">{{ showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance') }}</v-tooltip>
+                                </v-btn>
+                            </div>
                         </v-card-text>
 
                         <v-row class="ps-4 pe-4" v-if="loading && activeAccountCategory && !hasAccount(activeAccountCategory)">
@@ -280,7 +289,20 @@
                                                             {{ tt('Delete') }}
                                                         </v-btn>
                                                         <v-spacer/>
-                                                        <span class="account-balance ms-2">{{ accountBalance(element, activeSubAccount[element.id], showAccountBalance) }}</span>
+                                                        <div class="d-flex align-center ms-2" v-if="element.category === AccountCategory.CreditCard.type">
+                                                            <div class="d-flex align-center">
+                                                                <span class="text-medium-emphasis me-3 pt-h1">{{ tt('pageSpecific.accountListPage.outstandingBalance') }}</span>
+                                                                <span class="account-balance">{{ accountBalance(element, activeSubAccount[element.id], showAccountBalance) }}</span>
+                                                            </div>
+                                                            <template v-if="!activeSubAccount[element.id] && canShowAvailableCredit(element) && accountAvailableCredit(element, showAccountBalance)">
+                                                                <v-divider vertical class="mx-3 my-1"/>
+                                                                <div class="d-flex align-center">
+                                                                    <span class="text-medium-emphasis me-3 pt-h1">{{ tt('pageSpecific.accountListPage.availableBalance') }}</span>
+                                                                    <span class="account-balance">{{ accountAvailableCredit(element, showAccountBalance) }}</span>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <span class="account-balance ms-2" v-else-if="element.category !== AccountCategory.CreditCard.type">{{ accountBalance(element, activeSubAccount[element.id], showAccountBalance) }}</span>
                                                     </div>
                                                 </v-card-text>
                                             </v-card>
@@ -392,8 +414,10 @@ const {
     netAssets,
     totalAssets,
     totalLiabilities,
+    canShowAvailableCredit,
     accountCategoryTotalBalance,
-    accountBalance
+    accountBalance,
+    accountAvailableCredit
 } = useAccountListPageBase();
 
 const settingsStore = useSettingsStore();
@@ -419,7 +443,8 @@ const showCustomDateRangeDialog = ref<boolean>(false);
 const hideAccountCategoriesWithoutAccounts = computed<boolean>(() => settingsStore.appSettings.hideCategoriesWithoutAccounts);
 const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
 const activeAccountCategory = computed<AccountCategory | undefined>(() => AccountCategory.valueOf(activeAccountCategoryType.value));
-const activeAccountCategoryTotalBalance = computed<string>(() => accountCategoryTotalBalance(activeAccountCategory.value));
+const activeAccountCategoryTotalBalance = computed<string>(() => accountCategoryTotalBalance(activeAccountCategory.value, false));
+const activeCreditCardTotalAvailabeCredit = computed<string>(() => accountCategoryTotalBalance(activeAccountCategory.value, true));
 
 const activeAccountCategoryVisibleAccountCount = computed<number>(() => {
     if (!activeAccountCategory.value) {

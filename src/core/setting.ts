@@ -3,6 +3,7 @@ import { TimezoneTypeForStatistics } from './timezone.ts';
 import { CurrencySortingType } from './currency.ts';
 import { KeywordMatchMode } from './text.ts';
 import { ImageUploadQualityType } from './image.ts';
+import { CreditCardAmountDisplayType } from './account.ts';
 import {
     TransactionQuickSaveButtonStyle,
     TransactionQuickAddButtonActionType
@@ -79,6 +80,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     // Account List Page
     totalAmountExcludeAccountIds: Record<string, boolean>;
     hideCategoriesWithoutAccounts: boolean;
+    defaultCreditCardAmountDisplayTypeInMobile: number;
     reconciliationStatementButtonDefaultDateRangeTypeInDesktop: number;
     reconciliationStatementPageDefaultDateRangeTypeInMobile: number;
     // Exchange Rates Data Page
@@ -169,6 +171,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     // Account List Page
     'totalAmountExcludeAccountIds': UserApplicationCloudSettingType.StringBooleanMap,
     'hideCategoriesWithoutAccounts': UserApplicationCloudSettingType.Boolean,
+    'defaultCreditCardAmountDisplayTypeInMobile': UserApplicationCloudSettingType.Number,
     'reconciliationStatementButtonDefaultDateRangeTypeInDesktop': UserApplicationCloudSettingType.Number,
     'reconciliationStatementPageDefaultDateRangeTypeInMobile': UserApplicationCloudSettingType.Number,
     // Exchange Rates Data Page
@@ -241,6 +244,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     // Account List Page
     totalAmountExcludeAccountIds: {},
     hideCategoriesWithoutAccounts: false,
+    defaultCreditCardAmountDisplayTypeInMobile: CreditCardAmountDisplayType.Default.type,
     reconciliationStatementButtonDefaultDateRangeTypeInDesktop: DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP.type,
     reconciliationStatementPageDefaultDateRangeTypeInMobile: DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE.type,
     // Exchange Rates Data Page

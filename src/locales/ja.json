@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "最終照合日時を現在の値より前に設定することはできません",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "取引IDは無効です",
         "transaction not found": "取引が見つかりません",
         "transaction type is invalid": "取引タイプは無効です",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[必須] 比較する値。比較方法に応じて、文字列、文字列の配列、または数値の配列を指定します",
             "conditionRelationDescription": "[必須] 前の条件との論理関係",
             "additionalQueryDescription": "追加のクエリ条件"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "OK",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "資産の概要",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "預金証書",
     "Balance": "残高",
     "Outstanding Balance": "未清算残高",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "口座リストを取得できません",
     "Account list is up to date": "口座リストは最新です",
     "Account list has been updated": "口座リストが更新されました",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "最終照合日時",
     "Sub-account Last Reconciled Time": "サブ口座の最終照合日時",
     "Statement Date": "明細日",
+    "Credit Limit": "Credit Limit",
     "Description": "説明",
     "Your account description (optional)": "口座の説明（オプション）",
     "Your sub-account description (optional)": "あなたのサブ口座の説明（オプション）",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "口座カテゴリの並び順を保存しました",
     "Unable to move account category": "口座カテゴリを移動できません",
     "Hide Categories Without Accounts": "口座のないカテゴリを非表示",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "照合明細ボタンのデフォルト期間",
     "Default Date Range for Reconciliation Statement Page": "照合明細ページのデフォルト期間",
     "Exchange Rates Data Page": "為替レートデータページ",

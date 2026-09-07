@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Son mutabakat tarihi mevcut değerden önceki bir zamana ayarlanamaz",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "İşlem ID geçersiz",
         "transaction not found": "İşlem bulunamadı",
         "transaction type is invalid": "İşlem türü geçersiz",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "Tamam",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "Varlık Özeti",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "Vadeli Mevduat",
     "Balance": "Bakiye",
     "Outstanding Balance": "Kalan Borç Bakiyesi",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "Hesap listesi alınamadı",
     "Account list is up to date": "Hesap listesi güncel",
     "Account list has been updated": "Hesap listesi güncellendi",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Son Mutabakat Tarihi",
     "Sub-account Last Reconciled Time": "Alt Hesap Son Mutabakat Tarihi",
     "Statement Date": "Ekstre Tarihi",
+    "Credit Limit": "Credit Limit",
     "Description": "Açıklama",
     "Your account description (optional)": "Hesap açıklamanız (isteğe bağlı)",
     "Your sub-account description (optional)": "Alt hesap açıklamanız (isteğe bağlı)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "Hesap kategorisi sırası kaydedildi",
     "Unable to move account category": "Hesap kategorisi taşınamadı",
     "Hide Categories Without Accounts": "Hesabı Olmayan Kategorileri Gizle",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Mutabakat Bildirimi Düğmesi için Varsayılan Tarih Aralığı",
     "Default Date Range for Reconciliation Statement Page": "Mutabakat Bildirimi Sayfası için Varsayılan Tarih Aralığı",
     "Exchange Rates Data Page": "Döviz Kuru Verileri Sayfası",

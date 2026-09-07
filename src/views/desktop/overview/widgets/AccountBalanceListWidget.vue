@@ -15,7 +15,7 @@
                         </span>
                     </template>
                     <template #append>
-                        <span class="overview-widget__list-amount overview-widget__amount">{{ accountBalance(account, undefined, showAmount, accountIds) }}</span>
+                        <span class="overview-widget__list-amount overview-widget__amount">{{ accountBalanceOrAvailableCredit(account, undefined, showAvailableCreditForCreditCard, showAmount, accountIds) }}</span>
                     </template>
                 </v-list-item>
             </v-list>
@@ -57,12 +57,13 @@ const props = defineProps<{
     itemCount: number;
     sortBy: string;
     alwaysShowAmount: boolean;
+    showAvailableCreditForCreditCard: boolean;
     editing?: boolean
 }>();
 
 const { tt } = useI18n();
 
-const { accountBalance } = useAccountListPageBase();
+const { accountBalanceOrAvailableCredit } = useAccountListPageBase();
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();

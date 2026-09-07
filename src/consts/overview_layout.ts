@@ -104,13 +104,19 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
                 settingType: 'switch',
                 settingName: 'alwaysShowAmount',
                 displayName: 'Always Show Amount'
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAvailableCreditForCreditCard',
+                displayName: 'Show Available Credit for Credit Cards'
             }
         ],
         defaultSettings: {
             accountIds: [],
             itemCount: 4,
             sortBy: 'displayOrder',
-            alwaysShowAmount: false
+            alwaysShowAmount: false,
+            showAvailableCreditForCreditCard: false
         },
         defaultWidth: 3,
         defaultHeight: 3,
@@ -681,6 +687,11 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                 settingType: 'switch',
                 settingName: 'alwaysShowAmount',
                 displayName: 'Always Show Amount'
+            },
+            {
+                settingType: 'switch',
+                settingName: 'showAvailableCreditForCreditCard',
+                displayName: 'Show Available Credit for Credit Cards'
             }
         ],
         defaultSettings: {
@@ -688,7 +699,8 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             accountIds: [],
             itemCount: 4,
             sortBy: 'displayOrder',
-            alwaysShowAmount: false
+            alwaysShowAmount: false,
+            showAvailableCreditForCreditCard: false
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.Accounts

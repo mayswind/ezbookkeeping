@@ -2,10 +2,11 @@ import { keys, keysIfValueEquals, values } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
 
-import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
+import { ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
 
 import { type AccountBalance, type CategorizedAccount, Account } from '@/models/account.ts';
 
+import { isDefined, isString } from '@/lib/common.ts';
 import { parseBigDecimal } from '@/lib/numeral.ts';
 
 export function getCategorizedAccountsMap(allAccounts: Account[]): Record<number, CategorizedAccount> {
@@ -155,9 +156,21 @@ export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number
                 continue;
             }
 
+            const creditCardLimit = account.category === AccountCategory.CreditCard.type && isString(account.creditCardLimit) ? {
+                amount: parseBigDecimal(account.creditCardLimit),
+                currency: account.currency,
+                shareByCount: 0
+            } : undefined;
+
             if (account.type === AccountType.SingleAccount.type) {
+                if (isDefined(creditCardLimit)) {
+                    creditCardLimit.shareByCount = 1;
+                }
+
                 ret.push({
                     balance: parseBigDecimal(account.balance),
+                    category: account.category,
+                    creditCardLimit: creditCardLimit,
                     isAsset: !!account.isAsset,
                     isLiability: !!account.isLiability,
                     currency: account.currency
@@ -168,8 +181,14 @@ export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number
                         continue;
                     }
 
+                    if (isDefined(creditCardLimit)) {
+                        creditCardLimit.shareByCount++;
+                    }
+
                     ret.push({
                         balance: parseBigDecimal(subAccount.balance),
+                        category: account.category,
+                        creditCardLimit: creditCardLimit,
                         isAsset: !!subAccount.isAsset,
                         isLiability: !!subAccount.isLiability,
                         currency: subAccount.currency
@@ -218,7 +237,7 @@ export function getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsM
             continue;
         }
 
-        if (account.currency === PARENT_ACCOUNT_CURRENCY_PLACEHOLDER) {
+        if (account.currency === ACCOUNT_CURRENCY_NOT_SET_VALUE) {
             continue;
         }
 

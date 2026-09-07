@@ -4,7 +4,7 @@
             <small>{{ title || tt('Account Balance List') }}</small>
         </f7-list-item>
         <f7-list-item :key="account.id" :title="account.name"
-                      :after="accountBalance(account, undefined, showAmount, accountIds) || ''"
+                      :after="accountBalanceOrAvailableCredit(account, undefined, showAvailableCreditForCreditCard, showAmount, accountIds) || ''"
                       :link="`/transaction/list?accountIds=${account.id}&dateType=${DateRange.All.type}`"
                       v-for="account in displayAccounts">
             <template #media>
@@ -44,11 +44,12 @@ const props = defineProps<{
     itemCount: number;
     sortBy: string;
     alwaysShowAmount: boolean;
+    showAvailableCreditForCreditCard: boolean;
 }>();
 
 const { tt } = useI18n();
 
-const { accountBalance } = useAccountListPageBase();
+const { accountBalanceOrAvailableCredit } = useAccountListPageBase();
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();

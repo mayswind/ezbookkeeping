@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "Transaction ID is invalid",
         "transaction not found": "Transaction is not found",
         "transaction type is invalid": "Transaction type is invalid",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "OK",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "Asset Summary",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "Certificate of Deposit",
     "Balance": "Balance",
     "Outstanding Balance": "Outstanding Balance",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "Unable to retrieve account list",
     "Account list is up to date": "Account list is up to date",
     "Account list has been updated": "Account list has been updated",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Last Reconciled Time",
     "Sub-account Last Reconciled Time": "Sub-account Last Reconciled Time",
     "Statement Date": "Statement Date",
+    "Credit Limit": "Credit Limit",
     "Description": "Description",
     "Your account description (optional)": "Your account description (optional)",
     "Your sub-account description (optional)": "Your sub-account description (optional)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "Account category order saved",
     "Unable to move account category": "Unable to move account category",
     "Hide Categories Without Accounts": "Hide Categories Without Accounts",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Default Date Range for Reconciliation Statement Button",
     "Default Date Range for Reconciliation Statement Page": "Default Date Range for Reconciliation Statement Page",
     "Exchange Rates Data Page": "Exchange Rates Data Page",

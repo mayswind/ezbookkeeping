@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "거래 ID가 유효하지 않습니다",
         "transaction not found": "거래를 찾을 수 없습니다",
         "transaction type is invalid": "거래 유형이 유효하지 않습니다",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "확인",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "자산 요약",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "예금",
     "Balance": "잔액",
     "Outstanding Balance": "미결제 잔액",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "계좌 목록을 가져올 수 없습니다",
     "Account list is up to date": "계좌 목록이 최신입니다",
     "Account list has been updated": "계좌 목록이 업데이트되었습니다",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Last Reconciled Time",
     "Sub-account Last Reconciled Time": "Sub-account Last Reconciled Time",
     "Statement Date": "명세서 날짜",
+    "Credit Limit": "Credit Limit",
     "Description": "설명",
     "Your account description (optional)": "계좌 설명 (선택 사항)",
     "Your sub-account description (optional)": "하위계좌 설명 (선택 사항)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "계좌 범주 순서가 저장되었습니다",
     "Unable to move account category": "계좌 범주를 이동할 수 없습니다",
     "Hide Categories Without Accounts": "계좌가 없는 범주 숨기기",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Default Date Range for Reconciliation Statement Button",
     "Default Date Range for Reconciliation Statement Page": "Default Date Range for Reconciliation Statement Page",
     "Exchange Rates Data Page": "환율 데이터 페이지",

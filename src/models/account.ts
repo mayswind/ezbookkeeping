@@ -2,7 +2,7 @@ import type { BigDecimal, HiddenAmount, BigDecimalWithSuffix } from '@/core/nume
 import type { ColorValue } from '@/core/color.ts';
 import { IconType } from '@/core/icon.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
-import { PARENT_ACCOUNT_CURRENCY_PLACEHOLDER } from '@/consts/currency.ts';
+import { ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
 import { DEFAULT_ACCOUNT_COLOR } from '@/consts/color.ts';
 
 export class Account implements AccountInfoResponse {
@@ -25,11 +25,13 @@ export class Account implements AccountInfoResponse {
 
     private _initialBalance?: string;
     private _numericBalance?: number;
+    private _initialCreditCardLimit?: string;
+    private _numericCreditCardLimit?: number;
 
     private readonly _isAsset?: boolean;
     private readonly _isLiability?: boolean;
 
-    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, iconType: number, color: string, currency: string, initialBalance: string, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, lastReconciledTime?: number, creditCardStatementDate?: number, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
+    protected constructor(id: string, name: string, parentId: string, category: number, type: number, icon: string, iconType: number, color: string, currency: string, initialBalance: string, comment: string, displayOrder: number, visible: boolean, balanceTime?: number, lastReconciledTime?: number, creditCardStatementDate?: number, initialCreditCardLimit?: string, isAsset?: boolean, isLiability?: boolean, subAccounts?: Account[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -48,6 +50,8 @@ export class Account implements AccountInfoResponse {
 
         this._initialBalance = initialBalance;
         this._numericBalance = undefined;
+        this._initialCreditCardLimit = initialCreditCardLimit;
+        this._numericCreditCardLimit = undefined;
 
         this._isAsset = isAsset;
         this._isLiability = isLiability;
@@ -67,7 +71,7 @@ export class Account implements AccountInfoResponse {
         return this._initialBalance ?? '0';
     }
 
-    public set balance(_value: string) {
+    public set balance(value: string) {
         throw new Error('account balance cannot be assigned directly');
     }
 
@@ -87,6 +91,40 @@ export class Account implements AccountInfoResponse {
 
     public set numericBalance(value: number) {
         this._numericBalance = value;
+    }
+
+    public get creditCardLimit(): string {
+        if (typeof(this._numericCreditCardLimit) !== 'undefined') {
+            return this._numericCreditCardLimit.toString(10);
+        }
+
+        return this._initialCreditCardLimit ?? '0';
+    }
+
+    public set creditCardLimit(value: string) {
+        throw new Error('account credit card limit cannot be assigned directly');
+    }
+
+    public get numericCreditCardLimit(): number {
+        if (typeof(this._numericCreditCardLimit) !== 'undefined') {
+            return this._numericCreditCardLimit;
+        }
+
+        this._numericCreditCardLimit = parseInt(this.creditCardLimit ?? '0', 10);
+
+        if (!Number.isSafeInteger(this._numericCreditCardLimit) || this._numericCreditCardLimit < 0) {
+            this._numericCreditCardLimit = 0;
+        }
+
+        return this._numericCreditCardLimit;
+    }
+
+    public set numericCreditCardLimit(value: number) {
+        if (value < 0) {
+            this._numericCreditCardLimit = 0;
+        } else {
+            this._numericCreditCardLimit = value;
+        }
     }
 
     public get isAsset(): boolean {
@@ -138,7 +176,9 @@ export class Account implements AccountInfoResponse {
             this.comment === other.comment &&
             this.displayOrder === other.displayOrder &&
             this.visible === other.visible &&
-            this.creditCardStatementDate === other.creditCardStatementDate;
+            this.creditCardStatementDate === other.creditCardStatementDate &&
+            this.creditCardLimit === other.creditCardLimit &&
+            this.numericCreditCardLimit === other.numericCreditCardLimit;
 
         if (!isEqual) {
             return false;
@@ -178,6 +218,8 @@ export class Account implements AccountInfoResponse {
 
         this._initialBalance = other._initialBalance;
         this._numericBalance = other._numericBalance;
+        this._initialCreditCardLimit = other._initialCreditCardLimit;
+        this._numericCreditCardLimit = other._numericCreditCardLimit;
     }
 
     public setSuitableIcon(oldCategory: number, newCategory: number): void {
@@ -225,11 +267,12 @@ export class Account implements AccountInfoResponse {
             icon: this.icon,
             iconType: this.iconType,
             color: this.color,
-            currency: parentAccount || this.type === AccountType.SingleAccount.type ? this.currency : PARENT_ACCOUNT_CURRENCY_PLACEHOLDER,
+            currency: parentAccount || this.type === AccountType.SingleAccount.type || this.category === AccountCategory.CreditCard.type ? this.currency : ACCOUNT_CURRENCY_NOT_SET_VALUE,
             balance: parentAccount || this.type === AccountType.SingleAccount.type ? this.balance : '0',
             balanceTime: (parentAccount || this.type === AccountType.SingleAccount.type) && this.balanceTime ? this.balanceTime : 0,
             comment: this.comment,
             creditCardStatementDate: !parentAccount && this.category === AccountCategory.CreditCard.type ? this.creditCardStatementDate : undefined,
+            creditCardLimit: !parentAccount && this.category === AccountCategory.CreditCard.type && this.numericCreditCardLimit > 0 ? this.creditCardLimit : undefined,
             subAccounts: !parentAccount ? subAccountCreateRequests : undefined,
             clientSessionId: !parentAccount ? clientSessionId : undefined
         };
@@ -259,12 +302,13 @@ export class Account implements AccountInfoResponse {
             icon: this.icon,
             iconType: this.iconType,
             color: this.color,
-            currency: parentAccount && (!this.id || this.id === '0') ? this.currency : undefined,
+            currency: (parentAccount && (!this.id || this.id === '0')) || (!parentAccount && this.category === AccountCategory.CreditCard.type) ? this.currency : undefined,
             balance: parentAccount && (!this.id || this.id === '0') ? this.balance : undefined,
             balanceTime: parentAccount && (!this.id || this.id === '0') ? this.balanceTime : undefined,
             lastReconciledTime: this.lastReconciledTime,
             comment: this.comment,
             creditCardStatementDate: !parentAccount && this.category === AccountCategory.CreditCard.type ? this.creditCardStatementDate : undefined,
+            creditCardLimit: !parentAccount && this.category === AccountCategory.CreditCard.type && this.numericCreditCardLimit > 0 ? this.creditCardLimit : undefined,
             hidden: !this.visible,
             subAccounts: !parentAccount ? subAccountModifyRequests : undefined,
             clientSessionId: !parentAccount ? clientSessionId : undefined
@@ -417,6 +461,7 @@ export class Account implements AccountInfoResponse {
             this.balanceTime,
             this.lastReconciledTime,
             this.creditCardStatementDate,
+            this.creditCardLimit,
             this.isAsset,
             this.isLiability
         );
@@ -440,6 +485,7 @@ export class Account implements AccountInfoResponse {
             this.balanceTime,
             this.lastReconciledTime,
             this.creditCardStatementDate,
+            this.creditCardLimit,
             this.isAsset,
             this.isLiability,
             typeof(this.subAccounts) !== 'undefined' ? Account.cloneAccounts(this.subAccounts) : undefined);
@@ -462,7 +508,8 @@ export class Account implements AccountInfoResponse {
             true, // visible
             balanceTime, // balanceTime
             undefined, // lastReconciledTime
-            0 // creditCardStatementDate
+            0, // creditCardStatementDate
+            undefined // creditCardLimit
         );
     }
 
@@ -483,7 +530,8 @@ export class Account implements AccountInfoResponse {
             true, // visible
             balanceTime, // balanceTime
             undefined, // lastReconciledTime
-            0 // creditCardStatementDate
+            0, // creditCardStatementDate
+            undefined // creditCardLimit
         );
     }
 
@@ -505,6 +553,7 @@ export class Account implements AccountInfoResponse {
             undefined,
             accountResponse.lastReconciledTime,
             accountResponse.creditCardStatementDate,
+            accountResponse.creditCardLimit,
             accountResponse.isAsset,
             accountResponse.isLiability,
             accountResponse.subAccounts ? Account.ofMulti(accountResponse.subAccounts) : undefined
@@ -621,6 +670,7 @@ export class AccountWithDisplayBalance extends Account {
             account.balanceTime,
             account.lastReconciledTime,
             account.creditCardStatementDate,
+            account.creditCardLimit,
             account.isAsset,
             account.isLiability,
             account.subAccounts
@@ -646,6 +696,7 @@ export interface AccountCreateRequest {
     readonly balanceTime: number;
     readonly comment: string;
     readonly creditCardStatementDate?: number;
+    readonly creditCardLimit?: string;
     readonly subAccounts?: AccountCreateRequest[];
     readonly clientSessionId?: string;
 }
@@ -663,6 +714,7 @@ export interface AccountModifyRequest {
     readonly lastReconciledTime?: number;
     readonly comment: string;
     readonly creditCardStatementDate?: number;
+    readonly creditCardLimit?: string;
     readonly hidden: boolean;
     readonly subAccounts?: AccountModifyRequest[];
     readonly clientSessionId?: string;
@@ -687,6 +739,7 @@ export interface AccountInfoResponse {
     readonly lastReconciledTime?: number;
     readonly comment: string;
     readonly creditCardStatementDate?: number;
+    readonly creditCardLimit?: string;
     readonly displayOrder: number;
     readonly isAsset?: boolean;
     readonly isLiability?: boolean;
@@ -714,6 +767,12 @@ export interface AccountDeleteRequest {
 
 export interface AccountBalance {
     readonly balance: BigDecimal;
+    readonly category: number;
+    readonly creditCardLimit?: {
+        readonly amount: BigDecimal;
+        readonly currency: string;
+        readonly shareByCount: number;
+    };
     readonly isAsset: boolean;
     readonly isLiability: boolean;
     readonly currency: string;

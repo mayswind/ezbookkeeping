@@ -2,6 +2,9 @@ package core
 
 import "fmt"
 
+// AccountCurrencyNotSetValue represents the default value for account currency when it is not set
+const AccountCurrencyNotSetValue = "---"
+
 // CurrencyDisplayType represents the display type of amount with currency
 type CurrencyDisplayType byte
 

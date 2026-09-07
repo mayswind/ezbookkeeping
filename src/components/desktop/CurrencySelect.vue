@@ -13,7 +13,7 @@
         v-model="currentCurrencyValue"
     >
         <template #append-inner>
-            <small class="text-field-append-text smaller">{{ currentCurrencyValue }}</small>
+            <small class="text-field-append-text smaller text-no-wrap" v-if="currentCurrencyValue !== ACCOUNT_CURRENCY_NOT_SET_VALUE">{{ currentCurrencyValue }}</small>
         </template>
 
         <template #item="{ props, internalItem }">
@@ -39,6 +39,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { NormalizedText } from '@/core/text.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
+import { ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
 
 import {
     mdiCheck
@@ -48,6 +49,7 @@ const props = defineProps<{
     disabled?: boolean;
     label?: string;
     placeholder?: string;
+    withNotSet?: boolean;
     modelValue: string;
 }>();
 
@@ -57,7 +59,7 @@ const emit = defineEmits<{
 
 const { tt, getAllCurrencies } = useI18n();
 
-const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies(props.withNotSet));
 
 const currentCurrencyValue = computed<string | null>({
     get: () => props.modelValue,

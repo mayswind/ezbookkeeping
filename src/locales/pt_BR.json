@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Cannot set last reconciled time before current value",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "ID da transação é inválido",
         "transaction not found": "Transação não foi encontrada",
         "transaction type is invalid": "Tipo de transação é inválido",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "OK",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "Resumo de Ativos",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "Certificado de Depósito",
     "Balance": "Saldo",
     "Outstanding Balance": "Saldo em Aberto",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "Não foi possível recuperar a lista de contas",
     "Account list is up to date": "A lista de contas está atualizada",
     "Account list has been updated": "A lista de contas foi atualizada",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Last Reconciled Time",
     "Sub-account Last Reconciled Time": "Sub-account Last Reconciled Time",
     "Statement Date": "Data do Extrato",
+    "Credit Limit": "Credit Limit",
     "Description": "Descrição",
     "Your account description (optional)": "Descrição da sua conta (opcional)",
     "Your sub-account description (optional)": "Descrição da sua subconta (opcional)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "Ordem das categorias de conta salva",
     "Unable to move account category": "Não foi possível mover a categoria de conta",
     "Hide Categories Without Accounts": "Ocultar Categorias sem Contas",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Default Date Range for Reconciliation Statement Button",
     "Default Date Range for Reconciliation Statement Page": "Default Date Range for Reconciliation Statement Page",
     "Exchange Rates Data Page": "Página de Dados de Taxas de Câmbio",

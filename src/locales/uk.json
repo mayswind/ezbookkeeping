@@ -1183,6 +1183,9 @@
         "cannot set last reconciled time before current value": "Не можна задати час останньої звірки раніше за поточне значення",
         "account balance overflow": "Account balance would exceed the supported range",
         "account icon is invalid": "Account icon is invalid",
+        "cannot set credit limit for non credit card account": "Cannot set credit limit for non credit card account",
+        "cannot set credit limit for sub account": "Cannot set credit limit for sub-account",
+        "must set parent account currency when set credit limit": "Parent account currency must be set when setting a credit limit",
         "transaction id is invalid": "ID транзакції недійсний",
         "transaction not found": "Транзакцію не знайдено",
         "transaction type is invalid": "Тип транзакції недійсний",
@@ -1497,6 +1500,12 @@
             "conditionValueDescription": "[required] Match value(s). Depending on the match type, this may be a string, an array of strings, or an array of numbers",
             "conditionRelationDescription": "[required] Logical relationship with the previous condition",
             "additionalQueryDescription": "Additional query conditions"
+        }
+    },
+    "pageSpecific": {
+        "accountListPage": {
+            "outstandingBalance": "Outstanding",
+            "availableBalance": "Available"
         }
     },
     "OK": "ОК",
@@ -1821,6 +1830,7 @@
     "Asset Summary": "Зведення по активах",
     "Account Balance List": "Account Balance List",
     "Always Show Amount": "Always Show Amount",
+    "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",
     "This Month's Expense Progress": "This Month's Expense Progress",
     "Period Income and Expense": "Period Income and Expense",
@@ -1996,6 +2006,7 @@
     "Certificate of Deposit": "Депозитний сертифікат",
     "Balance": "Баланс",
     "Outstanding Balance": "Заборгованість",
+    "Available Credit": "Available Credit",
     "Unable to retrieve account list": "Не вдалося отримати список рахунків",
     "Account list is up to date": "Список рахунків актуальний",
     "Account list has been updated": "Список рахунків оновлено",
@@ -2028,6 +2039,7 @@
     "Last Reconciled Time": "Час останньої звірки",
     "Sub-account Last Reconciled Time": "Час останньої звірки субрахунку",
     "Statement Date": "Дата виписки",
+    "Credit Limit": "Credit Limit",
     "Description": "Опис",
     "Your account description (optional)": "Опис вашого рахунку (необов'язково)",
     "Your sub-account description (optional)": "Опис вашого субрахунку (необов’язково)",
@@ -2504,6 +2516,7 @@
     "Account category order saved": "Порядок категорій рахунків збережено",
     "Unable to move account category": "Не вдалося перемістити категорію рахунку",
     "Hide Categories Without Accounts": "Приховувати категорії без рахунків",
+    "Default Credit Card Amount": "Default Credit Card Amount",
     "Default Date Range for Reconciliation Statement Button": "Стандартний діапазон дат для кнопки звіту звірки",
     "Default Date Range for Reconciliation Statement Page": "Стандартний діапазон дат для сторінки звіту звірки",
     "Exchange Rates Data Page": "Сторінка курсів валют",

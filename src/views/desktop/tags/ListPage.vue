@@ -27,7 +27,7 @@
                                 <span class="text-truncate">{{ tagGroup.name }}</span>
                             </v-tab>
                             <template v-if="loading && (!allTagGroupsWithDefault || allTagGroupsWithDefault.length < 2)">
-                                <v-skeleton-loader class="skeleton-no-margin mx-5 mt-4 mb-3" type="text"
+                                <v-skeleton-loader class="skeleton-no-margin mx-4 mt-h1 py-3" type="text"
                                                    :key="itemIdx" :loading="true" v-for="itemIdx in [ 1, 2, 3, 4, 5 ]"></v-skeleton-loader>
                             </template>
                         </v-tabs>

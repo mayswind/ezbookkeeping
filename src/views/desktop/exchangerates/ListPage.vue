@@ -12,14 +12,14 @@
                                 <span v-else-if="!loading && exchangeRatesData && isUserCustomExchangeRates">{{ tt('User Custom') }}</span>
                                 <span v-else-if="!loading && !exchangeRatesData">{{ tt('None') }}</span>
                                 <span v-else-if="loading">
-                                    <v-skeleton-loader class="skeleton-no-margin mt-3 mb-4" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin mt-2 mb-4 pt-h1 pb-h1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </div>
                             <span class="text-body-medium" v-if="exchangeRatesDataUpdateTime || loading">{{ tt('Last Updated') }}</span>
                             <div class="text-body-large mt-1" v-if="exchangeRatesDataUpdateTime || loading">
                                 <span v-if="!loading">{{ exchangeRatesDataUpdateTime }}</span>
                                 <span v-if="loading">
-                                    <v-skeleton-loader class="skeleton-no-margin mt-3 mb-3" type="text" :loading="true"></v-skeleton-loader>
+                                    <v-skeleton-loader class="skeleton-no-margin mt-2 mb-4 pt-h1" type="text" :loading="true"></v-skeleton-loader>
                                 </span>
                             </div>
                         </div>
@@ -35,25 +35,25 @@
                             <span class="text-body-medium">{{ tt('Base Currency') }}</span>
                         </div>
                         <v-tabs show-arrows class="mb-4" direction="vertical"
-                                :disabled="loading" v-model="baseCurrency"
-                                v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
-                            <v-tab class="tab-text-truncate" :key="exchangeRate.currencyCode" :value="exchangeRate.currencyCode"
-                                   v-for="exchangeRate in availableExchangeRates">
-                                <div class="d-flex align-baseline w-100">
-                                    <span class="d-block text-truncate">{{ exchangeRate.currencyDisplayName }}</span>
-                                    <small class="smaller ms-1">{{ exchangeRate.currencyCode }}</small>
-                                </div>
-                            </v-tab>
+                                :disabled="loading" v-model="baseCurrency">
+                            <template v-if="exchangeRatesData && exchangeRatesData.exchangeRates && exchangeRatesData.exchangeRates.length">
+                                <v-tab class="tab-text-truncate" :key="exchangeRate.currencyCode" :value="exchangeRate.currencyCode"
+                                       v-for="exchangeRate in availableExchangeRates">
+                                    <div class="d-flex align-baseline w-100">
+                                        <span class="d-block text-truncate">{{ exchangeRate.currencyDisplayName }}</span>
+                                        <small class="smaller ms-1">{{ exchangeRate.currencyCode }}</small>
+                                    </div>
+                                </v-tab>
+                            </template>
+                            <template v-else-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
+                                <span class="mx-4 mt-h1 mb-3" v-if="!loading">{{ tt('None') }}</span>
+                                <template v-else-if="loading">
+                                    <v-skeleton-loader class="skeleton-no-margin mx-4 mt-h1 py-3" type="text"
+                                                       :key="itemIdx" :loading="loading"
+                                                       v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"></v-skeleton-loader>
+                                </template>
+                            </template>
                         </v-tabs>
-                        <div class="mx-4 mt-3 mb-4"
-                             v-else-if="!exchangeRatesData || !exchangeRatesData.exchangeRates || !exchangeRatesData.exchangeRates.length">
-                            <span v-if="!loading">{{ tt('None') }}</span>
-                            <span v-else-if="loading">
-                                <v-skeleton-loader class="skeleton-no-margin pt-2 pb-5" type="text"
-                                                   :key="itemIdx" :loading="loading"
-                                                   v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"></v-skeleton-loader>
-                            </span>
-                        </div>
                     </v-navigation-drawer>
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">

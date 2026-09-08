@@ -37,7 +37,6 @@ import {
     isNumber,
     isBoolean,
     isInteger,
-    isHextualColor,
     normalizeInteger
 } from '@/lib/common.ts';
 
@@ -107,8 +106,6 @@ function normalizeOverviewWidgetSetting(setting: OverviewWidgetSettingItem, valu
         }
     } else if (setting.settingType === 'switch') {
         return isBoolean(value) ? value : undefined;
-    } else if (setting.settingType === 'color') {
-        return isHextualColor(value) ? value.toLowerCase() : undefined;
     } else if (setting.settingType === 'amount') {
         return isString(value) && AmountFilterType.parseTextualFilter(value) ? value : undefined;
     } else if (setting.settingType === 'textbox') {

@@ -13,32 +13,52 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="account-overview-card margin-top-half" :class="{ 'skeleton-text': loading }">
-            <f7-card-header class="display-block" style="padding-top: 120px;">
-                <p class="no-margin">
-                    <small class="card-header-content" v-if="loading">Net assets</small>
-                    <small class="card-header-content" v-else-if="!loading">{{ tt('Net assets') }}</small>
-                </p>
-                <p class="no-margin">
-                    <span class="net-assets" v-if="loading">0.00 USD</span>
-                    <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
-                    <f7-link class="display-inline-flex margin-inline-start-half" :aria-label="showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance')" @click="showAccountBalance = !showAccountBalance">
-                        <f7-icon class="ebk-hide-icon" :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
+        <f7-card class="asset-summary-widget margin-top-half" :class="{ 'skeleton-text': loading }">
+            <f7-card-content class="padding-horizontal padding-vertical">
+                <div class="asset-summary-widget__header display-flex align-items-baseline justify-content-space-between">
+                    <span class="asset-summary-widget__title font-weight-bold">{{ tt('Asset Summary') }}</span>
+                    <f7-link class="margin-inline-start-half text-color-gray"
+                           :aria-label="showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance')"
+                           @click="showAccountBalance = !showAccountBalance">
+                        <f7-icon :f7="showAccountBalance ? 'eye_slash' : 'eye'" size="20"></f7-icon>
                     </f7-link>
-                </p>
-                <p class="no-margin">
-                    <small class="account-overview-info" v-if="loading">
-                        <span>Total assets | Total liabilities</span>
-                    </small>
-                    <small class="account-overview-info" v-else-if="!loading">
-                        <span>{{ tt('Total assets') }}</span>
-                        <span>{{ totalAssets }}</span>
-                        <span>|</span>
-                        <span>{{ tt('Total liabilities') }}</span>
-                        <span>{{ totalLiabilities }}</span>
-                    </small>
-                </p>
-            </f7-card-header>
+                </div>
+
+                <div class="asset-summary-widget__metrics margin-top">
+                    <div class="asset-summary-widget__metric">
+                        <div class="asset-summary-widget__metric-icon text-color-gray" style="background-color: rgba(128, 128, 128, 0.15);">
+                            <f7-icon f7="briefcase" size="24"></f7-icon>
+                        </div>
+                        <div class="asset-summary-widget__metric-text display-flex flex-direction-column">
+                            <span class="asset-summary-widget__metric-title">{{ tt('Total assets') }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-if="!loading">{{ totalAssets }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-else>0.00 USD</span>
+                        </div>
+                    </div>
+
+                    <div class="asset-summary-widget__metric">
+                        <div class="asset-summary-widget__metric-icon text-color-red" style="background-color: rgba(255, 59, 48, 0.1);">
+                            <f7-icon f7="creditcard" size="24"></f7-icon>
+                        </div>
+                        <div class="asset-summary-widget__metric-text display-flex flex-direction-column">
+                            <span class="asset-summary-widget__metric-title">{{ tt('Total liabilities') }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-if="!loading">{{ totalLiabilities }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-else>0.00 USD</span>
+                        </div>
+                    </div>
+
+                    <div class="asset-summary-widget__metric">
+                        <div class="asset-summary-widget__metric-icon text-color-primary" style="background-color: rgba(var(--f7-theme-color-rgb), 0.1);">
+                            <f7-icon f7="money_dollar_circle" size="24"></f7-icon>
+                        </div>
+                        <div class="asset-summary-widget__metric-text display-flex flex-direction-column">
+                            <span class="asset-summary-widget__metric-title">{{ tt('Net assets') }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold text-color-primary" v-if="!loading">{{ netAssets }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold text-color-primary" v-else>0.00 USD</span>
+                        </div>
+                    </div>
+                </div>
+            </f7-card-content>
         </f7-card>
 
         <div class="skeleton-text" v-if="loading">
@@ -652,35 +672,54 @@ function onPageAfterIn(): void {
 init();
 </script>
 
+<style scoped>
+.asset-summary-widget__title {
+    font-size: 1.25rem;
+}
+
+.asset-summary-widget__caption {
+    font-size: 0.85rem;
+}
+
+.asset-summary-widget__metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.asset-summary-widget__metric {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.asset-summary-widget__metric-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.asset-summary-widget__metric-text {
+    flex: 1;
+    min-width: 0;
+    gap: 2px;
+}
+
+.asset-summary-widget__metric-title {
+    font-size: 0.8rem;
+}
+
+.asset-summary-widget__metric-amount {
+    font-size: 1.15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
+
 <style>
-.account-overview-card {
-    background-color: var(--f7-color-yellow);
-}
-
-.dark .account-overview-card {
-    background-color: var(--f7-theme-color);
-}
-
-.dark .account-overview-card a {
-    color: var(--f7-text-color);
-    opacity: 0.6;
-}
-
-.net-assets {
-    font-size: 1.5em;
-}
-
-.account-overview-info {
-    opacity: 0.6;
-}
-
-.account-overview-info > span {
-    margin-inline-end: 4px;
-}
-
-.account-overview-info > span:last-child {
-    margin-inline-end: 0;
-}
 
 .account-list {
     --f7-list-item-footer-font-size: var(--ebk-large-footer-font-size);

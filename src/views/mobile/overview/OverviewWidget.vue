@@ -1,7 +1,5 @@
 <template>
-    <asset-summary-widget :loading="loading" :height="widget.settings['height'] as number"
-                          :light-background-color="widget.settings['lightBackgroundColor'] as ColorValue"
-                          :dark-background-color="widget.settings['darkBackgroundColor'] as ColorValue"
+    <asset-summary-widget :loading="loading"
                           v-if="widget.type === OverviewWidgetType.AssetSummary" />
 
     <account-balance-list-widget :loading="loading" :title="widgetTitle"
@@ -13,9 +11,7 @@
                                  :show-available-credit-for-credit-card="widget.settings['showAvailableCreditForCreditCard'] as boolean"
                                  v-else-if="widget.type === OverviewWidgetType.AccountBalanceList" />
 
-    <monthly-expense-overview-widget :loading="loading" :height="widget.settings['height'] as number"
-                                     :light-background-color="widget.settings['lightBackgroundColor'] as ColorValue"
-                                     :dark-background-color="widget.settings['darkBackgroundColor'] as ColorValue"
+    <monthly-expense-overview-widget :loading="loading"
                                      v-else-if="widget.type === OverviewWidgetType.CurrentMonthOverview" />
 
     <monthly-expense-progress-widget :loading="loading" :title="widgetTitle"
@@ -68,7 +64,6 @@ import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget
 import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
 import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 
-import type { ColorValue } from '@/core/color.ts';
 import { type MobileOverviewWidgetLayout, OverviewWidgetType } from '@/core/overview_layout.ts';
 
 const props = defineProps<{

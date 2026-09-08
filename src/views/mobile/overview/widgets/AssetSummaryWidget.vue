@@ -1,87 +1,124 @@
 <template>
-    <f7-card class="account-overview-card no-margin-top margin-bottom" :class="{ 'skeleton-text': loading }" :style="cardStyle">
-        <f7-card-header class="display-block" :style="cardHeaderStyle">
-            <p class="no-margin">
-                <small class="card-header-content" v-if="loading">Net assets</small>
-                <small class="card-header-content" v-else-if="!loading">{{ tt('Net assets') }}</small>
-            </p>
-            <p class="no-margin">
-                <span class="net-assets" v-if="loading">0.00 USD</span>
-                <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
-            </p>
-            <p class="no-margin">
-                <small class="account-overview-info" v-if="loading">
-                    <span>Total assets | Total liabilities</span>
-                </small>
-                <small class="account-overview-info" v-else-if="!loading">
-                    <span>{{ tt('Total assets') }}</span>
-                    <span>{{ totalAssets }}</span>
-                    <span>|</span>
-                    <span>{{ tt('Total liabilities') }}</span>
-                    <span>{{ totalLiabilities }}</span>
-                </small>
-            </p>
-        </f7-card-header>
+    <f7-card class="asset-summary-widget no-margin-top margin-bottom" :class="{ 'skeleton-text': loading }">
+        <f7-card-content class="padding-horizontal padding-vertical">
+            <div class="asset-summary-widget__header display-flex align-items-baseline justify-content-space-between">
+                <span class="asset-summary-widget__title font-weight-bold">{{ tt('Asset Summary') }}</span>
+                <f7-link class="margin-inline-start-half text-color-gray"
+                       :aria-label="showAmountInHomePage ? tt('Hide Amount') : tt('Show Amount')"
+                       @click="showAmountInHomePage = !showAmountInHomePage">
+                    <f7-icon :f7="showAmountInHomePage ? 'eye_slash' : 'eye'" size="20"></f7-icon>
+                </f7-link>
+            </div>
+
+            <div class="asset-summary-widget__caption margin-top-half text-color-gray">
+                <span v-if="!loading || (allAccounts && allAccounts.length)">{{ tt('format.misc.youHaveAccounts', { count: displayAccountCount }) }}</span>
+                <span v-else>Loading...</span>
+            </div>
+
+            <div class="asset-summary-widget__metrics margin-top">
+                    <div class="asset-summary-widget__metric">
+                        <div class="asset-summary-widget__metric-icon text-color-gray" style="background-color: rgba(128, 128, 128, 0.15);">
+                            <f7-icon f7="briefcase" size="24"></f7-icon>
+                        </div>
+                        <div class="asset-summary-widget__metric-text display-flex flex-direction-column">
+                            <span class="asset-summary-widget__metric-title">{{ tt('Total assets') }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-if="!loading || (allAccounts && allAccounts.length)">{{ totalAssets }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-else>0.00 USD</span>
+                        </div>
+                    </div>
+
+                    <div class="asset-summary-widget__metric">
+                        <div class="asset-summary-widget__metric-icon text-color-red" style="background-color: rgba(255, 59, 48, 0.1);">
+                            <f7-icon f7="creditcard" size="24"></f7-icon>
+                        </div>
+                        <div class="asset-summary-widget__metric-text display-flex flex-direction-column">
+                            <span class="asset-summary-widget__metric-title">{{ tt('Total liabilities') }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-if="!loading || (allAccounts && allAccounts.length)">{{ totalLiabilities }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold" v-else>0.00 USD</span>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-summary-widget__metric">
+                        <div class="asset-summary-widget__metric-icon text-color-primary" style="background-color: rgba(var(--f7-theme-color-rgb), 0.1);">
+                            <f7-icon f7="money_dollar_circle" size="24"></f7-icon>
+                        </div>
+                        <div class="asset-summary-widget__metric-text display-flex flex-direction-column">
+                            <span class="asset-summary-widget__metric-title">{{ tt('Net assets') }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold text-color-primary" v-if="!loading || (allAccounts && allAccounts.length)">{{ netAssets }}</span>
+                            <span class="asset-summary-widget__metric-amount font-weight-bold text-color-primary" v-else>0.00 USD</span>
+                        </div>
+                    </div>
+            </div>
+        </f7-card-content>
     </f7-card>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-
 import { useI18n } from '@/locales/helpers.ts';
 import { useAssetSummaryWidgetBase } from '@/views/base/overview/AssetSummaryWidgetBase.ts';
 
-import { useEnvironmentsStore } from '@/stores/environment.ts';
-
-import type { ColorValue } from '@/core/color.ts';
-import {
-    DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR,
-    DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR
-} from '@/consts/color.ts';
-
-import { getDisplayColor, getContrastTextColor } from '@/lib/color.ts';
-
-const props = defineProps<{
+defineProps<{
     loading: boolean;
-    height: number;
-    lightBackgroundColor?: ColorValue;
-    darkBackgroundColor?: ColorValue;
 }>();
 
-const { tt } = useI18n();
-
+const { tt, formatNumberToLocalizedNumerals } = useI18n();
 const {
+    showAmountInHomePage,
+    allAccounts,
     netAssets,
     totalAssets,
     totalLiabilities
 } = useAssetSummaryWidgetBase();
 
-const environmentsStore = useEnvironmentsStore();
+const displayAccountCount = computed<string>(() => formatNumberToLocalizedNumerals(allAccounts.value?.length ?? 0));
 
-const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
-const backgroundColor = computed<ColorValue>(() => isDarkMode.value ?
-    props.darkBackgroundColor ?? DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR :
-    props.lightBackgroundColor ?? DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR);
-const foregroundColor = computed<ColorValue>(() => getContrastTextColor(backgroundColor.value));
 
-const cardStyle = computed<Record<string, string>>(() => ({
-    'background-color': getDisplayColor(backgroundColor.value),
-    'color': getDisplayColor(foregroundColor.value)
-}));
-
-const cardHeaderStyle = computed<Record<string, string>>(() => {
-    const finalStyle: Record<string, string> = {
-        color: getDisplayColor(foregroundColor.value)
-    };
-
-    if (props.height === 1) {
-        finalStyle['padding-top'] = '10px';
-    } else if (props.height === 2) {
-        finalStyle['padding-top'] = '60px';
-    } else {
-        finalStyle['padding-top'] = '120px';
-    }
-
-    return finalStyle;
-});
 </script>
+
+<style scoped>
+.asset-summary-widget__title {
+    font-size: 1.25rem;
+}
+
+.asset-summary-widget__caption {
+    font-size: 0.85rem;
+}
+
+.asset-summary-widget__metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.asset-summary-widget__metric {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.asset-summary-widget__metric-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.asset-summary-widget__metric-text {
+    flex: 1;
+    min-width: 0;
+    gap: 2px;
+}
+
+.asset-summary-widget__metric-title {
+    font-size: 0.8rem;
+}
+
+.asset-summary-widget__metric-amount {
+    font-size: 1.15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

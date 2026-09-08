@@ -85,14 +85,14 @@ export interface OverviewWidgetTextboxSettingItem extends OverviewWidgetSettingI
     placeholder?: string;
 }
 
-export type OverviewWidgetSettingItem = OverviewWidgetItemCountSelectSettingItem |
+export type OverviewWidgetSettingItem =
+    OverviewWidgetItemCountSelectSettingItem |
     OverviewWidgetMonthSelectSettingItem |
     OverviewWidgetAccountSelectSettingItem |
     OverviewWidgetCategorySelectSettingItem |
     OverviewWidgetTagSelectSettingItem |
     OverviewWidgetCustomSelectSettingItem |
     OverviewWidgetSwitchSettingItem |
-    OverviewWidgetColorSettingItem |
     OverviewWidgetAmountSettingItem |
     OverviewWidgetTextboxSettingItem;
 

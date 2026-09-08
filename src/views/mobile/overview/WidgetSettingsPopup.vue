@@ -36,27 +36,7 @@
                         </template>
                     </f7-list-item>
 
-                    <f7-list-input readonly type="colorpicker" class="list-color-picker-input"
-                                   :color-picker-params="{
-                                       modules: ['sb-spectrum', 'hue-slider', 'hex'],
-                                       hexLabel: false,
-                                       hexValueEditable: true
-                                   }"
-                                   :value="{ hex: getDisplayColor(getSettingValue(setting.settingName) as string) }"
-                                   @colorpicker:change="updateColorSettingValue(setting.settingName, $event)"
-                                   v-else-if="setting.settingType === 'color' && (!setting.condition || setting.condition(widget?.settings))">
-                        <template #inner-start>
-                            <div class="item-actual-title">
-                                <span>{{ tt(setting.displayName) }}</span>
-                            </div>
-                        </template>
-                        <template #inner-end>
-                            <div class="color-picker-display">
-                                <ItemIcon icon-type="fixed-f7" icon-id="app_fill" :color="getSettingValue(setting.settingName)"></ItemIcon>
-                                <f7-icon class="color-picker-chevron" f7="chevron_up_chevron_down"></f7-icon>
-                            </div>
-                        </template>
-                    </f7-list-input>
+
 
                     <f7-list-input type="text"
                                    :label="tt(setting.displayName)"
@@ -144,7 +124,6 @@ import {
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
 
 import { isDefined, isArray, isString, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
-import { getDisplayColor } from '@/lib/color.ts';
 import { isAllAccountsChecked } from '@/lib/account.ts';
 import { isAllCategoriesChecked } from '@/lib/category.ts';
 import { cloneWidget } from '@/lib/overview_layout.ts';
@@ -228,12 +207,6 @@ function getSettingValue(settingName: string): OverviewWidgetSettingValue | unde
 function updateSettingValue(settingName: string, value: OverviewWidgetSettingValue): void {
     if (widget.value) {
         widget.value.settings[settingName] = value;
-    }
-}
-
-function updateColorSettingValue(settingName: string, value: { hex: string }): void {
-    if (widget.value && value && value.hex) {
-        widget.value.settings[settingName] = value.hex.replace(/^#/, '').substring(0, 6).toLowerCase();
     }
 }
 

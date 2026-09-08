@@ -343,38 +343,6 @@ init();
 </script>
 
 <style>
-.home-summary-card {
-    background-color: var(--f7-color-yellow);
-}
-
-.home-summary-card .home-summary-month {
-    font-size: 1.3em;
-}
-
-.home-summary-card .month-expense {
-    font-size: 1.5em;
-}
-
-.home-summary-card .home-summary-misc {
-    opacity: 0.6;
-}
-
-.home-summary-misc > span {
-    margin-inline-end: 4px;
-}
-
-.home-summary-misc > span:last-child {
-    margin-inline-end: 0;
-}
-
-.dark .home-summary-card {
-    background-color: var(--f7-theme-color);
-}
-
-.dark .home-summary-card a {
-    color: var(--f7-text-color);
-    opacity: 0.6;
-}
 
 .overview-transaction-list .item-title > div {
     overflow: hidden;

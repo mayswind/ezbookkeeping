@@ -5,7 +5,6 @@ import { TrendChartType } from '@/core/statistics.ts';
 import {
     type OverviewWidgetSettingValue,
     type OverviewWidgetSwitchSettingItem,
-    type OverviewWidgetColorSettingItem,
     type OverviewWidgetTextboxSettingItem,
     type DesktopOverviewLayout,
     type DesktopOverviewWidgetDefinition,
@@ -14,11 +13,6 @@ import {
     OverviewWidgetType,
     OverviewWidgetDataRequirement
 } from '@/core/overview_layout.ts';
-
-import {
-    DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR,
-    DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR
-} from '@/consts/color.ts';
 
 export const DESKTOP_OVERVIEW_LAYOUT_COLUMNS: number = 12;
 export const DESKTOP_OVERVIEW_LAYOUT_MAX_WIDGETS: number = 100;
@@ -38,19 +32,6 @@ const WIDGET_SHOW_TITLE_SETTING: OverviewWidgetSwitchSettingItem = {
     settingName: 'showTitle',
     displayName: 'Show Title'
 };
-
-const WIDGET_BACKGROUND_COLOR_SETTINGS: OverviewWidgetColorSettingItem[] = [
-    {
-        settingType: 'color',
-        settingName: 'lightBackgroundColor',
-        displayName: 'Light Mode Background Color'
-    },
-    {
-        settingType: 'color',
-        settingName: 'darkBackgroundColor',
-        displayName: 'Dark Mode Background Color'
-    }
-];
 
 export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetType, DesktopOverviewWidgetDefinition> = {
     [OverviewWidgetType.AssetSummary]: {
@@ -629,22 +610,8 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         type: OverviewWidgetType.AssetSummary,
         name: 'Asset Summary',
         supportsSettings: [
-            {
-                settingType: 'customSelect',
-                settingName: 'height',
-                displayName: 'Widget Height',
-                selectValues: [
-                    { name: 'Small', value: 1 },
-                    { name: 'Medium', value: 2 },
-                    { name: 'Large', value: 3 }
-                ]
-            },
-            ...WIDGET_BACKGROUND_COLOR_SETTINGS
         ],
         defaultSettings: {
-            height: 3,
-            lightBackgroundColor: DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR,
-            darkBackgroundColor: DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.Accounts
@@ -710,22 +677,8 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         type: OverviewWidgetType.CurrentMonthOverview,
         name: 'This Month\'s Income and Expense Overview',
         supportsSettings: [
-            {
-                settingType: 'customSelect',
-                settingName: 'height',
-                displayName: 'Widget Height',
-                selectValues: [
-                    { name: 'Small', value: 1 },
-                    { name: 'Medium', value: 2 },
-                    { name: 'Large', value: 3 }
-                ]
-            },
-            ...WIDGET_BACKGROUND_COLOR_SETTINGS
         ],
         defaultSettings: {
-            height: 3,
-            lightBackgroundColor: DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR,
-            darkBackgroundColor: DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.TransactionOverview

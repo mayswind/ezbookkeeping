@@ -412,7 +412,7 @@ export class TransactionExplorerChartType implements NameValue {
     public static readonly Pie = new TransactionExplorerChartType('Pie Chart', TransactionExplorerChartTypeValue.Pie, undefined, false, undefined);
     public static readonly Donut = new TransactionExplorerChartType('Donut Chart', TransactionExplorerChartTypeValue.Donut, undefined, false, undefined);
     public static readonly NightingaleRose = new TransactionExplorerChartType('Nightingale Rose Chart', TransactionExplorerChartTypeValue.NightingaleRose, undefined, false, undefined);
-    public static readonly Radar = new TransactionExplorerChartType('Radar Chart', TransactionExplorerChartTypeValue.Radar, undefined, false, undefined);
+    public static readonly Radar = new TransactionExplorerChartType('Radar Chart', TransactionExplorerChartTypeValue.Radar, undefined, true, undefined);
     public static readonly ColumnStacked = new TransactionExplorerChartType('Column Chart (Stacked)', TransactionExplorerChartTypeValue.ColumnStacked, undefined, true, undefined);
     public static readonly Column100PercentStacked = new TransactionExplorerChartType('Column Chart (100% Stacked)', TransactionExplorerChartTypeValue.Column100PercentStacked, undefined, true, undefined);
     public static readonly ColumnGrouped = new TransactionExplorerChartType('Column Chart (Grouped)', TransactionExplorerChartTypeValue.ColumnGrouped, undefined, true, undefined);

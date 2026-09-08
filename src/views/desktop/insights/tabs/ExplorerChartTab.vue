@@ -114,19 +114,25 @@
     <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExploration.chartType === TransactionExplorerChartType.Radar.value">
         <radar-chart
             :items="[
-                { name: '---', value: 10 },
-                { name: '---', value: 10 },
-                { name: '---', value: 10 },
-                { name: '---', value: 10 },
-                { name: '---', value: 10 },
-                { name: '---', value: 10 }
+                {
+                    name: '---',
+                    values: Array.from({ length: 6 }, () => parseBigDecimal(10)),
+                    displayOrders: [ 0, 1, 2, 3, 4, 5 ]
+                }
             ]"
+            :all-category-names="[ '---', '---', '---', '---', '---', '---' ]"
             :value-type="ChartValueType.Amount"
             :skeleton="true"
+            :hide-legend="true"
+            category-type-name=""
             v-if="loading"
         />
         <radar-chart
-            :items="categoryDimensionTransactionExplorerData && categoryDimensionTransactionExplorerData.length ? categoryDimensionTransactionExplorerData : []"
+            ref="radarChart"
+            :category-type-name="currentExploration.seriesDimension === TransactionExplorerDataDimension.None.value ? tt('Name') : currentTransactionExplorerCategoryDimensionName"
+            :items="seriesDimensionTransactionExplorerData"
+            :all-category-names="categoriedNamesSortedByDisplayOrder"
+            :hide-legend="currentExploration.seriesDimension === TransactionExplorerDataDimension.None.value"
             :value-type="TransactionExplorerValueMetric.valueOf(currentExploration.valueMetric)?.valueType ?? ChartValueType.Number"
             :show-value="true"
             :show-percent="true"
@@ -241,6 +247,7 @@
 
 <script setup lang="ts">
 import AxisChart, { type AxisChartDisplayType } from '@/components/desktop/AxisChart.vue';
+import RadarChart from '@/components/desktop/RadarChart.vue';
 import HierarchyChart, { type HierarchyChartDisplayType } from '@/components/desktop/HierarchyChart.vue';
 import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
 import TransactionListDialog from '@/views/desktop/insights/dialogs/TransactionListDialog.vue';
@@ -281,6 +288,7 @@ import { getCurrentDateTime, parseDateTimeFromString } from '@/lib/datetime.ts';
 import { sortStatisticsItems } from '@/lib/statistics.ts';
 
 type AxisChartType = InstanceType<typeof AxisChart>;
+type RadarChartType = InstanceType<typeof RadarChart>;
 type HierarchyChartType = InstanceType<typeof HierarchyChart>;
 type HeatMapChartType = InstanceType<typeof HeatMapChart>;
 type TransactionListDialogType = InstanceType<typeof TransactionListDialog>;
@@ -351,6 +359,7 @@ const userStore = useUserStore();
 const explorersStore = useExplorersStore();
 
 const axisChart = useTemplateRef<AxisChartType>('axisChart');
+const radarChart = useTemplateRef<RadarChartType>('radarChart');
 const hierarchyChart = useTemplateRef<HierarchyChartType>('hierarchyChart');
 const heatmapChart = useTemplateRef<HeatMapChartType>('heatmapChart');
 const transactionListDialog = useTemplateRef<TransactionListDialogType>('transactionListDialog');
@@ -380,7 +389,6 @@ const categoryDimensionTransactionExplorerData = computed<CategoryDimensionData[
     if (currentExploration.value.chartType !== TransactionExplorerChartType.Pie.value
         && currentExploration.value.chartType !== TransactionExplorerChartType.Donut.value
         && currentExploration.value.chartType !== TransactionExplorerChartType.NightingaleRose.value
-        && currentExploration.value.chartType !== TransactionExplorerChartType.Radar.value
         && currentExploration.value.chartType !== TransactionExplorerChartType.CalendarHeatmap.value) {
         return [];
     }
@@ -420,17 +428,18 @@ const categoriedDataSortedByDisplayOrder = computed<SortableCategoriedTransactio
     }
 
     const result: SortableCategoriedTransactionExplorerDataItem[] = [];
+    const customSorting = currentExploration.value.chartType === TransactionExplorerChartType.Radar.value && currentExploration.value.seriesDimension === TransactionExplorerDataDimension.None.value;
 
     for (const categoriedData of explorersStore.categoriedTransactionExplorerData) {
         result.push({
             name: getCategoriedDataDisplayName(categoriedData),
             displayOrders: categoriedData.categoryDisplayOrders,
-            value: BIG_DECIMAL_ZERO,
+            value: customSorting ? (categoriedData.data[0]?.value ?? BIG_DECIMAL_ZERO) : BIG_DECIMAL_ZERO,
             originalItem: categoriedData
         });
     }
 
-    sortStatisticsItems(result, ChartSortingType.DisplayOrder.type);
+    sortStatisticsItems(result, customSorting ? currentExploration.value.chartSortingType : ChartSortingType.DisplayOrder.type);
 
     return result;
 });
@@ -1008,7 +1017,6 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
     if (currentExploration.value.chartType === TransactionExplorerChartType.Pie.value
         || currentExploration.value.chartType === TransactionExplorerChartType.Donut.value
         || currentExploration.value.chartType === TransactionExplorerChartType.NightingaleRose.value
-        || currentExploration.value.chartType === TransactionExplorerChartType.Radar.value
         || currentExploration.value.chartType === TransactionExplorerChartType.CalendarHeatmap.value) {
         const valueMetric = TransactionExplorerValueMetric.valueOf(currentExploration.value.valueMetric);
         let supportedMermaidCharts: ExportMermaidChartType[] | undefined = undefined;
@@ -1027,6 +1035,18 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
                 valueMetric?.valueType === ChartValueType.Amount ? formatAmountToWesternArabicNumeralsWithoutDigitGrouping(data.value, defaultCurrency.value) : formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(data.value)
             ]),
             supportedMermaidCharts: supportedMermaidCharts
+        };
+    } else if (currentExploration.value.chartType === TransactionExplorerChartType.Radar.value) {
+        const results = radarChart.value?.exportData();
+
+        if (!results) {
+            return undefined;
+        }
+
+        return {
+            headers: results.headers,
+            data: results.data,
+            supportedMermaidCharts: undefined
         };
     } else if (TransactionExplorerChartType.valueOf(currentExploration.value.chartType)?.seriesDimensionRequired && axisChartDisplayType.value) {
         const results = axisChart.value?.exportData();

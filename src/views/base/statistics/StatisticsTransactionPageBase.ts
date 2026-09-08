@@ -10,6 +10,7 @@ import type { TypeAndDisplayName } from '@/core/base.ts';
 import type { BigDecimal } from '@/core/numeral.ts';
 import { type LocalizedDateRange, type WeekDayValue, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import type { ColorStyleValue } from '@/core/color.ts';
+import type { AxisChartSourceDataItem } from '@/core/chart.ts';
 import {
     StatisticsAnalysisType,
     ChartDataType,
@@ -338,6 +339,25 @@ export function useStatisticsTransactionPageBase() {
     const trendsAnalysisData = computed<TransactionTrendsAnalysisData | null>(() => statisticsStore.trendsAnalysisData);
     const assetTrendsData = computed<TransactionAssetTrendsAnalysisData | null>(() => statisticsStore.assetTrendsData);
 
+    const radarChartCategoryNames = computed<string[]>(() => {
+        return categoricalAnalysisData.value?.items.filter(item => !item.hidden).map(item => item.name) ?? [];
+    });
+
+    const radarChartData = computed<AxisChartSourceDataItem[]>(() => {
+        const items = categoricalAnalysisData.value?.items.filter(item => !item.hidden) ?? [];
+
+        if (!items.length) {
+            return [];
+        }
+
+        return [{
+            id: 'amount',
+            name: tt('Amount'),
+            values: items.map(item => item.value),
+            displayOrders: [0]
+        }];
+    });
+
     function canShowCustomDateRange(dateRangeType: number): boolean {
         if (analysisType.value === StatisticsAnalysisType.CategoricalAnalysis) {
             return query.value.categoricalChartDateType === dateRangeType && !!query.value.categoricalChartStartTime && !!query.value.categoricalChartEndTime;
@@ -421,6 +441,8 @@ export function useStatisticsTransactionPageBase() {
         categoricalAnalysisData,
         trendsAnalysisData,
         assetTrendsData,
+        radarChartCategoryNames,
+        radarChartData,
         // functions
         canShowCustomDateRange,
         getTransactionCategoricalAnalysisDataItemDisplayColor,

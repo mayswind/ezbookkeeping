@@ -323,23 +323,28 @@
                         <v-card-text class="py-0" :class="{ 'readonly': loading }" v-if="queryAnalysisType === StatisticsAnalysisType.CategoricalAnalysis && !isQuerySpecialChartType && query.categoricalChartType === CategoricalChartType.Radar.type">
                             <radar-chart
                                 :items="[
-                                    {name: '---', value: 10},
-                                    {name: '---', value: 10},
-                                    {name: '---', value: 10},
-                                    {name: '---', value: 10},
-                                    {name: '---', value: 10},
-                                    {name: '---', value: 10}
+                                    {
+                                        name: '---',
+                                        values: Array.from({ length: 6 }, () => parseBigDecimal(10)),
+                                        displayOrders: [ 0, 1, 2, 3, 4, 5 ]
+                                    }
                                 ]"
+                                :all-category-names="[ '---', '---', '---', '---', '---', '---' ]"
                                 :value-type="ChartValueType.Amount"
                                 :skeleton="true"
+                                :hide-legend="true"
+                                category-type-name=""
                                 v-if="initing"
                             />
                             <radar-chart
-                                :items="categoricalAnalysisData && categoricalAnalysisData.items && categoricalAnalysisData.items.length ? categoricalAnalysisData.items : []"
+                                :items="radarChartData"
+                                :all-category-names="radarChartCategoryNames"
                                 :value-type="ChartValueType.Amount"
                                 :show-value="showAmountInChart"
                                 :show-percent="showPercentInCategoricalChart"
                                 :default-currency="defaultCurrency"
+                                :category-type-name="tt('Name')"
+                                :hide-legend="true"
                                 v-else-if="!initing"
                             />
                         </v-card-text>
@@ -606,6 +611,8 @@ const {
     categoricalOverviewAnalysisData,
     categoricalAnalysisData,
     trendsAnalysisData,
+    radarChartCategoryNames,
+    radarChartData,
     assetTrendsData,
     canShowCustomDateRange,
     getTransactionCategoricalAnalysisDataItemDisplayColor,

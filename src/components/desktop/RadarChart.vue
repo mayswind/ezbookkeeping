@@ -7,26 +7,26 @@
 import { computed } from 'vue';
 import { useTheme } from 'vuetify';
 
+import type { CallbackDataParams } from 'echarts/types/dist/shared';
+
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 
+import { itemAndIndex } from '@/core/base.ts';
 import type { BigDecimal } from '@/core/numeral.ts';
 import type { ColorValue, ColorStyleValue } from '@/core/color.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { ChartValueType, type CategoricalChartSourceDataItem } from '@/core/chart.ts';
+import { type AxisChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
 
-import { isNumber } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, isBigDecimal } from '@/lib/numeral.ts';
 import { max } from '@/lib/math.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 
 interface RadarChartData {
-    totalValidValue: BigDecimal;
-    maxValue: BigDecimal;
     indicators: RadarChartDataItem[];
-    values: number[]; // only used for echarts rendering
-    tooltip: string;
+    allSeries: RadarChartSeriesDataItem[];
+    seriesIdMap: Record<string, RadarChartSeriesDataItem>;
 }
 
 interface RadarChartDataItem {
@@ -35,9 +35,20 @@ interface RadarChartDataItem {
     color: ColorStyleValue;
 }
 
+interface RadarChartSeriesDataItem {
+    id: string;
+    name: string;
+    values: number[]; // only used for echarts rendering
+    tooltip: string;
+    color: ColorStyleValue;
+}
+
 const props = defineProps<{
     skeleton?: boolean;
-    items: CategoricalChartSourceDataItem[];
+    categoryTypeName: string;
+    items: AxisChartSourceDataItem[];
+    allCategoryNames?: string[];
+    hideLegend?: boolean;
     valueType: ChartValueType;
     defaultCurrency?: string;
     showValue?: boolean;
@@ -48,6 +59,8 @@ const props = defineProps<{
 const theme = useTheme();
 
 const {
+    formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping,
     formatPercentToLocalizedNumerals,
     formatChartValueToLocalizedNumerals
 } = useI18n();
@@ -58,52 +71,58 @@ const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType
 const chartColors = computed<ColorValue[]>(() => settingsStore.chartColorList);
 
 const radarData = computed<RadarChartData>(() => {
-    let totalValidValue: BigDecimal = BIG_DECIMAL_ZERO;
     let maxValue: BigDecimal = BIG_DECIMAL_ZERO;
     const indicators: RadarChartDataItem[] = [];
-    const values: number[] = [];
-    let tooltip = '';
+    const allSeries: RadarChartSeriesDataItem[] = [];
+    const seriesIdMap: Record<string, RadarChartSeriesDataItem> = {};
 
     if (props.items.length) {
         for (const item of props.items) {
-            if (isBigDecimal(item.value) && item.value.isPositive() && !item.hidden) {
-                totalValidValue = totalValidValue.add(item.value);
+            if (!item.values || item.hidden) {
+                continue;
+            }
 
-                if (item.value.greaterThan(maxValue)) {
-                    maxValue = item.value;
+            for (const value of item.values) {
+                if (isBigDecimal(value) && value.greaterThan(maxValue)) {
+                    maxValue = value;
                 }
             }
         }
 
+        for (const name of props.allCategoryNames ?? []) {
+            indicators.push({
+                name: name,
+                max: maxValue.toDoubleNumber(),
+                color: isDarkMode.value ? '#ccc' : '#333'
+            });
+        }
+
         for (const item of props.items) {
-            if (isBigDecimal(item.value) && !item.hidden) {
-                let percent: number = isNumber(item.percent) ? item.percent : -1;
+            if (!item.values || item.hidden) {
+                continue;
+            }
 
-                if (percent < 0) {
-                    if (item.value.isPositive()) {
-                        percent = item.value.divide(totalValidValue).multiply(100).toDoubleNumber();
-                    } else {
-                        percent = 0;
-                    }
+            let totalValidValue: BigDecimal = BIG_DECIMAL_ZERO;
+            const color = props.hideLegend ? '#c07d43' : getDisplayColor(props.useCustomColor && item.color ? item.color : chartColors.value[allSeries.length % chartColors.value.length]);
+            let tooltip = props.hideLegend ? '' : `<div><span class="chart-pointer" style="background-color: ${color}"></span><span>${item.name}</span></div>`;
+
+            for (const value of item.values) {
+                if (isBigDecimal(value) && value.isPositive()) {
+                    totalValidValue = totalValidValue.add(value);
                 }
+            }
 
-                const color = getDisplayColor(props.useCustomColor && item.color ? item.color : chartColors.value[indicators.length % chartColors.value.length]);
-                const displayValue = formatChartValueToLocalizedNumerals(item.value, props.valueType, props.defaultCurrency);
+            for (let i = 0; i < indicators.length; i++) {
+                const value = item.values[i] ?? BIG_DECIMAL_ZERO;
+                const percent = value.isPositive() && !totalValidValue.isZero() ? value.divide(totalValidValue).multiply(100).toDoubleNumber() : 0;
+                const displayValue = formatChartValueToLocalizedNumerals(value, props.valueType, props.defaultCurrency);
                 const displayPercent = formatPercentToLocalizedNumerals(percent, 2, '<0.01');
 
-                indicators.push({
-                    name: item.name,
-                    max: maxValue.toDoubleNumber(),
-                    color: isDarkMode.value ? '#ccc' : '#333'
-                });
-
-                values.push(max(item.value, BIG_DECIMAL_ZERO).toDoubleNumber());
-
-                tooltip += '<div><span class="chart-pointer" style="background-color: ' + color + '"></span>';
-                tooltip += `<span>${item.name}</span>`;
+                const categoryColor = getDisplayColor(chartColors.value[i % chartColors.value.length]);
+                tooltip += `<div>${props.hideLegend ? `<span class="chart-pointer" style="background-color: ${categoryColor}"></span>` : ''}<span>${indicators[i]?.name ?? ''}</span>`;
 
                 const showValue = props.showValue;
-                const showPercent = props.showPercent && item.value.isPositive();
+                const showPercent = props.showPercent && value.isPositive();
 
                 if (showValue && showPercent) {
                     tooltip += `<span class="ms-1" style="float: inline-end">(${displayPercent})</span><span class="ms-5" style="float: inline-end">${displayValue}</span>`;
@@ -115,6 +134,17 @@ const radarData = computed<RadarChartData>(() => {
 
                 tooltip += '</div>';
             }
+
+            const seriesItem: RadarChartSeriesDataItem = {
+                id: item.id ?? item.name,
+                name: item.name,
+                values: item.values.map(value => max(value, BIG_DECIMAL_ZERO).toDoubleNumber()),
+                tooltip: tooltip,
+                color: color
+            };
+
+            allSeries.push(seriesItem);
+            seriesIdMap[item.id ?? item.name] = seriesItem;
         }
     } else {
         for (let i = 0; i < 6; i++) {
@@ -123,19 +153,14 @@ const radarData = computed<RadarChartData>(() => {
                 max: 0,
                 color: isDarkMode.value ? '#ccc' : '#333'
             });
-            values.push(0);
         }
     }
 
-    const ret: RadarChartData = {
-        totalValidValue: totalValidValue,
-        maxValue: maxValue,
+    return {
         indicators: indicators,
-        values: values,
-        tooltip: tooltip
+        allSeries: allSeries,
+        seriesIdMap: seriesIdMap
     };
-
-    return ret;
 });
 
 const chartOptions = computed<object>(() => {
@@ -147,40 +172,55 @@ const chartOptions = computed<object>(() => {
             textStyle: {
                 color: isDarkMode.value ? '#eee' : '#333'
             },
-            formatter: () => radarData.value.tooltip
+            formatter: (params: CallbackDataParams) => {
+                return radarData.value.allSeries[params.dataIndex ?? 0]?.tooltip ?? '';
+            }
+        },
+        legend: {
+            show: !props.hideLegend,
+            orient: 'horizontal',
+            type: 'scroll',
+            top: 0,
+            data: radarData.value.allSeries.map(item => item.id),
+            textStyle: {
+                color: isDarkMode.value ? '#eee' : '#333'
+            },
+            formatter: (id: string) => radarData.value.seriesIdMap[id]?.name ?? id
         },
         radar: {
             radius: '75%',
-            splitNumber: (!props.skeleton && props.items.length) ? 5 : 1,
+            splitNumber: (!props.skeleton && radarData.value.allSeries.length) ? 5 : 1,
             splitLine: {
                 lineStyle: {
-                    color: (!props.skeleton && props.items.length) ? '#e8e8e7' : '#d3d3d3'
+                    color: (!props.skeleton && radarData.value.allSeries.length) ? '#e8e8e7' : '#d3d3d3'
                 }
             },
             splitArea: {
                 areaStyle: {
-                    color: (!props.skeleton && props.items.length) ? (isDarkMode.value ? ['#363534', '#1a1a1a'] : ['#faf8f4', '#fff']) : ['#d3d3d3', '#d3d3d3']
+                    color: (!props.skeleton && radarData.value.allSeries.length) ? (isDarkMode.value ? ['#363534', '#1a1a1a'] : ['#faf8f4', '#fff']) : ['#d3d3d3', '#d3d3d3']
                 }
             },
             indicator: radarData.value.indicators
         },
-        series: (!props.skeleton && props.items.length) ? [
+        series: (!props.skeleton && radarData.value.allSeries.length) ? [
             {
                 type: 'radar',
-                data: [
-                    {
-                        value: radarData.value.values,
-                        itemStyle: {
-                            color: '#c07d43'
-                        },
-                        lineStyle: {
-                            color: '#c07d43'
-                        },
-                        areaStyle: {
-                            color: isDarkMode.value ? '#c07d4380' : '#c07d4340'
-                        }
+                data: radarData.value.allSeries.map(item => ({
+                    name: item.id,
+                    value: item.values,
+                    itemStyle: {
+                        color: item.color
+                    },
+                    lineStyle: {
+                        color: item.color
+                    },
+                    areaStyle: radarData.value.allSeries.length > 1 ? {
+                        color: item.color,
+                        opacity: isDarkMode.value ? 0.5 : 0.2
+                    } : {
+                        color: isDarkMode.value ? '#c07d4380' : '#c07d4340'
                     }
-                ],
+                })),
                 top: 0,
                 emphasis: {
                     itemStyle: {
@@ -191,8 +231,54 @@ const chartOptions = computed<object>(() => {
                 },
                 animation: !props.skeleton
             }
-        ] : []
+        ] : [],
+        media: [
+            {
+                query: {
+                    minWidth: 600,
+                },
+                option: {
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left'
+                    }
+                }
+            }
+        ]
     };
+});
+
+function exportData(): { headers: string[], data: string[][] } {
+    const headers: string[] = [];
+    const data: string[][] = [];
+
+    headers.push(props.categoryTypeName);
+
+    for (const series of radarData.value.allSeries) {
+        headers.push(series.name);
+    }
+
+    for (const [categoryName, index] of itemAndIndex(props.allCategoryNames ?? [''])) {
+        const row: string[] = [];
+        row.push(categoryName);
+        row.push(...props.items.map(item => {
+            if (props.valueType === ChartValueType.Amount) {
+                return formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.values[index] ?? BIG_DECIMAL_ZERO, props.defaultCurrency);
+            } else {
+                return formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(item.values[index] ?? BIG_DECIMAL_ZERO);
+            }
+        }));
+        data.push(row);
+    }
+
+    return {
+        headers: headers,
+        data: data
+    };
+}
+
+defineExpose({
+    exportData
 });
 </script>
 

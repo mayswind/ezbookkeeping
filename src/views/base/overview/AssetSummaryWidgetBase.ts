@@ -10,7 +10,7 @@ import type { BigDecimal, HiddenAmount, BigDecimalWithSuffix } from '@/core/nume
 
 import { Account } from '@/models/account.ts';
 
-export function useAssetSummaryWidgetBase() {
+export function useAssetSummaryWidgetBase(scene: 'overview' | 'accountList') {
     const { formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 
     const settingsStore = useSettingsStore();
@@ -22,27 +22,54 @@ export function useAssetSummaryWidgetBase() {
         set: (value) => settingsStore.setShowAmountInHomePage(value)
     });
 
+    const showAccountBalance = computed<boolean>({
+        get: () => settingsStore.appSettings.showAccountBalance,
+        set: (value) => settingsStore.setShowAccountBalance(value)
+    });
+
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
     const allAccounts = computed<Account[]>(() => accountsStore.allAccounts);
 
     const netAssets = computed<string>(() => {
-        const netAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getNetAssets(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
-        return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
+        if (scene === 'overview') {
+            const netAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getNetAssets(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
+            return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
+        } else if (scene === 'accountList') {
+            const netAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getNetAssets(showAccountBalance.value, settingsStore.appSettings.totalAmountExcludeAccountIds);
+            return formatAmountToLocalizedNumeralsWithCurrency(netAssets, defaultCurrency.value);
+        } else {
+            return '';
+        }
     });
 
     const totalAssets = computed<string>(() => {
-        const totalAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalAssets(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
-        return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
+        if (scene === 'overview') {
+            const totalAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalAssets(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
+            return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
+        } else if (scene === 'accountList') {
+            const totalAssets: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalAssets(showAccountBalance.value, settingsStore.appSettings.totalAmountExcludeAccountIds);
+            return formatAmountToLocalizedNumeralsWithCurrency(totalAssets, defaultCurrency.value);
+        } else {
+            return '';
+        }
     });
 
     const totalLiabilities = computed<string>(() => {
-        const totalLiabilities: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalLiabilities(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
-        return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
+        if (scene === 'overview') {
+            const totalLiabilities: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalLiabilities(showAmountInHomePage.value, settingsStore.appSettings.overviewAccountFilterInHomePage);
+            return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
+        } else if (scene === 'accountList') {
+            const totalLiabilities: BigDecimal | HiddenAmount | BigDecimalWithSuffix = accountsStore.getTotalLiabilities(showAccountBalance.value, settingsStore.appSettings.totalAmountExcludeAccountIds);
+            return formatAmountToLocalizedNumeralsWithCurrency(totalLiabilities, defaultCurrency.value);
+        } else {
+            return '';
+        }
     });
 
     return {
         // computed states
         showAmountInHomePage,
+        showAccountBalance,
         defaultCurrency,
         allAccounts,
         netAssets,

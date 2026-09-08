@@ -60,7 +60,7 @@ const {
     netAssets,
     totalAssets,
     totalLiabilities
-} = useAssetSummaryWidgetBase();
+} = useAssetSummaryWidgetBase('overview');
 
 const displayAccountCount = computed<string>(() => formatNumberToLocalizedNumerals(allAccounts.value?.length ?? 0));
 

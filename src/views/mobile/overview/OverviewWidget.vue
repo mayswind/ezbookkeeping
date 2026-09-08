@@ -1,5 +1,5 @@
 <template>
-    <asset-summary-widget :loading="loading" :height="widget.settings['height'] as number"
+    <asset-summary-widget scene="overview" :loading="loading" :height="widget.settings['height'] as number"
                           :light-background-color="widget.settings['lightBackgroundColor'] as ColorValue"
                           :dark-background-color="widget.settings['darkBackgroundColor'] as ColorValue"
                           v-if="widget.type === OverviewWidgetType.AssetSummary" />

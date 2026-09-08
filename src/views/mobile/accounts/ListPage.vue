@@ -13,33 +13,9 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-card class="account-overview-card margin-top-half" :class="{ 'skeleton-text': loading }">
-            <f7-card-header class="display-block" style="padding-top: 120px;">
-                <p class="no-margin">
-                    <small class="card-header-content" v-if="loading">Net assets</small>
-                    <small class="card-header-content" v-else-if="!loading">{{ tt('Net assets') }}</small>
-                </p>
-                <p class="no-margin">
-                    <span class="net-assets" v-if="loading">0.00 USD</span>
-                    <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
-                    <f7-link class="display-inline-flex margin-inline-start-half" :aria-label="showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance')" @click="showAccountBalance = !showAccountBalance">
-                        <f7-icon class="ebk-hide-icon" :f7="showAccountBalance ? 'eye_slash_fill' : 'eye_fill'"></f7-icon>
-                    </f7-link>
-                </p>
-                <p class="no-margin">
-                    <small class="account-overview-info" v-if="loading">
-                        <span>Total assets | Total liabilities</span>
-                    </small>
-                    <small class="account-overview-info" v-else-if="!loading">
-                        <span>{{ tt('Total assets') }}</span>
-                        <span>{{ totalAssets }}</span>
-                        <span>|</span>
-                        <span>{{ tt('Total liabilities') }}</span>
-                        <span>{{ totalLiabilities }}</span>
-                    </small>
-                </p>
-            </f7-card-header>
-        </f7-card>
+        <div class="margin-top-half margin-bottom">
+            <asset-summary-widget scene="accountList" :loading="loading" :support-hide-account-balance="true" />
+        </div>
 
         <div class="skeleton-text" v-if="loading">
             <f7-list strong inset dividers sortable class="list-has-group-title account-list margin-vertical"
@@ -254,6 +230,8 @@
 </template>
 
 <script setup lang="ts">
+import AssetSummaryWidget from '@/views/mobile/overview/widgets/AssetSummaryWidget.vue';
+
 import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 
@@ -290,9 +268,6 @@ const {
     allCategorizedAccountsMap,
     allAccountCount,
     maxCategoryAccountCount,
-    netAssets,
-    totalAssets,
-    totalLiabilities,
     accountCategoryTotalBalance,
     accountBalance,
     accountBalanceOrAvailableCredit

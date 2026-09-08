@@ -214,7 +214,7 @@ describe('mobile overview layout', () => {
             {
                 id: 'asset-summary',
                 type: OverviewWidgetType.AssetSummary,
-                settings: { height: 3, lightBackgroundColor: 'ffcc00', darkBackgroundColor: 'c67e48' }
+                settings: {}
             },
             {
                 id: 'accounts',
@@ -224,7 +224,7 @@ describe('mobile overview layout', () => {
             {
                 id: 'month',
                 type: OverviewWidgetType.CurrentMonthOverview,
-                settings: { height: 3, lightBackgroundColor: 'ffcc00', darkBackgroundColor: 'c67e48' }
+                settings: {}
             }
         ]);
     });
@@ -239,8 +239,8 @@ describe('mobile overview layout', () => {
             ]
         });
 
-        expect(layout.widgets[0]?.settings).toEqual({ height: 1, lightBackgroundColor: '112233', darkBackgroundColor: 'abcdef' });
-        expect(layout.widgets[1]?.settings).toEqual({ height: 3, lightBackgroundColor: 'ffcc00', darkBackgroundColor: 'c67e48' });
+        expect(layout.widgets[0]?.settings).toEqual({});
+        expect(layout.widgets[1]?.settings).toEqual({});
         expect(layout.widgets[2]?.settings).toEqual({ dateRanges: [DateRange.ThisYear.type, DateRange.Today.type] });
         expect(layout.widgets[3]?.settings).toEqual({ dateRanges: [DateRange.Today.type, DateRange.ThisWeek.type, DateRange.ThisMonth.type, DateRange.ThisYear.type] });
     });

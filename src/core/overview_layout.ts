@@ -31,7 +31,7 @@ export enum OverviewWidgetDataRequirement {
 export type OverviewWidgetSettingValue = string | number | boolean | (string | number)[];
 
 interface OverviewWidgetSettingItemBase {
-    settingType: 'itemCountSelect' | 'monthSelect' | 'accountSelect' | 'categorySelect' | 'tagSelect' | 'customSelect' | 'switch' | 'color' | 'amount' | 'textbox';
+    settingType: 'itemCountSelect' | 'monthSelect' | 'accountSelect' | 'categorySelect' | 'tagSelect' | 'customSelect' | 'switch' | 'amount' | 'textbox';
     settingName: string;
     displayName: string;
     condition?: (settings?: Record<string, OverviewWidgetSettingValue>) => boolean;
@@ -70,10 +70,6 @@ export interface OverviewWidgetCustomSelectSettingItem extends OverviewWidgetSet
 
 export interface OverviewWidgetSwitchSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'switch';
-}
-
-export interface OverviewWidgetColorSettingItem extends OverviewWidgetSettingItemBase {
-    settingType: 'color';
 }
 
 export interface OverviewWidgetAmountSettingItem extends OverviewWidgetSettingItemBase {

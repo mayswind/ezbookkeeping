@@ -911,9 +911,7 @@ export const DEFAULT_MOBILE_OVERVIEW_LAYOUT: MobileOverviewLayout = {
         {
             id: 'default-current-month-overview',
             type: OverviewWidgetType.CurrentMonthOverview,
-            settings: {
-                height: 3
-            }
+            settings: {}
         },
         {
             id: 'default-period-income-expense',

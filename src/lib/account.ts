@@ -6,7 +6,7 @@ import { ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
 
 import { type AccountBalance, type CategorizedAccount, Account } from '@/models/account.ts';
 
-import { isDefined, isString } from '@/lib/common.ts';
+import { isDefined } from '@/lib/common.ts';
 import { parseBigDecimal } from '@/lib/numeral.ts';
 
 export function getCategorizedAccountsMap(allAccounts: Account[]): Record<number, CategorizedAccount> {
@@ -156,7 +156,7 @@ export function getAllFilteredAccountsBalance(categorizedAccounts: Record<number
                 continue;
             }
 
-            const creditCardLimit = account.category === AccountCategory.CreditCard.type && isString(account.creditCardLimit) ? {
+            const creditCardLimit = account.category === AccountCategory.CreditCard.type && account.numericCreditCardLimit && account.numericCreditCardLimit > 0 ? {
                 amount: parseBigDecimal(account.creditCardLimit),
                 currency: account.currency,
                 shareByCount: 0

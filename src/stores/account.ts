@@ -589,34 +589,31 @@ export const useAccountsStore = defineStore('accounts', () => {
         const accountsBalance = getAllFilteredAccountsBalance(allCategorizedAccountsMap.value, settingsStore.appSettings.accountCategoryOrders,
             account => account.category === accountCategory.type);
         let totalBalance: BigDecimal = BIG_DECIMAL_ZERO;
-        let totalCreditCardCreditLimit: BigDecimal = BIG_DECIMAL_ZERO;
+        let totalCreditCardAvailableCredit: BigDecimal = BIG_DECIMAL_ZERO;
         let hasUnCalculatedAmount = false;
-        let hasUnCalculatedCreditLimit = false;
+        let hasUnCalculatedAvailableCredit = false;
+        let hasCalculatedAvailableCredit = false;
 
         for (const accountBalance of accountsBalance) {
+            let balance: BigDecimal | null = null;
+
             if (accountBalance.currency === userStore.currentUserDefaultCurrency) {
-                if (accountBalance.isAsset) {
-                    totalBalance = totalBalance.add(accountBalance.balance);
-                } else if (accountBalance.isLiability) {
-                    totalBalance = totalBalance.subtract(accountBalance.balance);
-                } else {
-                    totalBalance = totalBalance.add(accountBalance.balance);
-                }
+                balance = accountBalance.balance;
             } else {
-                const balance = exchangeRatesStore.getExchangedAmount(accountBalance.balance, accountBalance.currency, userStore.currentUserDefaultCurrency);
+                balance = exchangeRatesStore.getExchangedAmount(accountBalance.balance, accountBalance.currency, userStore.currentUserDefaultCurrency);
 
                 if (!balance) {
                     hasUnCalculatedAmount = true;
                     continue;
                 }
+            }
 
-                if (accountBalance.isAsset) {
-                    totalBalance = totalBalance.add(balance);
-                } else if (accountBalance.isLiability) {
-                    totalBalance = totalBalance.subtract(balance);
-                } else {
-                    totalBalance = totalBalance.add(balance);
-                }
+            if (accountBalance.isAsset) {
+                totalBalance = totalBalance.add(balance);
+            } else if (accountBalance.isLiability) {
+                totalBalance = totalBalance.subtract(balance);
+            } else {
+                totalBalance = totalBalance.add(balance);
             }
 
             if (accountBalance.category === AccountCategory.CreditCard.type && showAvailableCreditForCreditCard) {
@@ -624,32 +621,34 @@ export const useAccountsStore = defineStore('accounts', () => {
                     const amount = accountBalance.creditCardLimit.amount.divide(accountBalance.creditCardLimit.shareByCount);
 
                     if (accountBalance.creditCardLimit.currency === userStore.currentUserDefaultCurrency) {
-                        totalCreditCardCreditLimit = totalCreditCardCreditLimit.add(amount);
+                        totalCreditCardAvailableCredit = totalCreditCardAvailableCredit.add(amount).add(balance);
+                        hasCalculatedAvailableCredit = true;
                     } else {
                         const limit = exchangeRatesStore.getExchangedAmount(amount, accountBalance.creditCardLimit.currency, userStore.currentUserDefaultCurrency);
 
                         if (limit) {
-                            totalCreditCardCreditLimit = totalCreditCardCreditLimit.add(limit);
+                            totalCreditCardAvailableCredit = totalCreditCardAvailableCredit.add(limit).add(balance);
+                            hasCalculatedAvailableCredit = true;
                         } else {
-                            hasUnCalculatedCreditLimit = true;
+                            hasUnCalculatedAvailableCredit = true;
                         }
                     }
                 } else {
-                    hasUnCalculatedCreditLimit = true;
+                    hasUnCalculatedAvailableCredit = true;
                 }
             }
         }
 
         if (accountCategory.type === AccountCategory.CreditCard.type && showAvailableCreditForCreditCard) {
-            if (hasUnCalculatedAmount) {
+            if (hasUnCalculatedAmount || !hasCalculatedAvailableCredit) {
                 return undefined;
-            } else if (hasUnCalculatedCreditLimit) {
+            } else if (hasUnCalculatedAvailableCredit) {
                 return {
-                    value: totalCreditCardCreditLimit.subtract(totalBalance),
+                    value: totalCreditCardAvailableCredit,
                     suffix: INCOMPLETE_AMOUNT_SUFFIX
                 };
             } else {
-                return totalCreditCardCreditLimit.subtract(totalBalance);
+                return totalCreditCardAvailableCredit;
             }
         } else {
             if (hasUnCalculatedAmount) {

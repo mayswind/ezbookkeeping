@@ -1,7 +1,7 @@
 <template>
     <v-card class="overview-widget expense-ranking-widget h-100" :class="{ disabled: loading }">
         <template #title>
-            <overview-widget-header :title="title || tt('Expense Category Ranking')" :icon="mdiViewDashboardOutline" />
+            <overview-widget-header :title="title || tt('Expense Category Ranking')" :icon="mdiSortVariant" />
         </template>
 
         <v-card-text class="overview-widget__body">
@@ -35,7 +35,7 @@
                 <v-skeleton-loader class="skeleton-no-margin py-4 mb-1" type="text" :key="idx" :loading="true" v-for="idx in props.itemCount"></v-skeleton-loader>
             </div>
             <div class="overview-widget__empty" v-if="!loading && !rankingItems.length">
-                <v-icon :icon="mdiViewDashboardOutline" size="32" />
+                <v-icon :icon="mdiRhombusSplitOutline" size="32" />
                 <span>{{ tt('No data') }}</span>
             </div>
         </v-card-text>
@@ -55,7 +55,8 @@ import { getCategoryIconType } from '@/lib/icon.ts';
 import { getCategoryDisplayColor } from '@/lib/color.ts';
 
 import {
-    mdiViewDashboardOutline
+    mdiSortVariant,
+    mdiRhombusSplitOutline
 } from '@mdi/js';
 
 const props = defineProps<CommonExpenseCategoryRankingWidgetProps>();

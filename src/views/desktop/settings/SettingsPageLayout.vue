@@ -14,7 +14,7 @@
             </li>
             <li class="nav-link">
                 <router-link to="/settings/user/security">
-                    <v-icon class="nav-item-icon" :icon="mdiLockOpenOutline"/>
+                    <v-icon class="nav-item-icon" :icon="mdiShieldAccountOutline"/>
                     <span class="nav-item-title">{{ tt('Security') }}</span>
                 </router-link>
             </li>
@@ -32,13 +32,13 @@
             </li>
             <li class="nav-link">
                 <router-link to="/category/list">
-                    <v-icon class="nav-item-icon" :icon="mdiViewDashboardOutline"/>
+                    <v-icon class="nav-item-icon" :icon="mdiRhombusSplitOutline"/>
                     <span class="nav-item-title">{{ tt('Transaction Categories') }}</span>
                 </router-link>
             </li>
             <li class="nav-link">
                 <router-link to="/tag/list">
-                    <v-icon class="nav-item-icon" :icon="mdiTagOutline"/>
+                    <v-icon class="nav-item-icon" :icon="mdiPoundBoxOutline"/>
                     <span class="nav-item-title">{{ tt('Transaction Tags') }}</span>
                 </router-link>
             </li>
@@ -126,15 +126,16 @@ import { isUserCustomIconEnabled, isUserScheduledTransactionEnabled } from '@/li
 
 import {
     mdiAccountOutline,
-    mdiViewDashboardOutline,
-    mdiTagOutline,
+    mdiShieldAccountOutline,
+    mdiOnepassword,
+    mdiRhombusSplitOutline,
+    mdiPoundBoxOutline,
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,
     mdiShapePlusOutline,
-    mdiLockOpenOutline,
-    mdiOnepassword,
     mdiDatabaseCogOutline,
     mdiCogOutline,
+    mdiLockOpenOutline,
     mdiChartPieOutline,
     mdiCloudOutline,
     mdiSwapHorizontal,

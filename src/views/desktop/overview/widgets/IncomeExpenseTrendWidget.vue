@@ -1,7 +1,7 @@
 <template>
     <v-card class="overview-widget d-flex flex-column" :class="{ 'disabled': loading }">
         <template #title>
-            <overview-widget-header :title="displayTitle" :icon="mdiChartBar" />
+            <overview-widget-header :title="displayTitle" :icon="mdiPoll" />
         </template>
 
         <monthly-income-and-expense-chart :data="monthlyIncomeAndExpenseData" :is-dark-mode="isDarkMode"
@@ -40,7 +40,7 @@ import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
 import { getUnixTimeAfterUnixTime, getUnixTimeBeforeUnixTime } from '@/lib/datetime.ts';
 
 import {
-    mdiChartBar
+    mdiPoll
 } from '@mdi/js';
 
 const props = defineProps<{

@@ -46,13 +46,13 @@
                             {
                                 title: 'Transaction Categories',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-',
-                                icon: mdiViewDashboardOutline,
+                                icon: mdiRhombusSplitOutline,
                                 color: 'teal'
                             },
                             {
                                 title: 'Transaction Tags',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-',
-                                icon: mdiTagOutline,
+                                icon: mdiPoundBoxOutline,
                                 color: 'grey'
                             },
                             {
@@ -195,8 +195,8 @@ import {
     mdiCreditCardOutline,
     mdiImage,
     mdiCompassOutline,
-    mdiViewDashboardOutline,
-    mdiTagOutline,
+    mdiRhombusSplitOutline,
+    mdiPoundBoxOutline,
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,
     mdiShapePlusOutline,

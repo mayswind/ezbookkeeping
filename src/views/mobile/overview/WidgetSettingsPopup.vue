@@ -66,6 +66,7 @@
                                    v-else-if="setting.settingType === 'textbox' && (!setting.condition || setting.condition(widget?.settings))"></f7-list-input>
 
                     <f7-list-item class="item-truncate-after-text"
+                                  :class="{ 'up-down-chevron': setting.settingType !== 'accountSelect' && setting.settingType !== 'categorySelect' && setting.settingType !== 'tagSelect' && setting.settingType !== 'amount' }"
                                   link="#" :disabled="isSettingDisabled(setting)"
                                   @click="openSettingSelection(setting, $event)"
                                   v-else>

@@ -79,15 +79,14 @@ html[dir="rtl"] .progressbar {
 }
 
 :not(.no-chevron) {
-    li > {
-        .item-link.popover-open[data-popover] {
-            > .item-content {
-                > .item-inner {
-                    &:before {
-                        --f7-list-chevron-icon-color: rgba(0, 0, 0, 0.3);
-                        font-family: 'Framework7 Icons';
-                        transform: scaleX(0.6) scaleY(0.9);
-                    }
+    li > .item-link.popover-open[data-popover],
+    li.up-down-chevron > .item-link {
+        > .item-content {
+            > .item-inner {
+                &:before {
+                    --f7-list-chevron-icon-color: rgba(0, 0, 0, 0.3);
+                    font-family: 'Framework7 Icons';
+                    transform: scaleX(0.6) scaleY(0.9);
                 }
             }
         }
@@ -95,14 +94,13 @@ html[dir="rtl"] .progressbar {
 }
 
 html:not([dir="rtl"]) :not(.no-chevron) {
-    li > {
-        .item-link.popover-open[data-popover] {
-            > .item-content {
-                > .item-inner {
-                    &:before {
-                        --f7-list-chevron-icon-right: 'chevron_up_chevron_down';
-                        margin-inline-end: 4px;
-                    }
+    li > .item-link.popover-open[data-popover],
+    li.up-down-chevron > .item-link {
+        > .item-content {
+            > .item-inner {
+                &:before {
+                    --f7-list-chevron-icon-right: 'chevron_up_chevron_down';
+                    margin-inline-end: 4px;
                 }
             }
         }
@@ -110,14 +108,13 @@ html:not([dir="rtl"]) :not(.no-chevron) {
 }
 
 html[dir="rtl"] :not(.no-chevron) {
-    li > {
-        .item-link.popover-open[data-popover] {
-            > .item-content {
-                > .item-inner {
-                    &:before {
-                        --f7-list-chevron-icon-left: 'chevron_up_chevron_down';
-                        margin-inline-start: -4px;
-                    }
+    li > .item-link.popover-open[data-popover],
+    li.up-down-chevron > .item-link {
+        > .item-content {
+            > .item-inner {
+                &:before {
+                    --f7-list-chevron-icon-left: 'chevron_up_chevron_down';
+                    margin-inline-start: -4px;
                 }
             }
         }

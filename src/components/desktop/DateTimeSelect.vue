@@ -20,13 +20,16 @@
                               :show-alternate-dates="true"
                               v-model="dateTime">
             </date-time-picker>
-            <div class="date-time-select-time-picker-container">
+            <div class="date-time-select-time-picker-container"
+                 @focusin="onFocused"
+                 @click="onFocused"
+                 @keydown="onKeyDown">
                 <v-btn class="px-3" color="primary" variant="flat"
                        v-if="!is24Hour && isMeridiemIndicatorFirst"
                        @click="toggleMeridiemIndicator">
                     {{ tt(`datetime.${currentMeridiemIndicator}.content`) }}
                 </v-btn>
-                <v-autocomplete eager ref="hourInput"
+                <v-autocomplete eager
                                 density="compact"
                                 max-width="70px"
                                 item-title="value"
@@ -35,12 +38,9 @@
                                 :items="hourItems"
                                 :hide-no-data="true"
                                 v-model="currentHour"
-                                @update:focused="onFocused(hourInput, $event)"
-                                @click="onFocused(hourInput, true)"
-                                @keydown="onKeyDown('hour', $event)"
                 />
                 <span>:</span>
-                <v-autocomplete eager ref="minuteInput"
+                <v-autocomplete eager
                                 density="compact"
                                 max-width="70px"
                                 item-title="value"
@@ -49,12 +49,9 @@
                                 :items="minuteItems"
                                 :hide-no-data="true"
                                 v-model="currentMinute"
-                                @update:focused="onFocused(minuteInput, $event)"
-                                @click="onFocused(minuteInput, true)"
-                                @keydown="onKeyDown('minute', $event)"
                 />
                 <span>:</span>
-                <v-autocomplete eager ref="secondInput"
+                <v-autocomplete eager
                                 density="compact"
                                 max-width="70px"
                                 item-title="value"
@@ -63,9 +60,6 @@
                                 :items="secondItems"
                                 :hide-no-data="true"
                                 v-model="currentSecond"
-                                @update:focused="onFocused(secondInput, $event)"
-                                @click="onFocused(secondInput, true)"
-                                @keydown="onKeyDown('second', $event)"
                 />
                 <v-btn class="px-3" color="primary" variant="flat"
                        v-if="!is24Hour && !isMeridiemIndicatorFirst"
@@ -78,9 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { VAutocomplete } from 'vuetify/components/VAutocomplete';
-
-import { computed, useTemplateRef, nextTick } from 'vue';
+import { computed, nextTick } from 'vue';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -103,7 +95,6 @@ import {
     getAMOrPM,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
-import { setChildInputFocus } from '@/lib/ui/desktop.ts';
 
 const props = defineProps<{
     modelValue: number;
@@ -144,10 +135,6 @@ const {
     generateAllHours,
     generateAllMinutesOrSeconds
 } = useDateTimeSelectionBase();
-
-const hourInput = useTemplateRef<VAutocomplete>('hourInput');
-const minuteInput = useTemplateRef<VAutocomplete>('minuteInput');
-const secondInput = useTemplateRef<VAutocomplete>('secondInput');
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
@@ -236,6 +223,17 @@ const currentSecond = computed<string>({
     }
 });
 
+function setTimeInputFocus(container: HTMLElement, inputIndex: number): void {
+    nextTick(() => {
+        setTimeout(() => {
+            const input = container.querySelectorAll<HTMLInputElement>('input[role="combobox"]')[inputIndex];
+
+            input?.focus();
+            input?.select();
+        }, 50);
+    });
+}
+
 function toggleMeridiemIndicator(): void {
     if (currentMeridiemIndicator.value === MeridiemIndicator.AM.name) {
         currentMeridiemIndicator.value = MeridiemIndicator.PM.name;
@@ -288,15 +286,31 @@ function onPaste(event: ClipboardEvent): void {
     event.preventDefault();
 }
 
-function onFocused(input: VAutocomplete | null | undefined, focused: boolean): void {
-    if (input && focused) {
+function onFocused(e: Event): void {
+    if (e.target instanceof HTMLInputElement && e.target.role === 'combobox') {
+        const input = e.target;
+
         nextTick(() => {
-            setChildInputFocus(input?.$el, 'input');
+            input.focus();
+            input.select();
         });
     }
 }
 
-function onKeyDown(type: string, e: KeyboardEvent): void {
+function onKeyDown(e: KeyboardEvent): void {
+    if (!(e.currentTarget instanceof HTMLElement) || !(e.target instanceof HTMLInputElement)) {
+        return;
+    }
+
+    const container = e.currentTarget;
+    const inputs = Array.from(container.querySelectorAll<HTMLInputElement>('input[role="combobox"]'));
+    const inputIndex = inputs.indexOf(e.target);
+    const type = ['hour', 'minute', 'second'][inputIndex];
+
+    if (!type) {
+        return;
+    }
+
     if (e.altKey || e.ctrlKey || e.metaKey || (e.key.indexOf('F') === 0 && (e.key.length === 2 || e.key.length === 3))
         || e.key === 'ArrowLeft' || e.key === 'ArrowRight'
         || e.key === 'Home' || e.key === 'End'
@@ -315,11 +329,7 @@ function onKeyDown(type: string, e: KeyboardEvent): void {
         value = input.value;
     }
 
-    if (!value) {
-        return;
-    }
-
-    if (e.key === 'Tab' || e.key === 'Enter') {
+    if (value && (e.key === 'Tab' || e.key === 'Enter')) {
         if (type === 'hour') {
             currentHour.value = value;
         } else if (type === 'minute') {
@@ -331,17 +341,9 @@ function onKeyDown(type: string, e: KeyboardEvent): void {
 
     if (e.shiftKey && e.key === 'Tab') {
         if (type === 'minute') {
-            nextTick(() => {
-                setTimeout(() => {
-                    setChildInputFocus(hourInput.value?.$el, 'input');
-                }, 50);
-            });
+            setTimeInputFocus(container, 0);
         } else if (type === 'second') {
-            nextTick(() => {
-                setTimeout(() => {
-                    setChildInputFocus(minuteInput.value?.$el, 'input');
-                }, 50);
-            });
+            setTimeInputFocus(container, 1);
         }
 
         e.preventDefault();
@@ -351,21 +353,13 @@ function onKeyDown(type: string, e: KeyboardEvent): void {
 
     if (!e.shiftKey && (e.key === 'Tab' || e.key === 'Enter')) {
         if (type === 'hour') {
-            nextTick(() => {
-                setTimeout(() => {
-                    setChildInputFocus(minuteInput.value?.$el, 'input');
-                }, 50);
-            });
+            setTimeInputFocus(container, 1);
 
             e.preventDefault();
             e.stopPropagation();
             return;
         } else if (type === 'minute') {
-            nextTick(() => {
-                setTimeout(() => {
-                    setChildInputFocus(secondInput.value?.$el, 'input');
-                }, 50);
-            });
+            setTimeInputFocus(container, 2);
 
             e.preventDefault();
             e.stopPropagation();

@@ -217,7 +217,7 @@
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v5.3.0/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v5.3.1/LICENSE"
     },
     {
         "name": "vue-i18n",
@@ -231,7 +231,7 @@
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v4.1.12/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v4.2.1/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -294,7 +294,7 @@
         "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
         "url": "https://github.com/ecomfe/vue-echarts",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.2.0/LICENSE"
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.3.0/LICENSE"
     },
     {
         "name": "@vuepic/vue-datepicker",

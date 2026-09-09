@@ -1,5 +1,5 @@
 <template>
-    <v-btn-toggle class="segmented-button" density="compact" mandatory="force" size="small"
+    <v-btn-toggle class="segmented-button" density="compact" mandatory="force"
                   :disabled="disabled" :model-value="modelValue"
                   @update:model-value="updateValue">
         <v-btn key="false" variant="text" color="default" :ripple="false"

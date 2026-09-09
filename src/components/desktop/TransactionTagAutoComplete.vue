@@ -3,6 +3,7 @@
         item-title="name"
         item-value="id"
         auto-select-first
+        clear-on-select
         persistent-placeholder
         multiple
         chips
@@ -17,6 +18,7 @@
         :custom-filter="filterTag"
         :model-value="modelValue"
         v-model:search="tagSearchContent"
+        @keydown.tab.capture="onTabKeyDown"
         @update:modelValue="updateModelValue"
     >
         <template #chip="{ props, internalItem }">
@@ -150,6 +152,20 @@ function filterTag(value: string, query: string, item?: { value: unknown, raw: T
     }
 
     return NormalizedText.normalizeForSearch(item.raw.name).indexOf(normalizedFilterContent) >= 0;
+}
+
+function onTabKeyDown(event: KeyboardEvent): void {
+    const normalizedSearchContent = NormalizedText.normalizeForSearch(tagSearchContent.value);
+
+    if (!normalizedSearchContent) {
+        return;
+    }
+
+    const firstMatchedTag = allTagsWithGroupHeader.value.find(item => item instanceof TransactionTag && NormalizedText.normalizeForSearch(item.name).indexOf(normalizedSearchContent) >= 0);
+
+    if (firstMatchedTag instanceof TransactionTag && !props.modelValue.includes(firstMatchedTag.id)) {
+        event.preventDefault();
+    }
 }
 
 function updateModelValue(newValue: string[]) {

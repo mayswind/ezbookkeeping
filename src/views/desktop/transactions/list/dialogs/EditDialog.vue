@@ -298,13 +298,7 @@
                                         :no-data-text="tt('No results')"
                                         :model-value="transaction.timeZone"
                                         @update:model-value="updateTransactionTimezone"
-                                    >
-                                        <template #selection="{ internalItem }">
-                                                <span class="text-truncate" v-if="transaction.timeZone || transaction.timeZone === ''">
-                                                    {{ internalItem.title }}
-                                                </span>
-                                        </template>
-                                    </v-autocomplete>
+                                    />
                                 </v-col>
                                 <v-col cols="12" md="6" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type">
                                     <date-select

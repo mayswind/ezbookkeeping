@@ -75,11 +75,11 @@ export function useAppSettingPageBase() {
     const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
     const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
 
-    const timeZone = computed<string>({
+    const timeZone = computed<string, string | null>({
         get: () => settingsStore.appSettings.timeZone,
         set: (value) => {
-            settingsStore.setTimeZone(value);
-            setTimeZone(value);
+            settingsStore.setTimeZone(value || '');
+            setTimeZone(value || '');
             transactionsStore.updateTransactionListInvalidState(true);
             overviewStore.updateTransactionOverviewInvalidState(true);
             statisticsStore.updateTransactionStatisticsInvalidState(true);

@@ -469,8 +469,12 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         updateTransactionTimezone(transaction.value.timeZone ?? '');
     }
 
-    function updateTransactionTimezone(timezoneName: string): void {
+    function updateTransactionTimezone(timezoneName: string | null): void {
         const oldUtcOffset = transaction.value.utcOffset;
+
+        if (!timezoneName) {
+            timezoneName = ''
+        }
 
         for (const timezone of allTimezones.value) {
             if (timezone.name === timezoneName) {

@@ -10,9 +10,9 @@
 [![Trending](https://trendshift.io/api/badge/repositories/12917)](https://trendshift.io/repositories/12917)
 
 ## Introduction
-ezBookkeeping is a lightweight, self-hosted personal finance app with a user-friendly interface and powerful bookkeeping features. It helps you record daily transactions, import data from various sources, and quickly search and filter your bills. You can analyze historical data using built-in charts or perform custom queries with your own chart dimensions to better understand spending patterns and financial trends. ezBookkeeping is easy to deploy, and you can start it with just one single Docker command. Designed to be resource-efficient, it runs smoothly on devices such as Raspberry Pi, NAS, and MicroServers.
+ezBookkeeping is a powerful, lightweight, self-hosted personal finance app that is easy to use. It helps you record daily transactions, import data from various sources, and quickly search and filter your bills. You can analyze historical data using built-in charts or perform custom queries with your own chart dimensions to better understand spending patterns and financial trends. ezBookkeeping is easy to deploy, and you can start it with just one single Docker command. Designed to be resource-efficient, it runs smoothly on devices such as home servers, NAS and Raspberry Pi.
 
-ezBookkeeping offers tailored interfaces for both mobile and desktop devices. With support for PWA (Progressive Web Apps), you can even [add it to your mobile home screen](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/mobile/add_to_home_screen.gif) and use it like a native app.
+ezBookkeeping offers tailored interfaces for mobile and desktop devices. With PWA (Progressive Web Apps) support, you can [add it to your mobile home screen](https://raw.githubusercontent.com/wiki/mayswind/ezbookkeeping/img/mobile/add_to_home_screen.gif) and use it like a native app.
 
 Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.mayswind.net)
 
@@ -20,20 +20,21 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
 - **Open Source & Self-Hosted**
     - Built for privacy and control
 - **Lightweight & Fast**
-    - Minimal resource usage, runs smoothly even on low-resource devices
+    - Minimal resource usage, suitable for home servers, NAS and Raspberry Pi
 - **Easy Installation**
     - Docker support
-    - Supports SQLite, MySQL, PostgreSQL
+    - SQLite, MySQL and PostgreSQL support
     - Cross-platform (Windows, macOS, Linux)
     - Works on x86, amd64, ARM architectures
 - **User-Friendly Interface**
     - UI optimized for both mobile and desktop
     - PWA support for native-like mobile experience
+    - Customizable overview layouts
     - Dark mode
 - **AI-Powered Features**
-    - Receipt image recognition
-    - MCP (Model Context Protocol) support for AI integration
-    - Agent Skill and API command-line script tools support for AI integration
+    - Text and receipt image recognition
+    - MCP (Model Context Protocol) for AI integration
+    - Agent Skill and API command-line script tools for AI integration
 - **Powerful Bookkeeping**
     - Two-level accounts and categories
     - Image attachments for transactions
@@ -51,7 +52,8 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
     - Login rate limiting
     - Application lock (PIN code / WebAuthn)
 - **Data Import & Export**
-    - Supports CSV, OFX, QFX, QIF, IIF, Camt.052, Camt.053, MT940, GnuCash, Firefly III, Beancount and more
+    - Import CSV, Excel, OFX, QFX, QIF, IIF, Camt.052, Camt.053, MT940, GnuCash, Firefly III, Beancount and more
+    - Custom column mapping, rules and scripts for CSV / Excel imports
 
 For a full list of features, visit the [Full Feature List](https://ezbookkeeping.mayswind.net/features/).
 
@@ -73,6 +75,8 @@ Visit [Docker Hub](https://hub.docker.com/r/mayswind/ezbookkeeping) to see all i
 **Latest Daily Build:**
 
     $ docker run -p8080:8080 mayswind/ezbookkeeping:latest-snapshot
+
+For production use of ezBookkeeping, you need to mount a persistent volume when starting the container to prevent data loss. For more information, see [documentation](https://ezbookkeeping.mayswind.net/installation/installation-docker).
 
 ### Install from Binary
 Download the latest release: [https://github.com/mayswind/ezbookkeeping/releases](https://github.com/mayswind/ezbookkeeping/releases)

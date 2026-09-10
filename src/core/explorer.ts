@@ -280,6 +280,7 @@ export enum TransactionExplorerValueMetricType {
     TransactionCount = 'transactionCount',
     ActiveTransactionDays = 'activeTransactionDays',
     TransactionsPerActiveDay = 'transactionsPerActiveDay',
+    AverageAmountPerActiveDay = 'averageAmountPerActiveDay',
     SourceAmountSum = 'sourceAmountSum',
     SourceIncomeAmountSum = 'sourceIncomeAmountSum',
     SourceExpenseAmountSum = 'sourceExpenseAmountSum',
@@ -323,6 +324,7 @@ export class TransactionExplorerValueMetric implements NameValue {
     public static readonly TransactionCount = new TransactionExplorerValueMetric('Transaction Count', TransactionExplorerValueMetricType.TransactionCount, ChartValueType.Number, true);
     public static readonly ActiveTransactionDays = new TransactionExplorerValueMetric('Active Transaction Days', TransactionExplorerValueMetricType.ActiveTransactionDays, ChartValueType.Number, true);
     public static readonly TransactionsPerDay = new TransactionExplorerValueMetric('Transactions per Active Day', TransactionExplorerValueMetricType.TransactionsPerActiveDay, ChartValueType.Number, true);
+    public static readonly AverageAmountPerActiveDay = new TransactionExplorerValueMetric('Average Amount per Active Day', TransactionExplorerValueMetricType.AverageAmountPerActiveDay, ChartValueType.Amount, true);
     public static readonly SourceAmountSum = new TransactionExplorerValueMetric('Total Amount', TransactionExplorerValueMetricType.SourceAmountSum, ChartValueType.Amount, true);
     public static readonly SourceIncomeAmountSum = new TransactionExplorerValueMetric('Total Income', TransactionExplorerValueMetricType.SourceIncomeAmountSum, ChartValueType.Amount, true);
     public static readonly SourceExpenseAmountSum = new TransactionExplorerValueMetric('Total Expense', TransactionExplorerValueMetricType.SourceExpenseAmountSum, ChartValueType.Amount, true);

@@ -1936,6 +1936,7 @@
     "Transaction Count": "取引件数",
     "Active Transaction Days": "取引アクティブ日数",
     "Transactions per Active Day": "アクティブ日あたりの取引件数",
+    "Average Amount per Active Day": "Average Amount per Active Day",
     "Expense / Income Ratio": "支出/収入比率",
     "Savings Rate": "貯蓄率",
     "Average Amount": "平均金額",

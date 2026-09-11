@@ -88,11 +88,11 @@
 
                 <div class="my-3 flex-grow-1 overflow-y-auto" :style="codeContainerStyle" v-if="generatedToken">
                     <div class="w-100 h-100 code-container">
-                        <v-textarea class="w-100 h-100 always-cursor-text" :readonly="true"
+                        <v-textarea no-resize class="w-100 h-100 always-cursor-text" :readonly="true"
                                     :value="generatedToken" v-if="(tokenType === 'api' && (!showAPIExample || !serverUrl)) || (tokenType === 'mcp' && (!showMCPConfiguration || !serverUrl))" />
-                        <v-textarea class="w-100 h-100 always-cursor-text" :readonly="true"
+                        <v-textarea no-resize class="w-100 h-100 always-cursor-text" :readonly="true"
                                     :value="apiExample" v-if="tokenType === 'api' && showAPIExample && serverUrl" />
-                        <v-textarea class="w-100 h-100 always-cursor-text" :readonly="true"
+                        <v-textarea no-resize class="w-100 h-100 always-cursor-text" :readonly="true"
                                     :value="mcpServerConfiguration" v-if="tokenType === 'mcp' && showMCPConfiguration && serverUrl" />
                     </div>
                 </div>

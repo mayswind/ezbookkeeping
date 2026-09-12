@@ -2,6 +2,9 @@ import type { ImportFileCategoryAndTypes } from '@/core/file.ts';
 
 export const SUPPORTED_IMAGE_EXTENSIONS: string = '.jpg,.jpeg,.png,.gif,.webp';
 
+// Receipt/transaction image recognition also accepts PDF documents (some merchants issue PDF receipts)
+export const SUPPORTED_RECEIPT_RECOGNITION_EXTENSIONS: string = SUPPORTED_IMAGE_EXTENSIONS + ',.pdf';
+
 export const DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE: string = 'en';
 export const SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE: Record<string, string> = {
     DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE: DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE,

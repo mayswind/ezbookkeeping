@@ -30,6 +30,7 @@
                         <span class="text-title-medium font-weight-bold pa-2" v-else-if="!loading && isDragOver">{{ tt('Release to load image') }}</span>
                         <span class="text-title-medium font-weight-bold pa-2" v-else-if="loading">{{ tt('Loading image...') }}</span>
                         <span class="text-title-medium font-weight-bold pa-2" v-else-if="recognizing">{{ tt('AI can make mistakes. Check important info.') }}</span>
+                        <span class="text-title-medium font-weight-bold pa-2" v-else-if="!loading && !recognizing && selectedPdfName && imageFile">{{ selectedPdfName }}</span>
                     </div>
                     <v-img :class="{ 'cursor-pointer': !loading && !recognizing && !isDragOver, 'h-100': true }"
                            :src="imageSrc" @click="showOpenImageDialog">
@@ -44,7 +45,7 @@
     </v-dialog>
 
     <snack-bar ref="snackbar" />
-    <input ref="imageInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="openImage($event)" />
+    <input ref="imageInput" type="file" style="display: none" :accept="SUPPORTED_RECEIPT_RECOGNITION_EXTENSIONS" @change="openImage($event)" />
 </template>
 
 <script setup lang="ts">
@@ -60,7 +61,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 import { ImageUploadQualityType } from '@/core/image.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
+import { SUPPORTED_RECEIPT_RECOGNITION_EXTENSIONS } from '@/consts/file.ts';
 
 import type { RecognizedTransactionResponse } from '@/models/large_language_model.ts';
 
@@ -93,6 +94,7 @@ const recognizing = ref<boolean>(false);
 const cancelRecognizingUuid = ref<string | undefined>(undefined);
 const imageFile = ref<File | null>(null);
 const imageSrc = ref<string | undefined>(undefined);
+const selectedPdfName = ref<string>('');
 const isDragOver = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
@@ -101,6 +103,14 @@ function loadImage(file: File): void {
     loading.value = true;
     imageFile.value = null;
     imageSrc.value = undefined;
+    selectedPdfName.value = '';
+
+    if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '')) {
+        imageFile.value = file; // PDFs are sent as-is; the backend forwards the document to the model
+        selectedPdfName.value = file.name || 'receipt.pdf';
+        loading.value = false;
+        return;
+    }
 
     compressJpgImageByQuality(file, ImageUploadQualityType.HD720P).then(blob => {
         imageFile.value = KnownFileType.JPG.createFileFromBlob(blob, "image");

@@ -20,7 +20,8 @@
                 <img :src="imageSrc" v-if="imageSrc" />
                 <div class="image-container-background display-flex justify-content-center align-items-center text-align-center padding-horizontal" v-if="!imageSrc">
                     <div class="display-inline-flex flex-direction-column" v-if="!loading">
-                        <span>{{ tt('Click here to select a receipt or transaction image') }}</span>
+                        <span v-if="selectedPdfName && imageFile">{{ selectedPdfName }}</span>
+                        <span v-else>{{ tt('Click here to select a receipt or transaction image') }}</span>
                         <small class="margin-top-half">{{ tt('Uploaded image and personal data will be sent to the large language model, please be aware of potential privacy risks.') }}</small>
                     </div>
                     <span v-else-if="loading">{{ tt('Loading image...') }}</span>
@@ -28,7 +29,7 @@
             </div>
         </f7-page-content>
 
-        <input ref="imageInput" type="file" style="display: none" :accept="`${SUPPORTED_IMAGE_EXTENSIONS};capture=camera`" @change="openImage($event)" />
+        <input ref="imageInput" type="file" style="display: none" :accept="SUPPORTED_RECEIPT_RECOGNITION_EXTENSIONS" @change="openImage($event)" />
     </f7-sheet>
 </template>
 
@@ -43,7 +44,7 @@ import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import { ImageUploadQualityType } from '@/core/image.ts';
 import { KnownFileType } from '@/core/file.ts';
-import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
+import { SUPPORTED_RECEIPT_RECOGNITION_EXTENSIONS } from '@/consts/file.ts';
 
 import type { RecognizedTransactionResponse } from '@/models/large_language_model.ts';
 
@@ -77,11 +78,22 @@ const recognizing = ref<boolean>(false);
 const cancelRecognizingUuid = ref<string | undefined>(undefined);
 const imageFile = ref<File | null>(null);
 const imageSrc = ref<string | undefined>(undefined);
+const selectedPdfName = ref<string>('');
 
 function loadImage(image: Blob): void {
     loading.value = true;
     imageFile.value = null;
     imageSrc.value = undefined;
+    selectedPdfName.value = '';
+
+    const selectedFile = image as File;
+
+    if (image.type === 'application/pdf' || /\.pdf$/i.test(selectedFile.name || '')) {
+        imageFile.value = selectedFile; // PDFs are sent as-is; the backend forwards the document to the model
+        selectedPdfName.value = selectedFile.name || 'receipt.pdf';
+        loading.value = false;
+        return;
+    }
 
     compressJpgImageByQuality(image, ImageUploadQualityType.HD720P).then(blob => {
         imageFile.value = KnownFileType.JPG.createFileFromBlob(blob, "image");

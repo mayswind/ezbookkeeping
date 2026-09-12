@@ -2,6 +2,10 @@
     <f7-page ptr @ptr:refresh="reload" @page:afterin="onPageAfterIn">
         <f7-navbar>
             <f7-nav-title :title="tt('global.app.title')"></f7-nav-title>
+            <f7-nav-right v-if="isTransactionFromAIImageRecognitionEnabled()">
+                <f7-link icon-f7="wand_stars" :aria-label="tt('AI Image Recognition')"
+                         @click="showAIReceiptImageRecognitionSheet = true"></f7-link>
+            </f7-nav-right>
         </f7-navbar>
 
         <overview-dashboard :layout="layout" :loading="loading" @navigate="onNavigate" />

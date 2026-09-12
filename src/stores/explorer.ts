@@ -1047,6 +1047,31 @@ export const useExplorersStore = defineStore('explorers', () => {
         return result;
     });
 
+    const filteredTransactionsForCustomChart = computed<TransactionInsightDataItem[]>(() => {
+        if (!allTransactions.value || allTransactions.value.length < 1) {
+            return [];
+        }
+
+        if (!currentExploration.value.queries || currentExploration.value.queries.length < 1) {
+            return allTransactions.value;
+        }
+
+        const result: TransactionInsightDataItem[] = [];
+
+        for (const transaction of allTransactions.value) {
+            const matchOptions: InsightsExplorerMatchContext = buildInsightsExplorerMatchContext(currentExploration.value, transaction);
+
+            for (const query of currentExploration.value.queries) {
+                if (query.match(transaction, matchOptions)) {
+                    result.push(transaction);
+                    break;
+                }
+            }
+        }
+
+        return result;
+    });
+
     const filteredTransactionsInDataTableStatistic = computed<InsightsExplorerTransactionStatisticData>(() => {
         const defaultCurrency = userStore.currentUserDefaultCurrency;
         const statisticData: InsightsExplorerTransactionStatisticData = {
@@ -1941,6 +1966,7 @@ export const useExplorersStore = defineStore('explorers', () => {
         // computed
         isUsingAmountRange,
         filteredTransactionsInDataTable,
+        filteredTransactionsForCustomChart,
         filteredTransactionsInDataTableStatistic,
         categoriedTransactionExplorerData,
         categoriedTransactions,

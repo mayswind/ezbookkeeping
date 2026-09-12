@@ -19,7 +19,8 @@ import {
     TransactionExplorerDataDimensionType,
     TransactionExplorerDataDimension,
     TransactionExplorerValueMetricType,
-    TransactionExplorerValueMetric
+    TransactionExplorerValueMetric,
+    TransactionExplorerCustomChartDisplayLayout
 } from '@/core/explorer.ts';
 
 import { Account } from '@/models/account.ts';
@@ -76,6 +77,8 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
     public amountRangeCount: number;
     public valueMetric: TransactionExplorerValueMetricType;
     public chartSortingType: number;
+    public customChartDisplayLayout: number;
+    public customChartScript: string;
 
     public static readonly Default: InsightsExplorer = new InsightsExplorer(
         '',
@@ -91,10 +94,12 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         TransactionExplorerDataDimension.SeriesDimensionDefault.value,
         5,
         TransactionExplorerValueMetric.Default.value,
-        ChartSortingType.Default.type
+        ChartSortingType.Default.type,
+        TransactionExplorerCustomChartDisplayLayout.Default.type,
+        ''
     );
 
-    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, datatableQuerySource: string, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, amountRangeCount: number, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number) {
+    private constructor(id: string, name: string, displayOrder: number, hidden: boolean, queries: TransactionExplorerQuery[], timezoneUsedForDateRange: number, datatableQuerySource: string, countPerPage: number, chartType: TransactionExplorerChartTypeValue, categoryDimension: TransactionExplorerDataDimensionType, seriesDimension: TransactionExplorerDataDimensionType, amountRangeCount: number, valueMetric: TransactionExplorerValueMetricType, chartSortingType: number, customChartDisplayLayout: number, customChartScript: string) {
         this.id = id;
         this.name = name;
         this.displayOrder = displayOrder;
@@ -109,6 +114,8 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         this.amountRangeCount = amountRangeCount;
         this.valueMetric = valueMetric;
         this.chartSortingType = chartSortingType;
+        this.customChartDisplayLayout = customChartDisplayLayout;
+        this.customChartScript = customChartScript;
     }
 
     public get data(): Record<string, string | number | object[]> {
@@ -122,7 +129,9 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             seriesDimension: this.seriesDimension,
             amountRangeCount: this.amountRangeCount,
             valueMetric: this.valueMetric,
-            chartSortingType: this.chartSortingType
+            chartSortingType: this.chartSortingType,
+            customChartDisplayLayout: this.customChartDisplayLayout,
+            customChartScript: this.customChartScript
         };
     }
 
@@ -159,6 +168,8 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
         let amountRangeCount = InsightsExplorer.Default.amountRangeCount;
         let valueMetric = InsightsExplorer.Default.valueMetric;
         let chartSortingType = InsightsExplorer.Default.chartSortingType;
+        let customChartDisplayLayout = InsightsExplorer.Default.customChartDisplayLayout;
+        let customChartScript = InsightsExplorer.Default.customChartScript;
         let hasDatatableQuerySource = false;
 
         if (data) {
@@ -198,6 +209,14 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
                 chartSortingType = data['chartSortingType'] as number;
             }
 
+            if (typeof data['customChartDisplayLayout'] === 'number') {
+                customChartDisplayLayout = data['customChartDisplayLayout'] as number;
+            }
+
+            if (typeof data['customChartScript'] === 'string') {
+                customChartScript = data['customChartScript'] as string;
+            }
+
             if (Array.isArray(data['queries'])) {
                 const queryItems = data['queries'] as object[];
 
@@ -233,7 +252,9 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             seriesDimension,
             amountRangeCount,
             valueMetric,
-            chartSortingType
+            chartSortingType,
+            customChartDisplayLayout,
+            customChartScript
         );
     }
 
@@ -252,7 +273,9 @@ export class InsightsExplorer implements InsightsExplorerInfoResponse {
             InsightsExplorer.Default.seriesDimension,
             InsightsExplorer.Default.amountRangeCount,
             InsightsExplorer.Default.valueMetric,
-            InsightsExplorer.Default.chartSortingType
+            InsightsExplorer.Default.chartSortingType,
+            InsightsExplorer.Default.customChartDisplayLayout,
+            InsightsExplorer.Default.customChartScript
         );
     }
 }

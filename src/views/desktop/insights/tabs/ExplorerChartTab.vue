@@ -26,6 +26,7 @@
                         :items="allTransactionExplorerDataDimensions"
                         :model-value="TransactionExplorerChartType.valueOf(currentExploration.chartType)?.fixedCategoryDimension ?? currentExploration.categoryDimension"
                         @update:model-value="updateCategoryDimensionType"
+                        v-if="currentExploration.chartType !== TransactionExplorerChartType.Custom.value"
                     />
                     <v-select
                         class="flex-0-0"
@@ -38,6 +39,7 @@
                         :items="allTransactionExplorerDataDimensions"
                         :model-value="TransactionExplorerChartType.valueOf(currentExploration.chartType)?.seriesDimensionRequired ? currentExploration.seriesDimension : TransactionExplorerDataDimension.None.value"
                         @update:model-value="currentExploration.seriesDimension = $event as TransactionExplorerDataDimensionType"
+                        v-if="currentExploration.chartType !== TransactionExplorerChartType.Custom.value"
                     >
                         <template #item="{ props, internalItem }">
                             <v-list-item :disabled="internalItem.value === currentExploration.categoryDimension && internalItem.value !== TransactionExplorerDataDimension.SeriesDimensionDefault.value" v-bind="props">
@@ -57,7 +59,7 @@
                         :label="tt('Number of Amount Ranges')"
                         :items="allAmountRangeCounts"
                         v-model="currentExploration.amountRangeCount"
-                        v-if="isUsingAmountRange"
+                        v-if="currentExploration.chartType !== TransactionExplorerChartType.Custom.value && isUsingAmountRange"
                     />
                     <v-select
                         class="flex-0-0"
@@ -69,6 +71,7 @@
                         :label="tt('Value Metric')"
                         :items="allTransactionExplorerValueMetrics"
                         v-model="currentExploration.valueMetric"
+                        v-if="currentExploration.chartType !== TransactionExplorerChartType.Custom.value"
                     />
                     <v-select
                         class="flex-0-0"
@@ -80,6 +83,19 @@
                         :label="tt('Sort Order')"
                         :items="allTransactionExplorerChartSortingTypes"
                         v-model="currentExploration.chartSortingType"
+                        v-if="currentExploration.chartType !== TransactionExplorerChartType.Custom.value"
+                    />
+                    <v-select
+                        class="flex-0-0"
+                        min-width="150"
+                        item-title="displayName"
+                        item-value="type"
+                        density="compact"
+                        :disabled="loading || disabled"
+                        :label="tt('Display Layout')"
+                        :items="allTransactionExplorerCustomChartDisplayLayouts"
+                        v-model="currentExploration.customChartDisplayLayout"
+                        v-if="currentExploration.chartType === TransactionExplorerChartType.Custom.value"
                     />
                     <v-spacer class="flex-1-1"/>
                 </div>
@@ -241,6 +257,14 @@
             @click="onClickCalendarHeatmapChartItem"
         />
     </v-card-text>
+    <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExploration.chartType === TransactionExplorerChartType.Custom.value">
+        <custom-chart
+            :disabled="loading || disabled"
+            :display-layout="currentExploration.customChartDisplayLayout"
+            :transactions="explorersStore.filteredTransactionsForCustomChart"
+            v-model="currentExploration.customChartScript"
+        />
+    </v-card-text>
 
     <transaction-list-dialog ref="transactionListDialog" @click:transaction="onClickTransaction" />
 </template>
@@ -266,7 +290,13 @@ import {
     useExplorersStore
 } from '@/stores/explorer.ts';
 
-import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, entries } from '@/core/base.ts';
+import {
+    type NameValue,
+    type NameNumeralValue,
+    type TypeAndDisplayName,
+    itemAndIndex,
+    entries
+} from '@/core/base.ts';
 import { type BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import { Month, WeekDay } from '@/core/datetime.ts';
 import { type AxisChartSourceDataItem, ChartValueType } from '@/core/chart.ts';
@@ -335,6 +365,7 @@ const {
     getAllTransactionExplorerDataDimensions,
     getAllTransactionExplorerValueMetrics,
     getAllTransactionExplorerChartTypes,
+    getAllTransactionExplorerCustomChartDisplayLayouts,
     getMonthLongName,
     getMonthdayShortName,
     getWeekdayLongName,
@@ -370,6 +401,7 @@ const allTransactionExplorerDataDimensions = computed<NameValue[]>(() => getAllT
 const allTransactionExplorerValueMetrics = computed<NameValue[]>(() => getAllTransactionExplorerValueMetrics());
 const allTransactionExplorerChartTypes = computed<NameValue[]>(() => getAllTransactionExplorerChartTypes());
 const allTransactionExplorerChartSortingTypes = computed<TypeAndDisplayName[]>(() => getAllStatisticsSortingTypes(true));
+const allTransactionExplorerCustomChartDisplayLayouts = computed<TypeAndDisplayName[]>(() => getAllTransactionExplorerCustomChartDisplayLayouts());
 const currentTransactionExplorerCategoryDimensionName = computed<string>(() => findNameByValue(allTransactionExplorerDataDimensions.value, currentExploration.value.categoryDimension) ?? tt('Unknown'));
 
 const currentExploration = computed<InsightsExplorer>(() => explorersStore.currentExploration);

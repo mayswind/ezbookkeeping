@@ -297,6 +297,13 @@
         "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.3.0/LICENSE"
     },
     {
+        "name": "Monaco Editor",
+        "copyright": "Copyright (c) 2016 - present Microsoft Corporation",
+        "url": "https://microsoft.github.io/monaco-editor/",
+        "license": "MIT License",
+        "licenseUrl": "https://github.com/microsoft/monaco-editor/blob/v0.56.0/LICENSE.txt"
+    },
+    {
         "name": "@vuepic/vue-datepicker",
         "copyright": "Copyright (c) 2021-present Vuepic",
         "url": "https://vue3datepicker.com/",

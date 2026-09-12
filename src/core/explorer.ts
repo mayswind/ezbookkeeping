@@ -1,4 +1,4 @@
-import { type NameValue } from '@/core/base.ts';
+import { type NameValue, type TypeAndName } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { ChartValueType } from '@/core/chart.ts';
 import { ChartSortingType } from '@/core/statistics.ts';
@@ -404,7 +404,8 @@ export enum TransactionExplorerChartTypeValue {
     Treemap = 'treemap',
     Sunburst = 'sunburst',
     Heatmap = 'heatmap',
-    CalendarHeatmap = 'calendarHeatmap'
+    CalendarHeatmap = 'calendarHeatmap',
+    Custom = 'custom'
 }
 
 export class TransactionExplorerChartType implements NameValue {
@@ -429,6 +430,7 @@ export class TransactionExplorerChartType implements NameValue {
     public static readonly Sunburst = new TransactionExplorerChartType('Sunburst Chart', TransactionExplorerChartTypeValue.Sunburst, undefined, true, undefined);
     public static readonly Heatmap = new TransactionExplorerChartType('Heatmap Chart', TransactionExplorerChartTypeValue.Heatmap, undefined, true, undefined);
     public static readonly CalendarHeatmap = new TransactionExplorerChartType('Calendar Heatmap Chart', TransactionExplorerChartTypeValue.CalendarHeatmap, TransactionExplorerDataDimensionType.DateTimeByYearMonthDay, false, ChartSortingType.DisplayOrder.type);
+    public static readonly Custom = new TransactionExplorerChartType('Custom Chart', TransactionExplorerChartTypeValue.Custom, undefined, false, undefined);
 
     public static readonly Default = TransactionExplorerChartType.Pie;
 
@@ -455,6 +457,43 @@ export class TransactionExplorerChartType implements NameValue {
 
     public static valueOf(value: string): TransactionExplorerChartType | undefined {
         return TransactionExplorerChartType.allInstancesByValue[value];
+    }
+}
+
+export class TransactionExplorerCustomChartDisplayLayout implements TypeAndName {
+    private static readonly allInstances: TransactionExplorerCustomChartDisplayLayout[] = [];
+    private static readonly allInstancesByType: Record<number, TransactionExplorerCustomChartDisplayLayout> = {};
+
+    public static readonly CodeAndChart = new TransactionExplorerCustomChartDisplayLayout(0, 'Code and Chart', true, true, false);
+    public static readonly CodeAndChartData = new TransactionExplorerCustomChartDisplayLayout(1, 'Code and Chart Data', true, false, true);
+    public static readonly Chart = new TransactionExplorerCustomChartDisplayLayout(2, 'Chart', false, true, false);
+    public static readonly Code = new TransactionExplorerCustomChartDisplayLayout(3, 'Code', true, false, false);
+
+    public static readonly Default = TransactionExplorerCustomChartDisplayLayout.CodeAndChart;
+
+    public readonly type: number;
+    public readonly name: string;
+    public readonly showCode: boolean;
+    public readonly showChart: boolean;
+    public readonly showChartData: boolean;
+
+    private constructor(type: number, name: string, showCode: boolean = true, showChart: boolean = true, showChartData: boolean = false) {
+        this.type = type;
+        this.name = name;
+        this.showCode = showCode;
+        this.showChart = showChart;
+        this.showChartData = showChartData;
+
+        TransactionExplorerCustomChartDisplayLayout.allInstances.push(this);
+        TransactionExplorerCustomChartDisplayLayout.allInstancesByType[type] = this;
+    }
+
+    public static values(): TransactionExplorerCustomChartDisplayLayout[] {
+        return TransactionExplorerCustomChartDisplayLayout.allInstances;
+    }
+
+    public static valueOf(type: number): TransactionExplorerCustomChartDisplayLayout | undefined {
+        return TransactionExplorerCustomChartDisplayLayout.allInstancesByType[type];
     }
 }
 

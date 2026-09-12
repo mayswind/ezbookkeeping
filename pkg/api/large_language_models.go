@@ -200,7 +200,7 @@ func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext
 	}
 
 	fileExtension := utils.GetFileNameExtension(imageFiles[0].Filename)
-	contentType := utils.GetImageContentType(fileExtension)
+	contentType := utils.GetReceiptFileContentType(fileExtension)
 
 	if contentType == "" {
 		log.Warnf(c, "[large_language_models.RecognizeReceiptImageHandler] the file extension \"%s\" of image in request is not supported for user \"uid:%d\"", fileExtension, uid)
@@ -244,6 +244,7 @@ func (a *LargeLanguageModelsApi) RecognizeReceiptImageHandler(c *core.WebContext
 		"AllAccountNames":          strings.Join(accountNames, "\n"),
 		"AllTagNames":              strings.Join(tagNames, "\n"),
 		"AdditionalNotes":          "",
+		"IncludeReceiptItems":      a.CurrentConfig().ReceiptImageRecognitionIncludeItems,
 	}
 
 	var bodyBuffer bytes.Buffer

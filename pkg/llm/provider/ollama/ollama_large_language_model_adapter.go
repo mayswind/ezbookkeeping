@@ -134,6 +134,10 @@ func (p *OllamaLargeLanguageModelAdapter) buildJsonRequestBody(c core.Context, u
 
 	if len(request.UserPrompt) > 0 {
 		if request.UserPromptType == data.LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL {
+			if request.UserPromptContentType == "application/pdf" {
+				return nil, errs.ErrPdfTypeNotSupportedByLLMProvider
+			}
+
 			imageBase64Data := base64.StdEncoding.EncodeToString(request.UserPrompt)
 			chatRequest.Messages = append(chatRequest.Messages, &OllamaChatRequestMessage{
 				Role:   OllamaMessageRoleUser,

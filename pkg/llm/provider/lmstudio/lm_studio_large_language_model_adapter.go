@@ -128,6 +128,10 @@ func (p *LMStudioLargeLanguageModelAdapter) buildJsonRequestBody(c core.Context,
 
 	if len(request.UserPrompt) > 0 {
 		if request.UserPromptType == data.LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL {
+			if request.UserPromptContentType == "application/pdf" {
+				return nil, errs.ErrPdfTypeNotSupportedByLLMProvider
+			}
+
 			imageBase64Data := "data:" + request.UserPromptContentType + ";base64," + base64.StdEncoding.EncodeToString(request.UserPrompt)
 			chatRequest.Input = append(chatRequest.Input, &LMStudioChatRequestInput{
 				Type:    "image",

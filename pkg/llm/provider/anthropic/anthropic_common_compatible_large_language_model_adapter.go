@@ -186,11 +186,15 @@ func (p *CommonAnthropicMessagesAPILargeLanguageModelAdapter) buildJsonRequestBo
 	if len(request.UserPrompt) > 0 {
 		if request.UserPromptType == data.LARGE_LANGUAGE_MODEL_REQUEST_PROMPT_TYPE_IMAGE_URL {
 			imageBase64Data := base64.StdEncoding.EncodeToString(request.UserPrompt)
+			blockType := "image"
+			if request.UserPromptContentType == "application/pdf" {
+				blockType = "document"
+			}
 			messagesRequest.Messages = append(messagesRequest.Messages, &AnthropicMessagesRequestMessage[[]*AnthropicMessagesRequestImageBlockParam]{
 				Role: AnthropicMessageRoleUser,
 				Content: []*AnthropicMessagesRequestImageBlockParam{
 					{
-						Type: "image",
+						Type: blockType,
 						Source: &AnthropicMessagesRequestBase64ImageSource{
 							Data:      imageBase64Data,
 							MediaType: request.UserPromptContentType,

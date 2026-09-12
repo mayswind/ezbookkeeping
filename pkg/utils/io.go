@@ -15,9 +15,29 @@ var imageFileExtensionContentTypeMap = map[string]string{
 	"webp": "image/webp",
 }
 
+var receiptFileExtensionContentTypeMap = map[string]string{
+	"jpg":  "image/jpeg",
+	"jpeg": "image/jpeg",
+	"png":  "image/png",
+	"gif":  "image/gif",
+	"webp": "image/webp",
+	"pdf":  "application/pdf",
+}
+
 // GetImageContentType returns the content type of specified image file extension or returns empty when the file extension is not image or not supported
 func GetImageContentType(fileExtension string) string {
 	contentType, exists := imageFileExtensionContentTypeMap[fileExtension]
+
+	if !exists {
+		return ""
+	}
+
+	return contentType
+}
+
+// GetReceiptFileContentType returns the content type of a supported receipt file (image or PDF) extension, or returns empty when the file extension is not supported
+func GetReceiptFileContentType(fileExtension string) string {
+	contentType, exists := receiptFileExtensionContentTypeMap[fileExtension]
 
 	if !exists {
 		return ""

@@ -422,7 +422,7 @@ import BatchReplaceDialog, { type BatchReplaceDialogDataType } from '../dialogs/
 import BatchReplaceAllTypesDialog from '../dialogs/BatchReplaceAllTypesDialog.vue';
 import BatchCreateDialog, { type BatchCreateDialogDataType } from '../dialogs/BatchCreateDialog.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useTransactionTagSelectionBase } from '@/components/base/TransactionTagSelectionBase.ts';
@@ -1654,6 +1654,18 @@ function selectNoneInThisPage(): void {
     }
 }
 
+function clearSelectedTransactionsNotDisplayed(): void {
+    if (!props.importTransactions) {
+        return;
+    }
+
+    for (const importTransaction of props.importTransactions) {
+        if (importTransaction.selected && !isTransactionDisplayed(importTransaction)) {
+            importTransaction.selected = false;
+        }
+    }
+}
+
 function selectInvertInThisPage(): void {
     for (const importTransaction of currentPageTransactions.value) {
         importTransaction.selected = !importTransaction.selected;
@@ -2303,6 +2315,13 @@ function reset(): void {
 function setCountPerPage(count: number): void {
     countPerPage.value = count;
 }
+
+watch(filters, () => {
+    clearSelectedTransactionsNotDisplayed();
+    currentPage.value = 1;
+}, {
+    deep: true
+});
 
 defineExpose({
     filterMenus,

@@ -410,7 +410,7 @@
                                  @dateRange:change="changeCustomDateFilter"
                                  @error="onShowDateRangeError" />
     <batch-replace-dialog ref="batchReplaceDialog" />
-    <batch-replace-all-types-dialog ref="batchReplaceAllTypesDialog" />
+    <batch-apply-rules-dialog ref="batchApplyRulesDialog" />
     <batch-create-dialog ref="batchCreateDialog" />
     <snack-bar ref="snackbar" />
 </template>
@@ -419,7 +419,7 @@
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import BatchReplaceDialog, { type BatchReplaceDialogDataType } from '../dialogs/BatchReplaceDialog.vue';
-import BatchReplaceAllTypesDialog from '../dialogs/BatchReplaceAllTypesDialog.vue';
+import BatchApplyRulesDialog from '../dialogs/BatchApplyRulesDialog.vue';
 import BatchCreateDialog, { type BatchCreateDialogDataType } from '../dialogs/BatchCreateDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -466,11 +466,11 @@ import { formatCoordinate } from '@/lib/coordinate.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { getAccountMapByName } from '@/lib/account.ts';
 import {
-    transactionTypeToCategoryType,
     getSecondaryTransactionMapByName,
     getTransactionPrimaryCategoryName,
     getTransactionSecondaryCategoryName
 } from '@/lib/category.ts';
+import { applyImportTransactionReplaceRules } from '@/lib/rule.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
 
 import {
@@ -488,16 +488,13 @@ import {
     mdiTextBoxEditOutline,
     mdiFilterOffOutline,
     mdiPlus,
-    mdiPencilBoxMultipleOutline,
-    mdiNumericPositive1,
-    mdiNumericNegative1,
     mdiComma,
     mdiKeyboardTab
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchReplaceDialogType = InstanceType<typeof BatchReplaceDialog>;
-type BatchReplaceAllTypesDialogType = InstanceType<typeof BatchReplaceAllTypesDialog>;
+type BatchApplyRulesDialogType = InstanceType<typeof BatchApplyRulesDialog>;
 type BatchCreateDialogType = InstanceType<typeof BatchCreateDialog>;
 
 interface ImportTransactionCheckDataFilter {
@@ -554,7 +551,7 @@ const exchangeRatesStore = useExchangeRatesStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchReplaceDialog = useTemplateRef<BatchReplaceDialogType>('batchReplaceDialog');
-const batchReplaceAllTypesDialog = useTemplateRef<BatchReplaceAllTypesDialogType>('batchReplaceAllTypesDialog');
+const batchApplyRulesDialog = useTemplateRef<BatchApplyRulesDialogType>('batchApplyRulesDialog');
 const batchCreateDialog = useTemplateRef<BatchCreateDialogType>('batchCreateDialog');
 
 const editingTransaction = ref<ImportTransaction | null>(null);
@@ -593,7 +590,24 @@ const allAccountsMap = computed<Record<string, Account>>(() => accountsStore.all
 const allAccountsMapByName = computed<Record<string, Account>>(() => getAccountMapByName(accountsStore.allAccounts));
 const allCategories = computed<Record<number, TransactionCategory[]>>(() => transactionCategoriesStore.allTransactionCategories);
 const allCategoriesMap = computed<Record<string, TransactionCategory>>(() => transactionCategoriesStore.allTransactionCategoriesMap);
+const allSecondaryCategoriesMapByName = computed<Record<number, Record<string, TransactionCategory>>>(() => ({
+    [CategoryType.Expense]: getSecondaryTransactionMapByName(allCategories.value[CategoryType.Expense]),
+    [CategoryType.Income]: getSecondaryTransactionMapByName(allCategories.value[CategoryType.Income]),
+    [CategoryType.Transfer]: getSecondaryTransactionMapByName(allCategories.value[CategoryType.Transfer])
+}));
 const allTagsMap = computed<Record<string, TransactionTag>>(() => transactionTagsStore.allTransactionTagsMap);
+
+const allInvalidExpenseCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Expense));
+const allInvalidIncomeCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Income));
+const allInvalidTransferCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Transfer));
+const allInvalidAccountNames = computed<NameValue[]>(() => getCurrentInvalidAccountNames());
+const allInvalidTransactionTagNames = computed<NameValue[]>(() => getCurrentInvalidTagNames());
+const allOriginalExpenseCategoryNames = computed<NameValue[]>(() => getAllOriginalCategoryNames(TransactionType.Expense));
+const allOriginalIncomeCategoryNames = computed<NameValue[]>(() => getAllOriginalCategoryNames(TransactionType.Income));
+const allOriginalTransferCategoryNames = computed<NameValue[]>(() => getAllOriginalCategoryNames(TransactionType.Transfer));
+const allOriginalSourceAccountNames = computed<NameValue[]>(() => getAllOriginalAccountNames(false));
+const allOriginalDestinationAccountNames = computed<NameValue[]>(() => getAllOriginalAccountNames(true));
+const allOriginalTransactionTagNames = computed<NameValue[]>(() => getAllOriginalTagNames());
 
 const hasVisibleExpenseCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleExpenseCategories);
 const hasVisibleIncomeCategories = computed<boolean>(() => transactionCategoriesStore.hasVisibleIncomeCategories);
@@ -820,9 +834,9 @@ const filterMenus = computed<ImportTransactionCheckDataMenuGroup[]>(() => [
 const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
     {
         prependIcon: mdiTextBoxEditOutline,
-        title: tt('Batch Replace Categories / Accounts / Tags'),
+        title: tt('Batch Apply Rules'),
         disabled: isEditing.value,
-        onClick: showReplaceAllTypesDialog
+        onClick: showBatchApplyRulesDialog
     },
     {
         prependIcon: mdiTextBoxEditOutline,
@@ -928,56 +942,6 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
         title: tt('Create Nonexistent Transaction Tags'),
         disabled: isEditing.value || !allInvalidTransactionTagNames.value || allInvalidTransactionTagNames.value.length < 1,
         onClick: () => showBatchCreateInvalidItemDialog('tag', allInvalidTransactionTagNames.value)
-    },
-    {
-        prependIcon: mdiPencilBoxMultipleOutline,
-        title: tt('Batch Convert Expense Transaction to Income Transaction'),
-        disabled: isEditing.value || selectedExpenseTransactionCount.value < 1,
-        divider: true,
-        onClick: () => convertTransactionType(TransactionType.Expense, TransactionType.Income)
-    },
-    {
-        prependIcon: mdiPencilBoxMultipleOutline,
-        title: tt('Batch Convert Expense Transaction to Transfer Transaction'),
-        disabled: isEditing.value || selectedExpenseTransactionCount.value < 1,
-        onClick: () => convertTransactionType(TransactionType.Expense, TransactionType.Transfer)
-    },
-    {
-        prependIcon: mdiPencilBoxMultipleOutline,
-        title: tt('Batch Convert Income Transaction to Expense Transaction'),
-        disabled: isEditing.value || selectedIncomeTransactionCount.value < 1,
-        onClick: () => convertTransactionType(TransactionType.Income, TransactionType.Expense)
-    },
-    {
-        prependIcon: mdiPencilBoxMultipleOutline,
-        title: tt('Batch Convert Income Transaction to Transfer Transaction'),
-        disabled: isEditing.value || selectedIncomeTransactionCount.value < 1,
-        onClick: () => convertTransactionType(TransactionType.Income, TransactionType.Transfer)
-    },
-    {
-        prependIcon: mdiPencilBoxMultipleOutline,
-        title: tt('Batch Convert Transfer Transaction to Expense Transaction'),
-        disabled: isEditing.value || selectedTransferTransactionCount.value < 1,
-        onClick: () => convertTransactionType(TransactionType.Transfer, TransactionType.Expense)
-    },
-    {
-        prependIcon: mdiPencilBoxMultipleOutline,
-        title: tt('Batch Convert Transfer Transaction to Income Transaction'),
-        disabled: isEditing.value || selectedTransferTransactionCount.value < 1,
-        onClick: () => convertTransactionType(TransactionType.Transfer, TransactionType.Income)
-    },
-    {
-        prependIcon: mdiNumericPositive1,
-        title: tt('Batch Convert Selected Amounts to Positive Values'),
-        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
-        divider: true,
-        onClick: () => convertTransactionAmountSign(1)
-    },
-    {
-        prependIcon: mdiNumericNegative1,
-        title: tt('Batch Convert Selected Amounts to Negative Values'),
-        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
-        onClick: () => convertTransactionAmountSign(-1)
     },
     {
         prependIcon: mdiComma,
@@ -1204,13 +1168,6 @@ const allUsedTagNames = computed<string[]>(() => {
 
     return objectFieldToArrayItem(tagNames);
 });
-
-const allInvalidExpenseCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Expense));
-const allInvalidIncomeCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Income));
-const allInvalidTransferCategoryNames = computed<NameValue[]>(() => getCurrentInvalidCategoryNames(TransactionType.Transfer));
-const allInvalidAccountNames = computed<NameValue[]>(() => getCurrentInvalidAccountNames());
-const allInvalidTransactionTagNames = computed<NameValue[]>(() => getCurrentInvalidTagNames());
-const allOriginalTransactionTagNames = computed<NameValue[]>(() => getAllOriginalTagNames());
 
 const displayFilterCustomDateRange = computed<string>(() => {
     if (filters.value.minDatetime === null || filters.value.maxDatetime === null) {
@@ -1544,6 +1501,56 @@ function getTransactionDescriptionTooltip(transaction: ImportTransaction): strin
     } else {
         return '';
     }
+}
+
+function getAllOriginalCategoryNames(transactionType: TransactionType): NameValue[] {
+    const categoryNames: Record<string, boolean> = {};
+    const categories: NameValue[] = [];
+
+    if (!props.importTransactions || props.importTransactions.length < 1) {
+        return categories;
+    }
+
+    for (const importTransaction of props.importTransactions) {
+        if (importTransaction.type === transactionType) {
+            categoryNames[importTransaction.originalCategoryName] = true;
+        }
+    }
+
+    for (const name of keys(categoryNames)) {
+        categories.push({
+            name: name || tt('(Empty)'),
+            value: name
+        });
+    }
+
+    return categories;
+}
+
+function getAllOriginalAccountNames(destination: boolean): NameValue[] {
+    const accountNames: Record<string, boolean> = {};
+    const accounts: NameValue[] = [];
+
+    if (!props.importTransactions || props.importTransactions.length < 1) {
+        return accounts;
+    }
+
+    for (const importTransaction of props.importTransactions) {
+        if (destination && importTransaction.type === TransactionType.Transfer) {
+            accountNames[importTransaction.originalDestinationAccountName || ''] = true;
+        } else if (!destination) {
+            accountNames[importTransaction.originalSourceAccountName] = true;
+        }
+    }
+
+    for (const name of keys(accountNames)) {
+        accounts.push({
+            name: name || tt('(Empty)'),
+            value: name
+        });
+    }
+
+    return accounts;
 }
 
 function getAllOriginalTagNames(): NameValue[] {
@@ -1989,78 +1996,36 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
     });
 }
 
-function showReplaceAllTypesDialog(): void {
+function showBatchApplyRulesDialog(): void {
     if (isEditing.value) {
         return;
     }
 
-    batchReplaceAllTypesDialog.value?.open({
-        expenseCategoryNames: allInvalidExpenseCategoryNames.value,
-        incomeCategoryNames: allInvalidIncomeCategoryNames.value,
-        transferCategoryNames: allInvalidTransferCategoryNames.value,
-        accountNames: allInvalidAccountNames.value,
-        tagNames: allInvalidTransactionTagNames.value
+    batchApplyRulesDialog.value?.open({
+        expenseCategoryNames: allOriginalExpenseCategoryNames.value,
+        incomeCategoryNames: allOriginalIncomeCategoryNames.value,
+        transferCategoryNames: allOriginalTransferCategoryNames.value,
+        sourceAccountNames: allOriginalSourceAccountNames.value,
+        destinationAccountNames: allOriginalDestinationAccountNames.value,
+        tagNames: allOriginalTransactionTagNames.value,
+        selectedTransactionCount: selectedImportTransactionCount.value
     }).then(result => {
-        if (!result || !result.rules) {
+        if (!result || !result.rules || !result.scope) {
             return;
         }
 
-        let updatedCount = 0;
+        const applyResult = applyImportTransactionReplaceRules(props.importTransactions || [], result.rules, result.scope, {
+            allCategoriesMap: allCategoriesMap.value,
+            allSecondaryCategoriesMapByName: allSecondaryCategoriesMapByName.value,
+            allAccountsMap: allAccountsMap.value,
+            allAccountsMapByName: allAccountsMapByName.value,
+            allTagsMap: allTagsMap.value,
+            updateTransaction: updateTransactionData
+        });
 
-        if (props.importTransactions) {
-            for (const importTransaction of props.importTransactions) {
-                let updated = false;
-
-                for (const rule of result.rules) {
-                    if (!rule || !rule.dataType || !rule.targetId) {
-                        continue;
-                    }
-
-                    if (rule.dataType === 'expenseCategory' || rule.dataType === 'incomeCategory' || rule.dataType === 'transferCategory') {
-                        if (importTransaction.type !== TransactionType.ModifyBalance && importTransaction.originalCategoryName === rule.sourceValue) {
-                            if (rule.dataType === 'expenseCategory' && importTransaction.type === TransactionType.Expense) {
-                                importTransaction.categoryId = rule.targetId;
-                                updated = true;
-                            } else if (rule.dataType === 'incomeCategory' && importTransaction.type === TransactionType.Income) {
-                                importTransaction.categoryId = rule.targetId;
-                                updated = true;
-                            } else if (rule.dataType === 'transferCategory' && importTransaction.type === TransactionType.Transfer) {
-                                importTransaction.categoryId = rule.targetId;
-                                updated = true;
-                            }
-                        }
-                    } else if (rule.dataType === 'account') {
-                        if (importTransaction.originalSourceAccountName === rule.sourceValue) {
-                            importTransaction.sourceAccountId = rule.targetId;
-                            updated = true;
-                        }
-
-                        if (importTransaction.type === TransactionType.Transfer && importTransaction.originalDestinationAccountName === rule.sourceValue) {
-                            importTransaction.destinationAccountId = rule.targetId;
-                            updated = true;
-                        }
-                    } else if (rule.dataType === 'tag' && importTransaction.tagIds) {
-                        for (let tagIndex = 0; tagIndex < importTransaction.tagIds.length; tagIndex++) {
-                            const originalTagName = importTransaction.originalTagNames ? (importTransaction.originalTagNames[tagIndex] ?? '') : '';
-
-                            if (originalTagName === rule.sourceValue) {
-                                importTransaction.tagIds[tagIndex] = rule.targetId;
-                                updated = true;
-                            }
-                        }
-                    }
-                }
-
-                if (updated) {
-                    updatedCount++;
-                    updateTransactionData(importTransaction);
-                }
-            }
-        }
-
-        if (updatedCount > 0) {
+        if (applyResult.updatedTransactionCount > 0) {
             snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
-                count: formatNumberToLocalizedNumerals(updatedCount)
+                count: formatNumberToLocalizedNumerals(applyResult.updatedTransactionCount)
             });
         }
     });
@@ -2134,66 +2099,6 @@ function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, inval
             });
         }
     });
-}
-
-function convertTransactionType(fromType: TransactionType, toType: TransactionType): void {
-    if (!props.importTransactions || props.importTransactions.length < 1) {
-        return;
-    }
-
-    const categoryType = transactionTypeToCategoryType(toType);
-
-    if (!categoryType) {
-        return;
-    }
-
-    const categoryMapByName: Record<string, TransactionCategory> = getSecondaryTransactionMapByName(allCategories.value[categoryType]);
-
-    for (const importTransaction of props.importTransactions) {
-        if (!importTransaction.selected || importTransaction.type !== fromType) {
-            continue;
-        }
-
-        importTransaction.type = toType;
-        importTransaction.categoryId = categoryMapByName[importTransaction.originalCategoryName]?.id || '0';
-
-        if (importTransaction.type === TransactionType.Transfer) {
-            importTransaction.destinationAccountId = allAccountsMapByName.value[importTransaction.originalDestinationAccountName || '']?.id || '0';
-            importTransaction.destinationAmount = importTransaction.sourceAmount;
-        } else {
-            if (fromType === TransactionType.Transfer && toType === TransactionType.Income) {
-                importTransaction.sourceAccountId = importTransaction.destinationAccountId;
-                importTransaction.sourceAmount = importTransaction.destinationAmount;
-            }
-
-            importTransaction.destinationAccountId = '0';
-            importTransaction.destinationAmount = 0;
-        }
-
-        updateTransactionData(importTransaction);
-    }
-}
-
-function convertTransactionAmountSign(toSign: number): void {
-    if (!props.importTransactions || props.importTransactions.length < 1) {
-        return;
-    }
-
-    for (const importTransaction of props.importTransactions) {
-        if (!importTransaction.selected) {
-            continue;
-        }
-
-        if (toSign > 0) {
-            importTransaction.sourceAmount = Math.abs(importTransaction.sourceAmount);
-            importTransaction.destinationAmount = Math.abs(importTransaction.destinationAmount);
-        } else if (toSign < 0) {
-            importTransaction.sourceAmount = -Math.abs(importTransaction.sourceAmount);
-            importTransaction.destinationAmount = -Math.abs(importTransaction.destinationAmount);
-        }
-
-        updateTransactionData(importTransaction);
-    }
 }
 
 function changeCustomDateFilter(minTime: number, maxTime: number): void {

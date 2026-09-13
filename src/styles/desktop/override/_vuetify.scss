@@ -258,21 +258,32 @@
 
 .v-btn-group {
     &.v-btn-group--density-compact {
-        height: 1.8rem !important;
+        height: 1.8rem;
     }
 
     &.v-btn-group--density-comfortable {
         height: 2.375rem;
     }
 
-    &.v-btn-group--divided .v-btn:not(:last-child) {
+    > .v-btn--variant-outlined {
+        &.text-primary {
+            border-color: currentColor;
+        }
+    }
+
+    &.v-btn-group--divided > .v-btn--variant-outlined:not(:last-child) {
         border-inline-end-color: rgba(var(--v-border-color), var(--v-border-opacity));
+
+        &.text-primary {
+            border-inline-end-color: currentColor;
+        }
     }
 }
 
 .dialog-layout-card {
     > .dialog-layout-card-title {
-        .v-btn {
+        .v-btn,
+        .v-btn-group {
             min-height: 30px;
         }
 

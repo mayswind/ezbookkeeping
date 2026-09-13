@@ -154,6 +154,10 @@ import {
 } from '@/core/import_transaction.ts';
 
 import {
+    ImportTransactionReplaceRuleConditionField
+} from '@/core/rule.ts';
+
+import {
     ScheduledTemplateFrequencyType
 } from '@/core/template.ts';
 
@@ -2695,6 +2699,7 @@ export function useI18n() {
         getAllTransactionQuickAddButtonActionTypes: () => getLocalizedDisplayNameAndType(TransactionQuickAddButtonActionType.values()),
         getAllTransactionScheduledFrequencyTypes: () => getLocalizedDisplayNameAndType(ScheduledTemplateFrequencyType.values()),
         getAllImportTransactionColumnTypes: () => getLocalizedDisplayNameAndType(ImportTransactionColumnType.values()),
+        getAllImportTransactionReplaceRuleConditionFields: () => getLocalizedNameValue(ImportTransactionReplaceRuleConditionField.values()),
         getAllTransactionDefaultCategories,
         getAllDisplayExchangeRates,
         getAllSupportedImportFileCagtegoryAndTypes,

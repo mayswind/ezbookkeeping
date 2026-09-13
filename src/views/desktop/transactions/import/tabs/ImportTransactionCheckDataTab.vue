@@ -487,7 +487,7 @@ import {
     mdiPound,
     mdiTextBoxEditOutline,
     mdiFilterOffOutline,
-    mdiShapePlusOutline,
+    mdiPlus,
     mdiPencilBoxMultipleOutline,
     mdiNumericPositive1,
     mdiNumericNegative1,
@@ -905,26 +905,26 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
         onClick: () => showReplaceInvalidItemDialog('tag', allInvalidTransactionTagNames.value)
     },
     {
-        prependIcon: mdiShapePlusOutline,
+        prependIcon: mdiPlus,
         title: tt('Create Nonexistent Expense Categories'),
         disabled: isEditing.value || !allInvalidExpenseCategoryNames.value || allInvalidExpenseCategoryNames.value.length < 1,
         divider: true,
         onClick: () => showBatchCreateInvalidItemDialog('expenseCategory', allInvalidExpenseCategoryNames.value)
     },
     {
-        prependIcon: mdiShapePlusOutline,
+        prependIcon: mdiPlus,
         title: tt('Create Nonexistent Income Categories'),
         disabled: isEditing.value || !allInvalidIncomeCategoryNames.value || allInvalidIncomeCategoryNames.value.length < 1,
         onClick: () => showBatchCreateInvalidItemDialog('incomeCategory', allInvalidIncomeCategoryNames.value)
     },
     {
-        prependIcon: mdiShapePlusOutline,
+        prependIcon: mdiPlus,
         title: tt('Create Nonexistent Transfer Categories'),
         disabled: isEditing.value || !allInvalidTransferCategoryNames.value || allInvalidTransferCategoryNames.value.length < 1,
         onClick: () => showBatchCreateInvalidItemDialog('transferCategory', allInvalidTransferCategoryNames.value)
     },
     {
-        prependIcon: mdiShapePlusOutline,
+        prependIcon: mdiPlus,
         title: tt('Create Nonexistent Transaction Tags'),
         disabled: isEditing.value || !allInvalidTransactionTagNames.value || allInvalidTransactionTagNames.value.length < 1,
         onClick: () => showBatchCreateInvalidItemDialog('tag', allInvalidTransactionTagNames.value)

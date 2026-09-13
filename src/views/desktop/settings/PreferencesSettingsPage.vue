@@ -104,6 +104,17 @@
                                     v-model="showAddTransactionButtonInDesktopNavbar"
                                 />
                             </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="value"
+                                    persistent-placeholder
+                                    :label="tt('Show Transaction Categories Button')"
+                                    :placeholder="tt('Show Transaction Categories Button')"
+                                    :items="enableDisableOptions"
+                                    v-model="showTransactionCategoriesButtonInDesktopNavbar"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -598,6 +609,11 @@ const desktopOverviewPageLayoutDisplayContent = computed(() => {
 const showAddTransactionButtonInDesktopNavbar = computed<boolean>({
     get: () => settingsStore.appSettings.showAddTransactionButtonInDesktopNavbar,
     set: (value) => settingsStore.setShowAddTransactionButtonInDesktopNavbar(value)
+});
+
+const showTransactionCategoriesButtonInDesktopNavbar = computed<boolean>({
+    get: () => settingsStore.appSettings.showTransactionCategoriesButtonInDesktopNavbar,
+    set: (value) => settingsStore.setShowTransactionCategoriesButtonInDesktopNavbar(value)
 });
 
 const rememberLastSelectedFileTypeInImportTransactionDialog = computed<boolean>({

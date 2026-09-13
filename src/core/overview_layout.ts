@@ -10,6 +10,7 @@ export enum OverviewWidgetType {
     IncomeExpenseTrend = 'income-expense-trend',
     NetAssetsTrend = 'net-assets-trend',
     ExpenseCategoryRanking = 'expense-category-ranking',
+    CategoryBudget = 'category-budget',
     RecentTransactions = 'recent-transactions',
     TransactionCalendar = 'transaction-calendar',
     TransactionCalendarHeatmap = 'transaction-calendar-heatmap'

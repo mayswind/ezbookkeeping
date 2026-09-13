@@ -13,6 +13,17 @@
             </f7-nav-right>
         </f7-navbar>
 
+        <f7-block strong inset class="category-budget-month margin-top-half margin-bottom-half"
+                  v-if="categoryType === CategoryType.Expense">
+            <div class="display-flex align-items-center justify-content-space-between">
+                <f7-link icon-f7="chevron_left" :class="{ disabled: loading || budgetStatisticsLoading }"
+                         :aria-label="tt('Previous Month')" @click="switchBudgetMonth(-1)" />
+                <span>{{ selectedBudgetMonthText }}</span>
+                <f7-link icon-f7="chevron_right" :class="{ disabled: loading || budgetStatisticsLoading }"
+                         :aria-label="tt('Next Month')" @click="switchBudgetMonth(1)" />
+            </div>
+        </f7-block>
+
         <f7-list strong inset dividers class="margin-top-half skeleton-text" v-if="loading">
             <f7-list-item title="Category Name"
                           :link="hasSubCategories ? '#' : null"
@@ -36,9 +47,9 @@
                  @sortable:sort="onSort">
             <f7-list-item swipeout
                           :class="{ 'actual-first-child': category.id === firstShowingId, 'actual-last-child': category.id === lastShowingId }"
+                          :style="getCategoryBudgetRowStyle(category)"
                           :id="getCategoryDomId(category)"
                           :title="category.name"
-                          :footer="category.comment"
                           :link="hasSubCategories ? '/category/list?type=' + categoryType + '&id=' + category.id : null"
                           :key="category.id"
                           v-for="category in categories"
@@ -50,6 +61,15 @@
                             <f7-icon f7="eye_slash_fill"></f7-icon>
                         </f7-badge>
                     </ItemIcon>
+                </template>
+                <template #after v-if="getBudgetProgress(category.id)">
+                    <span class="category-budget-amount">{{ getCategoryBudgetSummary(category) }}</span>
+                </template>
+                <template #footer v-if="category.comment || getCategoryBudgetOverrun(category)">
+                    <span>{{ category.comment }}</span>
+                    <span class="text-color-red" v-if="getCategoryBudgetOverrun(category)">
+                        {{ category.comment ? ' · ' : '' }}{{ getCategoryBudgetOverrun(category) }}
+                    </span>
                 </template>
                 <f7-swipeout-actions :left="textDirection === TextDirection.LTR"
                                      :right="textDirection === TextDirection.RTL"
@@ -102,8 +122,12 @@ import type { Router } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPageBase.ts';
+import { useCategoryBudgetStatisticsBase } from '@/views/base/categories/CategoryBudgetStatisticsBase.ts';
+import { useCategoryBudgetProgressBase } from '@/views/base/categories/CategoryBudgetProgressBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useAccountsStore } from '@/stores/account.ts';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { TextDirection } from '@/core/text.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -121,11 +145,23 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
+const query = props.f7route.query;
+
 const { tt, getCurrentLanguageTextDirection } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
+const accountsStore = useAccountsStore();
+const exchangeRatesStore = useExchangeRatesStore();
+const {
+    selectedBudgetMonthText,
+    budgetStatistics,
+    budgetStatisticsLoading,
+    changeBudgetMonth,
+    loadBudgetStatistics
+} = useCategoryBudgetStatisticsBase(query['month']);
+const { getBudgetProgress, getBudgetAmountText } = useCategoryBudgetProgressBase(budgetStatistics);
 
 const hasSubCategories = ref<boolean>(false);
 const categoryType = ref<CategoryType | 0>(0);
@@ -206,8 +242,6 @@ function parseCategoryIdFromDomId(domId: string): string | null {
 }
 
 function init(): void {
-    const query = props.f7route.query;
-
     categoryType.value = parseInt(query['type'] || '0');
 
     if (categoryType.value !== CategoryType.Income &&
@@ -228,9 +262,12 @@ function init(): void {
 
     loading.value = true;
 
-    transactionCategoriesStore.loadAllCategories({
-        force: false
-    }).then(() => {
+    Promise.all([
+        transactionCategoriesStore.loadAllCategories({ force: false }),
+        accountsStore.loadAllAccounts({ force: false }),
+        exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false }).catch(() => undefined),
+        categoryType.value === CategoryType.Expense ? loadBudgetStatistics() : Promise.resolve()
+    ]).then(() => {
         loading.value = false;
     }).catch(error => {
         if (error.processed) {
@@ -250,9 +287,18 @@ function reload(done?: () => void): void {
 
     const force = !!done;
 
-    transactionCategoriesStore.loadAllCategories({
-        force: force
-    }).then(() => {
+    const categoriesPromise = transactionCategoriesStore.loadAllCategories({ force }).catch(error => {
+        if (error?.isUpToDate) {
+            return transactionCategoriesStore.allTransactionCategories;
+        }
+
+        throw error;
+    });
+
+    Promise.all([
+        categoriesPromise,
+        categoryType.value === CategoryType.Expense ? loadBudgetStatistics() : Promise.resolve()
+    ]).then(() => {
         done?.();
 
         if (force) {
@@ -265,6 +311,50 @@ function reload(done?: () => void): void {
             showToast(error.message || error);
         }
     });
+}
+
+function switchBudgetMonth(offset: number): void {
+    changeBudgetMonth(offset).catch(error => {
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function getCategoryBudgetSummary(category: TransactionCategory): string {
+    const progress = getBudgetProgress(category.id);
+
+    if (!progress) {
+        return '';
+    }
+
+    return `${getBudgetAmountText(progress.spent, category.budgetCurrency, progress.incomplete)} / ${getBudgetAmountText(progress.limit, category.budgetCurrency)}`;
+}
+
+function getCategoryBudgetOverrun(category: TransactionCategory): string {
+    const progress = getBudgetProgress(category.id);
+
+    if (!progress?.overrun.isPositive()) {
+        return '';
+    }
+
+    return `${tt('Over Budget')}: ${getBudgetAmountText(progress.overrun, category.budgetCurrency)}`;
+}
+
+function getCategoryBudgetRowStyle(category: TransactionCategory): Record<string, string> | undefined {
+    const progress = getBudgetProgress(category.id);
+
+    if (!progress) {
+        return undefined;
+    }
+
+    const percent = Math.max(0, Math.min(100, progress.percent));
+    const opacity = progress.percent >= 100 ? '42' : (progress.percent >= 80 ? '32' : '22');
+    const color = progress.overrun.isPositive() ? '#f44336' : `#${category.color}`;
+
+    return {
+        backgroundImage: `linear-gradient(to right, ${color}${opacity} 0%, ${color}${opacity} ${percent}%, transparent ${percent}%, transparent 100%)`
+    };
 }
 
 function edit(category: TransactionCategory): void {
@@ -431,5 +521,17 @@ init();
 
 .category-list .item-footer {
     padding-top: 4px;
+}
+
+.category-budget-month {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.category-budget-amount {
+    max-width: 45vw;
+    font-size: 0.8rem;
+    white-space: normal;
+    text-align: end;
 }
 </style>

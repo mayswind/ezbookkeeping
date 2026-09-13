@@ -40,6 +40,20 @@
                                                 <v-icon :icon="mdiMenu" size="24" />
                                             </v-btn>
                                             <span>{{ tt('Transaction Categories') }}</span>
+                                            <div class="category-budget-month-selector d-flex align-center ms-4"
+                                                 v-if="activeCategoryType === CategoryType.Expense">
+                                                <v-btn density="compact" color="default" variant="text" :icon="true"
+                                                       :disabled="loading || budgetStatisticsLoading"
+                                                       :aria-label="tt('Previous Month')" @click="switchBudgetMonth(-1)">
+                                                    <v-icon :icon="mdiChevronLeft" size="22" />
+                                                </v-btn>
+                                                <span class="text-body-medium text-no-wrap mx-1">{{ selectedBudgetMonthText }}</span>
+                                                <v-btn density="compact" color="default" variant="text" :icon="true"
+                                                       :disabled="loading || budgetStatisticsLoading"
+                                                       :aria-label="tt('Next Month')" @click="switchBudgetMonth(1)">
+                                                    <v-icon :icon="mdiChevronRight" size="22" />
+                                                </v-btn>
+                                            </div>
                                             <v-btn class="ms-3" color="default" variant="outlined"
                                                    :disabled="loading || updating" @click="add">{{ tt('Add') }}</v-btn>
                                             <v-btn class="ms-3" color="primary" variant="tonal"
@@ -118,7 +132,7 @@
                                             <template #item="{ element }">
                                                 <tr class="transaction-category-table-row" v-if="showHidden || !element.hidden"
                                                     @mouseenter="hoveredCategoryId = element.id" @mouseleave="hoveredCategoryId = ''">
-                                                    <td>
+                                                    <td :style="getCategoryBudgetRowStyle(element)">
                                                         <div class="d-flex align-center">
                                                             <div class="d-flex align-center" :class="{ 'cursor-pointer': isCategorySupportSwitch(element) }"
                                                                  @click="switchPrimaryCategory(element)">
@@ -133,7 +147,28 @@
 
                                                             <v-spacer/>
 
-                                                            <template v-if="hoveredCategoryId === element.id && !loading">
+                                                            <template :key="budgetProgress.category.id" v-for="budgetProgress in getBudgetProgressItems(element.id)">
+                                                                <div class="category-budget-status d-flex justify-end ms-3" v-if="budgetProgress">
+                                                                    <v-chip class="category-budget-chip" size="small" variant="tonal"
+                                                                            :color="budgetProgress.overrun.isPositive() ? 'error' : 'default'">
+                                                                        <v-icon start :icon="mdiWalletOutline" size="16" />
+                                                                        {{ getBudgetAmountText(budgetProgress.limit, element.budgetCurrency) }}
+                                                                        <v-tooltip activator="parent">
+                                                                            {{ tt('Spent') }}:
+                                                                            {{ getBudgetAmountText(budgetProgress.spent, element.budgetCurrency, budgetProgress.incomplete) }}
+                                                                            ·
+                                                                            {{ formatPercentToLocalizedNumerals(budgetProgress.percent, 1, '<0.1') }}
+                                                                            <template v-if="budgetProgress.overrun.isPositive()">
+                                                                                · {{ tt('Over Budget') }}:
+                                                                                {{ getBudgetAmountText(budgetProgress.overrun, element.budgetCurrency) }}
+                                                                            </template>
+                                                                        </v-tooltip>
+                                                                    </v-chip>
+                                                                </div>
+                                                            </template>
+
+                                                            <div class="category-row-actions d-flex align-center justify-end ms-2"
+                                                                 :class="{ 'category-row-actions--visible': hoveredCategoryId === element.id && !loading }">
                                                                 <v-btn class="px-2 ms-2" color="default"
                                                                        density="comfortable" variant="text"
                                                                        :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
@@ -163,7 +198,7 @@
                                                                     </template>
                                                                     {{ tt('Delete') }}
                                                                 </v-btn>
-                                                            </template>
+                                                            </div>
 
                                                             <span class="ms-2">
                                                                 <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
@@ -203,11 +238,19 @@ import PresetDialog from './list/dialogs/PresetDialog.vue';
 
 import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
+import { useRoute, useRouter } from 'vue-router';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPageBase.ts';
+import { useCategoryBudgetStatisticsBase } from '@/views/base/categories/CategoryBudgetStatisticsBase.ts';
+import {
+    type CategoryBudgetProgress,
+    useCategoryBudgetProgressBase
+} from '@/views/base/categories/CategoryBudgetProgressBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useAccountsStore } from '@/stores/account.ts';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -227,7 +270,10 @@ import {
     mdiEyeOutline,
     mdiDeleteOutline,
     mdiDrag,
-    mdiDotsVertical
+    mdiDotsVertical,
+    mdiChevronLeft,
+    mdiChevronRight,
+    mdiWalletOutline
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
@@ -235,10 +281,23 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
 const { lgAndUp } = useDisplay();
-const { tt } = useI18n();
+const route = useRoute();
+const router = useRouter();
+const { tt, formatPercentToLocalizedNumerals } = useI18n();
 const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
+const {
+    selectedBudgetMonthText,
+    selectedBudgetMonthValue,
+    budgetStatistics,
+    budgetStatisticsLoading,
+    changeBudgetMonth,
+    loadBudgetStatistics
+} = useCategoryBudgetStatisticsBase(typeof route.query['month'] === 'string' ? route.query['month'] : undefined);
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
+const accountsStore = useAccountsStore();
+const exchangeRatesStore = useExchangeRatesStore();
+const { getBudgetProgress, getBudgetAmountText } = useCategoryBudgetProgressBase(budgetStatistics);
 
 const navbar = useTemplateRef<VNavigationDrawer>('navbar');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
@@ -327,11 +386,28 @@ function switchPrimaryCategory(category: TransactionCategory): void {
 function reload(force: boolean): void {
     loading.value = true;
 
-    transactionCategoriesStore.loadAllCategories({
-        force: force
-    }).then(() => {
+    const categoriesPromise = transactionCategoriesStore.loadAllCategories({ force }).catch(error => {
+        if (error?.isUpToDate) {
+            return transactionCategoriesStore.allTransactionCategories;
+        }
+
+        throw error;
+    });
+
+    Promise.all([
+        categoriesPromise,
+        accountsStore.loadAllAccounts({ force: false }),
+        exchangeRatesStore.getLatestExchangeRates({ silent: true, force: false }).catch(() => undefined),
+        loadBudgetStatistics()
+    ]).then(() => {
         loading.value = false;
         displayOrderModified.value = false;
+
+        const requestedCategoryId = typeof route.query['id'] === 'string' ? route.query['id'] : '';
+
+        if (requestedCategoryId && transactionCategoriesStore.allTransactionCategoriesMap[requestedCategoryId]) {
+            primaryCategoryId.value = requestedCategoryId;
+        }
 
         if (force) {
             snackbar.value?.showMessage('Category list has been updated');
@@ -349,6 +425,43 @@ function reload(force: boolean): void {
             snackbar.value?.showError(error);
         }
     });
+}
+
+function switchBudgetMonth(offset: number): void {
+    changeBudgetMonth(offset).then(() => {
+        router.replace({
+            path: route.path,
+            query: {
+                ...route.query,
+                month: selectedBudgetMonthValue.value
+            }
+        });
+    }).catch(error => {
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function getCategoryBudgetRowStyle(category: TransactionCategory): Record<string, string> | undefined {
+    const budgetProgress = getBudgetProgress(category.id);
+
+    if (!budgetProgress) {
+        return undefined;
+    }
+
+    const progress = Math.max(0, Math.min(100, budgetProgress.percent));
+    const opacity = budgetProgress.percent >= 100 ? '42' : (budgetProgress.percent >= 80 ? '32' : '22');
+    const color = budgetProgress.overrun.isPositive() ? '#f44336' : `#${category.color}`;
+
+    return {
+        backgroundImage: `linear-gradient(to right, ${color}${opacity} 0%, ${color}${opacity} ${progress}%, transparent ${progress}%, transparent 100%)`
+    };
+}
+
+function getBudgetProgressItems(categoryId: string): CategoryBudgetProgress[] {
+    const progress = getBudgetProgress(categoryId);
+    return progress ? [progress] : [];
 }
 
 function add(): void {
@@ -498,6 +611,34 @@ watch(lgAndUp, (newValue) => {
 
 reload(false);
 </script>
+
+<style scoped>
+.category-budget-status {
+    min-width: 132px;
+}
+
+.category-budget-chip {
+    font-variant-numeric: tabular-nums;
+}
+
+.category-row-actions {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+}
+
+.category-row-actions--visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.category-budget-month-selector {
+    min-width: 190px;
+    justify-content: center;
+}
+</style>
 
 <style>
 .transaction-category-table .transaction-category-comment {

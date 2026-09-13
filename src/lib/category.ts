@@ -45,6 +45,8 @@ export function localizedPresetCategoryToTransactionCategoryCreateWithSubCategor
             iconType: IconType.System,
             color: subPresetCategory.color,
             comment: '',
+            budgetAmount: 0,
+            budgetCurrency: '',
             clientSessionId: ''
         };
 

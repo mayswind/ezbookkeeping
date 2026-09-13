@@ -14,11 +14,13 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     public iconType: number;
     public color: ColorValue;
     public comment: string;
+    public budgetAmount: number;
+    public budgetCurrency: string;
     public displayOrder: number;
     public visible: boolean;
     public subCategories?: TransactionCategory[];
 
-    private constructor(id: string, name: string, parentId: string, type: CategoryType, icon: string, iconType: number, color: ColorValue, comment: string, displayOrder: number, visible: boolean, subCategories?: TransactionCategory[]) {
+    private constructor(id: string, name: string, parentId: string, type: CategoryType, icon: string, iconType: number, color: ColorValue, comment: string, budgetAmount: number, budgetCurrency: string, displayOrder: number, visible: boolean, subCategories?: TransactionCategory[]) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -27,6 +29,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         this.iconType = iconType;
         this.color = color;
         this.comment = comment;
+        this.budgetAmount = budgetAmount;
+        this.budgetCurrency = budgetCurrency;
         this.displayOrder = displayOrder;
         this.visible = visible;
 
@@ -50,6 +54,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             this.iconType === other.iconType &&
             this.color === other.color &&
             this.comment === other.comment &&
+            this.budgetAmount === other.budgetAmount &&
+            this.budgetCurrency === other.budgetCurrency &&
             this.displayOrder === other.displayOrder &&
             this.visible === other.visible;
 
@@ -83,6 +89,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
         this.iconType = other.iconType;
         this.color = other.color;
         this.comment = other.comment;
+        this.budgetAmount = other.budgetAmount;
+        this.budgetCurrency = other.budgetCurrency;
         this.visible = other.visible;
     }
 
@@ -96,6 +104,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             this.iconType,
             this.color,
             this.comment,
+            this.budgetAmount,
+            this.budgetCurrency,
             this.displayOrder,
             this.visible
         );
@@ -110,6 +120,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             iconType: this.iconType,
             color: this.color,
             comment: this.comment,
+            budgetAmount: this.budgetAmount,
+            budgetCurrency: this.budgetCurrency,
             clientSessionId: clientSessionId
         };
     }
@@ -123,6 +135,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             iconType: this.iconType,
             color: this.color,
             comment: this.comment,
+            budgetAmount: this.budgetAmount,
+            budgetCurrency: this.budgetCurrency,
             hidden: !this.visible
         };
     }
@@ -137,6 +151,8 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
             categoryResponse.iconType,
             categoryResponse.color,
             categoryResponse.comment,
+            categoryResponse.budgetAmount ?? 0,
+            categoryResponse.budgetCurrency ?? '',
             categoryResponse.displayOrder,
             !categoryResponse.hidden,
             categoryResponse.subCategories ? TransactionCategory.ofMulti(categoryResponse.subCategories) : undefined
@@ -174,7 +190,7 @@ export class TransactionCategory implements TransactionCategoryInfoResponse {
     }
 
     public static createNewCategory(type?: CategoryType, parentId?: string): TransactionCategory {
-        return new TransactionCategory('', '', parentId || '0', type || CategoryType.Income, DEFAULT_CATEGORY_ICON_ID, IconType.System, DEFAULT_CATEGORY_COLOR, '', 0, true);
+        return new TransactionCategory('', '', parentId || '0', type || CategoryType.Income, DEFAULT_CATEGORY_ICON_ID, IconType.System, DEFAULT_CATEGORY_COLOR, '', 0, '', 0, true);
     }
 }
 
@@ -186,6 +202,8 @@ export interface TransactionCategoryCreateRequest {
     readonly iconType: number;
     readonly color: string;
     readonly comment: string;
+    readonly budgetAmount: number;
+    readonly budgetCurrency: string;
     readonly clientSessionId: string;
 }
 
@@ -210,6 +228,8 @@ export interface TransactionCategoryModifyRequest {
     readonly iconType: number;
     readonly color: string;
     readonly comment: string;
+    readonly budgetAmount: number;
+    readonly budgetCurrency: string;
     readonly hidden: boolean;
 }
 
@@ -240,6 +260,8 @@ export interface TransactionCategoryInfoResponse {
     readonly iconType: number;
     readonly color: string;
     readonly comment: string;
+    readonly budgetAmount: number;
+    readonly budgetCurrency: string;
     readonly displayOrder: number;
     readonly hidden: boolean;
     readonly subCategories?: TransactionCategoryInfoResponse[];

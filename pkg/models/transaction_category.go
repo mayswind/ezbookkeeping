@@ -29,6 +29,8 @@ type TransactionCategory struct {
 	Color            string `xorm:"VARCHAR(6) NOT NULL"`
 	Hidden           bool   `xorm:"NOT NULL"`
 	Comment          string `xorm:"VARCHAR(255) NOT NULL"`
+	BudgetAmount     int64  `xorm:"NOT NULL default(0)"`
+	BudgetCurrency   string `xorm:"VARCHAR(3) NOT NULL default('')"`
 	CreatedUnixTime  int64
 	UpdatedUnixTime  int64
 	DeletedUnixTime  int64
@@ -54,6 +56,8 @@ type TransactionCategoryCreateRequest struct {
 	IconType        core.IconType           `json:"iconType" binding:"min=0,max=1"`
 	Color           string                  `json:"color" binding:"required,len=6,validHexRGBColor"`
 	Comment         string                  `json:"comment" binding:"max=255"`
+	BudgetAmount    int64                   `json:"budgetAmount" binding:"min=0,max=999999999999999"`
+	BudgetCurrency  string                  `json:"budgetCurrency" binding:"omitempty,len=3,validCurrency"`
 	ClientSessionId string                  `json:"clientSessionId"`
 }
 
@@ -75,14 +79,16 @@ type TransactionCategoryCreateWithSubCategories struct {
 
 // TransactionCategoryModifyRequest represents all parameters of transaction category modification request
 type TransactionCategoryModifyRequest struct {
-	Id       int64         `json:"id,string" binding:"required,min=1"`
-	Name     string        `json:"name" binding:"required,notBlank,max=64"`
-	ParentId int64         `json:"parentId,string" binding:"min=0"`
-	Icon     int64         `json:"icon,string" binding:"min=1"`
-	IconType core.IconType `json:"iconType" binding:"min=0,max=1"`
-	Color    string        `json:"color" binding:"required,len=6,validHexRGBColor"`
-	Comment  string        `json:"comment" binding:"max=255"`
-	Hidden   bool          `json:"hidden"`
+	Id             int64         `json:"id,string" binding:"required,min=1"`
+	Name           string        `json:"name" binding:"required,notBlank,max=64"`
+	ParentId       int64         `json:"parentId,string" binding:"min=0"`
+	Icon           int64         `json:"icon,string" binding:"min=1"`
+	IconType       core.IconType `json:"iconType" binding:"min=0,max=1"`
+	Color          string        `json:"color" binding:"required,len=6,validHexRGBColor"`
+	Comment        string        `json:"comment" binding:"max=255"`
+	BudgetAmount   int64         `json:"budgetAmount" binding:"min=0,max=999999999999999"`
+	BudgetCurrency string        `json:"budgetCurrency" binding:"omitempty,len=3,validCurrency"`
+	Hidden         bool          `json:"hidden"`
 }
 
 // TransactionCategoryHideRequest represents all parameters of transaction category hiding request
@@ -109,32 +115,36 @@ type TransactionCategoryDeleteRequest struct {
 
 // TransactionCategoryInfoResponse represents a view-object of transaction category
 type TransactionCategoryInfoResponse struct {
-	Id            int64                                `json:"id,string"`
-	Name          string                               `json:"name"`
-	ParentId      int64                                `json:"parentId,string"`
-	Type          TransactionCategoryType              `json:"type"`
-	Icon          int64                                `json:"icon,string"`
-	IconType      core.IconType                        `json:"iconType"`
-	Color         string                               `json:"color"`
-	Comment       string                               `json:"comment"`
-	DisplayOrder  int32                                `json:"displayOrder"`
-	Hidden        bool                                 `json:"hidden"`
-	SubCategories TransactionCategoryInfoResponseSlice `json:"subCategories,omitempty"`
+	Id             int64                                `json:"id,string"`
+	Name           string                               `json:"name"`
+	ParentId       int64                                `json:"parentId,string"`
+	Type           TransactionCategoryType              `json:"type"`
+	Icon           int64                                `json:"icon,string"`
+	IconType       core.IconType                        `json:"iconType"`
+	Color          string                               `json:"color"`
+	Comment        string                               `json:"comment"`
+	BudgetAmount   int64                                `json:"budgetAmount"`
+	BudgetCurrency string                               `json:"budgetCurrency"`
+	DisplayOrder   int32                                `json:"displayOrder"`
+	Hidden         bool                                 `json:"hidden"`
+	SubCategories  TransactionCategoryInfoResponseSlice `json:"subCategories,omitempty"`
 }
 
 // ToTransactionCategoryInfoResponse returns a view-object according to database model
 func (c *TransactionCategory) ToTransactionCategoryInfoResponse() *TransactionCategoryInfoResponse {
 	return &TransactionCategoryInfoResponse{
-		Id:           c.CategoryId,
-		Name:         c.Name,
-		ParentId:     c.ParentCategoryId,
-		Type:         c.Type,
-		Icon:         c.Icon,
-		IconType:     c.IconType,
-		Color:        c.Color,
-		Comment:      c.Comment,
-		DisplayOrder: c.DisplayOrder,
-		Hidden:       c.Hidden,
+		Id:             c.CategoryId,
+		Name:           c.Name,
+		ParentId:       c.ParentCategoryId,
+		Type:           c.Type,
+		Icon:           c.Icon,
+		IconType:       c.IconType,
+		Color:          c.Color,
+		Comment:        c.Comment,
+		BudgetAmount:   c.BudgetAmount,
+		BudgetCurrency: c.BudgetCurrency,
+		DisplayOrder:   c.DisplayOrder,
+		Hidden:         c.Hidden,
 	}
 }
 

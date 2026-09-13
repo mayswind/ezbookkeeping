@@ -99,6 +99,11 @@ func (a *TransactionCategoriesApi) CategoryCreateHandler(c *core.WebContext) (an
 		return nil, errs.ErrTransactionCategoryTypeInvalid
 	}
 
+	if !a.isTransactionCategoryBudgetValid(categoryCreateReq.Type, categoryCreateReq.BudgetAmount, categoryCreateReq.BudgetCurrency) {
+		log.Warnf(c, "[transaction_categories.CategoryCreateHandler] category budget invalid, type is %d", categoryCreateReq.Type)
+		return nil, errs.ErrTransactionCategoryBudgetInvalid
+	}
+
 	uid := c.GetCurrentUid()
 
 	if categoryCreateReq.ParentId > 0 {
@@ -227,7 +232,14 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 		IconType:         categoryModifyReq.IconType,
 		Color:            categoryModifyReq.Color,
 		Comment:          categoryModifyReq.Comment,
+		BudgetAmount:     categoryModifyReq.BudgetAmount,
+		BudgetCurrency:   categoryModifyReq.BudgetCurrency,
 		Hidden:           categoryModifyReq.Hidden,
+	}
+
+	if !a.isTransactionCategoryBudgetValid(category.Type, newCategory.BudgetAmount, newCategory.BudgetCurrency) {
+		log.Warnf(c, "[transaction_categories.CategoryModifyHandler] category budget invalid for category \"id:%d\"", categoryModifyReq.Id)
+		return nil, errs.ErrTransactionCategoryBudgetInvalid
 	}
 
 	if newCategory.ParentCategoryId == category.ParentCategoryId &&
@@ -236,6 +248,8 @@ func (a *TransactionCategoriesApi) CategoryModifyHandler(c *core.WebContext) (an
 		newCategory.IconType == category.IconType &&
 		newCategory.Color == category.Color &&
 		newCategory.Comment == category.Comment &&
+		newCategory.BudgetAmount == category.BudgetAmount &&
+		newCategory.BudgetCurrency == category.BudgetCurrency &&
 		newCategory.Hidden == category.Hidden {
 		return nil, errs.ErrNothingWillBeUpdated
 	}
@@ -415,7 +429,13 @@ func (a *TransactionCategoriesApi) createBatchCategories(c *core.WebContext, uid
 		categoriesMap[category] = make([]*models.TransactionCategory, len(categoryCreateReq.SubCategories))
 
 		for j := int32(0); j < int32(len(categoryCreateReq.SubCategories)); j++ {
-			subCategory := a.createNewCategoryModel(uid, categoryCreateReq.SubCategories[j], j+1)
+			subCategoryCreateReq := categoryCreateReq.SubCategories[j]
+
+			if !a.isTransactionCategoryBudgetValid(subCategoryCreateReq.Type, subCategoryCreateReq.BudgetAmount, subCategoryCreateReq.BudgetCurrency) {
+				return nil, errs.ErrTransactionCategoryBudgetInvalid
+			}
+
+			subCategory := a.createNewCategoryModel(uid, subCategoryCreateReq, j+1)
 
 			categories = append(categories, subCategory)
 			categoriesMap[category][j] = subCategory
@@ -457,7 +477,21 @@ func (a *TransactionCategoriesApi) createNewCategoryModel(uid int64, categoryCre
 		IconType:         categoryCreateReq.IconType,
 		Color:            categoryCreateReq.Color,
 		Comment:          categoryCreateReq.Comment,
+		BudgetAmount:     categoryCreateReq.BudgetAmount,
+		BudgetCurrency:   categoryCreateReq.BudgetCurrency,
 	}
+}
+
+func (a *TransactionCategoriesApi) isTransactionCategoryBudgetValid(categoryType models.TransactionCategoryType, amount int64, currency string) bool {
+	if amount < 0 {
+		return false
+	}
+
+	if amount == 0 {
+		return currency == ""
+	}
+
+	return categoryType == models.CATEGORY_TYPE_EXPENSE && currency != ""
 }
 
 func (a *TransactionCategoriesApi) getTransactionCategoryListByTypeResponse(categories []*models.TransactionCategory, parentId int64) (map[models.TransactionCategoryType]models.TransactionCategoryInfoResponseSlice, *errs.Error) {

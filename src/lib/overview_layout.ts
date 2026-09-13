@@ -27,6 +27,7 @@ import {
 } from '@/consts/overview_layout.ts';
 
 import { AmountFilterType } from '@/core/numeral.ts';
+import { DateRange } from '@/core/datetime.ts';
 import { TransactionTagFilter } from '@/models/transaction.ts';
 
 import {
@@ -235,11 +236,13 @@ export function getOverviewTransactionCategoryStatisticDateTypes(layout: Overvie
     const existingDateTypes: Record<number, boolean> = {};
 
     for (const widget of layout.widgets) {
-        if (widget.type !== OverviewWidgetType.ExpenseCategoryRanking) {
+        if (widget.type !== OverviewWidgetType.ExpenseCategoryRanking && widget.type !== OverviewWidgetType.CategoryBudget) {
             continue;
         }
 
-        const dateType = widget.settings['dateRange'];
+        const dateType = widget.type === OverviewWidgetType.CategoryBudget
+            ? DateRange.ThisMonth.type
+            : widget.settings['dateRange'];
 
         if (isNumber(dateType) && !existingDateTypes[dateType]) {
             dateTypes.push(dateType);

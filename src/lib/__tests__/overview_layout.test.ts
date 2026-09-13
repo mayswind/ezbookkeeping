@@ -70,12 +70,13 @@ describe('desktop overview layout', () => {
         expect(getOverviewCalendarHeatmapMonths(layout)).toBe(6);
     });
 
-    test('gets only the category statistic date types used by ranking widgets', () => {
+    test('gets only the category statistic date types used by category widgets', () => {
         const layout = normalizeDesktopOverviewLayout({
             widgets: [
                 { id: 'month-ranking', type: OverviewWidgetType.ExpenseCategoryRanking, x: 0, y: 0, w: 3, h: 4, settings: { dateRange: DateRange.ThisMonth.type } },
                 { id: 'year-ranking', type: OverviewWidgetType.ExpenseCategoryRanking, x: 3, y: 0, w: 3, h: 4, settings: { dateRange: DateRange.ThisYear.type } },
-                { id: 'month-ranking-2', type: OverviewWidgetType.ExpenseCategoryRanking, x: 6, y: 0, w: 3, h: 4, settings: { dateRange: DateRange.ThisMonth.type } }
+                { id: 'month-ranking-2', type: OverviewWidgetType.ExpenseCategoryRanking, x: 6, y: 0, w: 3, h: 4, settings: { dateRange: DateRange.ThisMonth.type } },
+                { id: 'category-budget', type: OverviewWidgetType.CategoryBudget, x: 9, y: 0, w: 3, h: 4, settings: { itemCount: 4 } }
             ]
         });
 

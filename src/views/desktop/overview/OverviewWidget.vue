@@ -46,6 +46,10 @@
                                       :item-count="widget.settings['itemCount'] as number"
                                       v-else-if="widget.type === OverviewWidgetType.ExpenseCategoryRanking" />
 
+    <category-budget-widget :loading="loading" :title="widgetTitle"
+                            :item-count="widget.settings['itemCount'] as number"
+                            v-else-if="widget.type === OverviewWidgetType.CategoryBudget" />
+
     <recent-transactions-widget :loading="loading" :editing="editing" :title="widgetTitle"
                                 :item-count="widget.settings['itemCount'] as number"
                                 :account-ids="widget.settings['accountIds'] as string[]"
@@ -80,6 +84,7 @@ import IncomeExpenseTrendWidget from './widgets/IncomeExpenseTrendWidget.vue';
 import NetAssetsTrendWidget from './widgets/NetAssetsTrendWidget.vue';
 import AccountBalanceListWidget from './widgets/AccountBalanceListWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
+import CategoryBudgetWidget from './widgets/CategoryBudgetWidget.vue';
 import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
 import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 import TransactionCalendarHeatmapWidget from './widgets/TransactionCalendarHeatmapWidget.vue';

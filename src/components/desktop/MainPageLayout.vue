@@ -54,6 +54,16 @@
                                     </v-btn>
                                 </router-link>
 
+                                <router-link to="/category/list" v-if="showTransactionCategoriesButtonInDesktopNavbar">
+                                    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                                           :aria-label="tt('Transaction Categories')" :icon="true"
+                                           :active="isTopNavigationActive('/category/list')"
+                                           :color="isTopNavigationActive('/category/list') ? 'primary' : 'default'">
+                                        <v-icon :icon="isTopNavigationActive('/category/list') ? mdiRhombusSplit : mdiRhombusSplitOutline" size="24" />
+                                        <v-tooltip activator="parent">{{ tt('Transaction Categories') }}</v-tooltip>
+                                    </v-btn>
+                                </router-link>
+
                                 <router-link to="/statistics/transaction">
                                     <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
                                            :aria-label="tt('Statistics & Analysis')" :icon="true"
@@ -202,6 +212,8 @@ import {
     mdiHomeOutline,
     mdiListBox,
     mdiListBoxOutline,
+    mdiRhombusSplit,
+    mdiRhombusSplitOutline,
     mdiCreditCard,
     mdiCreditCardOutline,
     mdiChartPie,
@@ -271,6 +283,7 @@ const currentTheme = computed<string>({
 });
 
 const showAddTransactionButtonInDesktopNavbar = computed<boolean>(() => settingsStore.appSettings.showAddTransactionButtonInDesktopNavbar);
+const showTransactionCategoriesButtonInDesktopNavbar = computed<boolean>(() => settingsStore.appSettings.showTransactionCategoriesButtonInDesktopNavbar);
 const isEnableApplicationLock = computed<boolean>(() => settingsStore.appSettings.applicationLock);
 
 function isTopNavigationActive(path: string): boolean {

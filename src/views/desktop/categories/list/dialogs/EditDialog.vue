@@ -56,6 +56,35 @@
                                           :disabled="loading || submitting"
                                           v-model="category.color" />
                         </v-col>
+                        <template v-if="category.type === CategoryType.Expense">
+                            <v-col cols="12" class="pb-0">
+                                <v-divider class="mb-4" />
+                                <div class="text-subtitle-1 font-weight-medium">{{ tt('Budget') }}</div>
+                            </v-col>
+                            <v-col cols="12" md="12" class="py-0">
+                                <v-switch :disabled="loading || submitting"
+                                          :label="tt('Enable Monthly Budget')" v-model="budgetEnabled" />
+                            </v-col>
+                            <v-col cols="12" md="7" v-if="budgetEnabled">
+                                <amount-input :disabled="loading || submitting"
+                                              :currency="category.budgetCurrency"
+                                              :show-currency="true"
+                                              :enable-formula="true"
+                                              :persistent-placeholder="true"
+                                              :label="tt('Monthly Budget')"
+                                              :placeholder="tt('Monthly Budget')"
+                                              v-model="category.budgetAmount" />
+                            </v-col>
+                            <v-col cols="12" md="5" v-if="budgetEnabled">
+                                <currency-select :disabled="loading || submitting"
+                                                 :label="tt('Currency')"
+                                                 :placeholder="tt('Currency')"
+                                                 v-model="category.budgetCurrency" />
+                            </v-col>
+                            <v-col cols="12" class="pt-0 text-medium-emphasis" v-if="budgetEnabled">
+                                <small>{{ tt('The budget repeats every month') }}</small>
+                            </v-col>
+                        </template>
                         <v-col cols="12" md="12">
                             <v-textarea
                                 type="text"
@@ -103,6 +132,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useCategoryEditPageBase } from '@/views/base/categories/CategoryEditPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useUserStore } from '@/stores/user.ts';
 
 import type { ColorValue } from '@/core/color.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -130,11 +160,11 @@ const {
     allAvailableCategories,
     title,
     saveButtonTitle,
-    inputEmptyProblemMessage,
-    inputIsEmpty
+    inputEmptyProblemMessage: baseInputEmptyProblemMessage
 } = useCategoryEditPageBase();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
+const userStore = useUserStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
@@ -143,12 +173,29 @@ let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const showState = ref<boolean>(false);
 const initCategory = ref<TransactionCategory | null>(null);
+const budgetEnabled = ref<boolean>(false);
+
+const inputEmptyProblemMessage = computed<string | null>(() => {
+    if (baseInputEmptyProblemMessage.value) {
+        return baseInputEmptyProblemMessage.value;
+    } else if (category.value.type === CategoryType.Expense && budgetEnabled.value && category.value.budgetAmount <= 0) {
+        return 'Monthly budget must be greater than zero';
+    } else if (category.value.type === CategoryType.Expense && budgetEnabled.value && !category.value.budgetCurrency) {
+        return 'Budget currency cannot be blank';
+    }
+
+    return null;
+});
+
+const inputIsEmpty = computed<boolean>(() => !!inputEmptyProblemMessage.value);
 
 const isCategoryModified = computed<boolean>(() => {
+    const budgetStateModified = !!initCategory.value && budgetEnabled.value !== (initCategory.value.budgetAmount > 0);
+
     if (!editCategoryId.value) { // Add
-        return !!initCategory.value && !isEquals(category.value.toCreateRequest(clientSessionId.value), initCategory.value.toCreateRequest(clientSessionId.value));
+        return budgetStateModified || (!!initCategory.value && !isEquals(category.value.toCreateRequest(clientSessionId.value), initCategory.value.toCreateRequest(clientSessionId.value)));
     } else { // Edit
-        return !!initCategory.value && !isEquals(category.value.toModifyRequest(), initCategory.value.toModifyRequest());
+        return budgetStateModified || (!!initCategory.value && !isEquals(category.value.toModifyRequest(), initCategory.value.toModifyRequest()));
     }
 });
 
@@ -159,6 +206,7 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
 
     initCategory.value = TransactionCategory.createNewCategory();
     category.value.fillFrom(initCategory.value);
+    budgetEnabled.value = false;
 
     if (options.id) {
         if (options.currentCategory) {
@@ -171,6 +219,7 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
         }).then(response => {
             category.value.fillFrom(response);
             initCategory.value = TransactionCategory.of(response);
+            budgetEnabled.value = category.value.budgetAmount > 0;
             loading.value = false;
         }).catch(error => {
             loading.value = false;
@@ -202,6 +251,11 @@ function open(options: { id?: string; parentId?: string; type?: CategoryType; cu
         category.value.type = initCategory.value.type;
         category.value.parentId = initCategory.value.parentId;
 
+        if (categoryType === CategoryType.Expense) {
+            initCategory.value.budgetCurrency = userStore.currentUserDefaultCurrency;
+            category.value.budgetCurrency = userStore.currentUserDefaultCurrency;
+        }
+
         if (options.color) {
             initCategory.value.color = options.color;
             category.value.color = initCategory.value.color;
@@ -228,6 +282,11 @@ function save(): void {
     if (problemMessage) {
         snackbar.value?.showMessage(problemMessage);
         return;
+    }
+
+    if (category.value.type !== CategoryType.Expense || !budgetEnabled.value) {
+        category.value.budgetAmount = 0;
+        category.value.budgetCurrency = '';
     }
 
     submitting.value = true;

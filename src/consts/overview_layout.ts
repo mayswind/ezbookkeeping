@@ -393,6 +393,31 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             OverviewWidgetDataRequirement.TransactionCategoryStatistics
         ]
     },
+    [OverviewWidgetType.CategoryBudget]: {
+        type: OverviewWidgetType.CategoryBudget,
+        name: 'Category Budgets',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'itemCount',
+                displayName: 'Item Count',
+                itemCountValues: [3, 4, 5, 6, 7, 8, 9, 10]
+            }
+        ],
+        defaultSettings: {
+            itemCount: 4
+        },
+        defaultWidth: 4,
+        defaultHeight: 4,
+        minWidth: 3,
+        minHeight: 3,
+        dataRequirements: [
+            OverviewWidgetDataRequirement.Accounts,
+            OverviewWidgetDataRequirement.TransactionCategories,
+            OverviewWidgetDataRequirement.TransactionCategoryStatistics
+        ]
+    },
     [OverviewWidgetType.RecentTransactions]: {
         type: OverviewWidgetType.RecentTransactions,
         name: 'Recent Transactions',
@@ -887,6 +912,29 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             showTitle: false,
             dateRange: DateRange.ThisMonth.type,
             categoryLevel: 'primary',
+            itemCount: 4
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.Accounts,
+            OverviewWidgetDataRequirement.TransactionCategories,
+            OverviewWidgetDataRequirement.TransactionCategoryStatistics
+        ]
+    },
+    [OverviewWidgetType.CategoryBudget]: {
+        type: OverviewWidgetType.CategoryBudget,
+        name: 'Category Budgets',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            WIDGET_SHOW_TITLE_SETTING,
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'itemCount',
+                displayName: 'Item Count',
+                itemCountValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            }
+        ],
+        defaultSettings: {
+            showTitle: true,
             itemCount: 4
         },
         dataRequirements: [

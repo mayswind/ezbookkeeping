@@ -28,3 +28,17 @@ func TestTransactionCategoryInfoResponseSliceLess(t *testing.T) {
 	assert.Equal(t, int64(3), transactionCategoryRespSlice[1].Id)
 	assert.Equal(t, int64(1), transactionCategoryRespSlice[2].Id)
 }
+
+func TestTransactionCategoryInfoResponseIncludesBudget(t *testing.T) {
+	category := &TransactionCategory{
+		CategoryId:     123,
+		Type:           CATEGORY_TYPE_EXPENSE,
+		BudgetAmount:   1500000,
+		BudgetCurrency: "RUB",
+	}
+
+	response := category.ToTransactionCategoryInfoResponse()
+
+	assert.Equal(t, int64(1500000), response.BudgetAmount)
+	assert.Equal(t, "RUB", response.BudgetCurrency)
+}

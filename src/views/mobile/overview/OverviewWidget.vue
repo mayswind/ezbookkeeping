@@ -37,6 +37,11 @@
                                      :item-count="widget.settings['itemCount'] as number"
                                      v-else-if="widget.type === OverviewWidgetType.ExpenseCategoryRanking" />
 
+    <category-budget-widget :loading="loading" :title="widgetTitle"
+                            :show-title="widget.settings['showTitle'] as boolean"
+                            :item-count="widget.settings['itemCount'] as number"
+                            v-else-if="widget.type === OverviewWidgetType.CategoryBudget" />
+
     <recent-transactions-widget :loading="loading" :editing="editing" :title="widgetTitle"
                                 :show-title="widget.settings['showTitle'] as boolean"
                                 :item-count="widget.settings['itemCount'] as number"
@@ -65,6 +70,7 @@ import MonthlyExpenseProgressWidget from './widgets/MonthlyExpenseProgressWidget
 import PeriodIncomeExpenseWidget from './widgets/PeriodIncomeExpenseWidget.vue';
 import PeriodNetIncomeAndSavingsRateWidget from './widgets/PeriodNetIncomeAndSavingsRateWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
+import CategoryBudgetWidget from './widgets/CategoryBudgetWidget.vue';
 import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
 import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 

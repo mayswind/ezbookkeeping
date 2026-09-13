@@ -130,6 +130,46 @@
                 </template>
             </f7-list-item>
 
+            <template v-if="category.type === CategoryType.Expense">
+                <f7-list-item :title="tt('Enable Monthly Budget')">
+                    <template #after>
+                        <f7-toggle :checked="budgetEnabled" @toggle:change="budgetEnabled = $event"></f7-toggle>
+                    </template>
+                </f7-list-item>
+
+                <f7-list-item class="list-item-with-header-and-title"
+                              link="#" no-chevron
+                              :header="tt('Monthly Budget')"
+                              :title="formatAmountToLocalizedNumeralsWithCurrency(parseBigDecimal(category.budgetAmount), category.budgetCurrency)"
+                              @click="showBudgetAmountSheet = true"
+                              v-if="budgetEnabled">
+                    <number-pad-sheet :min-value="0"
+                                      :max-value="TRANSACTION_MAX_AMOUNT"
+                                      :currency="category.budgetCurrency"
+                                      v-model:show="showBudgetAmountSheet"
+                                      v-model="category.budgetAmount" />
+                </f7-list-item>
+
+                <f7-list-item class="list-item-with-header-and-title"
+                              link="#" no-chevron
+                              :header="tt('Currency')"
+                              @click="showBudgetCurrencySheet = true"
+                              v-if="budgetEnabled">
+                    <template #title>
+                        <div class="list-item-custom-title">
+                            <span>{{ getCurrencyName(category.budgetCurrency) }}&nbsp;</span>
+                            <small class="smaller">{{ category.budgetCurrency }}</small>
+                        </div>
+                    </template>
+                    <list-item-selection-sheet value-type="item"
+                                               key-field="currencyCode" value-field="currencyCode"
+                                               title-field="displayName" after-field="currencyCode"
+                                               :items="allCurrencies"
+                                               v-model:show="showBudgetCurrencySheet"
+                                               v-model="category.budgetCurrency" />
+                </f7-list-item>
+            </template>
+
             <f7-list-item :title="tt('Visible')" v-if="editCategoryId">
                 <template #after>
                     <f7-toggle :checked="category.visible" @toggle:change="category.visible = $event"></f7-toggle>
@@ -149,7 +189,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -157,15 +197,19 @@ import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.t
 import { useCategoryEditPageBase } from '@/views/base/categories/CategoryEditPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useUserStore } from '@/stores/user.ts';
 
 import type { ColorValue } from '@/core/color.ts';
+import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { CategoryType } from '@/core/category.ts';
+import { TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { ALL_CATEGORY_ICONS } from '@/consts/icon.ts';
 import { ALL_CATEGORY_COLORS } from '@/consts/color.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 
 const props = defineProps<{
     f7route: Router.Route;
@@ -174,7 +218,7 @@ const props = defineProps<{
 
 const query = props.f7route.query;
 
-const { tt } = useI18n();
+const { tt, getAllCurrencies, getCurrencyName, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
 const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 const {
     editCategoryId,
@@ -184,16 +228,33 @@ const {
     category,
     allAvailableCategories,
     title,
-    inputEmptyProblemMessage,
-    inputIsEmpty
+    inputEmptyProblemMessage: baseInputEmptyProblemMessage
 } = useCategoryEditPageBase(query['type'] ? parseInt(query['type']) as CategoryType : undefined, query['parentId']);
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
+const userStore = useUserStore();
 
 const loadingError = ref<unknown | null>(null);
 const showPrimaryCategorySheet = ref<boolean>(false);
 const showIconSelectionSheet = ref<boolean>(false);
 const showColorSelectionSheet = ref<boolean>(false);
+const showBudgetAmountSheet = ref<boolean>(false);
+const showBudgetCurrencySheet = ref<boolean>(false);
+const budgetEnabled = ref<boolean>(false);
+
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies(false));
+const inputEmptyProblemMessage = computed<string | null>(() => {
+    if (baseInputEmptyProblemMessage.value) {
+        return baseInputEmptyProblemMessage.value;
+    } else if (category.value.type === CategoryType.Expense && budgetEnabled.value && category.value.budgetAmount <= 0) {
+        return 'Monthly budget must be greater than zero';
+    } else if (category.value.type === CategoryType.Expense && budgetEnabled.value && !category.value.budgetCurrency) {
+        return 'Budget currency cannot be blank';
+    }
+
+    return null;
+});
+const inputIsEmpty = computed<boolean>(() => !!inputEmptyProblemMessage.value);
 
 function getPrimaryCategoryName(parentId: string): string | null {
     return TransactionCategory.findNameById(allAvailableCategories.value, parentId);
@@ -214,6 +275,7 @@ function init(): void {
             categoryId: editCategoryId.value
         }).then(response => {
             category.value.fillFrom(response);
+            budgetEnabled.value = category.value.budgetAmount > 0;
             loading.value = false;
         }).catch(error => {
             if (error.processed) {
@@ -242,6 +304,10 @@ function init(): void {
             category.value.icon = query['icon'];
         }
 
+        if (categoryType === CategoryType.Expense) {
+            category.value.budgetCurrency = userStore.currentUserDefaultCurrency;
+        }
+
         clientSessionId.value = generateRandomUUID();
         loading.value = false;
     }
@@ -254,6 +320,11 @@ function save(): void {
     if (problemMessage) {
         showAlert(problemMessage);
         return;
+    }
+
+    if (category.value.type !== CategoryType.Expense || !budgetEnabled.value) {
+        category.value.budgetAmount = 0;
+        category.value.budgetCurrency = '';
     }
 
     submitting.value = true;

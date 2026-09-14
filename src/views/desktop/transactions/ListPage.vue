@@ -566,13 +566,13 @@
                                                       :color="transaction.category.color"
                                                       v-if="transaction.category && transaction.category.color"></ItemIcon>
                                             <v-icon size="24" :icon="mdiPencilBoxOutline" v-else-if="!transaction.category || !transaction.category.color" />
-                                            <span class="ms-2" v-if="transaction.type === TransactionType.ModifyBalance">
+                                            <span class="ms-1" v-if="transaction.type === TransactionType.ModifyBalance">
                                                 {{ tt('Modify Balance') }}
                                             </span>
-                                            <span class="ms-2" v-else-if="transaction.type !== TransactionType.ModifyBalance && transaction.category">
+                                            <span class="ms-1" v-else-if="transaction.type !== TransactionType.ModifyBalance && transaction.category">
                                                 {{ transaction.category.name }}
                                             </span>
-                                            <span class="ms-2" v-else-if="transaction.type !== TransactionType.ModifyBalance && !transaction.category">
+                                            <span class="ms-1" v-else-if="transaction.type !== TransactionType.ModifyBalance && !transaction.category">
                                                 {{ getTransactionTypeName(transaction.type, 'Transaction') }}
                                             </span>
                                         </div>
@@ -1953,8 +1953,7 @@ init(props);
 .transaction-category-menu .item-icon,
 .transaction-amount-menu .item-icon,
 .transaction-account-menu .item-icon,
-.transaction-tag-menu .item-icon,
-.transaction-table .item-icon {
+.transaction-tag-menu .item-icon {
     padding-bottom: 3px;
 }
 

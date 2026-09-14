@@ -81,9 +81,11 @@
                 <v-tooltip activator="parent" v-if="!disabled">{{ editingTransaction === item ? tt('Apply') : tt('Edit') }}</v-tooltip>
             </template>
             <template #item.time="{ item }">
-                <span>{{ getDisplayDateTime(item) }}</span>
-                <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
-                        v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
+                <div class="d-flex align-center">
+                    <span>{{ getDisplayDateTime(item) }}</span>
+                    <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
+                            v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
+                </div>
             </template>
             <template #item.type="{ value }">
                 <v-chip label color="secondary" variant="outlined" size="x-small" v-if="value === TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-chip>
@@ -99,7 +101,7 @@
                               :icon-id="allCategoriesMap[item.categoryId]?.icon ?? ''"
                               :color="allCategoriesMap[item.categoryId]?.color ?? ''"
                               v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]"></ItemIcon>
-                    <span class="ms-2" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
+                    <span class="ms-1" v-if="item.type !== TransactionType.ModifyBalance && item.categoryId && item.categoryId !== '0' && allCategoriesMap[item.categoryId]">
                                         {{ allCategoriesMap[item.categoryId]?.name }}
                                     </span>
                     <div class="text-error font-italic" v-else-if="item.type !== TransactionType.ModifyBalance && (!item.categoryId || item.categoryId === '0' || !allCategoriesMap[item.categoryId])">

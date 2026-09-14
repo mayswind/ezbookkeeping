@@ -133,10 +133,12 @@
         v-model:page="currentPage"
     >
         <template #item.time="{ item }">
-            <span>{{ getDisplayDateTime(item) }}</span>
-            <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
-                    v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
-            <v-tooltip activator="parent" v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimeInDefaultTimezone(item) }}</v-tooltip>
+            <div class="d-flex align-center">
+                <span>{{ getDisplayDateTime(item) }}</span>
+                <v-chip class="ms-1" variant="flat" color="grey" size="x-small"
+                        v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimezone(item) }}</v-chip>
+                <v-tooltip activator="parent" v-if="!isSameAsDefaultTimezoneOffsetMinutes(item)">{{ getDisplayTimeInDefaultTimezone(item) }}</v-tooltip>
+            </div>
         </template>
         <template #item.type="{ item }">
             <v-chip label variant="outlined" size="x-small"
@@ -150,10 +152,10 @@
                           :color="item.secondaryCategory?.color ?? ''"
                           v-if="item.secondaryCategory?.color"></ItemIcon>
                 <v-icon size="24" :icon="mdiPencilBoxOutline" v-else-if="!item.secondaryCategory || !item.secondaryCategory?.color" />
-                <span class="ms-2" v-if="item.type === TransactionType.ModifyBalance">
+                <span class="ms-1" v-if="item.type === TransactionType.ModifyBalance">
                     {{ tt('Modify Balance') }}
                 </span>
-                <span class="ms-2" v-else-if="item.type !== TransactionType.ModifyBalance && item.secondaryCategory">
+                <span class="ms-1" v-else-if="item.type !== TransactionType.ModifyBalance && item.secondaryCategory">
                     {{ item.secondaryCategory?.name }}
                 </span>
             </div>

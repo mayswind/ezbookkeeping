@@ -34,8 +34,18 @@ func (s *LocalFileSystemObjectStorage) Exists(ctx core.Context, path string) (bo
 }
 
 // Read returns the object instance according to specified the file path
-func (s *LocalFileSystemObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, error) {
-	return os.Open(s.getFinalPath(path))
+func (s *LocalFileSystemObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, bool, error) {
+	object, err := os.Open(s.getFinalPath(path))
+
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, false, nil
+		}
+
+		return nil, false, err
+	}
+
+	return object, true, nil
 }
 
 // Save returns whether save the object instance successfully
@@ -61,7 +71,13 @@ func (s *LocalFileSystemObjectStorage) Save(ctx core.Context, path string, objec
 
 // Delete returns whether delete the object according to specified the file path successfully
 func (s *LocalFileSystemObjectStorage) Delete(ctx core.Context, path string) error {
-	return os.Remove(s.getFinalPath(path))
+	err := os.Remove(s.getFinalPath(path))
+
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
+	return nil
 }
 
 func (s *LocalFileSystemObjectStorage) getFinalPath(path string) string {

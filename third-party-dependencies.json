@@ -138,6 +138,20 @@
         "licenseUrl": "https://github.com/go-mail/mail/blob/v2.3.1/LICENSE"
     },
     {
+        "name": "AWS SDK for Go v2",
+        "copyright": "Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved. Copyright 2014-2015 Stripe, Inc.",
+        "url": "https://github.com/aws/aws-sdk-go-v2",
+        "license": "Apache License 2.0",
+        "licenseUrl": "https://github.com/aws/aws-sdk-go-v2/blob/v1.47.0/LICENSE.txt"
+    },
+    {
+        "name": "Smithy Go",
+        "copyright": "Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.",
+        "url": "https://github.com/aws/smithy-go",
+        "license": "Apache License 2.0",
+        "licenseUrl": "https://github.com/aws/smithy-go/blob/v1.28.1/LICENSE"
+    },
+    {
         "name": "MinIO Go Client SDK",
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",

@@ -6,7 +6,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/url"
-	"os"
 	"time"
 
 	"xorm.io/xorm"
@@ -162,14 +161,14 @@ func (s *UserService) GetUserAvatar(c core.Context, uid int64, fileExtension str
 		return nil, errs.ErrUserAvatarExtensionInvalid
 	}
 
-	avatarFile, err := s.ReadAvatar(c, user.Uid, user.CustomAvatarType)
-
-	if os.IsNotExist(err) {
-		return nil, errs.ErrUserAvatarNoExists
-	}
+	avatarFile, exists, err := s.ReadAvatar(c, user.Uid, user.CustomAvatarType)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if !exists {
+		return nil, errs.ErrUserAvatarNoExists
 	}
 
 	defer avatarFile.Close()
@@ -458,7 +457,7 @@ func (s *UserService) RemoveUserAvatar(c core.Context, uid int64, fileExtension 
 
 	err := s.DeleteAvatar(c, uid, fileExtension)
 
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil {
 		return err
 	}
 

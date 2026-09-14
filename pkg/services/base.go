@@ -100,7 +100,7 @@ func (s *ServiceUsingStorage) ExistsAvatar(ctx core.Context, uid int64, fileExte
 }
 
 // ReadAvatar returns the user avatar from the current avatar object storage
-func (s *ServiceUsingStorage) ReadAvatar(ctx core.Context, uid int64, fileExtension string) (storage.ObjectInStorage, error) {
+func (s *ServiceUsingStorage) ReadAvatar(ctx core.Context, uid int64, fileExtension string) (storage.ObjectInStorage, bool, error) {
 	return s.container.ReadAvatar(ctx, s.getUserAvatarPath(uid, fileExtension))
 }
 
@@ -120,7 +120,7 @@ func (s *ServiceUsingStorage) ExistsUserCustomIcon(ctx core.Context, uid int64, 
 }
 
 // ReadUserCustomIcon returns the user custom icon from the current user custom icon object storage
-func (s *ServiceUsingStorage) ReadUserCustomIcon(ctx core.Context, uid int64, iconId int64) (storage.ObjectInStorage, error) {
+func (s *ServiceUsingStorage) ReadUserCustomIcon(ctx core.Context, uid int64, iconId int64) (storage.ObjectInStorage, bool, error) {
 	return s.container.ReadUserCustomIcon(ctx, s.getUserCustomIconPath(uid, iconId))
 }
 
@@ -140,7 +140,7 @@ func (s *ServiceUsingStorage) ExistsTransactionPicture(ctx core.Context, uid int
 }
 
 // ReadTransactionPicture returns the transaction picture from the current transaction picture object storage
-func (s *ServiceUsingStorage) ReadTransactionPicture(ctx core.Context, uid int64, pictureId int64, fileExtension string) (storage.ObjectInStorage, error) {
+func (s *ServiceUsingStorage) ReadTransactionPicture(ctx core.Context, uid int64, pictureId int64, fileExtension string) (storage.ObjectInStorage, bool, error) {
 	return s.container.ReadTransactionPicture(ctx, s.getTransactionPicturePath(uid, pictureId, fileExtension))
 }
 

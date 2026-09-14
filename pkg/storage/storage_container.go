@@ -67,9 +67,9 @@ func (s *StorageContainer) ExistsAvatar(ctx core.Context, path string) (bool, er
 }
 
 // ReadAvatar returns the avatar file from the current avatar object storage
-func (s *StorageContainer) ReadAvatar(ctx core.Context, path string) (ObjectInStorage, error) {
+func (s *StorageContainer) ReadAvatar(ctx core.Context, path string) (ObjectInStorage, bool, error) {
 	if s.avatarCurrentStorage == nil {
-		return nil, errs.ErrSystemError
+		return nil, false, errs.ErrSystemError
 	}
 
 	return s.avatarCurrentStorage.Read(ctx, path)
@@ -103,9 +103,9 @@ func (s *StorageContainer) ExistsUserCustomIcon(ctx core.Context, path string) (
 }
 
 // ReadUserCustomIcon returns the user custom icon file from the current user custom icon object storage
-func (s *StorageContainer) ReadUserCustomIcon(ctx core.Context, path string) (ObjectInStorage, error) {
+func (s *StorageContainer) ReadUserCustomIcon(ctx core.Context, path string) (ObjectInStorage, bool, error) {
 	if s.userCustomIconCurrentStorage == nil {
-		return nil, errs.ErrSystemError
+		return nil, false, errs.ErrSystemError
 	}
 
 	return s.userCustomIconCurrentStorage.Read(ctx, path)
@@ -139,9 +139,9 @@ func (s *StorageContainer) ExistsTransactionPicture(ctx core.Context, path strin
 }
 
 // ReadTransactionPicture returns the transaction picture file from the current transaction picture object storage
-func (s *StorageContainer) ReadTransactionPicture(ctx core.Context, path string) (ObjectInStorage, error) {
+func (s *StorageContainer) ReadTransactionPicture(ctx core.Context, path string) (ObjectInStorage, bool, error) {
 	if s.transactionPictureCurrentStorage == nil {
-		return nil, errs.ErrSystemError
+		return nil, false, errs.ErrSystemError
 	}
 
 	return s.transactionPictureCurrentStorage.Read(ctx, path)
@@ -168,6 +168,8 @@ func (s *StorageContainer) DeleteTransactionPicture(ctx core.Context, path strin
 func newObjectStorage(config *settings.Config, pathPrefix string) (ObjectStorage, error) {
 	if config.StorageType == settings.LocalFileSystemObjectStorageType {
 		return NewLocalFileSystemObjectStorage(config, pathPrefix)
+	} else if config.StorageType == settings.S3StorageType {
+		return NewS3ObjectStorage(config, pathPrefix)
 	} else if config.StorageType == settings.MinIOStorageType {
 		return NewMinIOObjectStorage(config, pathPrefix)
 	} else if config.StorageType == settings.WebDAVStorageType {

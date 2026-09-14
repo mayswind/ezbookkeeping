@@ -3,7 +3,6 @@ package services
 import (
 	"io"
 	"mime/multipart"
-	"os"
 	"time"
 
 	"xorm.io/xorm"
@@ -103,14 +102,14 @@ func (s *UserCustomIconService) GetCustomIconByIconId(c core.Context, uid int64,
 		return nil, errs.ErrUserCustomIconNotFound
 	}
 
-	customIconFile, err := s.ReadUserCustomIcon(c, uid, iconId)
-
-	if os.IsNotExist(err) {
-		return nil, errs.ErrUserCustomIconeNotExists
-	}
+	customIconFile, exists, err := s.ReadUserCustomIcon(c, uid, iconId)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if !exists {
+		return nil, errs.ErrUserCustomIconeNotExists
 	}
 
 	defer customIconFile.Close()

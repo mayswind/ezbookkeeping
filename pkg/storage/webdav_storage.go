@@ -79,11 +79,11 @@ func (s *WebDAVObjectStorage) Exists(ctx core.Context, path string) (bool, error
 }
 
 // Read returns the object instance according to specified the file path
-func (s *WebDAVObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, error) {
+func (s *WebDAVObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, bool, error) {
 	req, err := http.NewRequest("GET", s.getFinalFileUrl(path), nil)
 
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	req.SetBasicAuth(s.webDavConfig.Username, s.webDavConfig.Password)
@@ -91,23 +91,28 @@ func (s *WebDAVObjectStorage) Read(ctx core.Context, path string) (ObjectInStora
 
 	if err != nil {
 		log.Errorf(ctx, "[webdav_storage.Read] cannot get file, because %s", err.Error())
-		return nil, err
+		return nil, false, err
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, false, nil
+	}
+
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		log.Errorf(ctx, "[webdav_storage.Read] cannot read response (http status code %d) body, because %s", resp.StatusCode, err.Error())
-		return nil, err
+		return nil, false, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		log.Errorf(ctx, "[webdav_storage.Read] cannot get file, http status code is %d, response is %s", resp.StatusCode, string(body))
-		return nil, errs.ErrSystemError
+		return nil, false, errs.ErrSystemError
 	}
 
-	return newByteSliceObject(body), nil
+	return newByteSliceObject(body), true, nil
 }
 
 // Save returns whether save the object instance successfully

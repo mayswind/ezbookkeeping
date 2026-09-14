@@ -68,16 +68,32 @@ func NewMinIOObjectStorage(config *settings.Config, pathPrefix string) (*MinIOOb
 func (s *MinIOObjectStorage) Exists(ctx core.Context, path string) (bool, error) {
 	objectInfo, err := s.minIOClient.StatObject(ctx, s.minIOConfig.Bucket, s.getFinalPath(path), minio.StatObjectOptions{})
 
-	if err == nil && !objectInfo.IsDeleteMarker {
-		return true, nil
+	if err != nil {
+		if isMinIOObjectNotFoundError(err) {
+			return false, nil
+		}
+
+		return false, err
 	}
 
-	return false, err
+	return !objectInfo.IsDeleteMarker, nil
 }
 
 // Read returns the object instance according to specified the file path
-func (s *MinIOObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, error) {
-	return s.minIOClient.GetObject(ctx, s.minIOConfig.Bucket, s.getFinalPath(path), minio.GetObjectOptions{})
+func (s *MinIOObjectStorage) Read(ctx core.Context, path string) (ObjectInStorage, bool, error) {
+	object, err := s.minIOClient.GetObject(ctx, s.minIOConfig.Bucket, s.getFinalPath(path), minio.GetObjectOptions{})
+
+	if err != nil {
+		if isMinIOObjectNotFoundError(err) {
+			return nil, false, nil
+		}
+
+		return nil, false, err
+	}
+
+	// this state does not reflect whether the actual object exists.
+	// however, loading the actual state would require an additional HTTP request, which is currently unnecessary.
+	return object, true, nil
 }
 
 // Save returns whether save the object instance successfully
@@ -110,4 +126,9 @@ func (s *MinIOObjectStorage) getFinalPath(path string) string {
 	path = strings.ReplaceAll(path, "\\", "/")
 
 	return rootPath + path
+}
+
+func isMinIOObjectNotFoundError(err error) bool {
+	errorResponse := minio.ToErrorResponse(err)
+	return errorResponse.Code == minio.NoSuchKey || errorResponse.Code == "NoSuchObject" || errorResponse.Code == "NotFound"
 }

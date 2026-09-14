@@ -3,7 +3,6 @@ package services
 import (
 	"io"
 	"mime/multipart"
-	"os"
 	"time"
 
 	"xorm.io/xorm"
@@ -176,14 +175,14 @@ func (s *TransactionPictureService) GetPictureByPictureId(c core.Context, uid in
 		return nil, errs.ErrTransactionPictureExtensionInvalid
 	}
 
-	pictureFile, err := s.ReadTransactionPicture(c, pictureInfo.Uid, pictureInfo.PictureId, pictureInfo.PictureExtension)
-
-	if os.IsNotExist(err) {
-		return nil, errs.ErrTransactionPictureNoExists
-	}
+	pictureFile, exists, err := s.ReadTransactionPicture(c, pictureInfo.Uid, pictureInfo.PictureId, pictureInfo.PictureExtension)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if !exists {
+		return nil, errs.ErrTransactionPictureNoExists
 	}
 
 	defer pictureFile.Close()

@@ -170,16 +170,16 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 		clonedConfig.SMTPConfig.SMTPPasswd = "****"
 	}
 
+	if clonedConfig.S3Config.SecretAccessKey != "" {
+		clonedConfig.S3Config.SecretAccessKey = "****"
+	}
+
+	if clonedConfig.S3Config.SessionToken != "" {
+		clonedConfig.S3Config.SessionToken = "****"
+	}
+
 	if clonedConfig.MinIOConfig.SecretAccessKey != "" {
 		clonedConfig.MinIOConfig.SecretAccessKey = "****"
-	}
-
-	if clonedConfig.SecretKey != "" {
-		clonedConfig.SecretKey = "****"
-	}
-
-	if clonedConfig.AmapApplicationSecret != "" {
-		clonedConfig.AmapApplicationSecret = "****"
 	}
 
 	if clonedConfig.WebDAVConfig != nil && clonedConfig.WebDAVConfig.Password != "" {
@@ -194,8 +194,16 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 		removeSensitiveDataFromLLMConfig(clonedConfig.ReceiptImageRecognitionLLMConfig)
 	}
 
+	if clonedConfig.SecretKey != "" {
+		clonedConfig.SecretKey = "****"
+	}
+
 	if clonedConfig.OAuth2ClientSecret != "" {
 		clonedConfig.OAuth2ClientSecret = "****"
+	}
+
+	if clonedConfig.AmapApplicationSecret != "" {
+		clonedConfig.AmapApplicationSecret = "****"
 	}
 
 	return clonedConfig

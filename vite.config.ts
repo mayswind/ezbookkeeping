@@ -159,7 +159,7 @@ export default defineConfig(() => {
                 manifest: {
                     name: 'ezBookkeeping',
                     short_name: 'ezBookkeeping',
-                    description: 'A lightweight, self-hosted personal finance app with a user-friendly interface and powerful bookkeeping features.',
+                    description: 'An open source, powerful, self-hosted personal finance app that is easy to use.',
                     theme_color: '#C67E48',
                     background_color: '#F6F7F8',
                     start_url: './',

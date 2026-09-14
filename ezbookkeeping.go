@@ -32,7 +32,7 @@ func main() {
 
 	cmd := &cli.Command{
 		Name:    "ezBookkeeping",
-		Usage:   "A lightweight, self-hosted personal finance app with a user-friendly interface and powerful bookkeeping features.",
+		Usage:   "An open source, powerful, self-hosted personal finance app that is easy to use.",
 		Version: GetFullVersion(),
 		Commands: []*cli.Command{
 			cmd.WebServer,

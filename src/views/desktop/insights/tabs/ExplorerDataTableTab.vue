@@ -41,7 +41,7 @@
                         <span class="text-body-large ms-2" v-else-if="!loading && filteredTransactionsStatistic">
                             {{ formatAmountToLocalizedNumeralsWithCurrency(filteredTransactionsStatistic.totalAmount) }}
                         </span>
-                        <v-tooltip interactive class="table-tooltip" activator="parent" v-if="!loading && filteredTransactions.length > 0 && filteredTransactionsStatistic">
+                        <v-tooltip interactive close-delay="100" class="table-tooltip" activator="parent" v-if="!loading && filteredTransactions.length > 0 && filteredTransactionsStatistic">
                             <v-table density="compact">
                                 <tbody>
                                 <tr>

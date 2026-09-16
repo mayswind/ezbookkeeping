@@ -1,7 +1,7 @@
 <template>
     <v-dialog width="800" v-model="showState">
         <one-column-dialog-layout content-class="pt-4"
-                                  :title="tt('About')" :cancel-button-title="tt('Cancel')"
+                                  :title="tt('About')" :cancel-button-title="tt('Close')"
                                   @cancel="showState = false">
             <template #content>
                 <v-row class="match-height">

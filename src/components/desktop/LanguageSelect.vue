@@ -3,6 +3,8 @@
         item-title="nativeDisplayName"
         item-value="languageTag"
         persistent-placeholder
+        :density="density"
+        :variant="variant"
         :disabled="disabled"
         :label="label"
         :placeholder="placeholder"
@@ -32,11 +34,15 @@ import { type LanguageSelectBaseProps, type LanguageSelectBaseEmits, useLanguage
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import type { ComponentDensity, InputVariant } from '@/lib/ui/desktop.ts';
+
 import {
     mdiCheck
 } from '@mdi/js';
 
 interface DesktopLanguageSelectProps extends LanguageSelectBaseProps {
+    density?: ComponentDensity;
+    variant?: InputVariant;
     label?: string;
     placeholder?: string;
 }

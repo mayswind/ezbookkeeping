@@ -1,462 +1,388 @@
 <template>
     <v-row>
         <v-col cols="12">
-            <v-card :title="tt('General Settings')">
+            <v-card class="setting-items" :title="tt('General Settings')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="name"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Theme')"
-                                    :placeholder="tt('Theme')"
-                                    :items="allThemes"
-                                    v-model="currentTheme"
-                                />
-                            </v-col>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Theme') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="name"
+                                item-value="value"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Theme')"
+                                :items="allThemes"
+                                v-model="currentTheme"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-autocomplete
-                                    item-title="displayNameWithUtcOffset"
-                                    item-value="name"
-                                    auto-select-first
-                                    persistent-placeholder
-                                    :label="tt('Timezone')"
-                                    :placeholder="tt('Timezone')"
-                                    :items="allTimezones"
-                                    :no-data-text="tt('No results')"
-                                    v-model="timeZone"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Timezone') }}</span>
+                            <v-spacer/>
+                            <v-autocomplete
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayNameWithUtcOffset"
+                                item-value="name"
+                                auto-select-first
+                                persistent-placeholder
+                                max-width="600px"
+                                :placeholder="tt('Timezone')"
+                                :items="allTimezones"
+                                :no-data-text="tt('No results')"
+                                v-model="timeZone"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Show Account Balance')"
-                                    :placeholder="tt('Show Account Balance')"
-                                    :items="enableDisableOptions"
-                                    v-model="showAccountBalance"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Show Account Balance') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="showAccountBalance"/>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :readonly="true"
-                                    :label="tt('Account Category Order')"
-                                    :placeholder="tt('Account Category Order')"
-                                    :model-value="accountCategorysDisplayOrderContent"
-                                    @pointerdown.prevent
-                                    @click="accountCategorysDisplayOrderDialog?.open().catch(()=>{})"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Account Category Order') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   @click="accountCategorysDisplayOrderDialog?.open().catch(()=>{})">
+                                {{ accountCategorysDisplayOrderContent }}
+                            </v-btn>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    persistent-placeholder
-                                    :readonly="true"
-                                    :label="tt('Chart Color Scheme')"
-                                    :placeholder="tt('Chart Color Scheme')"
-                                    :model-value="chartColorSchemeContent"
-                                    @pointerdown.prevent
-                                    @click="chartColorSchemeDialog?.open().catch(()=>{})"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Chart Color Scheme') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   @click="chartColorSchemeDialog?.open().catch(()=>{})">
+                                {{ chartColorSchemeContent }}
+                            </v-btn>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Auto-update Exchange Rates Data')"
-                                    :placeholder="tt('Auto-update Exchange Rates Data')"
-                                    :items="enableDisableOptions"
-                                    v-model="isAutoUpdateExchangeRatesData"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Auto-update Exchange Rates Data') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="isAutoUpdateExchangeRatesData"/>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Navigation Bar')">
+            <v-card class="setting-items" :title="tt('Navigation Bar')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Show Add Transaction Button')"
-                                    :placeholder="tt('Show Add Transaction Button')"
-                                    :items="enableDisableOptions"
-                                    v-model="showAddTransactionButtonInDesktopNavbar"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Show Add Transaction Button') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="showAddTransactionButtonInDesktopNavbar"/>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Overview Page')">
+            <v-card class="setting-items" :title="tt('Overview Page')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    persistent-placeholder
-                                    :readonly="true"
-                                    :label="tt('Home Page Layout')"
-                                    :placeholder="tt('Home Page Layout')"
-                                    :model-value="desktopOverviewPageLayoutDisplayContent"
-                                    @pointerdown.prevent
-                                    @click="router.push('/overview/edit')"
-                                />
-                            </v-col>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Home Page Layout') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   @click="router.push('/overview/edit')">
+                                {{ desktopOverviewPageLayoutDisplayContent }}
+                            </v-btn>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Show Amount')"
-                                    :placeholder="tt('Show Amount')"
-                                    :items="enableDisableOptions"
-                                    v-model="showAmountInHomePage"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Show Amount') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="showAmountInHomePage"/>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Timezone Used for Statistics')"
-                                    :placeholder="tt('Timezone Used for Statistics')"
-                                    :items="allTimezoneTypesUsedForStatistics"
-                                    v-model="timezoneUsedForStatisticsInHomePage"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Timezone Used for Statistics') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Timezone Used for Statistics')"
+                                :items="allTimezoneTypesUsedForStatistics"
+                                v-model="timezoneUsedForStatisticsInHomePage"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :loading="loadingAccounts"
-                                    :readonly="true"
-                                    :disabled="!hasAnyAccount"
-                                    :label="tt('Accounts Included in Overview Statistics')"
-                                    :placeholder="tt('Accounts Included in Overview Statistics')"
-                                    :model-value="accountsIncludedInHomePageOverviewDisplayContent"
-                                    @pointerdown.prevent
-                                    @click="showAccountsIncludedInHomePageOverviewDialog = true"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Accounts Included in Overview Statistics') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   :disabled="!hasAnyAccount" :loading="loadingAccounts"
+                                   @click="showAccountsIncludedInHomePageOverviewDialog = true">
+                                {{ accountsIncludedInHomePageOverviewDisplayContent || tt('All') }}
+                                <template #loader>
+                                    <v-progress-circular indeterminate size="20"/>
+                                </template>
+                            </v-btn>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :loading="loadingTransactionCategories"
-                                    :readonly="true"
-                                    :disabled="!hasAnyTransactionCategory"
-                                    :label="tt('Transaction Categories Included in Overview Statistics')"
-                                    :placeholder="tt('Transaction Categories Included in Overview Statistics')"
-                                    :model-value="transactionCategoriesIncludedInHomePageOverviewDisplayContent"
-                                    @pointerdown.prevent
-                                    @click="showTransactionCategoriesIncludedInHomePageOverviewDialog = true"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Transaction Categories Included in Overview Statistics') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   :disabled="!hasAnyTransactionCategory" :loading="loadingTransactionCategories"
+                                   @click="showTransactionCategoriesIncludedInHomePageOverviewDialog = true">
+                                {{ transactionCategoriesIncludedInHomePageOverviewDisplayContent || tt('All') }}
+                                <template #loader>
+                                    <v-progress-circular indeterminate size="20"/>
+                                </template>
+                            </v-btn>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Transaction List Page')">
+            <v-card class="setting-items" :title="tt('Transaction List Page')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="name"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Transactions Per Page')"
-                                    :placeholder="tt('Transactions Per Page')"
-                                    :items="allPageCounts"
-                                    v-model="itemsCountInTransactionListPage"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Show Monthly Total Amount')"
-                                    :placeholder="tt('Show Monthly Total Amount')"
-                                    :items="enableDisableOptions"
-                                    v-model="showTotalAmountInTransactionListPage"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Show Transaction Tags')"
-                                    :placeholder="tt('Show Transaction Tags')"
-                                    :items="enableDisableOptions"
-                                    v-model="showTagInTransactionListPage"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Keyword Search Matching Mode')"
-                                    :placeholder="tt('Default Keyword Search Matching Mode')"
-                                    :items="allKeywordMatchModes"
-                                    v-model="defaultKeywordMatchModeInTransactionListPage"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Transactions Per Page') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="name"
+                                item-value="value"
+                                persistent-placeholder
+                                max-width="200px"
+                                :placeholder="tt('Transactions Per Page')"
+                                :items="allPageCounts"
+                                v-model="itemsCountInTransactionListPage"
+                            />
+                        </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Show Monthly Total Amount') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="showTotalAmountInTransactionListPage"/>
+                        </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Show Transaction Tags') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="showTagInTransactionListPage"/>
+                        </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Default Keyword Search Matching Mode') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Keyword Search Matching Mode')"
+                                :items="allKeywordMatchModes"
+                                v-model="defaultKeywordMatchModeInTransactionListPage"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Transaction Edit Page')">
+            <v-card class="setting-items" :title="tt('Transaction Edit Page')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="name"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Automatically Save Draft')"
-                                    :placeholder="tt('Automatically Save Draft')"
-                                    :items="allAutoSaveTransactionDraftTypes"
-                                    v-model="autoSaveTransactionDraft"
-                                />
-                            </v-col>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Automatically Save Draft') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="name"
+                                item-value="value"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Automatically Save Draft')"
+                                :items="allAutoSaveTransactionDraftTypes"
+                                v-model="autoSaveTransactionDraft"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Automatically Add Geolocation')"
-                                    :placeholder="tt('Automatically Add Geolocation')"
-                                    :items="enableDisableOptions"
-                                    v-model="isAutoGetCurrentGeoLocation"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Automatically Add Geolocation') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="isAutoGetCurrentGeoLocation"/>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Transaction Picture Upload Quality')"
-                                    :placeholder="tt('Transaction Picture Upload Quality')"
-                                    :items="allImageUploadQualityTypes"
-                                    v-model="transactionPictureQuality"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Transaction Picture Upload Quality') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Transaction Picture Upload Quality')"
+                                :items="allImageUploadQualityTypes"
+                                v-model="transactionPictureQuality"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('AI Clipboard Text Recognition')">
+            <v-card class="setting-items" :title="tt('AI Clipboard Text Recognition')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Always Require Confirmation of Clipboard Content Before Submission')"
-                                    :placeholder="tt('Always Require Confirmation of Clipboard Content Before Submission')"
-                                    :items="enableDisableOptions"
-                                    v-model="isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Always Require Confirmation of Clipboard Content Before Submission') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission"/>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('AI Image Recognition')">
+            <v-card class="setting-items" :title="tt('AI Image Recognition')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Auto Upload AI Recognition Image as Transaction Picture')"
-                                    :placeholder="tt('Auto Upload AI Recognition Image as Transaction Picture')"
-                                    :items="enableDisableOptions"
-                                    v-model="isAutoUploadTransactionPictureForAIRecognition"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Auto Upload AI Recognition Image as Transaction Picture') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="isAutoUploadTransactionPictureForAIRecognition"/>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Import Transaction Dialog')">
+            <v-card class="setting-items" :title="tt('Import Transaction Dialog')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Remember Last Selected File Type')"
-                                    :placeholder="tt('Remember Last Selected File Type')"
-                                    :items="enableDisableOptions"
-                                    v-model="rememberLastSelectedFileTypeInImportTransactionDialog"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Remember Last Selected File Type') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="rememberLastSelectedFileTypeInImportTransactionDialog"/>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Insights Explorer Page')">
+            <v-card class="setting-items" :title="tt('Insights Explorer Page')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Date Range')"
-                                    :placeholder="tt('Default Date Range')"
-                                    :items="allInsightsExplorerDefaultDateRanges"
-                                    v-model="insightsExplorerDefaultDateRangeType"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Show Transaction Tags')"
-                                    :placeholder="tt('Show Transaction Tags')"
-                                    :items="enableDisableOptions"
-                                    v-model="showTagInInsightsExplorerPage"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Default Date Range') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Date Range')"
+                                :items="allInsightsExplorerDefaultDateRanges"
+                                v-model="insightsExplorerDefaultDateRangeType"
+                            />
+                        </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Show Transaction Tags') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="showTagInInsightsExplorerPage"/>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Account List Page')">
+            <v-card class="setting-items" :title="tt('Account List Page')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :loading="loadingAccounts"
-                                    :readonly="true"
-                                    :disabled="!hasAnyVisibleAccount"
-                                    :label="tt('Accounts Included in Total')"
-                                    :placeholder="tt('Accounts Included in Total')"
-                                    :model-value="accountsIncludedInTotalDisplayContent"
-                                    @pointerdown.prevent
-                                    @click="showAccountsIncludedInTotalDialog = true"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :label="tt('Hide Categories Without Accounts')"
-                                    :placeholder="tt('Hide Categories Without Accounts')"
-                                    :items="enableDisableOptions"
-                                    v-model="hideCategoriesWithoutAccounts"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Date Range for Reconciliation Statement Button')"
-                                    :placeholder="tt('Default Date Range for Reconciliation Statement Button')"
-                                    :items="allReconciliationStatementDateRanges"
-                                    v-model="reconciliationStatementButtonDefaultDateRangeTypeInDesktop"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Accounts Included in Total') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   :disabled="!hasAnyVisibleAccount" :loading="loadingAccounts"
+                                   @click="showAccountsIncludedInTotalDialog = true">
+                                {{ accountsIncludedInTotalDisplayContent || tt('All') }}
+                                <template #loader>
+                                    <v-progress-circular indeterminate size="20"/>
+                                </template>
+                            </v-btn>
+                        </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Hide Categories Without Accounts') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="hideCategoriesWithoutAccounts"/>
+                        </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Default Date Range for Reconciliation Statement Button') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Date Range for Reconciliation Statement Button')"
+                                :items="allReconciliationStatementDateRanges"
+                                v-model="reconciliationStatementButtonDefaultDateRangeTypeInDesktop"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Exchange Rates Data Page')">
+            <v-card class="setting-items" :title="tt('Exchange Rates Data Page')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Sort by')"
-                                    :placeholder="tt('Sort by')"
-                                    :items="allCurrencySortingTypes"
-                                    v-model="currencySortByInExchangeRatesPage"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Sort by') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Sort by')"
+                                :items="allCurrencySortingTypes"
+                                v-model="currencySortByInExchangeRatesPage"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
@@ -500,7 +426,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
-import type { NameNumeralValue, LocalizedSwitchOption } from '@/core/base.ts';
+import type { NameNumeralValue } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -518,7 +444,7 @@ type AccountCategoryDisplayOrderDialogType = InstanceType<typeof AccountCategory
 const theme = useTheme();
 const router = useRouter();
 
-const { tt, getAllEnableDisableOptions, getAllDateRanges, getTablePageOptions } = useI18n();
+const { tt, getAllDateRanges, getTablePageOptions } = useI18n();
 const {
     loadingAccounts,
     loadingTransactionCategories,
@@ -568,7 +494,6 @@ const showAccountsIncludedInHomePageOverviewDialog = ref<boolean>(false);
 const showTransactionCategoriesIncludedInHomePageOverviewDialog = ref<boolean>(false);
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
-const enableDisableOptions = computed<LocalizedSwitchOption[]>(() => getAllEnableDisableOptions());
 const allPageCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, undefined, false, true));
 const allInsightsExplorerDefaultDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, {}));
 

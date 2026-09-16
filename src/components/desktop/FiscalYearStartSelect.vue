@@ -1,6 +1,8 @@
 <template>
     <v-select
         persistent-placeholder
+        :density="density"
+        :variant="variant"
         :readonly="readonly"
         :disabled="disabled"
         :label="label"
@@ -39,7 +41,14 @@ import {
 
 import { ThemeType } from '@/core/theme.ts';
 
-const props = defineProps<CommonFiscalYearStartSelectionProps>();
+import { type ComponentDensity, type InputVariant } from '@/lib/ui/desktop.ts';
+
+interface DesktopFiscalYearStartSelectionProps extends CommonFiscalYearStartSelectionProps {
+    density?: ComponentDensity;
+    variant?: InputVariant;
+}
+
+const props = defineProps<DesktopFiscalYearStartSelectionProps>();
 const emit = defineEmits<CommonFiscalYearStartSelectionEmits>();
 
 const theme = useTheme();

@@ -4,6 +4,8 @@
         item-value="currencyCode"
         auto-select-first
         persistent-placeholder
+        :density="density"
+        :variant="variant"
         :disabled="disabled"
         :label="label"
         :placeholder="placeholder"
@@ -41,11 +43,15 @@ import { NormalizedText } from '@/core/text.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
 
+import type { ComponentDensity, InputVariant } from '@/lib/ui/desktop.ts';
+
 import {
     mdiCheck
 } from '@mdi/js';
 
 const props = defineProps<{
+    density?: ComponentDensity;
+    variant?: InputVariant;
     disabled?: boolean;
     label?: string;
     placeholder?: string;

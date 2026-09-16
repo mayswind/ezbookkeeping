@@ -1,194 +1,218 @@
 <template>
     <v-row>
         <v-col cols="12">
-            <v-card :title="tt('Statistics Settings')">
+            <v-card class="setting-items" :title="tt('Common Settings')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Chart Data Type')"
-                                    :placeholder="tt('Default Chart Data Type')"
-                                    :items="allChartDataTypes"
-                                    v-model="defaultChartDataType"
-                                />
-                            </v-col>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Default Chart Data Type') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Chart Data Type')"
+                                :items="allChartDataTypes"
+                                v-model="defaultChartDataType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Timezone Used for Date Range')"
-                                    :placeholder="tt('Timezone Used for Date Range')"
-                                    :items="allTimezoneTypesUsedForStatistics"
-                                    v-model="defaultTimezoneType"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Timezone Used for Date Range') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Timezone Used for Date Range')"
+                                :items="allTimezoneTypesUsedForStatistics"
+                                v-model="defaultTimezoneType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Keyword Search Matching Mode')"
-                                    :placeholder="tt('Default Keyword Search Matching Mode')"
-                                    :items="allKeywordMatchModes"
-                                    v-model="defaultKeywordMatchMode"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Keyword Search Matching Mode') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Keyword Search Matching Mode')"
+                                :items="allKeywordMatchModes"
+                                v-model="defaultKeywordMatchMode"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :loading="loadingAccounts"
-                                    :readonly="true"
-                                    :disabled="!hasAnyAccount"
-                                    :label="tt('Default Account Filter')"
-                                    :placeholder="tt('Default Account Filter')"
-                                    :model-value="defaultAccountFilterDisplayContent"
-                                    @pointerdown.prevent
-                                    @click="showFilterAccountDialog = true"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Account Filter') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   :disabled="!hasAnyAccount" :loading="loadingAccounts"
+                                   @click="showFilterAccountDialog = true">
+                                {{ defaultAccountFilterDisplayContent || tt('All') }}
+                                <template #loader>
+                                    <v-progress-circular indeterminate size="20"/>
+                                </template>
+                            </v-btn>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    class="always-cursor-pointer"
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :loading="loadingTransactionCategories"
-                                    :readonly="true"
-                                    :disabled="!hasAnyTransactionCategory"
-                                    :label="tt('Default Transaction Category Filter')"
-                                    :placeholder="tt('Default Transaction Category Filter')"
-                                    :model-value="defaultTransactionCategoryFilterDisplayContent"
-                                    @pointerdown.prevent
-                                    @click="showFilterCategoryDialog = true"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Transaction Category Filter') }}</span>
+                            <v-spacer/>
+                            <v-btn class="ms-4" variant="outlined" color="default"
+                                   :disabled="!hasAnyTransactionCategory" :loading="loadingTransactionCategories"
+                                   @click="showFilterCategoryDialog = true">
+                                {{ defaultTransactionCategoryFilterDisplayContent || tt('All') }}
+                                <template #loader>
+                                    <v-progress-circular indeterminate size="20"/>
+                                </template>
+                            </v-btn>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Sort Order')"
-                                    :placeholder="tt('Default Sort Order')"
-                                    :items="allSortingTypes"
-                                    v-model="defaultSortingType"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Sort Order') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Sort Order')"
+                                :items="allSortingTypes"
+                                v-model="defaultSortingType"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Categorical Analysis Settings')">
+            <v-card class="setting-items" :title="tt('Categorical Analysis Settings')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Chart Type')"
-                                    :placeholder="tt('Default Chart Type')"
-                                    :items="allCategoricalChartTypes"
-                                    v-model="defaultCategoricalChartType"
-                                />
-                            </v-col>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Default Chart Type') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Chart Type')"
+                                :items="allCategoricalChartTypes"
+                                v-model="defaultCategoricalChartType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Date Range')"
-                                    :placeholder="tt('Default Date Range')"
-                                    :items="allCategoricalChartDateRanges"
-                                    v-model="defaultCategoricalChartDateRange"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Date Range') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Date Range')"
+                                :items="allCategoricalChartDateRanges"
+                                v-model="defaultCategoricalChartDateRange"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Trend Analysis Settings')">
+            <v-card class="setting-items" :title="tt('Trend Analysis Settings')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Chart Type')"
-                                    :placeholder="tt('Default Chart Type')"
-                                    :items="allTrendChartTypes"
-                                    v-model="defaultTrendChartType"
-                                />
-                            </v-col>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Default Chart Type') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Chart Type')"
+                                :items="allTrendChartTypes"
+                                v-model="defaultTrendChartType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Date Range')"
-                                    :placeholder="tt('Default Date Range')"
-                                    :items="allTrendChartDateRanges"
-                                    v-model="defaultTrendChartDateRange"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Date Range') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Date Range')"
+                                :items="allTrendChartDateRanges"
+                                v-model="defaultTrendChartDateRange"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
         </v-col>
 
         <v-col cols="12">
-            <v-card :title="tt('Asset Trends Settings')">
+            <v-card class="setting-items" :title="tt('Asset Trends Settings')">
                 <v-form>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Chart Type')"
-                                    :placeholder="tt('Default Chart Type')"
-                                    :items="allTrendChartTypes"
-                                    v-model="defaultAssetTrendsChartType"
-                                />
-                            </v-col>
+                    <v-card-text class="pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Default Chart Type') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Chart Type')"
+                                :items="allTrendChartTypes"
+                                v-model="defaultAssetTrendsChartType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :label="tt('Default Date Range')"
-                                    :placeholder="tt('Default Date Range')"
-                                    :items="allAssetTrendsChartDateRanges"
-                                    v-model="defaultAssetTrendsChartDateRange"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Date Range') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Default Date Range')"
+                                :items="allAssetTrendsChartDateRanges"
+                                v-model="defaultAssetTrendsChartDateRange"
+                            />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>

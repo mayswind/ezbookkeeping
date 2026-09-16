@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col cols="12">
-            <v-card :class="{ 'disabled': loading || saving }">
+            <v-card class="setting-items" :class="{ 'disabled': loading || saving }">
                 <template #title>
                     <span>{{ tt('Basic Settings') }}</span>
                     <v-progress-circular indeterminate size="20" class="ms-3" v-if="loading"></v-progress-circular>
@@ -51,349 +51,427 @@
                 <v-divider />
 
                 <v-form>
-                    <v-card-text class="mt-1">
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    type="text"
-                                    autocomplete="nickname"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Nickname')"
-                                    :placeholder="tt('Your nickname')"
-                                    v-model="newProfile.nickname"
-                                />
-                            </v-col>
+                    <v-card-text class="my-1 pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Nickname') }}</span>
+                            <v-spacer/>
+                            <v-text-field
+                                class="ms-4"
+                                density="compact"
+                                type="text"
+                                autocomplete="nickname"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Your nickname')"
+                                v-model="newProfile.nickname"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-text-field
-                                    type="email"
-                                    autocomplete="email"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('E-mail')"
-                                    :placeholder="tt('Your email address')"
-                                    v-model="newProfile.email"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('E-mail') }}</span>
+                            <v-spacer/>
+                            <v-text-field
+                                class="ms-4"
+                                density="compact"
+                                type="email"
+                                autocomplete="email"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Your email address')"
+                                v-model="newProfile.email"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <two-column-select primary-key-field="id" primary-value-field="category"
-                                                   primary-title-field="name"
-                                                   primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
-                                                   primary-sub-items-field="accounts"
-                                                   :primary-title-i18n="true"
-                                                   secondary-key-field="id" secondary-value-field="id"
-                                                   secondary-title-field="name"
-                                                   secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
-                                                   :disabled="loading || saving || !allVisibleAccounts.length"
-                                                   :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
-                                                   :label="tt('Default Account')"
-                                                   :placeholder="tt('Default Account')"
-                                                   :items="allVisibleCategorizedAccounts"
-                                                   :no-item-text="Account.findAccountNameById(allAccounts, newProfile.defaultAccountId, tt('Unspecified'))"
-                                                   v-model="newProfile.defaultAccountId">
-                                </two-column-select>
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Account') }}</span>
+                            <v-spacer/>
+                            <two-column-select class="ms-4" density="compact" max-width="600px"
+                                               primary-key-field="id" primary-value-field="category"
+                                               primary-title-field="name"
+                                               primary-icon-field="icon" primary-icon-type-field="iconType" primary-icon-type="account"
+                                               primary-sub-items-field="accounts"
+                                               :primary-title-i18n="true"
+                                               secondary-key-field="id" secondary-value-field="id"
+                                               secondary-title-field="name"
+                                               secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
+                                               :disabled="loading || saving || !allVisibleAccounts.length"
+                                               :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
+                                               :placeholder="tt('Default Account')"
+                                               :items="allVisibleCategorizedAccounts"
+                                               :no-item-text="Account.findAccountNameById(allAccounts, newProfile.defaultAccountId, tt('Unspecified'))"
+                                               v-model="newProfile.defaultAccountId">
+                            </two-column-select>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="value"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Use Last Reconciled Time')"
-                                    :placeholder="tt('Use Last Reconciled Time')"
-                                    :items="enableDisableOptions"
-                                    v-model="newProfile.useLastReconciledTime"
-                                >
-                                    <template #item="{ props, internalItem }">
-                                        <v-list-item :disabled="!internalItem.raw.value && (TransactionEditScopeType.valueOf(newProfile.transactionEditScope)?.needLastReconciledTime ?? false)" v-bind="props">
-                                            <template #title>
-                                                <div class="text-truncate">{{ internalItem.raw.displayName }}</div>
-                                            </template>
-                                        </v-list-item>
-                                    </template>
-                                </v-select>
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Use Last Reconciled Time') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="value"
+                                persistent-placeholder
+                                :disabled="loading || saving"
+                                max-width="400px"
+                                :placeholder="tt('Use Last Reconciled Time')"
+                                :items="enableDisableOptions"
+                                v-model="newProfile.useLastReconciledTime"
+                            >
+                                <template #item="{ props, internalItem }">
+                                    <v-list-item :disabled="!internalItem.raw.value && (TransactionEditScopeType.valueOf(newProfile.transactionEditScope)?.needLastReconciledTime ?? false)" v-bind="props">
+                                        <template #title>
+                                            <div class="text-truncate">{{ internalItem.raw.displayName }}</div>
+                                        </template>
+                                    </v-list-item>
+                                </template>
+                            </v-select>
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Editable Transaction Range')"
-                                    :placeholder="tt('Editable Transaction Range')"
-                                    :items="allTransactionEditScopeTypes"
-                                    v-model="newProfile.transactionEditScope"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Editable Transaction Range') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Editable Transaction Range')"
+                                :items="allTransactionEditScopeTypes"
+                                v-model="newProfile.transactionEditScope"
+                            />
+                        </div>
                     </v-card-text>
 
                     <v-divider />
 
-                    <v-card-text class="mt-1">
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <language-select :disabled="loading || saving"
-                                                 :label="languageTitle"
-                                                 :placeholder="languageTitle"
-                                                 :include-system-default="true"
-                                                 :use-model-value="true" v-model="newProfile.language" />
-                            </v-col>
+                    <v-card-text class="my-1 pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ languageTitle }}</span>
+                            <v-spacer/>
+                            <language-select class="ms-4" density="compact" max-width="400px"
+                                             :disabled="loading || saving"
+                                             :placeholder="languageTitle"
+                                             :include-system-default="true"
+                                             :use-model-value="true" v-model="newProfile.language" />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <currency-select :disabled="loading || saving"
-                                                 :label="tt('Default Currency')"
-                                                 :placeholder="tt('Default Currency')"
-                                                 v-model="newProfile.defaultCurrency" />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Default Currency') }}</span>
+                            <v-spacer/>
+                            <currency-select class="ms-4" density="compact" max-width="400px"
+                                             :disabled="loading || saving"
+                                             :placeholder="tt('Default Currency')"
+                                             v-model="newProfile.defaultCurrency" />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('First Day of Week')"
-                                    :placeholder="tt('First Day of Week')"
-                                    :items="allWeekDays"
-                                    v-model="newProfile.firstDayOfWeek"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('First Day of Week') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('First Day of Week')"
+                                :items="allWeekDays"
+                                v-model="newProfile.firstDayOfWeek"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <fiscal-year-start-select
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Fiscal Year Start Date')"
-                                    :placeholder="tt('Fiscal Year Start Date')"
-                                    :numeral-system="newProfile.numeralSystem"
-                                    v-model="newProfile.fiscalYearStart"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Fiscal Year Start Date') }}</span>
+                            <v-spacer/>
+                            <fiscal-year-start-select
+                                class="ms-4"
+                                density="compact"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Fiscal Year Start Date')"
+                                :numeral-system="newProfile.numeralSystem"
+                                v-model="newProfile.fiscalYearStart"
+                            />
+                        </div>
                     </v-card-text>
 
                     <v-divider />
 
-                    <v-card-text class="mt-1">
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Calendar Display Type')"
-                                    :placeholder="tt('Calendar Display Type')"
-                                    :items="allCalendarDisplayTypes"
-                                    v-model="newProfile.calendarDisplayType"
-                                />
-                            </v-col>
+                    <v-card-text class="my-1 pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Calendar Display Type') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Calendar Display Type')"
+                                :items="allCalendarDisplayTypes"
+                                v-model="newProfile.calendarDisplayType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Date Display Type')"
-                                    :placeholder="tt('Date Display Type')"
-                                    :items="allDateDisplayTypes"
-                                    v-model="newProfile.dateDisplayType"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Date Display Type') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Date Display Type')"
+                                :items="allDateDisplayTypes"
+                                v-model="newProfile.dateDisplayType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Long Date Format')"
-                                    :placeholder="tt('Long Date Format')"
-                                    :items="allLongDateFormats"
-                                    v-model="newProfile.longDateFormat"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Long Date Format') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Long Date Format')"
+                                :items="allLongDateFormats"
+                                v-model="newProfile.longDateFormat"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Short Date Format')"
-                                    :placeholder="tt('Short Date Format')"
-                                    :items="allShortDateFormats"
-                                    v-model="newProfile.shortDateFormat"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Short Date Format') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Short Date Format')"
+                                :items="allShortDateFormats"
+                                v-model="newProfile.shortDateFormat"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Long Time Format')"
-                                    :placeholder="tt('Long Time Format')"
-                                    :items="allLongTimeFormats"
-                                    v-model="newProfile.longTimeFormat"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Long Time Format') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Long Time Format')"
+                                :items="allLongTimeFormats"
+                                v-model="newProfile.longTimeFormat"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Short Time Format')"
-                                    :placeholder="tt('Short Time Format')"
-                                    :items="allShortTimeFormats"
-                                    v-model="newProfile.shortTimeFormat"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Short Time Format') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Short Time Format')"
+                                :items="allShortTimeFormats"
+                                v-model="newProfile.shortTimeFormat"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Fiscal Year Format')"
-                                    :placeholder="tt('Fiscal Year Format')"
-                                    :items="allFiscalYearFormats"
-                                    v-model="newProfile.fiscalYearFormat"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Fiscal Year Format') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Fiscal Year Format')"
+                                :items="allFiscalYearFormats"
+                                v-model="newProfile.fiscalYearFormat"
+                            />
+                        </div>
                     </v-card-text>
 
                     <v-divider />
 
-                    <v-card-text class="mt-1">
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Currency Display Mode')"
-                                    :placeholder="tt('Currency Display Mode')"
-                                    :items="allCurrencyDisplayTypes"
-                                    v-model="newProfile.currencyDisplayType"
-                                />
-                            </v-col>
+                    <v-card-text class="my-1 pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Currency Display Mode') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Currency Display Mode')"
+                                :items="allCurrencyDisplayTypes"
+                                v-model="newProfile.currencyDisplayType"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Numeral System')"
-                                    :placeholder="tt('Numeral System')"
-                                    :items="allNumeralSystemTypes"
-                                    v-model="newProfile.numeralSystem"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Numeral System') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Numeral System')"
+                                :items="allNumeralSystemTypes"
+                                v-model="newProfile.numeralSystem"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Digit Grouping')"
-                                    :placeholder="tt('Digit Grouping')"
-                                    :items="allDigitGroupingTypes"
-                                    v-model="newProfile.digitGrouping"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Digit Grouping') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Digit Grouping')"
+                                :items="allDigitGroupingTypes"
+                                v-model="newProfile.digitGrouping"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving || !supportDigitGroupingSymbol"
-                                    :label="tt('Digit Grouping Symbol')"
-                                    :placeholder="tt('Digit Grouping Symbol')"
-                                    :items="allDigitGroupingSymbols"
-                                    v-model="newProfile.digitGroupingSymbol"
-                                />
-                            </v-col>
+                        <div class="setting-item">
+                            <span>{{ tt('Digit Grouping Symbol') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving || !supportDigitGroupingSymbol"
+                                :placeholder="tt('Digit Grouping Symbol')"
+                                :items="allDigitGroupingSymbols"
+                                v-model="newProfile.digitGroupingSymbol"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Decimal Separator')"
-                                    :placeholder="tt('Decimal Separator')"
-                                    :items="allDecimalSeparators"
-                                    v-model="newProfile.decimalSeparator"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Decimal Separator') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Decimal Separator')"
+                                :items="allDecimalSeparators"
+                                v-model="newProfile.decimalSeparator"
+                            />
+                        </div>
                     </v-card-text>
 
                     <v-divider />
 
-                    <v-card-text class="mt-1">
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Geographic Location Format')"
-                                    :placeholder="tt('Geographic Location Format')"
-                                    :items="allCoordinateDisplayTypes"
-                                    v-model="newProfile.coordinateDisplayType"
-                                />
-                            </v-col>
-                        </v-row>
+                    <v-card-text class="my-1 pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Geographic Location Format') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Geographic Location Format')"
+                                :items="allCoordinateDisplayTypes"
+                                v-model="newProfile.coordinateDisplayType"
+                            />
+                        </div>
                     </v-card-text>
 
                     <v-divider />
 
-                    <v-card-text class="mt-1">
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Expense Amount Color')"
-                                    :placeholder="tt('Expense Amount Color')"
-                                    :items="allExpenseAmountColorTypes"
-                                    v-model="newProfile.expenseAmountColor"
-                                />
-                            </v-col>
+                    <v-card-text class="my-1 pa-0 text-body-medium">
+                        <div class="setting-item">
+                            <span>{{ tt('Expense Amount Color') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Expense Amount Color')"
+                                :items="allExpenseAmountColorTypes"
+                                v-model="newProfile.expenseAmountColor"
+                            />
+                        </div>
 
-                            <v-col cols="12" md="6">
-                                <v-select
-                                    item-title="displayName"
-                                    item-value="type"
-                                    persistent-placeholder
-                                    :disabled="loading || saving"
-                                    :label="tt('Income Amount Color')"
-                                    :placeholder="tt('Income Amount Color')"
-                                    :items="allIncomeAmountColorTypes"
-                                    v-model="newProfile.incomeAmountColor"
-                                />
-                            </v-col>
-                        </v-row>
+                        <div class="setting-item">
+                            <span>{{ tt('Income Amount Color') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="type"
+                                persistent-placeholder
+                                max-width="400px"
+                                :disabled="loading || saving"
+                                :placeholder="tt('Income Amount Color')"
+                                :items="allIncomeAmountColorTypes"
+                                v-model="newProfile.incomeAmountColor"
+                            />
+                        </div>
                     </v-card-text>
 
                     <v-divider />

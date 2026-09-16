@@ -1,0 +1,20 @@
+.setting-items {
+    .setting-item {
+        display: flex;
+        align-items: center;
+        margin-inline: 4px;
+        padding-inline: 12px;
+        padding-block: 6px;
+        border-radius: var(--ebk-radius-lg);
+        transition: background-color 0.15s ease-in-out;
+
+        &:hover,
+        &:focus-within {
+            background-color: rgba(var(--v-theme-on-surface), 0.03);
+        }
+
+        &:last-child {
+            margin-bottom: 6px;
+        }
+    }
+}

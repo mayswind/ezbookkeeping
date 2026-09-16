@@ -27,6 +27,13 @@
                     <v-icon :icon="mdiRefresh" size="22" />
                     <v-tooltip activator="parent">{{ tt('Refresh Accounts, Categories and Tags') }}</v-tooltip>
                 </v-btn>
+
+                <v-btn class="ms-2" density="comfortable" color="primary" variant="outlined"
+                       :disabled="loading || submitting || importTransactionCheckDataTab?.isEditing"
+                       @click="batchApplyRules"
+                       v-if="currentStep === 'checkData'">
+                    {{ tt('Batch Apply Rules') }}
+                </v-btn>
             </template>
 
             <template #toolbar>
@@ -1164,6 +1171,14 @@ function parseData(): void {
             }
         });
     }
+}
+
+function batchApplyRules(): void {
+    if (importTransactionCheckDataTab.value?.isEditing) {
+        return;
+    }
+
+    importTransactionCheckDataTab.value?.showBatchApplyRulesDialog();
 }
 
 function submit(): void {

@@ -836,15 +836,8 @@ const filterMenus = computed<ImportTransactionCheckDataMenuGroup[]>(() => [
 const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
     {
         prependIcon: mdiTextBoxEditOutline,
-        title: tt('Batch Apply Rules'),
-        disabled: isEditing.value,
-        onClick: showBatchApplyRulesDialog
-    },
-    {
-        prependIcon: mdiTextBoxEditOutline,
         title: tt('Batch Replace Selected Expense Categories'),
         disabled: isEditing.value || selectedExpenseTransactionCount.value < 1,
-        divider: true,
         onClick: () => showBatchReplaceDialog('expenseCategory')
     },
     {
@@ -2235,6 +2228,7 @@ defineExpose({
     toolMenus,
     isEditing,
     canImport,
+    showBatchApplyRulesDialog,
     updateAllTransactionsIsValid,
     reset,
     setCountPerPage

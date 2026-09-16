@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
+import { useOverviewStore } from '@/stores/overview.ts';
 import { useExchangeRatesStore } from './exchangeRates.ts';
 
 import { type BeforeResolveFunction, itemAndIndex, reversed, entries, values } from '@/core/base.ts';
@@ -28,6 +29,7 @@ import logger from '@/lib/logger.ts';
 export const useAccountsStore = defineStore('accounts', () => {
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
+    const overviewStore = useOverviewStore();
     const exchangeRatesStore = useExchangeRatesStore();
 
     let loadingPromise: Promise<Account[]> | null = null;
@@ -1020,6 +1022,8 @@ export const useAccountsStore = defineStore('accounts', () => {
                     }
                 }
 
+                overviewStore.updateTransactionOverviewInvalidState(true);
+
                 resolve(newAccount);
             }).catch(error => {
                 logger.error('failed to save account', error);
@@ -1200,6 +1204,8 @@ export const useAccountsStore = defineStore('accounts', () => {
                     removeAccountFromAccountList(account);
                 }
 
+                overviewStore.updateTransactionOverviewInvalidState(true);
+
                 resolve(data.result);
             }).catch(error => {
                 logger.error('failed to delete account', error);
@@ -1234,6 +1240,8 @@ export const useAccountsStore = defineStore('accounts', () => {
                 } else {
                     removeSubAccountFromAccountList(subAccount);
                 }
+
+                overviewStore.updateTransactionOverviewInvalidState(true);
 
                 resolve(data.result);
             }).catch(error => {

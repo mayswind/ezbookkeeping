@@ -13,7 +13,8 @@
                                                 :use-model-value="true" v-model="currentLocale" />
                     </div>
 
-                    <v-expansion-panels class="compacted-expansion-panels" variant="accordion" multiple :disabled="submitting">
+                    <v-expansion-panels class="compacted-expansion-panels" variant="accordion" multiple :disabled="submitting"
+                                        @click="focusParentWhenClicked($event, 'v-list', '.v-card-text')">
                         <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                             <v-expansion-panel-title class="py-0 px-4">
                                 <ItemIcon :icon-type="getCategoryIconType(category.iconType)" :icon-id="category.icon" :color="category.color"></ItemIcon>
@@ -61,9 +62,11 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
+
 import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';
+import { focusParentWhenClicked } from '@/lib/ui/desktop.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 

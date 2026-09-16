@@ -18,7 +18,7 @@
             <slot name="subtitle" />
         </v-card-title>
         <v-divider />
-        <v-card-text class="flex-grow-1 overflow-y-auto" :class="contentClass" :style="contentStyle">
+        <v-card-text class="flex-grow-1 overflow-y-auto" tabindex="0" :class="contentClass" :style="contentStyle">
             <slot name="content" />
         </v-card-text>
         <v-divider v-if="$slots['footer']" />

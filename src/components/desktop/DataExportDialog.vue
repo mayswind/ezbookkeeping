@@ -78,6 +78,7 @@
                         :hide-default-footer="true"
                         :items-per-page="dataTableItems.length"
                         :no-data-text="tt('No data')"
+                        @click="focusTableScrollContainer"
                         v-if="!showRawData"
                     ></v-data-table>
                     <div class="w-100 h-100 code-container" v-if="showRawData">
@@ -111,6 +112,7 @@ import { ExportMermaidChartType } from '@/core/statistics.ts';
 import { replaceAll, arrayItemToObjectField } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
+import { focusTableScrollContainer } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
 
 import {

@@ -54,3 +54,53 @@ export function setChildInputFocus(parentEl: HTMLElement | undefined, childSelec
     childInput.focus();
     childInput.select();
 }
+
+export function focusParentWhenClicked(event: MouseEvent, currentClass: string, parentSelector: string): void {
+    const activeElement = document.activeElement as HTMLElement | null;
+    if (!activeElement?.classList.contains(currentClass)) {
+        return;
+    }
+
+    const currentTarget = event.currentTarget as HTMLElement | null;
+    currentTarget?.closest<HTMLElement>(parentSelector)?.focus({ preventScroll: true });
+}
+
+export function focusTableScrollContainer(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    const tableRoot = event.currentTarget as HTMLElement | null;
+
+    if (!target || !tableRoot) {
+        return;
+    }
+
+    if (target.closest([
+        'button',
+        'input',
+        'textarea',
+        'select',
+        'label',
+        '[contenteditable="true"]',
+        '[role="button"]',
+        '[role="checkbox"]',
+        '[role="radio"]',
+        '[role="switch"]',
+        '[role="slider"]'
+    ].join(','))) {
+        return;
+    }
+
+    const wrapper = tableRoot.querySelector<HTMLElement>(':scope > .v-table__wrapper');
+
+    if (!wrapper) {
+        return;
+    }
+
+    const canScroll = wrapper.scrollHeight > wrapper.clientHeight || wrapper.scrollWidth > wrapper.clientWidth;
+
+    if (!canScroll) {
+        return;
+    }
+
+    wrapper.tabIndex = -1;
+    wrapper.focus({ preventScroll: true });
+}

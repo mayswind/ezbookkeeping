@@ -17,6 +17,7 @@
             :no-data-text="tt('No data to import')"
             v-model:items-per-page="countPerPage"
             v-model:page="currentPage"
+            @click="focusTableScrollContainerWhenNonEditing"
         >
             <template #header.data-table-select>
                 <v-checkbox readonly class="always-cursor-pointer"
@@ -474,6 +475,7 @@ import {
 } from '@/lib/category.ts';
 import { applyImportTransactionReplaceRules } from '@/lib/rule.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
+import { focusTableScrollContainer } from '@/lib/ui/desktop.ts';
 
 import {
     extendMdiSemicolon
@@ -2194,6 +2196,14 @@ function exportData(fileType: KnownFileType): void {
     });
 
     startDownloadFile(fileType.formatFileName(tt('dataExport.defaultImportCheckResultFileName')), fileType.createBlob(header + rows.join('\n')));
+}
+
+function focusTableScrollContainerWhenNonEditing(event: MouseEvent): void {
+    if (isEditing.value) {
+        return;
+    }
+
+    focusTableScrollContainer(event);
 }
 
 function onShowDateRangeError(message: string): void {

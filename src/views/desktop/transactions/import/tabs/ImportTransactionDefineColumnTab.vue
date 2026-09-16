@@ -14,6 +14,7 @@
             :no-data-text="tt('No data to import')"
             v-model:items-per-page="countPerPage"
             v-model:page="currentPage"
+            @click="focusTableScrollContainer"
         >
             <template #headers="{ columns }">
                 <tr>
@@ -256,6 +257,7 @@ import {
     openTextFileContent,
     startDownloadFile
 } from '@/lib/ui/common.ts';
+import { focusTableScrollContainer } from '@/lib/ui/desktop.ts';
 import logger from '@/lib/logger.ts';
 
 import {

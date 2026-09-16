@@ -53,7 +53,8 @@
                 </div>
 
                 <div v-else-if="!loading">
-                    <v-expansion-panels class="category-types" multiple v-model="expandCategoryTypes">
+                    <v-expansion-panels class="category-types" multiple v-model="expandCategoryTypes"
+                                        @click="focusParentWhenClicked($event, 'v-list', '.v-card-text')">
                         <v-expansion-panel :key="categoryType"
                                            :value="parseInt(categoryType) as CategoryType"
                                            class="border"
@@ -143,6 +144,7 @@ import {
     isSubCategoriesAllChecked,
     isSubCategoriesHasButNotAllChecked
 } from '@/lib/category.ts';
+import { focusParentWhenClicked } from '@/lib/ui/desktop.ts';
 
 import {
     mdiMagnify,

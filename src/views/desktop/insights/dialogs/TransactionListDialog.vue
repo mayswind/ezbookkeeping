@@ -34,6 +34,7 @@
                     :hover="true"
                     v-model:items-per-page="countPerPage"
                     v-model:page="currentPage"
+                    @click="focusTableScrollContainer"
                 >
                     <template #item.time="{ item }">
                         <div class="d-flex align-center">
@@ -123,6 +124,7 @@ import { TransactionType } from '@/core/transaction.ts';
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
 
 import { getCategoryIconType } from '@/lib/icon.ts';
+import { focusTableScrollContainer } from '@/lib/ui/desktop.ts';
 
 import {
     mdiArrowRight,

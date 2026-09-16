@@ -53,7 +53,8 @@
                 </div>
 
                 <div v-else-if="!loading && hasAnyVisibleTag">
-                    <v-expansion-panels class="tag-categories" multiple v-model="expandTagGroups">
+                    <v-expansion-panels class="tag-categories" multiple v-model="expandTagGroups"
+                                        @click="focusParentWhenClicked($event, 'v-list', '.v-card-text')">
                         <template :key="tagGroup.id" v-for="tagGroup in allTagGroupsWithDefault">
                             <v-expansion-panel class="border" :value="tagGroup.id" v-if="allVisibleTags[tagGroup.id] && allVisibleTags[tagGroup.id]!.length > 0">
                                 <v-expansion-panel-title class="expand-panel-title-with-bg py-0">
@@ -143,6 +144,8 @@ import { TransactionTagFilterType } from '@/core/transaction.ts';
 
 import type { TransactionTagGroup } from '@/models/transaction_tag_group.ts';
 import type { TransactionTag } from '@/models/transaction_tag.ts';
+
+import { focusParentWhenClicked } from '@/lib/ui/desktop.ts';
 
 import {
     mdiMagnify,

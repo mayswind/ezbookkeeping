@@ -179,6 +179,7 @@
                     :no-data-text="loading ? '' : tt('No transaction data')"
                     v-model:items-per-page="countPerPage"
                     v-model:page="currentPage"
+                    @click="focusTableScrollContainer"
                     v-if="!showAccountBalanceTrendsCharts"
                 >
                     <template #item.time="{ item }">
@@ -349,6 +350,7 @@ import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { startDownloadFile } from '@/lib/ui/common.ts';
+import { focusTableScrollContainer } from '@/lib/ui/desktop.ts';
 
 import {
     extendMdiSemicolon

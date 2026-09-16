@@ -1788,7 +1788,9 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagIt
                         updated = true;
                     }
                 } else if (type === 'timezone') {
+                    const oldUtcOffset = importTransaction.utcOffset;
                     importTransaction.utcOffset = getTimezoneOffsetMinutes(importTransaction.time, result.targetItem as string);
+                    importTransaction.time = importTransaction.time - (importTransaction.utcOffset - oldUtcOffset) * 60;
                     updated = true;
                 } else if (type === 'tag') {
                     const removeIndex: number[] = [];

@@ -262,13 +262,15 @@ function applyRuleAction(transaction: ImportTransaction, rule: ImportTransaction
 }
 
 function setTransactionTimezone(transaction: ImportTransaction, timezone: string): boolean {
+    const oldUtcOffset = transaction.utcOffset;
     const utcOffset = getTimezoneOffsetMinutes(transaction.time, timezone);
 
-    if (transaction.utcOffset === utcOffset) {
+    if (oldUtcOffset === utcOffset) {
         return false;
     }
 
     transaction.utcOffset = utcOffset;
+    transaction.time = transaction.time - (transaction.utcOffset - oldUtcOffset) * 60;
     return true;
 }
 

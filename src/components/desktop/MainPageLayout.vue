@@ -34,7 +34,7 @@
                         <div class="app-top-toolbar d-inline-flex"
                              :class="{ 'app-top-toolbar-without-navbar': noNavbar }">
                             <slot name="top-toolbar">
-                                <router-link to="/">
+                                <router-link to="/" :aria-current="isTopNavigationActive('/') ? 'page' : undefined">
                                     <v-btn class="top-navigation-button" density="comfortable" variant="text"
                                            :aria-label="tt('Overview')" :icon="true"
                                            :active="isTopNavigationActive('/')"
@@ -44,7 +44,8 @@
                                     </v-btn>
                                 </router-link>
 
-                                <router-link to="/transaction/list?pageType=0&dateType=7">
+                                <router-link to="/transaction/list?pageType=0&dateType=7"
+                                             :aria-current="isTopNavigationActive('/transaction/list') ? 'page' : undefined">
                                     <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
                                            :aria-label="tt('Transaction Details')" :icon="true"
                                            :active="isTopNavigationActive('/transaction/list')"
@@ -54,7 +55,8 @@
                                     </v-btn>
                                 </router-link>
 
-                                <router-link to="/statistics/transaction">
+                                <router-link to="/statistics/transaction"
+                                             :aria-current="isTopNavigationActive('/statistics/transaction') ? 'page' : undefined">
                                     <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
                                            :aria-label="tt('Statistics & Analysis')" :icon="true"
                                            :active="isTopNavigationActive('/statistics/transaction')"
@@ -64,7 +66,8 @@
                                     </v-btn>
                                 </router-link>
 
-                                <router-link to="/insights/explorer">
+                                <router-link to="/insights/explorer"
+                                             :aria-current="isTopNavigationActive('/insights/explorer') ? 'page' : undefined">
                                     <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
                                            :aria-label="tt('Insights Explorer')" :icon="true"
                                            :active="isTopNavigationActive('/insights/explorer')"
@@ -74,7 +77,8 @@
                                     </v-btn>
                                 </router-link>
 
-                                <router-link to="/account/list">
+                                <router-link to="/account/list"
+                                             :aria-current="isTopNavigationActive('/account/list') ? 'page' : undefined">
                                     <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
                                            :aria-label="tt('Accounts')" :icon="true"
                                            :active="isTopNavigationActive('/account/list')"
@@ -107,7 +111,7 @@
                                @click="(currentTheme === 'light' ? currentTheme = 'dark' : (currentTheme === 'dark' ? currentTheme = 'auto' : currentTheme = 'light'))">
                             <v-icon :icon="(currentTheme === 'light' ? mdiWeatherSunny : (currentTheme === 'dark' ? mdiWeatherNight : mdiThemeLightDark))" size="24" />
                         </v-btn>
-                        <v-avatar class="cursor-pointer ms-3" variant="tonal"
+                        <v-avatar class="cursor-pointer ms-3" variant="tonal" :aria-label="tt('Settings')"
                                   :color="currentUserAvatar ? 'rgba(0,0,0,0)' : 'primary'">
                             <v-icon :color="currentUserAvatar ? 'primary' : undefined" :icon="mdiAccount"/>
                             <span class="user-avatar-image" :style="currentUserAvatarStyle" v-if="currentUserAvatar"></span>

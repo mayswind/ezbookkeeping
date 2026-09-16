@@ -7,12 +7,12 @@
         <overview-dashboard :layout="layout" :loading="loading" @navigate="onNavigate" />
 
         <f7-toolbar tabbar icons bottom class="main-tabbar">
-            <f7-link class="link" href="/transaction/list">
-                <f7-icon f7="square_list"></f7-icon>
+            <f7-link class="link" href="/transaction/list" :aria-label="tt('Details')">
+                <f7-icon f7="square_list" aria-hidden="true"></f7-icon>
                 <span class="tabbar-label">{{ tt('Details') }}</span>
             </f7-link>
-            <f7-link class="link" href="/account/list">
-                <f7-icon f7="creditcard"></f7-icon>
+            <f7-link class="link" href="/account/list" :aria-label="tt('Accounts')">
+                <f7-icon f7="creditcard" aria-hidden="true"></f7-icon>
                 <span class="tabbar-label">{{ tt('Accounts') }}</span>
             </f7-link>
             <!-- "homepage-add-button" must have the "dragenabled" class, otherwise the popover disappears immediately after the second long press -->
@@ -20,14 +20,14 @@
                      href="/transaction/add"
                      :aria-label="tt('Add Transaction')"
                      @taphold="openTransactionTemplatePopover">
-                <f7-icon f7="plus_square" class="ebk-tarbar-big-icon"></f7-icon>
+                <f7-icon f7="plus_square" class="ebk-tarbar-big-icon" aria-hidden="true"></f7-icon>
             </f7-link>
-            <f7-link class="link" href="/statistic/transaction">
-                <f7-icon f7="chart_pie"></f7-icon>
+            <f7-link class="link" href="/statistic/transaction" :aria-label="tt('Statistics')">
+                <f7-icon f7="chart_pie" aria-hidden="true"></f7-icon>
                 <span class="tabbar-label">{{ tt('Statistics') }}</span>
             </f7-link>
-            <f7-link class="link" href="/settings">
-                <f7-icon f7="gear_alt"></f7-icon>
+            <f7-link class="link" href="/settings" :aria-label="tt('Settings')">
+                <f7-icon f7="gear_alt" aria-hidden="true"></f7-icon>
                 <span class="tabbar-label">{{ tt('Settings') }}</span>
             </f7-link>
         </f7-toolbar>

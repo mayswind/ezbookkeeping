@@ -8,7 +8,7 @@
             <p class="no-margin">
                 <span class="net-assets" v-if="loading">0.00 USD</span>
                 <span class="net-assets" v-else-if="!loading">{{ netAssets }}</span>
-                <f7-link class="display-inline-flex margin-inline-start-half"
+                <f7-link class="display-inline-flex margin-inline-start-half" :style="iconStyle"
                          :aria-label="showAccountBalance ? tt('Hide Account Balance') : tt('Show Account Balance')"
                          @click="showAccountBalance = !showAccountBalance"
                          v-if="scene === 'accountList'">
@@ -45,7 +45,7 @@ import {
     DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR
 } from '@/consts/color.ts';
 
-import { getDisplayColor, getContrastTextColor } from '@/lib/color.ts';
+import { getDisplayColor, getContrastTextColor, getContrastIconColor } from '@/lib/color.ts';
 
 const props = defineProps<{
     loading: boolean;
@@ -71,6 +71,7 @@ const backgroundColor = computed<ColorValue>(() => isDarkMode.value ?
     props.darkBackgroundColor ?? DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR :
     props.lightBackgroundColor ?? DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR);
 const foregroundColor = computed<ColorValue>(() => getContrastTextColor(backgroundColor.value));
+const iconColor = computed<ColorValue>(() => getContrastIconColor(backgroundColor.value));
 
 const cardStyle = computed<Record<string, string>>(() => ({
     'background-color': getDisplayColor(backgroundColor.value),
@@ -92,4 +93,9 @@ const cardHeaderStyle = computed<Record<string, string>>(() => {
 
     return finalStyle;
 });
+
+const iconStyle = computed<Record<string, string>>(() => ({
+    color: getDisplayColor(iconColor.value),
+    opacity: '1'
+}));
 </script>

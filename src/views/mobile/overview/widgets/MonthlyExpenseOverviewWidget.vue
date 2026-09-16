@@ -85,6 +85,7 @@ const cardHeaderStyle = computed<Record<string, string>>(() => {
 
     return finalStyle;
 });
+
 const iconStyle = computed<Record<string, string>>(() => ({
     color: getDisplayColor(iconColor.value),
     opacity: '1'

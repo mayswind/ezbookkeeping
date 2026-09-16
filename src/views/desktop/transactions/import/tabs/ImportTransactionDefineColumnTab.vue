@@ -65,7 +65,7 @@
                                         <td>{{ typeName }}</td>
                                         <td>
                                             <v-btn-toggle class="toggle-buttons" density="compact" variant="outlined"
-                                                          color="default" mandatory="force" divided
+                                                          color="default" mandatory="force"
                                                           v-model="parsedFileDataColumnMapping.transactionTypeMapping[typeName]">
                                                 <v-btn :value="undefined">{{ tt('None') }}</v-btn>
                                                 <v-btn :value="TransactionType.ModifyBalance">{{ tt('Modify Balance') }}</v-btn>

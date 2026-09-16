@@ -246,12 +246,24 @@
         &:not(:first-child) {
             border-start-start-radius: 0;
             border-end-start-radius: 0;
-            border-inline-start: 0;
+            margin-inline-start: -1px;
         }
 
         &:not(:last-child) {
             border-start-end-radius: 0;
             border-end-end-radius: 0;
+
+            &:not(.v-btn--active) {
+                border-inline-end-color: transparent;
+            }
+        }
+
+        &.v-btn--active {
+            z-index: 1;
+
+            + .v-btn {
+                border-inline-start-color: transparent;
+            }
         }
     }
 }

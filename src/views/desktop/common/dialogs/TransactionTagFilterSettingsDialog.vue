@@ -103,7 +103,7 @@
                                                 </template>
                                                 <template #append>
                                                     <v-btn-toggle class="toggle-buttons" style="min-height: 30px"
-                                                                  density="compact" variant="outlined" mandatory="force" divided
+                                                                  density="compact" variant="outlined" mandatory="force"
                                                                   :model-value="tagFilterStateMap[transactionTag.id]"
                                                                   @update:model-value="updateTransactionTagState(transactionTag, $event)">
                                                         <v-btn :value="TransactionTagFilterState.Include">{{ tt('Included') }}</v-btn>

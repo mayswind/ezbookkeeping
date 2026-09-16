@@ -189,7 +189,7 @@
                                                             color="primary"
                                                             density="compact"
                                                             mandatory="force"
-                                                            divided rounded="xl"
+                                                            rounded="xl"
                                                             :disabled="loading"
                                                             v-model="activeSubAccount[element.id]"
                                                         >

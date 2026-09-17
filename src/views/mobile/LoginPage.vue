@@ -9,8 +9,9 @@
             <f7-block-footer>{{ tips }}</f7-block-footer>
         </f7-list>
 
-        <f7-list form class="login-page-form margin-bottom-half" v-if="isInternalAuthEnabled()">
+        <f7-list form class="login-page-form margin-bottom-half" v-if="isInternalAuthEnabled() || isOAuth2Enabled()">
             <f7-list-input
+                v-if="isInternalAuthEnabled()"
                 type="text"
                 autocomplete="username"
                 autocapitalize="none"
@@ -26,11 +27,12 @@
                 @input="tempToken = ''"
             ></f7-list-input>
 
-            <f7-list-item class="login-divider no-margin display-flex align-items-center">
+            <f7-list-item class="login-divider no-margin display-flex align-items-center" v-if="isInternalAuthEnabled()">
                 <hr class="no-margin" />
             </f7-list-item>
 
             <f7-list-input
+                v-if="isInternalAuthEnabled()"
                 type="password"
                 autocomplete="current-password"
                 clear-button
@@ -64,7 +66,7 @@
                 <hr class="margin-inline-start-half" />
             </f7-list-item>
 
-            <f7-list-button external class="login-page-secondary-action margin-horizontal" :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" :href="oauth2LoginUrl" :text="oauth2LoginDisplayName"
+            <f7-list-button external class="login-page-secondary-action margin-horizontal" :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2, 'margin-bottom': !isInternalAuthEnabled() }" :href="oauth2LoginUrl" :text="oauth2LoginDisplayName"
                             @click="loginByOAuth2" v-if="isOAuth2Enabled()"></f7-list-button>
 
             <f7-list-item class="block-footer margin-bottom-half" v-if="isInternalAuthEnabled()">

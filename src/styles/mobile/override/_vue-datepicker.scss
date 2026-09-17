@@ -45,6 +45,7 @@
 
     .dp--calendar .dp--calendar-item {
         flex: 1;
+        min-width: 0;
 
         > .dp--cell-inner {
             width: 100%;

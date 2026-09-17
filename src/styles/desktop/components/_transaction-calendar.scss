@@ -69,6 +69,7 @@
 
             .dp--calendar-row {
                 --dp-cell-size: auto;
+                min-width: 0;
 
                 > .dp--calendar-item,
                 > .dp--calendar-item > .dp--cell-inner {

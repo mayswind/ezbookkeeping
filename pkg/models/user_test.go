@@ -35,7 +35,7 @@ func TestUserCanEditTransactionByTransactionTime_ScopeIsTodayOrLater(t *testing.
 
 	now := time.Now()
 	timezone := time.FixedZone("Timezone", int(utils.GetServerTimezoneOffsetMinutes())*60)
-	todayFirstDatetime := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	todayFirstDatetime := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, timezone)
 	yesterdayLastDatetime := todayFirstDatetime.Add(-1 * time.Second)
 	todayLastDatetime := yesterdayLastDatetime.Add(24 * time.Hour)
 
@@ -67,7 +67,7 @@ func TestUserCanEditTransactionByTransactionTime_ScopeIsThisWeekOrLater(t *testi
 
 	now := time.Now()
 	timezone := time.FixedZone("Timezone", int(utils.GetServerTimezoneOffsetMinutes())*60)
-	thisWeekFirstDatetime := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	thisWeekFirstDatetime := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, timezone)
 
 	if thisWeekFirstDatetime.Weekday() == time.Sunday {
 		thisWeekFirstDatetime = thisWeekFirstDatetime.Add(-6 * 24 * time.Hour)
@@ -91,7 +91,7 @@ func TestUserCanEditTransactionByTransactionTime_ScopeIsThisMonthOrLater(t *test
 
 	now := time.Now()
 	timezone := time.FixedZone("Timezone", int(utils.GetServerTimezoneOffsetMinutes())*60)
-	thisMonthFirstDatetime := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.Local)
+	thisMonthFirstDatetime := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, timezone)
 	lastMonthLastDatetime := thisMonthFirstDatetime.Add(-1 * time.Second)
 	thisMonthLastDatetime := lastMonthLastDatetime.Add(24 * time.Hour)
 
@@ -108,7 +108,7 @@ func TestUserCanEditTransactionByTransactionTime_ScopeIsThisYearOrLater(t *testi
 
 	now := time.Now()
 	timezone := time.FixedZone("Timezone", int(utils.GetServerTimezoneOffsetMinutes())*60)
-	thisYearFirstDatetime := time.Date(now.Year(), 1, 1, 0, 0, 0, 0, time.Local)
+	thisYearFirstDatetime := time.Date(now.Year(), 1, 1, 0, 0, 0, 0, timezone)
 	lastYearLastDatetime := thisYearFirstDatetime.Add(-1 * time.Second)
 	thisYearLastDatetime := lastYearLastDatetime.Add(24 * time.Hour)
 

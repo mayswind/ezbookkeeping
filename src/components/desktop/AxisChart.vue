@@ -444,7 +444,7 @@ const chartOptions = computed<object>(() => {
         },
         grid: {
             left: props.noMargin ? 0 : (props.hideYAxisLabels ? 10 : yAxisWidth.value),
-            top: props.noMargin ? 0 : (!props.hideLegend && (!props.legendPosition || props.legendPosition === 'top') ? 50 : 5),
+            top: props.noMargin ? 5 : (!props.hideLegend && (!props.legendPosition || props.legendPosition === 'top') ? 50 : 5),
             right: props.noMargin ? 0 : 10,
             bottom: props.noMargin ? 0 : ((props.hideXAxisLabels ? 10 : 30) + (!props.hideLegend && props.legendPosition === 'bottom' ? 25 : 0)),
         },

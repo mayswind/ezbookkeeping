@@ -219,10 +219,10 @@ const chartOptions = computed<object>(() => {
         grid: {
             left: props.noMargin ? 0 : 10,
             right: props.noMargin ? 0 : 10,
-            top: props.noMargin ? 0 : (showIncomeAndExpense.value ? 10 : 5),
+            top: props.noMargin ? 5 : (showIncomeAndExpense.value ? 10 : 5),
             bottom: props.chartType === TrendChartType.Area.type
                 ? props.noMargin ? 0 : (!props.hideXAxisLabels ? 30 : 10) + (!props.hideLegend ? 25 : 0)
-                : (!props.hideXAxisLabels ? 20 : 0) + (!props.hideLegend ? 25 : 0) + (showIncomeAndExpense.value ? 20 : 10),
+                : props.noMargin ? 10 : ((!props.hideXAxisLabels ? 20 : 0) + (!props.hideLegend ? 25 : 0) + (showIncomeAndExpense.value ? 20 : 10)),
         },
         xAxis: [
             {

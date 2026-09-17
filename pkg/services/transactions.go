@@ -762,6 +762,27 @@ func (s *TransactionService) BatchCreateTransactions(c core.Context, uid int64, 
 	})
 }
 
+// getScheduledTransactionTimeAndFrequencyValues returns the time at which the given
+// scheduled template creates its transaction, and the frequency values with negative
+// monthly values, which count back from the end of the month, resolved.
+func getScheduledTransactionTimeAndFrequencyValues(template *models.TransactionTemplate, frequencyValues []int64, todayFirstUnixTimeInUTC int64) (time.Time, []int64) {
+	templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
+	transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60
+	transactionTime := time.Unix(transactionUnixTime, 0).In(templateTimeZone)
+
+	if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY {
+		maxDayInMonth := utils.GetMaxDayOfMonth(transactionTime.Year(), transactionTime.Month())
+
+		for i := 0; i < len(frequencyValues); i++ {
+			if frequencyValues[i] < 0 {
+				frequencyValues[i] = int64(maxDayInMonth) + frequencyValues[i] + 1
+			}
+		}
+	}
+
+	return transactionTime, frequencyValues
+}
+
 // CreateScheduledTransactions saves all scheduled transactions that should be created now
 func (s *TransactionService) CreateScheduledTransactions(c core.Context, currentUnixTime int64, interval time.Duration) error {
 	var allTemplates []*models.TransactionTemplate
@@ -842,20 +863,11 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			continue
 		}
 
-		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY {
-			maxDayInMonth := utils.GetMaxDayOfMonth(currentTime.Year(), currentTime.Month())
-
-			for i := 0; i < len(frequencyValues); i++ {
-				if frequencyValues[i] < 0 {
-					frequencyValues[i] = int64(maxDayInMonth) + frequencyValues[i] + 1
-				}
-			}
-		}
+		transactionTime, frequencyValues := getScheduledTransactionTimeAndFrequencyValues(template, frequencyValues, todayFirstUnixTimeInUTC)
 
 		frequencyValueSet := utils.ToSet(frequencyValues)
-		templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
-		transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60
-		transactionTime := time.Unix(transactionUnixTime, 0).In(templateTimeZone)
+		templateTimeZone := transactionTime.Location()
+		transactionUnixTime := transactionTime.Unix()
 
 		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY && !frequencyValueSet[int64(transactionTime.Weekday())] {
 			skipCount++

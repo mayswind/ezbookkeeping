@@ -74,6 +74,17 @@
         text-overflow: clip;
     }
 
+    .login-page-utilities.login-page-utilities-centered {
+        .item-title {
+            width: 100%;
+            text-align: center;
+        }
+
+        .item-after {
+            display: none;
+        }
+    }
+
     .login-page-utilities .item-after {
         margin-inline-start: auto;
     }

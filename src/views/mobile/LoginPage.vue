@@ -9,9 +9,8 @@
             <f7-block-footer>{{ tips }}</f7-block-footer>
         </f7-list>
 
-        <f7-list form class="login-page-form margin-bottom-half" v-if="isInternalAuthEnabled() || isOAuth2Enabled()">
+        <f7-list form class="login-page-form margin-bottom-half">
             <f7-list-input
-                v-if="isInternalAuthEnabled()"
                 type="text"
                 autocomplete="username"
                 autocapitalize="none"
@@ -25,6 +24,7 @@
                 :placeholder="tt('Your username or email')"
                 v-model:value.trim="username"
                 @input="tempToken = ''"
+                v-if="isInternalAuthEnabled()"
             ></f7-list-input>
 
             <f7-list-item class="login-divider no-margin display-flex align-items-center" v-if="isInternalAuthEnabled()">
@@ -32,7 +32,6 @@
             </f7-list-item>
 
             <f7-list-input
-                v-if="isInternalAuthEnabled()"
                 type="password"
                 autocomplete="current-password"
                 clear-button
@@ -42,9 +41,10 @@
                 v-model:value="password"
                 @input="tempToken = ''"
                 @keyup.enter="loginByPressEnter"
+                v-if="isInternalAuthEnabled()"
             ></f7-list-input>
 
-            <f7-list-item class="login-page-utilities">
+            <f7-list-item class="login-page-utilities" v-if="isInternalAuthEnabled()">
                 <template #title>
                     <small>
                         <f7-link :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" @click="switchToDesktopVersion">{{ tt('Switch to Desktop Version') }}</f7-link>
@@ -66,8 +66,18 @@
                 <hr class="margin-inline-start-half" />
             </f7-list-item>
 
-            <f7-list-button external class="login-page-secondary-action margin-horizontal" :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2, 'margin-bottom': !isInternalAuthEnabled() }" :href="oauth2LoginUrl" :text="oauth2LoginDisplayName"
+            <f7-list-button external class="login-page-secondary-action margin-horizontal"
+                            :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2, 'margin-top': !isInternalAuthEnabled() }"
+                            :href="oauth2LoginUrl" :text="oauth2LoginDisplayName"
                             @click="loginByOAuth2" v-if="isOAuth2Enabled()"></f7-list-button>
+
+            <f7-list-item class="login-page-utilities login-page-utilities-centered" v-if="!isInternalAuthEnabled()">
+                <template #title>
+                    <small>
+                        <f7-link :class="{ 'disabled': loggingInByPassword || loggingInByOAuth2 }" @click="switchToDesktopVersion">{{ tt('Switch to Desktop Version') }}</f7-link>
+                    </small>
+                </template>
+            </f7-list-item>
 
             <f7-list-item class="block-footer margin-bottom-half" v-if="isInternalAuthEnabled()">
                 <div class="width-100 align-content-center">

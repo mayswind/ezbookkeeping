@@ -842,8 +842,12 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			continue
 		}
 
+		templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
+		transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60
+		transactionTime := time.Unix(transactionUnixTime, 0).In(templateTimeZone)
+
 		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY {
-			maxDayInMonth := utils.GetMaxDayOfMonth(currentTime.Year(), currentTime.Month())
+			maxDayInMonth := utils.GetMaxDayOfMonth(transactionTime.Year(), transactionTime.Month())
 
 			for i := 0; i < len(frequencyValues); i++ {
 				if frequencyValues[i] < 0 {
@@ -853,9 +857,6 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		}
 
 		frequencyValueSet := utils.ToSet(frequencyValues)
-		templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
-		transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60
-		transactionTime := time.Unix(transactionUnixTime, 0).In(templateTimeZone)
 
 		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY && !frequencyValueSet[int64(transactionTime.Weekday())] {
 			skipCount++

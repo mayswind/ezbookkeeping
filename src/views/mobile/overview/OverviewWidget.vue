@@ -53,6 +53,9 @@
                                  :show-amount="widget.settings['showAmount'] as boolean"
                                  @navigate="onNavigate"
                                  v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
+
+    <add-transaction-button-widget :widget-id="widget.id" @navigate="onNavigate"
+                                   v-else-if="widget.type === OverviewWidgetType.AddTransactionButton" />
 </template>
 
 <script setup lang="ts">
@@ -67,9 +70,14 @@ import PeriodNetIncomeAndSavingsRateWidget from './widgets/PeriodNetIncomeAndSav
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
 import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
 import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
+import AddTransactionButtonWidget from './widgets/AddTransactionButtonWidget.vue';
 
 import type { ColorValue } from '@/core/color.ts';
-import { type MobileOverviewWidgetLayout, OverviewWidgetType } from '@/core/overview_layout.ts';
+import {
+    type MobileOverviewWidgetLayout,
+    OverviewWidgetType,
+    MobileOverviewWidgetNavigationType
+} from '@/core/overview_layout.ts';
 
 const props = defineProps<{
     widget: MobileOverviewWidgetLayout;
@@ -78,7 +86,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'navigate', path: string): void;
+    (e: 'navigate', type: MobileOverviewWidgetNavigationType, path?: string): void;
 }>();
 
 const widgetTitle = computed<string>(() => {
@@ -86,8 +94,8 @@ const widgetTitle = computed<string>(() => {
     return typeof title === 'string' ? title.trim() : '';
 });
 
-function onNavigate(path: string): void {
-    emit('navigate', path);
+function onNavigate(type: MobileOverviewWidgetNavigationType, path?: string): void {
+    emit('navigate', type, path);
 }
 </script>
 

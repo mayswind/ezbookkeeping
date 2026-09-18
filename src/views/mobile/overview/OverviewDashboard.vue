@@ -15,7 +15,7 @@ import OverviewWidget from './OverviewWidget.vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import type { MobileOverviewLayout } from '@/core/overview_layout.ts';
+import { type MobileOverviewLayout, MobileOverviewWidgetNavigationType } from '@/core/overview_layout.ts';
 
 defineProps<{
     layout: MobileOverviewLayout;
@@ -23,13 +23,13 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'navigate', path: string): void;
+    (e: 'navigate', type: MobileOverviewWidgetNavigationType, path?: string): void;
 }>();
 
 const { tt } = useI18n();
 
-function onNavigate(path: string): void {
-    emit('navigate', path);
+function onNavigate(type: MobileOverviewWidgetNavigationType, path?: string): void {
+    emit('navigate', type, path);
 }
 </script>
 

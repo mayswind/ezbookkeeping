@@ -11,10 +11,10 @@
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-list sortable sortable-enabled sortable-tap-hold class="overview-layout-editor no-margin"
+        <f7-list sortable sortable-enabled sortable-tap-hold class="overview-layout-editor no-margin margin-bottom"
                  :class="{ 'disabled': loadingOverview }"
                  :sortable-move-elements="false" @sortable:sort="onSort" v-if="draftLayout.widgets.length">
-            <li class="cursor-pointer" :key="widget.id" v-for="widget in draftLayout.widgets">
+            <li class="mobile-overview-dashboard-item cursor-pointer" :key="widget.id" v-for="widget in draftLayout.widgets">
                 <overview-widget editing class="overview-widget-editor-content" :widget="widget" :loading="loadingOverview" />
                 <div class="overview-widget-drag-area" @click="showWidgetActions(widget)"></div>
             </li>

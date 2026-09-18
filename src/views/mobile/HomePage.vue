@@ -34,7 +34,7 @@
 
         <f7-popover class="template-popover-menu" target-el="#homepage-add-button"
                     v-model:opened="showTransactionTemplatePopover">
-            <f7-list dividers v-if="isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates && allTransactionTemplates.length)">
+            <f7-list dividers v-if="hasTransactionAddMenuItems">
                 <f7-list-item key="AIClipboardTextRecognition" link="#" no-chevron popover-close
                               :title="tt('AI Clipboard Text Recognition')"
                               @click="addByRecognizingClipboardText"
@@ -83,7 +83,11 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
-import { type MobileOverviewLayout, OverviewWidgetDataRequirement } from '@/core/overview_layout.ts';
+import {
+    type MobileOverviewLayout,
+    OverviewWidgetDataRequirement,
+    MobileOverviewWidgetNavigationType
+} from '@/core/overview_layout.ts';
 import { TemplateType } from '@/core/template.ts';
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS, DEFAULT_MOBILE_OVERVIEW_LAYOUT } from '@/consts/overview_layout.ts';
 
@@ -142,8 +146,10 @@ const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
     return allTemplates[TemplateType.Normal.type] || [];
 });
 
+const hasTransactionAddMenuItems = computed<boolean>(() => isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates.value && allTransactionTemplates.value.length > 0));
+
 function openTransactionTemplatePopover(): void {
-    if (isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates.value && allTransactionTemplates.value.length)) {
+    if (hasTransactionAddMenuItems.value) {
         showTransactionTemplatePopover.value = true;
     }
 }
@@ -327,9 +333,13 @@ function onReceiptRecognitionChanged(result: AIImageRecognitionResult): void {
     });
 }
 
-function onNavigate(path: string): void {
-    if (path) {
+function onNavigate(type: MobileOverviewWidgetNavigationType, path?: string): void {
+    if (type === MobileOverviewWidgetNavigationType.Url && path) {
         props.f7router.navigate(path);
+    } else if (type === MobileOverviewWidgetNavigationType.AIClipboardTextRecognition) {
+        addByRecognizingClipboardText();
+    } else if (type === MobileOverviewWidgetNavigationType.AIImageRecognition) {
+        showAIReceiptImageRecognitionSheet.value = true;
     }
 }
 

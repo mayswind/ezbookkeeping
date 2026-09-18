@@ -990,6 +990,13 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         dataRequirements: [
             OverviewWidgetDataRequirement.CurrentMonthTransactions
         ]
+    },
+    [OverviewWidgetType.AddTransactionButton]: {
+        type: OverviewWidgetType.AddTransactionButton,
+        name: 'Add Transaction Button',
+        supportsSettings: [],
+        defaultSettings: {},
+        dataRequirements: []
     }
 };
 

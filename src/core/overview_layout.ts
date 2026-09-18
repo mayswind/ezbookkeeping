@@ -12,7 +12,8 @@ export enum OverviewWidgetType {
     ExpenseCategoryRanking = 'expense-category-ranking',
     RecentTransactions = 'recent-transactions',
     TransactionCalendar = 'transaction-calendar',
-    TransactionCalendarHeatmap = 'transaction-calendar-heatmap'
+    TransactionCalendarHeatmap = 'transaction-calendar-heatmap',
+    AddTransactionButton = 'add-transaction-button'
 }
 
 export enum OverviewWidgetDataRequirement {
@@ -167,4 +168,10 @@ export interface MobileOverviewWidgetLayout extends OverviewWidgetLayoutBase {
     id: string;
     type: OverviewWidgetType;
     settings: Record<string, OverviewWidgetSettingValue>;
+}
+
+export enum MobileOverviewWidgetNavigationType {
+    Url = 'url',
+    AIClipboardTextRecognition = 'ai-clipboard-text-recognition',
+    AIImageRecognition = 'ai-image-recognition'
 }

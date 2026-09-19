@@ -267,7 +267,7 @@ function clickItem(item: CommonPieChartDataItem): void {
 }
 
 .pie-chart-toolbox-info .item-navigate-icon {
-    color: rgba(0, 0, 0, 0.2);
+    color: var(--ebk-chevron-icon-color);
     font-size: 18px;
     font-weight: bold;
     padding-inline-start: 4px;
@@ -280,6 +280,10 @@ function clickItem(item: CommonPieChartDataItem): void {
 .pie-chart-selected-item-info {
     display: inline-block;
     text-align: center;
+
+    > * {
+        vertical-align: middle;
+    }
 }
 
 .pie-chart-background {

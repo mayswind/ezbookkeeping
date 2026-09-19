@@ -62,7 +62,7 @@
                          v-if="accountCategory.type === AccountCategory.CreditCard.type">
                         <f7-link href="#" class="text-color-gray" popover-open=".credit-card-amount-popover">
                             <span class="text-truncate">{{ showAvailableCreditForCreditCard ? tt('pageSpecific.accountListPage.availableBalance') : tt('pageSpecific.accountListPage.outstandingBalance') }}</span>
-                            <f7-icon class="picker-chevron" f7="chevron_up_chevron_down"></f7-icon>
+                            <f7-icon class="picker-chevron bold-chevron" f7="chevron_up_chevron_down"></f7-icon>
                         </f7-link>
                     </small>
                 </f7-list-item>
@@ -677,6 +677,7 @@ init();
 
         > .picker-chevron {
             flex-shrink: 0;
+            font-weight: bold;
         }
     }
 }

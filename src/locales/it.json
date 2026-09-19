@@ -29,19 +29,19 @@
     },
     "default": {
         "currency": "EUR",
-        "firstDayOfWeek": "Lunedì",
-        "fiscalYearFormat": "FineYYYY",
-        "calendarDisplayType": "Gregoriano",
-        "dateDisplayType": "Gregoriano",
-        "longDateFormat": "GiornoMeseAnno",
-        "shortDateFormat": "GiornoMeseAnno",
-        "longTimeFormat": "OraMinutoSecondo",
-        "shortTimeFormat": "OraMinuto",
-        "numeralSystem": "NumeriArabiOccidentali",
-        "decimalSeparator": "Virgola",
-        "digitGroupingSymbol": "Punto",
-        "digitGrouping": "SeparatoreMigliaia",
-        "currencyDisplayType": "SimboloDopoImporto"
+        "firstDayOfWeek": "Monday",
+        "fiscalYearFormat": "EndYYYY",
+        "calendarDisplayType": "Gregorian",
+        "dateDisplayType": "Gregorian",
+        "longDateFormat": "DayMonthYear",
+        "shortDateFormat": "DayMonthYear",
+        "longTimeFormat": "HourMinuteSecond",
+        "shortTimeFormat": "HourMinute",
+        "numeralSystem": "WesternArabicNumerals",
+        "decimalSeparator": "Comma",
+        "digitGroupingSymbol": "Dot",
+        "digitGrouping": "ThousandsSeparator",
+        "currencyDisplayType": "SymbolAfterAmount"
     },
     "format": {
         "longDate": {

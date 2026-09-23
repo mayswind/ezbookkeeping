@@ -241,6 +241,16 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 	}
 
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[users.UserUpdateProfileHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[users.UserUpdateProfileHandler] token type \"%d\" is not allowed to update user profile", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
@@ -613,6 +623,16 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 // UserUpdateAvatarHandler saves user avatar by request parameters for current user
 func (a *UsersApi) UserUpdateAvatarHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[users.UserUpdateAvatarHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[users.UserUpdateAvatarHandler] token type \"%d\" is not allowed to update user avatar", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
@@ -680,6 +700,16 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.WebContext) (any, *errs.Error
 // UserRemoveAvatarHandler removes user avatar by request parameters for current user
 func (a *UsersApi) UserRemoveAvatarHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[users.UserRemoveAvatarHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[users.UserRemoveAvatarHandler] token type \"%d\" is not allowed to remove user avatar", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {

@@ -73,6 +73,16 @@ func (a *UserExternalAuthsApi) UnlinkExternalAuthHandler(c *core.WebContext) (an
 	}
 
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[user_external_auths.UnlinkExternalAuthHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[user_external_auths.UnlinkExternalAuthHandler] token type \"%d\" is not allowed to unlink external authentication", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {

@@ -29,6 +29,15 @@ var (
 // ApplicationSettingsGetHandler returns application cloud settings of current user
 func (a *UserApplicationCloudSettingsApi) ApplicationSettingsGetHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsGetHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsGetHandler] token type \"%d\" is not allowed to get application cloud settings", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, uid)
 
@@ -61,6 +70,16 @@ func (a *UserApplicationCloudSettingsApi) ApplicationSettingsUpdateHandler(c *co
 	}
 
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsUpdateHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsUpdateHandler] token type \"%d\" is not allowed to update application cloud settings", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
@@ -210,6 +229,16 @@ func (a *UserApplicationCloudSettingsApi) ApplicationSettingsUpdateHandler(c *co
 // ApplicationSettingsDisableHandler disabled user application cloud settings by request parameters for current user
 func (a *UserApplicationCloudSettingsApi) ApplicationSettingsDisableHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsDisableHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[user_app_cloud_settings.ApplicationSettingsDisableHandler] token type \"%d\" is not allowed to disable application cloud settings", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {

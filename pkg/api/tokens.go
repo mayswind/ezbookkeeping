@@ -98,6 +98,16 @@ func (a *TokensApi) TokenGenerateAPIHandler(c *core.WebContext) (any, *errs.Erro
 	}
 
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[tokens.TokenGenerateAPIHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[tokens.TokenGenerateAPIHandler] token type \"%d\" is not allowed to generate API tokens", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
@@ -145,6 +155,16 @@ func (a *TokensApi) TokenGenerateMCPHandler(c *core.WebContext) (any, *errs.Erro
 	}
 
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[tokens.TokenGenerateMCPHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[tokens.TokenGenerateMCPHandler] token type \"%d\" is not allowed to generate MCP tokens", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	user, err := a.users.GetUserById(c, uid)
 
 	if err != nil {
@@ -243,7 +263,19 @@ func (a *TokensApi) TokenRevokeHandler(c *core.WebContext) (any, *errs.Error) {
 		return nil, errs.ErrInvalidTokenId
 	}
 
-	if utils.Int64ToString(tokenRecord.UserTokenId) != c.GetTokenClaims().UserTokenId || tokenRecord.CreatedUnixTime != c.GetTokenClaims().IssuedAt {
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[tokens.TokenRevokeHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	}
+
+	if utils.Int64ToString(tokenRecord.UserTokenId) != claims.UserTokenId || tokenRecord.CreatedUnixTime != claims.IssuedAt {
+		if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+			log.Warnf(c, "[tokens.TokenRevokeHandler] token type \"%d\" is not allowed to revoke other tokens", claims.Type)
+			return nil, errs.ErrInvalidToken
+		}
+
 		user, err := a.users.GetUserById(c, uid)
 
 		if err != nil {
@@ -273,6 +305,16 @@ func (a *TokensApi) TokenRevokeHandler(c *core.WebContext) (any, *errs.Error) {
 // TokenRevokeAllHandler revokes all tokens of current user except current token
 func (a *TokensApi) TokenRevokeAllHandler(c *core.WebContext) (any, *errs.Error) {
 	uid := c.GetCurrentUid()
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[tokens.TokenRevokeAllHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[tokens.TokenRevokeAllHandler] token type \"%d\" is not allowed to revoke all tokens", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
 	tokens, err := a.tokens.GetAllTokensByUid(c, uid)
 
 	if err != nil {
@@ -280,7 +322,6 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.WebContext) (any, *errs.Error)
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	claims := c.GetTokenClaims()
 	currentTokenIndex := 0
 
 	for i := 0; i < len(tokens); i++ {
@@ -335,6 +376,14 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 
 	now := time.Now().Unix()
 	oldTokenClaims := c.GetTokenClaims()
+
+	if oldTokenClaims == nil {
+		log.Warnf(c, "[tokens.TokenRefreshHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if oldTokenClaims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[tokens.TokenRefreshHandler] token type \"%d\" is not allowed to be refreshed", oldTokenClaims.Type)
+		return nil, errs.ErrInvalidToken
+	}
 
 	if now-oldTokenClaims.IssuedAt < int64(a.CurrentConfig().TokenMinRefreshInterval) {
 		log.Infof(c, "[tokens.TokenRefreshHandler] token of user \"uid:%d\" does not need to be refreshed", uid)

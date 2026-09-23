@@ -83,6 +83,11 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidToken)
 		}
 
+		if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+			log.Errorf(c, "[oauth2_authentications.LoginHandler] token type \"%d\" is not allowed to login via oauth 2.0", claims.Type)
+			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidToken)
+		}
+
 		uid = claims.Uid
 		user, err := a.users.GetUserById(c, uid)
 

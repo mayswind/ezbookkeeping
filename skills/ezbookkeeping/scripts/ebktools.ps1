@@ -52,24 +52,6 @@ $API_CONFIGS = @(
         }
     }
     @{
-        Name = "tokens-revoke"
-        Description = "Revoke a specified token"
-        Method = "POST"
-        Path = "tokens/revoke.json"
-        RequiresTimezone = $false
-        RequiredParams = @("tokenId")
-        OptionalParams = @()
-        ParamTypes = @{
-            "tokenId" = "string"
-        }
-        ParamDescriptions = @{
-            "tokenId" = "string (Token ID)"
-        }
-        ResponseStructure = @(
-            "boolean (Whether the token is revoked successfully)"
-        )
-    }
-    @{
         Name = "accounts-list"
         Description = "Retrieve all account information"
         Method = "GET"

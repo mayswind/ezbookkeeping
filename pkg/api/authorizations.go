@@ -319,7 +319,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 		return nil, errs.ErrEmailIsNotVerified
 	}
 
-	err = a.twoFactorAuthorizations.GetAndUseUserTwoFactorRecoveryCode(c, uid, credential.RecoveryCode, user.Salt)
+	err = a.twoFactorAuthorizations.UseUserTwoFactorRecoveryCode(c, uid, credential.RecoveryCode, user.Salt)
 
 	if errs.IsCustomError(err) {
 		failureCheckErr := a.CheckAndIncreaseFailureCount(c, uid)

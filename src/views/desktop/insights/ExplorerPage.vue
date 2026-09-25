@@ -96,58 +96,65 @@
                             <v-icon :icon="mdiDotsVertical" />
                             <v-menu activator="parent">
                                 <v-list>
-                                    <v-list-subheader class="text-body-small"
-                                                      :title="tt('Timezone Used for Date Range')"
-                                                      v-if="activeTab === 'query'"/>
                                     <template v-if="activeTab === 'query'">
+                                        <v-list-subheader class="text-body-small"
+                                                          :title="tt('Timezone Used for Date Range')"/>
                                         <v-list-item :key="timezoneType.type" :value="timezoneType.type"
                                                      :prepend-icon="timezoneTypeIconMap[timezoneType.type]"
                                                      :append-icon="(currentExploration.timezoneUsedForDateRange === timezoneType.type ? mdiCheck : undefined)"
                                                      :title="timezoneType.displayName"
                                                      v-for="timezoneType in allTimezoneTypesUsedForDateRange"
                                                      @click="currentExploration.timezoneUsedForDateRange = timezoneType.type"></v-list-item>
+                                        <v-divider class="my-2"/>
+                                        <v-list-item :prepend-icon="mdiApplicationImport"
+                                                     :title="tt('Import Queries')"
+                                                     :disabled="loading || updating"
+                                                     @click="importQueries"></v-list-item>
+                                        <v-list-item :prepend-icon="mdiApplicationExport"
+                                                     :title="tt('Export Queries')"
+                                                     :disabled="loading || updating"
+                                                     @click="exportQueries"></v-list-item>
+                                        <v-divider class="my-2"/>
                                     </template>
-                                    <v-divider class="my-2" v-if="activeTab === 'query'"/>
-                                    <v-list-item :prepend-icon="mdiApplicationImport"
-                                                 :title="tt('Import Queries')"
-                                                 :disabled="loading || updating"
-                                                 @click="importQueries"
-                                                 v-if="activeTab === 'query'"></v-list-item>
-                                    <v-list-item :prepend-icon="mdiApplicationExport"
-                                                 :title="tt('Export Queries')"
-                                                 :disabled="loading || updating"
-                                                 @click="exportQueries"
-                                                 v-if="activeTab === 'query'"></v-list-item>
-                                    <v-list-item :prepend-icon="mdiTableEdit"
-                                                 :title="tt('Enter Edit Mode')"
-                                                 :disabled="loading || updating || filteredTransactionsInDataTable.length < 1"
-                                                 @click="isCurrentDataTableEditable = true"
-                                                 v-if="activeTab === 'table' && !isCurrentDataTableEditable"></v-list-item>
-                                    <v-list-item :prepend-icon="mdiTableCheck"
-                                                 :title="tt('Exit Edit Mode')"
-                                                 :disabled="loading || updating"
-                                                 @click="isCurrentDataTableEditable = false"
-                                                 v-if="activeTab === 'table' && isCurrentDataTableEditable"></v-list-item>
-                                    <v-divider class="my-2" v-if="activeTab === 'table' && !isCurrentDataTableEditable"/>
-                                    <v-list-item :prepend-icon="mdiExport"
-                                                 :title="tt('Export Results')"
-                                                 :disabled="loading || updating || (activeTab === 'table' && (!filteredTransactionsInDataTable || filteredTransactionsInDataTable.length < 1))"
-                                                 @click="exportResults"
-                                                 v-if="(activeTab === 'table' || activeTab === 'chart') && !isCurrentDataTableEditable"></v-list-item>
-                                    <v-divider class="my-2" v-if="currentExploration.id && !isCurrentDataTableEditable" />
-                                    <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorationName" v-if="currentExploration.id && !isCurrentDataTableEditable">
-                                        <v-list-item-title>{{ tt('Rename Exploration') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item :prepend-icon="mdiEyeOffOutline" @click="hideExploration(true)" v-if="currentExploration.id && !currentExploration.hidden && !isCurrentDataTableEditable">
-                                        <v-list-item-title>{{ tt('Hide Exploration') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item :prepend-icon="mdiEyeOutline" @click="hideExploration(false)" v-if="currentExploration.id && currentExploration.hidden && !isCurrentDataTableEditable">
-                                        <v-list-item-title>{{ tt('Unhide Exploration') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExploration" v-if="currentExploration.id && !isCurrentDataTableEditable">
-                                        <v-list-item-title>{{ tt('Delete Exploration') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-divider class="my-2" v-if="!isCurrentDataTableEditable"/>
+
+                                    <template v-if="activeTab === 'table'">
+                                        <v-list-item :prepend-icon="mdiTableEdit"
+                                                     :title="tt('Enter Edit Mode')"
+                                                     :disabled="loading || updating || filteredTransactionsInDataTable.length < 1"
+                                                     @click="isCurrentDataTableEditable = true"
+                                                     v-if="!isCurrentDataTableEditable"></v-list-item>
+                                        <v-list-item :prepend-icon="mdiTableCheck"
+                                                     :title="tt('Exit Edit Mode')"
+                                                     :disabled="loading || updating"
+                                                     @click="isCurrentDataTableEditable = false"
+                                                     v-if="isCurrentDataTableEditable"></v-list-item>
+                                        <v-divider class="my-2" v-if="!isCurrentDataTableEditable"/>
+                                    </template>
+
+                                    <template v-if="(activeTab === 'table' && !isCurrentDataTableEditable) || (activeTab === 'chart' && currentExploration.chartType !== TransactionExplorerChartTypeValue.Custom)">
+                                        <v-list-item :prepend-icon="mdiExport"
+                                                     :title="tt('Export Results')"
+                                                     :disabled="loading || updating || (activeTab === 'table' && (!filteredTransactionsInDataTable || filteredTransactionsInDataTable.length < 1))"
+                                                     @click="exportResults"></v-list-item>
+                                        <v-divider class="my-2" />
+                                    </template>
+
+                                    <template v-if="currentExploration.id && !isCurrentDataTableEditable">
+                                        <v-list-item :prepend-icon="mdiPencilOutline" @click="setExplorationName">
+                                            <v-list-item-title>{{ tt('Rename Exploration') }}</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item :prepend-icon="mdiEyeOffOutline" @click="hideExploration(true)" v-if="!currentExploration.hidden">
+                                            <v-list-item-title>{{ tt('Hide Exploration') }}</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item :prepend-icon="mdiEyeOutline" @click="hideExploration(false)" v-if="currentExploration.hidden">
+                                            <v-list-item-title>{{ tt('Unhide Exploration') }}</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item :prepend-icon="mdiDeleteOutline" @click="removeExploration">
+                                            <v-list-item-title>{{ tt('Delete Exploration') }}</v-list-item-title>
+                                        </v-list-item>
+                                        <v-divider class="my-2"/>
+                                    </template>
+
                                     <v-list-item :prepend-icon="mdiSort"
                                                  :disabled="!allExplorations || allExplorations.length < 2"
                                                  :title="tt('Change Exploration Display Order')"
@@ -233,6 +240,7 @@ import { type TransactionExplorerPartialFilter, type TransactionExplorerFilter, 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
+import { TransactionExplorerChartTypeValue } from '@/core/explorer.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 
 import { type TransactionInsightDataItem, Transaction } from '@/models/transaction.ts';

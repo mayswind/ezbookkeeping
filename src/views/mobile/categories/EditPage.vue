@@ -56,6 +56,7 @@
         <f7-list form strong inset dividers class="margin-top-half" v-else-if="!loading">
             <f7-list-input
                 type="text"
+                autocomplete="off"
                 clear-button
                 :label="tt('Category Name')"
                 :placeholder="tt('Your category name')"
@@ -139,6 +140,7 @@
             <f7-list-input
                 type="textarea"
                 style="height: auto"
+                autocomplete="off"
                 :label="tt('Description')"
                 :placeholder="tt('Your category description (optional)')"
                 v-textarea-auto-size

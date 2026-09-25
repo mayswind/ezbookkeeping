@@ -97,6 +97,7 @@
         <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === AccountType.SingleAccount.type">
             <f7-list-input
                 type="text"
+                autocomplete="off"
                 clear-button
                 :label="tt('Account Name')"
                 :placeholder="tt('Your account name')"
@@ -293,6 +294,7 @@
             <f7-list-input
                 type="textarea"
                 style="height: auto"
+                autocomplete="off"
                 :label="tt('Description')"
                 :placeholder="tt('Your account description (optional)')"
                 v-textarea-auto-size
@@ -303,6 +305,7 @@
         <f7-list form strong inset dividers class="margin-vertical" v-else-if="!loading && account.type === AccountType.MultiSubAccounts.type">
             <f7-list-input
                 type="text"
+                autocomplete="off"
                 clear-button
                 :label="tt('Account Name')"
                 :placeholder="tt('Your account name')"
@@ -433,6 +436,7 @@
             <f7-list-input
                 type="textarea"
                 style="height: auto"
+                autocomplete="off"
                 :label="tt('Description')"
                 :placeholder="tt('Your account description (optional)')"
                 v-textarea-auto-size
@@ -454,6 +458,7 @@
 
                 <f7-list-input
                     type="text"
+                    autocomplete="off"
                     clear-button
                     :label="tt('Sub-account Name')"
                     :placeholder="tt('Your sub-account name')"
@@ -612,6 +617,7 @@
                 <f7-list-input
                     type="textarea"
                     style="height: auto"
+                    autocomplete="off"
                     :label="tt('Description')"
                     :placeholder="tt('Your sub-account description (optional)')"
                     v-textarea-auto-size

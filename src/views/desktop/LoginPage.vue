@@ -70,6 +70,7 @@
                                         />
                                         <v-text-field
                                             type="text"
+                                            autocomplete="off"
                                             :disabled="loggingInByPassword || loggingInByOAuth2 || verifying"
                                             :label="tt('Backup Code')"
                                             :placeholder="tt('Backup Code')"

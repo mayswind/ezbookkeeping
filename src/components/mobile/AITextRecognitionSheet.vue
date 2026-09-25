@@ -24,6 +24,7 @@
                     <f7-list-input
                         type="textarea"
                         class="clipboard-text"
+                        autocomplete="off"
                         :placeholder="tt('Click here to paste a transaction description')"
                         v-model:value="pastedText"
                     ></f7-list-input>

@@ -47,6 +47,7 @@
 
             <f7-list-input
                 type="text"
+                autocomplete="off"
                 clear-button
                 :label="tt('Confirm Target Account Name')"
                 :placeholder="tt('Please re-enter the target account name to confirm')"

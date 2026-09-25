@@ -1,5 +1,6 @@
 <template>
-    <v-text-field ref="textInput" type="text" :class="extraClass" :density="density" :readonly="!!readonly" :disabled="!!disabled"
+    <v-text-field ref="textInput" type="text" autocomplete="off"
+                  :class="extraClass" :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
                   v-model="currentValue"

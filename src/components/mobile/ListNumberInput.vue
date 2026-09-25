@@ -1,6 +1,7 @@
 <template>
     <f7-list-input
         type="text"
+        autocomplete="off"
         :readonly="!!readonly"
         :disabled="!!disabled"
         :label="label"

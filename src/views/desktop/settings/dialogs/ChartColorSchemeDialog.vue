@@ -74,7 +74,7 @@
                     </v-table>
                     <div class="w-100 h-100" v-if="showRawData">
                         <v-textarea no-resize class="w-100 h-100 ps-4 code-textarea hextual-color always-cursor-text"
-                                    density="compact" variant="plain" :rounded="false"
+                                    autocomplete="off" density="compact" variant="plain" :rounded="false"
                                     :placeholder="tt('Each line should be a hex color value (e.g. c67e48 or #c67e48)')"
                                     v-model="textualChartColors"></v-textarea>
                     </div>

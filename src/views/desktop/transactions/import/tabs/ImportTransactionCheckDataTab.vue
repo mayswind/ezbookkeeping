@@ -316,7 +316,7 @@
                     </div>
                 </template>
                 <div v-if="editingTransaction === item">
-                    <v-text-field style="width: calc(max(300px, 100%))" type="text"
+                    <v-text-field style="width: calc(max(300px, 100%))" type="text" autocomplete="off"
                                   density="compact" variant="plain"
                                   persistent-placeholder
                                   :placeholder="tt('Description')"
@@ -396,6 +396,7 @@
                 <div class="mt-2">
                     <v-text-field
                         type="text"
+                        autocomplete="off"
                         persistent-placeholder
                         :label="tt('Description')"
                         :placeholder="tt('Description')"

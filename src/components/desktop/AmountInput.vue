@@ -1,6 +1,6 @@
 <template>
-    <v-text-field type="text" class="amount-input text-field-with-colored-label" :class="extraClass"
-                  :color="color" :base-color="color"
+    <v-text-field type="text" class="amount-input text-field-with-colored-label" autocomplete="off"
+                  :class="extraClass" :color="color" :base-color="color"
                   :density="density" :variant="variant" :autofocus="autofocus"
                   :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
@@ -21,8 +21,8 @@
             </v-tooltip>
         </template>
     </v-text-field>
-    <v-text-field type="text" class="text-field-with-colored-label" :class="extraClass"
-                  :color="color" :base-color="color"
+    <v-text-field type="text" class="text-field-with-colored-label" autocomplete="off"
+                  :class="extraClass" :color="color" :base-color="color"
                   :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"
@@ -49,8 +49,8 @@
             </v-tooltip>
         </template>
     </v-text-field>
-    <v-text-field type="password" class="text-field-with-colored-label" :class="extraClass"
-                  :color="color" :base-color="color"
+    <v-text-field type="password" class="text-field-with-colored-label" autocomplete="off"
+                  :class="extraClass" :color="color" :base-color="color"
                   :density="density" :readonly="!!readonly" :disabled="!!disabled"
                   :label="label" :placeholder="placeholder"
                   :persistent-placeholder="!!persistentPlaceholder"

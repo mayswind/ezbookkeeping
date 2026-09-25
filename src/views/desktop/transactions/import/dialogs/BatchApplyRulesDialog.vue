@@ -59,7 +59,8 @@
                                     <v-icon :icon="mdiFunctionVariant" size="20" />
                                     <span class="rule-name text-body-large ms-2" v-if="editingRule !== element">{{ getRuleName(element, index) }}</span>
                                     <div class="rule-name-edit ms-2" v-if="editingRule === element">
-                                        <v-text-field autofocus type="text" density="compact" variant="underlined"
+                                        <v-text-field autofocus type="text" autocomplete="off"
+                                                      density="compact" variant="underlined"
                                                       :disabled="loading" :placeholder="getDefaultRuleName(index)"
                                                       v-text-field-auto-width="{ minWidth: 20, maxWidth: 300, auxSpanId: `rule-name-aux-span-${index + 1}-${element.id}` }"
                                                       v-model="editingRuleName" @keyup.esc="cancelUpdateRuleName"
@@ -140,7 +141,8 @@
                                                       :placeholder="tt('None')"
                                                       v-else-if="isEmptyTextConditionOperator(element.conditionOperator)" />
 
-                                        <v-text-field class="flex-1-1" min-width="240" density="compact" :disabled="loading || !!editingRule"
+                                        <v-text-field class="flex-1-1" min-width="240" autocomplete="off" density="compact"
+                                                      :disabled="loading || !!editingRule"
                                                       :placeholder="tt('None')" :model-value="element.conditionValue"
                                                       @update:model-value="updateStringConditionValue(element, $event)" v-else />
                                     </div>

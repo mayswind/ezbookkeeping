@@ -138,7 +138,7 @@
                                 </v-btn>
                                 <v-spacer/>
                                 <div class="transaction-keyword-filter ms-2">
-                                    <v-text-field density="compact" :disabled="loading"
+                                    <v-text-field autocomplete="off" density="compact" :disabled="loading"
                                                   :prepend-inner-icon="mdiMagnify"
                                                   :append-inner-icon="filterKeyword !== query.keyword ? mdiCheck : undefined"
                                                   :placeholder="tt('Filter transaction description')"

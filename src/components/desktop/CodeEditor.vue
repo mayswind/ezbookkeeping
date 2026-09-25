@@ -5,6 +5,7 @@
             no-resize
             hide-details
             class="code-editor-fallback w-100 h-100 code-textarea ps-3"
+            autocomplete="off"
             variant="plain"
             :class="{ 'always-cursor-text': readonly }"
             :aria-label="ariaLabel"

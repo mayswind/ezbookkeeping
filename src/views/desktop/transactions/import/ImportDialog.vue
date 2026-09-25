@@ -230,6 +230,7 @@
                                 <v-col cols="12" md="12" v-if="supportedAIAdditionalPrompt">
                                     <v-textarea
                                         type="text"
+                                        autocomplete="off"
                                         persistent-placeholder
                                         rows="2"
                                         :disabled="submitting"
@@ -255,6 +256,7 @@
                                 <v-col cols="12" md="12" v-if="isImportDataFromTextbox">
                                     <v-textarea
                                         type="text"
+                                        autocomplete="off"
                                         persistent-placeholder
                                         rows="5"
                                         :disabled="submitting"

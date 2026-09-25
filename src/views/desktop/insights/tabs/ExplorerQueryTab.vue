@@ -23,7 +23,7 @@
                         <v-icon :icon="mdiTextBoxSearchOutline" size="20" />
                         <span class="query-name text-body-large ms-2" v-if="editingQuery !== element">{{ element.name || tt('format.misc.queryIndex', { index: formatNumberToLocalizedNumeralsWithoutDigitGrouping(index + 1) }) }}</span>
                         <div class="query-name-edit ms-2" v-if="editingQuery === element">
-                            <v-text-field autofocus type="text" density="compact" variant="underlined"
+                            <v-text-field autofocus type="text" autocomplete="off" density="compact" variant="underlined"
                                           :disabled="loading || disabled"
                                           :placeholder="tt('format.misc.queryIndex', { index: formatNumberToLocalizedNumeralsWithoutDigitGrouping(index + 1) })"
                                           v-text-field-auto-width="{ minWidth: 20, maxWidth: 300, auxSpanId: `query-name-aux-span-${index + 1}-${element.id}` }"
@@ -363,7 +363,7 @@
                                                                         conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.LongitudeBetween.value &&
                                                                         conditionWithRelation.condition.operator !== TransactionExplorerConditionOperator.LongitudeNotBetween.value"
                                                     />
-                                                    <number-input density="compact"
+                                                    <number-input autocomplete="off" density="compact"
                                                                   :disabled="loading || disabled || !!editingQuery"
                                                                   :min-value="TransactionExplorerGeoLocationCondition.MIN_LATITUDE"
                                                                   :max-value="TransactionExplorerGeoLocationCondition.MAX_LATITUDE"
@@ -408,6 +408,7 @@
 
                                                 <div class="d-flex w-100" v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTag.value">
                                                     <v-text-field
+                                                        autocomplete="off"
                                                         disabled
                                                         persistent-placeholder
                                                         density="compact"
@@ -435,7 +436,7 @@
                                                                          conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsEmpty.value || conditionWithRelation.condition.operator === TransactionExplorerConditionOperator.IsNotEmpty.value"
                                                 />
 
-                                                <v-text-field density="compact"
+                                                <v-text-field autocomplete="off" density="compact"
                                                               :disabled="loading || disabled || !!editingQuery"
                                                               :placeholder="tt('None')"
                                                               v-model="conditionWithRelation.condition.value"

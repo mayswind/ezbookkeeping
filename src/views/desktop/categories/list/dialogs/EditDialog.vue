@@ -9,6 +9,7 @@
                         <v-col cols="12" md="12">
                             <v-text-field
                                 type="text"
+                                autocomplete="off"
                                 persistent-placeholder
                                 :disabled="loading || submitting"
                                 :label="tt('Category Name')"
@@ -59,6 +60,7 @@
                         <v-col cols="12" md="12">
                             <v-textarea
                                 type="text"
+                                autocomplete="off"
                                 persistent-placeholder
                                 rows="3"
                                 :disabled="loading || submitting"

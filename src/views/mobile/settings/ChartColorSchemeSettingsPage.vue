@@ -60,6 +60,7 @@
                         <f7-list-input
                             type="textarea"
                             class="import-chart-color-scheme-textarea code-textarea"
+                            autocomplete="off"
                             :placeholder="tt('Each line should be a hex color value (e.g. c67e48 or #c67e48)')"
                             :value="importText"
                             @input="importText = $event.target.value"

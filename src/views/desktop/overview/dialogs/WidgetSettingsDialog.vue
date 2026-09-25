@@ -78,7 +78,7 @@
                                              @update:model-value="updateSettingValue(setting, $event)"
                                              v-else-if="setting.settingType === 'amount' && (!setting.condition || setting.condition(widget?.settings))" />
 
-                        <v-text-field :class="{ 'mt-4': index > 0 }" :label="tt(setting.displayName)"
+                        <v-text-field autocomplete="off" :class="{ 'mt-4': index > 0 }" :label="tt(setting.displayName)"
                                       :placeholder="setting.placeholder ? tt(setting.placeholder) : undefined"
                                       :persistent-placeholder="!!setting.placeholder"
                                       :model-value="getSettingValue(setting.settingName)"

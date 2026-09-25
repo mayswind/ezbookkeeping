@@ -85,6 +85,7 @@
                         <f7-list-input
                             type="textarea"
                             class="import-chart-color-scheme-textarea code-textarea"
+                            autocomplete="off"
                             :placeholder="layoutJsonPlaceholder"
                             :value="importText"
                             @input="importText = $event.target.value"

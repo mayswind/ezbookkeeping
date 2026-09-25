@@ -120,7 +120,7 @@
                                 </v-btn>
                                 <v-spacer/>
                                 <div class="transaction-keyword-filter ms-2">
-                                    <v-text-field density="compact" :disabled="loading"
+                                    <v-text-field autocomplete="off" density="compact" :disabled="loading"
                                                   :prepend-inner-icon="mdiMagnify"
                                                   :append-inner-icon="searchKeyword !== query.keyword ? mdiCheck : undefined"
                                                   :placeholder="tt('Search transaction description')"

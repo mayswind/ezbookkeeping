@@ -58,6 +58,7 @@
         <f7-list form strong inset dividers class="margin-vertical-half" v-else-if="!loading">
             <f7-list-input
                 type="text"
+                autocomplete="off"
                 clear-button
                 :label="tt('Template Name')"
                 :placeholder="tt('Template Name')"
@@ -431,6 +432,7 @@
                 type="textarea"
                 class="transaction-edit-comment"
                 style="height: auto"
+                autocomplete="off"
                 :class="{ 'readonly': mode === TransactionEditPageMode.View }"
                 :label="transactionDescriptionTitle"
                 :placeholder="mode !== TransactionEditPageMode.View ? tt('Your transaction description (optional)') : ''"

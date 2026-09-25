@@ -59,6 +59,7 @@
                     </f7-list-input>
 
                     <f7-list-input type="text"
+                                   autocomplete="off"
                                    :label="tt(setting.displayName)"
                                    :placeholder="setting.placeholder ? tt(setting.placeholder) : undefined"
                                    :value="getSettingValue(setting.settingName) as string"

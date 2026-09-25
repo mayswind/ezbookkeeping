@@ -4,7 +4,8 @@
                                   @cancel="cancel">
             <template #content>
                 <div class="mt-2">
-                    <v-text-field persistent-placeholder
+                    <v-text-field autocomplete="off"
+                                  persistent-placeholder
                                   :autofocus="true"
                                   :label="label"
                                   :placeholder="placeholder"

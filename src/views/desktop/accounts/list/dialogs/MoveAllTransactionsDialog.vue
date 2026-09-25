@@ -29,6 +29,7 @@
 
                         <v-col cols="12" md="12">
                             <v-text-field type="text"
+                                          autocomplete="off"
                                           persistent-placeholder
                                           :disabled="moving"
                                           :label="tt('Confirm Target Account Name')"

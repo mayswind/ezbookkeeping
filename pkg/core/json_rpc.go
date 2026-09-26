@@ -1,16 +1,16 @@
 package core
 
-import "encoding/json"
+import "encoding/json/jsontext"
 
 // JSONRPCVersion defines the version of JSON-RPC protocol
 const JSONRPCVersion = "2.0"
 
 // JSONRPCRequest represents the JSON-RPC 2.0 request
 type JSONRPCRequest struct {
-	JSONRPC string          `json:"jsonrpc"`
-	Method  string          `json:"method"`
-	Params  json.RawMessage `json:"params,omitempty"`
-	ID      any             `json:"id,omitempty"`
+	JSONRPC string         `json:"jsonrpc"`
+	Method  string         `json:"method"`
+	Params  jsontext.Value `json:"params,omitempty"`
+	ID      any            `json:"id,omitempty"`
 }
 
 // JSONRPCResponse represents the JSON-RPC 2.0 response

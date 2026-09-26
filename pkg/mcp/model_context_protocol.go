@@ -2,7 +2,7 @@ package mcp
 
 import (
 	"encoding/base64"
-	"encoding/json"
+	"encoding/json/jsontext"
 
 	"github.com/invopop/jsonschema"
 )
@@ -133,8 +133,8 @@ type MCPTool struct {
 
 // MCPCallToolRequest defines the request structure for listing tools in the MCP
 type MCPCallToolRequest struct {
-	Name      string          `json:"name"`
-	Arguments json.RawMessage `json:"arguments,omitempty"`
+	Name      string         `json:"name"`
+	Arguments jsontext.Value `json:"arguments,omitempty"`
 }
 
 // MCPCallToolResponse defines the response structure for calling a tool in the MCP

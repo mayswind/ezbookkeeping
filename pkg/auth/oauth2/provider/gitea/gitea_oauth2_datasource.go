@@ -1,7 +1,7 @@
 package gitea
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 
 	"github.com/mayswind/ezbookkeeping/pkg/auth/oauth2/data"

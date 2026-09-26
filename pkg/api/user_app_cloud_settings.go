@@ -1,7 +1,7 @@
 package api
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"

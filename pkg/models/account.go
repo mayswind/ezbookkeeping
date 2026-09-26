@@ -1,7 +1,7 @@
 package models
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"

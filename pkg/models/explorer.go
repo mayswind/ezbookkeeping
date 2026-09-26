@@ -1,6 +1,6 @@
 package models
 
-import "encoding/json"
+import "encoding/json/v2"
 
 // InsightsExplorer represents a saved exploration configuration
 type InsightsExplorer struct {

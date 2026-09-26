@@ -1,7 +1,7 @@
 package models
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 )
 
 type UserApplicationCloudSettingType string

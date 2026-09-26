@@ -1,7 +1,7 @@
 package _default
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"

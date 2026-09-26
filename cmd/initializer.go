@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"encoding/json"
+	jsonv1 "encoding/json"
+	"encoding/json/v2"
 	"os"
 
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
@@ -145,7 +146,14 @@ func initializeSystem(c *core.CliContext) (*settings.Config, error) {
 		return nil, err
 	}
 
-	cfgJson, _ := json.Marshal(getConfigWithoutSensitiveData(config))
+	cfgJson, err := json.Marshal(getConfigWithoutSensitiveData(config), jsonv1.FormatDurationAsNano(true))
+
+	if err != nil {
+		if !isDisableBootLog {
+			log.BootErrorf(c, "[initializer.initializeSystem] cannot marshal configuration to json, because %s", err.Error())
+		}
+		return nil, err
+	}
 
 	if !isDisableBootLog {
 		log.BootInfof(c, "[initializer.initializeSystem] has loaded configuration %s", cfgJson)

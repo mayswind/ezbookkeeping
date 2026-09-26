@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"net/http"
 	"reflect"

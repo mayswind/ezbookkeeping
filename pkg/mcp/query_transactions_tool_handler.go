@@ -1,7 +1,7 @@
 package mcp
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"reflect"
 	"strings"
 	"time"

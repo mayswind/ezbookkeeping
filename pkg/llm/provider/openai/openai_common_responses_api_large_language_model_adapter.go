@@ -3,7 +3,7 @@ package openai
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
+	"encoding/json/v2"
 	"io"
 	"net/http"
 	"strings"
@@ -78,7 +78,7 @@ type OpenAIResponsesRequestTextConfig struct {
 type OpenAIResponsesRequestResponseFormat struct {
 	Type   OpenAIResponsesRequestResponseFormatType `json:"type"`
 	Name   string                                   `json:"name,omitempty"`
-	Strict bool                                     `json:"strict,omitempty"`
+	Strict bool                                     `json:"strict,omitzero"`
 	Schema *jsonschema.Schema                       `json:"schema,omitempty"`
 }
 

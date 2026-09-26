@@ -1,7 +1,7 @@
 package exchangerates
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"math"
 	"net/http"
 	"strings"

@@ -3,7 +3,7 @@ package ollama
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"

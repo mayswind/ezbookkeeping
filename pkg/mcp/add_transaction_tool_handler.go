@@ -1,7 +1,7 @@
 package mcp
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"math/big"
 	"reflect"
 	"time"
@@ -36,7 +36,7 @@ type MCPAddTransactionRequest struct {
 // MCPAddTransactionResponse represents the response structure for add transaction
 type MCPAddTransactionResponse struct {
 	Success                   bool   `json:"success" jsonschema_description:"Indicates whether this operation is successful"`
-	DryRun                    bool   `json:"dry_run,omitempty" jsonschema_description:"Indicates whether this operation is a dry run (transaction not saved actually)"`
+	DryRun                    bool   `json:"dry_run,omitzero" jsonschema_description:"Indicates whether this operation is a dry run (transaction not saved actually)"`
 	AccountBalance            string `json:"account_balance,omitempty" jsonschema_description:"Account balance (or outstanding balance for debt accounts) after the transaction"`
 	DestinationAccountBalance string `json:"destination_account_balance,omitempty" jsonschema_description:"Destination account balance (or outstanding balance for debt accounts) after the transaction (only for transfer transactions)"`
 }

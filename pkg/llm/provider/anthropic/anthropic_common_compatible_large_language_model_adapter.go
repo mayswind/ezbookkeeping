@@ -3,7 +3,7 @@ package anthropic
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
+	"encoding/json/v2"
 	"io"
 	"net/http"
 
@@ -86,7 +86,7 @@ type AnthropicMessagesRequestBase64ImageSource struct {
 // AnthropicMessagesRequestThinkingConfigParam defines the structure of Anthropic messages request thinking config param
 type AnthropicMessagesRequestThinkingConfigParam struct {
 	Type         AnthropicThinkingType `json:"type"`
-	BudgetTokens uint32                `json:"budget_tokens,omitempty"`
+	BudgetTokens uint32                `json:"budget_tokens,omitzero"`
 }
 
 // AnthropicMessagesResponse defines the structure of Anthropic messages response

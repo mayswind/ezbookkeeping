@@ -178,6 +178,23 @@ jobs:
           skip-tests: ${{ vars.SKIP_TESTS }}
           backend-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-backend-artifact-name-prefix }}
 
+  build-freebsd-backend:
+    needs:
+      - setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/build-freebsd-backend
+        with:
+          architecture: amd64
+          build-unix-time: ${{ needs.setup.outputs.build-unix-time }}
+          build-date: ${{ needs.setup.outputs.build-date }}
+          check-3rd-api: ${{ vars.CHECK_3RD_API }}
+          skip-tests: ${{ vars.SKIP_TESTS }}
+          backend-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-backend-artifact-name-prefix }}
+
   build-windows-package:
     needs:
       - setup
@@ -206,5 +223,21 @@ jobs:
       - uses: ./.github/actions/build-macos-package
         with:
           architecture: arm64
+          package-file-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-file-name-prefix }}
+          backend-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-backend-artifact-name-prefix }}
+
+  build-freebsd-package:
+    needs:
+      - setup
+      - build-freebsd-backend
+      - build-linux-docker-and-package-x86
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/build-freebsd-package
+        with:
+          architecture: amd64
           package-file-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-package-file-name-prefix }}
           backend-artifact-name-prefix: ${{ needs.setup.outputs.ezbookkeeping-backend-artifact-name-prefix }}

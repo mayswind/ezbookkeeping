@@ -1,0 +1,58 @@
+name: Build packages for FreeBSD
+
+inputs:
+  architecture:
+    required: true
+    description: "The name of the architecture to build the FreeBSD package for."
+  package-file-name-prefix:
+    required: true
+    description: "The prefix for the FreeBSD package file name."
+  backend-artifact-name-prefix:
+    required: true
+    description: "The prefix for the FreeBSD backend artifact name."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download FreeBSD-${{ inputs.architecture }} backend file
+      uses: actions/download-artifact@v8
+      with:
+        name: ${{ inputs.backend-artifact-name-prefix }}-freebsd-${{ inputs.architecture }}
+        path: ${{ runner.temp }}/backend
+
+    - name: Download linux-amd64 packaged files
+      uses: actions/download-artifact@v8
+      with:
+        name: ${{ inputs.package-file-name-prefix }}-linux-amd64.tar.gz
+        path: ${{ runner.temp }}/package
+
+    - name: Extract frontend files from linux-amd64 package
+      shell: bash
+      run: |
+        mkdir -p package
+        tar -xzf ${{ runner.temp }}/package/${{ inputs.package-file-name-prefix }}-linux-amd64.tar.gz -C package
+
+    - name: Package FreeBSD-${{ inputs.architecture }} package
+      shell: bash
+      run: |
+        mkdir -p ezbookkeeping
+        mkdir -p ezbookkeeping/data
+        mkdir -p ezbookkeeping/storage
+        mkdir -p ezbookkeeping/log
+        cp ${{ runner.temp }}/backend/ezbookkeeping ezbookkeeping/
+        cp -R package/public ezbookkeeping/public
+        cp -R conf ezbookkeeping/conf
+        cp -R templates ezbookkeeping/templates
+        cp LICENSE ezbookkeeping/
+        cd ezbookkeeping
+        chmod +x ezbookkeeping
+        tar -czf ${{ runner.temp }}/${{ inputs.package-file-name-prefix }}-freebsd-${{ inputs.architecture }}.tar.gz -C ezbookkeeping .
+        cd ..
+        rm -rf ezbookkeeping
+
+    - name: Upload FreeBSD-${{ inputs.architecture }} artifact
+      uses: actions/upload-artifact@v7
+      with:
+        archive: false
+        path: ${{ runner.temp }}/${{ inputs.package-file-name-prefix }}-freebsd-${{ inputs.architecture }}.tar.gz
+        if-no-files-found: error

@@ -1,0 +1,60 @@
+name: Build backend file for FreeBSD
+
+inputs:
+  go-version:
+    required: false
+    description: "The Go version to use for building the FreeBSD backend. The version should be in the format of 'x.y.z'."
+    default: "1.27.1"
+  release-build:
+    required: false
+    description: "Whether to build the FreeBSD backend in release mode. If set to '1', the backend will be built in release mode. Otherwise, it will be built in development mode."
+  build-unix-time:
+    required: false
+    description: "The unix time to use for building the FreeBSD backend. The value should be a string representing the unix time in seconds."
+  build-date:
+    required: false
+    description: "The date to use for building the FreeBSD backend. The value should be a string representing the date in the format of 'YYYYMMDD'."
+  check-3rd-api:
+    required: false
+    description: "Whether to run integration tests that call third party APIs. If set to '1', the tests will be run. Otherwise, the tests will be skipped."
+  skip-tests:
+    required: false
+    description: "Whether to skip tests when building the FreeBSD backend. If set to '1', the tests will be skipped. Otherwise, the tests will be run."
+  architecture:
+    required: true
+    description: "The name of the architecture to build the FreeBSD package for."
+  backend-artifact-name-prefix:
+    required: true
+    description: "The prefix for the FreeBSD backend artifact name."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up and build backend for FreeBSD-${{ inputs.architecture }}
+      uses: vmactions/freebsd-vm@v1
+      with:
+        arch: x86_64
+        prepare: |
+          set -e
+          pkg install -y git
+          mkdir -p /usr/local/go
+          fetch -o /tmp/go.tar.gz "https://go.dev/dl/go${{ inputs.go-version }}.freebsd-amd64.tar.gz"
+          tar -C /usr/local/ -xzf /tmp/go.tar.gz
+        run: |
+          set -e
+          export PATH="/usr/local/go/bin:$PATH"
+          go version | grep -F "go${{ inputs.go-version }} freebsd/amd64"
+          export RELEASE_BUILD="${{ inputs.release-build }}"
+          export BUILD_PIPELINE="1"
+          export BUILD_UNIXTIME="${{ inputs.build-unix-time }}"
+          export BUILD_DATE="${{ inputs.build-date }}"
+          export CHECK_3RD_API="${{ inputs.check-3rd-api }}"
+          export SKIP_TESTS="${{ inputs.skip-tests }}"
+          ./build.sh backend
+
+    - name: Upload FreeBSD-${{ inputs.architecture }} backend artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.backend-artifact-name-prefix }}-freebsd-${{ inputs.architecture }}
+        path: ezbookkeeping
+        if-no-files-found: error

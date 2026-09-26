@@ -105,13 +105,25 @@ check_type_dependencies() {
 
     check_dependency "git"
 
-    if [ "$TYPE" = "backend" ]; then
-        check_dependency "go gcc"
-    elif [ "$TYPE" = "frontend" ]; then
+    if [ "$TYPE" = "backend" ] || [ "$TYPE" = "package" ]; then
+        check_dependency "go"
+
+        if [ "$(uname -s)" = "Darwin" ] || [ "$(uname -s)" = "FreeBSD" ]; then
+            check_dependency "clang"
+        else
+            check_dependency "gcc"
+        fi
+    fi
+
+    if [ "$TYPE" = "frontend" ] || [ "$TYPE" = "package" ]; then
         check_dependency "node npm"
-    elif [ "$TYPE" = "package" ]; then
-        check_dependency "go gcc node npm tar"
-    elif [ "$TYPE" = "docker" ]; then
+    fi
+
+    if [ "$TYPE" = "package" ]; then
+        check_dependency "tar"
+    fi
+
+    if [ "$TYPE" = "docker" ]; then
         check_dependency "docker"
     fi
 }

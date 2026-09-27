@@ -2548,6 +2548,7 @@
     "Timezone Used for Statistics": "統計に使用されるタイムゾーン",
     "Accounts Included in Overview Statistics": "概要統計に含める口座",
     "Transaction Categories Included in Overview Statistics": "概要統計に含める取引カテゴリ",
+    "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
     "Timezone Type": "タイムゾーンタイプ",
     "Application Timezone": "アプリのタイムゾーン",
     "Transaction List Page": "取引リストページ",

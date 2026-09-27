@@ -321,6 +321,7 @@ type TransactionAmountsRequest struct {
 	Query                  string `form:"query"`
 	ExcludeAccountIds      string `form:"exclude_account_ids"`
 	ExcludeCategoryIds     string `form:"exclude_category_ids"`
+	TagFilter              string `form:"tag_filter"`
 	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
 }
 
@@ -330,6 +331,7 @@ type TransactionDailyAmountsRequest struct {
 	EndTime                int64  `form:"end_time" binding:"required,min=1"`
 	ExcludeAccountIds      string `form:"exclude_account_ids"`
 	ExcludeCategoryIds     string `form:"exclude_category_ids"`
+	TagFilter              string `form:"tag_filter"`
 	UseTransactionTimezone bool   `form:"use_transaction_timezone"`
 }
 

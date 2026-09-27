@@ -2548,6 +2548,7 @@
     "Timezone Used for Statistics": "Fuseau horaire utilisé pour les statistiques",
     "Accounts Included in Overview Statistics": "Comptes inclus dans les statistiques d'aperçu",
     "Transaction Categories Included in Overview Statistics": "Catégories de transaction incluses dans les statistiques d'aperçu",
+    "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
     "Timezone Type": "Type de fuseau horaire",
     "Application Timezone": "Fuseau horaire de l'application",
     "Transaction List Page": "Page de liste des transactions",

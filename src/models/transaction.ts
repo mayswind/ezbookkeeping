@@ -1042,6 +1042,7 @@ export interface TransactionDailyAmountsRequest {
     readonly useTransactionTimezone: boolean;
     readonly excludeAccountIds: string[];
     readonly excludeCategoryIds: string[];
+    readonly tagFilter: string;
 }
 
 export interface TransactionDailyAmountsResponseItem {

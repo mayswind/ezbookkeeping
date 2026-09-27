@@ -2548,6 +2548,7 @@
     "Timezone Used for Statistics": "Часовой пояс, используемый для статистики",
     "Accounts Included in Overview Statistics": "Счета, включенные в обзорную статистику",
     "Transaction Categories Included in Overview Statistics": "Категории транзакций, включенные в обзорную статистику",
+    "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
     "Timezone Type": "Тип часового пояса",
     "Application Timezone": "Часовой пояс приложения",
     "Transaction List Page": "Страница списка транзакций",

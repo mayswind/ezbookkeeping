@@ -2,9 +2,11 @@ import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
+import { useOverviewStore } from '@/stores/overview.ts';
 
 import { entries, keys, values } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
@@ -44,9 +46,11 @@ function getEmptyGroupTagFilterTypesMap(allTransactionTagsByGroupMap: Record<str
 export function useTransactionTagFilterSettingPageBase(type?: string) {
     const { tt } = useI18n();
 
+    const settingsStore = useSettingsStore();
     const transactionTagsStore = useTransactionTagsStore();
     const transactionsStore = useTransactionsStore();
     const statisticsStore = useStatisticsStore();
+    const overviewStore = useOverviewStore();
 
     const loading = ref<boolean>(true);
     const showHidden = ref<boolean>(false);
@@ -152,6 +156,8 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
             tagFilters = TransactionTagFilter.parse(statisticsStore.transactionStatisticsFilter.tagFilter);
         } else if (type === 'transactionListCurrent') {
             tagFilters = TransactionTagFilter.parse(transactionsStore.transactionsFilter.tagFilter);
+        } else if (type === 'homePageOverview') {
+            tagFilters = TransactionTagFilter.parse(settingsStore.appSettings.overviewTransactionTagFilterInHomePage);
         } else if (type === 'custom') {
             tagFilters = TransactionTagFilter.parse(customTagFilter ?? '');
         } else {
@@ -253,6 +259,13 @@ export function useTransactionTagFilterSettingPageBase(type?: string) {
 
             if (changed) {
                 transactionsStore.updateTransactionListInvalidState(true);
+            }
+        } else if (type === 'homePageOverview') {
+            changed = settingsStore.appSettings.overviewTransactionTagFilterInHomePage !== textualTagFilter;
+
+            if (changed) {
+                settingsStore.setOverviewTransactionTagFilterInHomePage(textualTagFilter);
+                overviewStore.updateTransactionOverviewInvalidState(true);
             }
         }
 

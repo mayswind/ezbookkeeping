@@ -781,6 +781,13 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 		}
 	}
 
+	tagFilters, err := models.ParseTransactionTagFilter(transactionAmountsReq.TagFilter)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionAmountsHandler] parse transaction tag filters error, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
@@ -803,7 +810,7 @@ func (a *TransactionsApi) TransactionAmountsHandler(c *core.WebContext) (any, *e
 	for i := 0; i < len(requestItems); i++ {
 		requestItem := requestItems[i]
 
-		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, excludeAccountIds, excludeCategoryIds, clientTimezone, transactionAmountsReq.UseTransactionTimezone)
+		incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsTotalIncomeAndExpense(c, uid, requestItem.StartTime, requestItem.EndTime, excludeAccountIds, excludeCategoryIds, tagFilters, clientTimezone, transactionAmountsReq.UseTransactionTimezone)
 
 		if err != nil {
 			log.Errorf(c, "[transactions.TransactionAmountsHandler] failed to get transaction amounts item for user \"uid:%d\", because %s", uid, err.Error())
@@ -911,6 +918,13 @@ func (a *TransactionsApi) TransactionDailyAmountsHandler(c *core.WebContext) (an
 		}
 	}
 
+	tagFilters, err := models.ParseTransactionTagFilter(transactionAmountsReq.TagFilter)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionDailyAmountsHandler] parse transaction tag filters error, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	clientTimezone, err := c.GetClientTimezone()
 
 	if err != nil {
@@ -927,7 +941,7 @@ func (a *TransactionsApi) TransactionDailyAmountsHandler(c *core.WebContext) (an
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsDailyIncomeAndExpense(c, uid, transactionAmountsReq.StartTime, transactionAmountsReq.EndTime, excludeAccountIds, excludeCategoryIds, clientTimezone, transactionAmountsReq.UseTransactionTimezone)
+	incomeAmounts, expenseAmounts, err := a.transactions.GetAccountsDailyIncomeAndExpense(c, uid, transactionAmountsReq.StartTime, transactionAmountsReq.EndTime, excludeAccountIds, excludeCategoryIds, tagFilters, clientTimezone, transactionAmountsReq.UseTransactionTimezone)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionDailyAmountsHandler] failed to get daily amounts for user \"uid:%d\", because %s", uid, err.Error())

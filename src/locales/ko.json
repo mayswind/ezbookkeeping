@@ -2548,6 +2548,7 @@
     "Timezone Used for Statistics": "통계에 사용되는 시간대",
     "Accounts Included in Overview Statistics": "개요 통계에 포함된 계좌",
     "Transaction Categories Included in Overview Statistics": "개요 통계에 포함된 거래 범주",
+    "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
     "Timezone Type": "시간대 유형",
     "Application Timezone": "애플리케이션 시간대",
     "Transaction List Page": "거래 목록 페이지",

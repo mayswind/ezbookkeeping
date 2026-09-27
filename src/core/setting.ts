@@ -55,6 +55,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     timezoneUsedForStatisticsInHomePage: number;
     overviewAccountFilterInHomePage: Record<string, boolean>;
     overviewTransactionCategoryFilterInHomePage: Record<string, boolean>;
+    overviewTransactionTagFilterInHomePage: string;
     // Transaction List Page
     quickSaveButtonStyleInMobileTransactionListPage: number;
     quickAddButtonActionInMobileTransactionEditPage: number;
@@ -146,6 +147,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'timezoneUsedForStatisticsInHomePage': UserApplicationCloudSettingType.Number,
     'overviewAccountFilterInHomePage': UserApplicationCloudSettingType.StringBooleanMap,
     'overviewTransactionCategoryFilterInHomePage': UserApplicationCloudSettingType.StringBooleanMap,
+    'overviewTransactionTagFilterInHomePage': UserApplicationCloudSettingType.String,
     // Transaction List Page
     'itemsCountInTransactionListPage': UserApplicationCloudSettingType.Number,
     'showTotalAmountInTransactionListPage': UserApplicationCloudSettingType.Boolean,
@@ -219,6 +221,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     timezoneUsedForStatisticsInHomePage: TimezoneTypeForStatistics.Default.type,
     overviewAccountFilterInHomePage: {},
     overviewTransactionCategoryFilterInHomePage: {},
+    overviewTransactionTagFilterInHomePage: '',
     // Transaction List Page
     itemsCountInTransactionListPage: 15,
     showTotalAmountInTransactionListPage: true,

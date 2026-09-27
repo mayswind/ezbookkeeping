@@ -2548,6 +2548,7 @@
     "Timezone Used for Statistics": "Časovni pas za statistiko",
     "Accounts Included in Overview Statistics": "Računi vključeni v statistiko pregleda",
     "Transaction Categories Included in Overview Statistics": "Kategorije vključene v statistiko pregleda",
+    "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
     "Timezone Type": "Vrsta časovnega pasu",
     "Application Timezone": "Časovni pas aplikacije",
     "Transaction List Page": "Stran s seznamom transakcij",

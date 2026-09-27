@@ -2548,6 +2548,7 @@
     "Timezone Used for Statistics": "โซนเวลาที่ใช้สำหรับสถิติ",
     "Accounts Included in Overview Statistics": "บัญชีที่รวมในสถิติภาพรวม",
     "Transaction Categories Included in Overview Statistics": "หมวดรายการที่รวมในสถิติภาพรวม",
+    "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
     "Timezone Type": "ประเภทโซนเวลา",
     "Application Timezone": "โซนเวลาแอปพลิเคชัน",
     "Transaction List Page": "หน้ารายการ",

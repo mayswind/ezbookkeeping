@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
@@ -36,11 +37,13 @@ export function useAppSettingPageBase() {
     const accountsStore = useAccountsStore();
     const transactionsStore = useTransactionsStore();
     const transactionCategoriesStore = useTransactionCategoriesStore();
+    const transactionTagsStore = useTransactionTagsStore();
     const overviewStore = useOverviewStore();
     const statisticsStore = useStatisticsStore();
 
     const loadingAccounts = ref<boolean>(false);
     const loadingTransactionCategories = ref<boolean>(false);
+    const loadingTags = ref<boolean>(false);
 
     const allThemes = computed<NameValue[]>(() => {
         return [
@@ -74,6 +77,7 @@ export function useAppSettingPageBase() {
     const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
     const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
     const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
+    const hasAnyTransactionTag = computed<boolean>(() => transactionTagsStore.allAvailableTagsCount > 0);
 
     const timeZone = computed<string, string | null>({
         get: () => settingsStore.appSettings.timeZone,
@@ -223,6 +227,7 @@ export function useAppSettingPageBase() {
         // states
         loadingAccounts,
         loadingTransactionCategories,
+        loadingTags,
         // computed states
         allThemes,
         allTimezones,
@@ -236,6 +241,7 @@ export function useAppSettingPageBase() {
         hasAnyAccount,
         hasAnyVisibleAccount,
         hasAnyTransactionCategory,
+        hasAnyTransactionTag,
         isAutoUpdateExchangeRatesData,
         transactionPictureQuality,
         isAlwaysRequireConfirmationOfClipboardContentBeforeSubmission,

@@ -125,6 +125,21 @@
                     <div v-else-if="!loadingTransactionCategories">{{ transactionCategoriesIncludedInHomePageOverviewDisplayContent }}</div>
                 </template>
             </f7-list-item>
+
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="/settings/filter/tag?type=homePageOverview"
+                :disabled="!hasAnyTransactionTag">
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Transaction Tags Included in Overview Statistics') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    <f7-preloader v-if="loadingTags" />
+                    <div v-else-if="!loadingTags">{{ tt(settingsStore.appSettings.overviewTransactionTagFilterInHomePage ? 'Custom' : 'All') }}</div>
+                </template>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ tt('Transaction List Page') }}</f7-block-title>
@@ -449,6 +464,7 @@ import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -468,9 +484,11 @@ const { showToast } = useI18nUIComponents();
 const {
     loadingAccounts,
     loadingTransactionCategories,
+    loadingTags,
     hasAnyAccount,
     hasAnyVisibleAccount,
     hasAnyTransactionCategory,
+    hasAnyTransactionTag,
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
     allKeywordMatchModes,
@@ -501,6 +519,7 @@ const {
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
+const transactionTagsStore = useTransactionTagsStore();
 
 const showTimezoneUsedForStatisticsInHomePagePopup = ref<boolean>(false);
 const showTransactionPictureQualityPopup = ref<boolean>(false);
@@ -546,6 +565,7 @@ const reconciliationStatementPageDefaultDateRangeTypeInMobile = computed<number>
 function init(): void {
     loadingAccounts.value = true;
     loadingTransactionCategories.value = true;
+    loadingTags.value = true;
 
     accountsStore.loadAllAccounts({
         force: false
@@ -565,6 +585,18 @@ function init(): void {
         loadingTransactionCategories.value = false;
     }).catch(error => {
         loadingTransactionCategories.value = false;
+
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+
+    transactionTagsStore.loadAllTags({
+        force: false
+    }).then(() => {
+        loadingTags.value = false;
+    }).catch(error => {
+        loadingTags.value = false;
 
         if (!error.processed) {
             showToast(error.message || error);

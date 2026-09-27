@@ -2548,6 +2548,7 @@
     "Timezone Used for Statistics": "Ζώνη ώρας για τα στατιστικά",
     "Accounts Included in Overview Statistics": "Λογαριασμοί που συμπεριλαμβάνονται στα στατιστικά επισκόπησης",
     "Transaction Categories Included in Overview Statistics": "Κατηγορίες συναλλαγών που συμπεριλαμβάνονται στα στατιστικά επισκόπησης",
+    "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
     "Timezone Type": "Τύπος ζώνης ώρας",
     "Application Timezone": "Ζώνη ώρας εφαρμογής",
     "Transaction List Page": "Σελίδα λίστας συναλλαγών",

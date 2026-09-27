@@ -610,7 +610,7 @@ export default {
 
         return axios.get<ApiResponse<TransactionStatisticAssetTrendsResponseItem[]>>('v1/transactions/statistics/asset_trends.json' + (queryParams.length ? '?' + queryParams.join('&') : ''));
     },
-    getTransactionAmounts: (params: TransactionAmountsRequestParams, excludeAccountIds: string[], excludeCategoryIds: string[]): ApiResponsePromise<TransactionAmountsResponse> => {
+    getTransactionAmounts: (params: TransactionAmountsRequestParams, excludeAccountIds: string[], excludeCategoryIds: string[], tagFilter: string): ApiResponsePromise<TransactionAmountsResponse> => {
         const req = TransactionAmountsRequest.of(params);
         let queryParams = req.buildQuery();
 
@@ -620,6 +620,10 @@ export default {
 
         if (excludeCategoryIds && excludeCategoryIds.length) {
             queryParams = queryParams + `&exclude_category_ids=${excludeCategoryIds.join(',')}`;
+        }
+
+        if (tagFilter) {
+            queryParams = queryParams + `&tag_filter=${encodeURIComponent(tagFilter)}`;
         }
 
         return axios.get<ApiResponse<TransactionAmountsResponse>>(`v1/transactions/amounts.json?${queryParams}`);
@@ -637,6 +641,10 @@ export default {
 
         if (req.excludeCategoryIds.length) {
             queryParams.push(`exclude_category_ids=${req.excludeCategoryIds.join(',')}`);
+        }
+
+        if (req.tagFilter) {
+            queryParams.push(`tag_filter=${encodeURIComponent(req.tagFilter)}`);
         }
 
         return axios.get<ApiResponse<TransactionDailyAmountsResponseItem[]>>(`v1/transactions/amounts/daily.json?${queryParams.join('&')}`);

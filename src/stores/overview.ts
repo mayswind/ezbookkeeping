@@ -357,9 +357,10 @@ export const useOverviewStore = defineStore('overview', () => {
 
         const excludeAccountIds: string[] = objectFieldWithValueToArrayItem(settingsStore.appSettings.overviewAccountFilterInHomePage, true);
         const excludeCategoryIds: string[] = objectFieldWithValueToArrayItem(settingsStore.appSettings.overviewTransactionCategoryFilterInHomePage, true);
+        const tagFilter: string = settingsStore.appSettings.overviewTransactionTagFilterInHomePage;
 
         return new Promise((resolve, reject) => {
-            services.getTransactionAmounts(requestParams, excludeAccountIds, excludeCategoryIds).then(response => {
+            services.getTransactionAmounts(requestParams, excludeAccountIds, excludeCategoryIds, tagFilter).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
@@ -425,7 +426,7 @@ export const useOverviewStore = defineStore('overview', () => {
             services.getTransactionStatistics({
                 startTime: requestDateRange.startTime,
                 endTime: requestDateRange.endTime,
-                tagFilter: '',
+                tagFilter: settingsStore.appSettings.overviewTransactionTagFilterInHomePage,
                 keyword: '',
                 matchMode: KeywordMatchMode.Default.type,
                 useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage === TimezoneTypeForStatistics.TransactionTimezone.type
@@ -655,7 +656,8 @@ export const useOverviewStore = defineStore('overview', () => {
                 endTime: endTime,
                 useTransactionTimezone: settingsStore.appSettings.timezoneUsedForStatisticsInHomePage === TimezoneTypeForStatistics.TransactionTimezone.type,
                 excludeAccountIds: excludeAccountIds,
-                excludeCategoryIds: excludeCategoryIds
+                excludeCategoryIds: excludeCategoryIds,
+                tagFilter: settingsStore.appSettings.overviewTransactionTagFilterInHomePage
             }).then(response => {
                 const data = response.data;
 
@@ -725,7 +727,7 @@ export const useOverviewStore = defineStore('overview', () => {
                     type: 0,
                     categoryIds: categoryIds,
                     accountIds: accountIds,
-                    tagFilter: '',
+                    tagFilter: settingsStore.appSettings.overviewTransactionTagFilterInHomePage,
                     amountFilter: '',
                     keyword: '',
                     matchMode: KeywordMatchMode.Default.type,
@@ -804,6 +806,10 @@ export const useOverviewStore = defineStore('overview', () => {
 
         if (!isObjectEmpty(settingsStore.appSettings.overviewAccountFilterInHomePage)) {
             querys.push('accountIds=' + getFinalAccountIdsByFilteredAccountIds(accountsStore.allAccountsMap, settingsStore.appSettings.overviewAccountFilterInHomePage));
+        }
+
+        if (settingsStore.appSettings.overviewTransactionTagFilterInHomePage) {
+            querys.push('tagFilter=' + encodeURIComponent(settingsStore.appSettings.overviewTransactionTagFilterInHomePage));
         }
 
         return querys.join('&');

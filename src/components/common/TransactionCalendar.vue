@@ -42,7 +42,7 @@ import type { BigDecimal } from '@/core/numeral.ts';
 import type { CalendarAlternateDate, TextualYearMonthDay, WeekDayValue } from '@/core/datetime.ts';
 import { INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 
-import { arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
+import { isNumber, arrangeArrayWithNewStartIndex } from '@/lib/common.ts';
 import { getYearMonthDayDateTime } from '@/lib/datetime.ts';
 
 const props = defineProps<{
@@ -60,6 +60,7 @@ const props = defineProps<{
     readonly?: boolean;
     calendarClass?: string;
     dayHasTransactionClass?: string;
+    datesHaveAnyTransactionClickable?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -121,8 +122,12 @@ function hasVisibleAmount(day: number): boolean {
         return false;
     }
 
-    return !!(props.showIncomeAmount && dailyTotalAmount.income && (!dailyTotalAmount.income.isZero() || dailyTotalAmount.incompleteIncome))
-        || !!(props.showExpenseAmount && dailyTotalAmount.expense && (!dailyTotalAmount.expense.isZero() || dailyTotalAmount.incompleteExpense));
+    if (props.datesHaveAnyTransactionClickable) {
+        return isNumber(dailyTotalAmount.transactionCount) && dailyTotalAmount.transactionCount > 0;
+    } else {
+        return !!(props.showIncomeAmount && dailyTotalAmount.income && (!dailyTotalAmount.income.isZero() || dailyTotalAmount.incompleteIncome))
+            || !!(props.showExpenseAmount && dailyTotalAmount.expense && (!dailyTotalAmount.expense.isZero() || dailyTotalAmount.incompleteExpense));
+    }
 }
 
 function getDisplayMonthTotalAmount(amount: BigDecimal, currency: string | false, symbol: string, incomplete: boolean): string {

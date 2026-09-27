@@ -90,6 +90,7 @@ export interface TransactionListFilter extends TransactionListPartialFilter {
 }
 
 export interface TransactionTotalAmount {
+    transactionCount: number;
     expense: BigDecimal;
     incompleteExpense: boolean;
     income: BigDecimal;
@@ -244,6 +245,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                         opened: autoExpand,
                         items: [],
                         inflowOutflowTotalAmount: {
+                            transactionCount: 0,
                             expense: BIG_DECIMAL_ZERO,
                             incompleteExpense: true,
                             income: BIG_DECIMAL_ZERO,
@@ -251,6 +253,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                         },
                         inflowOutflowDailyTotalAmounts: {},
                         incomeExpenseTotalAmount: {
+                            transactionCount: 0,
                             expense: BIG_DECIMAL_ZERO,
                             incompleteExpense: true,
                             income: BIG_DECIMAL_ZERO,
@@ -382,6 +385,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
             if (!inflowOutflowDailyTotalAmount) {
                 inflowOutflowDailyTotalAmount = {
+                    transactionCount: 0,
                     expense: BIG_DECIMAL_ZERO,
                     incompleteExpense: false,
                     income: BIG_DECIMAL_ZERO,
@@ -392,6 +396,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
             if (!incomeExpenseDailyTotalAmount) {
                 incomeExpenseDailyTotalAmount = {
+                    transactionCount: 0,
                     expense: BIG_DECIMAL_ZERO,
                     incompleteExpense: false,
                     income: BIG_DECIMAL_ZERO,
@@ -413,6 +418,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
             if (!account) {
                 continue;
             }
+
+            inflowOutflowDailyTotalAmount.transactionCount++;
+            incomeExpenseDailyTotalAmount.transactionCount++;
 
             if (account.currency !== defaultCurrency) {
                 const balance = exchangeRatesStore.getExchangedAmount(amount, account.currency, defaultCurrency);
@@ -481,11 +489,13 @@ export const useTransactionsStore = defineStore('transactions', () => {
             }
         }
 
+        transactionMonthList.inflowOutflowTotalAmount.transactionCount = transactionMonthList.items.length;
         transactionMonthList.inflowOutflowTotalAmount.expense = totalOutflow.truncate();
         transactionMonthList.inflowOutflowTotalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalOutflow;
         transactionMonthList.inflowOutflowTotalAmount.income = totalInflow.truncate();
         transactionMonthList.inflowOutflowTotalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalInflow;
 
+        transactionMonthList.incomeExpenseTotalAmount.transactionCount = transactionMonthList.items.length;
         transactionMonthList.incomeExpenseTotalAmount.expense = totalExpense.truncate();
         transactionMonthList.incomeExpenseTotalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalExpense;
         transactionMonthList.incomeExpenseTotalAmount.income = totalIncome.truncate();
@@ -500,6 +510,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         for (const [day, inflowOutflowDailyTotalAmount] of entries(inflowOutflowDailyTotalAmounts)) {
             transactionMonthList.inflowOutflowDailyTotalAmounts[day] = {
+                transactionCount: inflowOutflowDailyTotalAmount.transactionCount,
                 expense: inflowOutflowDailyTotalAmount.expense.truncate(),
                 incompleteExpense: incomplete || inflowOutflowDailyTotalAmount.incompleteExpense,
                 income: inflowOutflowDailyTotalAmount.income.truncate(),
@@ -508,6 +519,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         }
         for (const [day, incomeExpenseDailyTotalAmount] of entries(incomeExpenseDailyTotalAmounts)) {
             transactionMonthList.incomeExpenseDailyTotalAmounts[day] = {
+                transactionCount: incomeExpenseDailyTotalAmount.transactionCount,
                 expense: incomeExpenseDailyTotalAmount.expense.truncate(),
                 incompleteExpense: incomplete || incomeExpenseDailyTotalAmount.incompleteExpense,
                 income: incomeExpenseDailyTotalAmount.income.truncate(),
@@ -642,6 +654,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
             opened: true,
             items: transactions.map(transaction => fillTransactionObject(Transaction.of(transaction))),
             inflowOutflowTotalAmount: {
+                transactionCount: 0,
                 expense: BIG_DECIMAL_ZERO,
                 incompleteExpense: true,
                 income: BIG_DECIMAL_ZERO,
@@ -649,6 +662,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
             },
             inflowOutflowDailyTotalAmounts: {},
             incomeExpenseTotalAmount: {
+                transactionCount: 0,
                 expense: BIG_DECIMAL_ZERO,
                 incompleteExpense: true,
                 income: BIG_DECIMAL_ZERO,

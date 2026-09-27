@@ -183,6 +183,7 @@
 
                         <v-card-text class="transaction-calendar-container pt-0" v-if="pageType === TransactionListPageType.Calendar.type">
                             <transaction-calendar show-amount show-income-amount show-expense-amount show-alternate-date
+                                                  dates-have-any-transaction-clickable
                                                   day-has-transaction-class="font-weight-bold"
                                                   :readonly="loading" :is-dark-mode="isDarkMode"
                                                   :default-currency="selectedAccountDefaultCurrency"

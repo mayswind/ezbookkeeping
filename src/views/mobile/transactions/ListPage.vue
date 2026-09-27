@@ -72,6 +72,7 @@
         <f7-block class="transaction-calendar-container" :class="{ 'margin-vertical': showSearchbar, 'margin-vertical-half': !showSearchbar }"
                   v-if="pageType === TransactionListPageType.Calendar.type">
             <transaction-calendar show-amount show-income-amount show-expense-amount show-alternate-date
+                                  dates-have-any-transaction-clickable
                                   calendar-class="justify-content-center" week-day-name-type="short"
                                   :readonly="loading" :is-dark-mode="isDarkMode"
                                   :default-currency="false"
@@ -832,6 +833,7 @@ const transactions = computed<TransactionMonthList[]>(() => {
                 opened: true,
                 items: transactions,
                 inflowOutflowTotalAmount: {
+                    transactionCount: transactions.length,
                     income: BIG_DECIMAL_ZERO,
                     expense: BIG_DECIMAL_ZERO,
                     incompleteIncome: false,
@@ -839,6 +841,7 @@ const transactions = computed<TransactionMonthList[]>(() => {
                 },
                 inflowOutflowDailyTotalAmounts: {},
                 incomeExpenseTotalAmount: {
+                    transactionCount: transactions.length,
                     income: BIG_DECIMAL_ZERO,
                     expense: BIG_DECIMAL_ZERO,
                     incompleteIncome: false,

@@ -7,6 +7,11 @@ export enum TransactionType {
     Transfer = 4
 }
 
+export enum TransactionAmountType {
+    InflowsAndOutflows = 0,
+    IncomeAndExpense = 1
+}
+
 export enum TransactionRelatedAccountType {
     TransferFrom = 1,
     TransferTo = 2

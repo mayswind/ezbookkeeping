@@ -52,6 +52,7 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         items: [
             { settingKey: 'itemsCountInTransactionListPage', settingName: 'Transactions Per Page', mobile: false, desktop: true },
             { settingKey: 'showTotalAmountInTransactionListPage', settingName: 'Show Monthly Total Amount', mobile: true, desktop: true },
+            { settingKey: 'totalAmountTypeInTransactionListPage', settingName: 'Total Amount Calculation Method', mobile: true, desktop: true },
             { settingKey: 'showTagInTransactionListPage', settingName: 'Show Transaction Tags', mobile: true, desktop: true },
             { settingKey: 'defaultKeywordMatchModeInTransactionListPage', settingName: 'Default Keyword Search Matching Mode', mobile: true, desktop: true }
         ]

@@ -152,6 +152,35 @@
                     <f7-toggle :checked="showTotalAmountInTransactionListPage" @toggle:change="showTotalAmountInTransactionListPage = $event"></f7-toggle>
                 </template>
             </f7-list-item>
+            <f7-list-item
+                link="#"
+                class="item-truncate-after-text"
+                popover-open=".monthly-total-amount-type-popover-menu"
+            >
+                <template #after-title>
+                    {{ tt('Total Amount Calculation Method') }}
+                </template>
+                <template #after>
+                    {{ totalAmountTypeInTransactionListPage === TransactionAmountType.IncomeAndExpense ? tt('Income and Expense') : tt('Inflows and Outflows') }}
+                </template>
+                <f7-popover class="monthly-total-amount-type-popover-menu">
+                    <f7-list dividers>
+                        <f7-list-item link="#" no-chevron popover-close
+                                      :title="option.name"
+                                      :class="{ 'list-item-selected': totalAmountTypeInTransactionListPage === option.value }"
+                                      :key="option.value"
+                                      v-for="option in [
+                                          { name: tt('Inflows and Outflows'), value: TransactionAmountType.InflowsAndOutflows },
+                                          { name: tt('Income and Expense'), value: TransactionAmountType.IncomeAndExpense }
+                                      ]"
+                                      @click="totalAmountTypeInTransactionListPage = option.value">
+                            <template #after>
+                                <f7-icon class="list-item-checked-icon" f7="checkmark_alt" v-if="totalAmountTypeInTransactionListPage === option.value"></f7-icon>
+                            </template>
+                        </f7-list-item>
+                    </f7-list>
+                </f7-popover>
+            </f7-list-item>
             <f7-list-item>
                 <template #after-title>
                     {{ tt('Show Transaction Tags') }}
@@ -468,7 +497,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
-import { TransactionQuickSaveButtonStyle } from '@/core/transaction.ts';
+import { TransactionAmountType, TransactionQuickSaveButtonStyle } from '@/core/transaction.ts';
 import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE } from '@/core/statistics.ts';
 
 import { findNameByValue, findDisplayNameByType } from '@/lib/common.ts';
@@ -500,6 +529,7 @@ const {
     showAmountInHomePage,
     timezoneUsedForStatisticsInHomePage,
     showTotalAmountInTransactionListPage,
+    totalAmountTypeInTransactionListPage,
     showTagInTransactionListPage,
     defaultKeywordMatchModeInTransactionListPage,
     autoSaveTransactionDraft,

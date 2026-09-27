@@ -118,6 +118,11 @@ export function useAppSettingPageBase() {
         set: (value) => settingsStore.setShowTotalAmountInTransactionListPage(value)
     });
 
+    const totalAmountTypeInTransactionListPage = computed<number>({
+        get: () => settingsStore.appSettings.totalAmountTypeInTransactionListPage,
+        set: (value) => settingsStore.setTotalAmountTypeInTransactionListPage(value)
+    });
+
     const showTagInTransactionListPage = computed<boolean>({
         get: () => settingsStore.appSettings.showTagInTransactionListPage,
         set: (value) => settingsStore.setShowTagInTransactionListPage(value)
@@ -251,6 +256,7 @@ export function useAppSettingPageBase() {
         itemsCountInTransactionListPage,
         timezoneUsedForStatisticsInHomePage,
         showTotalAmountInTransactionListPage,
+        totalAmountTypeInTransactionListPage,
         showTagInTransactionListPage,
         defaultKeywordMatchModeInTransactionListPage,
         autoSaveTransactionDraft,

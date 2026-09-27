@@ -191,6 +191,25 @@
                         </div>
 
                         <div class="setting-item">
+                            <span>{{ tt('Total Amount Calculation Method') }}</span>
+                            <v-spacer/>
+                            <v-select
+                                class="ms-4"
+                                density="compact"
+                                item-title="name"
+                                item-value="value"
+                                persistent-placeholder
+                                max-width="400px"
+                                :placeholder="tt('Total Amount Calculation Method')"
+                                :items="[
+                                    { name: tt('Inflows and Outflows'), value: TransactionAmountType.InflowsAndOutflows },
+                                    { name: tt('Income and Expense'), value: TransactionAmountType.IncomeAndExpense }
+                                ]"
+                                v-model="totalAmountTypeInTransactionListPage"
+                            />
+                        </div>
+
+                        <div class="setting-item">
                             <span>{{ tt('Show Transaction Tags') }}</span>
                             <v-spacer/>
                             <v-switch class="ms-4" v-model="showTagInTransactionListPage"/>
@@ -448,6 +467,7 @@ import type { NameNumeralValue } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
+import { TransactionAmountType } from '@/core/transaction.ts';
 import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP } from '@/core/statistics.ts';
 
 import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
@@ -486,6 +506,7 @@ const {
     itemsCountInTransactionListPage,
     timezoneUsedForStatisticsInHomePage,
     showTotalAmountInTransactionListPage,
+    totalAmountTypeInTransactionListPage,
     showTagInTransactionListPage,
     defaultKeywordMatchModeInTransactionListPage,
     autoSaveTransactionDraft,

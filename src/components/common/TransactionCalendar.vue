@@ -20,11 +20,11 @@
             <div class="transaction-calendar-daily-amounts">
                 <span :class="dayHasTransactionClass && hasVisibleAmount(day) ? dayHasTransactionClass : undefined">{{ getDisplayDay(date) }}</span>
                 <span class="transaction-calendar-alternate-date" v-if="alternateDates && alternateDates[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`]">{{ alternateDates[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`] }}</span>
-                <span class="transaction-calendar-daily-amount text-income" v-if="showAmount && showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].income, defaultCurrency, '', dailyTotalAmounts[day].incompleteIncome) }}</span>
-                <span class="transaction-calendar-daily-amount text-expense" v-if="showAmount && showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].expense, defaultCurrency, '', dailyTotalAmounts[day].incompleteExpense) }}</span>
+                <span class="transaction-calendar-daily-amount text-income" v-if="showAmount && showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && (!dailyTotalAmounts[day].income.isZero() || dailyTotalAmounts[day].incompleteIncome)">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].income, defaultCurrency, '', dailyTotalAmounts[day].incompleteIncome) }}</span>
+                <span class="transaction-calendar-daily-amount text-expense" v-if="showAmount && showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && (!dailyTotalAmounts[day].expense.isZero() || dailyTotalAmounts[day].incompleteExpense)">{{ getDisplayMonthTotalAmount(dailyTotalAmounts[day].expense, defaultCurrency, '', dailyTotalAmounts[day].incompleteExpense) }}</span>
                 <span class="transaction-calendar-daily-amount" v-if="!showAmount">
-                    <span class="transaction-calendar-daily-amount-dot text-income" v-if="showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && !dailyTotalAmounts[day].income.isZero()"></span>
-                    <span class="transaction-calendar-daily-amount-dot text-expense" v-if="showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && !dailyTotalAmounts[day].expense.isZero()"></span>
+                    <span class="transaction-calendar-daily-amount-dot text-income" v-if="showIncomeAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].income && (!dailyTotalAmounts[day].income.isZero() || dailyTotalAmounts[day].incompleteIncome)"></span>
+                    <span class="transaction-calendar-daily-amount-dot text-expense" v-if="showExpenseAmount && dailyTotalAmounts && dailyTotalAmounts[day] && dailyTotalAmounts[day].expense && (!dailyTotalAmounts[day].expense.isZero() || dailyTotalAmounts[day].incompleteExpense)"></span>
                 </span>
             </div>
         </template>
@@ -121,7 +121,8 @@ function hasVisibleAmount(day: number): boolean {
         return false;
     }
 
-    return !!(props.showIncomeAmount && dailyTotalAmount.income && !dailyTotalAmount.income.isZero()) || !!(props.showExpenseAmount && dailyTotalAmount.expense && !dailyTotalAmount.expense.isZero());
+    return !!(props.showIncomeAmount && dailyTotalAmount.income && (!dailyTotalAmount.income.isZero() || dailyTotalAmount.incompleteIncome))
+        || !!(props.showExpenseAmount && dailyTotalAmount.expense && (!dailyTotalAmount.expense.isZero() || dailyTotalAmount.incompleteExpense));
 }
 
 function getDisplayMonthTotalAmount(amount: BigDecimal, currency: string | false, symbol: string, incomplete: boolean): string {

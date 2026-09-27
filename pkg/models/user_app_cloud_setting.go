@@ -32,6 +32,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	// Transaction List Page
 	"itemsCountInTransactionListPage":              USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"showTotalAmountInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"totalAmountTypeInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"showTagInTransactionListPage":                 USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"defaultKeywordMatchModeInTransactionListPage": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// Transaction Edit Page

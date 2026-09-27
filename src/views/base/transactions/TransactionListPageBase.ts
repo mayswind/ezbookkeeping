@@ -7,14 +7,14 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
-import { type TransactionListFilter, type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
+import { type TransactionListFilter, type TransactionTotalAmount, type TransactionMonthList, useTransactionsStore } from '@/stores/transaction.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { type TypeAndName, keys, entries } from '@/core/base.ts';
 import type { BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import { type TextualYearMonthDay, type Year0BasedMonth, type LocalizedDateRange, type WeekDayValue, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
-import { TransactionType } from '@/core/transaction.ts';
+import { TransactionType, TransactionAmountType } from '@/core/transaction.ts';
 import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numeral.ts';
 import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
@@ -47,6 +47,15 @@ import {
 import {
     categoryTypeToTransactionType
 } from '@/lib/category.ts';
+
+export interface TransactionListDisplayTotalAmount {
+    incomeIsZero: boolean;
+    expenseIsZero: boolean;
+    income: string;
+    expense: string;
+    incomeInDefaultCurrency: string;
+    expenseInDefaultCurrency: string;
+}
 
 export class TransactionListPageType implements TypeAndName {
     private static readonly allInstances: TransactionListPageType[] = [];
@@ -112,6 +121,7 @@ export function useTransactionListPageBase() {
     const userDefaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
     const selectedAccountDefaultCurrency = computed<string>(() => getUnifiedSelectedAccountsCurrencyOrDefaultCurrency(allAccountsMap.value, queryAllFilterAccountIds.value, userStore.currentUserDefaultCurrency));
     const showTotalAmountInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTotalAmountInTransactionListPage);
+    const totalAmountTypeInTransactionListPage = computed<number>(() => settingsStore.appSettings.totalAmountTypeInTransactionListPage);
     const showTagInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTagInTransactionListPage);
 
     const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, {
@@ -297,6 +307,11 @@ export function useTransactionListPageBase() {
         return true;
     });
 
+    function getDisplayTotalAmount(amount: BigDecimal, currency: string, prefix: string, incomplete: boolean, inDefaultCurrency?: boolean) {
+        const displayAmount = formatAmount(amount, false, currency, inDefaultCurrency);
+        return prefix + displayAmount + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
+    }
+
     function hasSubCategoryInQuery(category: TransactionCategory): boolean {
         if (!category.subCategories || !category.subCategories.length) {
             return false;
@@ -342,6 +357,65 @@ export function useTransactionListPageBase() {
             const exchangedAmount = exchangeRatesStore.getExchangedAmount(amount, currencyCode, userDefaultCurrency.value);
             return exchangedAmount ? formatAmountToLocalizedNumeralsWithCurrency(exchangedAmount.truncate(), userDefaultCurrency.value) : formatAmountToLocalizedNumeralsWithCurrency(amount, currencyCode);
         }
+    }
+
+    function hasMonthTotalAmount(transactionMonth?: TransactionMonthList | null): boolean {
+        if (!transactionMonth) {
+            return false;
+        }
+
+        if (totalAmountTypeInTransactionListPage.value === TransactionAmountType.InflowsAndOutflows) {
+            return !!transactionMonth.inflowOutflowTotalAmount;
+        } else if (totalAmountTypeInTransactionListPage.value === TransactionAmountType.IncomeAndExpense) {
+            return !!transactionMonth.incomeExpenseTotalAmount;
+        } else {
+            return false;
+        }
+    }
+
+    function getDailyTotalAmounts(transactionMonth?: TransactionMonthList | null): Record<string, TransactionTotalAmount> | undefined {
+        if (!transactionMonth) {
+            return undefined;
+        }
+
+        if (totalAmountTypeInTransactionListPage.value === TransactionAmountType.InflowsAndOutflows) {
+            return transactionMonth.inflowOutflowDailyTotalAmounts;
+        } else if (totalAmountTypeInTransactionListPage.value === TransactionAmountType.IncomeAndExpense) {
+            return transactionMonth.incomeExpenseDailyTotalAmounts;
+        } else {
+            return undefined;
+        }
+    }
+
+    function getDisplayMonthTotalAmount(transactionMonth: TransactionMonthList | null, prefix: string): TransactionListDisplayTotalAmount | null {
+        if (!transactionMonth) {
+            return null;
+        }
+
+        let totalAmount: TransactionTotalAmount;
+
+        if (totalAmountTypeInTransactionListPage.value === TransactionAmountType.InflowsAndOutflows) {
+            totalAmount = transactionMonth.inflowOutflowTotalAmount;
+        } else if (totalAmountTypeInTransactionListPage.value === TransactionAmountType.IncomeAndExpense) {
+            totalAmount = transactionMonth.incomeExpenseTotalAmount;
+        } else {
+            return null;
+        }
+
+        if (!totalAmount) {
+            return null;
+        }
+
+        const displayMonthlyTotalAmount: TransactionListDisplayTotalAmount = {
+            incomeIsZero: totalAmount.income.isZero(),
+            expenseIsZero: totalAmount.expense.isZero(),
+            income: getDisplayTotalAmount(totalAmount.income, selectedAccountDefaultCurrency.value, prefix, totalAmount.incompleteIncome),
+            expense: getDisplayTotalAmount(totalAmount.expense, selectedAccountDefaultCurrency.value, prefix, totalAmount.incompleteExpense),
+            incomeInDefaultCurrency: getDisplayTotalAmount(totalAmount.income, selectedAccountDefaultCurrency.value, prefix, totalAmount.incompleteIncome, true),
+            expenseInDefaultCurrency: getDisplayTotalAmount(totalAmount.expense, selectedAccountDefaultCurrency.value, prefix, totalAmount.incompleteExpense, true)
+        };
+
+        return displayMonthlyTotalAmount;
     }
 
     function getDisplayTime(transaction: Transaction): string {
@@ -431,11 +505,6 @@ export function useTransactionListPageBase() {
         return userDefaultCurrency.value;
     }
 
-    function getDisplayMonthTotalAmount(amount: BigDecimal, currency: string, symbol: string, incomplete: boolean, inDefaultCurrency?: boolean): string {
-        const displayAmount = formatAmount(amount, false, currency, inDefaultCurrency);
-        return symbol + displayAmount + (incomplete ? INCOMPLETE_AMOUNT_SUFFIX : '');
-    }
-
     function getTransactionTypeName(type: number | null, defaultName: string): string {
         switch (type){
             case TransactionType.ModifyBalance:
@@ -468,6 +537,7 @@ export function useTransactionListPageBase() {
         userDefaultCurrency,
         selectedAccountDefaultCurrency,
         showTotalAmountInTransactionListPage,
+        totalAmountTypeInTransactionListPage,
         showTagInTransactionListPage,
         allDateRanges,
         allAccounts,
@@ -505,6 +575,9 @@ export function useTransactionListPageBase() {
         hasSubCategoryInQuery,
         hasVisibleTagsInTagGroup,
         isSameAsDefaultTimezoneOffsetMinutes,
+        hasMonthTotalAmount,
+        getDailyTotalAmounts,
+        getDisplayMonthTotalAmount,
         getDisplayTime,
         getDisplayLongDate,
         getDisplayLongYearMonth,
@@ -512,7 +585,6 @@ export function useTransactionListPageBase() {
         getDisplayTimeInDefaultTimezone,
         getDisplayAmount,
         getDisplayAmountCurrency,
-        getDisplayMonthTotalAmount,
         getTransactionTypeName,
         getTransactionPictureUrl
     };

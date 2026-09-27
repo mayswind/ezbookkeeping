@@ -271,6 +271,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('showTotalAmountInTransactionListPage', value);
     }
 
+    function setTotalAmountTypeInTransactionListPage(value: number): void {
+        updateApplicationSettingsValue('totalAmountTypeInTransactionListPage', value);
+        appSettings.value.totalAmountTypeInTransactionListPage = value;
+        updateUserApplicationCloudSettingValue('totalAmountTypeInTransactionListPage', value);
+    }
+
     function setShowTagInTransactionListPage(value: boolean): void {
         updateApplicationSettingsValue('showTagInTransactionListPage', value);
         appSettings.value.showTagInTransactionListPage = value;
@@ -635,6 +641,7 @@ export const useSettingsStore = defineStore('settings', () => {
         // -- Transaction List Page
         setItemsCountInTransactionListPage,
         setShowTotalAmountInTransactionListPage,
+        setTotalAmountTypeInTransactionListPage,
         setShowTagInTransactionListPage,
         setDefaultKeywordMatchModeInTransactionListPage,
         // -- Transaction Edit Page

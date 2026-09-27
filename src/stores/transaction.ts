@@ -102,8 +102,10 @@ export interface TransactionMonthList {
     readonly yearDashMonth: TextualYearMonth;
     opened: boolean;
     readonly items: Transaction[];
-    readonly totalAmount: TransactionTotalAmount;
-    readonly dailyTotalAmounts: Record<string, TransactionTotalAmount>;
+    readonly inflowOutflowTotalAmount: TransactionTotalAmount;
+    readonly inflowOutflowDailyTotalAmounts: Record<string, TransactionTotalAmount>;
+    readonly incomeExpenseTotalAmount: TransactionTotalAmount;
+    readonly incomeExpenseDailyTotalAmounts: Record<string, TransactionTotalAmount>;
 }
 
 export const useTransactionsStore = defineStore('transactions', () => {
@@ -201,7 +203,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 if (index === 0 && transactions.value.length > 0) {
                     const lastMonthList = transactions.value[transactions.value.length - 1] as TransactionMonthList;
 
-                    if (lastMonthList.totalAmount.incompleteExpense || lastMonthList.totalAmount.incompleteIncome) {
+                    if (lastMonthList.inflowOutflowTotalAmount.incompleteExpense || lastMonthList.inflowOutflowTotalAmount.incompleteIncome
+                        || lastMonthList.incomeExpenseTotalAmount.incompleteExpense || lastMonthList.incomeExpenseTotalAmount.incompleteIncome) {
                         // calculate the total amount of last month which has incomplete total amount before starting to process a new request
                         calculateMonthTotalAmount(lastMonthList, defaultCurrency, transactionsFilter.value.accountIds, false);
                     }
@@ -235,13 +238,20 @@ export const useTransactionsStore = defineStore('transactions', () => {
                         yearDashMonth: transactionYearDashMonth,
                         opened: autoExpand,
                         items: [],
-                        totalAmount: {
+                        inflowOutflowTotalAmount: {
                             expense: BIG_DECIMAL_ZERO,
                             incompleteExpense: true,
                             income: BIG_DECIMAL_ZERO,
                             incompleteIncome: true
                         },
-                        dailyTotalAmounts: {}
+                        inflowOutflowDailyTotalAmounts: {},
+                        incomeExpenseTotalAmount: {
+                            expense: BIG_DECIMAL_ZERO,
+                            incompleteExpense: true,
+                            income: BIG_DECIMAL_ZERO,
+                            incompleteIncome: true
+                        },
+                        incomeExpenseDailyTotalAmounts: {}
                     };
 
                     transactions.value.push(monthList);
@@ -335,11 +345,16 @@ export const useTransactionsStore = defineStore('transactions', () => {
             return;
         }
 
+        const inflowOutflowDailyTotalAmounts: Record<string, TransactionTotalAmount> = {};
+        const incomeExpenseDailyTotalAmounts: Record<string, TransactionTotalAmount> = {};
+        let totalOutflow: BigDecimal = BIG_DECIMAL_ZERO;
+        let totalInflow: BigDecimal = BIG_DECIMAL_ZERO;
         let totalExpense: BigDecimal = BIG_DECIMAL_ZERO;
         let totalIncome: BigDecimal = BIG_DECIMAL_ZERO;
+        let hasUnCalculatedTotalOutflow = false;
+        let hasUnCalculatedTotalInflow = false;
         let hasUnCalculatedTotalExpense = false;
         let hasUnCalculatedTotalIncome = false;
-        const dailyTotalAmounts: Record<string, TransactionTotalAmount> = {};
 
         const allAccountIdsMap: Record<string, boolean> = {};
         let totalAccountIdsCount = 0;
@@ -357,16 +372,27 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         for (const transaction of transactionMonthList.items) {
             const transactionDay = isNumber(transaction.gregorianCalendarDayOfMonth) ? transaction.gregorianCalendarDayOfMonth.toString() : '0';
-            let dailyTotalAmount = dailyTotalAmounts[transactionDay];
+            let inflowOutflowDailyTotalAmount = inflowOutflowDailyTotalAmounts[transactionDay];
+            let incomeExpenseDailyTotalAmount = incomeExpenseDailyTotalAmounts[transactionDay];
 
-            if (!dailyTotalAmount) {
-                dailyTotalAmount = {
+            if (!inflowOutflowDailyTotalAmount) {
+                inflowOutflowDailyTotalAmount = {
                     expense: BIG_DECIMAL_ZERO,
                     incompleteExpense: false,
                     income: BIG_DECIMAL_ZERO,
                     incompleteIncome: false
                 };
-                dailyTotalAmounts[transactionDay] = dailyTotalAmount;
+                inflowOutflowDailyTotalAmounts[transactionDay] = inflowOutflowDailyTotalAmount;
+            }
+
+            if (!incomeExpenseDailyTotalAmount) {
+                incomeExpenseDailyTotalAmount = {
+                    expense: BIG_DECIMAL_ZERO,
+                    incompleteExpense: false,
+                    income: BIG_DECIMAL_ZERO,
+                    incompleteIncome: false
+                };
+                incomeExpenseDailyTotalAmounts[transactionDay] = incomeExpenseDailyTotalAmount;
             }
 
             let amount: BigDecimal = parseBigDecimal(transaction.sourceAmount);
@@ -388,11 +414,31 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
                 if (!balance) {
                     if (transaction.type === TransactionType.Expense) {
+                        hasUnCalculatedTotalOutflow = true;
                         hasUnCalculatedTotalExpense = true;
-                        dailyTotalAmount.incompleteExpense = true;
+                        inflowOutflowDailyTotalAmount.incompleteExpense = true;
+                        incomeExpenseDailyTotalAmount.incompleteExpense = true;
                     } else if (transaction.type === TransactionType.Income) {
+                        hasUnCalculatedTotalInflow = true;
                         hasUnCalculatedTotalIncome = true;
-                        dailyTotalAmount.incompleteIncome = true;
+                        inflowOutflowDailyTotalAmount.incompleteIncome = true;
+                        incomeExpenseDailyTotalAmount.incompleteIncome = true;
+                    } else if (transaction.type === TransactionType.Transfer) {
+                        if (allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccountId]) {
+                            // Do Nothing
+                        } else if (transaction.sourceAccount && transaction.destinationAccount && allAccountIdsMap[transaction.sourceAccount.parentId] && allAccountIdsMap[transaction.destinationAccount.parentId]) {
+                            // Do Nothing
+                        } else if (transaction.sourceAccount && allAccountIdsMap[transaction.sourceAccount.parentId] && allAccountIdsMap[transaction.destinationAccountId]) {
+                            // Do Nothing
+                        } else if (transaction.destinationAccount && allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccount.parentId]) {
+                            // Do Nothing
+                        } else if (allAccountIdsMap[transaction.sourceAccountId] || (transaction.sourceAccount && allAccountIdsMap[transaction.sourceAccount.parentId])) {
+                            hasUnCalculatedTotalOutflow = true;
+                            inflowOutflowDailyTotalAmount.incompleteExpense = true;
+                        } else if (allAccountIdsMap[transaction.destinationAccountId] || (transaction.destinationAccount && allAccountIdsMap[transaction.destinationAccount.parentId])) {
+                            hasUnCalculatedTotalInflow = true;
+                            inflowOutflowDailyTotalAmount.incompleteIncome = true;
+                        }
                     }
 
                     continue;
@@ -402,11 +448,15 @@ export const useTransactionsStore = defineStore('transactions', () => {
             }
 
             if (transaction.type === TransactionType.Expense) {
+                totalOutflow = totalOutflow.add(amount);
                 totalExpense = totalExpense.add(amount);
-                dailyTotalAmount.expense = dailyTotalAmount.expense.add(amount);
+                inflowOutflowDailyTotalAmount.expense = inflowOutflowDailyTotalAmount.expense.add(amount);
+                incomeExpenseDailyTotalAmount.expense = incomeExpenseDailyTotalAmount.expense.add(amount);
             } else if (transaction.type === TransactionType.Income) {
+                totalInflow = totalInflow.add(amount);
                 totalIncome = totalIncome.add(amount);
-                dailyTotalAmount.income = dailyTotalAmount.income.add(amount);
+                inflowOutflowDailyTotalAmount.income = inflowOutflowDailyTotalAmount.income.add(amount);
+                incomeExpenseDailyTotalAmount.income = incomeExpenseDailyTotalAmount.income.add(amount);
             } else if (transaction.type === TransactionType.Transfer && totalAccountIdsCount > 0) {
                 if (allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccountId]) {
                     // Do Nothing
@@ -417,30 +467,46 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 } else if (transaction.destinationAccount && allAccountIdsMap[transaction.sourceAccountId] && allAccountIdsMap[transaction.destinationAccount.parentId]) {
                     // Do Nothing
                 } else if (allAccountIdsMap[transaction.sourceAccountId] || (transaction.sourceAccount && allAccountIdsMap[transaction.sourceAccount.parentId])) {
-                    totalExpense = totalExpense.add(amount);
-                    dailyTotalAmount.expense = dailyTotalAmount.expense.add(amount);
+                    totalOutflow = totalOutflow.add(amount);
+                    inflowOutflowDailyTotalAmount.expense = inflowOutflowDailyTotalAmount.expense.add(amount);
                 } else if (allAccountIdsMap[transaction.destinationAccountId] || (transaction.destinationAccount && allAccountIdsMap[transaction.destinationAccount.parentId])) {
-                    totalIncome = totalIncome.add(amount);
-                    dailyTotalAmount.income = dailyTotalAmount.income.add(amount);
+                    totalInflow = totalInflow.add(amount);
+                    inflowOutflowDailyTotalAmount.income = inflowOutflowDailyTotalAmount.income.add(amount);
                 }
             }
         }
 
-        transactionMonthList.totalAmount.expense = totalExpense.truncate();
-        transactionMonthList.totalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalExpense;
-        transactionMonthList.totalAmount.income = totalIncome.truncate();
-        transactionMonthList.totalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalIncome;
+        transactionMonthList.inflowOutflowTotalAmount.expense = totalOutflow.truncate();
+        transactionMonthList.inflowOutflowTotalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalOutflow;
+        transactionMonthList.inflowOutflowTotalAmount.income = totalInflow.truncate();
+        transactionMonthList.inflowOutflowTotalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalInflow;
 
-        for (const day of keys(transactionMonthList.dailyTotalAmounts)) {
-            delete transactionMonthList.dailyTotalAmounts[day];
+        transactionMonthList.incomeExpenseTotalAmount.expense = totalExpense.truncate();
+        transactionMonthList.incomeExpenseTotalAmount.incompleteExpense = incomplete || hasUnCalculatedTotalExpense;
+        transactionMonthList.incomeExpenseTotalAmount.income = totalIncome.truncate();
+        transactionMonthList.incomeExpenseTotalAmount.incompleteIncome = incomplete || hasUnCalculatedTotalIncome;
+
+        for (const day of keys(transactionMonthList.inflowOutflowDailyTotalAmounts)) {
+            delete transactionMonthList.inflowOutflowDailyTotalAmounts[day];
+        }
+        for (const day of keys(transactionMonthList.incomeExpenseDailyTotalAmounts)) {
+            delete transactionMonthList.incomeExpenseDailyTotalAmounts[day];
         }
 
-        for (const [day, dailyTotalAmount] of entries(dailyTotalAmounts)) {
-            transactionMonthList.dailyTotalAmounts[day] = {
-                expense: dailyTotalAmount.expense.truncate(),
-                incompleteExpense: incomplete || dailyTotalAmount.incompleteExpense,
-                income: dailyTotalAmount.income.truncate(),
-                incompleteIncome: incomplete || dailyTotalAmount.incompleteIncome
+        for (const [day, inflowOutflowDailyTotalAmount] of entries(inflowOutflowDailyTotalAmounts)) {
+            transactionMonthList.inflowOutflowDailyTotalAmounts[day] = {
+                expense: inflowOutflowDailyTotalAmount.expense.truncate(),
+                incompleteExpense: incomplete || inflowOutflowDailyTotalAmount.incompleteExpense,
+                income: inflowOutflowDailyTotalAmount.income.truncate(),
+                incompleteIncome: incomplete || inflowOutflowDailyTotalAmount.incompleteIncome
+            };
+        }
+        for (const [day, incomeExpenseDailyTotalAmount] of entries(incomeExpenseDailyTotalAmounts)) {
+            transactionMonthList.incomeExpenseDailyTotalAmounts[day] = {
+                expense: incomeExpenseDailyTotalAmount.expense.truncate(),
+                incompleteExpense: incomplete || incomeExpenseDailyTotalAmount.incompleteExpense,
+                income: incomeExpenseDailyTotalAmount.income.truncate(),
+                incompleteIncome: incomplete || incomeExpenseDailyTotalAmount.incompleteIncome
             };
         }
     }
@@ -563,25 +629,32 @@ export const useTransactionsStore = defineStore('transactions', () => {
         clearUserTransactionDraft();
     }
 
-    function getCurrentMonthTransactionDailyTotalAmounts(transactions: TransactionInfoResponse[], accountIds: string): Record<string, TransactionTotalAmount> {
+    function getCurrentMonthTransactionIncomeExpenseDailyTotalAmounts(transactions: TransactionInfoResponse[], accountIds: string): Record<string, TransactionTotalAmount> {
         const monthList: TransactionMonthList = {
             year: 0,
             month: 0,
             yearDashMonth: '0-0',
             opened: true,
             items: transactions.map(transaction => fillTransactionObject(Transaction.of(transaction))),
-            totalAmount: {
+            inflowOutflowTotalAmount: {
                 expense: BIG_DECIMAL_ZERO,
                 incompleteExpense: true,
                 income: BIG_DECIMAL_ZERO,
                 incompleteIncome: true
             },
-            dailyTotalAmounts: {}
+            inflowOutflowDailyTotalAmounts: {},
+            incomeExpenseTotalAmount: {
+                expense: BIG_DECIMAL_ZERO,
+                incompleteExpense: true,
+                income: BIG_DECIMAL_ZERO,
+                incompleteIncome: true
+            },
+            incomeExpenseDailyTotalAmounts: {}
         };
 
         calculateMonthTotalAmount(monthList, userStore.currentUserDefaultCurrency, accountIds, false);
 
-        return monthList.dailyTotalAmounts;
+        return monthList.incomeExpenseDailyTotalAmounts;
     }
 
     function setTransactionSuitableDestinationAmount(transaction: Transaction, oldSourceAmount: number, newSourceAmount: number, oldSourceAccountId?: string, oldDestinationAccountId?: string): void {
@@ -1729,7 +1802,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         isTransactionDraftModified,
         saveTransactionDraft,
         clearTransactionDraft,
-        getCurrentMonthTransactionDailyTotalAmounts,
+        getCurrentMonthTransactionIncomeExpenseDailyTotalAmounts,
         setTransactionSuitableDestinationAmount,
         updateTransactionListInvalidState,
         updateTransactionReconciliationStatementInvalidState,

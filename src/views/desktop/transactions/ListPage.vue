@@ -157,7 +157,7 @@
                                 </div>
                                 <v-spacer/>
                                 <div class="skeleton-no-margin d-flex align-center" v-if="showTotalAmountInTransactionListPage && currentMonthTotalAmount">
-                                    <span class="ms-2 text-body-large">{{ queryAllFilterAccountIdsCount ? tt('Total Inflows') : tt('Total Income') }}</span>
+                                    <span class="ms-2 text-body-large">{{ totalAmountTypeInTransactionListPage === TransactionAmountType.IncomeAndExpense ? tt('Total Income') : tt('Total Inflows') }}</span>
                                     <span class="text-income ms-2" v-if="loading">
                                         <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                     </span>
@@ -167,7 +167,7 @@
                                             <span>{{ currentMonthTotalAmount.incomeInDefaultCurrency }}</span>
                                         </v-tooltip>
                                     </span>
-                                    <span class="text-body-large ms-3">{{ queryAllFilterAccountIdsCount ? tt('Total Outflows') : tt('Total Expense') }}</span>
+                                    <span class="text-body-large ms-3">{{ totalAmountTypeInTransactionListPage === TransactionAmountType.IncomeAndExpense ? tt('Total Expense') : tt('Total Outflows') }}</span>
                                     <span class="text-expense ms-2" v-if="loading">
                                         <v-skeleton-loader type="text" style="width: 60px" :loading="true"></v-skeleton-loader>
                                     </span>
@@ -188,7 +188,7 @@
                                                   :default-currency="selectedAccountDefaultCurrency"
                                                   :min-date="transactionCalendarMinDate"
                                                   :max-date="transactionCalendarMaxDate"
-                                                  :dailyTotalAmounts="currentMonthTransactionData?.dailyTotalAmounts"
+                                                  :daily-total-amounts="getDailyTotalAmounts(currentMonthTransactionData)"
                                                   v-model="currentCalendarDate"></transaction-calendar>
                         </v-card-text>
 
@@ -717,7 +717,7 @@ import { useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
-import { TransactionListPageType, useTransactionListPageBase } from '@/views/base/transactions/TransactionListPageBase.ts';
+import { type TransactionListDisplayTotalAmount, TransactionListPageType, useTransactionListPageBase } from '@/views/base/transactions/TransactionListPageBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
@@ -742,7 +742,7 @@ import {
 } from '@/core/datetime.ts';
 import { AmountFilterType } from '@/core/numeral.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { TransactionType } from '@/core/transaction.ts';
+import { TransactionType, TransactionAmountType } from '@/core/transaction.ts';
 import { TemplateType }  from '@/core/template.ts';
 
 import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
@@ -834,15 +834,6 @@ type EditDialogType = InstanceType<typeof EditDialog>;
 type AIImageRecognitionDialogType = InstanceType<typeof AIImageRecognitionDialog>;
 type ImportDialogType = InstanceType<typeof ImportDialog>;
 
-interface TransactionListDisplayTotalAmount {
-    incomeIsZero: boolean;
-    expenseIsZero: boolean;
-    income: string;
-    expense: string;
-    incomeInDefaultCurrency: string;
-    expenseInDefaultCurrency: string;
-}
-
 const router = useRouter();
 const theme = useTheme();
 
@@ -865,6 +856,7 @@ const {
     userDefaultCurrency,
     selectedAccountDefaultCurrency,
     showTotalAmountInTransactionListPage,
+    totalAmountTypeInTransactionListPage,
     showTagInTransactionListPage,
     allDateRanges,
     allAccounts,
@@ -899,13 +891,14 @@ const {
     hasVisibleTagsInTagGroup,
     isSameAsDefaultTimezoneOffsetMinutes,
     canAddTransaction,
+    getDailyTotalAmounts,
+    getDisplayMonthTotalAmount,
     getDisplayTime,
     getDisplayLongDate,
     getDisplayTimezone,
     getDisplayTimeInDefaultTimezone,
     getDisplayAmount,
     getDisplayAmountCurrency,
-    getDisplayMonthTotalAmount,
     getTransactionTypeName,
     getTransactionPictureUrl
 } = useTransactionListPageBase();
@@ -1129,22 +1122,7 @@ const skeletonData = computed<number[]>(() => {
 
 const currentMonthTotalAmount = computed<TransactionListDisplayTotalAmount | null>(() => {
     if (queryMonthlyData.value) {
-        const transactionData = currentMonthTransactionData.value;
-
-        if (!transactionData) {
-            return null;
-        }
-
-        const displayMonthlyTotalAmount: TransactionListDisplayTotalAmount = {
-            incomeIsZero: transactionData.totalAmount.income.isZero(),
-            expenseIsZero: transactionData.totalAmount.expense.isZero(),
-            income: getDisplayMonthTotalAmount(transactionData.totalAmount.income, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteIncome),
-            expense: getDisplayMonthTotalAmount(transactionData.totalAmount.expense, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteExpense),
-            incomeInDefaultCurrency: getDisplayMonthTotalAmount(transactionData.totalAmount.income, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteIncome, true),
-            expenseInDefaultCurrency: getDisplayMonthTotalAmount(transactionData.totalAmount.expense, selectedAccountDefaultCurrency.value, '', transactionData.totalAmount.incompleteExpense, true)
-        };
-
-        return displayMonthlyTotalAmount;
+        return getDisplayMonthTotalAmount(currentMonthTransactionData.value, '');
     } else {
         return null;
     }

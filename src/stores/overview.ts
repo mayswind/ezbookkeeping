@@ -751,7 +751,7 @@ export const useOverviewStore = defineStore('overview', () => {
                     }
 
                     currentMonthTransactions.value = data.result.items;
-                    currentMonthTransactionDailyTotalAmounts.value = transactionsStore.getCurrentMonthTransactionDailyTotalAmounts(currentMonthTransactions.value, accountIds);
+                    currentMonthTransactionDailyTotalAmounts.value = transactionsStore.getCurrentMonthTransactionIncomeExpenseDailyTotalAmounts(currentMonthTransactions.value, accountIds);
 
                     resolve(currentMonthTransactionDailyTotalAmounts.value);
                 }).catch(error => {

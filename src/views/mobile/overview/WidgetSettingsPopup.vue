@@ -12,7 +12,7 @@
             </f7-navbar>
 
             <f7-list strong inset dividers class="settings-list margin-top-half" :class="{ 'disabled': loading }" >
-                <template :key="setting.settingName" v-for="setting in supportsSettings">
+                <template :key="`${setting.settingName}-${index}`" v-for="(setting, index) in supportsSettings">
                     <template v-if="setting.settingType === 'customSelect' && setting.multiple && (!setting.condition || setting.condition(widget?.settings))">
                         <f7-list-item group-title>
                             <small>{{ tt(setting.displayName) }}</small>

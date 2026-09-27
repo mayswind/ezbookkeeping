@@ -2046,6 +2046,8 @@
     "Transfer": "Virement",
     "Transfer In": "Virement entrant",
     "Transfer Out": "Virement sortant",
+    "Inflow": "Inflow",
+    "Outflow": "Outflow",
     "Cash": "Espèces",
     "Checking Account": "Compte courant",
     "Credit Card": "Carte de crédit",

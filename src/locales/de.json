@@ -2046,6 +2046,8 @@
     "Transfer": "Überweisung",
     "Transfer In": "Eingehende Überweisung",
     "Transfer Out": "Ausgehende Überweisung",
+    "Inflow": "Inflow",
+    "Outflow": "Outflow",
     "Cash": "Bargeld",
     "Checking Account": "Bankkonto",
     "Credit Card": "Kreditkarte",

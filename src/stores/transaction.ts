@@ -96,6 +96,11 @@ export interface TransactionTotalAmount {
     incompleteIncome: boolean;
 }
 
+export interface TransactionDailyTotalAmounts {
+    inflowOutflowDailyTotalAmounts: Record<string, TransactionTotalAmount>;
+    incomeExpenseDailyTotalAmounts: Record<string, TransactionTotalAmount>;
+}
+
 export interface TransactionMonthList {
     readonly year: number;
     readonly month: number; // 1-based (1 = January, 12 = December)
@@ -629,7 +634,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         clearUserTransactionDraft();
     }
 
-    function getCurrentMonthTransactionIncomeExpenseDailyTotalAmounts(transactions: TransactionInfoResponse[], accountIds: string): Record<string, TransactionTotalAmount> {
+    function getCurrentMonthTransactionDailyTotalAmounts(transactions: TransactionInfoResponse[], accountIds: string): TransactionDailyTotalAmounts {
         const monthList: TransactionMonthList = {
             year: 0,
             month: 0,
@@ -654,7 +659,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         calculateMonthTotalAmount(monthList, userStore.currentUserDefaultCurrency, accountIds, false);
 
-        return monthList.incomeExpenseDailyTotalAmounts;
+        return {
+            inflowOutflowDailyTotalAmounts: monthList.inflowOutflowDailyTotalAmounts,
+            incomeExpenseDailyTotalAmounts: monthList.incomeExpenseDailyTotalAmounts
+        };
     }
 
     function setTransactionSuitableDestinationAmount(transaction: Transaction, oldSourceAmount: number, newSourceAmount: number, oldSourceAccountId?: string, oldDestinationAccountId?: string): void {
@@ -1802,7 +1810,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         isTransactionDraftModified,
         saveTransactionDraft,
         clearTransactionDraft,
-        getCurrentMonthTransactionIncomeExpenseDailyTotalAmounts,
+        getCurrentMonthTransactionDailyTotalAmounts,
         setTransactionSuitableDestinationAmount,
         updateTransactionListInvalidState,
         updateTransactionReconciliationStatementInvalidState,

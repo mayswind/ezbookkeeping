@@ -7,7 +7,7 @@ import { useOverviewStore } from '@/stores/overview.ts';
 
 import { DateRange, KnownDateTimeFormat } from '@/core/datetime.ts';
 import type { TextualYearMonthDay } from '@/core/datetime.ts';
-import { TransactionType } from '@/core/transaction.ts';
+import { TransactionType, TransactionAmountType } from '@/core/transaction.ts';
 
 import {
     getLocalDatetimeFromUnixTime,
@@ -21,6 +21,7 @@ import {
 } from '@/lib/datetime.ts';
 
 export interface CommonTransactionCalendarWidgetProps {
+    totalAmountType?: number;
     transactionTypes: number[];
     showAmount: boolean;
 }
@@ -35,7 +36,10 @@ export function useTransactionCalendarWidgetBase(props: CommonTransactionCalenda
 
     const showIncome = computed<boolean>(() => props.transactionTypes.includes(TransactionType.Income));
     const showExpense = computed<boolean>(() => props.transactionTypes.includes(TransactionType.Expense));
-    const dailyTotalAmounts = computed<Record<string, TransactionTotalAmount>>(() => overviewStore.currentMonthTransactionDailyTotalAmounts);
+    const dailyTotalAmounts = computed<Record<string, TransactionTotalAmount>>(() =>
+        props.totalAmountType === TransactionAmountType.IncomeAndExpense
+        ? overviewStore.currentMonthTransactionIncomeExpenseDailyTotalAmounts
+        : overviewStore.currentMonthTransactionInflowOutflowDailyTotalAmounts);
 
     const currentCalendarDate = ref<TextualYearMonthDay>(getValidMonthDayOrCurrentDayShortDate(overviewStore.transactionDataRange.thisMonth.startTime, getCurrentDateTime().getGregorianCalendarYearDashMonthDashDay()));
     const transactionCalendarMinDate = computed<Date>(() => getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTime(overviewStore.transactionDataRange.thisMonth.startTime)).getUnixTime()));
@@ -50,7 +54,7 @@ export function useTransactionCalendarWidgetBase(props: CommonTransactionCalenda
 
         const minTime = dateTime.getUnixTime();
         const maxTime = getUnixTimeBeforeUnixTime(getUnixTimeAfterUnixTime(minTime, 1, 'days'), 1, 'seconds');
-        const type = props.transactionTypes.length === 1 ? props.transactionTypes[0] as TransactionType : undefined;
+        const type = props.totalAmountType !== TransactionAmountType.InflowsAndOutflows && props.transactionTypes.length === 1 ? props.transactionTypes[0] as TransactionType : undefined;
         return `/transaction/list?${overviewStore.getTransactionListPageParams({
             type: type,
             dateType: DateRange.Custom.type,

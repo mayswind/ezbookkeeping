@@ -2046,6 +2046,8 @@
     "Transfer": "转账",
     "Transfer In": "转入",
     "Transfer Out": "转出",
+    "Inflow": "流入",
+    "Outflow": "流出",
     "Cash": "现金",
     "Checking Account": "借记账户",
     "Credit Card": "信用卡",

@@ -2046,6 +2046,8 @@
     "Transfer": "이체",
     "Transfer In": "이체 입금",
     "Transfer Out": "이체 출금",
+    "Inflow": "Inflow",
+    "Outflow": "Outflow",
     "Cash": "현금",
     "Checking Account": "당좌예금",
     "Credit Card": "신용카드",

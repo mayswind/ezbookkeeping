@@ -30,6 +30,7 @@ const props = defineProps<{
     loading: boolean;
     editing?: boolean;
     title?: string;
+    totalAmountType?: number;
     transactionTypes: number[];
     showAlternateDate: boolean;
     showAmount: boolean;

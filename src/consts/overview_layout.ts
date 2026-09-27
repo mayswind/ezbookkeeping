@@ -1,6 +1,6 @@
 import type { PartialRecord } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
-import { TransactionType } from '@/core/transaction.ts';
+import { TransactionType, TransactionAmountType } from '@/core/transaction.ts';
 import { TrendChartType } from '@/core/statistics.ts';
 import { TransactionCalendarHeatmapOutlierColorMode } from '@/core/chart.ts';
 import {
@@ -456,8 +456,40 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             WIDGET_TITLE_SETTING,
             {
                 settingType: 'customSelect',
+                settingName: 'totalAmountType',
+                displayName: 'Total Amount Calculation Method',
+                selectValues: [
+                    { name: 'Inflows and Outflows', value: TransactionAmountType.InflowsAndOutflows },
+                    { name: 'Income and Expense', value: TransactionAmountType.IncomeAndExpense }
+                ]
+            },
+            {
+                settingType: 'customSelect',
                 settingName: 'transactionTypes',
                 displayName: 'Transaction Type',
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['totalAmountType'] === TransactionAmountType.InflowsAndOutflows;
+                },
+                selectValues: [
+                    {
+                        name: 'Inflow',
+                        value: TransactionType.Income
+                    },
+                    {
+                        name: 'Outflow',
+                        value: TransactionType.Expense
+                    }
+                ],
+                multiple: true,
+                minSelections: 1
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'transactionTypes',
+                displayName: 'Transaction Type',
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['totalAmountType'] === TransactionAmountType.IncomeAndExpense;
+                },
                 selectValues: [
                     {
                         name: 'Income',
@@ -483,6 +515,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             }
         ],
         defaultSettings: {
+            totalAmountType: TransactionAmountType.InflowsAndOutflows,
             transactionTypes: [
                 TransactionType.Income,
                 TransactionType.Expense
@@ -618,6 +651,7 @@ export const DEFAULT_DESKTOP_OVERVIEW_LAYOUT: DesktopOverviewLayout = {
             w: 4,
             h: 6,
             settings: {
+                totalAmountType: TransactionAmountType.InflowsAndOutflows,
                 transactionTypes: [
                     TransactionType.Income,
                     TransactionType.Expense
@@ -993,8 +1027,40 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         supportsSettings: [
             {
                 settingType: 'customSelect',
+                settingName: 'totalAmountType',
+                displayName: 'Total Amount Calculation Method',
+                selectValues: [
+                    { name: 'Inflows and Outflows', value: TransactionAmountType.InflowsAndOutflows },
+                    { name: 'Income and Expense', value: TransactionAmountType.IncomeAndExpense }
+                ]
+            },
+            {
+                settingType: 'customSelect',
                 settingName: 'transactionTypes',
                 displayName: 'Transaction Type',
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['totalAmountType'] === TransactionAmountType.InflowsAndOutflows;
+                },
+                selectValues: [
+                    {
+                        name: 'Inflow',
+                        value: TransactionType.Income
+                    },
+                    {
+                        name: 'Outflow',
+                        value: TransactionType.Expense
+                    }
+                ],
+                multiple: true,
+                minSelections: 1
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'transactionTypes',
+                displayName: 'Transaction Type',
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['totalAmountType'] === TransactionAmountType.IncomeAndExpense;
+                },
                 selectValues: [
                     {
                         name: 'Income',
@@ -1020,6 +1086,7 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
             }
         ],
         defaultSettings: {
+            totalAmountType: TransactionAmountType.InflowsAndOutflows,
             transactionTypes: [
                 TransactionType.Income,
                 TransactionType.Expense

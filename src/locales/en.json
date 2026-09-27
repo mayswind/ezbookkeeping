@@ -2046,6 +2046,8 @@
     "Transfer": "Transfer",
     "Transfer In": "Transfer In",
     "Transfer Out": "Transfer Out",
+    "Inflow": "Inflow",
+    "Outflow": "Outflow",
     "Cash": "Cash",
     "Checking Account": "Checking Account",
     "Credit Card": "Credit Card",

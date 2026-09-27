@@ -8,7 +8,7 @@
 
             <template #content>
                 <div class="mt-1">
-                    <template :key="setting.settingName" v-for="(setting, index) in supportsSettings">
+                    <template :key="`${setting.settingName}-${index}`" v-for="(setting, index) in supportsSettings">
                         <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
                                   :label="tt(setting.displayName)" :items="getItemCountOptions(setting.itemCountValues)"
                                   :model-value="getSettingValue(setting.settingName)"

@@ -2046,6 +2046,8 @@
     "Transfer": "โอน",
     "Transfer In": "โอนเข้า",
     "Transfer Out": "โอนออก",
+    "Inflow": "Inflow",
+    "Outflow": "Outflow",
     "Cash": "เงินสด",
     "Checking Account": "บัญชีกระแสรายวัน",
     "Credit Card": "บัตรเครดิต",

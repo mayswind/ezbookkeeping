@@ -57,6 +57,7 @@
                                 v-else-if="widget.type === OverviewWidgetType.RecentTransactions" />
 
     <transaction-calendar-widget :loading="loading" :editing="editing" :title="widgetTitle"
+                                 :total-amount-type="widget.settings['totalAmountType'] as number"
                                  :transaction-types="widget.settings['transactionTypes'] as number[]"
                                  :show-alternate-date="widget.settings['showAlternateDate'] as boolean"
                                  :show-amount="widget.settings['showAmount'] as boolean"

@@ -2046,6 +2046,8 @@
     "Transfer": "Overboeking",
     "Transfer In": "Inkomende overboeking",
     "Transfer Out": "Uitgaande overboeking",
+    "Inflow": "Inflow",
+    "Outflow": "Outflow",
     "Cash": "Contant",
     "Checking Account": "Betaalrekening",
     "Credit Card": "Creditcard",

@@ -2046,6 +2046,8 @@
     "Transfer": "振替",
     "Transfer In": "振替入金",
     "Transfer Out": "振替出金",
+    "Inflow": "Inflow",
+    "Outflow": "Outflow",
     "Cash": "現金",
     "Checking Account": "当座預金口座",
     "Credit Card": "クレジットカード",

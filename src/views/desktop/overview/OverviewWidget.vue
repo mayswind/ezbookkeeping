@@ -65,6 +65,9 @@
     <transaction-calendar-heatmap-widget :loading="loading" :editing="editing" :title="widgetTitle"
                                          :transaction-type="widget.settings['transactionType'] as TransactionType"
                                          :months="widget.settings['months'] as number"
+                                         :outlier-color-mode="widget.settings['outlierColorMode'] as TransactionCalendarHeatmapOutlierColorMode"
+                                         :outlier-top-count="widget.settings['outlierTopCount'] as number"
+                                         :outlier-amount-threshold="widget.settings['outlierAmountThreshold'] as number"
                                          v-else-if="widget.type === OverviewWidgetType.TransactionCalendarHeatmap" />
 </template>
 
@@ -85,6 +88,7 @@ import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 import TransactionCalendarHeatmapWidget from './widgets/TransactionCalendarHeatmapWidget.vue';
 
 import { TransactionType } from '@/core/transaction.ts';
+import { TransactionCalendarHeatmapOutlierColorMode } from '@/core/chart.ts';
 import {
     type DesktopOverviewWidgetLayout,
     OverviewWidgetType

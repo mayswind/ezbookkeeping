@@ -15,15 +15,23 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { reversedItemAndIndex } from '@/core/base.ts';
 import type { BigDecimal } from '@/core/numeral.ts';
 import { type WeekDayValue, KnownDateTimeFormat } from '@/core/datetime.ts';
 import { ThemeType } from '@/core/theme.ts';
-import { ChartValueType, type CalendarChartSourceDataItem } from '@/core/chart.ts';
+import {
+    type CalendarChartSourceDataItem,
+    ChartValueType,
+    TransactionCalendarHeatmapOutlierColorMode
+} from '@/core/chart.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
+
+import { isNumber, isInteger } from '@/lib/common.ts';
 
 import {
     BIG_DECIMAL_ZERO,
     BIG_DECIMAL_POSITIVE_INFINITY,
+    parseBigDecimal,
     isBigDecimal
 } from '@/lib/numeral.ts';
 
@@ -37,6 +45,7 @@ interface HeatMapData {
     data: [string, number][]; // second value only used for echarts rendering, the actual value is in allOriginalDataMap
     minValue: BigDecimal;
     maxValue: BigDecimal;
+    outlierThreshold?: BigDecimal;
 }
 
 const props = defineProps<{
@@ -51,6 +60,9 @@ const props = defineProps<{
     valueTypeName: string;
     translateName?: boolean;
     defaultCurrency?: string;
+    outlierColorMode?: TransactionCalendarHeatmapOutlierColorMode;
+    outlierTopCount?: number;
+    outlierAmountThreshold?: number;
 }>();
 
 const emit = defineEmits<{
@@ -95,6 +107,9 @@ const endDate = computed<string>(() => parseDateTimeFromUnixTime(props.endTime).
 const heatMapData = computed<HeatMapData>(() => {
     const allOriginalDataMap: Record<string, BigDecimal> = {};
     const data: [string, number][] = [];
+    const topAmounts: BigDecimal[] = [];
+    const topAmountCounts: Record<string, number> = {};
+    const topCount = props.outlierColorMode === TransactionCalendarHeatmapOutlierColorMode.TopCount && isInteger(props.outlierTopCount) ? props.outlierTopCount : 0;
     let minValue: BigDecimal = BIG_DECIMAL_POSITIVE_INFINITY;
     let maxValue: BigDecimal = BIG_DECIMAL_ZERO;
 
@@ -117,17 +132,56 @@ const heatMapData = computed<HeatMapData>(() => {
         const date = dateTime.getGregorianCalendarYearDashMonthDashDay();
         allOriginalDataMap[date] = item.value;
         data.push([date, item.value.toDoubleNumber()]);
+
+        if (topCount > 0) {
+            const amountKey = item.value.toString();
+
+            if (isNumber(topAmountCounts[amountKey])) {
+                topAmountCounts[amountKey]++;
+            } else if (topAmounts.length < topCount + 1) {
+                topAmounts.push(item.value);
+                topAmounts.sort((a, b) => a.compareTo(b));
+                topAmountCounts[amountKey] = 1;
+            } else if (item.value.greaterThan(topAmounts[0]!)) {
+                const removedAmount = topAmounts[0]!;
+                topAmounts[0] = item.value;
+                topAmounts.sort((a, b) => a.compareTo(b));
+                topAmountCounts[amountKey] = 1;
+                delete topAmountCounts[removedAmount.toString()];
+            }
+        }
+    }
+
+    let outlierThreshold: BigDecimal | undefined;
+
+    if (topAmounts.length > 0) {
+        const targetCount: number = Math.min(topCount, data.length);
+        let countedDays: number = 0;
+
+        for (const [amount, index] of reversedItemAndIndex(topAmounts)) {
+            countedDays += topAmountCounts[amount.toString()] ?? 0;
+
+            if (countedDays >= targetCount) {
+                outlierThreshold = index > 0 ? (topAmounts[index - 1] ?? amount.subtract(1)) : amount.subtract(1);
+                break;
+            }
+        }
+    } else if (props.outlierColorMode === TransactionCalendarHeatmapOutlierColorMode.AboveAmount && isInteger(props.outlierAmountThreshold)) {
+        outlierThreshold = parseBigDecimal(props.outlierAmountThreshold);
     }
 
     return {
         allOriginalDataMap: allOriginalDataMap,
         data: data,
         minValue: minValue.isPositiveInfinity() ? BIG_DECIMAL_ZERO : minValue,
-        maxValue: maxValue
+        maxValue: maxValue,
+        outlierThreshold: outlierThreshold
     };
 });
 
 const chartOptions = computed<object>(() => {
+    const outlierThreshold = heatMapData.value.outlierThreshold?.toDoubleNumber();
+
     return {
         tooltip: {
             backgroundColor: isDarkMode.value ? '#333' : '#fff',
@@ -158,10 +212,14 @@ const chartOptions = computed<object>(() => {
         },
         visualMap: {
             show: false,
-            min: heatMapData.value.minValue.toDoubleNumber(),
-            max: heatMapData.value.maxValue.toDoubleNumber(),
+            min: isNumber(outlierThreshold) && outlierThreshold < heatMapData.value.minValue.toDoubleNumber() ? outlierThreshold - 1 : heatMapData.value.minValue.toDoubleNumber(),
+            max: outlierThreshold ?? heatMapData.value.maxValue.toDoubleNumber(),
+            unboundedRange: !isNumber(outlierThreshold),
             inRange: {
                 color: isDarkMode.value ? [ '#1a1a1a', '#c67e48' ] : [ '#faf8f4', '#c67e48' ]
+            },
+            outOfRange: {
+                color: isDarkMode.value ? '#a0a0a0' : '#8f8f8f'
             }
         },
         calendar: {

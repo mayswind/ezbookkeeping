@@ -2,6 +2,7 @@ import type { PartialRecord } from '@/core/base.ts';
 import { DateRange } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TrendChartType } from '@/core/statistics.ts';
+import { TransactionCalendarHeatmapOutlierColorMode } from '@/core/chart.ts';
 import {
     type OverviewWidgetSettingValue,
     type OverviewWidgetSwitchSettingItem,
@@ -421,7 +422,7 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
                 displayName: 'Tags'
             },
             {
-                settingType: 'amount',
+                settingType: 'amountFilter',
                 settingName: 'amountFilter',
                 displayName: 'Amount'
             },
@@ -522,11 +523,50 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
                 settingName: 'months',
                 displayName: 'Date Range',
                 monthValues: [6, 12]
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'outlierColorMode',
+                displayName: 'Color Outliers Separately',
+                selectValues: [
+                    {
+                        name: 'Disabled',
+                        value: TransactionCalendarHeatmapOutlierColorMode.Disabled
+                    },
+                    {
+                        name: 'Days with Highest Amounts',
+                        value: TransactionCalendarHeatmapOutlierColorMode.TopCount
+                    },
+                    {
+                        name: 'Amount Threshold',
+                        value: TransactionCalendarHeatmapOutlierColorMode.AboveAmount
+                    }
+                ]
+            },
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'outlierTopCount',
+                displayName: 'Outlier Day Count',
+                itemCountValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['outlierColorMode'] === TransactionCalendarHeatmapOutlierColorMode.TopCount;
+                }
+            },
+            {
+                settingType: 'amount',
+                settingName: 'outlierAmountThreshold',
+                displayName: 'Outlier Amount Threshold',
+                condition: (settings?: Record<string, OverviewWidgetSettingValue>) => {
+                    return settings?.['outlierColorMode'] === TransactionCalendarHeatmapOutlierColorMode.AboveAmount;
+                }
             }
         ],
         defaultSettings: {
             transactionType: TransactionType.Expense,
-            months: 12
+            months: 12,
+            outlierColorMode: TransactionCalendarHeatmapOutlierColorMode.Disabled,
+            outlierTopCount: 1,
+            outlierAmountThreshold: 0
         },
         defaultWidth: 6,
         defaultHeight: 3,
@@ -923,7 +963,7 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                 displayName: 'Tags'
             },
             {
-                settingType: 'amount',
+                settingType: 'amountFilter',
                 settingName: 'amountFilter',
                 displayName: 'Amount'
             },

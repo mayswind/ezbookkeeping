@@ -67,10 +67,11 @@
                                    v-else-if="setting.settingType === 'textbox' && (!setting.condition || setting.condition(widget?.settings))"></f7-list-input>
 
                     <f7-list-item class="item-truncate-after-text"
-                                  :class="{ 'up-down-chevron': setting.settingType !== 'accountSelect' && setting.settingType !== 'categorySelect' && setting.settingType !== 'tagSelect' && setting.settingType !== 'amount' }"
+                                  :class="{ 'up-down-chevron': setting.settingType !== 'accountSelect' && setting.settingType !== 'categorySelect' && setting.settingType !== 'tagSelect' && setting.settingType !== 'amount' && setting.settingType !== 'amountFilter' }"
+                                  :no-chevron="setting.settingType === 'amount'"
                                   link="#" :disabled="isSettingDisabled(setting)"
                                   @click="openSettingSelection(setting, $event)"
-                                  v-else>
+                                  v-else-if="!setting.condition || setting.condition(widget?.settings)">
                         <template #after-title>
                             <div class="item-actual-title">
                                 <span>{{ tt(setting.displayName) }}</span>
@@ -113,6 +114,13 @@
                                               @save="updateTagValue"
                                               v-if="showFilterTagsPopup" />
 
+        <number-pad-sheet :min-value="TRANSACTION_MIN_AMOUNT"
+                          :max-value="TRANSACTION_MAX_AMOUNT"
+                          :currency="defaultCurrency"
+                          v-model:show="showAmountSheet"
+                          v-model="customAmountValue"
+                          @update:model-value="updateAmountSettingValue" />
+
         <transaction-amount-filter-page show-all-option
                                         v-model:custom-amount-filter="customAmountFilter"
                                         @save="updateAmountValue"
@@ -131,12 +139,14 @@ import { ref, computed, nextTick } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 import { type Framework7Dom, openPopover, useI18nUIComponents } from '@/lib/ui/mobile.ts';
 
+import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
 import type { GenericNameValue } from '@/core/base.ts';
 
+import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import {
     type OverviewWidgetSettingValue,
     type OverviewWidgetCustomSelectSettingItem,
@@ -145,7 +155,8 @@ import {
 } from '@/core/overview_layout.ts';
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
 
-import { isDefined, isArray, isString, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
+import { isDefined, isArray, isString, isInteger, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 import { isAllAccountsChecked } from '@/lib/account.ts';
 import { isAllCategoriesChecked } from '@/lib/category.ts';
@@ -164,11 +175,13 @@ const emit = defineEmits<{
 
 const {
     tt,
+    formatAmountToLocalizedNumerals,
     formatNumberToLocalizedNumerals,
     getTablePageOptions
 } = useI18n();
 const { showToast } = useI18nUIComponents();
 
+const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
@@ -179,12 +192,15 @@ const currentSettingItem = ref<OverviewWidgetSettingItem | undefined>(undefined)
 const showFilterAccountsPopup = ref<boolean>(false);
 const showFilterCategoriesPopup = ref<boolean>(false);
 const showFilterTagsPopup = ref<boolean>(false);
+const showAmountSheet = ref<boolean>(false);
 const showAmountFilterPopup = ref<boolean>(false);
 const customSelectedAccountIds = ref<string[]>([]);
 const customSelectedCategoryIds = ref<string[]>([]);
 const customTagFilter = ref<string>('');
+const customAmountValue = ref<number>(0);
 const customAmountFilter = ref<string>('');
 
+const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
 const hasAnyVisibleAccount = computed<boolean>(() => accountsStore.allVisibleAccountsCount > 0);
 const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
@@ -254,8 +270,10 @@ function getSingleSettingDisplayName(setting: OverviewWidgetSettingItem): string
         }
 
         return isAllCategoriesChecked(transactionCategoriesStore.allTransactionCategories, arrayItemToObjectField(value as string[], true)) ? tt('All') : tt('Partial');
-    } else if (setting.settingType === 'tagSelect' || setting.settingType === 'amount') {
+    } else if (setting.settingType === 'tagSelect' || setting.settingType === 'amountFilter') {
         return value ? tt('Custom') : tt('All');
+    } else if (setting.settingType === 'amount') {
+        return formatAmountToLocalizedNumerals(parseBigDecimal(isInteger(value) ? value : 0), defaultCurrency.value);
     }
 
     return getSettingOptions(setting).find(option => option.value === value)?.name ?? '';
@@ -307,23 +325,23 @@ function openSettingSelection(setting: OverviewWidgetSettingItem, event: MouseEv
         return;
     }
 
+    const value = getSettingValue(setting.settingName);
     currentSettingItem.value = setting;
 
     if (setting.settingType === 'accountSelect') {
-        const selectedAccountIds = getSettingValue(setting.settingName);
-        customSelectedAccountIds.value = isArray(selectedAccountIds) ? [...selectedAccountIds] as string[] : [];
+        customSelectedAccountIds.value = isArray(value) ? [...value] as string[] : [];
         showFilterAccountsPopup.value = true;
     } else if (setting.settingType === 'categorySelect') {
-        const selectedCategoryIds = getSettingValue(setting.settingName);
-        customSelectedCategoryIds.value = isArray(selectedCategoryIds) ? [...selectedCategoryIds] as string[] : [];
+        customSelectedCategoryIds.value = isArray(value) ? [...value] as string[] : [];
         showFilterCategoriesPopup.value = true;
     } else if (setting.settingType === 'tagSelect') {
-        const tagFilter = getSettingValue(setting.settingName);
-        customTagFilter.value = isString(tagFilter) ? tagFilter : '';
+        customTagFilter.value = isString(value) ? value : '';
         showFilterTagsPopup.value = true;
     } else if (setting.settingType === 'amount') {
-        const amountFilter = getSettingValue(setting.settingName);
-        customAmountFilter.value = isString(amountFilter) ? amountFilter : '';
+        customAmountValue.value = isInteger(value) ? value : 0;
+        showAmountSheet.value = true;
+    } else if (setting.settingType === 'amountFilter') {
+        customAmountFilter.value = isString(value) ? value : '';
         showAmountFilterPopup.value = true;
     } else {
         nextTick(() => {
@@ -368,8 +386,18 @@ function updateTagValue(): void {
     showFilterTagsPopup.value = false;
 }
 
+function updateAmountSettingValue(value: number): void {
+    if (currentSettingItem.value?.settingType === 'amount') {
+        updateSettingValue(currentSettingItem.value.settingName, value);
+    }
+
+    currentSettingItem.value = undefined;
+    customAmountValue.value = 0;
+    showAmountSheet.value = false;
+}
+
 function updateAmountValue(): void {
-    if (currentSettingItem.value && currentSettingItem.value.settingType === 'amount') {
+    if (currentSettingItem.value && currentSettingItem.value.settingType === 'amountFilter') {
         updateSettingValue(currentSettingItem.value.settingName, customAmountFilter.value);
     }
 
@@ -405,6 +433,7 @@ function onPopupOpen(): void {
     customSelectedAccountIds.value = [];
     customSelectedCategoryIds.value = [];
     customTagFilter.value = '';
+    customAmountValue.value = 0;
     customAmountFilter.value = '';
 
     if (MOBILE_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]) {
@@ -447,10 +476,12 @@ function onPopupClosed(): void {
     showFilterAccountsPopup.value = false;
     showFilterCategoriesPopup.value = false;
     showFilterTagsPopup.value = false;
+    showAmountSheet.value = false;
     showAmountFilterPopup.value = false;
     customSelectedAccountIds.value = [];
     customSelectedCategoryIds.value = [];
     customTagFilter.value = '';
+    customAmountValue.value = 0;
     customAmountFilter.value = '';
     close();
 }

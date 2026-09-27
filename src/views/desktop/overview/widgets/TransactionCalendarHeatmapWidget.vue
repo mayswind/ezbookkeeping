@@ -8,6 +8,9 @@
             <date-range-calendar-heat-map-chart :start-time="startTime" :end-time="endTime"
                                                 :items="items" :value-type="ChartValueType.Amount"
                                                 :value-type-name="tt(transactionTypeName)" :default-currency="defaultCurrency"
+                                                :outlier-color-mode="outlierColorMode"
+                                                :outlier-top-count="outlierTopCount"
+                                                :outlier-amount-threshold="outlierAmountThreshold"
                                                 :show-value="showAmountInHomePage" :enable-click-item="!editing"
                                                 @click="clickDate" />
         </v-card-text>
@@ -29,7 +32,11 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { BigDecimal } from '@/core/numeral.ts';
 import { DateRange, KnownDateTimeFormat } from '@/core/datetime.ts';
-import { ChartValueType, type CalendarChartSourceDataItem } from '@/core/chart.ts';
+import {
+    type CalendarChartSourceDataItem,
+    ChartValueType,
+    TransactionCalendarHeatmapOutlierColorMode
+} from '@/core/chart.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
 import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
@@ -47,6 +54,9 @@ const props = defineProps<{
     loading: boolean;
     months: number;
     transactionType: TransactionType;
+    outlierColorMode?: TransactionCalendarHeatmapOutlierColorMode;
+    outlierTopCount?: number;
+    outlierAmountThreshold?: number;
     editing?: boolean;
     title?: string
 }>();

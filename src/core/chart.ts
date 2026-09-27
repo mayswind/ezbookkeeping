@@ -7,6 +7,12 @@ export enum ChartValueType {
     Number = 'number'
 }
 
+export enum TransactionCalendarHeatmapOutlierColorMode {
+    Disabled = 'disabled',
+    TopCount = 'topCount',
+    AboveAmount = 'aboveAmount'
+}
+
 export interface CategoricalChartSourceDataItem {
     id?: string;
     name: string;

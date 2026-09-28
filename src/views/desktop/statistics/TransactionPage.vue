@@ -574,6 +574,7 @@ const {
     getAllCategoricalChartTypes,
     getAllTrendChartTypes,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
+    formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping,
     formatPercentToLocalizedNumerals
 } = useI18n();
 
@@ -1243,7 +1244,7 @@ function exportResults(): void {
                 .map(item => [
                     item.name,
                     formatAmountToWesternArabicNumeralsWithoutDigitGrouping(item.value, defaultCurrency.value),
-                    item.percent.toFixed(4)
+                    formatBigDecimalToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(item.percent.toFixed(4)))
                 ]),
             supportedMermaidCharts: supportedMermaidCharts
         });

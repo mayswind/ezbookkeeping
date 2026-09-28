@@ -439,7 +439,7 @@ import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { type NameValue, type NameNumeralValue, itemAndIndex, reversed, keys } from '@/core/base.ts';
-import { AmountFilterType } from '@/core/numeral.ts';
+import { DecimalSeparator, AmountFilterType } from '@/core/numeral.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { KnownFileType } from '@/core/file.ts';
@@ -536,11 +536,13 @@ const props = defineProps<{
 const {
     tt,
     formatRange,
+    getCurrentDecimalSeparator,
     formatDateTimeToLongDateTime,
     formatDateTimeToGregorianDefaultDateTime,
     formatAmountToWesternArabicNumeralsWithoutDigitGrouping,
     formatAmountToLocalizedNumeralsWithCurrency,
     formatNumberToLocalizedNumerals,
+    formatNumberToWesternArabicNumeralsWithoutDigitGrouping,
     getCategorizedAccountsWithDisplayBalance,
     getTablePageOptions
 } = useI18n();
@@ -585,6 +587,7 @@ const currentDescriptionFilterValue = ref<string | null>(null);
 const showAccountBalance = computed<boolean>(() => settingsStore.appSettings.showAccountBalance);
 const customAccountCategoryOrder = computed<string>(() => settingsStore.appSettings.accountCategoryOrders);
 
+const useCommaDecimalSeparator = computed<boolean>(() => getCurrentDecimalSeparator() === DecimalSeparator.Comma.symbol);
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const coordinateDisplayType = computed<number>(() => userStore.currentUserCoordinateDisplayType);
 
@@ -944,7 +947,7 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
     {
         prependIcon: mdiComma,
         title: tt('Save as CSV (Comma-separated values) File'),
-        disabled: isEditing.value || selectedImportTransactionCount.value < 1,
+        disabled: isEditing.value || selectedImportTransactionCount.value < 1 || useCommaDecimalSeparator.value,
         divider: true,
         onClick: () => exportData(KnownFileType.CSV)
     },
@@ -2145,7 +2148,7 @@ function exportData(fileType: KnownFileType): void {
         const accountName = transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId] ? (allAccountsMap.value[transaction.sourceAccountId]?.name ?? transaction.originalSourceAccountName) : transaction.originalSourceAccountName;
         const amountCurrency = transaction.sourceAccountId && transaction.sourceAccountId !== '0' && allAccountsMap.value[transaction.sourceAccountId] ? (allAccountsMap.value[transaction.sourceAccountId]?.currency ?? transaction.originalSourceAccountCurrency) : transaction.originalSourceAccountCurrency;
         const amount = formatAmountToWesternArabicNumeralsWithoutDigitGrouping(parseBigDecimal(transaction.sourceAmount), amountCurrency);
-        const geographicLocation = transaction.geoLocation ? `${transaction.geoLocation.longitude} ${transaction.geoLocation.latitude}` : '';
+        const geographicLocation = transaction.geoLocation ? `${formatNumberToWesternArabicNumeralsWithoutDigitGrouping(transaction.geoLocation.longitude)} ${formatNumberToWesternArabicNumeralsWithoutDigitGrouping(transaction.geoLocation.latitude)}` : '';
         let categoryName = transaction.categoryId && transaction.categoryId !== '0' && allCategoriesMap.value[transaction.categoryId] ? (allCategoriesMap.value[transaction.categoryId]?.name ?? transaction.originalCategoryName) : transaction.originalCategoryName;
         let relatedAccountName: string | undefined = undefined;
         let relatedAccountCurrency: string | undefined = undefined;

@@ -75,7 +75,7 @@
                                          v-if="canUpdateAccountCloseBalance"></v-list-item>
                             <v-divider class="my-2"/>
                             <v-list-item :prepend-icon="mdiComma"
-                                         :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
+                                         :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1 || useCommaDecimalSeparator"
                                          @click="exportReconciliationStatements(KnownFileType.CSV)">
                                 <v-list-item-title>{{ tt('Save as CSV (Comma-separated values) File') }}</v-list-item-title>
                             </v-list-item>
@@ -335,7 +335,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 
 import type { NameNumeralValue } from '@/core/base.ts';
-import type { BigDecimal } from '@/core/numeral.ts';
+import { type BigDecimal, DecimalSeparator } from '@/core/numeral.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { AccountBalanceTrendChartType, ChartDateAggregationType } from '@/core/statistics.ts';
@@ -389,6 +389,7 @@ const emit = defineEmits<{
 const {
     tt,
     formatRange,
+    getCurrentDecimalSeparator,
     formatNumberToLocalizedNumerals,
     getTablePageOptions
 } = useI18n();
@@ -464,6 +465,8 @@ const timezoneTypeIconMap = {
     [TimezoneTypeForStatistics.TransactionTimezone.type]: mdiInvoiceTextClockOutline
 };
 
+let rejectFunc: ((reason?: unknown) => void) | null = null;
+
 const dialogLayout = useTemplateRef<OneColumnDialogLayoutType>('dialogLayout');
 const amountInputDialog = useTemplateRef<AmountInputDialogType>('amountInputDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -478,8 +481,7 @@ const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const chartType = ref<number>(AccountBalanceTrendChartType.Default.type);
 const transactionListDialogHeight = ref<number>(0);
 
-let rejectFunc: ((reason?: unknown) => void) | null = null;
-
+const useCommaDecimalSeparator = computed<boolean>(() => getCurrentDecimalSeparator() === DecimalSeparator.Comma.symbol);
 const reconciliationStatementsTablePageOptions = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, reconciliationStatements.value?.transactions.length, true, false));
 const preserveDialogHeight = computed<boolean>(() => showAccountBalanceTrendsCharts.value && transactionListDialogHeight.value > 0);
 

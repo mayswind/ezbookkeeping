@@ -29,6 +29,7 @@
                         <v-list>
                             <v-list-subheader class="text-body-small" :title="tt('File Format')"/>
                             <v-list-item :prepend-icon="mdiComma"
+                                         :disabled="useCommaDecimalSeparator"
                                          :append-icon="fileFormat === KnownFileType.CSV.extension ? mdiCheck : undefined"
                                          :title="tt('CSV (Comma-separated values) File')"
                                          @click="fileFormat = KnownFileType.CSV.extension"></v-list-item>
@@ -105,7 +106,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
-import type { BigDecimal } from '@/core/numeral.ts';
+import { type BigDecimal, DecimalSeparator } from '@/core/numeral.ts';
 import { KnownFileType } from '@/core/file.ts';
 import { ExportMermaidChartType } from '@/core/statistics.ts';
 
@@ -131,7 +132,7 @@ import {
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
-const { tt } = useI18n();
+const { tt, getCurrentDecimalSeparator } = useI18n();
 
 const userStore = useUserStore();
 
@@ -145,6 +146,8 @@ const fileFormat = ref<string>(KnownFileType.CSV.extension);
 const supportedMermaidChartTypes = ref<PartialRecord<ExportMermaidChartType, boolean>>({});
 const mermaidChartType = ref<ExportMermaidChartType | undefined>(undefined);
 const showRawData = ref<boolean>(false);
+
+const useCommaDecimalSeparator = computed<boolean>(() => getCurrentDecimalSeparator() === DecimalSeparator.Comma.symbol);
 
 const fileName = computed<string>(() => {
     const nickname = userStore.currentUserNickname;
@@ -291,7 +294,7 @@ const exportedData = computed<string>(() => {
 function open(options: { headers: string[], data: string[][], supportedMermaidCharts?: ExportMermaidChartType[] }): void {
     headers.value = options.headers || [];
     data.value = options.data || [];
-    fileFormat.value = KnownFileType.CSV.extension;
+    fileFormat.value = useCommaDecimalSeparator.value ? KnownFileType.SSV.extension : KnownFileType.CSV.extension;
     supportedMermaidChartTypes.value = arrayItemToObjectField(options.supportedMermaidCharts || [], true);
     mermaidChartType.value = undefined;
     showRawData.value = false;

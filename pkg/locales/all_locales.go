@@ -36,6 +36,9 @@ var AllLanguages = map[string]*LocaleInfo{
 	"nl": {
 		Content: nl,
 	},
+	"pl": {
+		Content: pl,
+	},	
 	"pt-BR": {
 		Content: ptBR,
 	},

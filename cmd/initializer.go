@@ -202,6 +202,10 @@ func getConfigWithoutSensitiveData(config *settings.Config) *settings.Config {
 		removeSensitiveDataFromLLMConfig(clonedConfig.ReceiptImageRecognitionLLMConfig)
 	}
 
+	if clonedConfig.CodingAssistantLLMConfig != nil {
+		removeSensitiveDataFromLLMConfig(clonedConfig.CodingAssistantLLMConfig)
+	}
+
 	if clonedConfig.SecretKey != "" {
 		clonedConfig.SecretKey = "****"
 	}

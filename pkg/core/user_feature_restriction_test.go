@@ -107,14 +107,14 @@ func TestParseUserFeatureRestrictions(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 
 	expectedValue = UserFeatureRestrictions(1)
-	actualValue = ParseUserFeatureRestrictions("1,20")
+	actualValue = ParseUserFeatureRestrictions("1,50")
 	assert.Equal(t, expectedValue, actualValue)
 
 	expectedValue = UserFeatureRestrictions(255)
-	actualValue = ParseUserFeatureRestrictions("1,2,3,4,5,6,7,8,20,21,22")
+	actualValue = ParseUserFeatureRestrictions("1,2,3,4,5,6,7,8,50,51,52")
 	assert.Equal(t, expectedValue, actualValue)
 
 	expectedValue = UserFeatureRestrictions(255)
-	actualValue = ParseUserFeatureRestrictions("1,2,3,4,5,6,7,8,a,b,20")
+	actualValue = ParseUserFeatureRestrictions("1,2,3,4,5,6,7,8,a,b,50")
 	assert.Equal(t, expectedValue, actualValue)
 }

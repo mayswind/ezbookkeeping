@@ -262,6 +262,7 @@
             :disabled="loading || disabled"
             :display-layout="currentExploration.customChartDisplayLayout"
             :transactions="explorersStore.filteredTransactionsForCustomChart"
+            :queries="currentExploration.queries"
             v-model="currentExploration.customChartScript"
         />
     </v-card-text>

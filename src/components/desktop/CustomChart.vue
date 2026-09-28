@@ -52,10 +52,12 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import { itemAndIndex } from '@/core/base.ts';
 import type { BigDecimal } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TransactionExplorerCustomChartDisplayLayout } from '@/core/explorer.ts';
-import type { TransactionInsightDataItem } from '@/models/transaction.ts';
+import type { TransactionInsightDataItemWithQueryIndexes } from '@/models/transaction.ts';
+import type { TransactionExplorerQuery } from '@/models/explorer.ts';
 
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTimeWithTimezoneOffset } from '@/lib/datetime.ts';
@@ -107,12 +109,14 @@ interface CustomChartTransaction {
         longitude: number
     };
     comment: string;
+    inQueries: string[];
 }
 
 const props = defineProps<{
     disabled?: boolean;
     displayLayout: number;
-    transactions: TransactionInsightDataItem[];
+    transactions: TransactionInsightDataItemWithQueryIndexes[];
+    queries: TransactionExplorerQuery[];
     modelValue: string;
 }>();
 
@@ -121,7 +125,8 @@ const emit = defineEmits<{
 }>();
 
 const {
-    tt
+    tt,
+    formatNumberToLocalizedNumeralsWithoutDigitGrouping
 } = useI18n();
 
 const settingsStore = useSettingsStore();
@@ -234,6 +239,8 @@ interface CustomChartTransaction {
     };
     /** ${tt('sample.insightsExplorerCustomChart.transactionField.comment')} */
     comment: string;
+    /** ${tt('sample.insightsExplorerCustomChart.transactionField.inQueries')} */
+    inQueries: string[];
 }
 
 /** ${tt('sample.insightsExplorerCustomChart.transactionTypeDescription')} */
@@ -435,6 +442,7 @@ function sumTransactionAmounts(transactions) {
  * {string[]} tagNames - ${tt('sample.insightsExplorerCustomChart.transactionField.tagNames')}
  * {string} geoLocation - ${tt('sample.insightsExplorerCustomChart.transactionField.geoLocation')}
  * {string} comment - ${tt('sample.insightsExplorerCustomChart.transactionField.comment')}
+ * {string[]} inQueries - ${tt('sample.insightsExplorerCustomChart.transactionField.inQueries')}
  */
 
 /**
@@ -456,6 +464,20 @@ const displayChartData = computed<string>(() => {
 });
 
 const customChartTransactions = computed<CustomChartTransaction[]>(() => {
+    const queryNamesMap: Record<number, string> = {};
+
+    if (props.queries) {
+        for (const [query, index] of itemAndIndex(props.queries)) {
+            let queryName = query.name;
+
+            if (!queryName) {
+                queryName = tt('format.misc.queryIndex', { index: formatNumberToLocalizedNumeralsWithoutDigitGrouping(index + 1) });
+            }
+
+            queryNamesMap[index] = queryName;
+        }
+    }
+
     return props.transactions.map(transaction => {
         const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
         const defaultCurrency = userStore.currentUserDefaultCurrency;
@@ -510,7 +532,8 @@ const customChartTransactions = computed<CustomChartTransaction[]>(() => {
                 latitude: transaction.geoLocation.latitude,
                 longitude: transaction.geoLocation.longitude
             } : undefined,
-            comment: transaction.comment || ''
+            comment: transaction.comment || '',
+            inQueries: transaction.queryIndexes.map(index => queryNamesMap[index] ?? tt('format.misc.queryIndex', { index: formatNumberToLocalizedNumeralsWithoutDigitGrouping(index + 1) }))
         };
 
         return finalTransaction;
@@ -607,6 +630,7 @@ watch(customScript, value => {
 watch(() => props.modelValue, value => {
     if (value !== customScript.value) {
         customScript.value = value;
+        reloadSandbox(true);
     }
 });
 </script>

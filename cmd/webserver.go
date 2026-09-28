@@ -495,6 +495,12 @@ func startWebServer(c *core.CliContext) error {
 				}
 			}
 
+			if config.CodingAssistantLLMConfig != nil && config.CodingAssistantLLMConfig.LLMProvider != "" {
+				if config.InsightsExplorerCodingAssistant {
+					apiV1Route.POST("/llm/code/generate.json", bindApi(api.LargeLanguageModels.GenerateCodeHandler, config))
+				}
+			}
+
 			// User Custom Icons
 			if config.EnableUserCustomIcon {
 				apiV1Route.GET("/custom_icons/list.json", bindApi(api.UserCustomIcons.CustomIconListHandler, config))

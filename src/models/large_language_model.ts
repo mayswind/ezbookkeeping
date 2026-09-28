@@ -1,3 +1,7 @@
+export enum CodingAssistantType {
+    InsightsExplorerCustomChart = 'insights_explorer_custom_chart'
+}
+
 export interface RecognizedTransactionResponse {
     readonly type: number;
     readonly time?: number;
@@ -8,4 +12,14 @@ export interface RecognizedTransactionResponse {
     readonly destinationAmount?: number;
     readonly tagIds?: string[];
     readonly comment?: string;
+}
+
+export interface CodingAssistantRequest {
+    readonly type: CodingAssistantType;
+    readonly userPrompt: string;
+    readonly code?: string;
+}
+
+export interface CodingAssistantResponse {
+    readonly code: string;
 }

@@ -33,6 +33,7 @@ Live Demo: [https://ezbookkeeping-demo.mayswind.net](https://ezbookkeeping-demo.
     - Dark mode
 - **AI-Powered Features**
     - Text and receipt image recognition
+    - AI custom chart generation
     - MCP (Model Context Protocol) for AI integration
     - Agent Skill and API command-line script tools for AI integration
 - **Powerful Bookkeeping**

@@ -17,6 +17,7 @@ import (
 type LargeLanguageModelProviderContainer struct {
 	textRecognitionCurrentProvider         provider.LargeLanguageModelProvider
 	receiptImageRecognitionCurrentProvider provider.LargeLanguageModelProvider
+	codingAssistantCurrentProvider         provider.LargeLanguageModelProvider
 }
 
 // Initialize a large language model provider container singleton instance
@@ -38,6 +39,14 @@ func InitializeLargeLanguageModelProvider(config *settings.Config) error {
 
 	if config.ReceiptImageRecognitionLLMConfig != nil {
 		Container.receiptImageRecognitionCurrentProvider, err = initializeLargeLanguageModelProvider(config.ReceiptImageRecognitionLLMConfig, config.EnableDebugLog)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if config.CodingAssistantLLMConfig != nil {
+		Container.codingAssistantCurrentProvider, err = initializeLargeLanguageModelProvider(config.CodingAssistantLLMConfig, config.EnableDebugLog)
 
 		if err != nil {
 			return err
@@ -89,4 +98,13 @@ func (l *LargeLanguageModelProviderContainer) GetJsonResponseByReceiptImageRecog
 	}
 
 	return l.receiptImageRecognitionCurrentProvider.GetJsonResponse(c, uid, currentConfig.ReceiptImageRecognitionLLMConfig, request)
+}
+
+// GetJsonResponseByCodingAssistantModel returns the json response from the coding assistant model
+func (l *LargeLanguageModelProviderContainer) GetJsonResponseByCodingAssistantModel(c core.Context, uid int64, currentConfig *settings.Config, request *data.LargeLanguageModelRequest) (*data.LargeLanguageModelTextualResponse, error) {
+	if currentConfig.CodingAssistantLLMConfig == nil || l.codingAssistantCurrentProvider == nil {
+		return nil, errs.ErrInvalidLLMProvider
+	}
+
+	return l.codingAssistantCurrentProvider.GetJsonResponse(c, uid, currentConfig.CodingAssistantLLMConfig, request)
 }

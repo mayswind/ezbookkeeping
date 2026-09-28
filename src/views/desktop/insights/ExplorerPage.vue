@@ -73,6 +73,13 @@
                             <v-icon :icon="mdiRefresh" size="24" />
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
+                        <v-btn density="compact" color="default" variant="text" class="ms-2"
+                               :aria-label="tt('AI Generate Chart Code')" :icon="true" :disabled="loading || updating"
+                               v-if="activeTab === 'chart' && currentExploration.chartType === TransactionExplorerChartTypeValue.Custom && isInsightsExplorerCodingAssistantEnabled()"
+                               @click="showAICustomChartCodeDialog">
+                            <v-icon :icon="mdiMagicStaff" size="20" />
+                            <v-tooltip activator="parent">{{ tt('AI Generate Chart Code') }}</v-tooltip>
+                        </v-btn>
                         <v-spacer/>
                         <v-btn class="ms-3"
                                :color="isCurrentExplorationModified ? 'primary' : 'default'"
@@ -199,6 +206,7 @@
                                  @error="onShowDateRangeError" />
 
     <explorer-change-display-order-dialog ref="explorerChangeDisplayOrderDialog" />
+    <a-i-custom-chart-code-dialog ref="aiCustomChartCodeDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <json-import-dialog ref="queryImportDialog" :title="tt('Import Queries')" :sample-json="sampleQueryJson" :on-import="onImportQueries" />
     <json-export-dialog ref="queryExportDialog" :title="tt('Export Queries')" :file-name="queryExportFileName" />
@@ -223,6 +231,7 @@ import ExplorerDataTableTab from '@/views/desktop/insights/tabs/ExplorerDataTabl
 import ExplorerEditableDataTableTab from '@/views/desktop/insights/tabs/ExplorerEditableDataTableTab.vue';
 import ExplorerChartTab from '@/views/desktop/insights/tabs/ExplorerChartTab.vue';
 import ExplorerChangeDisplayOrderDialog from '@/views/desktop/insights/dialogs/ExplorerChangeDisplayOrderDialog.vue';
+import AICustomChartCodeDialog from '@/views/desktop/insights/dialogs/AICustomChartCodeDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -255,6 +264,7 @@ import {
 
 import { isObject, isArray, isEquals, isTextualUUID } from '@/lib/common.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
+import { isInsightsExplorerCodingAssistantEnabled } from '@/lib/server_settings.ts';
 import logger from '@/lib/logger.ts';
 
 import {
@@ -262,6 +272,7 @@ import {
     mdiArrowRight,
     mdiCheck,
     mdiRefresh,
+    mdiMagicStaff,
     mdiDotsVertical,
     mdiPencilOutline,
     mdiEyeOutline,
@@ -298,6 +309,7 @@ type JsonExportDialogType = InstanceType<typeof JsonExportDialog>;
 type ExplorerDataTableTabType = InstanceType<typeof ExplorerDataTableTab>;
 type ExplorerChartTabType = InstanceType<typeof ExplorerChartTab>;
 type ExplorerChangeDisplayOrderDialogType = InstanceType<typeof ExplorerChangeDisplayOrderDialog>;
+type AICustomChartCodeDialogType = InstanceType<typeof AICustomChartCodeDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
 const router = useRouter();
@@ -329,6 +341,7 @@ const queryExportDialog = useTemplateRef<JsonExportDialogType>('queryExportDialo
 const explorerDataTableTab = useTemplateRef<ExplorerDataTableTabType>('explorerDataTableTab');
 const explorerChartTab = useTemplateRef<ExplorerChartTabType>('explorerChartTab');
 const explorerChangeDisplayOrderDialog = useTemplateRef<ExplorerChangeDisplayOrderDialogType>('explorerChangeDisplayOrderDialog');
+const aiCustomChartCodeDialog = useTemplateRef<AICustomChartCodeDialogType>('aiCustomChartCodeDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const loading = ref<boolean>(true);
@@ -799,6 +812,14 @@ function shiftDateRange(scale: number): void {
         explorersStore.updateTransactionExplorerInvalidState(true);
         router.push(getFilterLinkUrl());
     }
+}
+
+function showAICustomChartCodeDialog(): void {
+    aiCustomChartCodeDialog.value?.open(currentExploration.value.customChartScript).then(code => {
+        if (code) {
+            currentExploration.value.customChartScript = code;
+        }
+    });
 }
 
 function onImportQueries(data: string): boolean {

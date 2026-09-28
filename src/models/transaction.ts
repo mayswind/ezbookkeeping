@@ -1022,6 +1022,10 @@ export interface TransactionInsightDataItem extends TransactionInfoResponse {
     readonly geoLocation?: TransactionGeoLocationResponse;
 }
 
+export interface TransactionInsightDataItemWithQueryIndexes extends TransactionInsightDataItem {
+    readonly queryIndexes: number[];
+}
+
 export type TransactionAmountsResponse = PartialRecord<TransactionAmountsRequestType, TransactionAmountsResponseItem>;
 
 export interface TransactionAmountsResponseItem {

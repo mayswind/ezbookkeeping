@@ -10,4 +10,5 @@ const (
 	SYSTEM_PROMPT_RECEIPT_IMAGE_RECOGNITION          KnownTemplate = "prompt/receipt_image_recognition"
 	SYSTEM_PROMPT_BATCH_TRANSACTION_TEXT_RECOGNITION KnownTemplate = "prompt/batch_transaction_text_recognition"
 	SYSTEM_PROMPT_BATCH_RECEIPT_IMAGE_RECOGNITION    KnownTemplate = "prompt/batch_receipt_image_recognition"
+	SYSTEM_PROMPT_INSIGHTS_EXPLORER_CUSTOM_CHART     KnownTemplate = "prompt/insights_explorer_custom_chart"
 )

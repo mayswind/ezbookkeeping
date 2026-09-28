@@ -71,6 +71,10 @@ export function isTransactionFromAIImageRecognitionEnabled(): boolean {
     return getServerSetting('llmir') === 1;
 }
 
+export function isInsightsExplorerCodingAssistantEnabled(): boolean {
+    return getServerSetting('llmec') === 1;
+}
+
 export function getLoginPageTips(): Record<string, string>{
     return getServerSetting('lpt') as Record<string, string>;
 }

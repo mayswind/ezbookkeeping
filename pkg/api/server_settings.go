@@ -73,6 +73,12 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 		}
 	}
 
+	if config.CodingAssistantLLMConfig != nil && config.CodingAssistantLLMConfig.LLMProvider != "" {
+		if config.InsightsExplorerCodingAssistant {
+			a.appendBooleanSetting(builder, "llmec", true)
+		}
+	}
+
 	if config.LoginPageTips.Enabled {
 		a.appendMultiLanguageTipSetting(builder, "lpt", config.LoginPageTips)
 	}

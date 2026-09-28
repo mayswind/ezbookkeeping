@@ -943,20 +943,20 @@ const toolMenus = computed<ImportTransactionCheckDataMenu[]>(() => [
     },
     {
         prependIcon: mdiComma,
-        title: tt('Export to CSV (Comma-separated values) File'),
+        title: tt('Save as CSV (Comma-separated values) File'),
         disabled: isEditing.value || selectedImportTransactionCount.value < 1,
         divider: true,
         onClick: () => exportData(KnownFileType.CSV)
     },
     {
         prependIcon: mdiKeyboardTab,
-        title: tt('Export to TSV (Tab-separated values) File'),
+        title: tt('Save as TSV (Tab-separated values) File'),
         disabled: isEditing.value || selectedImportTransactionCount.value < 1,
         onClick: () => exportData(KnownFileType.TSV)
     },
     {
         prependIcon: extendMdiSemicolon,
-        title: tt('Export to SSV (Semicolon-separated values) File'),
+        title: tt('Save as SSV (Semicolon-separated values) File'),
         disabled: isEditing.value || selectedImportTransactionCount.value < 1,
         onClick: () => exportData(KnownFileType.SSV)
     }

@@ -77,17 +77,17 @@
                             <v-list-item :prepend-icon="mdiComma"
                                          :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
                                          @click="exportReconciliationStatements(KnownFileType.CSV)">
-                                <v-list-item-title>{{ tt('Export to CSV (Comma-separated values) File') }}</v-list-item-title>
+                                <v-list-item-title>{{ tt('Save as CSV (Comma-separated values) File') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item :prepend-icon="mdiKeyboardTab"
                                          :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
                                          @click="exportReconciliationStatements(KnownFileType.TSV)">
-                                <v-list-item-title>{{ tt('Export to TSV (Tab-separated values) File') }}</v-list-item-title>
+                                <v-list-item-title>{{ tt('Save as TSV (Tab-separated values) File') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item :prepend-icon="extendMdiSemicolon"
                                          :disabled="!reconciliationStatements || !reconciliationStatements.transactions || reconciliationStatements.transactions.length < 1"
                                          @click="exportReconciliationStatements(KnownFileType.SSV)">
-                                <v-list-item-title>{{ tt('Export to SSV (Semicolon-separated values) File') }}</v-list-item-title>
+                                <v-list-item-title>{{ tt('Save as SSV (Semicolon-separated values) File') }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>

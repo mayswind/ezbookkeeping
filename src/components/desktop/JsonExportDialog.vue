@@ -10,10 +10,10 @@
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>
-                    <v-btn density="compact" color="default" variant="text" class="ms-1" :aria-label="tt('Save')" :icon="true"
+                    <v-btn density="compact" color="default" variant="text" class="ms-1" :aria-label="tt('Save to File')" :icon="true"
                            :disabled="!json" @click="save">
                         <v-icon :icon="mdiContentSaveOutline" size="22" />
-                        <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
+                        <v-tooltip activator="parent">{{ tt('Save to File') }}</v-tooltip>
                     </v-btn>
                 </div>
             </template>

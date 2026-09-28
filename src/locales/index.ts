@@ -110,13 +110,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         textDirection: 'ltr',
         content: nl
     },
-	'pl': {
-		name: 'Polish',
-		displayName: 'Polski',
-		alternativeLanguageTag: 'pl-PL',
-		textDirection: 'ltr',
-		content: pl
-	},	
+    'pl': {
+        name: 'Polish',
+        displayName: 'Polski',
+        alternativeLanguageTag: 'pl-PL',
+        textDirection: 'ltr',
+        content: pl
+    },
     'pt-BR': {
         name: 'Portuguese (Brazil)',
         displayName: 'Português (Brasil)',

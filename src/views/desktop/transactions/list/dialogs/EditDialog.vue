@@ -15,7 +15,7 @@
                        :aria-label="tt('AI Clipboard Text Recognition')" :disabled="loading || submitting || recognizing"
                        v-if="mode !== TransactionEditPageMode.View && type === TransactionEditPageType.Transaction && activeTab === 'basicInfo' && isTransactionFromAITextRecognitionEnabled()"
                        @click="recognizeFromClipboard">
-                    <v-icon :icon="mdiMagicStaff" size="22" v-if="!recognizing"/>
+                    <v-icon :icon="mdiMagicStaff" size="20" v-if="!recognizing"/>
                     <v-tooltip activator="parent">{{ tt('AI Clipboard Text Recognition') }}</v-tooltip>
                     <v-progress-circular indeterminate size="22" v-if="recognizing"></v-progress-circular>
                 </v-btn>

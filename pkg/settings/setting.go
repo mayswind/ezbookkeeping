@@ -560,7 +560,7 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 		return nil, err
 	}
 
-	err = loadLLMGlobalConfiguration(config, cfgFile, "llm")
+	err = loadAIConfiguration(config, cfgFile, "ai")
 
 	if err != nil {
 		return nil, err
@@ -921,7 +921,7 @@ func loadStorageConfiguration(config *Config, configFile *ini.File, sectionName 
 	return nil
 }
 
-func loadLLMGlobalConfiguration(config *Config, configFile *ini.File, sectionName string) error {
+func loadAIConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	config.TransactionFromAITextRecognition = getConfigItemBoolValue(configFile, sectionName, "transaction_from_ai_text_recognition", false)
 	config.TransactionFromAIImageRecognition = getConfigItemBoolValue(configFile, sectionName, "transaction_from_ai_image_recognition", false)
 	config.InsightsExplorerCodingAssistant = getConfigItemBoolValue(configFile, sectionName, "insights_explorer_coding_assistant", false)

@@ -22,6 +22,9 @@ const (
 	twoFactorSecretSize         uint = 20 // bytes
 	twoFactorRecoveryCodeCount  int  = 10
 	twoFactorRecoveryCodeLength int  = 10 // bytes
+	twoFactorSkew               uint = 0
+	twoFactorDigits                  = otp.DigitsSix
+	twoFactorAlgorithm               = otp.AlgorithmSHA1
 )
 
 // TwoFactorAuthorizationService represents 2fa service
@@ -92,6 +95,18 @@ func (s *TwoFactorAuthorizationService) GenerateTwoFactorSecret(c core.Context, 
 	})
 
 	return key, err
+}
+
+// ValidateTwoFactorPasscode validates whether the given 2fa passcode is valid according to the given secret
+func (s *TwoFactorAuthorizationService) ValidateTwoFactorPasscode(c core.Context, passcode string, secret string) bool {
+	ret, _ := totp.ValidateCustom(passcode, secret, time.Now().UTC(), totp.ValidateOpts{
+		Period:    twoFactorPeriod,
+		Skew:      twoFactorSkew,
+		Digits:    twoFactorDigits,
+		Algorithm: twoFactorAlgorithm,
+	})
+
+	return ret
 }
 
 // CreateTwoFactorSetting saves a new 2fa setting to database

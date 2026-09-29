@@ -6,8 +6,6 @@ import (
 	"image/png"
 	"time"
 
-	"github.com/pquerna/otp/totp"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -174,7 +172,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.WebCo
 		Secret: confirmReq.Secret,
 	}
 
-	if !totp.Validate(confirmReq.Passcode, confirmReq.Secret) {
+	if !a.twoFactorAuthorizations.ValidateTwoFactorPasscode(c, confirmReq.Passcode, confirmReq.Secret) {
 		log.Warnf(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] passcode is invalid")
 		return nil, errs.ErrPasscodeInvalid
 	}

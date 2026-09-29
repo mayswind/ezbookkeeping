@@ -5,8 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/pquerna/otp/totp"
-
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
@@ -204,7 +202,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 		return nil, errs.ErrPasscodeInvalid
 	}
 
-	if !totp.Validate(credential.Passcode, twoFactorSetting.Secret) {
+	if !a.twoFactorAuthorizations.ValidateTwoFactorPasscode(c, credential.Passcode, twoFactorSetting.Secret) {
 		log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
 
 		err = a.CheckAndIncreaseFailureCount(c, uid)
@@ -457,7 +455,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 					return nil, errs.ErrPasscodeInvalid
 				}
 
-				if !totp.Validate(credential.Passcode, twoFactorSetting.Secret) {
+				if !a.twoFactorAuthorizations.ValidateTwoFactorPasscode(c, credential.Passcode, twoFactorSetting.Secret) {
 					log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
 
 					err = a.CheckAndIncreaseFailureCount(c, uid)

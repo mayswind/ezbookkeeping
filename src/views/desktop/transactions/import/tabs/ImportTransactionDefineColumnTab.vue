@@ -291,6 +291,7 @@ interface ImportTransactionDefineColumnMenu {
 
 const props = defineProps<{
     parsedFileData?: string[][];
+    parsedFileColumnSeparator?: string;
     disabled?: boolean;
 }>();
 
@@ -308,7 +309,7 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
-const parsedFileDataColumnMapping = ref<ImportTransactionDataMapping>(ImportTransactionDataMapping.createEmpty());
+const parsedFileDataColumnMapping = ref<ImportTransactionDataMapping>(ImportTransactionDataMapping.createEmpty(props.parsedFileColumnSeparator));
 
 const longDateFormatOrder = computed<DateFormatOrder>(() => getLongDateFormatOrder());
 const shortDateFormatOrder = computed<DateFormatOrder>(() => getShortDateFormatOrder());
@@ -629,7 +630,7 @@ function generateResult(): ImportTransactionDefineColumnResult | undefined {
 }
 
 function reset(): void {
-    parsedFileDataColumnMapping.value.reset();
+    parsedFileDataColumnMapping.value.reset(props.parsedFileColumnSeparator);
     currentPage.value = 1;
     countPerPage.value = 10;
 }

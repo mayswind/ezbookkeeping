@@ -46,6 +46,7 @@ export class ImportTransactionDataMapping {
     private static readonly DEFAULT_GEO_LOCATION_SEPARATOR = ' ';
     private static readonly DEFAULT_GEO_LOCATION_ORDER = 'lonlat';
     private static readonly DEFAULT_TAG_SEPARATOR = ';';
+    private static readonly DEFAULT_TAG_SEPARATOR_FOR_SSV = ',';
 
     public includeHeader: boolean;
     public dataColumnMapping: Record<number, number>;
@@ -276,7 +277,7 @@ export class ImportTransactionDataMapping {
         return detectedFormats[0]!.type;
     }
 
-    public reset(): void {
+    public reset(columnSeparator?: string): void {
         this.includeHeader = ImportTransactionDataMapping.DEFAULT_INCLUDE_HEADER;
         this.dataColumnMapping = {};
         this.transactionTypeMapping = {};
@@ -285,7 +286,7 @@ export class ImportTransactionDataMapping {
         this.amountFormat = ImportTransactionDataMapping.DEFAULT_AMOUNT_FORMAT;
         this.geoLocationSeparator = ImportTransactionDataMapping.DEFAULT_GEO_LOCATION_SEPARATOR;
         this.geoLocationOrder = ImportTransactionDataMapping.DEFAULT_GEO_LOCATION_ORDER;
-        this.tagSeparator = ImportTransactionDataMapping.DEFAULT_TAG_SEPARATOR;
+        this.tagSeparator = ImportTransactionDataMapping.getDefaultTagSeparator(columnSeparator);
     }
 
     public toJson(): string {
@@ -304,7 +305,7 @@ export class ImportTransactionDataMapping {
         });
     }
 
-    public static createEmpty(): ImportTransactionDataMapping {
+    public static createEmpty(columnSeparator?: string): ImportTransactionDataMapping {
         return new ImportTransactionDataMapping(
             ImportTransactionDataMapping.DEFAULT_INCLUDE_HEADER,
             {},
@@ -314,7 +315,7 @@ export class ImportTransactionDataMapping {
             ImportTransactionDataMapping.DEFAULT_AMOUNT_FORMAT,
             ImportTransactionDataMapping.DEFAULT_GEO_LOCATION_SEPARATOR,
             ImportTransactionDataMapping.DEFAULT_GEO_LOCATION_ORDER,
-            ImportTransactionDataMapping.DEFAULT_TAG_SEPARATOR
+            ImportTransactionDataMapping.getDefaultTagSeparator(columnSeparator)
         );
     }
 
@@ -340,6 +341,14 @@ export class ImportTransactionDataMapping {
             );
         } catch {
             return null;
+        }
+    }
+
+    private static getDefaultTagSeparator(columnSeparator?: string): string {
+        if (columnSeparator === ';') {
+            return ImportTransactionDataMapping.DEFAULT_TAG_SEPARATOR_FOR_SSV;
+        } else {
+            return ImportTransactionDataMapping.DEFAULT_TAG_SEPARATOR;
         }
     }
 }

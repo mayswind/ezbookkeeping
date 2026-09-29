@@ -296,6 +296,7 @@
                         <import-transaction-define-column-tab
                             ref="importTransactionDefineColumnTab"
                             :parsed-file-data="parsedFileData"
+                            :parsed-file-column-separator="parsedFileColumnSeparator"
                             :disabled="loading || submitting"
                         />
                     </v-window-item>
@@ -487,6 +488,7 @@ const importAdditionalOptions = ref<ImportFileTypeSupportedAdditionalOptions>({}
 const importAIAdditionalPrompt = ref<string>('');
 const importImageCancelRecognizingUuid = ref<string | undefined>(undefined);
 const parsedFileData = ref<string[][] | undefined>(undefined);
+const parsedFileColumnSeparator = ref<string | undefined>(undefined);
 const importTransactions = ref<ImportTransaction[] | undefined>(undefined);
 
 const importedCount = ref<number | null>(null);
@@ -702,6 +704,7 @@ function open(): Promise<void> {
     importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
     importAIAdditionalPrompt.value = '';
     parsedFileData.value = undefined;
+    parsedFileColumnSeparator.value = undefined;
     importTransactionDefineColumnTab.value?.reset();
     importTransactionExecuteCustomScriptTab.value?.reset();
     importTransactions.value = undefined;
@@ -1056,6 +1059,15 @@ function parseData(): void {
 
     if (isCustomFileFormat.value && currentStep.value === 'uploadFile') {
         submitting.value = true;
+        let columnSeparator: string | undefined = undefined;
+
+        if (type === 'custom_csv') {
+            columnSeparator = ',';
+        } else if (type === 'custom_tsv') {
+            columnSeparator = '\t';
+        } else if (type === 'custom_ssv') {
+            columnSeparator = ';';
+        }
 
         transactionsStore.parseImportCustomFile({
             fileType: type,
@@ -1066,14 +1078,17 @@ function parseData(): void {
                 if (processCustomFileFormatMethod.value === ImportCustomFileFormatProcessMethod.CustomScript) {
                     importTransactionExecuteCustomScriptTab.value?.reset();
                     parsedFileData.value = response;
+                    parsedFileColumnSeparator.value = columnSeparator;
                     currentStep.value = 'executeCustomScript';
                 } else {
                     importTransactionDefineColumnTab.value?.reset();
                     parsedFileData.value = response;
+                    parsedFileColumnSeparator.value = columnSeparator;
                     currentStep.value = 'defineColumn';
                 }
             } else {
                 parsedFileData.value = undefined;
+                parsedFileColumnSeparator.value = undefined;
                 snackbar.value?.showError('No data to import');
             }
 
@@ -1309,6 +1324,7 @@ watch(fileType, (newValue) => {
 
     importFile.value = null;
     parsedFileData.value = undefined;
+    parsedFileColumnSeparator.value = undefined;
     importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
     importTransactions.value = undefined;
     clearImportImageFiles();

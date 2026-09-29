@@ -22,6 +22,7 @@ type customPlainTextDataTable struct {
 	timeFormatIncludeTimezone  bool
 	amountDecimalSeparator     string
 	amountDigitGroupingSymbol  string
+	geoLocationSeparator       string
 }
 
 // customPlainTextDataRow defines the structure of custom plain text transaction data row
@@ -224,6 +225,40 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 		rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 	}
 
+	// parse geographic location
+	if rowData[datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION] != "" {
+		geoLocation := rowData[datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION]
+
+		if geoLocation != "" {
+			geoLocationItems := strings.Split(geoLocation, t.transactionDataTable.geoLocationSeparator)
+
+			if len(geoLocationItems) != 2 {
+				log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction geographic location \"%s\", because it does not contain two parts separated by \"%s\"", geoLocation, t.transactionDataTable.geoLocationSeparator)
+				return nil, false, errs.ErrGeographicLocationInvalid
+			}
+
+			item1 := strings.TrimSpace(geoLocationItems[0])
+			item2 := strings.TrimSpace(geoLocationItems[1])
+
+			if item1 == "" || item2 == "" {
+				log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction geographic location \"%s\", because it contains empty part", geoLocation)
+				return nil, false, errs.ErrGeographicLocationInvalid
+			}
+
+			if !strings.Contains(item1, ".") && !strings.Contains(item2, ".") {
+				if strings.Contains(item1, ",") {
+					item1 = strings.ReplaceAll(item1, ",", ".")
+				}
+
+				if strings.Contains(item2, ",") {
+					item2 = strings.ReplaceAll(item2, ",", ".")
+				}
+			}
+
+			rowData[datatable.TRANSACTION_DATA_TABLE_GEOGRAPHIC_LOCATION] = item1 + t.transactionDataTable.geoLocationSeparator + item2
+		}
+	}
+
 	return rowData, true, nil
 }
 
@@ -257,7 +292,7 @@ func (t *customPlainTextDataRowIterator) parseAmount(ctx core.Context, amountVal
 }
 
 // CreateNewCustomPlainTextDataTable returns transaction data table from imported data table
-func CreateNewCustomPlainTextDataTable(dataTable datatable.BasicDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string) *customPlainTextDataTable {
+func CreateNewCustomPlainTextDataTable(dataTable datatable.BasicDataTable, columnIndexMapping map[datatable.TransactionDataTableColumn]int, transactionTypeNameMapping map[string]models.TransactionType, timeFormat string, timezoneFormat string, amountDecimalSeparator string, amountDigitGroupingSymbol string, geoLocationSeparator string) *customPlainTextDataTable {
 	timeFormatIncludeTimezone := strings.Contains(timeFormat, "z") || strings.Contains(timeFormat, "Z")
 
 	return &customPlainTextDataTable{
@@ -269,6 +304,7 @@ func CreateNewCustomPlainTextDataTable(dataTable datatable.BasicDataTable, colum
 		timeFormatIncludeTimezone:  timeFormatIncludeTimezone,
 		amountDecimalSeparator:     amountDecimalSeparator,
 		amountDigitGroupingSymbol:  amountDigitGroupingSymbol,
+		geoLocationSeparator:       geoLocationSeparator,
 	}
 }
 

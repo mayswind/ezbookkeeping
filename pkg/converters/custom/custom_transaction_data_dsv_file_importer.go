@@ -154,7 +154,7 @@ func (c *customTransactionDataDsvFileImporter) ParseImportedData(ctx core.Contex
 	}
 
 	dataTable := csvconverter.CreateNewCustomCsvBasicDataTable(allLines, c.hasHeaderLine)
-	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat, c.amountDecimalSeparator, c.amountDigitGroupingSymbol)
+	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat, c.amountDecimalSeparator, c.amountDigitGroupingSymbol, c.geoLocationSeparator)
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(customTransactionTypeNameMapping, c.geoLocationSeparator, c.geoLocationOrder, c.transactionTagSeparator)
 
 	return dataTableImporter.ParseImportedData(ctx, user, transactionDataTable, defaultTimezone, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)

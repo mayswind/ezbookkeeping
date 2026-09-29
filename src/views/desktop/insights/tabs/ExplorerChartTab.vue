@@ -9,7 +9,7 @@
                         item-title="name"
                         item-value="value"
                         density="compact"
-                        :disabled="loading || disabled"
+                        :disabled="loading || disabled || isInAIMode()"
                         :label="tt('Chart Type')"
                         :items="allTransactionExplorerChartTypes"
                         :model-value="currentExploration.chartType"
@@ -91,7 +91,7 @@
                         item-title="displayName"
                         item-value="type"
                         density="compact"
-                        :disabled="loading || disabled"
+                        :disabled="loading || disabled || isInAIMode()"
                         :label="tt('Display Layout')"
                         :items="allTransactionExplorerCustomChartDisplayLayouts"
                         v-model="currentExploration.customChartDisplayLayout"
@@ -259,6 +259,7 @@
     </v-card-text>
     <v-card-text :class="{ 'readonly': loading }" v-else-if="currentExploration.chartType === TransactionExplorerChartType.Custom.value">
         <custom-chart
+            ref="customChart"
             :disabled="loading || disabled"
             :display-layout="currentExploration.customChartDisplayLayout"
             :transactions="explorersStore.filteredTransactionsForCustomChart"
@@ -275,6 +276,7 @@ import AxisChart, { type AxisChartDisplayType } from '@/components/desktop/AxisC
 import RadarChart from '@/components/desktop/RadarChart.vue';
 import HierarchyChart, { type HierarchyChartDisplayType } from '@/components/desktop/HierarchyChart.vue';
 import HeatMapChart from '@/components/desktop/HeatMapChart.vue';
+import CustomChart from '@/components/desktop/CustomChart.vue';
 import TransactionListDialog from '@/views/desktop/insights/dialogs/TransactionListDialog.vue';
 
 import { computed, useTemplateRef } from 'vue';
@@ -307,7 +309,8 @@ import {
     TransactionExplorerDataDimension,
     TransactionExplorerValueMetric,
     TransactionExplorerChartTypeValue,
-    TransactionExplorerChartType
+    TransactionExplorerChartType,
+    TransactionExplorerCustomChartDisplayLayout
 } from '@/core/explorer.ts';
 
 import type { SortableTransactionStatisticDataItem, TransactionInsightDataItem } from '@/models/transaction.ts';
@@ -322,6 +325,7 @@ type AxisChartType = InstanceType<typeof AxisChart>;
 type RadarChartType = InstanceType<typeof RadarChart>;
 type HierarchyChartType = InstanceType<typeof HierarchyChart>;
 type HeatMapChartType = InstanceType<typeof HeatMapChart>;
+type CustomChartType = InstanceType<typeof CustomChart>;
 type TransactionListDialogType = InstanceType<typeof TransactionListDialog>;
 
 interface InsightsExplorerDataTableTabProps {
@@ -394,6 +398,7 @@ const axisChart = useTemplateRef<AxisChartType>('axisChart');
 const radarChart = useTemplateRef<RadarChartType>('radarChart');
 const hierarchyChart = useTemplateRef<HierarchyChartType>('hierarchyChart');
 const heatmapChart = useTemplateRef<HeatMapChartType>('heatmapChart');
+const customChart = useTemplateRef<CustomChartType>('customChart');
 const transactionListDialog = useTemplateRef<TransactionListDialogType>('transactionListDialog');
 
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -710,6 +715,14 @@ const axisChartTooltipExtraColumnNames = computed<string[]>(() => {
     return extraColumnNames;
 });
 
+function isInAIMode(): boolean {
+    return customChart.value?.isInAIMode() ?? false;
+}
+
+function isAIGenerating(): boolean {
+    return customChart.value?.isAIGenerating() ?? false;
+}
+
 function getFormattedI18nParameters(i18nParameters: Record<string, unknown> | undefined): Record<string, string> | undefined {
     if (!i18nParameters) {
         return undefined;
@@ -960,6 +973,20 @@ function updateCategoryDimensionType(dimensionType: TransactionExplorerDataDimen
     }
 }
 
+function switchToAIChartMode(): void {
+    if (currentExploration.value.chartType !== TransactionExplorerChartType.Custom.value) {
+        currentExploration.value.chartType = TransactionExplorerChartType.Custom.value;
+    }
+
+    const displayLayout = TransactionExplorerCustomChartDisplayLayout.valueOf(currentExploration.value.customChartDisplayLayout) ?? TransactionExplorerCustomChartDisplayLayout.Default
+
+    if (!displayLayout.showCode) {
+        currentExploration.value.customChartDisplayLayout = TransactionExplorerCustomChartDisplayLayout.Default.type;
+    }
+
+    customChart.value?.switchToAIChartMode();
+}
+
 function showClickedTransactionList({ categoryId, seriesId, title }: { categoryId: string, seriesId?: string, title?: string }): void {
     const categoriedData = explorersStore.categoriedTransactions[categoryId];
 
@@ -1147,6 +1174,9 @@ function buildExportResults(): { headers: string[], data: string[][], supportedM
 }
 
 defineExpose({
+    isInAIMode,
+    isAIGenerating,
+    switchToAIChartMode,
     buildExportResults
 });
 </script>

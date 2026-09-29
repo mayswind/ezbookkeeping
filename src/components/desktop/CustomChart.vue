@@ -4,19 +4,47 @@
             <div class="title-and-toolbar d-flex w-100 mb-1">
                 <v-btn density="compact" variant="tonal" :prepend-icon="mdiPlay"
                        :disabled="disabled || !sandboxLoaded || executingScript" :loading="executingScript"
-                       @click="executeCustomScript">
+                       @click="executeCustomScript"
+                       v-if="aiModeState === CustomChartAIState.Idle">
                     <template #loader>
                         <v-progress-circular indeterminate size="18" class="me-1"/>
                         <span>{{ tt('Execute Custom Script') }}</span>
                     </template>
                     <span>{{ tt('Execute Custom Script') }}</span>
                 </v-btn>
+                <v-btn density="compact" variant="tonal" :prepend-icon="mdiCheck"
+                       :disabled="disabled || aiModeState === CustomChartAIState.Generating || !userPrompt || !userPrompt.trim()"
+                       :loading="aiModeState === CustomChartAIState.Generating"
+                       @click="generateAICode"
+                       v-if="aiModeState !== CustomChartAIState.Idle">
+                    <template #loader>
+                        <v-progress-circular indeterminate size="15" width="2" class="loading-icon-before-text" />
+                        <span>{{ tt('Generate') }}</span>
+                    </template>
+                    {{ tt('Generate') }}
+                </v-btn>
+                <v-btn class="ms-2" density="compact" color="secondary" variant="tonal"
+                       :prepend-icon="aiModeState === CustomChartAIState.Generating ? mdiStop : mdiClose"
+                       @click="aiModeState === CustomChartAIState.Generating ? cancelAIGeneration() : exitAIMode()"
+                       v-if="aiModeState !== CustomChartAIState.Idle">
+                    {{ aiModeState === CustomChartAIState.Generating ? tt('Cancel Generation') : tt('Cancel') }}
+                </v-btn>
             </div>
             <code-editor class="w-100" style="height: 620px" language="javascript"
                          :readonly="disabled" :rounded="true" :line-numbers="true"
-                         :extra-libs="customChartEditorExtraLibs" v-model="customScript" />
+                         :extra-libs="customChartEditorExtraLibs" v-model="customScript"
+                         v-if="aiModeState === CustomChartAIState.Idle" />
+            <v-textarea no-resize persistent-placeholder
+                        class="w-100 always-cursor-text" style="height: 620px"
+                        autocomplete="off" density="compact" variant="outlined"
+                        :disabled="disabled || aiModeState === CustomChartAIState.Generating"
+                        :placeholder="tt('Describe the chart you want')"
+                        v-model="userPrompt"
+                        v-if="aiModeState !== CustomChartAIState.Idle"></v-textarea>
         </v-col>
-        <v-col cols="12" :md="displayLayout.showCode ? 6 : 12" v-if="displayLayout.showChart">
+        <v-col cols="12" :md="displayLayout.showCode ? 6 : 12"
+               :class="{ 'readonly': disabled || aiModeState === CustomChartAIState.Generating }"
+               v-if="displayLayout.showChart">
             <div class="w-100 custom-chart-container">
                 <div class="w-100 h-100 d-flex align-center justify-content-center" v-if="executionError">
                     <v-alert class="mb-3" density="compact" type="error" variant="tonal" :text="executionError" />
@@ -25,7 +53,9 @@
                          v-if="!executionError && chartOptions" />
             </div>
         </v-col>
-        <v-col cols="12" :md="displayLayout.showCode ? 6 : 12" v-else-if="displayLayout.showChartData">
+        <v-col cols="12" :md="displayLayout.showCode ? 6 : 12"
+               :class="{ 'readonly': disabled || aiModeState === CustomChartAIState.Generating }"
+               v-else-if="displayLayout.showChartData">
             <div class="title-and-toolbar d-flex align-center w-100 mb-1">
                 <span class="text-body-large">{{ tt('Chart Data') }}</span>
             </div>
@@ -50,6 +80,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
+import { useExplorersStore } from '@/stores/explorer.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { itemAndIndex } from '@/core/base.ts';
@@ -61,10 +92,14 @@ import type { TransactionExplorerQuery } from '@/models/explorer.ts';
 
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTimeWithTimezoneOffset } from '@/lib/datetime.ts';
+import { generateRandomUUID } from '@/lib/misc.ts';
 import logger from '@/lib/logger.ts';
 
 import {
-    mdiPlay
+    mdiPlay,
+    mdiCheck,
+    mdiStop,
+    mdiClose
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -80,6 +115,12 @@ type SandboxResponse = {
     knownError?: string;
     error?: string;
 };
+
+enum CustomChartAIState {
+    Idle = 'idle',
+    Prompting = 'prompting',
+    Generating = 'generating'
+}
 
 interface CustomChartTransaction {
     id: string;
@@ -131,6 +172,7 @@ const {
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
+const explorersStore = useExplorersStore();
 const exchangeRatesStore = useExchangeRatesStore();
 
 const sandboxMessageSignature: string = '#ezBookkeeping-sandbox-message#';
@@ -180,6 +222,9 @@ const customScript = ref<string>('');
 const chartOptions = ref<Record<string, unknown>>({});
 const executingScript = ref<boolean>(false);
 const executionError = ref<string>('');
+const aiModeState = ref<CustomChartAIState>(CustomChartAIState.Idle);
+const userPrompt = ref<string>('');
+const cancelAIGeneratingUuid = ref<string | undefined>(undefined);
 
 const displayLayout = computed<TransactionExplorerCustomChartDisplayLayout>(() => TransactionExplorerCustomChartDisplayLayout.valueOf(props.displayLayout) ?? TransactionExplorerCustomChartDisplayLayout.Default);
 
@@ -540,6 +585,14 @@ const customChartTransactions = computed<CustomChartTransaction[]>(() => {
     });
 });
 
+function isInAIMode(): boolean {
+    return aiModeState.value !== CustomChartAIState.Idle;
+}
+
+function isAIGenerating(): boolean {
+    return aiModeState.value === CustomChartAIState.Generating;
+}
+
 function reloadSandbox(executeAfterLoaded: boolean): void {
     sandboxLoaded.value = false;
 
@@ -571,6 +624,73 @@ function executeCustomScript(): void {
     };
 
     sandbox.value?.contentWindow?.postMessage(JSON.stringify(sandboxRequest), '*');
+}
+
+function switchToAIChartMode(): void {
+    if (props.disabled || aiModeState.value !== CustomChartAIState.Idle) {
+        return;
+    }
+
+    userPrompt.value = '';
+    aiModeState.value = CustomChartAIState.Prompting;
+}
+
+function generateAICode(): void {
+    if (props.disabled || aiModeState.value !== CustomChartAIState.Prompting || !userPrompt.value) {
+        return;
+    }
+
+    const prompt = userPrompt.value.trim();
+
+    if (!prompt) {
+        return;
+    }
+
+    cancelAIGeneratingUuid.value = generateRandomUUID();
+    aiModeState.value = CustomChartAIState.Generating;
+
+    explorersStore.generateCustomChartCode({
+        userPrompt: prompt,
+        currentCode: customScript.value,
+        cancelableUuid: cancelAIGeneratingUuid.value
+    }).then(response => {
+        aiModeState.value = CustomChartAIState.Idle;
+        cancelAIGeneratingUuid.value = undefined;
+
+        if (response.code) {
+            customScript.value = response.code;
+            reloadSandbox(true);
+        }
+    }).catch(error => {
+        if (error.canceled) {
+            return;
+        }
+
+        aiModeState.value = CustomChartAIState.Prompting;
+        cancelAIGeneratingUuid.value = undefined;
+
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function cancelAIGeneration(): void {
+    if (!cancelAIGeneratingUuid.value) {
+        return;
+    }
+
+    explorersStore.cancelGenerateCustomChartCode(cancelAIGeneratingUuid.value);
+    aiModeState.value = CustomChartAIState.Prompting;
+    cancelAIGeneratingUuid.value = undefined;
+
+    snackbar.value?.showMessage('User Canceled');
+}
+
+function exitAIMode(): void {
+    if (aiModeState.value == CustomChartAIState.Prompting) {
+        aiModeState.value = CustomChartAIState.Idle;
+    }
 }
 
 function onMessage(event: MessageEvent<SandboxResponse>): void {
@@ -632,6 +752,12 @@ watch(() => props.modelValue, value => {
         customScript.value = value;
         reloadSandbox(true);
     }
+});
+
+defineExpose({
+    isInAIMode,
+    isAIGenerating,
+    switchToAIChartMode
 });
 </script>
 

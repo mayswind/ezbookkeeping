@@ -220,6 +220,18 @@
     }
 }
 
+.v-btn.v-btn--loading {
+    .v-btn__loader {
+        .v-progress-circular.loading-icon-before-text {
+            margin-inline-start: -2px;
+
+            + span {
+                margin-inline-start: 5px;
+            }
+        }
+    }
+}
+
 .v-btn-toggle {
     .v-btn {
         .right-bottom-icon {

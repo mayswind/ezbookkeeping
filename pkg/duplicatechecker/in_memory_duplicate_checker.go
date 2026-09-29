@@ -47,6 +47,22 @@ func (c *InMemoryDuplicateChecker) SetSubmissionRemarkWithCustomExpiration(check
 	c.cache.Set(c.getCacheKey(checkerType, uid, identification), remark, expiration)
 }
 
+// GetOrSetSubmissionRemarkWithCustomExpiration returns the remark when the same submission has been processed or saves the identification and remark to in-memory cache with custom expiration time
+func (c *InMemoryDuplicateChecker) GetOrSetSubmissionRemarkWithCustomExpiration(checkerType DuplicateCheckerType, uid int64, identification string, remark string, expiration time.Duration) (bool, string) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	existedRemark, found := c.cache.Get(c.getCacheKey(checkerType, uid, identification))
+
+	if found {
+		return true, existedRemark.(string)
+	}
+
+	c.cache.Set(c.getCacheKey(checkerType, uid, identification), remark, expiration)
+
+	return false, ""
+}
+
 // RemoveSubmissionRemark removes the identification and remark in in-memory cache
 func (c *InMemoryDuplicateChecker) RemoveSubmissionRemark(checkerType DuplicateCheckerType, uid int64, identification string) {
 	c.cache.Delete(c.getCacheKey(checkerType, uid, identification))

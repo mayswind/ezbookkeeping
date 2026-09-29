@@ -109,6 +109,11 @@ func (s *TwoFactorAuthorizationService) ValidateTwoFactorPasscode(c core.Context
 	return ret
 }
 
+// GetTwoFactorPasscodeExpirationDuration returns the expiration duration of 2fa passcode
+func (s *TwoFactorAuthorizationService) GetTwoFactorPasscodeExpirationDuration() time.Duration {
+	return time.Duration(twoFactorPeriod) * time.Second
+}
+
 // CreateTwoFactorSetting saves a new 2fa setting to database
 func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(c core.Context, twoFactor *models.TwoFactor) error {
 	if twoFactor.Uid <= 0 {

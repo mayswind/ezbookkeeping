@@ -196,12 +196,6 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 		return nil, errs.Or(err, errs.ErrSystemError)
 	}
 
-	passcodeUsed, passcodeHash := a.is2FAPasscodeUsed(c, uid, credential.Passcode)
-
-	if passcodeUsed {
-		return nil, errs.ErrPasscodeInvalid
-	}
-
 	if !a.twoFactorAuthorizations.ValidateTwoFactorPasscode(c, credential.Passcode, twoFactorSetting.Secret) {
 		log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
 
@@ -215,7 +209,18 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 		return nil, errs.ErrPasscodeInvalid
 	}
 
-	a.update2FAPasscodeUsed(c, uid, passcodeHash)
+	passcodeUsed := a.update2FAPasscodeUsed(c, uid, credential.Passcode)
+
+	if passcodeUsed {
+		err = a.CheckAndIncreaseFailureCount(c, uid)
+
+		if err != nil {
+			log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] cannot auth for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+		}
+
+		return nil, errs.ErrPasscodeInvalid
+	}
 
 	user, err := a.users.GetUserById(c, uid)
 
@@ -449,12 +454,6 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 					return nil, errs.ErrPasscodeEmpty
 				}
 
-				passcodeUsed, passcodeHash := a.is2FAPasscodeUsed(c, uid, credential.Passcode)
-
-				if passcodeUsed {
-					return nil, errs.ErrPasscodeInvalid
-				}
-
 				if !a.twoFactorAuthorizations.ValidateTwoFactorPasscode(c, credential.Passcode, twoFactorSetting.Secret) {
 					log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] passcode is invalid for user \"uid:%d\"", uid)
 
@@ -468,7 +467,18 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 					return nil, errs.ErrPasscodeInvalid
 				}
 
-				a.update2FAPasscodeUsed(c, uid, passcodeHash)
+				passcodeUsed := a.update2FAPasscodeUsed(c, uid, credential.Passcode)
+
+				if passcodeUsed {
+					err = a.CheckAndIncreaseFailureCount(c, uid)
+
+					if err != nil {
+						log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] cannot auth for user \"uid:%d\", because %s", uid, err.Error())
+						return nil, errs.Or(err, errs.ErrFailureCountLimitReached)
+					}
+
+					return nil, errs.ErrPasscodeInvalid
+				}
 			}
 		}
 
@@ -566,18 +576,13 @@ func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, ne
 	}
 }
 
-func (a *AuthorizationsApi) is2FAPasscodeUsed(c *core.WebContext, uid int64, passcode string) (bool, string) {
+func (a *AuthorizationsApi) update2FAPasscodeUsed(c *core.WebContext, uid int64, passcode string) bool {
 	passcodeHash := utils.MD5EncodeToStringWithUidAndSalt([]byte(passcode), uid, a.CurrentConfig().SecretKey)
-	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_2FA_PASSCODE, uid, passcodeHash)
+	found, remark := a.GetOrSetSubmissionRemarkWithCustomExpiration(duplicatechecker.DUPLICATE_CHECKER_TYPE_2FA_PASSCODE, uid, passcodeHash, utils.Int64ToString(time.Now().Unix()), a.twoFactorAuthorizations.GetTwoFactorPasscodeExpirationDuration())
 
 	if found {
-		log.Warnf(c, "[authorizations.is2FAPasscodeUsed] passcode \"%s\" has been used for user \"uid:%d\" in unix timestamp %s", passcode, uid, remark)
-		return true, passcodeHash
+		log.Warnf(c, "[authorizations.update2FAPasscodeUsed] passcode \"%s\" has been used for user \"uid:%d\" in unix timestamp %s", passcode, uid, remark)
 	}
 
-	return false, passcodeHash
-}
-
-func (a *AuthorizationsApi) update2FAPasscodeUsed(c *core.WebContext, uid int64, passcodeHash string) {
-	a.SetSubmissionRemarkWithCustomExpiration(duplicatechecker.DUPLICATE_CHECKER_TYPE_2FA_PASSCODE, uid, passcodeHash, utils.Int64ToString(time.Now().Unix()), 30*time.Second)
+	return found
 }

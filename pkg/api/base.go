@@ -119,6 +119,11 @@ func (a *ApiUsingDuplicateChecker) SetSubmissionRemarkWithCustomExpiration(check
 	a.container.SetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
 }
 
+// GetOrSetSubmissionRemarkWithCustomExpiration returns the remark when the same submission has been processed or saves the identification and remark by the current duplicate checker with custom expiration time
+func (a *ApiUsingDuplicateChecker) GetOrSetSubmissionRemarkWithCustomExpiration(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string, expiration time.Duration) (bool, string) {
+	return a.container.GetOrSetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
+}
+
 // SetSubmissionRemarkIfEnable saves the identification and remark by the current duplicate checker if the duplicate submission check is enabled
 func (a *ApiUsingDuplicateChecker) SetSubmissionRemarkIfEnable(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string) {
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {

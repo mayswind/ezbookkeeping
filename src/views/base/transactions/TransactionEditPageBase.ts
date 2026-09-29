@@ -118,7 +118,6 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
     const defaultAccountId = computed<string>(() => userStore.currentUserDefaultAccountId);
     const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
-    const coordinateDisplayType = computed<number>(() => userStore.currentUserCoordinateDisplayType);
     const imageUploadQualityType = computed<ImageUploadQualityType>(() => ImageUploadQualityType.valueOf(settingsStore.appSettings.transactionPictureQuality) ?? ImageUploadQualityType.Default);
 
     const allTimezones = computed<LocalizedTimezoneInfo[]>(() => {
@@ -575,7 +574,6 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         defaultCurrency,
         defaultAccountId,
         firstDayOfWeek,
-        coordinateDisplayType,
         imageUploadQualityType,
         allTimezones,
         allAccounts,

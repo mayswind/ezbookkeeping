@@ -1,4 +1,5 @@
 import type { TypeAndName } from '@/core/base.ts';
+import type { NumberFormatOptions } from '@/core/numeral.ts';
 
 export interface Coordinate {
     latitude: number;
@@ -19,6 +20,12 @@ export enum CoordinateDisplayFormat {
 export enum CoordinateDirectionFormat {
     Signed = 0,
     Directional = 1
+}
+
+
+export interface CoordinateFormatOptions {
+    coordinateDisplayType: CoordinateDisplayType;
+    numberFormatOptions: NumberFormatOptions;
 }
 
 export class CoordinateDisplayType implements TypeAndName {

@@ -109,6 +109,8 @@ import {
 } from '@/core/fiscalyear.ts';
 
 import {
+    type Coordinate,
+    type CoordinateFormatOptions,
     CoordinateDisplayType
 } from '@/core/coordinate.ts';
 
@@ -269,6 +271,10 @@ import {
     appendCurrencySymbol,
     getAmountPrependAndAppendCurrencySymbol
 } from '@/lib/currency.ts';
+
+import {
+    formatCoordinate
+} from '@/lib/coordinate.ts';
 
 import {
     getCategorizedAccountsMap,
@@ -2474,6 +2480,24 @@ export function useI18n() {
         return pageOptions;
     }
 
+    function getFormattedCoordinate(value: Coordinate, coordinateDisplayType?: CoordinateDisplayType): string {
+        if (!coordinateDisplayType) {
+            coordinateDisplayType = CoordinateDisplayType.valueOf(userStore.currentUserCoordinateDisplayType) ?? CoordinateDisplayType.Default;
+        }
+
+        const numberFormatOptions = getNumberFormatOptions({
+            digitGrouping: DigitGroupingType.None,
+            numeralSystem: NumeralSystem.WesternArabicNumerals
+        });
+
+        const options: CoordinateFormatOptions = {
+            coordinateDisplayType: coordinateDisplayType,
+            numberFormatOptions: numberFormatOptions
+        };
+
+        return formatCoordinate(value, options);
+    }
+
     function getLocalizedFileEncodingName(encoding: string): string {
         return t(`encoding.${encoding}`);
     }
@@ -2813,6 +2837,7 @@ export function useI18n() {
         getCategorizedAccountsWithDisplayBalance,
         getTablePageOptions,
         // other format functions
+        formatCoordinate: (value: Coordinate) => getFormattedCoordinate(value),
         getLocalizedFileEncodingName,
         getLocalizedOAuth2ProviderName,
         getLocalizedOAuth2LoginText,

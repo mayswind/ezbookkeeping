@@ -247,7 +247,7 @@
                 </div>
             </template>
             <template #item.geoLocation="{ item }">
-                <span v-if="item.geoLocation">{{ `(${formatCoordinate(item.geoLocation, coordinateDisplayType)})` }}</span>
+                <span v-if="item.geoLocation">{{ `(${formatCoordinate(item.geoLocation)})` }}</span>
                 <span v-else-if="!item.geoLocation">{{ tt('None') }}</span>
             </template>
             <template #item.tagIds="{ item }">
@@ -466,7 +466,6 @@ import {
     parseDateTimeFromUnixTime,
     parseDateTimeFromUnixTimeWithTimezoneOffset
 } from '@/lib/datetime.ts';
-import { formatCoordinate } from '@/lib/coordinate.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { getAccountMapByName } from '@/lib/account.ts';
 import {
@@ -544,7 +543,8 @@ const {
     formatNumberToLocalizedNumerals,
     formatNumberToWesternArabicNumeralsWithoutDigitGrouping,
     getCategorizedAccountsWithDisplayBalance,
-    getTablePageOptions
+    getTablePageOptions,
+    formatCoordinate
 } = useI18n();
 
 const { allTagsWithGroupHeader } = useTransactionTagSelectionBase({ modelValue: [] }, false);
@@ -589,7 +589,6 @@ const customAccountCategoryOrder = computed<string>(() => settingsStore.appSetti
 
 const useCommaDecimalSeparator = computed<boolean>(() => getCurrentDecimalSeparator() === DecimalSeparator.Comma.symbol);
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
-const coordinateDisplayType = computed<number>(() => userStore.currentUserCoordinateDisplayType);
 
 const allAccounts = computed<Account[]>(() => accountsStore.allPlainAccounts);
 const allVisibleAccounts = computed<Account[]>(() => accountsStore.allVisiblePlainAccounts);

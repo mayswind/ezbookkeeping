@@ -7,7 +7,7 @@
                        @click="executeCustomScript"
                        v-if="aiModeState === CustomChartAIState.Idle">
                     <template #loader>
-                        <v-progress-circular indeterminate size="18" class="me-1"/>
+                        <v-progress-circular indeterminate size="15" width="2" class="loading-icon-before-text" />
                         <span>{{ tt('Execute Custom Script') }}</span>
                     </template>
                     <span>{{ tt('Execute Custom Script') }}</span>

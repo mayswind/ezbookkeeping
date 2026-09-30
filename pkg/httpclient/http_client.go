@@ -45,14 +45,29 @@ func (t *defaultTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 }
 
 // NewHttpClient creates and returns a new http client with specified settings
-func NewHttpClient(requestTimeout uint32, proxy string, skipTLSVerify bool, defaultUserAgent string, enableHttpResponseLog bool) *http.Client {
+func NewHttpClient(requestTimeout uint32, proxy string, skipTLSVerify bool, defaultUserAgent string, enableHttpResponseLog bool, additionTLSCipherSuites []uint16) *http.Client {
 	baseTransport := http.DefaultTransport.(*http.Transport).Clone()
 	SetProxyUrl(baseTransport, proxy)
 
-	if skipTLSVerify {
-		baseTransport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
+	if skipTLSVerify || len(additionTLSCipherSuites) > 0 {
+		tlsClientConfig := &tls.Config{}
+
+		if skipTLSVerify {
+			tlsClientConfig.InsecureSkipVerify = true
 		}
+
+		if len(additionTLSCipherSuites) > 0 {
+			var tlsCipherSuites []uint16
+
+			for _, cipherSuite := range tls.CipherSuites() {
+				tlsCipherSuites = append(tlsCipherSuites, cipherSuite.ID)
+			}
+
+			tlsCipherSuites = append(tlsCipherSuites, additionTLSCipherSuites...)
+			tlsClientConfig.CipherSuites = tlsCipherSuites
+		}
+
+		baseTransport.TLSClientConfig = tlsClientConfig
 	}
 
 	return &http.Client{

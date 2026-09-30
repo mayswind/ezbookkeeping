@@ -168,6 +168,22 @@ func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfKazakhstan(t *t
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }
 
+func TestExchangeRatesApiLatestExchangeRateHandler_CentralBankOfMalaysiaDataSource(t *testing.T) {
+	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.CentralBankOfMalaysiaDataSource)
+
+	if exchangeRateResponse == nil {
+		return
+	}
+
+	assert.Equal(t, "MYR", exchangeRateResponse.BaseCurrency)
+
+	supportedCurrencyCodes := []string{"AED", "AUD", "BND", "CAD", "CHF", "CNY", "EGP", "EUR", "GBP",
+		"HKD", "IDR", "INR", "JPY", "KHR", "KRW", "MMK", "NPR", "NZD", "PHP", "PKR", "SAR", "SGD",
+		"THB", "TWD", "USD", "VND"}
+
+	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
+}
+
 func TestExchangeRatesApiLatestExchangeRateHandler_CentralBankOfMyanmarDataSource(t *testing.T) {
 	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.CentralBankOfMyanmarDataSource)
 

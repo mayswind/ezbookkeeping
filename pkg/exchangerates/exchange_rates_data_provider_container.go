@@ -1,6 +1,8 @@
 package exchangerates
 
 import (
+	"crypto/tls"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -45,6 +47,9 @@ func InitializeExchangeRatesDataSource(config *settings.Config) error {
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.NationalBankOfKazakhstanDataSource {
 		Container.current = newCommonHttpExchangeRatesDataProvider(config, &NationalBankOfKazakhstanDataSource{})
+		return nil
+	} else if config.ExchangeRatesDataSource == settings.CentralBankOfMalaysiaDataSource {
+		Container.current = newCommonHttpExchangeRatesDataProvider(config, &CentralBankOfMalaysiaDataSource{}, tls.TLS_RSA_WITH_AES_128_GCM_SHA256)
 		return nil
 	} else if config.ExchangeRatesDataSource == settings.CentralBankOfMyanmarDataSource {
 		Container.current = newCommonHttpExchangeRatesDataProvider(config, &CentralBankOfMyanmarDataSource{})

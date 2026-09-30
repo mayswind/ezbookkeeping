@@ -26,7 +26,7 @@ func NewWebDAVObjectStorage(config *settings.Config, pathPrefix string) (*WebDAV
 	webDavConfig := config.WebDAVConfig
 
 	storage := &WebDAVObjectStorage{
-		httpClient:   httpclient.NewHttpClient(webDavConfig.RequestTimeout, webDavConfig.Proxy, webDavConfig.SkipTLSVerify, core.GetOutgoingUserAgent(), false),
+		httpClient:   httpclient.NewHttpClient(webDavConfig.RequestTimeout, webDavConfig.Proxy, webDavConfig.SkipTLSVerify, core.GetOutgoingUserAgent(), false, []uint16{}),
 		webDavConfig: webDavConfig,
 		rootPath:     webDavConfig.RootPath,
 	}

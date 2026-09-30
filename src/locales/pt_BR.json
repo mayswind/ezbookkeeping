@@ -30,7 +30,7 @@
     },
     "default": {
         "currency": "BRL",
-        "firstDayOfWeek": "Monday",
+        "firstDayOfWeek": "Sunday",
         "fiscalYearFormat": "EndYYYY",
         "calendarDisplayType": "Gregorian",
         "dateDisplayType": "Gregorian",

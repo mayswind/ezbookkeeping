@@ -48,10 +48,12 @@ type CodingAssistantRequest struct {
 
 // CodingAssistantResponse represents a response from the coding assistant
 type CodingAssistantResponse struct {
-	Code string `json:"code"`
+	Code          string `json:"code"`
+	FailureReason string `json:"failureReason,omitempty"`
 }
 
 // CodingAssistantResult represents the result of code generation
 type CodingAssistantResult struct {
-	Code string `json:"code" jsonschema_description:"Complete executable source code"`
+	Code          string `json:"code" jsonschema_description:"Complete executable source code, or empty when the task cannot be completed"`
+	FailureReason string `json:"failureReason" jsonschema_description:"Reason the task cannot be completed, or empty on success"`
 }

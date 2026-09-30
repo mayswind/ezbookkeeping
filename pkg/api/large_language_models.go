@@ -379,14 +379,16 @@ func (a *LargeLanguageModelsApi) GenerateCodeHandler(c *core.WebContext) (any, *
 	}
 
 	code := strings.TrimSpace(result.Code)
+	failureReason := strings.TrimSpace(result.FailureReason)
 
-	if len(code) == 0 {
-		log.Warnf(c, "[large_language_models.GenerateCodeHandler] the code in coding response is empty for user \"uid:%d\"", uid)
+	if (len(code) == 0 && len(failureReason) == 0) || (len(code) > 0 && len(failureReason) > 0) {
+		log.Warnf(c, "[large_language_models.GenerateCodeHandler] the response of coding assistant is invalid for user \"uid:%d\"", uid)
 		return nil, errs.ErrNoAICodingResult
 	}
 
 	return &models.CodingAssistantResponse{
-		Code: code,
+		Code:          code,
+		FailureReason: failureReason,
 	}, nil
 }
 

@@ -1,5 +1,6 @@
 export type ComponentDensity = 'default' | 'comfortable' | 'compact';
 export type InputVariant = 'filled' | 'underlined' | 'outlined' | 'plain' | 'solo' | 'solo-inverted' | 'solo-filled';
+export type SnackBarVariant = 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain';
 
 export function getOuterHeight(element: HTMLElement | null): number {
     if (!element) {

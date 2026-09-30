@@ -68,6 +68,7 @@
 
     <iframe id="sandbox" ref="sandbox" sandbox="allow-scripts" style="display: none;"></iframe>
     <snack-bar ref="snackbar" />
+    <snack-bar ref="snackbarForFailureReason" not-auto-hide color="warning" variant="outlined" location="top center" />
 </template>
 
 <script setup lang="ts">
@@ -216,6 +217,7 @@ window.addEventListener('message', function (event) {
 
 const sandbox = useTemplateRef<HTMLIFrameElement>('sandbox');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const snackbarForFailureReason = useTemplateRef<SnackBarType>('snackbarForFailureReason');
 
 const sandboxLoaded = ref<boolean>(false);
 const customScript = ref<string>('');
@@ -660,6 +662,8 @@ function generateAICode(): void {
         if (response.code) {
             customScript.value = response.code;
             reloadSandbox(true);
+        } else if (response.failureReason) {
+            snackbarForFailureReason.value?.showError(response.failureReason);
         }
     }).catch(error => {
         if (error.canceled) {

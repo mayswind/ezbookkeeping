@@ -441,7 +441,7 @@
         box-shadow: var(--ebk-shadow-lg) !important;
     }
 
-    .v-snackbar__wrapper:not([class^="bg-"]):not([class*=" bg-"]) {
+    .v-snackbar__wrapper:not(.v-snackbar--variant-outlined):not([class^="bg-"]):not([class*=" bg-"]) {
         background-color: rgba(var(--v-tooltip-background));
 
         .v-snackbar__content {

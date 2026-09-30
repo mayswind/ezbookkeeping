@@ -22,4 +22,5 @@ export interface CodingAssistantRequest {
 
 export interface CodingAssistantResponse {
     readonly code: string;
+    readonly failureReason?: string;
 }

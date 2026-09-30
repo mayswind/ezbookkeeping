@@ -1,20 +1,30 @@
 <template>
-    <v-snackbar v-model="showState">
+    <v-snackbar :color="color" :variant="variant" :location="location"
+                :timeout="notAutoHide ? -1 : undefined" v-model="showState">
         {{ messageContent }}
 
         <template #actions>
-            <v-btn color="primary" variant="text" @click="showState = false">{{ tt('Close') }}</v-btn>
+            <v-btn variant="text" :color="color ?? 'primary'" @click="showState = false">{{ tt('Close') }}</v-btn>
         </template>
     </v-snackbar>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import type { Anchor } from 'vuetify/lib/util/anchor.d.ts';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import type { ErrorResponse } from '@/core/api.ts';
 import { isObject, isString } from '@/lib/common.ts';
+import type { SnackBarVariant } from '@/lib/ui/desktop.ts';
+
+defineProps<{
+    notAutoHide?: boolean;
+    color?: string;
+    variant?: SnackBarVariant;
+    location?: Anchor;
+}>();
 
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;

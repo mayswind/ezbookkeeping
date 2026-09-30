@@ -1218,6 +1218,14 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
         },
         unit: 'Dollar'
     },
+    'XCG': { // Caribbean Guilder
+        code: 'XCG',
+        fraction: 2,
+        symbol: {
+            normal: 'Cg'
+        },
+        unit: 'Guilder'
+    },
     'XOF': { // CFA Franc BCEAO
         code: 'XOF',
         fraction: 0,

@@ -160,6 +160,7 @@ var AllCurrencyNames = map[string]bool{
 	"WST": true, //Tala
 	"XAF": true, //CFA Franc BEAC
 	"XCD": true, //East Caribbean Dollar
+	"XCG": true, //Caribbean Guilder
 	"XOF": true, //CFA Franc BCEAO
 	"XPF": true, //CFP Franc
 	"XSU": true, //Sucre

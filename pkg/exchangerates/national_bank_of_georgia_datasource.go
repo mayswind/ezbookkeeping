@@ -134,7 +134,7 @@ func (e *NationalBankOfGeorgiaDataSource) Parse(c core.Context, content []byte) 
 	}
 
 	if nationalBankOfGeorgiaData == nil || len(*nationalBankOfGeorgiaData) < 1 {
-		log.Errorf(c, "[national_bank_of_georgia_datasource.ToLatestExchangeRateResponse] all exchange rates is empty")
+		log.Errorf(c, "[national_bank_of_georgia_datasource.Parse] all exchange rates is empty")
 		return nil, errs.ErrFailedToRequestRemoteApi
 	}
 

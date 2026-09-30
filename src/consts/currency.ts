@@ -2,6 +2,7 @@ import type { CurrencyInfo } from '@/core/currency.ts';
 
 // ISO 4217
 // Reference: https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
+// Reference: https://github.com/unicode-org/cldr/blob/main/common/supplemental/supplementalData.xml
 export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     'AED': { // UAE Dirham
         code: 'AED',
@@ -14,7 +15,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'AFN': { // Afghani
         code: 'AFN',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'Af.',
             plural: 'Afs.'
@@ -23,7 +24,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'ALL': { // Lek
         code: 'ALL',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'L'
         },
@@ -248,7 +249,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'COP': { // Colombian Peso
         code: 'COP',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: '$'
         },
@@ -464,7 +465,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'HUF': { // Forint
         code: 'HUF',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'Ft'
         },
@@ -472,7 +473,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'IDR': { // Rupiah
         code: 'IDR',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'Rp'
         },
@@ -496,7 +497,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'IQD': { // Iraqi Dinar
         code: 'IQD',
-        fraction: 3,
+        fraction: 0,
         symbol: {
             normal: 'ID'
         },
@@ -504,7 +505,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'IRR': { // Iranian Rial
         code: 'IRR',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'Rl',
             plural: 'Rls'
@@ -577,7 +578,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'KPW': { // North Korean Won
         code: 'KPW',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: '₩'
         },
@@ -617,7 +618,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'LAK': { // Lao Kip
         code: 'LAK',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: '₭'
         },
@@ -625,7 +626,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'LBP': { // Lebanese Pound
         code: 'LBP',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'LL'
         },
@@ -682,7 +683,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'MGA': { // Malagasy Ariary
         code: 'MGA',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'Ar'
         },
@@ -698,7 +699,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'MMK': { // Kyat
         code: 'MMK',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'K',
             plural: 'Ks.'
@@ -998,7 +999,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'SOS': { // Somali Shilling
         code: 'SOS',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'Sh.So.'
         },
@@ -1038,7 +1039,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'SYP': { // Syrian Pound
         code: 'SYP',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'LS'
         },
@@ -1242,7 +1243,7 @@ export const ALL_CURRENCIES: Record<string, CurrencyInfo> = {
     },
     'YER': { // Yemeni Rial
         code: 'YER',
-        fraction: 2,
+        fraction: 0,
         symbol: {
             normal: 'YRl',
             plural: 'YRls'

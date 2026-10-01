@@ -737,6 +737,12 @@ init();
     vertical-align: middle;
 }
 
+.v-theme--dark {
+    .user-profile-avatar-icon:hover .avatar-edit-icon {
+        background-color: rgba(64, 64, 64, 0.6);
+    }
+}
+
 .user-profile-avatar-icon-modifiable:hover .user-profile-avatar-placeholder {
     display: none;
 }

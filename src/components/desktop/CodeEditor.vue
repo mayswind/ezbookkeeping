@@ -1,5 +1,5 @@
 <template>
-    <div class="code-editor w-100 h-100"
+    <div class="code-editor w-100 h-100" dir="ltr"
          :class="{ 'code-editor-readonly': readonly, 'code-editor-rounded': !!rounded }">
         <v-textarea
             no-resize

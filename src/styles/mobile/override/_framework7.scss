@@ -38,6 +38,12 @@ i.icon.la, i.icon.las, i.icon.lab {
     padding: 0 6px;
 }
 
+.ios .dark .toolbar-bottom,
+.ios.dark .toolbar-bottom {
+    /** the original framework7's dark bars background is translucent, including the safe area. **/
+    --f7-toolbar-bg-color: var(--f7-page-bg-color);
+}
+
 .chip.chip-placeholder {
     border: 0;
 }

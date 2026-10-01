@@ -151,7 +151,7 @@
 }
 
 .v-table {
-    border-radius: var(--ebk-radius-md);
+    border-radius: 0;
     color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
 
     th {

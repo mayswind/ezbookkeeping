@@ -217,7 +217,7 @@
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.42/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.43/LICENSE"
     },
     {
         "name": "Pinia",
@@ -238,14 +238,14 @@
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.4.10/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.4.12/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v4.2.1/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v4.2.3/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -259,14 +259,14 @@
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.1.3/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.2.0/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.1.3/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.2.0/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -308,14 +308,14 @@
         "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
         "url": "https://github.com/ecomfe/vue-echarts",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.3.0/LICENSE"
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.3.1/LICENSE"
     },
     {
         "name": "Monaco Editor",
         "copyright": "Copyright (c) 2016 - present Microsoft Corporation",
         "url": "https://microsoft.github.io/monaco-editor/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/microsoft/monaco-editor/blob/v0.56.0/LICENSE.txt"
+        "licenseUrl": "https://github.com/microsoft/monaco-editor/blob/v0.57.0/LICENSE.txt"
     },
     {
         "name": "@vuepic/vue-datepicker",
@@ -343,14 +343,14 @@
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/moment/moment/blob/2.30.1/LICENSE"
+        "licenseUrl": "https://github.com/moment/moment/blob/2.31.0/LICENSE"
     },
     {
         "name": "Moment Timezone",
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.6.3/LICENSE"
+        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.6.4/LICENSE"
     },
     {
         "name": "Leaflet",

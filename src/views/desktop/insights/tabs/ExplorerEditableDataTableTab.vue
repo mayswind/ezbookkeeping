@@ -16,7 +16,7 @@
                     />
                     <v-select
                         class="flex-0-0"
-                        min-width="150"
+                        min-width="200"
                         item-title="name"
                         item-value="value"
                         density="compact"

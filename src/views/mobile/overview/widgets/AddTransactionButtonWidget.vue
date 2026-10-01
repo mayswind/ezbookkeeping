@@ -1,14 +1,15 @@
 <template>
     <f7-segmented round class="add-transaction-button-group margin-horizontal" v-if="hasTransactionAddMenuItems">
-        <f7-button round large fill icon-f7="plus" :text="tt('Add Transaction')"
+        <f7-button round large fill icon-f7="plus" :text="tt('Add Transaction')" :style="buttonStyle"
                    @click="emit('navigate', MobileOverviewWidgetNavigationType.Url, '/transaction/add')" />
         <f7-button round large fill class="add-transaction-menu-button" icon-f7="chevron_down"
+                   :style="buttonStyle"
                    :popover-open="`.add-transaction-button-widget-popover-menu-${widgetId}`"
                    :aria-label="tt('More')"/>
     </f7-segmented>
 
     <f7-segmented round class="add-transaction-button-group margin-horizontal" v-else-if="!hasTransactionAddMenuItems" >
-        <f7-button round large fill icon-f7="plus" :text="tt('Add Transaction')"
+        <f7-button round large fill icon-f7="plus" :text="tt('Add Transaction')" :style="buttonStyle"
                    @click="emit('navigate', MobileOverviewWidgetNavigationType.Url, '/transaction/add')" />
     </f7-segmented>
 
@@ -42,24 +43,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed} from 'vue';
+import { computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
+import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
+import type { ColorValue } from '@/core/color.ts';
 import { TemplateType } from '@/core/template.ts';
 import { MobileOverviewWidgetNavigationType } from '@/core/overview_layout.ts';
 
+import { DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR } from '@/consts/color.ts';
+
 import type { TransactionTemplate } from '@/models/transaction_template.ts';
 
+import { getContrastTextColor } from '@/lib/color.ts';
 import {
     isTransactionFromAITextRecognitionEnabled,
     isTransactionFromAIImageRecognitionEnabled
 } from '@/lib/server_settings.ts';
 
-defineProps<{
+const props = defineProps<{
     widgetId: string;
+    lightBackgroundColor?: ColorValue;
+    darkBackgroundColor?: ColorValue;
 }>();
 
 const emit = defineEmits<{
@@ -68,7 +76,25 @@ const emit = defineEmits<{
 
 const { tt } = useI18n();
 
+const environmentsStore = useEnvironmentsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
+
+const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
+const backgroundColor = computed<ColorValue>(() => isDarkMode.value ?
+    props.darkBackgroundColor ?? DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR :
+    props.lightBackgroundColor ?? DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR);
+
+const buttonStyle = computed<Record<string, string>>((): Record<string, string> => {
+    if (backgroundColor.value === DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR) {
+        return {};
+    }
+
+    return {
+        '--f7-button-fill-bg-color': `#${backgroundColor.value}`,
+        '--f7-button-fill-pressed-bg-color': `color-mix(in srgb, #${backgroundColor.value}, white 20%)`,
+        '--f7-button-fill-text-color': `#${getContrastTextColor(backgroundColor.value)}`
+    };
+});
 
 const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
     const allTemplates = transactionTemplatesStore.allVisibleTemplates;

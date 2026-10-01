@@ -56,6 +56,8 @@
                                  v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
 
     <add-transaction-button-widget :widget-id="widget.id" @navigate="onNavigate"
+                                   :light-background-color="widget.settings['lightBackgroundColor'] as ColorValue"
+                                   :dark-background-color="widget.settings['darkBackgroundColor'] as ColorValue"
                                    v-else-if="widget.type === OverviewWidgetType.AddTransactionButton" />
 </template>
 

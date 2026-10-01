@@ -18,7 +18,8 @@ import {
 
 import {
     DEFAULT_MOBILE_OVERVIEW_WIDGET_DARK_BACKGROUND_COLOR,
-    DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR
+    DEFAULT_MOBILE_OVERVIEW_WIDGET_LIGHT_BACKGROUND_COLOR,
+    DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR
 } from '@/consts/color.ts';
 
 export const DESKTOP_OVERVIEW_LAYOUT_COLUMNS: number = 12;
@@ -1101,8 +1102,13 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
     [OverviewWidgetType.AddTransactionButton]: {
         type: OverviewWidgetType.AddTransactionButton,
         name: 'Add Transaction Button',
-        supportsSettings: [],
-        defaultSettings: {},
+        supportsSettings: [
+            ...WIDGET_BACKGROUND_COLOR_SETTINGS
+        ],
+        defaultSettings: {
+            lightBackgroundColor: DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR,
+            darkBackgroundColor: DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR
+        },
         dataRequirements: []
     }
 };

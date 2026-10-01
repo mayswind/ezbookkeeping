@@ -34,7 +34,7 @@
                 </div>
                 <button class="overview-dashboard-resize-handle" :aria-label="tt('Resize')"
                         @pointerdown="startPointerAction($event, widget, 'resize')">
-                    <v-icon :icon="mdiResizeBottomRight" size="32" />
+                    <v-icon class="icon-with-direction" :icon="mdiResizeBottomRight" size="32" />
                 </button>
             </template>
         </div>

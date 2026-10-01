@@ -232,6 +232,12 @@
     }
 }
 
+html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__content > .v-icon > .v-icon__svg,
+html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__prepend > .v-icon > .v-icon__svg,
+html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__append > .v-icon > .v-icon__svg {
+    transform: scaleX(-1);
+}
+
 .v-btn-toggle {
     .v-btn {
         .right-bottom-icon {
@@ -376,6 +382,10 @@
     * {
         font-size: inherit !important;
     }
+}
+
+html[dir="rtl"] .v-icon.icon-with-direction > .v-icon__svg {
+    transform: scaleX(-1);
 }
 
 .v-avatar {

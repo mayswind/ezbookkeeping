@@ -172,7 +172,7 @@
                     <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId">{{ getTransactionDisplayDestinationAmount(item) }}</span>
                     <v-tooltip activator="parent" v-if="(item.type !== TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency) || (item.type === TransactionType.Transfer && getTransactionSourceAccountCurrency(item) !== defaultCurrency && getTransactionDestinationAccountCurrency(item) !== defaultCurrency)">
                         <span>{{ getTransactionDisplaySourceAmountInDefaultCurrency(item) }}</span>
-                        <v-icon class="ms-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount"></v-icon>
+                        <v-icon class="icon-with-direction mx-1" size="13" :icon="mdiArrowRight" v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount"></v-icon>
                         <span v-if="item.type === TransactionType.Transfer && item.sourceAccountId !== item.destinationAccountId && getTransactionSourceAccountCurrency(item) !== getTransactionDestinationAccountCurrency(item) && item.sourceAmount !== item.destinationAmount">{{ getTransactionDisplayDestinationAmountInDefaultCurrency(item) }}</span>
                     </v-tooltip>
                 </div>

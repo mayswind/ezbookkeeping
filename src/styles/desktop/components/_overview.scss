@@ -87,6 +87,10 @@
     }
 }
 
+html[dir="rtl"] .overview-dashboard-resize-handle {
+    cursor: nesw-resize;
+}
+
 .overview-dashboard-empty {
     display: flex;
     align-items: center;

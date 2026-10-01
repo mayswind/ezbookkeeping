@@ -336,8 +336,17 @@ html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__append > .v-icon > .
 .v-theme--dark {
     .v-btn--variant-elevated,
     .v-btn--variant-flat {
-        &.v-btn--disabled .v-btn__overlay {
-            opacity: 0.35;
+        &.bg-primary:not(.v-btn--disabled):not(.v-btn--loading) {
+            --v-hover-opacity: 0.04;
+        }
+
+        &.v-btn--disabled {
+            opacity: 0.5;
+            filter: saturate(0.6);
+
+            .v-btn__overlay {
+                opacity: 0;
+            }
         }
     }
 }

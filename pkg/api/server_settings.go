@@ -150,6 +150,8 @@ func (a *ServerSettingsApi) ServerSettingsJavascriptHandler(c *core.WebContext) 
 		a.appendIntegerSetting(builder, "errt", int(config.ExchangeRatesRequestTimeout))
 	}
 
+	a.appendBooleanSetting(builder, "dlp", config.EnableLanguagePreview)
+
 	builder.WriteString(ezbookkeepingServerSettingsJavascriptFileFooter)
 
 	return []byte(builder.String()), "", nil

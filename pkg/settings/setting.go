@@ -498,6 +498,9 @@ type Config struct {
 	ExchangeRatesRequestTimeoutExceedDefaultValue bool
 	ExchangeRatesProxy                            string
 	ExchangeRatesSkipTLSVerify                    bool
+
+	// Developer Tools
+	EnableLanguagePreview bool
 }
 
 // LoadConfiguration loads setting config from given config file path
@@ -646,6 +649,12 @@ func LoadConfiguration(configFilePath string) (*Config, error) {
 	}
 
 	err = loadExchangeRatesConfiguration(config, cfgFile, "exchange_rates")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = loadDeveloperTools(config, cfgFile, "developer")
 
 	if err != nil {
 		return nil, err
@@ -1334,6 +1343,12 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 	}
 
 	config.ExchangeRatesSkipTLSVerify = getConfigItemBoolValue(configFile, sectionName, "skip_tls_verify", false)
+
+	return nil
+}
+
+func loadDeveloperTools(config *Config, configFile *ini.File, sectionName string) error {
+	config.EnableLanguagePreview = getConfigItemBoolValue(configFile, sectionName, "enable_language_preview", false)
 
 	return nil
 }

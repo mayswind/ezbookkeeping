@@ -41,6 +41,7 @@ import ApplicationLockPage from '@/views/desktop/settings/ApplicationLockPage.vu
 import StatisticsSettingPage from '@/views/desktop/settings/StatisticsSettingPage.vue';
 import ApplicationCloudSyncSettingsPage from '@/views/desktop/settings/ApplicationCloudSyncSettingsPage.vue';
 import BrowserCacheSettingPage from '@/views/desktop/settings/BrowserCacheSettingPage.vue';
+import DeveloperToolsPage from '@/views/desktop/settings/DeveloperToolsPage.vue';
 
 import ExchangeRatesListPage from '@/views/desktop/exchangerates/ListPage.vue';
 
@@ -241,6 +242,11 @@ const router = createRouter({
                 {
                     path: '/settings/browser_cache',
                     component: BrowserCacheSettingPage,
+                    beforeEnter: checkLogin
+                },
+                {
+                    path: '/settings/developer_tools',
+                    component: DeveloperToolsPage,
                     beforeEnter: checkLogin
                 },
                 {

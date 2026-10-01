@@ -39,7 +39,7 @@ import { DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '@/consts/numera
 
 import { type TransactionMonthlyIncomeAndExpenseData } from '@/models/transaction.ts';
 
-import { BIG_DECIMAL_ZERO } from '@/lib/numeral.ts';
+import { BIG_DECIMAL_ZERO, parseBigDecimal } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import { getExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
@@ -251,6 +251,14 @@ const chartOptions = computed<object>(() => {
                 axisLabel: {
                     show: false
                 },
+                axisPointer: props.chartType === TrendChartType.Area.type ? {
+                    label: {
+                        show: showAmountInHomePage.value,
+                        formatter: (params: CallbackDataParams) => {
+                            return getDisplayAmount(parseBigDecimal(params.value as number).truncate(), false);
+                        }
+                    }
+                } : undefined,
                 splitLine: {
                     show: false
                 }

@@ -45,6 +45,12 @@
                                 <v-icon :icon="mdiFolderOpenOutline" size="20" />
                                 <v-tooltip activator="parent">{{ tt('Load Language Configuration File') }}</v-tooltip>
                             </v-btn>
+                            <v-btn density="compact" color="default" variant="text" class="ms-1"
+                                   :aria-label="tt('Save to File')" :icon="true"
+                                   :disabled="!currentLanguageConfigJson || !currentLanguageConfigJson.trim()" @click="saveLanguageConfigurationFile">
+                                <v-icon :icon="mdiContentSaveOutline" size="20" />
+                                <v-tooltip activator="parent">{{ tt('Save to File') }}</v-tooltip>
+                            </v-btn>
                         </div>
 
                         <code-editor class="w-100 mt-2" style="height: 400px" language="json"
@@ -87,11 +93,12 @@ import { TextDirection } from '@/core/text.ts';
 import { KnownFileType } from '@/core/file.ts';
 
 import { isLanguagePreviewEnabled } from '@/lib/server_settings.ts';
-import { openTextFileContent } from '@/lib/ui/common.ts';
+import { openTextFileContent, startDownloadFile } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
 import {
-    mdiFolderOpenOutline
+    mdiFolderOpenOutline,
+    mdiContentSaveOutline
 } from '@mdi/js';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -130,6 +137,10 @@ function loadLanguageConfigurationFile(): void {
         logger.error('Failed to load language configuration file', error);
         snackbar.value?.showError('Unable to load language configuration file');
     });
+}
+
+function saveLanguageConfigurationFile(): void {
+    startDownloadFile('lang.json', KnownFileType.JSON.createBlob(currentLanguageConfigJson.value));
 }
 
 function applyPreview(): void {

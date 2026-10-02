@@ -17,6 +17,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://api.nbp.pl/en.html
+
 const nationalBankOfPolandDailyExchangeRateUrl = "https://api.nbp.pl/api/exchangerates/tables/A?format=xml"
 const nationalBankOfPolandInconvertibleCurrencyExchangeRateUrl = "https://api.nbp.pl/api/exchangerates/tables/B?format=xml"
 const nationalBankOfPolandExchangeRateReferenceUrl = "https://nbp.pl/en/statistic-and-financial-reporting/rates/"

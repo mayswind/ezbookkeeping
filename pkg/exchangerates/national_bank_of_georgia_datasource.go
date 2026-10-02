@@ -14,6 +14,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://nbg.gov.ge/en/monetary-policy/currency
+
 const nationalBankOfGeorgiaExchangeRateUrl = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json"
 const nationalBankOfGeorgiaExchangeRateReferenceUrl = "https://nbg.gov.ge/en/monetary-policy/currency"
 const nationalBankOfGeorgiaDataSource = "საქართველოს ეროვნული ბანკი"

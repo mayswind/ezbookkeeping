@@ -14,6 +14,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://bank.gov.ua/admin_uploads/article/Instr_API_KURS_VAL_Full_eng.pdf
+
 const nationalBankOfUkraineExchangeRateUrl = "https://bank.gov.ua/NBU_Exchange/exchange?json"
 const nationalBankOfUkraineExchangeRateReferenceUrl = "https://bank.gov.ua/en/markets/exchangerates"
 const nationalBankOfUkraineDataSource = "Національний банк України"

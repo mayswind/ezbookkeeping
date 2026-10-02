@@ -18,6 +18,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://cbr.ru/development/sxml/
+
 const bankOfRussiaExchangeRateUrl = "https://cbr.ru/scripts/XML_daily_eng.asp"
 const bankOfRussiaExchangeRateReferenceUrl = "https://www.cbr.ru/eng/currency_base/daily/"
 const bankOfRussiaDataSource = "Банк России"

@@ -14,6 +14,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://cbu.uz/en/arkhiv-kursov-valyut/veb-masteram/
+
 const centralBankOfUzbekistanExchangeRateUrl = "https://cbu.uz/ru/arkhiv-kursov-valyut/json/"
 const centralBankOfUzbekistanExchangeRateReferenceUrl = "https://cbu.uz/en/arkhiv-kursov-valyut/"
 const centralBankOfUzbekistanDataSource = "O‘zbekiston Respublikasi Markaziy banki"

@@ -14,8 +14,12 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://www.bnm.gov.my/rates-statistics
+// https://apikijangportal.bnm.gov.my/faq
+
 const centralBankOfMalaysiaExchangeRateUrl = "https://api.bnm.gov.my/public/exchange-rate?quote=rm"
-const centralBankOfMalaysiaExchangeRateReferenceUrl = "https://www.bnm.gov.my/rates-statistics"
+const centralBankOfMalaysiaExchangeRateReferenceUrl = "https://www.bnm.gov.my/exchange-rates"
 const centralBankOfMalaysiaDataSource = "Bank Negara Malaysia"
 const centralBankOfMalaysiaBaseCurrency = "MYR"
 

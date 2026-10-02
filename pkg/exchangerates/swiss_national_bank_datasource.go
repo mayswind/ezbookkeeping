@@ -17,6 +17,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// RSS Documentation:
+// https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates
+
 const swissNationalBankExchangeRateUrl = "https://www.snb.ch/public/en/rss/exchangeRates"
 const swissNationalBankExchangeRateReferenceUrl = "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates"
 const swissNationalBankDataSource = "Schweizerische Nationalbank"

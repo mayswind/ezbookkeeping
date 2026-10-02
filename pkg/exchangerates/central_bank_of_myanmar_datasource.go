@@ -14,6 +14,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://forex.cbm.gov.mm/index.php/api
+
 const centralBankOfMyanmarExchangeRateUrl = "https://forex.cbm.gov.mm/api/latest"
 const centralBankOfMyanmarExchangeRateReferenceUrl = "https://forex.cbm.gov.mm/index.php/fxrate"
 const centralBankOfMyanmarDataSource = "မြန်မာနိုင်ငံတော်ဗဟိုဘဏ်"

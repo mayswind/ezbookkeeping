@@ -16,8 +16,13 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://www.bcra.gob.ar/en/central-bank-api-catalog/
+// https://www.bcra.gob.ar/en/api-documentation/?fileName=estadisticascambiarias-v1
+// https://www.bcra.gob.ar/archivos/Catalogo/Content/files/pdf/estadisticascambiarias-v1.pdf
+
 const centralBankOfArgentinaExchangeRateUrl = "https://api.bcra.gob.ar/estadisticascambiarias/v1.0/Cotizaciones"
-const centralBankOfArgentinaExchangeRateReferenceUrl = "https://www.bcra.gob.ar/en/central-bank-api-catalog/"
+const centralBankOfArgentinaExchangeRateReferenceUrl = "https://www.bcra.gob.ar/en/quotes-by-date/"
 const centralBankOfArgentinaDataSource = "Banco Central de la República Argentina"
 const centralBankOfArgentinaBaseCurrency = "ARS"
 

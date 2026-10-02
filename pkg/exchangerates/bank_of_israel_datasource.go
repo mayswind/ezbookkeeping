@@ -17,6 +17,10 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://www.boi.org.il/en/economic-roles/financial-markets/exchange-rates/
+// https://www.boi.org.il/media/tzxbuhhj/extracting-representative-exchange-rates-from-the-new-series-database.pdf
+
 const bankOfIsraelExchangeRateUrl = "https://boi.org.il/PublicApi/GetExchangeRates?asXml=true"
 const bankOfIsraelExchangeRateReferenceUrl = "https://www.boi.org.il/en/economic-roles/financial-markets/exchange-rates/"
 const bankOfIsraelDataSource = "בנק ישראל"

@@ -16,6 +16,10 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// API Documentation:
+// https://www.mnb.hu/en/statistics/statistical-data-and-information/statistical-time-series/exchange-rates
+// https://www.mnb.hu/letoltes/documentation-on-the-mnb-s-web-service-on-current-and-historic-exchange-rates.pdf
+
 const centralBankOfHungaryExchangeRateServiceUrl = "http://www.mnb.hu/arfolyamok.asmx"
 const centralBankOfHungaryExchangeRateServiceCurrentExchangeRatesSoapAction = "http://www.mnb.hu/webservices/MNBArfolyamServiceSoap/GetCurrentExchangeRates"
 const centralBankOfHungaryExchangeRateReferenceUrl = "https://www.mnb.hu/en/arfolyamok"

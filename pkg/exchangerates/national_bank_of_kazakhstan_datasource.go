@@ -14,6 +14,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/validators"
 )
 
+// RSS Documentation:
+// https://nationalbank.kz/kz/page/rss
+
 const nationalBankOfKazakhstanExchangeRateUrl = "https://www.nationalbank.kz/rss/rates_all.xml"
 const nationalBankOfKazakhstanExchangeRateReferenceUrl = "https://nationalbank.kz/en/exchangerates/ezhednevnye-oficialnye-rynochnye-kursy-valyut"
 const nationalBankOfKazakhstanDataSource = "Қазақстан Республикасының Ұлттық Банкі"

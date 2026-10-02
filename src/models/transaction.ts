@@ -806,6 +806,15 @@ export interface TransactionReconciliationStatementResponse {
     readonly closingBalance: string;
 }
 
+export interface TransactionUnreconciledCountItem {
+    readonly accountId: string;
+    readonly count: number;
+}
+
+export interface TransactionUnreconciledCountResponse {
+    readonly items: TransactionUnreconciledCountItem[];
+}
+
 export interface TransactionReconciliationStatementResponseItemWithInfo extends TransactionReconciliationStatementResponseItem {
     readonly sourceAccount?: Account;
     readonly sourceAccountName: string;

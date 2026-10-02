@@ -534,6 +534,52 @@ func (a *TransactionsApi) TransactionReconciliationStatementHandler(c *core.WebC
 	return reconciliationStatementResp, nil
 }
 
+// TransactionUnreconciledTransactionCountsHandler returns unreconciled transaction counts of current user's accounts
+func (a *TransactionsApi) TransactionUnreconciledTransactionCountsHandler(c *core.WebContext) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionUnreconciledTransactionCountsHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	if !user.UseLastReconciledTime {
+		return nil, errs.ErrLastReconciledTimeIsNotEnabled
+	}
+
+	accounts, err := a.accounts.GetAllAccountsByUid(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionUnreconciledTransactionCountsHandler] failed to get all accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	accountLastReconciledTimes := make(map[int64]int64, len(accounts))
+
+	for _, account := range accounts {
+		if account.Extend == nil || account.Extend.LastReconciledTime == nil || *account.Extend.LastReconciledTime <= 0 {
+			continue
+		}
+
+		accountLastReconciledTimes[account.AccountId] = *account.Extend.LastReconciledTime
+	}
+
+	counts, err := a.transactions.GetUnreconciledTransactionCounts(c, uid, accountLastReconciledTimes)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionUnreconciledTransactionCountsHandler] failed to get unreconciled transaction counts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	return &models.TransactionUnreconciledCountResponse{
+		Items: counts,
+	}, nil
+}
+
 // TransactionStatisticsHandler returns transaction statistics of current user
 func (a *TransactionsApi) TransactionStatisticsHandler(c *core.WebContext) (any, *errs.Error) {
 	var statisticReq models.TransactionStatisticRequest

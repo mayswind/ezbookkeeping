@@ -1,4 +1,4 @@
-import { type PartialRecord, entries, keys } from '@/core/base.ts';
+import { type PartialRecord, entries } from '@/core/base.ts';
 import {
     type OverviewWidgetSettingValue,
     type OverviewWidgetSettingItem,
@@ -150,9 +150,8 @@ export function cloneWidget<T extends OverviewWidgetLayoutBase>(widget: T): T {
     return { ...widget, settings };
 }
 
-export function getOverviewDataRequirements(layout: OverviewLayoutBase, definitions: PartialRecord<OverviewWidgetType, OverviewWidgetDefinitionBase>): OverviewWidgetDataRequirement[] {
-    const requirements: Record<string, boolean> = {};
-    const result: OverviewWidgetDataRequirement[] = [];
+export function getOverviewDataRequirements(layout: OverviewLayoutBase, definitions: PartialRecord<OverviewWidgetType, OverviewWidgetDefinitionBase>): PartialRecord<OverviewWidgetDataRequirement, boolean> {
+    const requirements: PartialRecord<OverviewWidgetDataRequirement, boolean> = {};
 
     for (const widget of layout.widgets) {
         const definition = definitions[widget.type];
@@ -174,13 +173,7 @@ export function getOverviewDataRequirements(layout: OverviewLayoutBase, definiti
         requirements[OverviewWidgetDataRequirement.TransactionOverview] = true;
     }
 
-    for (const requirement of keys(requirements)) {
-        if (requirements[requirement]) {
-            result.push(requirement as OverviewWidgetDataRequirement);
-        }
-    }
-
-    return result;
+    return requirements;
 }
 
 export function getOverviewTransactionOverviewMonths(layout: OverviewLayoutBase): number {

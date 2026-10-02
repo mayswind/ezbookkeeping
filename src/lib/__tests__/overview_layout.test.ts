@@ -35,9 +35,9 @@ describe('desktop overview layout', () => {
         const requirements = getOverviewDataRequirements(normalizeDesktopOverviewLayout({
             widgets: [{ id: 'trend', type: OverviewWidgetType.IncomeExpenseTrend, x: 0, y: 0, w: 6, h: 6 }]
         }), DESKTOP_OVERVIEW_WIDGET_DEFINITIONS);
-        expect(requirements.includes(OverviewWidgetDataRequirement.TransactionOverview)).toBe(true);
-        expect(requirements.includes(OverviewWidgetDataRequirement.TransactionOverviewLast12Months)).toBe(true);
-        expect(requirements.includes(OverviewWidgetDataRequirement.Accounts)).toBe(false);
+        expect(requirements[OverviewWidgetDataRequirement.TransactionOverview]).toBe(true);
+        expect(requirements[OverviewWidgetDataRequirement.TransactionOverviewLast12Months]).toBe(true);
+        expect(requirements[OverviewWidgetDataRequirement.Accounts]).toBe(false);
     });
 
     test('gets the maximum transaction overview months required by widgets', () => {

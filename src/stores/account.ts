@@ -1069,6 +1069,8 @@ export const useAccountsStore = defineStore('accounts', () => {
                     updateAccountListInvalidState(true);
                 }
 
+                overviewStore.updateTransactionOverviewInvalidState(true);
+
                 resolve(data.result);
             }).catch(error => {
                 logger.error('failed to update last reconciled time', error);

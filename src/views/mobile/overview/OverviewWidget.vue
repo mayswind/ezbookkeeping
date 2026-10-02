@@ -13,6 +13,13 @@
                                  :show-available-credit-for-credit-card="widget.settings['showAvailableCreditForCreditCard'] as boolean"
                                  v-else-if="widget.type === OverviewWidgetType.AccountBalanceList" />
 
+    <account-unreconciled-transactions-widget :loading="loading" :title="widgetTitle"
+                                              :show-title="widget.settings['showTitle'] as boolean"
+                                              :account-ids="widget.settings['accountIds'] as string[]"
+                                              :item-count="widget.settings['itemCount'] as number"
+                                              :sort-by="widget.settings['sortBy'] as string"
+                                              v-else-if="widget.type === OverviewWidgetType.AccountUnreconciledTransactions" />
+
     <monthly-expense-overview-widget :loading="loading" :height="widget.settings['height'] as number"
                                      :light-background-color="widget.settings['lightBackgroundColor'] as ColorValue"
                                      :dark-background-color="widget.settings['darkBackgroundColor'] as ColorValue"
@@ -66,6 +73,7 @@ import { computed } from 'vue';
 
 import AssetSummaryWidget from './widgets/AssetSummaryWidget.vue';
 import AccountBalanceListWidget from './widgets/AccountBalanceListWidget.vue';
+import AccountUnreconciledTransactionsWidget from './widgets/AccountUnreconciledTransactionsWidget.vue';
 import MonthlyExpenseOverviewWidget from './widgets/MonthlyExpenseOverviewWidget.vue';
 import MonthlyExpenseProgressWidget from './widgets/MonthlyExpenseProgressWidget.vue';
 import PeriodIncomeExpenseWidget from './widgets/PeriodIncomeExpenseWidget.vue';

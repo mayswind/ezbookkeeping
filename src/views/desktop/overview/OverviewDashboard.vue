@@ -8,7 +8,7 @@
              :class="{ 'overview-dashboard-item-editing': editing, 'overview-dashboard-item-dragging': draggingWidget?.id === widget.id, 'overview-dashboard-item-fixed-height': isFixedHeightWidget(widget) }"
              :style="getWidgetStyle(widget)" :key="widget.id" v-for="widget in sortedWidgets">
             <overview-widget class="overview-dashboard-widget" :widget="widget" :loading="loading" :editing="editing"
-                             @refresh="$emit('refresh')" />
+                             @refresh="refresh" />
             <template v-if="editing">
                 <div class="overview-dashboard-title-drag-area" :aria-label="tt('Move')"
                      @pointerdown="startPointerAction($event, widget, 'move')"></div>
@@ -112,7 +112,7 @@ const emit = defineEmits<{
     (e: 'configure', value: DesktopOverviewWidgetLayout): void;
     (e: 'duplicate', value: DesktopOverviewWidgetLayout): void;
     (e: 'remove', value: string): void;
-    (e: 'refresh'): void;
+    (e: 'refresh', force: boolean): void;
 }>();
 
 const { tt } = useI18n();
@@ -272,6 +272,10 @@ function finishPointerAction(event: PointerEvent): void {
     window.removeEventListener('pointercancel', finishPointerAction);
 
     emit('update:layout', { ...props.layout, widgets: compactDesktopOverviewWidgets(props.layout.widgets) });
+}
+
+function refresh(force: boolean): void {
+    emit('refresh', force);
 }
 
 onBeforeUnmount(() => {

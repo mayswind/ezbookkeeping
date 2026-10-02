@@ -20,6 +20,7 @@ export enum KnownErrorCode {
     ValidatorError = 200000,
     NothingWillBeUpdated = 200004,
     UserEmailNotVerified = 201020,
+    UserLastReconciledTimeNotEnabled = 201035,
     TwoFactorAuthorizationPasscodeEmpty = 203005,
     TransactionCannotCreateInThisTime = 205017,
     TransactionCannotModifyInThisTime = 205018,

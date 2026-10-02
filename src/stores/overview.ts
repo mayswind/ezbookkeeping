@@ -15,10 +15,13 @@ import { KeywordMatchMode } from '@/core/text.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import type { OverviewRecentTransactionsQuery } from '@/core/overview_layout.ts';
 
+import { KnownErrorCode } from '@/consts/api.ts';
+
 import type {
     TransactionAmountsRequestType,
     TransactionAmountsRequestParams,
     TransactionInfoPageWrapperResponse,
+    TransactionUnreconciledCountItem,
     TransactionAmountsResponse,
     TransactionOverviewData,
     TransactionStatisticResponse,
@@ -147,6 +150,8 @@ export const useOverviewStore = defineStore('overview', () => {
 
     const transactionOverviewData = ref<TransactionAmountsResponse>({});
     const transactionOverviewStateInvalid = ref<boolean>(true);
+    const transactionUnreconciledCounts = ref<TransactionUnreconciledCountItem[]>([]);
+    const transactionUnreconciledCountsStateInvalid = ref<boolean>(true);
     const transactionCategoryStatisticsData = ref<Record<number, TransactionStatisticResponse>>({});
     const transactionCategoryStatisticsStateInvalid = ref<Record<number, boolean>>({});
     const transactionAssetTrendsData = ref<TransactionStatisticAssetTrendsResponseItem[]>([]);
@@ -289,6 +294,7 @@ export const useOverviewStore = defineStore('overview', () => {
 
     function updateTransactionOverviewInvalidState(invalidState: boolean): void {
         transactionOverviewStateInvalid.value = invalidState;
+        transactionUnreconciledCountsStateInvalid.value = invalidState;
 
         for (const dateType of keys(transactionCategoryStatisticsData.value)) {
             transactionCategoryStatisticsStateInvalid.value[parseInt(dateType)] = invalidState;
@@ -309,6 +315,8 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewOptions.value.loadedMonths = 1;
         transactionOverviewData.value = {};
         transactionOverviewStateInvalid.value = true;
+        transactionUnreconciledCounts.value = [];
+        transactionUnreconciledCountsStateInvalid.value = true;
         transactionCategoryStatisticsData.value = {};
         transactionCategoryStatisticsStateInvalid.value = {};
         transactionAssetTrendsData.value = [];
@@ -394,6 +402,48 @@ export const useOverviewStore = defineStore('overview', () => {
                     reject({ error: error.response.data });
                 } else if (!error.processed) {
                     reject({ message: 'Unable to retrieve transaction overview' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function loadTransactionUnreconciledCounts({ force }: { force: boolean }): Promise<TransactionUnreconciledCountItem[]> {
+        if (!force && !transactionUnreconciledCountsStateInvalid.value) {
+            return Promise.resolve(transactionUnreconciledCounts.value);
+        }
+
+        return new Promise((resolve, reject) => {
+            services.getUnreconciledTransactionCounts().then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result || !data.result.items) {
+                    reject({ message: 'Unable to retrieve unreconciled transaction counts' });
+                    return;
+                }
+
+                if (transactionUnreconciledCountsStateInvalid.value) {
+                    transactionUnreconciledCountsStateInvalid.value = false;
+                }
+
+                if (force && data.result && isEquals(transactionUnreconciledCounts.value, data.result.items)) {
+                    reject({ message: 'Data is up to date', isUpToDate: true });
+                    return;
+                }
+
+                transactionUnreconciledCounts.value = data.result.items;
+
+                resolve(data.result.items);
+            }).catch(error => {
+                logger.error('failed to retrieve unreconciled transaction counts', error);
+
+                if (error.response && error.response.data && error.response.data.errorCode === KnownErrorCode.UserLastReconciledTimeNotEnabled) {
+                    resolve([]);
+                } else if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve unreconciled transaction counts' });
                 } else {
                     reject(error);
                 }
@@ -830,6 +880,7 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewOptions,
         transactionOverviewData,
         transactionOverviewStateInvalid,
+        transactionUnreconciledCounts,
         transactionCategoryStatisticsData,
         transactionAssetTrendsData,
         recentTransactions,
@@ -843,6 +894,7 @@ export const useOverviewStore = defineStore('overview', () => {
         updateTransactionOverviewInvalidState,
         resetTransactionOverview,
         loadTransactionOverview,
+        loadTransactionUnreconciledCounts,
         loadTransactionCategoryStatistics,
         loadTransactionAssetTrends,
         loadRecentTransactions,

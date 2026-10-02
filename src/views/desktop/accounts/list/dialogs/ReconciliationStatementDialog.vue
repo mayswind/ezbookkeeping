@@ -383,6 +383,7 @@ type AmountInputDialogType = InstanceType<typeof AmountInputDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
 const emit = defineEmits<{
+    (e: 'update:last-reconciled-time', newLastReconciledTime: number): void;
     (e: 'error', message: string): void;
 }>();
 
@@ -708,11 +709,13 @@ function updateLastReconciledTime(): void {
         return;
     }
 
+    const reconciledTime: number = newLastReconciledTime.value;
     updatingLastReconciledTime.value = true;
 
-    accountsStore.updateAccountLastReconciledTime(accountId.value, newLastReconciledTime.value).then(() => {
+    accountsStore.updateAccountLastReconciledTime(accountId.value, reconciledTime).then(() => {
         updatingLastReconciledTime.value = false;
         snackbar.value?.showMessage('Last reconciled time have been updated');
+        emit('update:last-reconciled-time', reconciledTime);
     }).catch(error => {
         updatingLastReconciledTime.value = false;
 

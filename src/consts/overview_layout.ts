@@ -128,6 +128,53 @@ export const DESKTOP_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTy
             OverviewWidgetDataRequirement.Accounts
         ]
     },
+    [OverviewWidgetType.AccountUnreconciledTransactions]: {
+        type: OverviewWidgetType.AccountUnreconciledTransactions,
+        name: 'Account Unreconciled Transactions',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            {
+                settingType: 'accountSelect',
+                settingName: 'accountIds',
+                displayName: 'Account',
+                disableHiddenAccounts: true
+            },
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'itemCount',
+                displayName: 'Item Count',
+                itemCountValues: [3, 4, 5, 6, 7, 8, 9, 10]
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'sortBy',
+                displayName: 'Sort By',
+                selectValues: [
+                    {
+                        name: 'Display Order',
+                        value: 'displayOrder'
+                    },
+                    {
+                        name: 'Transaction Count',
+                        value: 'transactionCount'
+                    }
+                ]
+            }
+        ],
+        defaultSettings: {
+            accountIds: [],
+            itemCount: 4,
+            sortBy: 'displayOrder'
+        },
+        defaultWidth: 3,
+        defaultHeight: 3,
+        minWidth: 2,
+        minHeight: 3,
+        dataRequirements: [
+            OverviewWidgetDataRequirement.Accounts,
+            OverviewWidgetDataRequirement.AccountUnreconciledTransactionCounts
+        ]
+    },
     [OverviewWidgetType.CurrentMonthOverview]: {
         type: OverviewWidgetType.CurrentMonthOverview,
         name: 'This Month\'s Income and Expense Overview',
@@ -819,6 +866,51 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.Accounts
+        ]
+    },
+    [OverviewWidgetType.AccountUnreconciledTransactions]: {
+        type: OverviewWidgetType.AccountUnreconciledTransactions,
+        name: 'Account Unreconciled Transactions',
+        supportsSettings: [
+            WIDGET_TITLE_SETTING,
+            WIDGET_SHOW_TITLE_SETTING,
+            {
+                settingType: 'accountSelect',
+                settingName: 'accountIds',
+                displayName: 'Account',
+                disableHiddenAccounts: true
+            },
+            {
+                settingType: 'itemCountSelect',
+                settingName: 'itemCount',
+                displayName: 'Item Count',
+                itemCountValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            },
+            {
+                settingType: 'customSelect',
+                settingName: 'sortBy',
+                displayName: 'Sort By',
+                selectValues: [
+                    {
+                        name: 'Display Order',
+                        value: 'displayOrder'
+                    },
+                    {
+                        name: 'Transaction Count',
+                        value: 'transactionCount'
+                    }
+                ]
+            }
+        ],
+        defaultSettings: {
+            showTitle: false,
+            accountIds: [],
+            itemCount: 4,
+            sortBy: 'displayOrder'
+        },
+        dataRequirements: [
+            OverviewWidgetDataRequirement.Accounts,
+            OverviewWidgetDataRequirement.AccountUnreconciledTransactionCounts
         ]
     },
     [OverviewWidgetType.CurrentMonthOverview]: {

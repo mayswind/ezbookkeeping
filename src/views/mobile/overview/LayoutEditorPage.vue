@@ -131,7 +131,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 
-import { itemAndIndex } from '@/core/base.ts';
+import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
 import {
     type OverviewWidgetType,
     type MobileOverviewLayout,
@@ -225,20 +225,26 @@ function hasWidgetSettings(type: OverviewWidgetType): boolean {
 function reload(force: boolean): void {
     loadingOverview.value = true;
 
-    const requirements: OverviewWidgetDataRequirement[] = getOverviewDataRequirements(draftLayout.value, MOBILE_OVERVIEW_WIDGET_DEFINITIONS);
+    const requirements: PartialRecord<OverviewWidgetDataRequirement, boolean> = getOverviewDataRequirements(draftLayout.value, MOBILE_OVERVIEW_WIDGET_DEFINITIONS);
     const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false })
     ];
 
-    if (requirements.includes(OverviewWidgetDataRequirement.TransactionOverview)) {
+    if (requirements[OverviewWidgetDataRequirement.TransactionOverview]) {
         promises.push(overviewStore.loadTransactionOverview({
             force: force,
             months: getOverviewTransactionOverviewMonths(draftLayout.value)
         }));
     }
 
-    if (requirements.includes(OverviewWidgetDataRequirement.TransactionCategoryStatistics)) {
+    if (requirements[OverviewWidgetDataRequirement.AccountUnreconciledTransactionCounts]) {
+        promises.push(overviewStore.loadTransactionUnreconciledCounts({
+            force: force
+        }));
+    }
+
+    if (requirements[OverviewWidgetDataRequirement.TransactionCategoryStatistics]) {
         for (const dateType of getOverviewTransactionCategoryStatisticDateTypes(draftLayout.value)) {
             promises.push(overviewStore.loadTransactionCategoryStatistics({
                 force: force,
@@ -247,27 +253,27 @@ function reload(force: boolean): void {
         }
     }
 
-    if (requirements.includes(OverviewWidgetDataRequirement.AssetTrends)) {
+    if (requirements[OverviewWidgetDataRequirement.AssetTrends]) {
         promises.push(overviewStore.loadTransactionAssetTrends({
             force: force,
             months: getOverviewAssetTrendMonths(draftLayout.value)
         }));
     }
 
-    if (requirements.includes(OverviewWidgetDataRequirement.RecentTransactions)) {
+    if (requirements[OverviewWidgetDataRequirement.RecentTransactions]) {
         promises.push(overviewStore.loadRecentTransactions({
             force: force,
             queries: getOverviewRecentTransactionsQueries(draftLayout.value)
         }));
     }
 
-    if (requirements.includes(OverviewWidgetDataRequirement.CurrentMonthTransactions)) {
+    if (requirements[OverviewWidgetDataRequirement.CurrentMonthTransactions]) {
         promises.push(overviewStore.loadCurrentMonthTransactions({
             force: force
         }));
     }
 
-    if (requirements.includes(OverviewWidgetDataRequirement.DailyTransactionAmounts)) {
+    if (requirements[OverviewWidgetDataRequirement.DailyTransactionAmounts]) {
         promises.push(overviewStore.loadTransactionDailyAmounts({
             force: force,
             months: getOverviewCalendarHeatmapMonths(draftLayout.value)

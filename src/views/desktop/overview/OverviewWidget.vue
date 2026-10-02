@@ -10,8 +10,15 @@
                                  :show-available-credit-for-credit-card="widget.settings['showAvailableCreditForCreditCard'] as boolean"
                                  v-else-if="widget.type === OverviewWidgetType.AccountBalanceList" />
 
+    <account-unreconciled-transactions-widget :loading="loading" :editing="editing" :title="widgetTitle"
+                                              :account-ids="widget.settings['accountIds'] as string[]"
+                                              :item-count="widget.settings['itemCount'] as number"
+                                              :sort-by="widget.settings['sortBy'] as string"
+                                              @refresh="$emit('refresh', false)"
+                                              v-else-if="widget.type === OverviewWidgetType.AccountUnreconciledTransactions" />
+
     <monthly-expense-overview-widget :loading="loading"
-                                     @refresh="$emit('refresh')"
+                                     @refresh="$emit('refresh', true)"
                                      v-else-if="widget.type === OverviewWidgetType.CurrentMonthOverview" />
 
     <monthly-expense-progress-widget :loading="loading" :title="widgetTitle"
@@ -53,7 +60,7 @@
                                 :tag-filter="widget.settings['tagFilter'] as string"
                                 :amount-filter="widget.settings['amountFilter'] as string"
                                 :keyword="widget.settings['keyword'] as string"
-                                @refresh="$emit('refresh')"
+                                @refresh="$emit('refresh', false)"
                                 v-else-if="widget.type === OverviewWidgetType.RecentTransactions" />
 
     <transaction-calendar-widget :loading="loading" :editing="editing" :title="widgetTitle"
@@ -83,6 +90,7 @@ import PeriodNetIncomeAndSavingsRateWidget from './widgets/PeriodNetIncomeAndSav
 import IncomeExpenseTrendWidget from './widgets/IncomeExpenseTrendWidget.vue';
 import NetAssetsTrendWidget from './widgets/NetAssetsTrendWidget.vue';
 import AccountBalanceListWidget from './widgets/AccountBalanceListWidget.vue';
+import AccountUnreconciledTransactionsWidget from './widgets/AccountUnreconciledTransactionsWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
 import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
 import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
@@ -101,13 +109,12 @@ const props = defineProps<{
     editing?: boolean
 }>();
 
-defineEmits<{
-    (e: 'refresh'): void
+const emit = defineEmits<{
+    (e: 'refresh', force: boolean): void
 }>();
 
 const widgetTitle = computed<string>(() => {
     const title = props.widget.settings['title'];
     return typeof title === 'string' ? title.trim() : '';
 });
-
 </script>

@@ -2539,6 +2539,32 @@ func (s *TransactionService) GetAccountsAndCategoriesTotalInflowAndOutflow(c cor
 	return transactionTotalAmounts, nil
 }
 
+// GetUnreconciledTransactionCounts returns transaction counts after each account's last reconciled time
+func (s *TransactionService) GetUnreconciledTransactionCounts(c core.Context, uid int64, accountLastReconciledTimes map[int64]int64) ([]*models.TransactionUnreconciledCountItem, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	accountConditions := make([]builder.Cond, 0, len(accountLastReconciledTimes))
+
+	for accountId, lastReconciledTime := range accountLastReconciledTimes {
+		accountConditions = append(accountConditions, builder.And(
+			builder.Eq{"account_id": accountId},
+			builder.Gt{"transaction_time": utils.GetMaxTransactionTimeFromUnixTime(lastReconciledTime)},
+		))
+	}
+
+	counts := make([]*models.TransactionUnreconciledCountItem, 0)
+
+	if len(accountConditions) < 1 {
+		return counts, nil
+	}
+
+	err := s.UserDataDB(uid).NewSession(c).Table(&models.Transaction{}).Select("account_id, SUM(1) AS count").Where(builder.And(builder.Eq{"uid": uid, "deleted": false}, builder.Or(accountConditions...))).GroupBy("account_id").Having("SUM(1) > 0").OrderBy("account_id asc").Find(&counts)
+
+	return counts, err
+}
+
 // GetAccountsAndCategoriesMonthlyInflowAndOutflow returns the every accounts monthly inflows and outflows amount by specific date range
 func (s *TransactionService) GetAccountsAndCategoriesMonthlyInflowAndOutflow(c core.Context, uid int64, startYear int32, startMonth int32, endYear int32, endMonth int32, tagFilters []*models.TransactionTagFilter, noTags bool, keyword string, matchMode core.MatchMode, clientTimezone *time.Location, useTransactionTimezone bool) (map[int32][]*models.TransactionTotalAmount, error) {
 	if uid <= 0 {

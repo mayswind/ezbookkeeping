@@ -3,6 +3,7 @@ import type { GenericNameValue } from './base.ts';
 export enum OverviewWidgetType {
     AssetSummary = 'asset-summary',
     AccountBalanceList = 'account-balance-list',
+    AccountUnreconciledTransactions = 'account-unreconciled-transactions',
     CurrentMonthOverview = 'current-month-overview',
     CurrentMonthExpenseProgress = 'current-month-expense-progress',
     PeriodIncomeExpense = 'period-income-expense',
@@ -20,6 +21,7 @@ export enum OverviewWidgetDataRequirement {
     Accounts = 'accounts',
     TransactionCategories = 'transactionCategories',
     TransactionOverview = 'transactionOverview',
+    AccountUnreconciledTransactionCounts = 'accountUnreconciledTransactionCounts',
     TransactionOverviewLast2Months = 'transactionOverviewLast2Months',
     TransactionOverviewLast12Months = 'transactionOverviewLast12Months',
     TransactionCategoryStatistics = 'transactionCategoryStatistics',

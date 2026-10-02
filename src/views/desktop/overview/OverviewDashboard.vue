@@ -21,13 +21,13 @@
                             <v-list>
                                 <template v-if="DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.type]?.supportsSettings?.length">
                                     <v-list-item :prepend-icon="mdiCogOutline" :title="tt('Settings')"
-                                                 @click="$emit('configure', widget)" />
+                                                 @click="emit('configure', widget)" />
                                     <v-divider class="my-2" />
                                 </template>
                                 <v-list-item :prepend-icon="mdiContentDuplicate" :title="tt('Duplicate')"
-                                             @click="$emit('duplicate', widget)" />
+                                             @click="emit('duplicate', widget)" />
                                 <v-list-item :prepend-icon="mdiDeleteOutline" :title="tt('Delete')"
-                                             @click="$emit('remove', widget.id)" />
+                                             @click="emit('remove', widget.id)" />
                             </v-list>
                         </v-menu>
                     </v-btn>
@@ -42,7 +42,7 @@
         <div class="d-flex flex-column align-center justify-center ga-3" v-if="!layout.widgets.length">
             <v-icon :icon="mdiWidgetsOutline" size="64" color="secondary" />
             <span class="text-title-medium">{{ tt('No widgets') }}</span>
-            <v-btn color="primary" variant="tonal" @click="$emit('add')" v-if="editing">{{ tt('Add Widget') }}</v-btn>
+            <v-btn color="primary" variant="tonal" @click="emit('add')" v-if="editing">{{ tt('Add Widget') }}</v-btn>
         </div>
     </div>
 </template>

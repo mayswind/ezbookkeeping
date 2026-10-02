@@ -14,11 +14,11 @@
                                               :account-ids="widget.settings['accountIds'] as string[]"
                                               :item-count="widget.settings['itemCount'] as number"
                                               :sort-by="widget.settings['sortBy'] as string"
-                                              @refresh="$emit('refresh', false)"
+                                              @refresh="emit('refresh', false)"
                                               v-else-if="widget.type === OverviewWidgetType.AccountUnreconciledTransactions" />
 
     <monthly-expense-overview-widget :loading="loading"
-                                     @refresh="$emit('refresh', true)"
+                                     @refresh="emit('refresh', true)"
                                      v-else-if="widget.type === OverviewWidgetType.CurrentMonthOverview" />
 
     <monthly-expense-progress-widget :loading="loading" :title="widgetTitle"
@@ -60,7 +60,7 @@
                                 :tag-filter="widget.settings['tagFilter'] as string"
                                 :amount-filter="widget.settings['amountFilter'] as string"
                                 :keyword="widget.settings['keyword'] as string"
-                                @refresh="$emit('refresh', false)"
+                                @refresh="emit('refresh', false)"
                                 v-else-if="widget.type === OverviewWidgetType.RecentTransactions" />
 
     <transaction-calendar-widget :loading="loading" :editing="editing" :title="widgetTitle"

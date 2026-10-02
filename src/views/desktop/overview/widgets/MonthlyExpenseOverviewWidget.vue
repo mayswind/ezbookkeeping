@@ -8,7 +8,7 @@
                     <span class="text-medium-emphasis font-weight-bold text-title-small">{{ tt('Expense') }}</span>
                 </div>
                 <v-btn class="ms-2" density="compact" color="default" variant="text"
-                       :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="$emit('refresh')">
+                       :aria-label="tt('Refresh')" :icon="true" :loading="loading" @click="emit('refresh')">
                     <template #loader>
                         <v-progress-circular indeterminate size="20" />
                     </template>
@@ -92,7 +92,7 @@ defineProps<{
     loading: boolean;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
     (e: 'refresh'): void
 }>();
 

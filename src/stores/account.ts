@@ -850,6 +850,11 @@ export const useAccountsStore = defineStore('accounts', () => {
             accounts.sort((a, b) => {
                 const balanceA = accountBalances[a.id] ?? BIG_DECIMAL_ZERO;
                 const balanceB = accountBalances[b.id] ?? BIG_DECIMAL_ZERO;
+
+                if (balanceA === balanceB) {
+                    return a.compareTo(b, settingsStore.accountCategoryDisplayOrders, allAccountsMap.value);
+                }
+
                 return balanceB.compareTo(balanceA);
             });
         }

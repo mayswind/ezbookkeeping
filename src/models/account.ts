@@ -201,6 +201,58 @@ export class Account implements AccountInfoResponse {
         return true;
     }
 
+    public compareTo(other: Account, accountCategoryDisplayOrders: Record<number, number>, allAccountsMap?: Record<string, Account>): number {
+        if (this.category !== other.category) {
+            const thisCategoryDisplayOrder = accountCategoryDisplayOrders[this.category];
+            const otherCategoryDisplayOrder = accountCategoryDisplayOrders[other.category];
+
+            if (!thisCategoryDisplayOrder) {
+                return 1;
+            }
+
+            if (!otherCategoryDisplayOrder) {
+                return -1;
+            }
+
+            return thisCategoryDisplayOrder - otherCategoryDisplayOrder;
+        }
+
+        if (this.parentId === other.parentId) {
+            return this.displayOrder - other.displayOrder;
+        }
+
+        if (this.id === other.parentId) {
+            return -1;
+        } else if (other.id === this.parentId) {
+            return 1;
+        }
+
+        let thisDisplayOrder: number | null = this.displayOrder;
+        let otherDisplayOrder: number | null = other.displayOrder;
+
+        if (this.parentId && this.parentId !== '0') {
+            if (allAccountsMap && allAccountsMap[this.parentId]) {
+                thisDisplayOrder = (allAccountsMap[this.parentId] as Account).displayOrder;
+            } else {
+                thisDisplayOrder = null;
+            }
+        }
+
+        if (other.parentId && other.parentId !== '0') {
+            if (allAccountsMap && allAccountsMap[other.parentId]) {
+                otherDisplayOrder = (allAccountsMap[other.parentId] as Account).displayOrder;
+            } else {
+                otherDisplayOrder = null;
+            }
+        }
+
+        if (thisDisplayOrder !== null && otherDisplayOrder !== null) {
+            return thisDisplayOrder - otherDisplayOrder;
+        } else {
+            return this.id.localeCompare(other.id);
+        }
+    }
+
     public fillFrom(other: Account): void {
         this.id = other.id;
         this.category = other.category;
@@ -595,57 +647,7 @@ export class Account implements AccountInfoResponse {
             return accounts;
         }
 
-        return accounts.sort(function (account1, account2) {
-            if (account1.category !== account2.category) {
-                const account1CategoryDisplayOrder = accountCategoryDisplayOrders[account1.category];
-                const account2CategoryDisplayOrder = accountCategoryDisplayOrders[account2.category];
-
-                if (!account1CategoryDisplayOrder) {
-                    return 1;
-                }
-
-                if (!account2CategoryDisplayOrder) {
-                    return -1;
-                }
-
-                return account1CategoryDisplayOrder - account2CategoryDisplayOrder;
-            }
-
-            if (account1.parentId === account2.parentId) {
-                return account1.displayOrder - account2.displayOrder;
-            }
-
-            if (account1.id === account2.parentId) {
-                return -1;
-            } else if (account2.id === account1.parentId) {
-                return 1;
-            }
-
-            let account1DisplayOrder: number | null = account1.displayOrder;
-            let account2DisplayOrder: number | null = account2.displayOrder;
-
-            if (account1.parentId && account1.parentId !== '0') {
-                if (allAccountsMap && allAccountsMap[account1.parentId]) {
-                    account1DisplayOrder = (allAccountsMap[account1.parentId] as Account).displayOrder;
-                } else {
-                    account1DisplayOrder = null;
-                }
-            }
-
-            if (account2.parentId && account2.parentId !== '0') {
-                if (allAccountsMap && allAccountsMap[account2.parentId]) {
-                    account2DisplayOrder = (allAccountsMap[account2.parentId] as Account).displayOrder;
-                } else {
-                    account2DisplayOrder = null;
-                }
-            }
-
-            if (account1DisplayOrder !== null && account2DisplayOrder !== null) {
-                return account1DisplayOrder - account2DisplayOrder;
-            } else {
-                return account1.id.localeCompare(account2.id);
-            }
-        });
+        return accounts.sort((account1, account2) => account1.compareTo(account2, accountCategoryDisplayOrders, allAccountsMap));
     }
 }
 

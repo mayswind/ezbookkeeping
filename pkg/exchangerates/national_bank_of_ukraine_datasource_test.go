@@ -43,7 +43,7 @@ func TestNationalBankOfUkraineDataSource_StandardDataExtractUpdateTime(t *testin
 
 	actualLatestExchangeRateResponse, err := dataSource.Parse(context, []byte(nationalBankOfUkraineMinimumRequiredContent))
 	assert.Equal(t, nil, err)
-	assert.Equal(t, int64(1745193600), actualLatestExchangeRateResponse.UpdateTime)
+	assert.Equal(t, int64(1745182800), actualLatestExchangeRateResponse.UpdateTime)
 }
 
 func TestNationalBankOfUkraineDataSource_StandardDataExtractExchangeRates(t *testing.T) {

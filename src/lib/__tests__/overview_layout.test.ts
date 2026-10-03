@@ -250,7 +250,10 @@ describe('mobile overview layout', () => {
         const layout = parseMobileOverviewLayout(json);
 
         expect(serializeMobileOverviewLayout(layout)).toBe(serializeMobileOverviewLayout(DEFAULT_MOBILE_OVERVIEW_LAYOUT));
-        expect(getOverviewDataRequirements(layout, MOBILE_OVERVIEW_WIDGET_DEFINITIONS)).toEqual([OverviewWidgetDataRequirement.TransactionOverview]);
+        expect(getOverviewDataRequirements(layout, MOBILE_OVERVIEW_WIDGET_DEFINITIONS)).toMatchObject({
+            [OverviewWidgetDataRequirement.TransactionOverview]: true
+        });
+        expect(getOverviewDataRequirements(layout, MOBILE_OVERVIEW_WIDGET_DEFINITIONS)[OverviewWidgetDataRequirement.Accounts]).toBe(false);
     });
 
     test('empty setting uses a cloned default layout', () => {

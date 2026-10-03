@@ -153,6 +153,10 @@ export function cloneWidget<T extends OverviewWidgetLayoutBase>(widget: T): T {
 export function getOverviewDataRequirements(layout: OverviewLayoutBase, definitions: PartialRecord<OverviewWidgetType, OverviewWidgetDefinitionBase>): PartialRecord<OverviewWidgetDataRequirement, boolean> {
     const requirements: PartialRecord<OverviewWidgetDataRequirement, boolean> = {};
 
+    for (const requirement of Object.values(OverviewWidgetDataRequirement)) {
+        requirements[requirement] = false;
+    }
+
     for (const widget of layout.widgets) {
         const definition = definitions[widget.type];
 

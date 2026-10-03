@@ -35,9 +35,9 @@ describe('desktop overview layout', () => {
         const requirements = getOverviewDataRequirements(normalizeDesktopOverviewLayout({
             widgets: [{ id: 'trend', type: OverviewWidgetType.IncomeExpenseTrend, x: 0, y: 0, w: 6, h: 6 }]
         }), DESKTOP_OVERVIEW_WIDGET_DEFINITIONS);
-        expect(requirements[OverviewWidgetDataRequirement.TransactionOverview]).toBe(true);
-        expect(requirements[OverviewWidgetDataRequirement.TransactionOverviewLast12Months]).toBe(true);
-        expect(requirements[OverviewWidgetDataRequirement.Accounts]).toBe(false);
+        expect(!!requirements[OverviewWidgetDataRequirement.TransactionOverview]).toBe(true);
+        expect(!!requirements[OverviewWidgetDataRequirement.TransactionOverviewLast12Months]).toBe(true);
+        expect(!!requirements[OverviewWidgetDataRequirement.Accounts]).toBe(false);
     });
 
     test('gets the maximum transaction overview months required by widgets', () => {
@@ -250,7 +250,7 @@ describe('mobile overview layout', () => {
         const layout = parseMobileOverviewLayout(json);
 
         expect(serializeMobileOverviewLayout(layout)).toBe(serializeMobileOverviewLayout(DEFAULT_MOBILE_OVERVIEW_LAYOUT));
-        expect(getOverviewDataRequirements(layout, MOBILE_OVERVIEW_WIDGET_DEFINITIONS)).toEqual([OverviewWidgetDataRequirement.TransactionOverview]);
+        expect(getOverviewDataRequirements(layout, MOBILE_OVERVIEW_WIDGET_DEFINITIONS)).toEqual({[OverviewWidgetDataRequirement.TransactionOverview]: true});
     });
 
     test('empty setting uses a cloned default layout', () => {

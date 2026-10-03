@@ -292,9 +292,16 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		newTemplate.ScheduledFrequency = a.getOrderedFrequencyValues(*templateModifyReq.ScheduledFrequency)
 		newTemplate.ScheduledAt = a.getUTCScheduledAt(*templateModifyReq.ScheduledTimezoneUtcOffset)
 		newTemplate.ScheduledTimezoneUtcOffset = *templateModifyReq.ScheduledTimezoneUtcOffset
+		newTemplate.ScheduledTimezoneName = template.ScheduledTimezoneName
+		if templateModifyReq.ScheduledTimezoneName != nil {
+			newTemplate.ScheduledTimezoneName = *templateModifyReq.ScheduledTimezoneName
+		}
+		if _, err := newTemplate.GetScheduledTimezone(); err != nil {
+			return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+		}
 
 		if templateModifyReq.ScheduledStartDate != nil {
-			startTime, err := utils.ParseFromLongDateFirstTime(*templateModifyReq.ScheduledStartDate, *templateModifyReq.ScheduledTimezoneUtcOffset)
+			startTime, err := newTemplate.ParseScheduledDate(*templateModifyReq.ScheduledStartDate, false)
 
 			if err != nil {
 				log.Errorf(c, "[transaction_templates.TemplateModifyHandler] failed to parse scheduled start date for user \"uid:%d\", because %s", uid, err.Error())
@@ -306,7 +313,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		}
 
 		if templateModifyReq.ScheduledEndDate != nil {
-			endTime, err := utils.ParseFromLongDateLastTime(*templateModifyReq.ScheduledEndDate, *templateModifyReq.ScheduledTimezoneUtcOffset)
+			endTime, err := newTemplate.ParseScheduledDate(*templateModifyReq.ScheduledEndDate, true)
 
 			if err != nil {
 				log.Errorf(c, "[transaction_templates.TemplateModifyHandler] failed to parse scheduled end date for user \"uid:%d\", because %s", uid, err.Error())
@@ -340,7 +347,8 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 				newTemplate.ScheduledStartTime == template.ScheduledStartTime &&
 				newTemplate.ScheduledEndTime == template.ScheduledEndTime &&
 				newTemplate.ScheduledAt == template.ScheduledAt &&
-				newTemplate.ScheduledTimezoneUtcOffset == template.ScheduledTimezoneUtcOffset {
+				newTemplate.ScheduledTimezoneUtcOffset == template.ScheduledTimezoneUtcOffset &&
+				newTemplate.ScheduledTimezoneName == template.ScheduledTimezoneName {
 				return nil, errs.ErrNothingWillBeUpdated
 			}
 		}
@@ -503,9 +511,15 @@ func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCrea
 		template.ScheduledFrequency = a.getOrderedFrequencyValues(*templateCreateReq.ScheduledFrequency)
 		template.ScheduledAt = a.getUTCScheduledAt(*templateCreateReq.ScheduledTimezoneUtcOffset)
 		template.ScheduledTimezoneUtcOffset = *templateCreateReq.ScheduledTimezoneUtcOffset
+		if templateCreateReq.ScheduledTimezoneName != nil {
+			template.ScheduledTimezoneName = *templateCreateReq.ScheduledTimezoneName
+		}
+		if _, err := template.GetScheduledTimezone(); err != nil {
+			return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+		}
 
 		if templateCreateReq.ScheduledStartDate != nil {
-			startTime, err := utils.ParseFromLongDateFirstTime(*templateCreateReq.ScheduledStartDate, *templateCreateReq.ScheduledTimezoneUtcOffset)
+			startTime, err := template.ParseScheduledDate(*templateCreateReq.ScheduledStartDate, false)
 
 			if err != nil {
 				return nil, err
@@ -516,7 +530,7 @@ func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCrea
 		}
 
 		if templateCreateReq.ScheduledEndDate != nil {
-			endTime, err := utils.ParseFromLongDateLastTime(*templateCreateReq.ScheduledEndDate, *templateCreateReq.ScheduledTimezoneUtcOffset)
+			endTime, err := template.ParseScheduledDate(*templateCreateReq.ScheduledEndDate, true)
 
 			if err != nil {
 				return nil, err

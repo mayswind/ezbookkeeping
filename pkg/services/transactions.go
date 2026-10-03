@@ -785,10 +785,11 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 		err := s.UserDataDBByIndex(i).NewSession(c).Where("deleted=?"+
 			" AND template_type=?"+
 			" AND (scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=? OR scheduled_frequency_type=?)"+
+			" AND (((scheduled_timezone_name IS NULL OR scheduled_timezone_name='')"+
 			" AND (scheduled_start_time IS NULL OR scheduled_start_time<=?)"+
 			" AND (scheduled_end_time IS NULL OR scheduled_end_time>=?)"+
 			" AND scheduled_at>=?"+
-			" AND scheduled_at<?",
+			" AND scheduled_at<?) OR scheduled_timezone_name<>'')",
 			false,
 			models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE,
 			models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_WEEKLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_YEARLY, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_EVERY_N_DAYS,
@@ -842,9 +843,30 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			continue
 		}
 
-		templateTimeZone := time.FixedZone("Template Timezone", int(template.ScheduledTimezoneUtcOffset)*60)
+		templateTimeZone, err := template.GetScheduledTimezone()
+		if err != nil {
+			skipCount++
+			log.Warnf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has invalid timezone, because %s", template.TemplateId, err.Error())
+			continue
+		}
 		transactionUnixTime := todayFirstUnixTimeInUTC + int64(template.ScheduledAt)*60
 		transactionTime := time.Unix(transactionUnixTime, 0).In(templateTimeZone)
+		transactionUtcOffset := template.ScheduledTimezoneUtcOffset
+		if template.ScheduledTimezoneName != "" {
+			localStartTime := startTime.In(templateTimeZone)
+			calendarDate := time.Date(localStartTime.Year(), localStartTime.Month(), localStartTime.Day(), 0, 0, 0, 0, time.UTC)
+			transactionTime, err = template.ParseScheduledDate(calendarDate.Format("2006-01-02"), false)
+			if err != nil || transactionTime.Before(startTime) {
+				transactionTime, err = template.ParseScheduledDate(calendarDate.AddDate(0, 0, 1).Format("2006-01-02"), false)
+			}
+			if err != nil || transactionTime.Before(startTime) || !transactionTime.Before(startTime.Add(interval)) {
+				skipCount++
+				continue
+			}
+			transactionUnixTime = transactionTime.Unix()
+			_, offset := transactionTime.Zone()
+			transactionUtcOffset = int16(offset / 60)
+		}
 
 		if template.ScheduledFrequencyType == models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY {
 			maxDayInMonth := utils.GetMaxDayOfMonth(transactionTime.Year(), transactionTime.Month())
@@ -881,6 +903,10 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			startDate := time.Unix(*template.ScheduledStartTime, 0).In(templateTimeZone)
 			startDateOnly := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, templateTimeZone)
 			transactionDateOnly := time.Date(transactionTime.Year(), transactionTime.Month(), transactionTime.Day(), 0, 0, 0, 0, templateTimeZone)
+			if template.ScheduledTimezoneName != "" {
+				startDateOnly = time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC)
+				transactionDateOnly = time.Date(transactionTime.Year(), transactionTime.Month(), transactionTime.Day(), 0, 0, 0, 0, time.UTC)
+			}
 			daysDiff := int(transactionDateOnly.Sub(startDateOnly).Hours() / 24)
 
 			if daysDiff < 0 || int64(daysDiff)%n != 0 {
@@ -921,7 +947,7 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			Type:              transactionDbType,
 			CategoryId:        template.CategoryId,
 			TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionTime.Unix()),
-			TimezoneUtcOffset: template.ScheduledTimezoneUtcOffset,
+			TimezoneUtcOffset: transactionUtcOffset,
 			AccountId:         template.AccountId,
 			Amount:            template.Amount,
 			HideAmount:        template.HideAmount,

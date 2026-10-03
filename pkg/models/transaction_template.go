@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
@@ -45,6 +46,7 @@ type TransactionTemplate struct {
 	ScheduledEndTime           *int64                           `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
 	ScheduledAt                int16                            `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
 	ScheduledTimezoneUtcOffset int16
+	ScheduledTimezoneName      string `xorm:"VARCHAR(100)"`
 	TagIds                     string `xorm:"VARCHAR(255) NOT NULL"`
 	Amount                     int64  `xorm:"NOT NULL"`
 	RelatedAccountId           int64  `xorm:"NOT NULL"`
@@ -86,6 +88,7 @@ type TransactionTemplateCreateRequest struct {
 	ScheduledStartDate         *string                           `json:"scheduledStartDate" binding:"omitempty"`
 	ScheduledEndDate           *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledTimezoneUtcOffset *int16                            `json:"utcOffset" binding:"omitempty,min=-720,max=840"`
+	ScheduledTimezoneName      *string                           `json:"timeZone" binding:"omitempty,max=100"`
 	ClientSessionId            string                            `json:"clientSessionId"`
 }
 
@@ -113,6 +116,7 @@ type TransactionTemplateModifyRequest struct {
 	ScheduledStartDate         *string                           `json:"scheduledStartDate" binding:"omitempty"`
 	ScheduledEndDate           *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledTimezoneUtcOffset *int16                            `json:"utcOffset" binding:"omitempty,min=-720,max=840"`
+	ScheduledTimezoneName      *string                           `json:"timeZone" binding:"omitempty,max=100"`
 }
 
 // TransactionTemplateHideRequest represents all parameters of transaction template hiding request
@@ -146,6 +150,7 @@ type TransactionTemplateInfoResponse struct {
 	ScheduledStartDate     *string                           `json:"scheduledStartDate" binding:"omitempty"`
 	ScheduledEndDate       *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledAt            *int16                            `json:"scheduledAt,omitempty"`
+	ScheduledTimezoneName  *string                           `json:"timeZone,omitempty"`
 	DisplayOrder           int32                             `json:"displayOrder"`
 	Hidden                 bool                              `json:"hidden"`
 }
@@ -183,8 +188,14 @@ func (t *TransactionTemplate) ToTransactionTemplateInfoResponse(serverUtcOffset 
 		response.ScheduledFrequencyType = &t.ScheduledFrequencyType
 		response.ScheduledFrequency = &t.ScheduledFrequency
 		response.ScheduledAt = &t.ScheduledAt
+		if t.ScheduledTimezoneName != "" {
+			response.ScheduledTimezoneName = &t.ScheduledTimezoneName
+		}
 
-		templateTimeZone := time.FixedZone("Template Timezone", int(t.ScheduledTimezoneUtcOffset)*60)
+		templateTimeZone, err := t.GetScheduledTimezone()
+		if err != nil {
+			templateTimeZone = time.FixedZone("Template Timezone", int(t.ScheduledTimezoneUtcOffset)*60)
+		}
 
 		if t.ScheduledStartTime != nil {
 			startDate := utils.FormatUnixTimeToLongDate(*t.ScheduledStartTime, templateTimeZone)
@@ -198,6 +209,60 @@ func (t *TransactionTemplate) ToTransactionTemplateInfoResponse(serverUtcOffset 
 	}
 
 	return response
+}
+
+// GetScheduledTimezone returns the named zone or the saved fixed offset for older templates.
+func (t *TransactionTemplate) GetScheduledTimezone() (*time.Location, error) {
+	if t.ScheduledTimezoneName == "" {
+		return time.FixedZone("Template Timezone", int(t.ScheduledTimezoneUtcOffset)*60), nil
+	}
+	if t.ScheduledTimezoneName == "Local" {
+		return nil, errs.ErrIncompleteOrIncorrectSubmission
+	}
+	return time.LoadLocation(t.ScheduledTimezoneName)
+}
+
+// ParseScheduledDate parses a schedule boundary in the template's time zone.
+func (t *TransactionTemplate) ParseScheduledDate(date string, endOfDay bool) (time.Time, error) {
+	if t.ScheduledTimezoneName == "" {
+		if endOfDay {
+			return utils.ParseFromLongDateLastTime(date, t.ScheduledTimezoneUtcOffset)
+		}
+		return utils.ParseFromLongDateFirstTime(date, t.ScheduledTimezoneUtcOffset)
+	}
+	location, err := t.GetScheduledTimezone()
+	if err != nil {
+		return time.Time{}, err
+	}
+	calendarDate, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		return time.Time{}, err
+	}
+	if endOfDay {
+		calendarDate = calendarDate.AddDate(0, 0, 1)
+	}
+	boundary := time.Date(calendarDate.Year(), calendarDate.Month(), calendarDate.Day(), 0, 0, 0, 0, location)
+	if boundary.Format("2006-01-02") != calendarDate.Format("2006-01-02") {
+		// A clock change at midnight can move time.Date into the previous day.
+		_, zoneEnd := boundary.ZoneBounds()
+		if zoneEnd.IsZero() || zoneEnd.Format("2006-01-02") != calendarDate.Format("2006-01-02") {
+			return time.Time{}, errs.ErrIncompleteOrIncorrectSubmission
+		}
+		boundary = zoneEnd
+	}
+	zoneStart, _ := boundary.ZoneBounds()
+	if !zoneStart.IsZero() {
+		// Use the first midnight when a backward clock change repeats it.
+		_, previousOffset := zoneStart.Add(-time.Nanosecond).Zone()
+		previousMidnight := time.Date(calendarDate.Year(), calendarDate.Month(), calendarDate.Day(), 0, 0, 0, 0, time.FixedZone("", previousOffset)).In(location)
+		if previousMidnight.Before(boundary) && previousMidnight.Format("2006-01-02") == calendarDate.Format("2006-01-02") {
+			boundary = previousMidnight
+		}
+	}
+	if endOfDay {
+		boundary = boundary.Add(-time.Nanosecond)
+	}
+	return boundary, nil
 }
 
 func (t *TransactionTemplate) toTransactionInfoResponse(utcOffset int16) *TransactionInfoResponse {

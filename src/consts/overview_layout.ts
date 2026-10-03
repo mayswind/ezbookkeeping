@@ -900,13 +900,19 @@ export const MOBILE_OVERVIEW_WIDGET_DEFINITIONS: PartialRecord<OverviewWidgetTyp
                         value: 'transactionCount'
                     }
                 ]
+            },
+            {
+                settingType: 'switch',
+                settingName: 'hideWhenEmpty',
+                displayName: 'Hide when there are no accounts with unreconciled transactions'
             }
         ],
         defaultSettings: {
             showTitle: false,
             accountIds: [],
             itemCount: 4,
-            sortBy: 'displayOrder'
+            sortBy: 'displayOrder',
+            hideWhenEmpty: false
         },
         dataRequirements: [
             OverviewWidgetDataRequirement.Accounts,

@@ -38,7 +38,8 @@ import {
     isInteger,
     isBoolean,
     isHextualColor,
-    normalizeInteger
+    normalizeInteger,
+    objectFieldToArrayItem
 } from '@/lib/common.ts';
 
 function normalizeOverviewWidgetSettings(definition: OverviewWidgetDefinitionBase, settings: unknown): Record<string, OverviewWidgetSettingValue> {
@@ -192,6 +193,28 @@ export function getOverviewTransactionOverviewMonths(layout: OverviewLayoutBase)
     }
 
     return months;
+}
+
+export function getOverviewUnreconciledTransactionAccountIds(layout: OverviewLayoutBase): string[] {
+    const accountIds: Record<string, boolean> = {};
+
+    for (const widget of layout.widgets) {
+        if (widget.type !== OverviewWidgetType.AccountUnreconciledTransactions) {
+            continue;
+        }
+
+        const widgetAccountIds = widget.settings['accountIds'];
+
+        if (!isArray(widgetAccountIds) || !widgetAccountIds.length) {
+            return [];
+        }
+
+        for (const accountId of widgetAccountIds as string[]) {
+            accountIds[accountId] = true;
+        }
+    }
+
+    return objectFieldToArrayItem(accountIds);
 }
 
 export function getOverviewRecentTransactionsQuery(settings: Record<string, OverviewWidgetSettingValue>): OverviewRecentTransactionsQuery {

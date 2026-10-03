@@ -34,7 +34,11 @@ function onNavigate(type: MobileOverviewWidgetNavigationType, path?: string): vo
 </script>
 
 <style>
-.mobile-overview-dashboard-item + .mobile-overview-dashboard-item {
+.mobile-overview-dashboard-item:empty {
+    display: none;
+}
+
+.mobile-overview-dashboard-item:not(:empty) ~ .mobile-overview-dashboard-item:not(:empty) {
     margin-block-start: 16px;
 }
 

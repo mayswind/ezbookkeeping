@@ -1889,6 +1889,8 @@
     "Asset Summary": "資產摘要",
     "Account Balance List": "帳戶餘額列表",
     "Account Unreconciled Transactions": "帳戶待對帳交易",
+    "Nothing to reconcile": "沒有需要對帳的內容",
+    "Hide when there are no accounts with unreconciled transactions": "沒有待對帳的帳戶時隱藏",
     "Always Show Amount": "總是顯示金額",
     "Show Available Credit for Credit Cards": "信用卡顯示可用額度",
     "This Month's Income and Expense Overview": "本月收支概覽",

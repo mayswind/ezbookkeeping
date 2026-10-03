@@ -1,5 +1,6 @@
 <template>
-    <f7-list strong inset dividers class="overview-widget-list no-margin-top margin-bottom" :class="{ 'skeleton-text': loading }">
+    <f7-list strong inset dividers class="overview-widget-list no-margin-top margin-bottom" :class="{ 'skeleton-text': loading }"
+             v-if="loading || editing || !hideWhenEmpty || displayAccounts.length">
         <f7-list-item group-title v-if="showTitle">
             <small>{{ title || tt('Account Unreconciled Transactions') }}</small>
         </f7-list-item>
@@ -35,7 +36,9 @@ import { DateRange } from '@/core/datetime.ts';
 import { getAccountIconType } from '@/lib/icon.ts';
 
 interface MobileAccountUnreconciledTransactionsWidgetProps extends CommonAccountUnreconciledTransactionsWidgetProps {
+    editing?: boolean;
     showTitle: boolean;
+    hideWhenEmpty?: boolean;
 }
 
 const props = defineProps<MobileAccountUnreconciledTransactionsWidgetProps>();

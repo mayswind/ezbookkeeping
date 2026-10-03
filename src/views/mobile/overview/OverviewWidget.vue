@@ -13,7 +13,8 @@
                                  :show-available-credit-for-credit-card="widget.settings['showAvailableCreditForCreditCard'] as boolean"
                                  v-else-if="widget.type === OverviewWidgetType.AccountBalanceList" />
 
-    <account-unreconciled-transactions-widget :loading="loading" :title="widgetTitle"
+    <account-unreconciled-transactions-widget :loading="loading" :editing="editing" :title="widgetTitle"
+                                              :hide-when-empty="widget.settings['hideWhenEmpty'] as boolean"
                                               :show-title="widget.settings['showTitle'] as boolean"
                                               :account-ids="widget.settings['accountIds'] as string[]"
                                               :item-count="widget.settings['itemCount'] as number"

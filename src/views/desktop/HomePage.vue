@@ -28,6 +28,7 @@ import { getShareCacheImageBlob } from '@/lib/cache.ts';
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
+    getOverviewUnreconciledTransactionAccountIds,
     getOverviewRecentTransactionsQueries,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
@@ -82,7 +83,8 @@ function reload(force: boolean): void {
 
     if (requirements[OverviewWidgetDataRequirement.AccountUnreconciledTransactionCounts]) {
         promises.push(overviewStore.loadTransactionUnreconciledCounts({
-            force: force
+            force: force,
+            accountIds: getOverviewUnreconciledTransactionAccountIds(layout.value)
         }));
     }
 

@@ -98,6 +98,7 @@ import { isFunction } from '@/lib/common.ts';
 import {
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
+    getOverviewUnreconciledTransactionAccountIds,
     getOverviewRecentTransactionsQueries,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
@@ -221,7 +222,8 @@ function reloadOverviewData(force: boolean): Promise<unknown>[] {
 
     if (requirements[OverviewWidgetDataRequirement.AccountUnreconciledTransactionCounts]) {
         promises.push(overviewStore.loadTransactionUnreconciledCounts({
-            force: force
+            force: force,
+            accountIds: getOverviewUnreconciledTransactionAccountIds(layout.value)
         }));
     }
 

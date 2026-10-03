@@ -152,6 +152,7 @@ export const useOverviewStore = defineStore('overview', () => {
     const transactionOverviewStateInvalid = ref<boolean>(true);
     const transactionUnreconciledCounts = ref<TransactionUnreconciledCountItem[]>([]);
     const transactionUnreconciledCountsStateInvalid = ref<boolean>(true);
+    const transactionUnreconciledCountsAccountIds = ref<string[]>([]);
     const transactionCategoryStatisticsData = ref<Record<number, TransactionStatisticResponse>>({});
     const transactionCategoryStatisticsStateInvalid = ref<Record<number, boolean>>({});
     const transactionAssetTrendsData = ref<TransactionStatisticAssetTrendsResponseItem[]>([]);
@@ -317,6 +318,7 @@ export const useOverviewStore = defineStore('overview', () => {
         transactionOverviewStateInvalid.value = true;
         transactionUnreconciledCounts.value = [];
         transactionUnreconciledCountsStateInvalid.value = true;
+        transactionUnreconciledCountsAccountIds.value = [];
         transactionCategoryStatisticsData.value = {};
         transactionCategoryStatisticsStateInvalid.value = {};
         transactionAssetTrendsData.value = [];
@@ -409,13 +411,18 @@ export const useOverviewStore = defineStore('overview', () => {
         });
     }
 
-    function loadTransactionUnreconciledCounts({ force }: { force: boolean }): Promise<TransactionUnreconciledCountItem[]> {
-        if (!force && !transactionUnreconciledCountsStateInvalid.value) {
+    function loadTransactionUnreconciledCounts({ force, accountIds }: { force: boolean, accountIds: string[] }): Promise<TransactionUnreconciledCountItem[]> {
+        const requestedAccountIds = [...accountIds].sort();
+        const accountIdsChanged = !isEquals(transactionUnreconciledCountsAccountIds.value, requestedAccountIds);
+
+        if (!accountIdsChanged && !force && !transactionUnreconciledCountsStateInvalid.value) {
             return Promise.resolve(transactionUnreconciledCounts.value);
         }
 
         return new Promise((resolve, reject) => {
-            services.getUnreconciledTransactionCounts().then(response => {
+            services.getUnreconciledTransactionCounts({
+                accountIds: requestedAccountIds
+            }).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result || !data.result.items) {
@@ -427,7 +434,9 @@ export const useOverviewStore = defineStore('overview', () => {
                     transactionUnreconciledCountsStateInvalid.value = false;
                 }
 
-                if (force && data.result && isEquals(transactionUnreconciledCounts.value, data.result.items)) {
+                transactionUnreconciledCountsAccountIds.value = requestedAccountIds;
+
+                if (!accountIdsChanged && force && data.result && isEquals(transactionUnreconciledCounts.value, data.result.items)) {
                     reject({ message: 'Data is up to date', isUpToDate: true });
                     return;
                 }
@@ -439,6 +448,9 @@ export const useOverviewStore = defineStore('overview', () => {
                 logger.error('failed to retrieve unreconciled transaction counts', error);
 
                 if (error.response && error.response.data && error.response.data.errorCode === KnownErrorCode.UserLastReconciledTimeNotEnabled) {
+                    transactionUnreconciledCounts.value = [];
+                    transactionUnreconciledCountsAccountIds.value = requestedAccountIds;
+                    transactionUnreconciledCountsStateInvalid.value = false;
                     resolve([]);
                 } else if (error.response && error.response.data && error.response.data.errorMessage) {
                     reject({ error: error.response.data });

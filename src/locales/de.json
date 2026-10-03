@@ -1889,6 +1889,8 @@
     "Asset Summary": "Vermögensübersicht",
     "Account Balance List": "Kontostandsliste",
     "Account Unreconciled Transactions": "Account Unreconciled Transactions",
+    "Nothing to reconcile": "Nothing to reconcile",
+    "Hide when there are no accounts with unreconciled transactions": "Hide when there are no accounts with unreconciled transactions",
     "Always Show Amount": "Betrag immer anzeigen",
     "Show Available Credit for Credit Cards": "Verfügbaren Kreditrahmen für Kreditkarten anzeigen",
     "This Month's Income and Expense Overview": "Einnahmen- und Ausgabenübersicht dieses Monats",

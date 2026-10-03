@@ -44,7 +44,7 @@ export function useAccountUnreconciledTransactionsWidgetBase(props: CommonAccoun
             return tt('Last reconciled time is not enabled');
         }
 
-        return tt('No data');
+        return tt('Nothing to reconcile');
     });
 
     const unreconciledCounts = computed<Record<string, number>>(() => {

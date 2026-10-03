@@ -145,6 +145,7 @@ import {
     cloneWidget,
     getOverviewDataRequirements,
     getOverviewTransactionOverviewMonths,
+    getOverviewUnreconciledTransactionAccountIds,
     getOverviewRecentTransactionsQueries,
     getOverviewAssetTrendMonths,
     getOverviewCalendarHeatmapMonths,
@@ -240,7 +241,8 @@ function reload(force: boolean): void {
 
     if (requirements[OverviewWidgetDataRequirement.AccountUnreconciledTransactionCounts]) {
         promises.push(overviewStore.loadTransactionUnreconciledCounts({
-            force: force
+            force: force,
+            accountIds: getOverviewUnreconciledTransactionAccountIds(draftLayout.value)
         }));
     }
 

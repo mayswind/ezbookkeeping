@@ -1889,6 +1889,8 @@
     "Asset Summary": "Varlık Özeti",
     "Account Balance List": "Account Balance List",
     "Account Unreconciled Transactions": "Account Unreconciled Transactions",
+    "Nothing to reconcile": "Nothing to reconcile",
+    "Hide when there are no accounts with unreconciled transactions": "Hide when there are no accounts with unreconciled transactions",
     "Always Show Amount": "Always Show Amount",
     "Show Available Credit for Credit Cards": "Show Available Credit for Credit Cards",
     "This Month's Income and Expense Overview": "This Month's Income and Expense Overview",

@@ -30,6 +30,22 @@ func TestExchangeRatesApiLatestExchangeRateHandler_CentralBankOfArgentinaDataSou
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }
 
+func TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfBelarusDataSource(t *testing.T) {
+	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.NationalBankOfBelarusDataSource)
+
+	if exchangeRateResponse == nil {
+		return
+	}
+
+	assert.Equal(t, "BYN", exchangeRateResponse.BaseCurrency)
+
+	supportedCurrencyCodes := []string{"AED", "AMD", "AUD", "BRL", "CAD", "CHF", "CNY", "CZK",
+		"DKK", "EUR", "GBP", "INR", "IRR", "ISK", "JPY", "KGS", "KWD", "KZT", "MDL", "NOK",
+		"NZD", "PLN", "RUB", "SEK", "SGD", "TRY", "UAH", "USD", "VND"}
+
+	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
+}
+
 func TestExchangeRatesApiLatestExchangeRateHandler_BankOfCanadaDataSource(t *testing.T) {
 	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.BankOfCanadaDataSource)
 
@@ -147,6 +163,33 @@ func TestExchangeRatesApiLatestExchangeRateHandler_BankOfIsraelDataSource(t *tes
 
 	supportedCurrencyCodes := []string{"AUD", "CAD", "CHF", "DKK", "EGP", "EUR", "GBP",
 		"JOD", "JPY", "LBP", "NOK", "SEK", "USD", "ZAR"}
+
+	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
+}
+
+func TestExchangeRatesApiLatestExchangeRateHandler_BankOfItalyDataSource(t *testing.T) {
+	exchangeRateResponse := executeLatestExchangeRateHandler(t, settings.BankOfItalyDataSource)
+
+	if exchangeRateResponse == nil {
+		return
+	}
+
+	assert.Equal(t, "EUR", exchangeRateResponse.BaseCurrency)
+
+	supportedCurrencyCodes := []string{"AED", "AFN", "ALL", "AMD", "AOA", "ARS", "AUD", "AWG", "AZN",
+		"BAM", "BBD", "BDT", "BHD", "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTN", "BWP", "BZD",
+		"CAD", "CDF", "CHF", "CLP", "CNY", "COP", "CRC", "CUP", "CVE", "CZK",
+		"DJF", "DKK", "DOP", "DZD", "EGP", "ERN", "ETB", "FJD", "FKP",
+		"GBP", "GEL", "GHS", "GIP", "GMD", "GNF", "GTQ", "GYD", "HKD", "HNL", "HTG", "HUF",
+		"IDR", "ILS", "INR", "IQD", "ISK", "JMD", "JOD", "JPY",
+		"KES", "KGS", "KHR", "KMF", "KRW", "KWD", "KYD", "KZT", "LAK", "LBP", "LKR", "LRD", "LSL", "LYD",
+		"MAD", "MDL", "MGA", "MKD", "MMK", "MNT", "MOP", "MRU", "MUR", "MVR", "MWK", "MXN", "MYR", "MZN",
+		"NAD", "NGN", "NIO", "NOK", "NPR", "NZD", "OMR", "PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG",
+		"QAR", "RON", "RSD", "RWF",
+		"SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLE", "SOS", "SRD", "SSP", "STN", "SVC", "SYP", "SZL",
+		"THB", "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TWD", "TZS",
+		"UAH", "UGX", "USD", "UYU", "UZS", "VES", "VND", "VUV", "WST",
+		"XAF", "XCD", "XCG", "XOF", "XPF", "YER", "ZAR", "ZMW", "ZWG"}
 
 	checkExchangeRatesHaveSpecifiedCurrencies(t, exchangeRateResponse.BaseCurrency, supportedCurrencyCodes, exchangeRateResponse.ExchangeRates)
 }

@@ -146,6 +146,7 @@ const (
 // Exchange rates data source types
 const (
 	CentralBankOfArgentinaDataSource   string = "central_bank_of_argentina"
+	NationalBankOfBelarusDataSource    string = "national_bank_of_belarus"
 	BankOfCanadaDataSource             string = "bank_of_canada"
 	CzechNationalBankDataSource        string = "czech_national_bank"
 	DanmarksNationalbankDataSource     string = "danmarks_national_bank"
@@ -153,6 +154,7 @@ const (
 	NationalBankOfGeorgiaDataSource    string = "national_bank_of_georgia"
 	CentralBankOfHungaryDataSource     string = "central_bank_of_hungary"
 	BankOfIsraelDataSource             string = "bank_of_israel"
+	BankOfItalyDataSource              string = "bank_of_italy"
 	NationalBankOfKazakhstanDataSource string = "national_bank_of_kazakhstan"
 	CentralBankOfMalaysiaDataSource    string = "central_bank_of_malaysia"
 	CentralBankOfMyanmarDataSource     string = "central_bank_of_myanmar"
@@ -1312,6 +1314,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 	dataSource := getConfigItemStringValue(configFile, sectionName, "data_source")
 
 	if dataSource == CentralBankOfArgentinaDataSource ||
+		dataSource == NationalBankOfBelarusDataSource ||
 		dataSource == BankOfCanadaDataSource ||
 		dataSource == CzechNationalBankDataSource ||
 		dataSource == DanmarksNationalbankDataSource ||
@@ -1319,6 +1322,7 @@ func loadExchangeRatesConfiguration(config *Config, configFile *ini.File, sectio
 		dataSource == NationalBankOfGeorgiaDataSource ||
 		dataSource == CentralBankOfHungaryDataSource ||
 		dataSource == BankOfIsraelDataSource ||
+		dataSource == BankOfItalyDataSource ||
 		dataSource == NationalBankOfKazakhstanDataSource ||
 		dataSource == CentralBankOfMalaysiaDataSource ||
 		dataSource == CentralBankOfMyanmarDataSource ||

@@ -34,9 +34,7 @@
                 <v-text-field eager ref="filterInput" density="compact"
                               :prepend-inner-icon="mdiMagnify"
                               :placeholder="filterPlaceholder"
-                              v-model="filterContent"
-                              @click:control="onInputFocused(filterInput, true)"
-                              @update:focused="onInputFocused(filterInput, $event)"></v-text-field>
+                              v-model="filterContent"></v-text-field>
             </div>
             <div class="text-body-large mx-4 mt-3 mb-2" v-show="!filteredItems || !filteredItems.length">
                 {{ filterNoItemsText }}
@@ -262,15 +260,6 @@ function onMenuStateChanged(state: boolean): void {
                     }
                 }, 50);
             }
-        });
-    }
-}
-
-function onInputFocused(input: VTextField | null | undefined, focused: boolean): void {
-    if (input && focused) {
-        nextTick(() => {
-            setChildInputFocus(input?.$el, 'input');
-            updateMenuPosition();
         });
     }
 }

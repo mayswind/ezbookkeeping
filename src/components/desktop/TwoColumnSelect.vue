@@ -253,6 +253,15 @@ function onMenuStateChanged(state: boolean): void {
                 scrollToSelectedItem(dropdownMenu.value.parentElement, '.primary-list-container', '.primary-list-container', '.primary-list-item-selected');
                 scrollToSelectedItem(dropdownMenu.value.parentElement, '.secondary-list-container', '.secondary-list-container', '.secondary-list-item-selected');
             }
+
+            if (props.enableFilter) {
+                // the menu content is created when the menu opens for the first time, so the filter field may not exist yet on this tick
+                setTimeout(() => {
+                    if (menuState.value && filterInput.value) {
+                        setChildInputFocus(filterInput.value.$el, 'input');
+                    }
+                }, 50);
+            }
         });
     }
 }

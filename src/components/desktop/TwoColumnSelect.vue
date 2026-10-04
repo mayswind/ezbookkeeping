@@ -255,8 +255,7 @@ function onMenuStateChanged(state: boolean): void {
             }
 
             if (props.enableFilter) {
-                // The menu content is created when the menu opens for the first time,
-                // so the filter field may not exist yet on this tick.
+                // the menu content is created when the menu opens for the first time, so the filter field may not exist yet on this tick
                 setTimeout(() => {
                     if (menuState.value && filterInput.value) {
                         setChildInputFocus(filterInput.value.$el, 'input');

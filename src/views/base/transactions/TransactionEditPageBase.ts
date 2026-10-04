@@ -40,6 +40,7 @@ import {
 import {
     getUtcOffsetByUtcOffsetMinutes,
     getTimezoneOffsetMinutes,
+    getBrowserTimezoneName,
     getSameDateTimeWithCurrentTimezone,
     parseDateTimeFromUnixTimeWithBrowserTimezone,
     getCurrentUnixTime
@@ -122,7 +123,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
 
     const allTimezones = computed<LocalizedTimezoneInfo[]>(() => {
         if (type === TransactionEditPageType.Template && transaction.value instanceof TransactionTemplate) {
-            return getAllTimezones(getCurrentUnixTime(), true);
+            return getAllTimezones(getCurrentUnixTime(), false);
         } else {
             return getAllTimezones(transaction.value.time, true)
         }
@@ -157,13 +158,13 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
             } else {
                 return 'Transaction Detail';
             }
-        } else if (type === TransactionEditPageType.Template && (transaction.value as TransactionTemplate).templateType === TemplateType.Normal.type) {
+        } else if (isNormalTransactionTemplate(transaction.value)) {
             if (mode.value === TransactionEditPageMode.Add) {
                 return 'Add Transaction Template';
             } else if (mode.value === TransactionEditPageMode.Edit) {
                 return 'Edit Transaction Template';
             }
-        } else if (type === TransactionEditPageType.Template && (transaction.value as TransactionTemplate).templateType === TemplateType.Schedule.type) {
+        } else if (isScheduledTransactionTemplate(transaction.value)) {
             if (mode.value === TransactionEditPageMode.Add) {
                 return 'Add Scheduled Transaction';
             } else if (mode.value === TransactionEditPageMode.Edit) {
@@ -309,7 +310,13 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
     });
 
     const transactionDisplayTimezone = computed<string>(() => {
-        const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getUtcOffsetByUtcOffsetMinutes(transaction.value.utcOffset));
+        let utcOffsetMinutes: number = transaction.value.utcOffset;
+
+        if (isScheduledTransactionTemplate(transaction.value) && transaction.value.timeZone) {
+            utcOffsetMinutes = getTimezoneOffsetMinutes(getCurrentUnixTime(), transaction.value.timeZone);
+        }
+
+        const utcOffset = numeralSystem.value.replaceWesternArabicDigitsToLocalizedDigits(getUtcOffsetByUtcOffsetMinutes(utcOffsetMinutes));
         return `UTC${utcOffset}`;
     });
 
@@ -391,6 +398,14 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
         return getSameDateTimeWithCurrentTimezone(parseDateTimeFromUnixTimeWithBrowserTimezone(getCurrentUnixTime())).getUnixTime();
     }
 
+    function isNormalTransactionTemplate(item: Transaction | TransactionTemplate): boolean {
+        return type === TransactionEditPageType.Template && item instanceof TransactionTemplate && item.templateType === TemplateType.Normal.type;
+    }
+
+    function isScheduledTransactionTemplate(item: Transaction | TransactionTemplate): boolean {
+        return type === TransactionEditPageType.Template && item instanceof TransactionTemplate && item.templateType === TemplateType.Schedule.type;
+    }
+
     function createNewTransactionModel(transactionType?: number): Transaction | TransactionTemplate {
         const now: number = getCurrentUnixTimeForNewTransaction();
         const currentTimezone: string = settingsStore.appSettings.timeZone;
@@ -407,6 +422,7 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
 
         if (type === TransactionEditPageType.Template) {
             newTransaction = TransactionTemplate.createNewTransactionTemplate(newTransaction);
+            newTransaction.timeZone = currentTimezone || getBrowserTimezoneName();
         }
 
         return newTransaction;
@@ -477,7 +493,12 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
 
         for (const timezone of allTimezones.value) {
             if (timezone.name === timezoneName) {
-                transaction.value.timeZone = timezone.name;
+                if (isScheduledTransactionTemplate(transaction.value)) {
+                    transaction.value.timeZone = timezone.name || getBrowserTimezoneName();
+                } else {
+                    transaction.value.timeZone = timezone.name;
+                }
+
                 transaction.value.utcOffset = timezone.utcOffsetMinutes;
                 break;
             }

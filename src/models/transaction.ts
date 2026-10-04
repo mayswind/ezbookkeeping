@@ -20,7 +20,7 @@ export class Transaction implements TransactionInfoResponse {
     public incomeCategoryId: string = '';
     public transferCategoryId: string = '';
     public time: number;
-    public timeZone?: string; // only in new transaction
+    public timeZone?: string; // only in new transaction or scheduled transaction
     public utcOffset: number;
     public sourceAccountId: string;
     public destinationAccountId: string;

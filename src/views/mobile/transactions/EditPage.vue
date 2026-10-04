@@ -320,7 +320,7 @@
                     <f7-block class="list-item-custom-title no-padding no-margin">
                         <span>{{ `(${transactionDisplayTimezone})` }}</span>
                         <span class="transaction-edit-timezone-name" v-if="transaction.timeZone || transaction.timeZone === ''">{{ transactionDisplayTimezoneName }}</span>
-                        <span class="transaction-edit-timezone-name" v-else-if="!transaction.timeZone && transaction.timeZone !== ''">{{ transactionTimezoneTimeDifference }}</span>
+                        <span class="transaction-edit-timezone-name" v-else-if="pageTypeAndMode?.type === TransactionEditPageType.Transaction && !transaction.timeZone && transaction.timeZone !== ''">{{ transactionTimezoneTimeDifference }}</span>
                     </f7-block>
                 </template>
                 <list-item-selection-popup value-type="item"

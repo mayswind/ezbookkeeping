@@ -203,6 +203,58 @@ func GetMaxUnixTimeWithSameLocalDateTime(unixTime int64, currentUtcOffset int16)
 	return unixTime + int64(currentUtcOffset)*60 - westernmostTimezoneUtcOffset*60
 }
 
+// GetDateFirstTimeInTimezone returns the first valid instant at or after a local date's beginning.
+func GetDateFirstTimeInTimezone(date time.Time, timezone *time.Location) time.Time {
+	dateOnly := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
+	currentTime := dateOnly.Add(-24 * time.Hour).In(timezone)
+
+	for {
+		_, offset := currentTime.Zone()
+		firstTime := dateOnly.Add(-time.Duration(offset) * time.Second)
+
+		if firstTime.Before(currentTime) {
+			firstTime = currentTime
+		}
+
+		_, zoneEndTime := currentTime.ZoneBounds()
+
+		if zoneEndTime.IsZero() || !zoneEndTime.After(currentTime) || firstTime.Before(zoneEndTime) {
+			return firstTime.In(timezone)
+		}
+
+		currentTime = zoneEndTime.In(timezone)
+	}
+}
+
+// ParseFromLongDateFirstTimeInTimezone parses a local date using timezone rules
+func ParseFromLongDateFirstTimeInTimezone(t string, timezone *time.Location) (time.Time, error) {
+	date, err := time.Parse(longDateFormat, t)
+
+	if err != nil {
+		return date, err
+	}
+
+	firstTime := GetDateFirstTimeInTimezone(date, timezone)
+
+	if firstTime.Year() != date.Year() || firstTime.Month() != date.Month() || firstTime.Day() != date.Day() {
+		return time.Time{}, errs.ErrParameterInvalid
+	}
+
+	return firstTime, nil
+}
+
+// ParseFromLongDateLastTimeInTimezone returns the last second of a local date
+func ParseFromLongDateLastTimeInTimezone(t string, timezone *time.Location) (time.Time, error) {
+	firstTime, err := ParseFromLongDateFirstTimeInTimezone(t, timezone)
+
+	if err != nil {
+		return firstTime, err
+	}
+
+	nextDate := time.Date(firstTime.Year(), firstTime.Month(), firstTime.Day()+1, 0, 0, 0, 0, time.UTC)
+	return GetDateFirstTimeInTimezone(nextDate, timezone).Add(-1 * time.Nanosecond), nil
+}
+
 // ParseFromLongDateFirstTime parses a formatted string in long date format
 func ParseFromLongDateFirstTime(t string, utcOffset int16) (time.Time, error) {
 	timezone := time.FixedZone("Timezone", int(utcOffset)*60)
@@ -301,12 +353,79 @@ func GetMaxDayOfMonth(year int, month time.Month) int {
 	return t.Day()
 }
 
+// GetDaysBetweenDates returns the signed calendar day difference, using each time's local date
+func GetDaysBetweenDates(startDate, endDate time.Time) int {
+	startDateOnly := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC)
+	endDateOnly := time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 0, 0, 0, 0, time.UTC)
+	return int((endDateOnly.Unix() - startDateOnly.Unix()) / (24 * 60 * 60))
+}
+
 // GetTimezoneOffsetMinutes returns offset minutes according specified timezone
 func GetTimezoneOffsetMinutes(unixTime int64, timezone *time.Location) int16 {
 	_, tzOffset := parseFromUnixTime(unixTime).In(timezone).Zone()
 	tzMinuteOffset := int16(tzOffset / 60)
 
 	return tzMinuteOffset
+}
+
+// GetMinimumTimezoneOffsetMinutes returns the minimum offset in the UTC year containing the Unix time
+func GetMinimumTimezoneOffsetMinutes(unixTime int64, location *time.Location) int16 {
+	year := time.Unix(unixTime, 0).UTC().Year()
+	currentTime := time.Date(year, 1, 1, 0, 0, 0, 0, location)
+	yearEndTime := time.Date(year+1, 1, 1, 0, 0, 0, 0, location)
+	minimumOffset := GetTimezoneOffsetMinutes(currentTime.Unix(), location)
+
+	for currentTime.Before(yearEndTime) {
+		offset := GetTimezoneOffsetMinutes(currentTime.Unix(), location)
+
+		if offset < minimumOffset {
+			minimumOffset = offset
+		}
+
+		_, zoneEndTime := currentTime.ZoneBounds()
+
+		if zoneEndTime.IsZero() || !zoneEndTime.Before(yearEndTime) {
+			break
+		}
+
+		if !zoneEndTime.After(currentTime) {
+			// POSIX timezone rules can return a non-advancing bound at the end of a leap year.
+			currentTime = currentTime.Add(24 * time.Hour)
+		} else {
+			currentTime = zoneEndTime
+		}
+	}
+
+	return minimumOffset
+}
+
+// GetScheduledTransactionScheduledAt returns the scheduled time using the minimum offset in the creation year
+func GetScheduledTransactionScheduledAt(createdUnixTime int64, location *time.Location) int16 {
+	referenceOffset := GetMinimumTimezoneOffsetMinutes(createdUnixTime, location)
+	minutesElapsedOfDayInUtc := (24*60 - int(referenceOffset)) % (24 * 60)
+	return int16(minutesElapsedOfDayInUtc)
+}
+
+// GetScheduledTransactionFinalTime returns the final time of scheduled transaction in given location
+func GetScheduledTransactionFinalTime(todayFirstUnixTimeInUTC int64, scheduledAt int16, createdUnixTime int64, location *time.Location) *time.Time {
+	referenceOffset := GetMinimumTimezoneOffsetMinutes(createdUnixTime, location)
+	referenceTimezone := time.FixedZone("Template Timezone", int(referenceOffset)*60)
+
+	expectedUnixTime := todayFirstUnixTimeInUTC + int64(scheduledAt)*60
+	expectedTime := time.Unix(expectedUnixTime, 0).In(referenceTimezone)
+
+	if expectedTime.Hour() == 0 && expectedTime.Minute() == 0 && expectedTime.Second() == 0 {
+		firstTime := GetDateFirstTimeInTimezone(expectedTime, location)
+
+		if firstTime.Year() != expectedTime.Year() || firstTime.Month() != expectedTime.Month() || firstTime.Day() != expectedTime.Day() {
+			return nil
+		}
+
+		return &firstTime
+	}
+
+	finalTime := time.Date(expectedTime.Year(), expectedTime.Month(), expectedTime.Day(), expectedTime.Hour(), expectedTime.Minute(), expectedTime.Second(), 0, location)
+	return &finalTime
 }
 
 // GetServerTimezoneOffsetMinutes returns offset minutes of current server timezone

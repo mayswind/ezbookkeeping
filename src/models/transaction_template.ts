@@ -37,8 +37,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             this.scheduledFrequency = other.scheduledFrequency;
             this.scheduledStartDate = other.scheduledStartDate;
             this.scheduledEndDate = other.scheduledEndDate;
+            this.timeZone = other.timeZone;
             this.utcOffset = other.utcOffset;
-            this.timeZone = undefined;
         }
     }
 
@@ -59,6 +59,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             scheduledFrequency: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequency : undefined,
             scheduledStartDate: this.templateType === TemplateType.Schedule.type && this.scheduledStartDate ? this.scheduledStartDate : undefined,
             scheduledEndDate: this.templateType === TemplateType.Schedule.type && this.scheduledEndDate ? this.scheduledEndDate : undefined,
+            timeZone: this.templateType === TemplateType.Schedule.type ? this.timeZone : undefined,
             utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined,
             clientSessionId: clientSessionId
         };
@@ -81,6 +82,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             scheduledFrequency: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequency : undefined,
             scheduledStartDate: this.templateType === TemplateType.Schedule.type && this.scheduledStartDate ? this.scheduledStartDate : undefined,
             scheduledEndDate: this.templateType === TemplateType.Schedule.type && this.scheduledEndDate ? this.scheduledEndDate : undefined,
+            timeZone: this.templateType === TemplateType.Schedule.type ? this.timeZone : undefined,
             utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined
         };
     }
@@ -119,7 +121,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             templateResponse.name,
             templateResponse.type,
             templateResponse.categoryId,
-            undefined, // only in new transaction template
+            templateResponse.timeZone ?? undefined, // only in new transaction or scheduled transaction
             templateResponse.utcOffset ?? 0,
             templateResponse.sourceAccountId,
             templateResponse.destinationAccountId,
@@ -166,6 +168,7 @@ export interface TransactionTemplateCreateRequest {
     readonly scheduledFrequency?: string;
     readonly scheduledStartDate?: string;
     readonly scheduledEndDate?: string;
+    readonly timeZone?: string;
     readonly utcOffset?: number;
     readonly clientSessionId: string;
 }
@@ -186,6 +189,7 @@ export interface TransactionTemplateModifyRequest {
     readonly scheduledFrequency?: string;
     readonly scheduledStartDate?: string;
     readonly scheduledEndDate?: string;
+    readonly timeZone?: string;
     readonly utcOffset?: number;
 }
 
@@ -215,6 +219,7 @@ export interface TransactionTemplateInfoResponse extends TransactionInfoResponse
     readonly scheduledStartDate?: TextualYearMonthDay;
     readonly scheduledEndDate?: TextualYearMonthDay;
     readonly scheduledAt?: number;
+    readonly timeZone?: string;
     readonly displayOrder: number;
     readonly hidden: boolean;
 }

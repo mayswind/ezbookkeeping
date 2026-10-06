@@ -1184,7 +1184,10 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.WebContext) (any, *errs.
 	var tagMap map[int64]*models.TransactionTag
 	var pictureInfos []*models.TransactionPictureInfo
 
-	if !transactionGetReq.TrimCategory {
+	// A balance modification transaction has no category (its category id is always 0),
+	// so do not try to get a category by an invalid category id, otherwise getting a
+	// balance modification transaction always fails with ErrTransactionCategoryIdInvalid
+	if !transactionGetReq.TrimCategory && transaction.CategoryId > 0 {
 		category, err = a.transactionCategories.GetCategoryByCategoryId(c, uid, transaction.CategoryId)
 
 		if err != nil {

@@ -1184,7 +1184,7 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.WebContext) (any, *errs.
 	var tagMap map[int64]*models.TransactionTag
 	var pictureInfos []*models.TransactionPictureInfo
 
-	if !transactionGetReq.TrimCategory {
+	if !transactionGetReq.TrimCategory && transaction.Type != models.TRANSACTION_DB_TYPE_MODIFY_BALANCE {
 		category, err = a.transactionCategories.GetCategoryByCategoryId(c, uid, transaction.CategoryId)
 
 		if err != nil {

@@ -64,6 +64,7 @@
                                  v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
 
     <add-transaction-button-widget :widget-id="widget.id" @navigate="onNavigate"
+                                   :default-action="widget.settings['defaultAction'] as AddTransactionButtonDefaultAction"
                                    :light-background-color="widget.settings['lightBackgroundColor'] as ColorValue"
                                    :dark-background-color="widget.settings['darkBackgroundColor'] as ColorValue"
                                    v-else-if="widget.type === OverviewWidgetType.AddTransactionButton" />
@@ -88,7 +89,8 @@ import type { ColorValue } from '@/core/color.ts';
 import {
     type MobileOverviewWidgetLayout,
     OverviewWidgetType,
-    MobileOverviewWidgetNavigationType
+    MobileOverviewWidgetNavigationType,
+    AddTransactionButtonDefaultAction
 } from '@/core/overview_layout.ts';
 
 const props = defineProps<{

@@ -33,6 +33,12 @@ export enum OverviewWidgetDataRequirement {
 
 export type OverviewWidgetSettingValue = string | number | boolean | (string | number)[];
 
+export interface OverviewWidgetCustomSelectSettingValue extends GenericNameValue<string | number> {
+    name: string;
+    value: string | number;
+    disabled?: (settings: Record<string, OverviewWidgetSettingValue> | undefined, context: OverviewWidgetSettingContext) => boolean;
+}
+
 interface OverviewWidgetSettingItemBase {
     settingType: 'itemCountSelect' | 'monthSelect' | 'accountSelect' | 'categorySelect' | 'tagSelect' | 'customSelect' | 'switch' | 'color' | 'amount' | 'amountFilter' | 'textbox';
     settingName: string;
@@ -65,7 +71,7 @@ export interface OverviewWidgetTagSelectSettingItem extends OverviewWidgetSettin
 
 export interface OverviewWidgetCustomSelectSettingItem extends OverviewWidgetSettingItemBase {
     settingType: 'customSelect';
-    selectValues: GenericNameValue<string | number>[];
+    selectValues: OverviewWidgetCustomSelectSettingValue[];
     multiple?: boolean;
     minSelections?: number;
     allValue?: string | number;
@@ -103,6 +109,11 @@ export type OverviewWidgetSettingItem = OverviewWidgetItemCountSelectSettingItem
     OverviewWidgetAmountSettingItem |
     OverviewWidgetAmountFilterSettingItem |
     OverviewWidgetTextboxSettingItem;
+
+export interface OverviewWidgetSettingContext {
+    aiTextRecognitionEnabled: boolean;
+    aiImageRecognitionEnabled: boolean;
+}
 
 export interface OverviewRecentTransactionsQuery {
     count: number;
@@ -179,6 +190,12 @@ export interface MobileOverviewWidgetLayout extends OverviewWidgetLayoutBase {
 
 export enum MobileOverviewWidgetNavigationType {
     Url = 'url',
+    AIClipboardTextRecognition = 'ai-clipboard-text-recognition',
+    AIImageRecognition = 'ai-image-recognition'
+}
+
+export enum AddTransactionButtonDefaultAction {
+    AddTransaction = 'add-transaction',
     AIClipboardTextRecognition = 'ai-clipboard-text-recognition',
     AIImageRecognition = 'ai-image-recognition'
 }

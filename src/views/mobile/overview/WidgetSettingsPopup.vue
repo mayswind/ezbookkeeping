@@ -21,7 +21,7 @@
                                       :title="tt(option.name)"
                                       :value="option.value"
                                       :checked="isMultipleValueSelected(setting, option.value)"
-                                      :disabled="isLastSelectedMultipleValue(setting, option.value)"
+                                      :disabled="option.disabled?.(widget?.settings, widgetSettingsContext) || isLastSelectedMultipleValue(setting, option.value)"
                                       v-for="option in setting.selectValues"
                                       @change="updateMultipleValue(setting, option.value, $event.target.checked)"></f7-list-item>
                     </template>
@@ -89,6 +89,7 @@
                 <f7-list dividers>
                     <f7-list-item link="#" no-chevron popover-close
                                   :title="option.name"
+                                  :disabled="option.disabled?.(widget?.settings, widgetSettingsContext)"
                                   :class="{ 'list-item-selected': selectedSettingValue === option.value }"
                                   :key="option.value" v-for="option in selectedSettingOptions"
                                   @click="updateSelectedSettingValue(option.value)">
@@ -144,13 +145,13 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
-import type { GenericNameValue } from '@/core/base.ts';
-
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import {
     type OverviewWidgetSettingValue,
+    type OverviewWidgetCustomSelectSettingValue,
     type OverviewWidgetCustomSelectSettingItem,
     type OverviewWidgetSettingItem,
+    type OverviewWidgetSettingContext,
     type MobileOverviewWidgetLayout
 } from '@/core/overview_layout.ts';
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
@@ -160,7 +161,7 @@ import { parseBigDecimal } from '@/lib/numeral.ts';
 import { getDisplayColor } from '@/lib/color.ts';
 import { isAllAccountsChecked } from '@/lib/account.ts';
 import { isAllCategoriesChecked } from '@/lib/category.ts';
-import { cloneWidget } from '@/lib/overview_layout.ts';
+import { cloneWidget, getOverviewWidgetSettingContext } from '@/lib/overview_layout.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 
 const props = defineProps<{
@@ -207,7 +208,8 @@ const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transac
 const hasAnyAvailableTag = computed<boolean>(() => transactionTagsStore.allAvailableTagsCount > 0);
 
 const supportsSettings = computed<OverviewWidgetSettingItem[]>(() => widget.value ? MOBILE_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.supportsSettings ?? [] : []);
-const selectedSettingOptions = computed<GenericNameValue<string | number>[]>(() => currentSettingItem.value ? getSettingOptions(currentSettingItem.value) : []);
+const widgetSettingsContext = computed<OverviewWidgetSettingContext>(() => getOverviewWidgetSettingContext());
+const selectedSettingOptions = computed<OverviewWidgetCustomSelectSettingValue[]>(() => currentSettingItem.value ? getSettingOptions(currentSettingItem.value) : []);
 const selectedSettingValue = computed<OverviewWidgetSettingValue | undefined>(() => currentSettingItem.value ? getSettingValue(currentSettingItem.value.settingName) : undefined);
 
 function isSettingDisabled(setting: OverviewWidgetSettingItem): boolean {
@@ -224,7 +226,7 @@ function isSettingDisabled(setting: OverviewWidgetSettingItem): boolean {
     return false;
 }
 
-function getSettingOptions(setting: OverviewWidgetSettingItem): GenericNameValue<string | number>[] {
+function getSettingOptions(setting: OverviewWidgetSettingItem): OverviewWidgetCustomSelectSettingValue[] {
     if (setting.settingType === 'itemCountSelect') {
         return getTablePageOptions(setting.itemCountValues, undefined, false, true);
     } else if (setting.settingType === 'monthSelect') {
@@ -233,7 +235,11 @@ function getSettingOptions(setting: OverviewWidgetSettingItem): GenericNameValue
             value: value
         }));
     } else if (setting.settingType === 'customSelect') {
-        return setting.selectValues.map(option => ({ name: tt(option.name), value: option.value }));
+        return setting.selectValues.map(option => ({
+            name: tt(option.name),
+            value: option.value,
+            disabled: option.disabled
+        }));
     }
 
     return [];

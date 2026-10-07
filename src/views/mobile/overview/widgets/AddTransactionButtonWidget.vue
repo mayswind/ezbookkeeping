@@ -1,7 +1,7 @@
 <template>
     <f7-segmented round class="add-transaction-button-group margin-horizontal" v-if="hasTransactionAddMenuItems">
-        <f7-button round large fill icon-f7="plus" :text="tt('Add Transaction')" :style="buttonStyle"
-                   @click="emit('navigate', MobileOverviewWidgetNavigationType.Url, '/transaction/add')" />
+        <f7-button round large fill :icon-f7="finalDefaultActionIcon" :text="finalDefaultActionText" :style="buttonStyle"
+                   @click="executeDefaultAction" />
         <f7-button round large fill class="add-transaction-menu-button" icon-f7="chevron_down"
                    :style="buttonStyle"
                    :popover-open="`.add-transaction-button-widget-popover-menu-${widgetId}`"
@@ -9,16 +9,24 @@
     </f7-segmented>
 
     <f7-segmented round class="add-transaction-button-group margin-horizontal" v-else-if="!hasTransactionAddMenuItems" >
-        <f7-button round large fill icon-f7="plus" :text="tt('Add Transaction')" :style="buttonStyle"
-                   @click="emit('navigate', MobileOverviewWidgetNavigationType.Url, '/transaction/add')" />
+        <f7-button round large fill :icon-f7="finalDefaultActionIcon" :text="finalDefaultActionText" :style="buttonStyle"
+                   @click="executeDefaultAction" />
     </f7-segmented>
 
     <f7-popover class="add-transaction-button-widget-popover-menu" :class="`add-transaction-button-widget-popover-menu-${widgetId}`">
         <f7-list dividers>
+            <f7-list-item key="AddTransaction" link="#" popover-close
+                          :title="tt('Add Transaction')"
+                          @click="emit('navigate', MobileOverviewWidgetNavigationType.Url, '/transaction/add')"
+                          v-if="finalDefaultAction !== AddTransactionButtonDefaultAction.AddTransaction">
+                <template #media>
+                    <f7-icon f7="plus"></f7-icon>
+                </template>
+            </f7-list-item>
             <f7-list-item key="AIClipboardTextRecognition" link="#" no-chevron popover-close
                           :title="tt('AI Clipboard Text Recognition')"
                           @click="emit('navigate', MobileOverviewWidgetNavigationType.AIClipboardTextRecognition)"
-                          v-if="isTransactionFromAITextRecognitionEnabled()">
+                          v-if="isTransactionFromAITextRecognitionEnabled() && finalDefaultAction !== AddTransactionButtonDefaultAction.AIClipboardTextRecognition">
                 <template #media>
                     <f7-icon f7="wand_stars"></f7-icon>
                 </template>
@@ -26,7 +34,7 @@
             <f7-list-item key="AIImageRecognition" link="#" no-chevron popover-close
                           :title="tt('AI Image Recognition')"
                           @click="emit('navigate', MobileOverviewWidgetNavigationType.AIImageRecognition)"
-                          v-if="isTransactionFromAIImageRecognitionEnabled()">
+                          v-if="isTransactionFromAIImageRecognitionEnabled() && finalDefaultAction !== AddTransactionButtonDefaultAction.AIImageRecognition">
                 <template #media>
                     <f7-icon f7="wand_stars"></f7-icon>
                 </template>
@@ -52,7 +60,7 @@ import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import type { ColorValue } from '@/core/color.ts';
 import { TemplateType } from '@/core/template.ts';
-import { MobileOverviewWidgetNavigationType } from '@/core/overview_layout.ts';
+import { MobileOverviewWidgetNavigationType, AddTransactionButtonDefaultAction } from '@/core/overview_layout.ts';
 
 import { DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR } from '@/consts/color.ts';
 
@@ -66,6 +74,7 @@ import {
 
 const props = defineProps<{
     widgetId: string;
+    defaultAction?: AddTransactionButtonDefaultAction;
     lightBackgroundColor?: ColorValue;
     darkBackgroundColor?: ColorValue;
 }>();
@@ -78,6 +87,38 @@ const { tt } = useI18n();
 
 const environmentsStore = useEnvironmentsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
+
+const finalDefaultAction = computed<AddTransactionButtonDefaultAction>(() => {
+    if (props.defaultAction === AddTransactionButtonDefaultAction.AIClipboardTextRecognition && isTransactionFromAITextRecognitionEnabled()) {
+        return AddTransactionButtonDefaultAction.AIClipboardTextRecognition;
+    } else if (props.defaultAction === AddTransactionButtonDefaultAction.AIImageRecognition && isTransactionFromAIImageRecognitionEnabled()) {
+        return AddTransactionButtonDefaultAction.AIImageRecognition;
+    }
+
+    return AddTransactionButtonDefaultAction.AddTransaction;
+});
+
+const finalDefaultActionIcon = computed<string>(() => finalDefaultAction.value === AddTransactionButtonDefaultAction.AddTransaction ? 'plus' : 'wand_stars');
+
+const finalDefaultActionText = computed<string>(() => {
+    if (finalDefaultAction.value === AddTransactionButtonDefaultAction.AIClipboardTextRecognition) {
+        return tt('AI Clipboard Text Recognition');
+    } else if (finalDefaultAction.value === AddTransactionButtonDefaultAction.AIImageRecognition) {
+        return tt('AI Image Recognition');
+    }
+
+    return tt('Add Transaction');
+});
+
+function executeDefaultAction(): void {
+    if (finalDefaultAction.value === AddTransactionButtonDefaultAction.AIClipboardTextRecognition) {
+        emit('navigate', MobileOverviewWidgetNavigationType.AIClipboardTextRecognition);
+    } else if (finalDefaultAction.value === AddTransactionButtonDefaultAction.AIImageRecognition) {
+        emit('navigate', MobileOverviewWidgetNavigationType.AIImageRecognition);
+    } else {
+        emit('navigate', MobileOverviewWidgetNavigationType.Url, '/transaction/add');
+    }
+}
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 const backgroundColor = computed<ColorValue>(() => isDarkMode.value ?

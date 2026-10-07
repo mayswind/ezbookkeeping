@@ -65,7 +65,15 @@
                                   :multiple="setting.multiple" :chips="setting.multiple" :closable-chips="setting.multiple"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-else-if="setting.settingType === 'customSelect' && (!setting.condition || setting.condition(widget?.settings))" />
+                                  v-else-if="setting.settingType === 'customSelect' && (!setting.condition || setting.condition(widget?.settings))">
+                            <template #item="{ props, internalItem }">
+                                <v-list-item :disabled="internalItem.raw.disabled?.(widget?.settings, widgetSettingsContext) ?? false" v-bind="props">
+                                    <template #title>
+                                        <div class="text-truncate">{{ internalItem.raw.name }}</div>
+                                    </template>
+                                </v-list-item>
+                            </template>
+                        </v-select>
 
                         <v-switch :class="{ 'mt-2': index > 0 && (supportsSettings[index - 1]?.settingType !== 'switch' || (supportsSettings[index - 1]?.condition && !supportsSettings[index - 1]?.condition?.(widget?.settings))) }"
                                   :label="tt(setting.displayName)"
@@ -132,19 +140,21 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 
-import { type GenericNameValue, type NameNumeralValue, values } from '@/core/base.ts';
+import { type NameNumeralValue, values } from '@/core/base.ts';
 import { AccountType } from '@/core/account.ts';
 import {
     type OverviewWidgetSettingValue,
+    type OverviewWidgetCustomSelectSettingValue,
     type OverviewWidgetCustomSelectSettingItem,
     type OverviewWidgetSettingItem,
+    type OverviewWidgetSettingContext,
     type DesktopOverviewWidgetLayout
 } from '@/core/overview_layout.ts';
 
 import { DESKTOP_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts';
 
 import { isDefined, isArray, isString, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
-import { cloneWidget } from '@/lib/overview_layout.ts';
+import { cloneWidget, getOverviewWidgetSettingContext } from '@/lib/overview_layout.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
 
@@ -176,7 +186,9 @@ const showFilterTransactionTagsDialog = ref<boolean>(false);
 const defaultCurrency = computed<string>(() => userStore.currentUserDefaultCurrency);
 const hasAnyAccount = computed<boolean>(() => accountsStore.allPlainAccounts.length > 0);
 const hasAnyTransactionCategory = computed<boolean>(() => !isObjectEmpty(transactionCategoriesStore.allTransactionCategoriesMap));
+
 const supportsSettings = computed<OverviewWidgetSettingItem[]>(() => widget.value ? DESKTOP_OVERVIEW_WIDGET_DEFINITIONS[widget.value.type]?.supportsSettings ?? [] : []);
+const widgetSettingsContext = computed<OverviewWidgetSettingContext>(() => getOverviewWidgetSettingContext());
 
 function getItemCountOptions(values: number[]): NameNumeralValue[] {
     return getTablePageOptions(values, undefined, false, true);
@@ -189,8 +201,12 @@ function getMonthOptions(values: number[]): NameNumeralValue[] {
     }));
 }
 
-function getCustomSelectOptions(setting: OverviewWidgetCustomSelectSettingItem): GenericNameValue<string | number>[] {
-    return setting.selectValues.map(item => ({ name: tt(item.name), value: item.value }));
+function getCustomSelectOptions(setting: OverviewWidgetCustomSelectSettingItem): OverviewWidgetCustomSelectSettingValue[] {
+    return setting.selectValues.map(item => ({
+        name: tt(item.name),
+        value: item.value,
+        disabled: item.disabled
+    }));
 }
 
 function getSettingValue(settingName: string): OverviewWidgetSettingValue | undefined {

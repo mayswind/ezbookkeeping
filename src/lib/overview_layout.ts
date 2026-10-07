@@ -3,6 +3,7 @@ import {
     type OverviewWidgetSettingValue,
     type OverviewWidgetSettingItem,
     type OverviewWidgetDefinitionBase,
+    type OverviewWidgetSettingContext,
     type OverviewRecentTransactionsQuery,
     type OverviewLayoutBase,
     type OverviewWidgetLayoutBase,
@@ -41,6 +42,11 @@ import {
     normalizeInteger,
     objectFieldToArrayItem
 } from '@/lib/common.ts';
+
+import {
+    isTransactionFromAITextRecognitionEnabled,
+    isTransactionFromAIImageRecognitionEnabled
+} from '@/lib/server_settings.ts';
 
 function normalizeOverviewWidgetSettings(definition: OverviewWidgetDefinitionBase, settings: unknown): Record<string, OverviewWidgetSettingValue> {
     const normalized = { ...definition.defaultSettings };
@@ -175,6 +181,13 @@ export function getOverviewDataRequirements(layout: OverviewLayoutBase, definiti
     }
 
     return requirements;
+}
+
+export function getOverviewWidgetSettingContext(): OverviewWidgetSettingContext {
+    return {
+        aiTextRecognitionEnabled: isTransactionFromAITextRecognitionEnabled(),
+        aiImageRecognitionEnabled: isTransactionFromAIImageRecognitionEnabled()
+    };
 }
 
 export function getOverviewTransactionOverviewMonths(layout: OverviewLayoutBase): number {

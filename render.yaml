@@ -41,3 +41,20 @@ services:
         sync: false
       - key: LITESTREAM_SECRET_ACCESS_KEY
         sync: false
+      # Uploaded files (transaction pictures, avatars, custom icons) go to S3 because the Render disk is ephemeral
+      - key: EBK_STORAGE_TYPE
+        value: s3
+      - key: EBK_STORAGE_S3_ENDPOINT
+        value: s3.eu-north-1.amazonaws.com
+      - key: EBK_STORAGE_S3_REGION
+        value: eu-north-1
+      - key: EBK_STORAGE_S3_USE_SSL
+        value: "true"
+      - key: EBK_STORAGE_S3_BUCKET
+        value: ezbookkeeping-sqlite-bkup
+      - key: EBK_STORAGE_S3_ROOT_PATH
+        value: /uploads
+      - key: EBK_STORAGE_S3_ACCESS_KEY_ID
+        sync: false
+      - key: EBK_STORAGE_S3_SECRET_ACCESS_KEY
+        sync: false

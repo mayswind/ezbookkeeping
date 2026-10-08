@@ -77,4 +77,8 @@ jobs:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
           IMAGE_URL: ${{ needs.build.outputs.render-image }}:${{ github.sha }}
         run: |
+          case "$RENDER_DEPLOY_HOOK_URL" in
+            https://api.render.com/deploy/*) ;;
+            *) echo "::error::RENDER_DEPLOY_HOOK_URL is missing or not a Render deploy hook URL (expected https://api.render.com/deploy/srv-...?key=...)"; exit 1 ;;
+          esac
           curl -fsS -X POST "${RENDER_DEPLOY_HOOK_URL}&imgURL=$(python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["IMAGE_URL"],safe=""))')"

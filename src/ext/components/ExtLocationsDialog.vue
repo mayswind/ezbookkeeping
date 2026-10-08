@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 
-import { useI18n } from '@/locales/helpers.ts';
+import { useExtI18n } from '@/ext/i18n.ts';
 
 import api from '@/ext/api.ts';
 import type { LocationInfo } from '@/ext/types.ts';
@@ -63,7 +63,7 @@ const emit = defineEmits<{
     (e: 'error', error: unknown): void;
 }>();
 
-const { tt } = useI18n();
+const { tt } = useExtI18n();
 
 const busy = ref<boolean>(false);
 const newName = ref<string>('');

@@ -118,5 +118,12 @@ export function useBusiness() {
         }
     }
 
-    return { businesses, own, working, invitations, current, role, isOwner, canManage, workingForSomeoneElse, loading, loaded, selectedBusinessId, refresh, switchBusiness };
+    /** Loads the list the first time it is needed; later calls do nothing. */
+    async function ensureLoaded(): Promise<void> {
+        if (!loaded.value && !loading.value) {
+            await refresh();
+        }
+    }
+
+    return { businesses, own, working, invitations, current, role, isOwner, canManage, workingForSomeoneElse, loading, loaded, selectedBusinessId, refresh, ensureLoaded, switchBusiness };
 }

@@ -17,6 +17,7 @@
         </div>
 
         <div :class="{ 'layout-content-wrapper': !noNavbar }">
+            <ext-business-banner /> <!-- [ext] -->
             <div class="layout-navbar navbar-blur">
                 <div class="navbar-content-container">
                     <div class="navbar-content d-flex h-100 align-center">
@@ -139,6 +140,7 @@
                                             {{ currentNickName }}
                                         </v-list-item-title>
                                     </v-list-item>
+                                    <ext-profile-menu-items /> <!-- [ext] -->
                                     <v-divider class="my-1"/>
                                     <v-list-item :prepend-icon="mdiCogOutline"
                                                  :title="tt('Settings')"
@@ -185,6 +187,8 @@
 import AboutDialog from '@/views/desktop/common/dialogs/AboutDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import ExtTopNav from '@/ext/components/ExtTopNav.vue'; // [ext]
+import ExtProfileMenuItems from '@/ext/components/ExtProfileMenuItems.vue'; // [ext]
+import ExtBusinessBanner from '@/ext/components/ExtBusinessBanner.vue'; // [ext]
 
 import { ref, computed, useTemplateRef } from 'vue';
 

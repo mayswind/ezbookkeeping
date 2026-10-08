@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue';
 
-import { useI18n } from '@/locales/helpers.ts';
+import { useExtI18n } from '@/ext/i18n.ts';
 
 import api from '@/ext/api.ts';
 import { parseQty, parseSignedQty } from '@/ext/qty.ts';
@@ -59,7 +59,7 @@ const emit = defineEmits<{
     (e: 'error', error: unknown): void;
 }>();
 
-const { tt } = useI18n();
+const { tt } = useExtI18n();
 
 const saving = ref<boolean>(false);
 const locationId = ref<string>('');

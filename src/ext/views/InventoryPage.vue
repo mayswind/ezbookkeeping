@@ -96,7 +96,7 @@ import ExtLocationsDialog from '@/ext/components/ExtLocationsDialog.vue';
 
 import { ref, computed, onMounted, useTemplateRef } from 'vue';
 
-import { useI18n } from '@/locales/helpers.ts';
+import { useExtI18n } from '@/ext/i18n.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import { parseBigDecimal } from '@/lib/numeral.ts';
@@ -111,7 +111,7 @@ type SnackBarType = InstanceType<typeof ExtSnackBar>;
 
 const ALL = 'all';
 
-const { tt, formatAmountToLocalizedNumeralsWithCurrency } = useI18n();
+const { tt, formatAmountToLocalizedNumeralsWithCurrency } = useExtI18n();
 const userStore = useUserStore();
 const { canManage, refresh } = useBusiness();
 
@@ -197,7 +197,7 @@ function openStockDialog(mode: StockDialogMode, item: ItemInfo): void {
 }
 
 function removeItem(item: ItemInfo): void {
-    confirmDialog.value?.open('Delete {name}? Its stock history is kept.', { name: item.name }).then(async () => {
+    confirmDialog.value?.open('ext.confirmDeleteItem', { name: item.name }).then(async () => {
         try {
             await api.deleteItem(item.id);
             snackbar.value?.showMessage(tt('Item deleted'));

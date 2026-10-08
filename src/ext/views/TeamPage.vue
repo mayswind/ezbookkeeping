@@ -7,7 +7,7 @@
                         <v-card-text>
                             <v-list>
                                 <v-list-item :key="invitation.ownerUid" :title="invitation.name"
-                                             :subtitle="tt('Invited as {role}', { role: tt(invitation.role) })"
+                                             :subtitle="tt('ext.invitedAs', { role: roleLabel(invitation.role) })"
                                              v-for="invitation in invitations">
                                     <template #append>
                                         <v-btn class="me-2" color="primary" size="small" :disabled="busy"
@@ -21,17 +21,31 @@
                     </v-card>
                 </v-col>
 
-                <v-col cols="12" v-if="otherBusinesses.length > 0">
+                <v-col cols="12" v-if="working.length > 1">
                     <v-card :title="tt('Businesses I work in')">
+                        <template #subtitle>
+                            {{ tt('Always check which business is selected before you record anything.') }}
+                        </template>
                         <v-card-text>
                             <v-list>
-                                <v-list-item :key="business.ownerUid" :title="business.name" :subtitle="tt(business.role)"
-                                             v-for="business in otherBusinesses">
+                                <v-list-item :key="business.ownerUid" :title="business.name"
+                                             :active="isCurrent(business)" :class="{ 'ext-current-business': isCurrent(business) }"
+                                             v-for="business in working">
+                                    <template #subtitle>
+                                        {{ business.status === 'owner' ? tt('ext.yourOwnBusiness') : roleLabel(business.role) }}
+                                    </template>
+                                    <template #prepend>
+                                        <v-icon :icon="isCurrent(business) ? mdiCheckCircle : mdiCircleOutline"
+                                                :color="isCurrent(business) ? 'primary' : undefined" />
+                                    </template>
                                     <template #append>
+                                        <v-chip class="me-2" size="small" color="primary" label v-if="isCurrent(business)">
+                                            {{ tt('Currently working here') }}
+                                        </v-chip>
                                         <v-btn class="me-2" size="small" variant="tonal" color="primary"
-                                               @click="switchBusiness(business.ownerUid)">{{ tt('Switch to this business') }}</v-btn>
+                                               @click="switchBusiness(business.ownerUid)" v-else>{{ tt('Switch to this business') }}</v-btn>
                                         <v-btn size="small" variant="text" :disabled="busy"
-                                               @click="leave(business)">{{ tt('Leave') }}</v-btn>
+                                               @click="leave(business)" v-if="business.status === 'active'">{{ tt('Leave') }}</v-btn>
                                     </template>
                                 </v-list-item>
                             </v-list>
@@ -114,7 +128,7 @@
                             <tbody>
                                 <tr :key="entry.id" v-for="entry in audit">
                                     <td>{{ formatTime(entry.time) }}</td>
-                                    <td>{{ nameOf(entry.actorUid) }} <span class="text-medium-emphasis">({{ tt(entry.role) }})</span></td>
+                                    <td>{{ nameOf(entry.actorUid) }} <span class="text-medium-emphasis">({{ roleLabel(entry.role) }})</span></td>
                                     <td>{{ describeAction(entry.path) }}</td>
                                     <td>
                                         <v-chip size="x-small" :color="entry.status < 400 ? 'success' : 'error'">{{ entry.status }}</v-chip>
@@ -141,9 +155,11 @@ import ExtSnackBar from '@/ext/components/ExtSnackBar.vue';
 
 import { ref, computed, onMounted, useTemplateRef } from 'vue';
 
-import { useI18n } from '@/locales/helpers.ts';
+import { useExtI18n } from '@/ext/i18n.ts';
 
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
+
+import { mdiCheckCircle, mdiCircleOutline } from '@mdi/js';
 
 import api from '@/ext/api.ts';
 import { switchBusiness, useBusiness } from '@/ext/business.ts';
@@ -152,8 +168,8 @@ import type { AuditEntry, BusinessInfo, BusinessRole, StaffInfo } from '@/ext/ty
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof ExtSnackBar>;
 
-const { tt, formatDateTimeToLongDateTime } = useI18n();
-const { businesses, invitations, refresh } = useBusiness();
+const { tt, roleLabel, formatDateTimeToLongDateTime } = useExtI18n();
+const { working, current, invitations, refresh } = useBusiness();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -170,8 +186,9 @@ const roleOptions = computed(() => [
     { title: tt('Manager'), value: 'manager' }
 ]);
 
-// businesses where the person works for somebody else
-const otherBusinesses = computed<BusinessInfo[]>(() => businesses.value.filter(b => b.status === 'active'));
+function isCurrent(business: BusinessInfo): boolean {
+    return !!current.value && current.value.ownerUid === business.ownerUid;
+}
 
 function formatTime(unixTime: number): string {
     return formatDateTimeToLongDateTime(parseDateTimeFromUnixTime(unixTime));
@@ -236,7 +253,7 @@ async function changeRole(member: StaffInfo, role: BusinessRole): Promise<void> 
 }
 
 function remove(member: StaffInfo): void {
-    confirmDialog.value?.open('Remove {name} from your business? They lose access immediately.', { name: member.nickname || member.username }).then(() => {
+    confirmDialog.value?.open('ext.confirmRemoveMember', { name: member.nickname || member.username }).then(() => {
         run(() => api.removeStaff(member.staffUid), tt('Removed'));
     }).catch(() => {
         // cancelled
@@ -248,7 +265,7 @@ async function respond(invitation: BusinessInfo, accept: boolean): Promise<void>
 }
 
 function leave(business: BusinessInfo): void {
-    confirmDialog.value?.open('Leave {name}? You will no longer have access to their business.', { name: business.name }).then(() => {
+    confirmDialog.value?.open('ext.confirmLeave', { name: business.name }).then(() => {
         run(() => api.leaveBusiness(business.ownerUid), tt('You left the business'));
     }).catch(() => {
         // cancelled

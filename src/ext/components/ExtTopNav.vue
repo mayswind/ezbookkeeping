@@ -1,73 +1,40 @@
 <template>
-    <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
-           :aria-label="tt('Business')" :icon="true"
-           :active="isActive"
-           :color="isActive || workingForSomeoneElse ? 'primary' : 'default'">
-        <v-badge dot color="error" :model-value="invitations.length > 0">
-            <v-icon :icon="isActive ? mdiStorefront : mdiStorefrontOutline" size="24" />
-        </v-badge>
-        <v-menu activator="parent" width="260" location="bottom end" offset="14px">
-            <v-list>
-                <v-list-subheader>{{ tt('Working in') }}</v-list-subheader>
-                <v-list-item :prepend-icon="isCurrent(business) ? mdiCheck : undefined"
-                             :key="business.ownerUid"
-                             :title="business.status === 'owner' ? tt('My own business') : business.name"
-                             :subtitle="tt(business.role)"
-                             @click="selectBusiness(business)"
-                             v-for="business in working">
-                </v-list-item>
+    <router-link to="/ext/inventory" :aria-current="isActive ? 'page' : undefined">
+        <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+               :aria-label="tt('Inventory')" :icon="true"
+               :active="isActive" :color="isActive ? 'primary' : 'default'">
+            <v-icon :icon="mdiPackageVariantClosed" size="24" />
+            <v-tooltip activator="parent">{{ tt('Inventory') }}</v-tooltip>
+        </v-btn>
+    </router-link>
 
-                <v-divider class="my-1" />
-                <v-list-item :prepend-icon="mdiPackageVariantClosed" :title="tt('Inventory')" to="/ext/inventory"></v-list-item>
-                <v-list-item :prepend-icon="mdiAccountGroupOutline" to="/ext/team">
-                    <v-list-item-title>
-                        {{ tt('Team') }}
-                        <v-chip class="ms-2" size="x-small" color="error" v-if="invitations.length > 0">{{ invitations.length }}</v-chip>
-                    </v-list-item-title>
-                </v-list-item>
-            </v-list>
-        </v-menu>
-    </v-btn>
+    <!-- always visible for people who belong to other businesses, so nobody forgets which one they are in -->
+    <v-chip class="ms-3" size="small" label :color="workingForSomeoneElse ? 'warning' : undefined"
+            :prepend-icon="mdiStorefrontOutline" v-if="current && working.length > 1">
+        {{ tt('ext.chip', { name: current.name, role: roleLabel(current.role) }) }}
+    </v-chip>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { useI18n } from '@/locales/helpers.ts';
+import { useExtI18n } from '@/ext/i18n.ts';
+import { installBusinessHeader, useBusiness } from '@/ext/business.ts';
 
-import { installBusinessHeader, switchBusiness, useBusiness } from '@/ext/business.ts';
-import type { BusinessInfo } from '@/ext/types.ts';
-
-import {
-    mdiCheck,
-    mdiStorefront,
-    mdiStorefrontOutline,
-    mdiPackageVariantClosed,
-    mdiAccountGroupOutline
-} from '@mdi/js';
+import { mdiPackageVariantClosed, mdiStorefrontOutline } from '@mdi/js';
 
 const route = useRoute();
-const { tt } = useI18n();
-const { working, invitations, current, workingForSomeoneElse, refresh } = useBusiness();
+const { tt, roleLabel } = useExtI18n();
+const { working, current, workingForSomeoneElse, ensureLoaded } = useBusiness();
 
-const isActive = computed<boolean>(() => route.path.startsWith('/ext/'));
-
-function isCurrent(business: BusinessInfo): boolean {
-    return !!current.value && current.value.ownerUid === business.ownerUid;
-}
-
-function selectBusiness(business: BusinessInfo): void {
-    if (!isCurrent(business)) {
-        switchBusiness(business.ownerUid);
-    }
-}
+const isActive = computed<boolean>(() => route.path.startsWith('/ext/inventory'));
 
 installBusinessHeader();
 
 onMounted(() => {
-    refresh().catch(() => {
-        // the menu still works for the person's own business if the list cannot be loaded
+    ensureLoaded().catch(() => {
+        // the app still works on the person's own business if the list cannot be loaded
     });
 });
 </script>

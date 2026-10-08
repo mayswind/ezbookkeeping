@@ -12,6 +12,8 @@ SEAMS="
 cmd/webserver.go
 cmd/database.go
 pkg/core/context_web.go
+src/router/desktop.ts
+src/components/desktop/MainPageLayout.vue
 "
 
 # Paths that are ours, not upstream's

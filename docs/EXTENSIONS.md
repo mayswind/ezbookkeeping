@@ -24,7 +24,8 @@ Individuals are unaffected: with no business header every request behaves exactl
 | HTTP API and routes | Done, tested end to end through the real middleware |
 | Upstream seams (3 files, ~39 lines) | Done |
 | Seam check script and CI workflow | Done (CI workflow untested on GitHub) |
-| **Frontend UI** | **Not started** (see section 9) |
+| Frontend: foundation, business switcher, Team page, Inventory page | Done: type-check, lint, build and unit tests pass; **not yet clicked through in a browser** |
+| Frontend: sales screen, customers and repayments | Not started (see section 9) |
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
@@ -55,6 +56,8 @@ pkg/ext/
 | `pkg/core/context_web.go` | `SetEffectiveUid`, `GetActualUid`, and `GetCurrentUid` returns the delegated owner's uid when set |
 | `cmd/webserver.go` | one `Use(ext.DelegationMiddleware(...))` line and one `ext.RegisterRoutes(...)` call, both tagged `[ext]` |
 | `cmd/database.go` | one `ext.SyncTables()` call, tagged `[ext]` |
+| `src/router/desktop.ts` | one import and one `...extRoutes` line, tagged `[ext]` |
+| `src/components/desktop/MainPageLayout.vue` | one import and one `<ext-top-nav />` line in the top toolbar, tagged `[ext]` |
 
 `scripts/check-seams.sh [base]` fails if a branch changes any other upstream file or makes a seam grow past 40 lines.
 Run it before merging and in CI (`.github/workflows/ext-ci.yml`).
@@ -182,13 +185,13 @@ Deployment: nothing to change; the next deploy creates the tables. Back up the d
 
 ## 9. What is left (next steps, in order)
 
-1. **Frontend** (not started). Suggested layout: `src/ext/` (views, stores, API client, router module) with the router and navigation hooked in through one or two lines, locales in a separate file.
-   - Business switcher (sets `X-Business-Id` on every request, persisted per user) driven by `/ext/me/businesses.json`.
-   - Staff page (invite, role, remove), accept-invitation prompt.
-   - Items and stock pages, location switcher, stock receive/adjust/transfer.
-   - A sale screen (cart, customer, amount paid, account pickers) and a customer balances / repayments screen.
-   - Hide pages the role cannot use (the server already enforces it; the UI should just not show dead ends).
-   - Add `src/ext/` to the seam check (already allowed) and any router/nav file to `SEAMS` in `scripts/check-seams.sh`.
+1. **Frontend, remaining.** Built so far in `src/ext/` (no upstream file holds ext UI logic):
+   - `api.ts` typed client over the app's shared axios, `business.ts` (the `X-Business-Id` header via its own axios interceptor, per-user remembered choice, switching reloads the page because every store holds the previous business's data), `qty.ts` (exact fixed-point quantities, unit tested).
+   - `ExtTopNav.vue` (business menu in the toolbar, with an invitations dot), `TeamPage.vue` (invitations, businesses I work in, my team with roles, recent activity), `InventoryPage.vue` with item, stock (receive / adjust / transfer) and location dialogs. Managers and owners see the buttons, staff see a read-only view.
+   - Routes `/ext/team` and `/ext/inventory`.
+
+   Still to build: the **sale screen** (cart, customer, amount paid, account pickers, receipt), **customers and repayments** (balances, record a repayment), sales history with void, and pickers that default the payment, receivable and income-category accounts.
+   Known gaps: prices are shown in the *user's* default currency because the API does not yet return the business currency; new strings use English text as the key and are not translated; the pages have been type-checked and built but not exercised in a browser, so expect layout fixes; the mobile app has no ext screens.
 2. **Registration and invitations for new people.** Invitees must already have an account, and public registration is closed (paywall plan).
    Decide how a new staff member gets an account: invitation links that allow registration, or the owner creates the account.
 3. **Billing / paywall** per owner; staff seats belong to the owner's subscription.

@@ -2,6 +2,7 @@ import { type NavigationGuardReturn, createRouter, createWebHashHistory } from '
 
 import { TemplateType } from '@/core/template.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
+import { extRoutes } from '@/ext/router.ts'; // [ext]
 
 import LoginPage from '@/views/desktop/LoginPage.vue';
 import SignUpPage from '@/views/desktop/SignupPage.vue';
@@ -163,6 +164,7 @@ const router = createRouter({
             component: AccountListPage,
             beforeEnter: checkLogin
         },
+        ...extRoutes, // [ext]
         {
             path: '/',
             component: SettingsPageLayout,

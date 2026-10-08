@@ -31,7 +31,7 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
-Tests: `go test ./pkg/ext/...` (74 tests, all passing). The service tests take about 4 seconds each because every test boots a fresh SQLite database and syncs all tables, so the package needs several minutes; run a single test with `-run`. The whole backend suite passes except
+Tests: `go test ./pkg/ext/...` (80 tests, all passing). The service tests take about 4 seconds each because every test boots a fresh SQLite database and syncs all tables, so the package needs several minutes; run a single test with `-run`. The whole backend suite passes except
 `TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfUkraineDataSource`, which calls a live third-party API and fails
 on `main` too (not related to this work).
 
@@ -140,6 +140,7 @@ Send `X-Business-Id` to work in somebody else's business.
 | Method and path | Min role | Purpose |
 |---|---|---|
 | GET `/ext/me/businesses.json` | any | My own business and those I was invited to |
+| GET `/ext/me/settings.json`, POST `/ext/me/settings/update.json` `{businessFeatures}` | any | My ext preferences (business features on or off); always about me, never about a business |
 | POST `/ext/staff/invite.json` `{email, role}` | owner | Invite an existing user as `manager` or `staff` |
 | GET `/ext/staff/list.json` | owner | My team |
 | POST `/ext/staff/set_role.json` `{staffUid, role}` | owner | Change a role |
@@ -180,7 +181,7 @@ Errors use upstream's format. Ext errors are in sub category `100` (`pkg/ext/err
 
 Tables (all `ext_` prefixed, created by `SyncTables()` during `ezbookkeeping database update` or on start when `auto_update_database` is true; additive only):
 
-- User database (looked up across owners): `ext_membership`, `ext_audit_log`.
+- User database (looked up across owners): `ext_membership`, `ext_audit_log`, `ext_user_setting` (one row per person: whether the business features are on).
 - Business data (next to the owner's data): `ext_location`, `ext_item`, `ext_stock_movement`, `ext_customer`, `ext_sale`, `ext_sale_line`, `ext_repayment`, `ext_repayment_allocation`.
 
 Works on SQLite, MySQL and PostgreSQL through the same ORM as upstream. Tests run on SQLite only.
@@ -197,7 +198,7 @@ Deployment: nothing to change; the next deploy creates the tables. Back up the d
 
    `CustomersPage.vue` (route `/ext/customers`): customers with what each owes (largest debt first), search, an "only people who owe me" filter, add / edit / delete (delete is refused while a customer owes money), a detail dialog with unpaid sales and repayment history, and a **Record repayment** dialog: amount (defaults to everything owed, never more), apply to the oldest sales or one chosen sale, the account the money arrived in, the owed-money (Receivables) account, and a transfer category (repayments are recorded as transfers, so the books need one). Choices are remembered per business.
 
-   **Opt-in:** Sales, Customers, Inventory and Team are hidden until the person switches on *Settings > Business Features* (`BusinessSettingsPage.vue`, kept in this browser per user name by `features.ts`). Being invited to work in somebody else's business turns the features on automatically while the person is a member. Team also shows when there is an invitation to answer. The routes are guarded the same way (`router.ts`) and send people to the settings page. Because the switch lives in the browser, it does not follow the person to another device; a server-side flag would be the next step if that matters.
+   **Opt-in:** Sales, Customers, Inventory and Team are hidden until the person switches on *Settings > Business Features* (`BusinessSettingsPage.vue`, stored **on the server** in the new `ext_user_setting` table so it follows the person to every device; `features.ts` keeps a browser copy only to avoid a flicker while the page loads). Being invited to work in somebody else's business turns the features on automatically while the person is a member. Team also shows when there is an invitation to answer. The routes are guarded the same way (`router.ts`) and send people to the settings page.  A choice made before the setting moved to the server (kept in the browser) is carried over once.
 
    **Translations:** all labels are registered in `src/ext/locales/en.json`, with the English sentence as the key like the app's own `en.json`. Other languages: add `src/ext/locales/<code>.json` (underscore in the file name for a hyphenated code, e.g. `zh_Hans.json`) with the same keys; missing keys fall back to English. After adding a label run `python3 scripts/ext-extract-i18n.py`; a unit test (`src/ext/__tests__/locales.test.ts`) fails if a label or placeholder is not registered.
 
@@ -231,7 +232,7 @@ Code review findings were fixed in this branch (see git history); what remains:
 
 ## 11. Working on it
 
-API smoke test against a running local server: `python3 scripts/ext-smoke.py` (35 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
+API smoke test against a running local server: `python3 scripts/ext-smoke.py` (41 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
 
 ```sh
 export PATH=$HOME/sdk/go/bin:$PATH GOTOOLCHAIN=local     # Go 1.27.1 (see go.mod)

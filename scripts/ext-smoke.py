@@ -72,6 +72,12 @@ s, b = o("GET", "ext/repayments/list.json?customerId=" + cust); check("repayment
 s, b = o("POST", "ext/customers/modify.json", {"id": cust, "name": "Ada Obi Jr", "phone": "0800", "email": "", "note": ""}); check("edit customer", s == 200 and b["result"]["name"] == "Ada Obi Jr" and b["result"]["outstanding"] == 200000, (s, b))
 s, b = o("POST", "ext/customers/delete.json", {"id": cust}); check("cannot delete a customer who owes", s == 400, (s, b))
 
+# per-person business features setting (server side)
+s, b = o("GET", "ext/me/settings.json"); check("features off until chosen", s == 200 and b["result"] == {"businessFeatures": False, "configured": False}, (s, b))
+s, b = o("POST", "ext/me/settings/update.json", {"businessFeatures": True}); check("turn features on", s == 200 and b["result"]["businessFeatures"] is True, (s, b))
+s, b = o("GET", "ext/me/settings.json"); check("features stay on", s == 200 and b["result"] == {"businessFeatures": True, "configured": True}, (s, b))
+s, b = call("GET", "v1/ext/me/settings.json", None, staff); check("another person's setting is separate", s == 200 and b["result"]["businessFeatures"] is False, (s, b))
+
 # staff
 uid_owner = call("GET", "v1/ext/me/businesses.json", None, owner)[1]["result"][0]["ownerUid"]
 s, b = o("POST", "ext/staff/invite.json", {"email": staff_name + "@example.com", "role": "staff"}); check("invite staff", s == 200, b)
@@ -87,6 +93,8 @@ s, b = st("POST", "ext/sales/void.json", {"id": staff_sale["id"]}); check("staff
 s, b = st("POST", "ext/items/add.json", {"sku": "X", "name": "X", "unit": "", "costPrice": 0, "salePrice": 0, "reorderLevel": 0, "trackStock": False}); check("staff add item refused (403)", s == 403, (s, b))
 s, b = st("POST", "ext/customers/modify.json", {"id": cust, "name": "Hacked", "phone": "", "email": "", "note": ""}); check("staff edit customer refused (403)", s == 403, (s, b))
 s, b = st("POST", "ext/customers/add.json", {"name": "Walk up"}); check("staff can add a customer", s == 200, (s, b))
+s, b = st("POST", "ext/me/settings/update.json", {"businessFeatures": True}); check("staff changes only their own setting", s == 200, (s, b))
+s, b = o("GET", "ext/me/settings.json"); check("owner setting unaffected by staff", s == 200 and b["result"]["businessFeatures"] is True, (s, b))
 s, b = st("GET", "ext/staff/list.json"); check("staff sees no team of the owner", s == 200 and b["result"] == [], (s, b))
 s, b = o("GET", "ext/audit/list.json"); check("owner audit shows staff sale", s == 200 and any(e["method"] == "POST" and "sales/add" in e["path"] for e in b["result"]), b)
 s, b = call("GET", "v1/ext/items/list.json", None, staff, "999999"); check("staff cannot use a business they don't belong to", s == 403, (s, b))

@@ -27,6 +27,8 @@ func RegisterRoutes(group *gin.RouterGroup, bind ApiBinder) {
 
 	// Business membership: always about the logged-in person
 	group.GET("/ext/me/businesses.json", bind(h.MyBusinessesHandler))
+	group.GET("/ext/me/settings.json", bind(h.MySettingsHandler))
+	group.POST("/ext/me/settings/update.json", bind(h.MySettingsUpdateHandler))
 	group.POST("/ext/staff/invite.json", bind(h.StaffInviteHandler))
 	group.GET("/ext/staff/list.json", bind(h.StaffListHandler))
 	group.POST("/ext/staff/set_role.json", bind(h.StaffSetRoleHandler))

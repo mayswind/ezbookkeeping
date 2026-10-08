@@ -4,6 +4,7 @@ import type { ApiResponse } from '@/core/api.ts';
 
 import type {
     BusinessInfo,
+    MySettings,
     StaffInfo,
     AuditEntry,
     LocationInfo,
@@ -55,6 +56,8 @@ export function describeError(error: unknown): string {
 export default {
     // business membership (always about the logged-in person)
     getMyBusinesses: () => get<BusinessInfo[]>('me/businesses.json'),
+    getMySettings: () => get<MySettings>('me/settings.json'),
+    updateMySettings: (businessFeatures: boolean) => post<MySettings>('me/settings/update.json', { businessFeatures }),
     listStaff: () => get<StaffInfo[]>('staff/list.json'),
     inviteStaff: (email: string, role: BusinessRole) => post<StaffInfo>('staff/invite.json', { email, role }),
     setStaffRole: (staffUid: string, role: BusinessRole) => post<boolean>('staff/set_role.json', { staffUid, role }),

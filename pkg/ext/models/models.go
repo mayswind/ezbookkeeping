@@ -67,6 +67,17 @@ type Membership struct {
 // TableName returns the table name
 func (Membership) TableName() string { return "ext_membership" }
 
+// UserSetting holds the ext preferences of one person, independent of any business they work in
+type UserSetting struct {
+	Uid              int64 `xorm:"PK"`
+	BusinessFeatures bool  `xorm:"NOT NULL"` // inventory, sales, customers and team are shown in the app
+	CreatedUnixTime  int64
+	UpdatedUnixTime  int64
+}
+
+// TableName returns the table name
+func (UserSetting) TableName() string { return "ext_user_setting" }
+
 // AuditLog records every write request made by a manager or staff member on behalf of an owner
 type AuditLog struct {
 	AuditId     int64  `xorm:"PK AUTOINCR"`
@@ -239,6 +250,7 @@ func GlobalTables() []any {
 	return []any{
 		new(Membership),
 		new(AuditLog),
+		new(UserSetting),
 	}
 }
 

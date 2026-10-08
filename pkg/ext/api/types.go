@@ -45,6 +45,10 @@ type RespondInviteRequest struct {
 	Accept   bool  `json:"accept"`
 }
 
+type UserSettingsRequest struct {
+	BusinessFeatures bool `json:"businessFeatures"`
+}
+
 type LeaveBusinessRequest struct {
 	OwnerUid int64 `json:"ownerUid,string" binding:"required,min=1"`
 }
@@ -155,6 +159,11 @@ type RepaymentListRequest struct {
 }
 
 // ---- responses
+
+type UserSettingsView struct {
+	BusinessFeatures bool `json:"businessFeatures"`
+	Configured       bool `json:"configured"` // false until the person chose, so the app can carry over an older local choice
+}
 
 type BusinessView struct {
 	OwnerUid int64  `json:"ownerUid,string"`

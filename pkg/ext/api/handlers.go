@@ -212,3 +212,31 @@ func (h *Handlers) AuditListHandler(c *core.WebContext) (any, *errs.Error) {
 }
 
 var _ = exterrs.SubcategoryExt
+
+// MySettingsHandler returns the caller's ext preferences
+func (h *Handlers) MySettingsHandler(c *core.WebContext) (any, *errs.Error) {
+	setting, configured, err := extservices.UserSettings.Get(c, c.GetActualUid())
+
+	if err != nil {
+		return nil, fail(c, "me.settings", err)
+	}
+
+	return &UserSettingsView{BusinessFeatures: setting.BusinessFeatures, Configured: configured}, nil
+}
+
+// MySettingsUpdateHandler changes the caller's ext preferences
+func (h *Handlers) MySettingsUpdateHandler(c *core.WebContext) (any, *errs.Error) {
+	var req UserSettingsRequest
+
+	if err := bindBody(c, &req); err != nil {
+		return nil, err
+	}
+
+	setting, err := extservices.UserSettings.SetBusinessFeatures(c, c.GetActualUid(), req.BusinessFeatures)
+
+	if err != nil {
+		return nil, fail(c, "me.settings.update", err)
+	}
+
+	return &UserSettingsView{BusinessFeatures: setting.BusinessFeatures, Configured: true}, nil
+}

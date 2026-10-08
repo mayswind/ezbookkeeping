@@ -341,3 +341,35 @@ func TestHTTP_StaffCannotOverridePricesOrGiveDiscounts(t *testing.T) {
 	code, _ := w.call(w.manager, w.owner, "POST", "/ext/sales/add.json", map[string]any{"categoryId": "1", "lines": []any{priced}, "amountPaid": 1})
 	assert.NotEqual(t, http.StatusForbidden, code)
 }
+
+func TestHTTP_BusinessFeaturesSettingIsPerPersonAndIgnoresTheBusinessHeader(t *testing.T) {
+	w := newWorld(t)
+
+	code, body := w.call(w.manager, 0, "GET", "/ext/me/settings.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, false, result(t, body)["businessFeatures"], "off until the person chooses")
+	assert.Equal(t, false, result(t, body)["configured"])
+
+	// a manager changing their own setting while a business header is present must not touch the owner's
+	code, body = w.call(w.manager, w.owner, "POST", "/ext/me/settings/update.json", map[string]any{"businessFeatures": true})
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, true, result(t, body)["businessFeatures"])
+
+	code, body = w.call(w.manager, 0, "GET", "/ext/me/settings.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, true, result(t, body)["businessFeatures"])
+	assert.Equal(t, true, result(t, body)["configured"])
+
+	code, body = w.call(w.owner, 0, "GET", "/ext/me/settings.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, false, result(t, body)["businessFeatures"], "the owner's setting is untouched")
+	assert.Equal(t, false, result(t, body)["configured"])
+
+	// switching off again is an explicit, remembered choice
+	code, _ = w.call(w.manager, 0, "POST", "/ext/me/settings/update.json", map[string]any{"businessFeatures": false})
+	require.Equal(t, http.StatusOK, code)
+	code, body = w.call(w.manager, 0, "GET", "/ext/me/settings.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, false, result(t, body)["businessFeatures"])
+	assert.Equal(t, true, result(t, body)["configured"])
+}

@@ -55,7 +55,7 @@ import {
 const route = useRoute();
 const { tt, roleLabel } = useExtI18n();
 const { working, current, workingForSomeoneElse, ensureLoaded } = useBusiness();
-const { available } = useBusinessFeatures();
+const { available, loadFeatureSetting } = useBusinessFeatures();
 
 function isActive(prefix: string): boolean {
     return route.path.startsWith(prefix);
@@ -66,6 +66,10 @@ installBusinessHeader();
 onMounted(() => {
     ensureLoaded().catch(() => {
         // the app still works on the person's own business if the list cannot be loaded
+    });
+
+    loadFeatureSetting().catch(() => {
+        // the menus then follow the last known answer
     });
 });
 </script>

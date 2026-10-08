@@ -178,6 +178,11 @@ export interface RepaymentRequest {
     readonly note: string;
 }
 
+export interface MySettings {
+    readonly businessFeatures: boolean;
+    readonly configured: boolean;
+}
+
 export interface ExtApiError {
     readonly errorCode?: number;
     readonly errorMessage?: string;

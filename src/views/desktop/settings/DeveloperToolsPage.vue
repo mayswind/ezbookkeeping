@@ -11,7 +11,7 @@
                 <v-card-text class="mt-2 text-body-medium">
                     <div>
                         <v-alert variant="tonal">
-                            {{ tt('This tool temporarily replaces the language configuration for the current language. Changes only affect the current session and are discarded when the page is refreshed.') }}
+                            {{ tt('This tool temporarily replaces the language configuration for the current language. The updated configuration only takes effect in the current tab session.') }}
                         </v-alert>
                     </div>
 

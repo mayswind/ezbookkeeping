@@ -2945,7 +2945,7 @@
     "Load Language Configuration File": "加载语言配置文件",
     "Apply Preview": "应用预览",
     "Restore Built-in Language": "恢复内置语言",
-    "This tool temporarily replaces the language configuration for the current language. Changes only affect the current session and are discarded when the page is refreshed.": "此工具会临时替换当前语言的语言配置。更改仅影响当前会话，刷新页面后即失效。",
+    "This tool temporarily replaces the language configuration for the current language. The updated configuration only takes effect in the current tab session.": "此工具会临时替换当前语言的语言配置，更新后的配置仅在当前标签页的会话生效。",
     "Paste a language JSON object or load a local file, then click Apply Preview. After editing the file, load it again to test the updated content. The JSON replaces the entire current language configuration.": "粘贴语言 JSON 对象或加载本地文件，然后点击应用预览。编辑文件后，请重新加载以测试更新后的内容。此 JSON 会替换当前语言的全部配置。",
     "Language preview applied. You can navigate to other pages to check the result.": "语言预览已应用。您可以切换到其他页面查看效果。",
     "Built-in language configuration restored": "内置语言配置已恢复",

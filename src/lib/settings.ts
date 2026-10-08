@@ -1,4 +1,5 @@
 import { keys } from '@/core/base.ts';
+import { TextDirection } from '@/core/text.ts';
 
 import type {
     ApplicationSettingKey,
@@ -14,8 +15,19 @@ import {
     DEFAULT_LOCALE_SETTINGS
 } from '@/core/setting.ts';
 
+import {
+    isObject,
+    isString
+} from '@/lib/common.ts';
+
 const settingsLocalStorageKey: string = 'ebk_app_settings';
 const currentLanguageSessionStorageKey: string = 'ebk_current_language';
+const languagePreviewSessionStorageKeyPrefix: string = 'ebk_language_preview_';
+
+export interface SessionLanguagePreview {
+    readonly data: string;
+    readonly textDirection: TextDirection;
+}
 
 function getStoredApplicationSettings(): BaseApplicationSetting {
     try {
@@ -120,4 +132,47 @@ export function setSessionCurrentLanguageKey(languageKey: string): void {
     }
 
     sessionStorage.setItem(currentLanguageSessionStorageKey, languageKey);
+}
+
+export function getSessionLanguagePreview(languageKey: string): SessionLanguagePreview | null {
+    try {
+        const storageData = sessionStorage.getItem(languagePreviewSessionStorageKeyPrefix + languageKey);
+
+        if (!storageData) {
+            return null;
+        }
+
+        const preview: unknown = JSON.parse(storageData) as unknown;
+
+        if (!preview || !isObject(preview) || !('data' in preview) || !('textDirection' in preview)) {
+            console.warn('language preview object is invalid', preview);
+            return null;
+        }
+
+        const data = preview['data'];
+        const textDirection = preview['textDirection'];
+
+        if (!preview || !isString(data) || (textDirection !== TextDirection.LTR && textDirection !== TextDirection.RTL)) {
+            console.warn('fields in language preview object are invalid', preview);
+            return null;
+        }
+
+        return {
+            data: data,
+            textDirection: textDirection
+        };
+    } catch (ex) {
+        console.warn('language preview in session storage is invalid', ex);
+        return null;
+    }
+}
+
+export function setSessionLanguagePreview(languageKey: string, preview: SessionLanguagePreview | null): void {
+    const storageKey = languagePreviewSessionStorageKeyPrefix + languageKey;
+
+    if (!preview) {
+        sessionStorage.removeItem(storageKey);
+    } else {
+        sessionStorage.setItem(storageKey, JSON.stringify(preview));
+    }
 }

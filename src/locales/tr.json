@@ -2945,7 +2945,7 @@
     "Load Language Configuration File": "Load Language Configuration File",
     "Apply Preview": "Apply Preview",
     "Restore Built-in Language": "Restore Built-in Language",
-    "This tool temporarily replaces the language configuration for the current language. Changes only affect the current session and are discarded when the page is refreshed.": "This tool temporarily replaces the language configuration for the current language. Changes only affect the current session and are discarded when the page is refreshed.",
+    "This tool temporarily replaces the language configuration for the current language. The updated configuration only takes effect in the current tab session.": "This tool temporarily replaces the language configuration for the current language. The updated configuration only takes effect in the current tab session.",
     "Paste a language JSON object or load a local file, then click Apply Preview. After editing the file, load it again to test the updated content. The JSON replaces the entire current language configuration.": "Paste a language JSON object or load a local file, then click Apply Preview. After editing the file, load it again to test the updated content. The JSON replaces the entire current language configuration.",
     "Language preview applied. You can navigate to other pages to check the result.": "Language preview applied. You can navigate to other pages to check the result.",
     "Built-in language configuration restored": "Built-in language configuration restored",

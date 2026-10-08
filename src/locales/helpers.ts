@@ -213,6 +213,7 @@ import type { LatestExchangeRateResponse, LocalizedLatestExchangeRate } from '@/
 import {
     isDefined,
     isObject,
+    isArray,
     isString,
     isNumber,
     isBoolean
@@ -284,8 +285,12 @@ import {
 
 import {
     getSessionCurrentLanguageKey,
-    setSessionCurrentLanguageKey
+    setSessionCurrentLanguageKey,
+    getSessionLanguagePreview,
+    setSessionLanguagePreview
 } from '@/lib/settings.ts';
+
+import { isLanguagePreviewEnabled } from '@/lib/server_settings.ts';
 
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
@@ -313,6 +318,29 @@ export interface LocalizedError {
 const allLanguageActualRtlSetting = reactive<Record<string, boolean>>({});
 const previewedLanguages = reactive<Record<string, boolean>>({});
 
+function parsePreviewMessages(json: string): PreviewLanguageMessages {
+    const value: unknown = JSON.parse(json.replace(/^\uFEFF/, ''));
+
+    function validate(value: unknown, path: string): asserts value is PreviewLanguageMessages {
+        if (!value || !isObject(value) || isArray(value)) {
+            throw new Error(`${path} must be a JSON object containing strings or nested objects.`);
+        }
+
+        for (const [key, message] of entries(value)) {
+            if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+                throw new Error(`Unsupported message key: ${path}.${key}`);
+            }
+
+            if (!isString(message)) {
+                validate(message, `${path}.${key}`);
+            }
+        }
+    }
+
+    validate(value, 'Language configuration');
+    return value;
+}
+
 export function getI18nOptions(): object {
     return {
         legacy: false,
@@ -324,6 +352,22 @@ export function getI18nOptions(): object {
 
             for (const [languageKey, languageInfo] of entries(ALL_LANGUAGES)) {
                 messages[languageKey] = languageInfo.content;
+
+                if (!isLanguagePreviewEnabled()) {
+                    continue;
+                }
+
+                const preview = getSessionLanguagePreview(languageKey);
+
+                if (preview && preview.data && preview.textDirection) {
+                    try {
+                        messages[languageKey] = parsePreviewMessages(preview.data);
+                        allLanguageActualRtlSetting[languageKey] = preview.textDirection === TextDirection.RTL;
+                        previewedLanguages[languageKey] = true;
+                    } catch (ex) {
+                        logger.warn(`failed to restore language preview for ${languageKey}`, ex);
+                    }
+                }
             }
 
             return messages;
@@ -349,29 +393,6 @@ export function useI18n() {
     const exchangeRatesStore = useExchangeRatesStore();
 
     // private functions
-    function parsePreviewMessages(json: string): PreviewLanguageMessages {
-        const value: unknown = JSON.parse(json.replace(/^\uFEFF/, ''));
-
-        function validate(value: unknown, path: string): asserts value is PreviewLanguageMessages {
-            if (!value || typeof value !== 'object' || Array.isArray(value)) {
-                throw new Error(`${path} must be a JSON object containing strings or nested objects.`);
-            }
-
-            for (const [key, message] of entries(value)) {
-                if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-                    throw new Error(`Unsupported message key: ${path}.${key}`);
-                }
-
-                if (typeof message !== 'string') {
-                    validate(message, `${path}.${key}`);
-                }
-            }
-        }
-
-        validate(value, 'Language configuration');
-        return value;
-    }
-
     function getLanguageDisplayName(languageName: string): string {
         return t(`language.${languageName}`);
     }
@@ -2668,6 +2689,10 @@ export function useI18n() {
 
     function previewLanguage(json: string, textDirection: TextDirection): void {
         const messages: PreviewLanguageMessages = parsePreviewMessages(json);
+        setSessionLanguagePreview(locale.value, {
+            data: json,
+            textDirection: textDirection
+        });
         setLocaleMessage(locale.value, messages);
         allLanguageActualRtlSetting[locale.value] = textDirection === TextDirection.RTL;
         previewedLanguages[locale.value] = true;
@@ -2681,6 +2706,7 @@ export function useI18n() {
             return;
         }
 
+        setSessionLanguagePreview(locale.value, null);
         setLocaleMessage(locale.value, JSON.parse(JSON.stringify(languageInfo.content)));
         allLanguageActualRtlSetting[locale.value] = languageInfo.textDirection === 'rtl';
         delete previewedLanguages[locale.value];

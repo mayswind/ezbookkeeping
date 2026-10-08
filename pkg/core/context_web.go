@@ -16,6 +16,7 @@ const webContextTextualTokenFieldKey = "TOKEN_STRING"
 const webContextTokenClaimsFieldKey = "TOKEN_CLAIMS"
 const webContextTokenContextFieldKey = "TOKEN_CONTEXT"
 const webContextResponseErrorFieldKey = "RESPONSE_ERROR"
+const webContextEffectiveUidFieldKey = "EFFECTIVE_UID" // [ext] set when a staff member acts on behalf of a business owner
 
 // AcceptLanguageHeaderName represents the header name of accept language
 const AcceptLanguageHeaderName = "Accept-Language"
@@ -137,8 +138,31 @@ func (c *WebContext) GetTokenContext() string {
 	return context.(string)
 }
 
-// GetCurrentUid returns the current user uid by the current user token
+// SetEffectiveUid sets the uid whose data the current request operates on (owner/staff delegation, see pkg/ext)
+func (c *WebContext) SetEffectiveUid(uid int64) {
+	c.Set(webContextEffectiveUidFieldKey, uid)
+}
+
+// GetActualUid returns the uid of the user who is really logged in, ignoring any owner/staff delegation
+func (c *WebContext) GetActualUid() int64 {
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		return 0
+	}
+
+	return claims.Uid
+}
+
+// GetCurrentUid returns the uid whose data the current request operates on:
+// the delegated business owner when set by pkg/ext, otherwise the user of the current token
 func (c *WebContext) GetCurrentUid() int64 {
+	if effectiveUid, exists := c.Get(webContextEffectiveUidFieldKey); exists {
+		if uid, ok := effectiveUid.(int64); ok && uid > 0 {
+			return uid
+		}
+	}
+
 	claims := c.GetTokenClaims()
 
 	if claims == nil {

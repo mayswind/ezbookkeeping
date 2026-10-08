@@ -95,7 +95,8 @@
                                 <div class="d-flex justify-space-between text-h6 mt-2"><span>{{ tt('Total') }}</span><span>{{ money(totals.total) }}</span></div>
 
                                 <v-divider class="my-3" />
-                                <v-btn-toggle class="w-100 mb-3" mandatory density="comfortable" color="primary" variant="outlined" divided
+                                <div class="d-flex flex-column ga-4">
+                                <v-btn-toggle class="w-100" mandatory density="comfortable" color="primary" variant="outlined" divided
                                               :disabled="submitting" v-model="payMode">
                                     <v-btn class="flex-grow-1" value="full">{{ tt('Paid in full') }}</v-btn>
                                     <v-btn class="flex-grow-1" value="partial">{{ tt('Part payment') }}</v-btn>
@@ -105,34 +106,40 @@
                                 <amount-input density="compact" :currency="currency" :label="tt('Amount paid now')"
                                               :disabled="submitting" v-model="partialPaid" v-if="payMode === 'partial'" />
 
-                                <v-select density="compact" :label="tt('Money goes into')" :items="paymentAccountOptions" item-title="title" item-value="value"
+                                <v-select density="compact" hide-details="auto" :label="tt('Money goes into')" :items="paymentAccountOptions" item-title="title" item-value="value"
                                           :disabled="submitting" :error-messages="problems.payment" v-model="paymentAccountId" v-if="totals.paid > 0" />
 
                                 <template v-if="totals.credit > 0">
-                                    <v-alert type="warning" variant="tonal" density="compact" class="mb-3">
+                                    <v-alert type="warning" variant="tonal" density="compact">
                                         {{ tt('{amount} will be recorded as owed by the customer.', { amount: money(totals.credit) }) }}
                                     </v-alert>
-                                    <div class="d-flex align-center ga-2">
-                                        <v-autocomplete class="flex-grow-1" density="compact" :label="tt('Customer')"
+                                    <div class="d-flex align-start ga-2">
+                                        <v-autocomplete class="flex-grow-1" density="compact" hide-details="auto" :label="tt('Customer')"
                                                         :items="customerOptions" item-title="title" item-value="value" clearable
                                                         :disabled="submitting" :error-messages="problems.customer" v-model="customerId" />
                                         <v-btn size="small" variant="tonal" :disabled="submitting" @click="showCustomerDialog = true">{{ tt('New') }}</v-btn>
                                     </div>
-                                    <v-select density="compact" :label="tt('Owed amount is tracked in')" :items="receivableAccountOptions" item-title="title" item-value="value"
+                                    <v-select density="compact" hide-details="auto" :label="tt('Owed amount is tracked in')" :items="receivableAccountOptions" item-title="title" item-value="value"
                                               :disabled="submitting" :error-messages="problems.receivable" v-model="receivableAccountId" />
                                 </template>
-                                <div class="d-flex align-center ga-2" v-else>
-                                    <v-autocomplete class="flex-grow-1" density="compact" :label="tt('Customer (optional)')"
+                                <div class="d-flex align-start ga-2" v-else>
+                                    <v-autocomplete class="flex-grow-1" density="compact" hide-details="auto" :label="tt('Customer (optional)')"
                                                     :items="customerOptions" item-title="title" item-value="value" clearable
                                                     :disabled="submitting" v-model="customerId" />
                                     <v-btn size="small" variant="tonal" :disabled="submitting" @click="showCustomerDialog = true">{{ tt('New') }}</v-btn>
                                 </div>
 
-                                <v-select density="compact" :label="tt('Record as')" :items="categoryOptions" item-title="title" item-value="value"
-                                          :disabled="submitting" :error-messages="problems.category" v-model="categoryId" />
-                                <v-text-field density="compact" :label="tt('Note (optional)')" :disabled="submitting" v-model="note" />
+                                <v-alert type="info" variant="tonal" density="compact" v-if="categoryOptions.length < 1">
+                                    {{ tt('You have no income categories yet. A sale must be recorded under one, such as "Product sales".') }}
+                                    <router-link class="ms-1" to="/category/list">{{ tt('Add one on the Categories page') }}</router-link>
+                                </v-alert>
+                                <v-select density="compact" hide-details="auto" :label="tt('Income category')" :items="categoryOptions" item-title="title" item-value="value"
+                                          :hint="tt('Where this sale appears in your income reports. Manage categories on the Categories page.')"
+                                          :disabled="submitting" :error-messages="problems.category" v-model="categoryId" v-else />
+                                <v-text-field density="compact" hide-details="auto" :label="tt('Note (optional)')" :disabled="submitting" v-model="note" />
+                                </div>
 
-                                <v-btn block size="large" color="primary" :loading="submitting" :disabled="!canSubmit" @click="submit">
+                                <v-btn block class="mt-4" size="large" color="primary" :loading="submitting" :disabled="!canSubmit" @click="submit">
                                     {{ tt('Complete sale') }} · {{ money(totals.total) }}
                                 </v-btn>
                                 <v-btn block class="mt-2" variant="text" :disabled="submitting" @click="clearCart">{{ tt('Clear cart') }}</v-btn>

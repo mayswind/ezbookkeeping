@@ -1,0 +1,8 @@
+# ${...} values are expanded from environment variables by Litestream
+dbs:
+  - path: /ezbookkeeping/data/ezbookkeeping.db
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_BUCKET}
+        path: ezbookkeeping
+        region: ${LITESTREAM_REGION}

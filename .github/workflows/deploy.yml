@@ -1,0 +1,80 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.ref.outputs.image }}
+      render-image: ${{ steps.ref.outputs.render_image }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up variables
+        id: ref
+        run: |
+          echo "image=${IMAGE,,}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "render_image=${IMAGE,,}-render" >> "$GITHUB_OUTPUT"
+          echo "build_unix_time=$(date '+%s')" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(date '+%Y%m%d')" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.ref.outputs.image }}
+          build-args: |
+            RELEASE_BUILD=1
+            BUILD_UNIXTIME=${{ steps.ref.outputs.build_unix_time }}
+            BUILD_DATE=${{ steps.ref.outputs.build_date }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Litestream image for Render
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: deploy/render/Dockerfile
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            APP_IMAGE=${{ steps.ref.outputs.image }}
+          tags: |
+            ${{ steps.ref.outputs.render_image }}:${{ github.sha }}
+            ${{ steps.ref.outputs.render_image }}:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Trigger Render deploy
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          IMAGE_URL: ${{ needs.build.outputs.render-image }}:${{ github.sha }}
+        run: |
+          curl -fsS -X POST "${RENDER_DEPLOY_HOOK_URL}&imgURL=$(python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["IMAGE_URL"],safe=""))')"

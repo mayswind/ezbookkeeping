@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: ezbookkeeping
+    runtime: image
+    plan: free
+    image:
+      url: ghcr.io/kent2cky/ezbookkeeping-render:latest
+    healthCheckPath: /
+    domains:
+      - book.vmerlabs.com
+    envVars:
+      - key: EBK_SERVER_HTTP_PORT
+        value: "10000"
+      - key: EBK_SERVER_DOMAIN
+        value: book.vmerlabs.com
+      - key: EBK_SERVER_ROOT_URL
+        value: https://book.vmerlabs.com/
+      - key: EBK_DATABASE_TYPE
+        value: sqlite3
+      - key: EBK_SECURITY_ENABLE_API_TOKEN
+        value: "true"
+      - key: EBK_SECURITY_SECRET_KEY
+        sync: false
+      # Mail through regular SES SMTP on port 2587 (Render blocks 25, 465 and 587 on the free plan)
+      - key: EBK_MAIL_ENABLE_SMTP
+        value: "true"
+      - key: EBK_MAIL_SMTP_HOST
+        value: email-smtp.eu-north-1.amazonaws.com:2587
+      - key: EBK_MAIL_FROM_ADDRESS
+        value: mailer@vmerlabs.com
+      - key: EBK_MAIL_SMTP_USER
+        sync: false
+      - key: EBK_MAIL_SMTP_PASSWD
+        sync: false
+      # Litestream replication to S3
+      - key: LITESTREAM_BUCKET
+        sync: false
+      - key: LITESTREAM_REGION
+        value: eu-north-1
+      - key: LITESTREAM_ACCESS_KEY_ID
+        sync: false
+      - key: LITESTREAM_SECRET_ACCESS_KEY
+        sync: false

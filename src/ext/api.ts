@@ -13,6 +13,10 @@ import type {
     StockChangeRequest,
     StockTransferRequest,
     StockMovement,
+    CustomerInfo,
+    CustomerRequest,
+    SaleInfo,
+    SaleRequest,
     BusinessRole,
     ExtApiError
 } from './types.ts';
@@ -72,5 +76,13 @@ export default {
     receiveStock: (req: StockChangeRequest) => post<StockMovement>('stock/receive.json', req),
     adjustStock: (req: StockChangeRequest) => post<StockMovement>('stock/adjust.json', req),
     transferStock: (req: StockTransferRequest) => post<boolean>('stock/transfer.json', req),
+    // customers and sales
+    listCustomers: () => get<CustomerInfo[]>('customers/list.json'),
+    addCustomer: (req: CustomerRequest) => post<CustomerInfo>('customers/add.json', req),
+    listSales: (beforeId?: string) => get<SaleInfo[]>('sales/list.json', { beforeId, limit: 30 }),
+    getSale: (id: string) => get<SaleInfo>('sales/get.json', { id }),
+    createSale: (req: SaleRequest) => post<SaleInfo>('sales/add.json', req),
+    voidSale: (id: string) => post<boolean>('sales/void.json', { id }),
+
     listStockMovements: (itemId?: string, beforeId?: string) => get<StockMovement[]>('stock/movements/list.json', { itemId, beforeId, limit: 50 })
 };

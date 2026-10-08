@@ -1,0 +1,86 @@
+# End-to-end check of the ext API against a running local server (default http://localhost:8080).
+# It registers two throw-away users, so only run it against a development database.
+# Usage: python3 scripts/ext-smoke.py
+import json, sys, time, urllib.request, urllib.error
+BASE = "http://localhost:8080/api/"
+sfx = str(int(time.time()))[-6:]
+fails = []
+
+def call(method, path, body=None, token=None, business=None):
+    req = urllib.request.Request(BASE + path, method=method, data=json.dumps(body).encode() if body is not None else None)
+    req.add_header("Content-Type", "application/json")
+    req.add_header("X-Timezone-Offset", "60"); req.add_header("X-Timezone-Name", "Africa/Lagos")
+    if token: req.add_header("Authorization", "Bearer " + token)
+    if business: req.add_header("X-Business-Id", business)
+    try:
+        with urllib.request.urlopen(req) as r: return r.status, json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        try: return e.code, json.loads(e.read())
+        except Exception: return e.code, {}
+
+def check(name, cond, extra=""):
+    print(("PASS " if cond else "FAIL ") + name + (" " + str(extra) if (extra and not cond) else ""))
+    if not cond: fails.append(name)
+
+def register(name):
+    s, b = call("POST", "register.json", {"username": name, "email": name + "@example.com", "nickname": name.upper(), "password": "secret123", "language": "en", "defaultCurrency": "NGN", "firstDayOfWeek": 0, "categories": []})
+    assert s == 200, (s, b)
+    return b["result"]["token"]
+
+owner_name, staff_name = "smkown" + sfx, "smkstf" + sfx
+owner = register(owner_name); staff = register(staff_name)
+o = lambda m, p, b=None: call(m, "v1/" + p, b, owner)
+
+def account(name, category):
+    s, b = o("POST", "accounts/add.json", {"name": name, "category": category, "type": 1, "icon": "1", "iconType": 0, "color": "000000", "currency": "NGN", "balance": "0", "comment": ""})
+    assert s == 200, (s, b); return b["result"]["id"]
+def category(name, ctype, parent="0"):
+    s, b = o("POST", "transaction/categories/add.json", {"name": name, "type": ctype, "parentId": parent, "icon": "1", "iconType": 0, "color": "000000", "comment": ""})
+    assert s == 200, (s, b); return b["result"]["id"]
+def balance(acc):
+    s, b = o("GET", "accounts/list.json?visible_only=false")
+    return next(int(a["balance"]) for a in b["result"] if a["id"] == acc)
+
+cash, recv = account("Cash", 1), account("Customers owe", 6)
+inc = category("Sales", 1, category("Sales group", 1)); xfer = category("Repayments", 3, category("Repay group", 3))
+s, b = o("POST", "ext/items/add.json", {"sku": "RICE", "name": "Rice 1kg", "unit": "kg", "costPrice": 70000, "salePrice": 150000, "reorderLevel": 0, "trackStock": True})
+check("add item", s == 200, b); item = b["result"]["id"]
+s, b = o("POST", "ext/stock/receive.json", {"itemId": item, "locationId": "0", "qty": 10000, "unitCost": 70000})
+check("receive stock", s == 200, b)
+s, b = o("POST", "ext/customers/add.json", {"name": "Ada Obi"}); check("add customer", s == 200, b); cust = b["result"]["id"]
+
+sale_req = lambda **kw: {"locationId": "0", "customerId": "0", "time": int(time.time()), "utcOffset": 60, "lines": [{"itemId": item, "qty": 2500}], "discount": 0,
+                          "amountPaid": 0, "paymentAccountId": "0", "receivableAccountId": "0", "categoryId": inc, "note": "smoke", **kw}
+# 2.5 kg x 1500.00 = 3750.00 -> 375000 minor units
+s, b = o("POST", "ext/sales/add.json", sale_req(customerId=cust, amountPaid=100000, paymentAccountId=cash, receivableAccountId=recv))
+check("credit sale accepted", s == 200, b); sale = b["result"]
+check("sale total = 375000", sale["total"] == 375000, sale); check("sale owes 275000", sale["outstanding"] == 275000, sale)
+check("cash balance 100000", balance(cash) == 100000, balance(cash)); check("receivables balance 275000", balance(recv) == 275000, balance(recv))
+s, b = o("GET", "ext/items/stock.json"); check("stock now 7.5", b["result"][0]["qty"] == 7500, b)
+s, b = o("GET", "ext/customers/balances.json"); check("customer owes 275000", b["result"][0]["outstanding"] == 275000, b)
+
+s, b = o("POST", "ext/sales/add.json", sale_req(amountPaid=0)); check("walk-in on credit refused", s == 400, (s, b))
+s, b = o("POST", "ext/sales/add.json", sale_req(lines=[{"itemId": item, "qty": 99000}], amountPaid=1, paymentAccountId=cash)); check("oversell refused", s == 400, (s, b))
+
+s, b = o("POST", "ext/repayments/add.json", {"customerId": cust, "amount": 75000, "saleId": "0", "time": int(time.time()), "utcOffset": 60, "paymentAccountId": cash, "receivableAccountId": recv, "categoryId": xfer, "note": ""})
+check("repayment accepted", s == 200, b); check("receivables now 200000", balance(recv) == 200000, balance(recv)); check("cash now 175000", balance(cash) == 175000, balance(cash))
+s, b = o("POST", "ext/sales/void.json", {"id": sale["id"]}); check("void refused after repayment", s == 400, (s, b))
+
+# staff
+uid_owner = call("GET", "v1/ext/me/businesses.json", None, owner)[1]["result"][0]["ownerUid"]
+s, b = o("POST", "ext/staff/invite.json", {"email": staff_name + "@example.com", "role": "staff"}); check("invite staff", s == 200, b)
+st = lambda m, p, b=None, biz=uid_owner: call(m, "v1/" + p, b, staff, biz)
+s, b = call("GET", "v1/ext/me/businesses.json", None, staff); check("staff sees pending invitation", any(x["status"] == "pending" for x in b["result"]), b)
+s, b = call("POST", "v1/ext/staff/respond.json", {"ownerUid": uid_owner, "accept": True}, staff); check("staff accepts", s == 200, b)
+s, b = st("GET", "ext/items/list.json"); check("staff lists owner's items", s == 200 and len(b["result"]) == 1, (s, b))
+s, b = st("POST", "ext/sales/add.json", sale_req(amountPaid=150000 * 1, lines=[{"itemId": item, "qty": 1000}], paymentAccountId=cash))
+check("staff records a cash sale", s == 200, (s, b)); staff_sale = b["result"]
+check("sale belongs to owner, actor is staff", staff_sale["actorUid"] != uid_owner, staff_sale)
+s, b = st("POST", "ext/sales/add.json", sale_req(discount=100, amountPaid=1, lines=[{"itemId": item, "qty": 1000}], paymentAccountId=cash)); check("staff discount refused (403)", s == 403, (s, b))
+s, b = st("POST", "ext/sales/void.json", {"id": staff_sale["id"]}); check("staff void refused (403)", s == 403, (s, b))
+s, b = st("POST", "ext/items/add.json", {"sku": "X", "name": "X", "unit": "", "costPrice": 0, "salePrice": 0, "reorderLevel": 0, "trackStock": False}); check("staff add item refused (403)", s == 403, (s, b))
+s, b = st("GET", "ext/staff/list.json"); check("staff sees no team of the owner", s == 200 and b["result"] == [], (s, b))
+s, b = o("GET", "ext/audit/list.json"); check("owner audit shows staff sale", s == 200 and any(e["method"] == "POST" and "sales/add" in e["path"] for e in b["result"]), b)
+s, b = call("GET", "v1/ext/items/list.json", None, staff, "999999"); check("staff cannot use a business they don't belong to", s == 403, (s, b))
+s, b = o("POST", "ext/sales/void.json", {"id": staff_sale["id"]}); check("owner voids the staff sale", s == 200, (s, b))
+print("\n%d failure(s)" % len(fails)); sys.exit(1 if fails else 0)

@@ -4,6 +4,7 @@ import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 
 import TeamPage from '@/ext/views/TeamPage.vue';
 import InventoryPage from '@/ext/views/InventoryPage.vue';
+import SalesPage from '@/ext/views/SalesPage.vue';
 
 // Same rule as the upstream pages: be logged in and unlocked
 function checkLogin(): NavigationGuardReturn {
@@ -23,6 +24,11 @@ export const extRoutes: RouteRecordRaw[] = [
     {
         path: '/ext/team',
         component: TeamPage,
+        beforeEnter: checkLogin
+    },
+    {
+        path: '/ext/sales',
+        component: SalesPage,
         beforeEnter: checkLogin
     },
     {

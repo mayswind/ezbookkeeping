@@ -92,6 +92,69 @@ export interface StockMovement {
     readonly time: number;
 }
 
+export interface CustomerInfo {
+    readonly id: string;
+    readonly name: string;
+    readonly phone: string;
+    readonly email: string;
+    readonly note: string;
+    readonly outstanding: number;
+}
+
+export interface CustomerRequest {
+    readonly id?: string;
+    readonly name: string;
+    readonly phone?: string;
+    readonly email?: string;
+    readonly note?: string;
+}
+
+export interface SaleLineInfo {
+    readonly itemId: string;
+    readonly qty: number;
+    readonly unitPrice: number;
+    readonly lineTotal: number;
+}
+
+export interface SaleInfo {
+    readonly id: string;
+    readonly locationId: string;
+    readonly customerId: string;
+    readonly time: number;
+    readonly subtotal: number;
+    readonly discount: number;
+    readonly total: number;
+    readonly paid: number;
+    readonly outstanding: number;
+    readonly voided: boolean;
+    readonly paymentAccountId: string;
+    readonly receivableAccountId: string;
+    readonly categoryId: string;
+    readonly note: string;
+    readonly actorUid: string;
+    readonly lines?: SaleLineInfo[];
+}
+
+export interface SaleLineRequest {
+    readonly itemId: string;
+    readonly qty: number;
+    readonly unitPrice?: number;
+}
+
+export interface SaleRequest {
+    readonly locationId: string;
+    readonly customerId: string;
+    readonly time: number;
+    readonly utcOffset: number;
+    readonly lines: SaleLineRequest[];
+    readonly discount: number;
+    readonly amountPaid: number;
+    readonly paymentAccountId: string;
+    readonly receivableAccountId: string;
+    readonly categoryId: string;
+    readonly note: string;
+}
+
 export interface ExtApiError {
     readonly errorCode?: number;
     readonly errorMessage?: string;

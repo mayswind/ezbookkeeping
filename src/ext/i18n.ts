@@ -17,6 +17,7 @@ const EXT_MESSAGES_EN = {
         confirmRemoveMember: 'Remove {name} from your business? They lose access immediately.',
         confirmLeave: 'Leave {name}? You will no longer have access to their business.',
         confirmDeleteItem: 'Delete {name}? Its stock history is kept.',
+        confirmVoidSale: 'Void this sale of {total}? The stock goes back and the money is removed from your books.',
         banner: 'You are working in {name}\'s business as {role}. Everything you do here changes their books.',
         chip: '{name} ({role})'
     }

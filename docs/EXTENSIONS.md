@@ -25,7 +25,8 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Upstream seams (3 files, ~39 lines) | Done |
 | Seam check script and CI workflow | Done (CI workflow untested on GitHub) |
 | Frontend: foundation, business switcher, Team page, Inventory page | Done: type-check, lint, build and unit tests pass; **not yet clicked through in a browser** |
-| Frontend: sales screen, customers and repayments | Not started (see section 9) |
+| Frontend: sales screen (cart, cash / part / credit, sales history, void) | Done: type-check, lint, build, unit tests and an API smoke test pass; **not yet clicked through in a browser** |
+| Frontend: customers page and repayments | Not started (see section 9) |
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
@@ -190,7 +191,9 @@ Deployment: nothing to change; the next deploy creates the tables. Back up the d
    - `ExtTopNav.vue` (business menu in the toolbar, with an invitations dot), `TeamPage.vue` (invitations, businesses I work in, my team with roles, recent activity), `InventoryPage.vue` with item, stock (receive / adjust / transfer) and location dialogs. Managers and owners see the buttons, staff see a read-only view.
    - Routes `/ext/team` and `/ext/inventory`.
 
-   Still to build: the **sale screen** (cart, customer, amount paid, account pickers, receipt), **customers and repayments** (balances, record a repayment), sales history with void, and pickers that default the payment, receivable and income-category accounts.
+   `SalesPage.vue` (route `/ext/sales`, toolbar cart button): pick items, edit quantities (exact fixed-point, checked against stock at the chosen location), choose paid in full / part payment / on credit, customer (quick add), payment account, receivables account (only accounts of type Receivables in the payment account's currency) and income category, then complete the sale; recent sales with void for managers. Choices are remembered per business. Managers and owners can override line prices and give discounts; staff cannot (the server enforces it too). Totals use `src/ext/money.ts`, which mirrors the server's rounding and is unit tested.
+
+   Still to build: a **customers page** (balances, history, **record a repayment**), receipts / printing, and a sales detail view.
    Known gaps: prices are shown in the *user's* default currency because the API does not yet return the business currency; new strings use English text as the key and are not translated; the pages have been type-checked and built but not exercised in a browser, so expect layout fixes; the mobile app has no ext screens.
 2. **Registration and invitations for new people.** Invitees must already have an account, and public registration is closed (paywall plan).
    Decide how a new staff member gets an account: invitation links that allow registration, or the owner creates the account.
@@ -219,6 +222,8 @@ Code review findings were fixed in this branch (see git history); what remains:
 - A location name can be reused after deletion, but deleting two locations with the same name within one second collides on the unique index.
 
 ## 11. Working on it
+
+API smoke test against a running local server: `python3 scripts/ext-smoke.py` (29 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
 
 ```sh
 export PATH=$HOME/sdk/go/bin:$PATH GOTOOLCHAIN=local     # Go 1.27.1 (see go.mod)

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"xorm.io/xorm"
+	"xorm.io/xorm/schemas"
 
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 )
@@ -26,3 +27,15 @@ var nowUnix = func() int64 {
 
 // xormSession is a short alias to keep service signatures readable
 type xormSession = xorm.Session
+
+// lockRows makes the next query take row locks (SELECT ... FOR UPDATE) on databases that support it.
+// This serializes concurrent stock changes of one item or location on MySQL and PostgreSQL. SQLite has no row locks,
+// but it only ever runs one writer at a time, so nothing is needed there.
+func lockRows(sess *xormSession) *xormSession {
+	switch sess.Engine().Dialect().URI().DBType {
+	case schemas.MYSQL, schemas.POSTGRES:
+		return sess.ForUpdate()
+	default:
+		return sess
+	}
+}

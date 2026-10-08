@@ -2,8 +2,10 @@ package extservices
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	exterrs "github.com/mayswind/ezbookkeeping/pkg/ext/errors"
 	extmodels "github.com/mayswind/ezbookkeeping/pkg/ext/models"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
@@ -176,12 +178,30 @@ func (s *SaleService) Create(c core.Context, ownerUid int64, actorUid int64, in 
 			}
 		}
 
-		for itemId, qty := range needed {
+		// lock the location, then the items in ascending id order (the same order everywhere, so no deadlocks),
+		// and only then read stock: concurrent sales of the same item queue up here instead of overselling
+		if err := requireLocation(sess, ownerUid, location.LocationId); err != nil {
+			return err
+		}
+
+		itemIds := make([]int64, 0, len(needed))
+
+		for itemId := range needed {
+			itemIds = append(itemIds, itemId)
+		}
+
+		sort.Slice(itemIds, func(i, j int) bool { return itemIds[i] < itemIds[j] })
+
+		for _, itemId := range itemIds {
+			if _, err := requireStockItem(sess, ownerUid, itemId); err != nil {
+				return err
+			}
+
 			current, err := onHand(sess, ownerUid, itemId, location.LocationId)
 
 			if err != nil {
 				return err
-			} else if current < qty {
+			} else if current < needed[itemId] {
 				return exterrs.ErrInsufficientStock
 			}
 		}
@@ -266,12 +286,13 @@ func (s *SaleService) Create(c core.Context, ownerUid int64, actorUid int64, in 
 		createdIds = append(createdIds, tx.TransactionId)
 	}
 
-	// (c) remember which transactions belong to the sale
+	// (c) remember which transactions belong to the sale; if that cannot be saved, undo everything so the client
+	// gets an error for a sale that really did not happen and a retry cannot double-sell
 	_, err = ownerDB(ownerUid).NewSession(c).ID(sale.SaleId).Cols("paid_transaction_id", "credit_transaction_id").Update(sale)
 
 	if err != nil {
-		log.Errorf(c, "[ext.sales.Create] sale %d was booked but its transaction ids could not be saved, because %s", sale.SaleId, err.Error())
-		return nil, err
+		log.Errorf(c, "[ext.sales.Create] could not save the transaction ids of sale %d, rolling it back, because %s", sale.SaleId, err.Error())
+		return rollback(err)
 	}
 
 	return &SaleDetail{Sale: sale, Lines: saleLines}, nil
@@ -329,8 +350,12 @@ func (s *SaleService) purge(c core.Context, ownerUid int64, saleId int64) error 
 	})
 }
 
-// Void cancels a sale: its transactions are deleted and its stock returns to the location.
+// Void cancels a sale: its stock returns to a location and its transactions are removed from the books.
 // A sale that already received repayments cannot be voided.
+//
+// The sale is flipped to voided and restocked first, in one database transaction that also checks for repayments.
+// Only then are the transactions removed, one at a time, clearing each id on the sale as it goes. If something
+// fails halfway the error is returned and calling Void again finishes the job instead of failing forever.
 func (s *SaleService) Void(c core.Context, ownerUid int64, actorUid int64, saleId int64) error {
 	detail, err := s.Get(c, ownerUid, saleId)
 
@@ -340,33 +365,74 @@ func (s *SaleService) Void(c core.Context, ownerUid int64, actorUid int64, saleI
 
 	sale := detail.Sale
 
-	if sale.Voided {
+	if sale.Voided && sale.PaidTransactionId == 0 && sale.CreditTransactionId == 0 {
 		return exterrs.ErrSaleAlreadyVoided
 	}
 
-	hasRepayments, err := ownerDB(ownerUid).NewSession(c).Where("owner_uid=? AND sale_id=?", ownerUid, saleId).Exist(&extmodels.RepaymentAllocation{})
-
-	if err != nil {
-		return err
-	} else if hasRepayments {
-		return exterrs.ErrSaleHasRepayments
+	if !sale.Voided {
+		if err = s.voidState(c, ownerUid, actorUid, sale); err != nil {
+			return err
+		}
 	}
 
-	for _, id := range []int64{sale.PaidTransactionId, sale.CreditTransactionId} {
+	for _, column := range []string{"paid_transaction_id", "credit_transaction_id"} {
+		id := sale.PaidTransactionId
+
+		if column == "credit_transaction_id" {
+			id = sale.CreditTransactionId
+		}
+
 		if id == 0 {
 			continue
 		}
 
-		if err = services.Transactions.DeleteTransaction(c, ownerUid, id); err != nil {
+		// "not found" means an earlier attempt already removed it
+		if err = services.Transactions.DeleteTransaction(c, ownerUid, id); err != nil && err != errs.ErrTransactionNotFound {
+			log.Errorf(c, "[ext.sales.Void] sale %d is voided but transaction %d could not be removed, call void again to finish, because %s", saleId, id, err.Error())
+			return err
+		}
+
+		if column == "paid_transaction_id" {
+			sale.PaidTransactionId = 0
+		} else {
+			sale.CreditTransactionId = 0
+		}
+
+		if _, err = ownerDB(ownerUid).NewSession(c).ID(saleId).Cols(column).Update(sale); err != nil {
+			log.Errorf(c, "[ext.sales.Void] sale %d: transaction %d was removed but its id could not be cleared, because %s", saleId, id, err.Error())
+			return err
+		}
+	}
+
+	return nil
+}
+
+// voidState marks the sale voided and returns its stock, atomically
+func (s *SaleService) voidState(c core.Context, ownerUid int64, actorUid int64, sale *extmodels.Sale) error {
+	// stock goes back to the sale's location, or to the default one if that location was deleted since
+	restock, err := Locations.Resolve(c, ownerUid, sale.LocationId)
+
+	if err != nil {
+		restock, err = Locations.Resolve(c, ownerUid, 0)
+
+		if err != nil {
 			return err
 		}
 	}
 
 	now := nowUnix()
 
-	err = ownerDB(ownerUid).DoTransaction(c, func(sess *xormSession) error {
-		// re-check inside the transaction so two concurrent voids cannot both restock
-		updated, err := sess.Where("owner_uid=? AND sale_id=? AND voided=?", ownerUid, saleId, false).Cols("voided", "voided_unix_time").Update(&extmodels.Sale{Voided: true, VoidedUnixTime: now})
+	return ownerDB(ownerUid).DoTransaction(c, func(sess *xormSession) error {
+		// checked in the same transaction as the update, and a repayment's own update requires voided=false
+		hasRepayments, err := sess.Where("owner_uid=? AND sale_id=?", ownerUid, sale.SaleId).Exist(&extmodels.RepaymentAllocation{})
+
+		if err != nil {
+			return err
+		} else if hasRepayments {
+			return exterrs.ErrSaleHasRepayments
+		}
+
+		updated, err := sess.Where("owner_uid=? AND sale_id=? AND voided=?", ownerUid, sale.SaleId, false).Cols("voided", "voided_unix_time").Update(&extmodels.Sale{Voided: true, VoidedUnixTime: now})
 
 		if err != nil {
 			return err
@@ -376,14 +442,20 @@ func (s *SaleService) Void(c core.Context, ownerUid int64, actorUid int64, saleI
 
 		original := make([]*extmodels.StockMovement, 0)
 
-		if err = sess.Where("owner_uid=? AND ref_type=? AND ref_id=?", ownerUid, "sale", saleId).Find(&original); err != nil {
+		if err = sess.Where("owner_uid=? AND ref_type=? AND ref_id=?", ownerUid, "sale", sale.SaleId).Find(&original); err != nil {
 			return err
+		}
+
+		if len(original) > 0 {
+			if err = requireLocation(sess, ownerUid, restock.LocationId); err != nil {
+				return err
+			}
 		}
 
 		for _, m := range original {
 			reverse := &extmodels.StockMovement{
-				OwnerUid: ownerUid, ItemId: m.ItemId, LocationId: m.LocationId, QtyChange: -m.QtyChange, Reason: extmodels.StockReasonSaleVoid,
-				RefType: "sale_void", RefId: saleId, UnitCost: m.UnitCost, ActorUid: actorUid, MovementTime: now, CreatedUnix: now,
+				OwnerUid: ownerUid, ItemId: m.ItemId, LocationId: restock.LocationId, QtyChange: -m.QtyChange, Reason: extmodels.StockReasonSaleVoid,
+				RefType: "sale_void", RefId: sale.SaleId, UnitCost: m.UnitCost, ActorUid: actorUid, MovementTime: now, CreatedUnix: now,
 			}
 
 			if _, err = sess.Insert(reverse); err != nil {
@@ -391,14 +463,10 @@ func (s *SaleService) Void(c core.Context, ownerUid int64, actorUid int64, saleI
 			}
 		}
 
+		sale.Voided, sale.VoidedUnixTime = true, now
+
 		return nil
 	})
-
-	if err != nil {
-		log.Errorf(c, "[ext.sales.Void] sale %d transactions were deleted but its state could not be updated, because %s", saleId, err.Error())
-	}
-
-	return err
 }
 
 // Get returns a sale with its lines
@@ -451,6 +519,15 @@ func (s *SaleService) List(c core.Context, ownerUid int64, f SaleFilter) ([]*ext
 	}
 
 	err := sess.OrderBy("sale_id desc").Limit(f.Limit).Find(&sales)
+
+	return sales, err
+}
+
+// openSalesOldestFirst returns every sale of a customer that still has an outstanding balance, oldest first.
+// It is deliberately not paged: repayments must see the customer's whole balance.
+func (s *SaleService) openSalesOldestFirst(c core.Context, ownerUid int64, customerId int64) ([]*extmodels.Sale, error) {
+	sales := make([]*extmodels.Sale, 0)
+	err := ownerDB(ownerUid).NewSession(c).Where("owner_uid=? AND customer_id=? AND voided=? AND paid<total", ownerUid, customerId, false).OrderBy("sale_time, sale_id").Find(&sales)
 
 	return sales, err
 }

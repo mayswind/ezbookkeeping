@@ -67,3 +67,10 @@ var (
 	ErrConcurrentModification     = errs.NewNormalError(SubcategoryExt, 58, http.StatusConflict, "data was modified by another request, please retry")
 	ErrFinancialRecordFailed      = errs.NewNormalError(SubcategoryExt, 59, http.StatusInternalServerError, "failed to record the financial transaction")
 )
+
+// Error codes added after review
+var (
+	ErrItemFieldTooLong    = errs.NewNormalError(SubcategoryExt, 35, http.StatusBadRequest, "item sku (max 64), name (max 128) or unit (max 16) is too long")
+	ErrStockTooLarge       = errs.NewNormalError(SubcategoryExt, 36, http.StatusBadRequest, "stock quantity or unit cost is too large")
+	ErrNotPermittedForRole = errs.NewNormalError(SubcategoryExt, 60, http.StatusForbidden, "your role cannot override prices or give discounts")
+)

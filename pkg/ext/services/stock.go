@@ -35,9 +35,11 @@ func onHand(sess *xormSession, ownerUid int64, itemId int64, locationId int64) (
 	return sess.Where("owner_uid=? AND item_id=? AND location_id=?", ownerUid, itemId, locationId).SumInt(&extmodels.StockMovement{}, "qty_change")
 }
 
+// requireStockItem loads a stock-tracked item and locks its row until the transaction ends, so concurrent
+// changes to the same item's stock queue up instead of both passing the stock check.
 func requireStockItem(sess *xormSession, ownerUid int64, itemId int64) (*extmodels.Item, error) {
 	item := &extmodels.Item{}
-	has, err := sess.Where("owner_uid=? AND item_id=? AND deleted=?", ownerUid, itemId, false).Get(item)
+	has, err := lockRows(sess).Where("owner_uid=? AND item_id=? AND deleted=?", ownerUid, itemId, false).Get(item)
 
 	if err != nil {
 		return nil, err
@@ -52,12 +54,14 @@ func requireStockItem(sess *xormSession, ownerUid int64, itemId int64) (*extmode
 	return item, nil
 }
 
+// requireLocation checks that the location is still active and locks its row until the transaction ends,
+// so a location cannot be deleted while stock is being added to it. Always lock locations before items.
 func requireLocation(sess *xormSession, ownerUid int64, locationId int64) error {
-	exists, err := sess.Where("owner_uid=? AND location_id=? AND deleted=?", ownerUid, locationId, false).Exist(&extmodels.Location{})
+	has, err := lockRows(sess).Where("owner_uid=? AND location_id=? AND deleted=?", ownerUid, locationId, false).Get(&extmodels.Location{})
 
 	if err != nil {
 		return err
-	} else if !exists {
+	} else if !has {
 		return exterrs.ErrLocationNotFound
 	}
 
@@ -82,6 +86,10 @@ func (s *StockService) apply(c core.Context, ownerUid int64, actorUid int64, in 
 		return nil, err
 	}
 
+	if in.Qty > maxQty || in.Qty < -maxQty || in.UnitCost > maxUnitPrice {
+		return nil, exterrs.ErrStockTooLarge
+	}
+
 	if in.Time <= 0 {
 		in.Time = nowUnix()
 	}
@@ -89,27 +97,30 @@ func (s *StockService) apply(c core.Context, ownerUid int64, actorUid int64, in 
 	var movement *extmodels.StockMovement
 
 	err = ownerDB(ownerUid).DoTransaction(c, func(sess *xormSession) error {
+		if err := requireLocation(sess, ownerUid, location.LocationId); err != nil {
+			return err
+		}
+
 		if _, err := requireStockItem(sess, ownerUid, in.ItemId); err != nil {
 			return err
 		}
 
 		change := in.Qty * sign
+		current, err := onHand(sess, ownerUid, in.ItemId, location.LocationId)
 
-		if change < 0 {
-			current, err := onHand(sess, ownerUid, in.ItemId, location.LocationId)
-
-			if err != nil {
-				return err
-			} else if current+change < 0 {
-				return exterrs.ErrInsufficientStock
-			}
+		if err != nil {
+			return err
+		} else if current+change < 0 {
+			return exterrs.ErrInsufficientStock
+		} else if current+change > maxStockOnHand {
+			return exterrs.ErrStockTooLarge
 		}
 
 		movement = &extmodels.StockMovement{
 			OwnerUid: ownerUid, ItemId: in.ItemId, LocationId: location.LocationId, QtyChange: change, Reason: reason,
 			UnitCost: in.UnitCost, Note: in.Note, ActorUid: actorUid, MovementTime: in.Time, CreatedUnix: nowUnix(),
 		}
-		_, err := sess.Insert(movement)
+		_, err = sess.Insert(movement)
 
 		return err
 	})
@@ -167,9 +178,25 @@ func (s *StockService) Transfer(c core.Context, ownerUid int64, actorUid int64, 
 		return exterrs.ErrSameLocation
 	}
 
+	if qty > maxQty {
+		return exterrs.ErrStockTooLarge
+	}
+
 	now := nowUnix()
 
 	return ownerDB(ownerUid).DoTransaction(c, func(sess *xormSession) error {
+		first, second := from.LocationId, to.LocationId
+
+		if first > second { // always lock in ascending id order so two opposite transfers cannot deadlock
+			first, second = second, first
+		}
+
+		for _, locationId := range []int64{first, second} {
+			if err := requireLocation(sess, ownerUid, locationId); err != nil {
+				return err
+			}
+		}
+
 		if _, err := requireStockItem(sess, ownerUid, itemId); err != nil {
 			return err
 		}
@@ -180,6 +207,14 @@ func (s *StockService) Transfer(c core.Context, ownerUid int64, actorUid int64, 
 			return err
 		} else if current < qty {
 			return exterrs.ErrInsufficientStock
+		}
+
+		destination, err := onHand(sess, ownerUid, itemId, to.LocationId)
+
+		if err != nil {
+			return err
+		} else if destination+qty > maxStockOnHand {
+			return exterrs.ErrStockTooLarge
 		}
 
 		out := &extmodels.StockMovement{OwnerUid: ownerUid, ItemId: itemId, LocationId: from.LocationId, QtyChange: -qty,

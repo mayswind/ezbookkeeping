@@ -16,6 +16,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	exterrs "github.com/mayswind/ezbookkeeping/pkg/ext/errors"
 	extmw "github.com/mayswind/ezbookkeeping/pkg/ext/middleware"
 	extmodels "github.com/mayswind/ezbookkeeping/pkg/ext/models"
 	extperm "github.com/mayswind/ezbookkeeping/pkg/ext/permissions"
@@ -55,8 +56,8 @@ func newWorld(t *testing.T) *world {
 	w := &world{t: t}
 	c := core.NewNullContext()
 	newUser := func(name string) int64 {
-		user := &models.User{Username: name, Email: name + "@example.com", Nickname: name, Password: "password123", Language: "en", DefaultCurrency: "NGN"}
-		require.NoError(t, services.Users.CreateUser(c, user, false))
+		user := &models.User{Username: name, Email: name + "@example.com", Nickname: name, Language: "en", DefaultCurrency: "NGN"}
+		require.NoError(t, services.Users.CreateUser(c, user, true))
 
 		return user.Uid
 	}
@@ -100,6 +101,7 @@ func newWorld(t *testing.T) *world {
 	}
 	v1.GET("/accounts/list.json", bindApi(whoami))
 	v1.POST("/transactions/delete.json", bindApi(whoami))
+	v1.POST("/transactions/add.json", bindApi(whoami))
 	v1.POST("/data/clear/all.json", bindApi(whoami))
 	v1.POST("/users/profile/update.json", bindApi(whoami))
 
@@ -182,6 +184,8 @@ func TestHTTP_RolesAreEnforcedOnEveryRoute(t *testing.T) {
 	}{
 		{"staff reads accounts", w.staff, "GET", "/accounts/list.json", true},
 		{"staff cannot delete transactions", w.staff, "POST", "/transactions/delete.json", false},
+		{"staff cannot post raw transactions", w.staff, "POST", "/transactions/add.json", false},
+		{"manager can post raw transactions", w.manager, "POST", "/transactions/add.json", true},
 		{"manager can delete transactions", w.manager, "POST", "/transactions/delete.json", true},
 		{"manager cannot clear all data", w.manager, "POST", "/data/clear/all.json", false},
 		{"staff cannot clear all data", w.staff, "POST", "/data/clear/all.json", false},
@@ -316,4 +320,24 @@ func TestEveryExtRouteHasAPermissionDecision(t *testing.T) {
 	}
 
 	assert.Greater(t, count, 30)
+}
+
+func TestHTTP_StaffCannotOverridePricesOrGiveDiscounts(t *testing.T) {
+	w := newWorld(t)
+	price := 1
+	line := map[string]any{"itemId": "1", "qty": 1000}
+	priced := map[string]any{"itemId": "1", "qty": 1000, "unitPrice": price}
+
+	for name, body := range map[string]map[string]any{
+		"discount":       {"categoryId": "1", "lines": []any{line}, "discount": 100, "amountPaid": 1},
+		"price override": {"categoryId": "1", "lines": []any{priced}, "amountPaid": 1},
+	} {
+		code, resp := w.call(w.staff, w.owner, "POST", "/ext/sales/add.json", body)
+		assert.Equal(t, http.StatusForbidden, code, name)
+		assert.Equal(t, float64(exterrs.ErrNotPermittedForRole.Code()), resp["errorCode"], name)
+	}
+
+	// a manager passes the role check and then fails on the unknown item, proving the check is by role
+	code, _ := w.call(w.manager, w.owner, "POST", "/ext/sales/add.json", map[string]any{"categoryId": "1", "lines": []any{priced}, "amountPaid": 1})
+	assert.NotEqual(t, http.StatusForbidden, code)
 }

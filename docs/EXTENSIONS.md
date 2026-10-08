@@ -28,7 +28,7 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
-Tests: `go test ./pkg/ext/...` (64 tests, all passing; the service tests take a few minutes because each one creates users with password hashing). The whole backend suite passes except
+Tests: `go test ./pkg/ext/...` (74 tests, all passing). The service tests take about 4 seconds each because every test boots a fresh SQLite database and syncs all tables, so the package needs several minutes; run a single test with `-run`. The whole backend suite passes except
 `TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfUkraineDataSource`, which calls a live third-party API and fails
 on `main` too (not related to this work).
 
@@ -80,8 +80,9 @@ Run it before merging and in CI (`.github/workflows/ext-ci.yml`).
 | Capability | Staff | Manager | Owner |
 |---|---|---|---|
 | Read accounts, categories, tags, templates, transaction list/get/count | yes | yes | yes |
-| Add a transaction | yes | yes | yes |
-| Record a sale, a repayment, add a customer | yes | yes | yes |
+| Record a sale at the listed price, record a repayment, add a customer | yes | yes | yes |
+| Override a sale price or give a discount | no | yes | yes |
+| Add a raw transaction (expense, transfer, income) | no | yes | yes |
 | List items, stock, customers, sales, repayments | yes | yes | yes |
 | Statistics, amounts, reports, all other reads | no | yes | yes |
 | Modify / delete transactions | no | yes | yes |
@@ -116,9 +117,14 @@ Rules enforced: a walk-in customer (no customer) must pay in full; payment and r
 repayments cannot exceed what is owed; repayments pay the oldest open sale first unless a sale is chosen; a sale with repayments cannot be voided.
 Per-customer balance = sum of `total - paid` over non-voided sales. Repayment allocations are stored (`ext_repayment_allocation`).
 
-Sales are recorded in this order, with compensation if a step fails: (a) sale + lines + stock movements in one DB transaction,
-(b) the finance transaction(s) through the upstream `TransactionService`, (c) save the transaction ids on the sale.
-If (b) fails, the sale rows are removed again. Repayments create the transfer first and the DB rows second, and delete the transfer if the DB step fails.
+Sales are recorded in this order, with compensation if a step fails: (a) sale + lines + stock movements in one DB transaction
+(row locks on the location and items on MySQL/PostgreSQL), (b) the finance transaction(s) through the upstream `TransactionService`,
+(c) save the transaction ids on the sale. If (b) or (c) fails, the finance transactions are deleted and the sale rows removed, so the client sees a clean failure and a retry cannot double-sell.
+Repayments create the transfer first and the DB rows second, and delete the transfer if the DB step fails.
+
+**Void** is retryable: first the sale is flipped to voided and restocked in one DB transaction (which also refuses if repayments exist),
+then the finance transactions are deleted one at a time, clearing each id on the sale. If a step fails, calling void again finishes the remaining work.
+Stock returns to the sale's location, or to the default location if that location was deleted since.
 
 ## 7. API
 
@@ -192,16 +198,22 @@ Deployment: nothing to change; the next deploy creates the tables. Back up the d
 
 ## 10. Known limitations and risks
 
+Code review findings were fixed in this branch (see git history); what remains:
+
 - **Not atomic across the books and the ext tables.** They are written in separate database transactions with compensating deletes.
-  If the process dies between steps, a sale can exist without its finance transaction (or the reverse). Failures are logged with the ids needed to repair them.
-  Fixing this properly needs an exported upstream method that accepts an open session; it would be one more seam.
-- **Overselling under concurrency** on MySQL/PostgreSQL: the stock check and insert share a transaction but not a row lock. SQLite serializes writers, so it is safe there.
-- Repayment allocation only considers a customer's 200 most recent open sales. A customer with more open sales than that could be refused a repayment or have the oldest sales skipped; it needs paging before such customers exist.
+  If the process dies, or a compensating delete itself fails, a sale can exist without its finance transaction (or the reverse).
+  Failures are logged with the ids needed to repair them. Fixing this properly needs an exported upstream method that accepts an open session; that would be one more seam.
+  A reconciliation report ("sales whose transactions are missing") would be a cheap safety net.
+- **Row locking is only verified on SQLite.** On MySQL/PostgreSQL stock changes take `SELECT ... FOR UPDATE` on the location and item rows
+  (always locations first, then items in ascending id order). That code path cannot run in the SQLite tests, so test concurrent sales on the real database before relying on it.
 - Payment and receivable accounts must share a currency; there is one currency per sale.
+- Staff cannot change prices or give discounts, and cannot post raw transactions. Both are role rules in code (`permissions.go`, `SaleCreateHandler`); make them configurable per business if owners want different policies.
+- Staff can still list all of the business's transactions and sales (no "own entries only" mode yet).
 - MCP routes and cron jobs are separate code paths and do not use delegation.
 - Delegated requests include **API tokens**: a token belonging to a staff user can use the header too, with the same role limits.
 - Prefix rules (`GET /accounts/`, `/transaction/`, `/transactions/`, `/ext/`) give managers read access to any *new* upstream GET route under those prefixes. Review the matrix after each upstream merge.
-- If upstream ever adds an identity-style route outside the `selfOnly` prefixes, delegated requests to it are denied (not silently run as the owner), which is safe, but the prefix list should be updated.
+- Identity routes (`/users/`, `/tokens/`, `/systems/`, `/ext/me|staff|audit/`) deliberately ignore the business header and act as the logged-in person. A new upstream route under those prefixes that should be business-scoped would silently use the caller's own data.
+- A location name can be reused after deletion, but deleting two locations with the same name within one second collides on the unique index.
 
 ## 11. Working on it
 

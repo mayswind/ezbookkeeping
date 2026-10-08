@@ -43,16 +43,12 @@ func normalizeItemInput(in *ItemInput) error {
 		return exterrs.ErrItemPriceInvalid
 	}
 
-	if len(in.Sku) > 32 {
-		in.Sku = in.Sku[:32]
+	if len(in.Sku) > 64 || len(in.Name) > 128 || len(in.Unit) > 16 {
+		return exterrs.ErrItemFieldTooLong
 	}
 
-	if len(in.Name) > 128 {
-		in.Name = in.Name[:128]
-	}
-
-	if len(in.Unit) > 16 {
-		in.Unit = in.Unit[:16]
+	if in.CostPrice > maxUnitPrice || in.SalePrice > maxUnitPrice || in.ReorderLevel > maxQty {
+		return exterrs.ErrItemPriceInvalid
 	}
 
 	return nil

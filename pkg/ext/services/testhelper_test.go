@@ -62,8 +62,8 @@ func newFixture(t *testing.T) *fixture {
 func (f *fixture) newUser(t *testing.T, name string) int64 {
 	t.Helper()
 
-	user := &models.User{Username: name, Email: name + "@example.com", Nickname: name, Password: "password123", Language: "en", DefaultCurrency: "NGN"}
-	require.NoError(t, services.Users.CreateUser(f.c, user, false))
+	user := &models.User{Username: name, Email: name + "@example.com", Nickname: name, Language: "en", DefaultCurrency: "NGN"}
+	require.NoError(t, services.Users.CreateUser(f.c, user, true)) // no password: hashing would dominate the test time
 
 	return user.Uid
 }

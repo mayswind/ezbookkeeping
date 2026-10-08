@@ -54,15 +54,10 @@ func (s *RepaymentService) Add(c core.Context, ownerUid int64, actorUid int64, i
 		return nil, err
 	}
 
-	openSales, err := Sales.List(c, ownerUid, SaleFilter{CustomerId: in.CustomerId, OnlyOpen: true, Limit: 200})
+	openSales, err := Sales.openSalesOldestFirst(c, ownerUid, in.CustomerId)
 
 	if err != nil {
 		return nil, err
-	}
-
-	// oldest first; List returns newest first
-	for i, j := 0, len(openSales)-1; i < j; i, j = i+1, j-1 {
-		openSales[i], openSales[j] = openSales[j], openSales[i]
 	}
 
 	if in.SaleId > 0 {

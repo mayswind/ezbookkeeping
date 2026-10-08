@@ -3,6 +3,8 @@ package extapi
 import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	exterrs "github.com/mayswind/ezbookkeeping/pkg/ext/errors"
+	extmw "github.com/mayswind/ezbookkeeping/pkg/ext/middleware"
 	extmodels "github.com/mayswind/ezbookkeeping/pkg/ext/models"
 	extservices "github.com/mayswind/ezbookkeeping/pkg/ext/services"
 )
@@ -141,6 +143,11 @@ func (h *Handlers) SaleCreateHandler(c *core.WebContext) (any, *errs.Error) {
 		return nil, err
 	}
 
+	// staff sell at the listed price; changing prices or giving discounts is for managers and owners
+	if extmw.RoleOf(c) < extmodels.RoleManager && (req.Discount != 0 || hasPriceOverride(req.Lines)) {
+		return nil, exterrs.ErrNotPermittedForRole
+	}
+
 	lines := make([]extservices.SaleLineInput, 0, len(req.Lines))
 
 	for _, l := range req.Lines {
@@ -266,4 +273,14 @@ func (h *Handlers) RepaymentListHandler(c *core.WebContext) (any, *errs.Error) {
 	}
 
 	return result, nil
+}
+
+func hasPriceOverride(lines []SaleLineRequest) bool {
+	for _, l := range lines {
+		if l.UnitPrice != nil {
+			return true
+		}
+	}
+
+	return false
 }

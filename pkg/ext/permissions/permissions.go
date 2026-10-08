@@ -71,8 +71,9 @@ func buildRules() []rule {
 		"/ext/sales/list.json", "/ext/sales/get.json",
 		"/ext/repayments/list.json",
 	))
+	// Staff record money through sales and repayments only. A raw "add transaction" could be an expense or a transfer
+	// between the owner's accounts, so it needs a manager.
 	add(exact("POST", extmodels.RoleStaff,
-		"/transactions/add.json",
 		"/ext/customers/add.json",
 		"/ext/sales/add.json",
 		"/ext/repayments/add.json",
@@ -85,7 +86,7 @@ func buildRules() []rule {
 	))
 	add(exact("GET", extmodels.RoleManager, "/data/statistics.json"))
 	add(exact("POST", extmodels.RoleManager,
-		"/transactions/modify.json", "/transactions/delete.json", "/transactions/batch_delete.json",
+		"/transactions/add.json", "/transactions/modify.json", "/transactions/delete.json", "/transactions/batch_delete.json",
 		"/accounts/add.json", "/accounts/modify.json", "/accounts/hide.json", "/accounts/move.json",
 		"/transaction/categories/add.json", "/transaction/categories/add_batch.json", "/transaction/categories/modify.json",
 		"/transaction/categories/hide.json", "/transaction/categories/move.json",

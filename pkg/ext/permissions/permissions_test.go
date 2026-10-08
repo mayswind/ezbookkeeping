@@ -10,7 +10,6 @@ import (
 
 func TestAllowed_StaffCanSellButNotManage(t *testing.T) {
 	assert.True(t, Allowed(extmodels.RoleStaff, "POST", "/ext/sales/add.json"))
-	assert.True(t, Allowed(extmodels.RoleStaff, "POST", "/transactions/add.json"))
 	assert.True(t, Allowed(extmodels.RoleStaff, "GET", "/accounts/list.json"))
 	assert.True(t, Allowed(extmodels.RoleStaff, "POST", "/ext/repayments/add.json"))
 
@@ -18,11 +17,13 @@ func TestAllowed_StaffCanSellButNotManage(t *testing.T) {
 	assert.False(t, Allowed(extmodels.RoleStaff, "POST", "/ext/items/add.json"))
 	assert.False(t, Allowed(extmodels.RoleStaff, "POST", "/ext/stock/adjust.json"))
 	assert.False(t, Allowed(extmodels.RoleStaff, "POST", "/transactions/delete.json"))
+	assert.False(t, Allowed(extmodels.RoleStaff, "POST", "/transactions/add.json"), "staff must not post raw expenses or transfers")
 	assert.False(t, Allowed(extmodels.RoleStaff, "GET", "/transactions/statistics.json"))
 	assert.False(t, Allowed(extmodels.RoleStaff, "GET", "/ext/stock/movements/list.json"))
 }
 
 func TestAllowed_ManagerCanOperateButNotExportOrDelete(t *testing.T) {
+	assert.True(t, Allowed(extmodels.RoleManager, "POST", "/transactions/add.json"))
 	assert.True(t, Allowed(extmodels.RoleManager, "POST", "/ext/items/add.json"))
 	assert.True(t, Allowed(extmodels.RoleManager, "POST", "/ext/sales/void.json"))
 	assert.True(t, Allowed(extmodels.RoleManager, "POST", "/transactions/modify.json"))

@@ -86,13 +86,13 @@ func (AuditLog) TableName() string { return "ext_audit_log" }
 // Location is a store, warehouse or any place where stock is kept
 type Location struct {
 	LocationId      int64  `xorm:"PK AUTOINCR"`
-	OwnerUid        int64  `xorm:"INDEX(IDX_ext_location_owner_deleted) NOT NULL"`
+	OwnerUid        int64  `xorm:"UNIQUE(UQE_ext_location_owner_name) INDEX(IDX_ext_location_owner_deleted) NOT NULL"`
 	Deleted         bool   `xorm:"INDEX(IDX_ext_location_owner_deleted) NOT NULL"`
-	Name            string `xorm:"VARCHAR(64) NOT NULL"`
+	Name            string `xorm:"VARCHAR(64) UNIQUE(UQE_ext_location_owner_name) NOT NULL"`
 	IsDefault       bool   `xorm:"NOT NULL"`
 	CreatedUnixTime int64
 	UpdatedUnixTime int64
-	DeletedUnixTime int64
+	DeletedUnixTime int64 `xorm:"UNIQUE(UQE_ext_location_owner_name) NOT NULL DEFAULT 0"` // 0 while active, so two active locations never share a name
 }
 
 // TableName returns the table name

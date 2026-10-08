@@ -14,6 +14,9 @@ const (
 	maxQty       int64 = 1_000_000_000_000     // one billion units
 	maxUnitPrice int64 = 1_000_000_000_000_0   // generous upper bound in minor units
 	maxAmount    int64 = 1_000_000_000_000_000 // 10^15 minor units
+
+	// maxStockOnHand caps stock of one item at one location, so sums of movements can never overflow an int64
+	maxStockOnHand int64 = 1_000_000_000_000_000
 )
 
 // lineTotal returns qty (scaled by QtyScale) times unit price per whole unit, rounded half up

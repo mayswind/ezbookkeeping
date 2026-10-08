@@ -16,7 +16,7 @@ type ImportTransaction struct {
 
 // ImportTransactionRequest represents all parameters of the imported transaction data
 type ImportTransactionRequest struct {
-	Transactions []*ImportTransactionRequestItem
+	Transactions []*ImportTransactionRequestItem `json:"transactions"`
 }
 
 // ImportTransactionRequestItem represents a single item of the imported transaction data

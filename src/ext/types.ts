@@ -155,6 +155,29 @@ export interface SaleRequest {
     readonly note: string;
 }
 
+export interface RepaymentInfo {
+    readonly id: string;
+    readonly customerId: string;
+    readonly amount: number;
+    readonly transactionId: string;
+    readonly time: number;
+    readonly note: string;
+    readonly actorUid: string;
+    readonly allocations?: { readonly saleId: string, readonly amount: number }[];
+}
+
+export interface RepaymentRequest {
+    readonly customerId: string;
+    readonly amount: number;
+    readonly saleId: string;
+    readonly time: number;
+    readonly utcOffset: number;
+    readonly paymentAccountId: string;
+    readonly receivableAccountId: string;
+    readonly categoryId: string;
+    readonly note: string;
+}
+
 export interface ExtApiError {
     readonly errorCode?: number;
     readonly errorMessage?: string;

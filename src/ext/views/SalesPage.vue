@@ -202,17 +202,13 @@ import ExtCustomerDialog from '@/ext/components/ExtCustomerDialog.vue';
 import { ref, reactive, computed, watch, onMounted, useTemplateRef } from 'vue';
 
 import { useExtI18n } from '@/ext/i18n.ts';
-import { useUserStore } from '@/stores/user.ts';
-import { useAccountsStore } from '@/stores/account.ts';
-import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
-
-import { CategoryType } from '@/core/category.ts';
-import { AccountCategory } from '@/core/account.ts';
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 
 import api from '@/ext/api.ts';
 import { useBusiness } from '@/ext/business.ts';
+import { useBusinessAccounts } from '@/ext/accounts.ts';
+import { loadFormDefaults, saveFormDefaults } from '@/ext/defaults.ts';
 import { formatQty, parseQty } from '@/ext/qty.ts';
 import { computeTotals, lineTotal, type PayMode } from '@/ext/money.ts';
 import type { CustomerInfo, ItemInfo, LocationInfo, SaleInfo, StockLevel } from '@/ext/types.ts';
@@ -234,9 +230,6 @@ interface CartLine {
 }
 
 const { tt, formatAmountToLocalizedNumeralsWithCurrency, formatDateTimeToLongDateTime } = useExtI18n();
-const userStore = useUserStore();
-const accountsStore = useAccountsStore();
-const categoriesStore = useTransactionCategoriesStore();
 const { canManage, current, ensureLoaded } = useBusiness();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
@@ -265,41 +258,10 @@ const showCustomerDialog = ref<boolean>(false);
 const showProblems = ref<boolean>(false);
 
 // ---- accounts and categories come from the app's own stores, which already follow the selected business
-const paymentAccounts = computed(() => accountsStore.allVisiblePlainAccounts.filter(a => a.isAsset && a.category !== AccountCategory.Receivables.type));
-const receivableAccounts = computed(() => accountsStore.allVisiblePlainAccounts.filter(a => a.category === AccountCategory.Receivables.type));
-
-const selectedPaymentAccount = computed(() => paymentAccounts.value.find(a => a.id === paymentAccountId.value));
-
-// the paid and the owed part are booked in one currency, so owed-money accounts must match the payment account
-const compatibleReceivables = computed(() => {
-    const currency = selectedPaymentAccount.value?.currency;
-    return receivableAccounts.value.filter(a => !currency || a.currency === currency);
-});
-
-const paymentAccountOptions = computed(() => paymentAccounts.value.map(a => ({ title: `${a.name} (${a.currency})`, value: a.id })));
-const receivableAccountOptions = computed(() => compatibleReceivables.value.map(a => ({ title: `${a.name} (${a.currency})`, value: a.id })));
-
-const categoryOptions = computed(() => {
-    const options: { title: string, value: string }[] = [];
-
-    for (const primary of categoriesStore.allTransactionCategories[CategoryType.Income] ?? []) {
-        if (primary.hidden) {
-            continue;
-        }
-
-        for (const secondary of primary.subCategories ?? []) {
-            if (!secondary.hidden) {
-                options.push({ title: `${primary.name} › ${secondary.name}`, value: secondary.id });
-            }
-        }
-    }
-
-    return options;
-});
-
-const currency = computed<string>(() => selectedPaymentAccount.value?.currency
-    ?? compatibleReceivables.value[0]?.currency
-    ?? userStore.currentUserDefaultCurrency);
+const {
+    paymentAccounts, receivableAccounts, selectedPaymentAccount, compatibleReceivables,
+    paymentAccountOptions, receivableAccountOptions, incomeCategoryOptions: categoryOptions, currency, load: loadAccounts
+} = useBusinessAccounts(paymentAccountId);
 
 const locationOptions = computed(() => locations.value.map(l => ({ title: l.name, value: l.id })));
 const customerOptions = computed(() => customers.value.map(c => ({ title: c.outstanding > 0 ? `${c.name} · ${tt('owes')} ${money(c.outstanding)}` : c.name, value: c.id })));
@@ -423,33 +385,20 @@ const canSubmit = computed<boolean>(() => cart.value.length > 0
     && totals.value.total > 0);
 
 // ---- remembered choices
-function defaultsKey(): string {
-    return `ebk_ext_sale_defaults_${current.value?.ownerUid ?? 'own'}`;
+function businessKey(): string {
+    return current.value?.ownerUid ?? 'own';
 }
 
 function loadDefaults(): void {
-    try {
-        const saved = JSON.parse(localStorage.getItem(defaultsKey()) ?? '{}') as Record<string, string>;
-        const validPayment = paymentAccounts.value.some(a => a.id === saved['payment']);
-        const validReceivable = receivableAccounts.value.some(a => a.id === saved['receivable']);
-        const validCategory = categoryOptions.value.some(c => c.value === saved['category']);
+    const saved = loadFormDefaults(businessKey());
 
-        paymentAccountId.value = validPayment ? saved['payment']! : (paymentAccounts.value[0]?.id ?? '');
-        receivableAccountId.value = validReceivable ? saved['receivable']! : (receivableAccounts.value[0]?.id ?? '');
-        categoryId.value = validCategory ? saved['category']! : (categoryOptions.value[0]?.value ?? '');
-    } catch {
-        paymentAccountId.value = paymentAccounts.value[0]?.id ?? '';
-        receivableAccountId.value = receivableAccounts.value[0]?.id ?? '';
-        categoryId.value = categoryOptions.value[0]?.value ?? '';
-    }
+    paymentAccountId.value = paymentAccounts.value.some(a => a.id === saved.payment) ? saved.payment! : (paymentAccounts.value[0]?.id ?? '');
+    receivableAccountId.value = receivableAccounts.value.some(a => a.id === saved.receivable) ? saved.receivable! : (receivableAccounts.value[0]?.id ?? '');
+    categoryId.value = categoryOptions.value.some(c => c.value === saved.category) ? saved.category! : (categoryOptions.value[0]?.value ?? '');
 }
 
 function saveDefaults(): void {
-    try {
-        localStorage.setItem(defaultsKey(), JSON.stringify({ payment: paymentAccountId.value, receivable: receivableAccountId.value, category: categoryId.value }));
-    } catch {
-        // remembering choices is a convenience only
-    }
+    saveFormDefaults(businessKey(), { payment: paymentAccountId.value, receivable: receivableAccountId.value, category: categoryId.value });
 }
 
 // keep the owed-money account valid when the payment account (and so the currency) changes
@@ -470,11 +419,7 @@ async function load(): Promise<void> {
     try {
         await ensureLoaded();
         [items.value, locations.value, customers.value] = await Promise.all([api.listItems(), api.listLocations(), api.listCustomers()]);
-        await Promise.all([
-            loadStockAndSales(),
-            accountsStore.loadAllAccounts({ force: false }),
-            categoriesStore.loadAllCategories({ force: false })
-        ]);
+        await Promise.all([loadStockAndSales(), loadAccounts()]);
 
         locationId.value = (locations.value.find(l => l.isDefault) ?? locations.value[0])?.id ?? '';
         loadDefaults();
@@ -513,7 +458,7 @@ async function submit(): Promise<void> {
         saveDefaults();
         snackbar.value?.showMessage(tt('Sale #{id} recorded: {total}', { id: sale.id, total: money(sale.total) }));
         clearCart();
-        await Promise.all([loadStockAndSales(), api.listCustomers().then(list => { customers.value = list; }), accountsStore.loadAllAccounts({ force: true })]);
+        await Promise.all([loadStockAndSales(), api.listCustomers().then(list => { customers.value = list; }), loadAccounts(true)]);
     } catch (error) {
         snackbar.value?.showError(error);
     } finally {
@@ -526,7 +471,7 @@ function voidSale(sale: SaleInfo): void {
         try {
             await api.voidSale(sale.id);
             snackbar.value?.showMessage(tt('Sale voided'));
-            await Promise.all([loadStockAndSales(), api.listCustomers().then(list => { customers.value = list; }), accountsStore.loadAllAccounts({ force: true })]);
+            await Promise.all([loadStockAndSales(), api.listCustomers().then(list => { customers.value = list; }), loadAccounts(true)]);
         } catch (error) {
             snackbar.value?.showError(error);
         }

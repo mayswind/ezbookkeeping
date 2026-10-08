@@ -26,7 +26,8 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Seam check script and CI workflow | Done (CI workflow untested on GitHub) |
 | Frontend: foundation, business switcher, Team page, Inventory page | Done: type-check, lint, build and unit tests pass; **not yet clicked through in a browser** |
 | Frontend: sales screen (cart, cash / part / credit, sales history, void) | Done: type-check, lint, build, unit tests and an API smoke test pass; **not yet clicked through in a browser** |
-| Frontend: customers page and repayments | Not started (see section 9) |
+| Frontend: customers page (balances, history, edit, **repayments**) | Done: type-check, lint, build, unit tests and an API smoke test pass; **not yet clicked through in a browser** |
+| Frontend: opt-in Business Features setting, i18n of all labels | Done |
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
@@ -58,7 +59,8 @@ pkg/ext/
 | `cmd/webserver.go` | one `Use(ext.DelegationMiddleware(...))` line and one `ext.RegisterRoutes(...)` call, both tagged `[ext]` |
 | `cmd/database.go` | one `ext.SyncTables()` call, tagged `[ext]` |
 | `src/router/desktop.ts` | one import and one `...extRoutes` line, tagged `[ext]` |
-| `src/components/desktop/MainPageLayout.vue` | one import and one `<ext-top-nav />` line in the top toolbar, tagged `[ext]` |
+| `src/components/desktop/MainPageLayout.vue` | imports and tags for `<ext-top-nav />` (toolbar), `<ext-profile-menu-items />` (avatar menu) and `<ext-business-banner />` (top of page), tagged `[ext]` |
+| `src/views/desktop/settings/SettingsPageLayout.vue` | one import and one `<ext-settings-nav-item />` line (the "Business Features" settings entry), tagged `[ext]` |
 
 `scripts/check-seams.sh [base]` fails if a branch changes any other upstream file or makes a seam grow past 40 lines.
 Run it before merging and in CI (`.github/workflows/ext-ci.yml`).
@@ -193,7 +195,13 @@ Deployment: nothing to change; the next deploy creates the tables. Back up the d
 
    `SalesPage.vue` (route `/ext/sales`, toolbar cart button): pick items, edit quantities (exact fixed-point, checked against stock at the chosen location), choose paid in full / part payment / on credit, customer (quick add), payment account, receivables account (only accounts of type Receivables in the payment account's currency) and income category, then complete the sale; recent sales with void for managers. Choices are remembered per business. Managers and owners can override line prices and give discounts; staff cannot (the server enforces it too). Totals use `src/ext/money.ts`, which mirrors the server's rounding and is unit tested.
 
-   Still to build: a **customers page** (balances, history, **record a repayment**), receipts / printing, and a sales detail view.
+   `CustomersPage.vue` (route `/ext/customers`): customers with what each owes (largest debt first), search, an "only people who owe me" filter, add / edit / delete (delete is refused while a customer owes money), a detail dialog with unpaid sales and repayment history, and a **Record repayment** dialog: amount (defaults to everything owed, never more), apply to the oldest sales or one chosen sale, the account the money arrived in, the owed-money (Receivables) account, and a transfer category (repayments are recorded as transfers, so the books need one). Choices are remembered per business.
+
+   **Opt-in:** Sales, Customers, Inventory and Team are hidden until the person switches on *Settings > Business Features* (`BusinessSettingsPage.vue`, kept in this browser per user name by `features.ts`). Being invited to work in somebody else's business turns the features on automatically while the person is a member. Team also shows when there is an invitation to answer. The routes are guarded the same way (`router.ts`) and send people to the settings page. Because the switch lives in the browser, it does not follow the person to another device; a server-side flag would be the next step if that matters.
+
+   **Translations:** all labels are registered in `src/ext/locales/en.json`, with the English sentence as the key like the app's own `en.json`. Other languages: add `src/ext/locales/<code>.json` (underscore in the file name for a hyphenated code, e.g. `zh_Hans.json`) with the same keys; missing keys fall back to English. After adding a label run `python3 scripts/ext-extract-i18n.py`; a unit test (`src/ext/__tests__/locales.test.ts`) fails if a label or placeholder is not registered.
+
+   Still to build: receipts / printing, a sale detail view, and reports.
    Known gaps: prices are shown in the *user's* default currency because the API does not yet return the business currency; new strings use English text as the key and are not translated; the pages have been type-checked and built but not exercised in a browser, so expect layout fixes; the mobile app has no ext screens.
 2. **Registration and invitations for new people.** Invitees must already have an account, and public registration is closed (paywall plan).
    Decide how a new staff member gets an account: invitation links that allow registration, or the owner creates the account.
@@ -223,7 +231,7 @@ Code review findings were fixed in this branch (see git history); what remains:
 
 ## 11. Working on it
 
-API smoke test against a running local server: `python3 scripts/ext-smoke.py` (29 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
+API smoke test against a running local server: `python3 scripts/ext-smoke.py` (35 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
 
 ```sh
 export PATH=$HOME/sdk/go/bin:$PATH GOTOOLCHAIN=local     # Go 1.27.1 (see go.mod)

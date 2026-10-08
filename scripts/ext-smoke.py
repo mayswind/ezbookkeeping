@@ -66,6 +66,12 @@ s, b = o("POST", "ext/repayments/add.json", {"customerId": cust, "amount": 75000
 check("repayment accepted", s == 200, b); check("receivables now 200000", balance(recv) == 200000, balance(recv)); check("cash now 175000", balance(cash) == 175000, balance(cash))
 s, b = o("POST", "ext/sales/void.json", {"id": sale["id"]}); check("void refused after repayment", s == 400, (s, b))
 
+# what the customers page relies on
+s, b = o("GET", "ext/sales/list.json?customerId=" + cust + "&onlyOpen=true"); check("open sales of a customer", s == 200 and len(b["result"]) == 1 and b["result"][0]["outstanding"] == 200000, (s, b))
+s, b = o("GET", "ext/repayments/list.json?customerId=" + cust); check("repayment history of a customer", s == 200 and len(b["result"]) == 1 and b["result"][0]["amount"] == 75000, (s, b))
+s, b = o("POST", "ext/customers/modify.json", {"id": cust, "name": "Ada Obi Jr", "phone": "0800", "email": "", "note": ""}); check("edit customer", s == 200 and b["result"]["name"] == "Ada Obi Jr" and b["result"]["outstanding"] == 200000, (s, b))
+s, b = o("POST", "ext/customers/delete.json", {"id": cust}); check("cannot delete a customer who owes", s == 400, (s, b))
+
 # staff
 uid_owner = call("GET", "v1/ext/me/businesses.json", None, owner)[1]["result"][0]["ownerUid"]
 s, b = o("POST", "ext/staff/invite.json", {"email": staff_name + "@example.com", "role": "staff"}); check("invite staff", s == 200, b)
@@ -79,6 +85,8 @@ check("sale belongs to owner, actor is staff", staff_sale["actorUid"] != uid_own
 s, b = st("POST", "ext/sales/add.json", sale_req(discount=100, amountPaid=1, lines=[{"itemId": item, "qty": 1000}], paymentAccountId=cash)); check("staff discount refused (403)", s == 403, (s, b))
 s, b = st("POST", "ext/sales/void.json", {"id": staff_sale["id"]}); check("staff void refused (403)", s == 403, (s, b))
 s, b = st("POST", "ext/items/add.json", {"sku": "X", "name": "X", "unit": "", "costPrice": 0, "salePrice": 0, "reorderLevel": 0, "trackStock": False}); check("staff add item refused (403)", s == 403, (s, b))
+s, b = st("POST", "ext/customers/modify.json", {"id": cust, "name": "Hacked", "phone": "", "email": "", "note": ""}); check("staff edit customer refused (403)", s == 403, (s, b))
+s, b = st("POST", "ext/customers/add.json", {"name": "Walk up"}); check("staff can add a customer", s == 200, (s, b))
 s, b = st("GET", "ext/staff/list.json"); check("staff sees no team of the owner", s == 200 and b["result"] == [], (s, b))
 s, b = o("GET", "ext/audit/list.json"); check("owner audit shows staff sale", s == 200 and any(e["method"] == "POST" and "sales/add" in e["path"] for e in b["result"]), b)
 s, b = call("GET", "v1/ext/items/list.json", None, staff, "999999"); check("staff cannot use a business they don't belong to", s == 403, (s, b))

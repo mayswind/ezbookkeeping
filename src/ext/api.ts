@@ -17,6 +17,8 @@ import type {
     CustomerRequest,
     SaleInfo,
     SaleRequest,
+    RepaymentInfo,
+    RepaymentRequest,
     BusinessRole,
     ExtApiError
 } from './types.ts';
@@ -79,7 +81,12 @@ export default {
     // customers and sales
     listCustomers: () => get<CustomerInfo[]>('customers/list.json'),
     addCustomer: (req: CustomerRequest) => post<CustomerInfo>('customers/add.json', req),
-    listSales: (beforeId?: string) => get<SaleInfo[]>('sales/list.json', { beforeId, limit: 30 }),
+    modifyCustomer: (req: CustomerRequest) => post<CustomerInfo>('customers/modify.json', req),
+    deleteCustomer: (id: string) => post<boolean>('customers/delete.json', { id }),
+    listSales: (options: { beforeId?: string, customerId?: string, onlyOpen?: boolean } = {}) =>
+        get<SaleInfo[]>('sales/list.json', { beforeId: options.beforeId, customerId: options.customerId, onlyOpen: options.onlyOpen, limit: 200 }),
+    listRepayments: (customerId?: string, beforeId?: string) => get<RepaymentInfo[]>('repayments/list.json', { customerId, beforeId, limit: 100 }),
+    addRepayment: (req: RepaymentRequest) => post<RepaymentInfo>('repayments/add.json', req),
     getSale: (id: string) => get<SaleInfo>('sales/get.json', { id }),
     createSale: (req: SaleRequest) => post<SaleInfo>('sales/add.json', req),
     voidSale: (id: string) => post<boolean>('sales/void.json', { id }),

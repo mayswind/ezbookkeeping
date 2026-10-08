@@ -12,8 +12,8 @@
         </v-list-item>
     </template>
 
-    <v-divider class="my-1" />
-    <v-list-item :prepend-icon="mdiAccountGroupOutline" to="/ext/team">
+    <v-divider class="my-1" v-if="teamAvailable" />
+    <v-list-item :prepend-icon="mdiAccountGroupOutline" to="/ext/team" v-if="teamAvailable">
         <v-list-item-title>
             {{ tt('Team') }}
             <v-chip class="ms-2" size="x-small" color="error" v-if="invitations.length > 0">{{ invitations.length }}</v-chip>
@@ -26,6 +26,7 @@ import { onMounted } from 'vue';
 
 import { useExtI18n } from '@/ext/i18n.ts';
 import { installBusinessHeader, switchBusiness, useBusiness } from '@/ext/business.ts';
+import { useBusinessFeatures } from '@/ext/features.ts';
 import type { BusinessInfo } from '@/ext/types.ts';
 
 import {
@@ -36,6 +37,7 @@ import {
 
 const { tt, roleLabel } = useExtI18n();
 const { working, invitations, current, refresh } = useBusiness();
+const { teamAvailable } = useBusinessFeatures();
 
 function isCurrent(business: BusinessInfo): boolean {
     return !!current.value && current.value.ownerUid === business.ownerUid;

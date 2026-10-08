@@ -50,6 +50,7 @@ const loading = ref<boolean>(false);
 const loaded = ref<boolean>(false);
 
 let headerInstalled = false;
+let loadedForUser = ''; // the user name the cached business list belongs to
 
 /** Adds the business header to every request of the app once. Safe to call many times. */
 export function installBusinessHeader(): void {
@@ -78,6 +79,9 @@ export function switchBusiness(ownerUid: string): void {
 }
 
 export function useBusiness() {
+    // a different person may have logged in since this module was loaded
+    selectedBusinessId.value = readSelection();
+
     const own = computed<BusinessInfo | undefined>(() => businesses.value.find(b => b.status === 'owner'));
     const working = computed<BusinessInfo[]>(() => businesses.value.filter(b => b.status !== 'pending'));
     const invitations = computed<BusinessInfo[]>(() => businesses.value.filter(b => b.status === 'pending'));
@@ -101,10 +105,12 @@ export function useBusiness() {
         }
 
         loading.value = true;
+        selectedBusinessId.value = readSelection();
 
         try {
             businesses.value = await api.getMyBusinesses();
             loaded.value = true;
+            loadedForUser = currentUsername();
 
             // the saved business may be gone (the owner removed this person): fall back to their own
             const stored = readSelection();
@@ -120,6 +126,11 @@ export function useBusiness() {
 
     /** Loads the list the first time it is needed; later calls do nothing. */
     async function ensureLoaded(): Promise<void> {
+        if (loadedForUser !== currentUsername()) {
+            businesses.value = [];
+            loaded.value = false;
+        }
+
         if (!loaded.value && !loading.value) {
             await refresh();
         }

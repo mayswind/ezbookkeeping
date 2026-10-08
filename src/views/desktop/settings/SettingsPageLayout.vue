@@ -108,6 +108,7 @@
                     <span class="nav-item-title">{{ tt('Browser Cache Management') }}</span>
                 </router-link>
             </li>
+            <ext-settings-nav-item /> <!-- [ext] -->
             <li class="nav-link" v-if="isLanguagePreviewEnabled()">
                 <router-link to="/settings/developer_tools">
                     <v-icon class="nav-item-icon" :icon="mdiCodeBraces"/>
@@ -123,6 +124,7 @@
 </template>
 
 <script setup lang="ts">
+import ExtSettingsNavItem from '@/ext/components/ExtSettingsNavItem.vue'; // [ext]
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 

@@ -33,9 +33,12 @@ the app starts on the restored data (running its own upgrade step) and serves pa
   not that a fresh deploy would find them. Keep a copy of the keys and of `deploy/render/litestream.yml` somewhere outside Render.
 - Large databases: restore time grows with the size and with the number of segments since the last snapshot.
 
-## Risks and settings worth changing
-- **History is short.** Litestream's default keeps about 24 hours of history, so a mistake noticed after two days cannot be rolled back.
-  Adding `retention: 168h` (7 days) and `snapshot-interval: 24h` under the replica in `deploy/render/litestream.yml` costs almost nothing.
+## Risks and settings
+- **History** (changed 9 Oct 2026): `deploy/render/litestream.yml` now sets `retention: 168h` and `snapshot-interval: 24h`, so a week of history is kept
+  and a full snapshot is taken daily. Before this the default kept about a day. It takes effect the next time the service is deployed from this file, and
+  the week builds up gradually from then (the bucket cannot hold history from before it was kept). Both settings were tested on a throwaway copy with short
+  timers (snapshots kept appearing and old ones were pruned, with no config errors), and the drill passes with the new file. After the deploy, run the drill
+  and check that `snapshots` shows a new entry about every 24 hours.
 - **The service holds keys that can delete its own backups** (Litestream needs delete rights to tidy old data). Turn on S3 **versioning** for the bucket
   (and optionally a lifecycle rule that keeps old versions for 30 days) so a bug or a leaked key cannot erase history.
 - **A missing or unreadable backup must stop the start**: `entrypoint.sh` runs with `set -e`, so a credentials error fails the deploy (good). But if the

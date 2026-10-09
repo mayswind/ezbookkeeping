@@ -21,7 +21,7 @@ OUT = ROOT / "public" / "legal"
 VERSION_FILE = ROOT / "src" / "ext" / "legalVersion.ts"
 
 PAGES = {"terms": "Terms of Service", "privacy": "Privacy Policy"}
-PLACEHOLDER = re.compile(r"\{\{(\w+)\}\}")
+PLACEHOLDER = re.compile(r"\{\{(\w+)(\|plain)?\}\}")
 CONDITIONAL = re.compile(r"<!--IF paid-->(.*?)<!--ELSE-->(.*?)<!--END-->", re.S)
 
 
@@ -52,7 +52,8 @@ def render_template(template, details):
             raise BuildError("the template uses {{%s}} but details.json has no such key" % key)
         raw = details[key]
         escaped = html.escape(str(raw), quote=True)
-        return '<mark class="todo">%s</mark>' % escaped if is_placeholder(raw) else escaped
+        # {{key|plain}} is for attributes such as href, where an HTML element must never be inserted
+        return '<mark class="todo">%s</mark>' % escaped if is_placeholder(raw) and not match.group(2) else escaped
 
     return PLACEHOLDER.sub(value, text)
 

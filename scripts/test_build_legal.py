@@ -18,6 +18,12 @@ class RenderTests(unittest.TestCase):
         out = build_legal.render_template("{{company_name}}", {**DETAILS, "company_name": "REPLACE: name"})
         self.assertEqual(out, '<mark class="todo">REPLACE: name</mark>')
 
+    def test_plain_values_never_get_a_highlight_inside_an_attribute(self):
+        details = {**DETAILS, "contact_email": "REPLACE: email"}
+        out = build_legal.render_template('<a href="mailto:{{contact_email|plain}}">{{contact_email}}</a>', details)
+        self.assertEqual(out, '<a href="mailto:REPLACE: email"><mark class="todo">REPLACE: email</mark></a>')
+        self.assertNotIn("<mark", out.split(">")[0])
+
     def test_unknown_key_is_an_error(self):
         with self.assertRaises(build_legal.BuildError):
             build_legal.render_template("{{nope}}", DETAILS)
@@ -39,6 +45,14 @@ class RenderTests(unittest.TestCase):
 
 
 class RealTemplateTests(unittest.TestCase):
+    def test_no_html_element_ever_appears_inside_an_attribute(self):
+        details = build_legal.json.loads((build_legal.LEGAL / "details.json").read_text())
+        for key in details:
+            if not key.startswith("_") and key != "version" and isinstance(details[key], str):
+                details[key] = "REPLACE: " + key  # worst case: everything unfilled
+        for path, content in build_legal.build(details).items():
+            self.assertNotRegex(content, r'="[^"]*<mark', path.name)
+
     def test_every_placeholder_in_the_real_templates_has_a_value(self):
         details = build_legal.json.loads((build_legal.LEGAL / "details.json").read_text())
         files = build_legal.build(details)  # raises if a template uses a key that details.json lacks

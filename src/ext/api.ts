@@ -64,6 +64,31 @@ export default {
     getMyBusinesses: () => get<BusinessInfo[]>('me/businesses.json'),
     getMySettings: () => get<MySettings>('me/settings.json'),
     updateMySettings: (businessFeatures: boolean) => post<MySettings>('me/settings/update.json', { businessFeatures }),
+    acceptTerms: (version: string) => post<boolean>('me/terms/accept.json', { version }),
+
+    /** Downloads a ZIP of CSV files with the business records the app's own export does not cover. */
+    downloadBusinessExport: async (): Promise<{ blob: Blob, fileName: string }> => {
+        try {
+            const response = await axios.get<Blob>(BASE + 'export/business.zip', { responseType: 'blob' });
+            const disposition = String(response.headers['content-disposition'] ?? '');
+            const fileName = /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? 'business-data.zip';
+
+            return { blob: response.data, fileName };
+        } catch (error) {
+            // an error answer arrives as a blob too; turn it back into the readable error the rest of the app expects
+            const response = (error as { response?: { data?: unknown } }).response;
+
+            if (response?.data instanceof Blob) {
+                try {
+                    response.data = JSON.parse(await response.data.text());
+                } catch {
+                    // not JSON: leave it
+                }
+            }
+
+            throw error;
+        }
+    },
     listStaff: () => get<StaffInfo[]>('staff/list.json'),
     inviteStaff: (email: string, role: BusinessRole) => post<StaffInfo>('staff/invite.json', { email, role }),
     setStaffRole: (staffUid: string, role: BusinessRole) => post<boolean>('staff/set_role.json', { staffUid, role }),

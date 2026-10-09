@@ -221,7 +221,28 @@ func (h *Handlers) MySettingsHandler(c *core.WebContext) (any, *errs.Error) {
 		return nil, fail(c, "me.settings", err)
 	}
 
-	return &UserSettingsView{BusinessFeatures: setting.BusinessFeatures, Configured: configured}, nil
+	version, accepted, err := extservices.Terms.Latest(c, c.GetActualUid())
+
+	if err != nil {
+		return nil, fail(c, "me.settings", err)
+	}
+
+	return &UserSettingsView{BusinessFeatures: setting.BusinessFeatures, Configured: configured, AcceptedTermsVersion: version, AcceptedTermsTime: accepted}, nil
+}
+
+// MyTermsAcceptHandler records that the caller accepted a version of the Terms and Privacy Policy
+func (h *Handlers) MyTermsAcceptHandler(c *core.WebContext) (any, *errs.Error) {
+	var req AcceptTermsRequest
+
+	if err := bindBody(c, &req); err != nil {
+		return nil, err
+	}
+
+	if err := extservices.Terms.Accept(c, c.GetActualUid(), req.Version, c.ClientIP()); err != nil {
+		return nil, fail(c, "me.terms.accept", err)
+	}
+
+	return true, nil
 }
 
 // MySettingsUpdateHandler changes the caller's ext preferences
@@ -238,5 +259,11 @@ func (h *Handlers) MySettingsUpdateHandler(c *core.WebContext) (any, *errs.Error
 		return nil, fail(c, "me.settings.update", err)
 	}
 
-	return &UserSettingsView{BusinessFeatures: setting.BusinessFeatures, Configured: true}, nil
+	version, accepted, err := extservices.Terms.Latest(c, c.GetActualUid())
+
+	if err != nil {
+		return nil, fail(c, "me.settings.update", err)
+	}
+
+	return &UserSettingsView{BusinessFeatures: setting.BusinessFeatures, Configured: true, AcceptedTermsVersion: version, AcceptedTermsTime: accepted}, nil
 }

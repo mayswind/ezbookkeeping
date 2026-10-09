@@ -12,6 +12,10 @@
         </v-list-item>
     </template>
 
+    <v-divider class="my-1" />
+    <v-list-item :prepend-icon="mdiFileDocumentOutline" :href="LEGAL_TERMS_URL" target="_blank" :title="tt('Terms of Service')"></v-list-item>
+    <v-list-item :prepend-icon="mdiShieldLockOutline" :href="LEGAL_PRIVACY_URL" target="_blank" :title="tt('Privacy Policy')"></v-list-item>
+
     <v-divider class="my-1" v-if="teamAvailable" />
     <v-list-item :prepend-icon="mdiAccountGroupOutline" to="/ext/team" v-if="teamAvailable">
         <v-list-item-title>
@@ -27,12 +31,15 @@ import { onMounted } from 'vue';
 import { useExtI18n } from '@/ext/i18n.ts';
 import { installBusinessHeader, switchBusiness, useBusiness } from '@/ext/business.ts';
 import { useBusinessFeatures } from '@/ext/features.ts';
+import { LEGAL_TERMS_URL, LEGAL_PRIVACY_URL } from '@/ext/legalVersion.ts';
 import type { BusinessInfo } from '@/ext/types.ts';
 
 import {
     mdiCheckCircle,
     mdiCircleOutline,
-    mdiAccountGroupOutline
+    mdiAccountGroupOutline,
+    mdiFileDocumentOutline,
+    mdiShieldLockOutline
 } from '@mdi/js';
 
 const { tt, roleLabel } = useExtI18n();

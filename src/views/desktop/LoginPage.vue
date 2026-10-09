@@ -154,6 +154,8 @@
 
                             <v-divider class="mt-2 mb-3" />
 
+                            <ext-legal-notice /> <!-- [ext] -->
+
                             <div class="auth-powered-by text-center">
                                 <span>Powered by </span>
                                 <a href="https://github.com/mayswind/ezbookkeeping" target="_blank">ezBookkeeping</a>&nbsp;<span>{{ version }}</span>
@@ -170,6 +172,7 @@
 </template>
 
 <script setup lang="ts">
+import ExtLegalNotice from '@/ext/components/ExtLegalNotice.vue'; // [ext]
 import { VTextField } from 'vuetify/components/VTextField';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 

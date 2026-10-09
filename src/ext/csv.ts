@@ -20,7 +20,11 @@ export function toCsv(rows: (string | number)[][]): string {
 
 /** Saves rows as a file in the browser. The byte order mark makes Excel read accented letters correctly. */
 export function downloadCsv(fileName: string, rows: (string | number)[][]): void {
-    const blob = new Blob(['﻿' + toCsv(rows)], { type: 'text/csv;charset=utf-8' });
+    saveBlob(fileName, new Blob(['\uFEFF' + toCsv(rows)], { type: 'text/csv;charset=utf-8' }));
+}
+
+/** Hands a file to the browser as a download. */
+export function saveBlob(fileName: string, blob: Blob): void {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
 

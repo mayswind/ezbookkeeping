@@ -139,6 +139,8 @@
             </f7-list-item>
         </f7-list>
 
+        <ext-legal-notice /> <!-- [ext] -->
+
         <f7-popup push :close-on-escape="false" :opened="showPresetCategories"
                   @popup:closed="showPresetCategories = false">
             <f7-page>
@@ -202,6 +204,7 @@
 </template>
 
 <script setup lang="ts">
+import ExtLegalNotice from '@/ext/components/ExtLegalNotice.vue'; // [ext]
 import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 

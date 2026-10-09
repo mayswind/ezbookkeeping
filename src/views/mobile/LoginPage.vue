@@ -90,6 +90,8 @@
             </f7-block-footer>
         </f7-list>
 
+        <ext-legal-notice /> <!-- [ext] -->
+
         <f7-list class="login-page-bottom">
             <f7-block-footer>
                 <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2" />
@@ -197,6 +199,7 @@
 </template>
 
 <script setup lang="ts">
+import ExtLegalNotice from '@/ext/components/ExtLegalNotice.vue'; // [ext]
 import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 

@@ -172,8 +172,14 @@ type RepaymentListRequest struct {
 // ---- responses
 
 type UserSettingsView struct {
-	BusinessFeatures bool `json:"businessFeatures"`
-	Configured       bool `json:"configured"` // false until the person chose, so the app can carry over an older local choice
+	BusinessFeatures     bool   `json:"businessFeatures"`
+	Configured           bool   `json:"configured"`           // false until the person chose, so the app can carry over an older local choice
+	AcceptedTermsVersion string `json:"acceptedTermsVersion"` // "" until the person accepted the Terms and Privacy Policy
+	AcceptedTermsTime    int64  `json:"acceptedTermsTime"`
+}
+
+type AcceptTermsRequest struct {
+	Version string `json:"version" binding:"required,max=32"`
 }
 
 type BusinessView struct {

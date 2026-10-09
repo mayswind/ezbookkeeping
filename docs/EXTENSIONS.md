@@ -29,12 +29,14 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Frontend: customers page (balances, history, edit, **repayments**) | Done: type-check, lint, build, unit tests and an API smoke test pass; **not yet clicked through in a browser** |
 | Frontend: opt-in Business Features setting, i18n of all labels | Done |
 | Reports: stock value, low stock, who owes what (with CSV download) | Done: backend tests pass on SQLite, API smoke test passes, UI **not yet clicked through in a browser** |
+| Terms of Service and Privacy Policy pages, recorded acceptance, notices on login and signup | Done, see `docs/LEGAL.md`; **the wording is generic and `legal/details.json` must be filled in before deploying** |
+| Export of business data (ZIP of CSV files) | Done, see below |
 | Receipts: printable sale and repayment receipts (80 mm or A4), Save as PDF, copy as text, business details on them | Done: unit tests, API smoke test; **printing not yet tried on a real printer or in a browser** |
 | Who did what: "by <name>" mark in transaction comments, "recorded by" columns, stock history, activity log with the thing changed | Done, same caveat |
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
-Tests: `go test ./pkg/ext/...` (111 tests, all passing on SQLite). The service tests take several seconds each because every test boots a fresh database and syncs all tables, so the package needs several minutes; run a single test with `-run`.
+Tests: `go test ./pkg/ext/...` (133 tests, all passing on SQLite). The service tests take several seconds each because every test boots a fresh database and syncs all tables, so the package needs several minutes; run a single test with `-run`.
 
 **Other databases:** the same tests run unchanged on PostgreSQL or MySQL by setting `EXT_TEST_DB` (`postgres` or `mysql`), `EXT_TEST_DB_HOST`, `EXT_TEST_DB_USER` and `EXT_TEST_DB_PASSWD` (see `pkg/ext/testdb`); each test gets its own throw-away database. Results so far: PostgreSQL 17 passed all 54 service tests and the HTTP suites, and MySQL 8.4 passed the HTTP suites and 45 of 54 service tests with no failures (that run was stopped early). The tests added since (reports, attribution, people) have not yet been run on PostgreSQL or MySQL. The whole backend suite passes except
 `TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfUkraineDataSource`, which calls a live third-party API and fails
@@ -153,6 +155,8 @@ Send `X-Business-Id` to work in somebody else's business.
 | POST `/ext/staff/respond.json` `{ownerUid, accept}` | any | Accept or decline an invitation |
 | POST `/ext/staff/leave.json` `{ownerUid}` | any | Leave a business |
 | GET `/ext/audit/list.json?limit&beforeId` | owner | What managers and staff changed |
+| GET `/ext/export/business.zip` | owner | ZIP of CSV files with the business records (always the caller's own business) |
+| POST `/ext/me/terms/accept.json` `{version}` | any | Record that I accepted a version of the Terms and Privacy Policy (settings also return the latest) |
 | GET `/ext/business/profile.json` | staff | What the business prints on receipts (name falls back to the owner's name) |
 | GET `/ext/me/business_profile.json`, POST `/ext/me/business_profile/update.json` | any | My own business's receipt details |
 | GET `/ext/repayments/get.json?id` | staff | One repayment with the sales it paid off |
@@ -229,6 +233,19 @@ repayment in a customer's dialog (so any receipt can be reprinted).
   repayments shows the newer balance; the sale receipt shows what that sale still owes now. Receipts are not stored as documents; they are
   rebuilt from the sale each time, so a reprint always reflects the sale as it is now (including a later void).
 
+### Export of business data
+
+*Settings > Business Features > Export your business data* downloads a ZIP of CSV files for the owner's own business (`GET /ext/export/business.zip`):
+items, locations, stock on hand, every stock movement, customers (with what they owe), sales and their lines, repayments and what each paid off, the team,
+the activity log and the receipt details, plus a `README.txt` explaining the columns. It covers what the app's own export (accounts, categories, tags,
+transactions) leaves out.
+- Amounts are whole numbers in minor currency units (columns end in `_minor_units`), quantities are decimals, times are UTC, and names are written out next
+  to ids (including for deleted items and people who left) so the files read on their own. Files start with a byte order mark so Excel shows accents correctly.
+- Free text that starts with `=`, `+`, `-` or `@` gets a quote in front, so a customer name typed as a formula cannot run in a spreadsheet.
+- It is **owner-only and always about the caller's own business**: the route is on the identity list, so a manager's business header cannot redirect it to the
+  owner's records (tested at HTTP level and in the live smoke test).
+- It streams in pages of 1000 rows (`exportChunkSize`), so a large business does not have to fit in memory; the response is `no-store`.
+
 ### Reports
 
 All read-only and computed from the stock ledger and the sales, so they cannot disagree with them (managers and owners; staff get a 403).
@@ -246,7 +263,7 @@ CSV cells that start with `=`, `+`, `-` or `@` get a quote in front so a spreads
 
 Tables (all `ext_` prefixed, created by `SyncTables()` during `ezbookkeeping database update` or on start when `auto_update_database` is true; additive only):
 
-- User database (looked up across owners): `ext_membership`, `ext_audit_log` (with `action`, `entity_type`, `entity_id`, added later as extra columns), `ext_user_setting` (one row per person: whether the business features are on).
+- User database (looked up across owners): `ext_terms_acceptance` (one row per acceptance), `ext_membership`, `ext_audit_log` (with `action`, `entity_type`, `entity_id`, added later as extra columns), `ext_user_setting` (one row per person: whether the business features are on).
 - Business data (next to the owner's data): `ext_business_profile` (receipt details), `ext_location`, `ext_item`, `ext_stock_movement`, `ext_customer`, `ext_sale`, `ext_sale_line`, `ext_repayment`, `ext_repayment_allocation`.
 
 Works on SQLite, MySQL and PostgreSQL through the same ORM as upstream. Tests run on SQLite only.
@@ -297,7 +314,7 @@ Code review findings were fixed in this branch (see git history); what remains:
 
 ## 11. Working on it
 
-API smoke test against a running local server: `python3 scripts/ext-smoke.py` (59 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
+API smoke test against a running local server: `python3 scripts/ext-smoke.py` (66 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
 
 ```sh
 export PATH=$HOME/sdk/go/bin:$PATH GOTOOLCHAIN=local     # Go 1.27.1 (see go.mod)

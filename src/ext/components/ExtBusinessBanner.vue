@@ -9,9 +9,13 @@
             {{ tt('Switch back to my business') }}
         </v-btn>
     </div>
+
+    <ext-terms-gate />
 </template>
 
 <script setup lang="ts">
+import ExtTermsGate from '@/ext/components/ExtTermsGate.vue';
+
 import { useExtI18n } from '@/ext/i18n.ts';
 import { installBusinessHeader, switchBusiness, useBusiness } from '@/ext/business.ts';
 

@@ -194,6 +194,8 @@
                                @click="navigateToLogin"
                                v-if="currentStep === 'finalResult'">{{ tt('Continue') }}</v-btn>
                     </div>
+
+                    <ext-legal-notice /> <!-- [ext] -->
                 </v-card>
             </v-col>
         </v-row>
@@ -203,6 +205,7 @@
 </template>
 
 <script setup lang="ts">
+import ExtLegalNotice from '@/ext/components/ExtLegalNotice.vue'; // [ext]
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import type { StepBarItem } from '@/components/desktop/StepsBar.vue';
 

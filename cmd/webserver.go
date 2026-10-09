@@ -139,6 +139,7 @@ func startWebServer(c *core.CliContext) error {
 	router.Static("/css", filepath.Join(config.StaticRootPath, "css"))
 	router.Static("/img", filepath.Join(config.StaticRootPath, "img"))
 	router.Static("/fonts", filepath.Join(config.StaticRootPath, "fonts"))
+	router.Static("/legal", filepath.Join(config.StaticRootPath, "legal")) // [ext] Terms of Service and Privacy Policy
 
 	router.StaticFile("robots.txt", filepath.Join(config.StaticRootPath, "robots.txt"))
 	router.StaticFile("favicon.ico", filepath.Join(config.StaticRootPath, "favicon.ico"))

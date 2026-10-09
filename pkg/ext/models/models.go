@@ -97,6 +97,19 @@ type AuditLog struct {
 // TableName returns the table name
 func (AuditLog) TableName() string { return "ext_audit_log" }
 
+// TermsAcceptance records that a person accepted a version of the Terms of Service and Privacy Policy.
+// A row is added for each version they accept and never changed, so there is a history.
+type TermsAcceptance struct {
+	AcceptanceId int64  `xorm:"PK AUTOINCR"`
+	Uid          int64  `xorm:"INDEX(IDX_ext_terms_acceptance_uid) NOT NULL"`
+	Version      string `xorm:"VARCHAR(32) NOT NULL"`
+	AcceptedUnix int64  `xorm:"NOT NULL"`
+	ClientIp     string `xorm:"VARCHAR(45) NOT NULL"`
+}
+
+// TableName returns the table name
+func (TermsAcceptance) TableName() string { return "ext_terms_acceptance" }
+
 // BusinessProfile holds what a business prints on its receipts. One row per owner.
 type BusinessProfile struct {
 	OwnerUid        int64  `xorm:"PK"`
@@ -267,6 +280,7 @@ func GlobalTables() []any {
 		new(Membership),
 		new(AuditLog),
 		new(UserSetting),
+		new(TermsAcceptance),
 	}
 }
 

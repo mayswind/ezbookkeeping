@@ -21,6 +21,7 @@ var selfOnlyPrefixes = []string{
 	"/ext/me/",
 	"/ext/staff/",
 	"/ext/audit/",
+	"/ext/export/",
 }
 
 type rule struct {

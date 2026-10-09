@@ -28,6 +28,7 @@ func RegisterRoutes(group *gin.RouterGroup, bind ApiBinder) {
 	// Business membership: always about the logged-in person
 	group.GET("/ext/me/businesses.json", bind(h.MyBusinessesHandler))
 	group.GET("/ext/me/settings.json", bind(h.MySettingsHandler))
+	group.POST("/ext/me/terms/accept.json", bind(h.MyTermsAcceptHandler))
 	group.GET("/ext/me/business_profile.json", bind(h.MyBusinessProfileHandler))
 	group.POST("/ext/me/business_profile/update.json", bind(h.MyBusinessProfileUpdateHandler))
 	group.POST("/ext/me/settings/update.json", bind(h.MySettingsUpdateHandler))
@@ -39,6 +40,9 @@ func RegisterRoutes(group *gin.RouterGroup, bind ApiBinder) {
 	group.POST("/ext/staff/respond.json", bind(h.StaffRespondHandler))
 	group.POST("/ext/staff/leave.json", bind(h.StaffLeaveHandler))
 	group.GET("/ext/audit/list.json", bind(h.AuditListHandler))
+
+	// A copy of the caller's own business records (a file, so it does not go through the JSON binder)
+	group.GET("/ext/export/business.zip", func(ginCtx *gin.Context) { h.ExportBusinessHandler(core.WrapWebContext(ginCtx, nil)) })
 
 	// What the business prints on receipts
 	group.GET("/ext/business/profile.json", bind(h.BusinessProfileHandler))

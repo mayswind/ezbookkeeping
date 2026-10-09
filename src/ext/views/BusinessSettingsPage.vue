@@ -48,6 +48,24 @@
                     </v-form>
                 </v-card-text>
             </v-card>
+            <v-card class="mt-4" :title="tt('Export your business data')">
+                <template #subtitle>
+                    {{ tt('Take a copy of your records whenever you like. It opens in Excel, Google Sheets or LibreOffice.') }}
+                </template>
+                <v-card-text>
+                    <p class="mb-3">
+                        {{ tt('The download is a ZIP file with your items, stock, locations, customers, sales, repayments, team and activity, as spreadsheet files, plus a short guide.') }}
+                    </p>
+                    <p class="mb-4 text-medium-emphasis">
+                        {{ tt('Your accounts, categories, tags and transactions are exported from') }}
+                        <router-link to="/settings/user/data_management">{{ tt('Data Management') }}</router-link>.
+                    </p>
+                    <v-btn color="primary" :loading="exporting" @click="exportData">{{ tt('Download my business data') }}</v-btn>
+                    <div class="text-body-2 text-medium-emphasis mt-3">
+                        {{ tt('Only the owner of a business can download its data.') }}
+                    </div>
+                </v-card-text>
+            </v-card>
             <ext-snack-bar ref="snackbar" />
         </v-col>
     </v-row>
@@ -60,6 +78,7 @@ import { ref, reactive, watch, onMounted, useTemplateRef } from 'vue';
 
 import { useExtI18n } from '@/ext/i18n.ts';
 import api from '@/ext/api.ts';
+import { saveBlob } from '@/ext/csv.ts';
 import { useBusiness } from '@/ext/business.ts';
 import { useBusinessFeatures } from '@/ext/features.ts';
 
@@ -71,6 +90,22 @@ const { available, worksForSomeoneElse, loadFeatureSetting, setEnabled } = useBu
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const saving = ref<boolean>(false);
+
+const exporting = ref<boolean>(false);
+
+async function exportData(): Promise<void> {
+    exporting.value = true;
+
+    try {
+        const { blob, fileName } = await api.downloadBusinessExport();
+        saveBlob(fileName, blob);
+        snackbar.value?.showMessage(tt('Your data was downloaded'));
+    } catch (error) {
+        snackbar.value?.showError(error);
+    } finally {
+        exporting.value = false;
+    }
+}
 
 // receipt details belong to the person's own business
 const savingProfile = ref<boolean>(false);

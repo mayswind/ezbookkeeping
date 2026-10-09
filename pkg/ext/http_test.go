@@ -1,8 +1,10 @@
 package ext
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -531,4 +533,102 @@ func TestHTTP_ReceiptDetails(t *testing.T) {
 	// strangers cannot read someone's business details
 	code, _ = w.call(w.other, w.owner, "GET", "/ext/business/profile.json", nil)
 	assert.Equal(t, http.StatusForbidden, code)
+}
+
+func TestHTTP_AcceptingTheTermsIsPerPersonAndIgnoresTheBusinessHeader(t *testing.T) {
+	w := newWorld(t)
+
+	code, body := w.call(w.manager, 0, "GET", "/ext/me/settings.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, "", result(t, body)["acceptedTermsVersion"], "nothing accepted yet")
+
+	// a manager accepting while working in the owner's business is recorded for the manager only
+	code, _ = w.call(w.manager, w.owner, "POST", "/ext/me/terms/accept.json", map[string]any{"version": "2026-10-09"})
+	require.Equal(t, http.StatusOK, code)
+
+	code, body = w.call(w.manager, 0, "GET", "/ext/me/settings.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, "2026-10-09", result(t, body)["acceptedTermsVersion"])
+	assert.Greater(t, result(t, body)["acceptedTermsTime"], float64(0))
+
+	code, body = w.call(w.owner, 0, "GET", "/ext/me/settings.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, "", result(t, body)["acceptedTermsVersion"], "the owner has not accepted anything")
+
+	// the settings update response also carries it
+	code, body = w.call(w.manager, 0, "POST", "/ext/me/settings/update.json", map[string]any{"businessFeatures": true})
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, "2026-10-09", result(t, body)["acceptedTermsVersion"])
+
+	for _, bad := range []any{"", "bad version", "<x>"} {
+		code, _ = w.call(w.manager, 0, "POST", "/ext/me/terms/accept.json", map[string]any{"version": bad})
+		assert.Equal(t, http.StatusBadRequest, code, bad)
+	}
+}
+
+func (w *world) raw(uid int64, businessId int64, method string, path string) *httptest.ResponseRecorder {
+	w.t.Helper()
+
+	req := httptest.NewRequest(method, "/api/v1"+path, nil)
+	req.Header.Set("X-Test-Uid", strconv.FormatInt(uid, 10))
+
+	if businessId != 0 {
+		req.Header.Set(extmw.BusinessHeaderName, strconv.FormatInt(businessId, 10))
+	}
+
+	rec := httptest.NewRecorder()
+	w.router.ServeHTTP(rec, req)
+
+	return rec
+}
+
+func zipFiles(t *testing.T, rec *httptest.ResponseRecorder) map[string]string {
+	t.Helper()
+
+	data := rec.Body.Bytes()
+	zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	require.NoError(t, err)
+
+	files := map[string]string{}
+
+	for _, f := range zr.File {
+		rc, err := f.Open()
+		require.NoError(t, err)
+		body, err := io.ReadAll(rc)
+		require.NoError(t, err)
+		files[f.Name] = string(body)
+	}
+
+	return files
+}
+
+func TestHTTP_BusinessExportIsAFileOfTheCallersOwnBusiness(t *testing.T) {
+	w := newWorld(t)
+
+	code, _ := w.call(w.owner, 0, "POST", "/ext/items/add.json", map[string]any{"sku": "RICE", "name": "Rice 1kg", "salePrice": 1500, "trackStock": true})
+	require.Equal(t, http.StatusOK, code)
+
+	rec := w.raw(w.owner, 0, "GET", "/ext/export/business.zip")
+	require.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "application/zip", rec.Header().Get("Content-Type"))
+	assert.Regexp(t, `^attachment; filename="business-data-\d{8}\.zip"$`, rec.Header().Get("Content-Disposition"))
+	assert.Equal(t, "no-store", rec.Header().Get("Cache-Control"), "an export must not be kept by caches")
+
+	files := zipFiles(t, rec)
+	assert.Contains(t, files["items.csv"], "RICE")
+	assert.Contains(t, files, "README.txt")
+	assert.Contains(t, files["team.csv"], "manager", "the team members are listed")
+
+	// a manager who sends the business header gets their own (empty) business, never the owner's records
+	rec = w.raw(w.manager, w.owner, "GET", "/ext/export/business.zip")
+	require.Equal(t, http.StatusOK, rec.Code)
+
+	files = zipFiles(t, rec)
+	assert.NotContains(t, files["items.csv"], "RICE", "the owner's items must not reach a manager")
+	assert.NotContains(t, files["team.csv"], "staff", "nor the owner's team")
+
+	// someone with no business of their own still gets a valid, empty export
+	rec = w.raw(w.other, 0, "GET", "/ext/export/business.zip")
+	require.Equal(t, http.StatusOK, rec.Code)
+	assert.NotContains(t, zipFiles(t, rec)["items.csv"], "RICE")
 }

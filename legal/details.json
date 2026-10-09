@@ -1,0 +1,27 @@
+{
+    "_help": "Fill in every value that starts with REPLACE, then run: python3 scripts/build-legal.py. Change 'version' whenever the wording or these details change in a way users should re-accept; the app then asks everybody to accept again.",
+
+    "version": "2026-10-09",
+    "effective_date": "9 October 2026",
+
+    "service_name": "REPLACE: the name customers know the product by",
+    "site_url": "https://book.vmerlabs.com",
+    "company_name": "REPLACE: your legal or trading name",
+    "company_address": "REPLACE: postal address",
+    "contact_email": "REPLACE: an address people can write to (and that you read)",
+
+    "country": "REPLACE: country whose courts decide disputes",
+    "governing_law": "REPLACE: for example the laws of England and Wales",
+    "supervisory_authority": "the data protection authority in your country",
+
+    "hosting_region": "REPLACE: the Render region of the service, as shown in the Render dashboard",
+    "log_retention": "REPLACE: how long Render keeps logs, for example 7 days",
+
+    "backup_days": 7,
+    "deleted_data_retention_days": 30,
+    "minimum_age": 18,
+
+    "paid_plans": false,
+    "notice_days": 30,
+    "refund_policy": "REPLACE (only used once paid_plans is true): your refund rules, for example: Fees already paid are not refunded, except where the law requires it or we agree otherwise."
+}

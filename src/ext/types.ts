@@ -248,6 +248,8 @@ export interface BusinessProfileRequest {
 export interface MySettings {
     readonly businessFeatures: boolean;
     readonly configured: boolean;
+    readonly acceptedTermsVersion: string; // '' until the person accepted the Terms and Privacy Policy
+    readonly acceptedTermsTime: number;
 }
 
 export interface ExtApiError {

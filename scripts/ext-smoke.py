@@ -71,6 +71,23 @@ s, b = o("GET", "ext/repayments/get.json?id=" + rep_id); check("repayment with i
 s, b = o("GET", "ext/business/profile.json"); check("receipt name falls back to the owner's name", s == 200 and b["result"]["name"] == owner_name.upper() and b["result"]["receiptName"] == "", (s, b))
 s, b = o("POST", "ext/me/business_profile/update.json", {"receiptName": "Ada Stores", "address": "12 Market Road", "phone": "0800", "footer": "Thank you"}); check("save receipt details", s == 200 and b["result"]["name"] == "Ada Stores", (s, b))
 
+# legal pages, the recorded acceptance and the business export
+import urllib.request as _u
+status = _u.urlopen("http://localhost:8080/legal/terms.html").status; page = _u.urlopen("http://localhost:8080/legal/privacy.html").read().decode()
+check("legal pages are public", status == 200 and "Privacy Policy" in page, status)
+s, b = o("GET", "ext/me/settings.json"); check("terms not accepted yet", s == 200 and b["result"]["acceptedTermsVersion"] == "", (s, b))
+s, b = o("POST", "ext/me/terms/accept.json", {"version": "smoke-1"}); check("accept the terms", s == 200, (s, b))
+s, b = o("GET", "ext/me/settings.json"); check("acceptance is recorded", s == 200 and b["result"]["acceptedTermsVersion"] == "smoke-1" and b["result"]["acceptedTermsTime"] > 0, (s, b))
+import io, zipfile
+def export_names(token, business=None):
+    req = urllib.request.Request(BASE + "v1/ext/export/business.zip", headers={"Authorization": "Bearer " + token, **({"X-Business-Id": business} if business else {})})
+    with urllib.request.urlopen(req) as r:
+        data = r.read(); ctype = r.headers.get("Content-Type")
+    z = zipfile.ZipFile(io.BytesIO(data)); return ctype, {n: z.read(n).decode("utf-8-sig") for n in z.namelist()}
+ctype, files = export_names(owner)
+check("owner's export is a zip with the business in it", ctype == "application/zip" and "RICE" in files["items.csv"] and "Ada Obi" in files["customers.csv"] and "README.txt" in files, ctype)
+check("export amounts are exact", "375000" in files["sales.csv"] and "2.5" in files["sale_lines.csv"], files["sales.csv"][:200])
+
 # what the customers page relies on
 s, b = o("GET", "ext/sales/list.json?customerId=" + cust + "&onlyOpen=true"); check("open sales of a customer", s == 200 and len(b["result"]) == 1 and b["result"][0]["outstanding"] == 200000, (s, b))
 s, b = o("GET", "ext/repayments/list.json?customerId=" + cust); check("repayment history of a customer", s == 200 and len(b["result"]) == 1 and b["result"][0]["amount"] == 75000, (s, b))
@@ -78,9 +95,9 @@ s, b = o("POST", "ext/customers/modify.json", {"id": cust, "name": "Ada Obi Jr",
 s, b = o("POST", "ext/customers/delete.json", {"id": cust}); check("cannot delete a customer who owes", s == 400, (s, b))
 
 # per-person business features setting (server side)
-s, b = o("GET", "ext/me/settings.json"); check("features off until chosen", s == 200 and b["result"] == {"businessFeatures": False, "configured": False}, (s, b))
+s, b = o("GET", "ext/me/settings.json"); check("features off until chosen", s == 200 and (b["result"]["businessFeatures"], b["result"]["configured"]) == (False, False), (s, b))
 s, b = o("POST", "ext/me/settings/update.json", {"businessFeatures": True}); check("turn features on", s == 200 and b["result"]["businessFeatures"] is True, (s, b))
-s, b = o("GET", "ext/me/settings.json"); check("features stay on", s == 200 and b["result"] == {"businessFeatures": True, "configured": True}, (s, b))
+s, b = o("GET", "ext/me/settings.json"); check("features stay on", s == 200 and (b["result"]["businessFeatures"], b["result"]["configured"]) == (True, True), (s, b))
 s, b = call("GET", "v1/ext/me/settings.json", None, staff); check("another person's setting is separate", s == 200 and b["result"]["businessFeatures"] is False, (s, b))
 
 # staff
@@ -124,6 +141,7 @@ s, b = st("POST", "ext/me/settings/update.json", {"businessFeatures": True}); ch
 s, b = o("GET", "ext/me/settings.json"); check("owner setting unaffected by staff", s == 200 and b["result"]["businessFeatures"] is True, (s, b))
 s, b = st("GET", "ext/business/profile.json"); check("staff print the owner's receipt details", s == 200 and b["result"]["name"] == "Ada Stores" and b["result"]["footer"] == "Thank you", (s, b))
 s, b = st("GET", "ext/repayments/get.json?id=" + rep_id); check("staff can reprint a repayment receipt", s == 200, (s, b))
+ctype, files = export_names(staff, uid_owner); check("a business header cannot fetch the owner's export", "RICE" not in files["items.csv"] and "Ada Obi" not in files["customers.csv"], files["items.csv"][:120])
 s, b = st("GET", "ext/staff/list.json"); check("staff sees no team of the owner", s == 200 and b["result"] == [], (s, b))
 s, b = o("GET", "ext/audit/list.json"); check("owner audit shows staff sale", s == 200 and any(e["method"] == "POST" and "sales/add" in e["path"] for e in b["result"]), b)
 s, b = call("GET", "v1/ext/items/list.json", None, staff, "999999"); check("staff cannot use a business they don't belong to", s == 403, (s, b))

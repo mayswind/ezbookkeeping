@@ -27,6 +27,14 @@ Trusting loopback is safe: only a connection from the machine itself has that ad
 (`pkg/ext/clientip_test.go`). After the change, repeat the check below. If the log then shows your own address, it is fixed; if it shows a CDN's
 address, add the CDN ranges (next section); if it still shows `::1`, the proxy sends no forwarding header and another approach is needed.
 
+### Second finding, same day: Cloudflare is the next hop
+After `::1` was trusted, the log showed `172.71.150.174`, which is inside Cloudflare's `172.64.0.0/13`. Cloudflare sits in front of Render, its
+server is the rightmost address in `X-Forwarded-For` that is not trusted, so the app took it for the visitor, and everybody arriving through that server
+still shared one counter. Fix: also trust Cloudflare's published ranges. `scripts/trusted-proxies.sh` prints the whole value (the default private
+networks, `::1/128` and Cloudflare's IPv4 and IPv6 ranges, 28 entries); paste its output into `EBK_SECURITY_TRUSTED_PROXY_IPS` in the Render dashboard
+(it is also in `render.yaml`). `pkg/ext/clientip_test.go` shows the real visitor is found with it and cannot be faked. Run the script again every few
+months and update the setting if Cloudflare has added ranges; a visitor arriving through an unlisted Cloudflare range would again look like Cloudflare.
+
 ### How to check (about five minutes, nothing is changed)
 1. Find your public address (search "what is my IP", or open https://ifconfig.me).
 2. Log in to the live site, then open the service's **Logs** in Render and find the line for that login (`POST /api/authorize.json`). Request lines look like

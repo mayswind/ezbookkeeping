@@ -20,9 +20,10 @@ services:
       - key: EBK_SECURITY_ENABLE_API_TOKEN
         value: "true"
       # Render hands traffic to the app from the machine's own IPv6 loopback address (::1), which the default list does not
-      # trust, so every visitor looked like "::1" and shared one login-failure counter. See docs/OPERATIONS.md.
+      # trust, and the next hop is Cloudflare's servers, which also need to be trusted. Without both, every visitor shared one
+      # login-failure counter. Generate the value with scripts/trusted-proxies.sh. See docs/OPERATIONS.md.
       - key: EBK_SECURITY_TRUSTED_PROXY_IPS
-        value: "10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128"
+        value: "10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128,173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22,2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32"
       - key: EBK_SECURITY_SECRET_KEY
         sync: false
       # Mail through regular SES SMTP on port 2587 (Render blocks 25, 465 and 587 on the free plan)

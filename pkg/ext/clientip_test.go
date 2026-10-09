@@ -19,8 +19,9 @@ import (
 // the app's default trusted_proxy_ips: private networks only
 const defaultTrusted = "10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
-// two Cloudflare ranges, for the example only: the real list must be fetched from https://www.cloudflare.com/ips
-const withCloudflare = defaultTrusted + ",172.64.0.0/13,104.16.0.0/13"
+// the private networks, the machine's own IPv6 loopback and Cloudflare's published ranges as of 9 Oct 2026
+// (scripts/trusted-proxies.sh prints the current list)
+const withCloudflare = "10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128,173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22,2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32"
 
 func clientIpFor(t *testing.T, trusted string, peer string, forwardedFor string) string {
 	t.Helper()
@@ -88,4 +89,22 @@ func TestClientIP_TrustingLoopbackDoesNotLetOutsidersFakeAnAddress(t *testing.T)
 	assert.Equal(t, "198.51.100.7", clientIpFor(t, defaultTrusted+",::1/128", "198.51.100.7", "1.2.3.4"))
 	// and even from the proxy, extra addresses added on the left by the visitor do not count
 	assert.Equal(t, "203.0.113.5", clientIpFor(t, defaultTrusted+",::1/128", "::1", "9.9.9.9, 203.0.113.5"))
+}
+
+// What Render shows after ::1 is trusted: the next hop is a Cloudflare server (172.71.150.174 was seen in the log).
+func TestClientIP_BehindLoopbackAndCloudflareTheRealVisitorIsFound(t *testing.T) {
+	const cloudflareEdge = "172.71.150.174"
+	onlyLoopbackTrusted := defaultTrusted + ",::1/128"
+
+	// without Cloudflare's ranges every visitor arriving through that server is "172.71.150.174"
+	assert.Equal(t, cloudflareEdge, clientIpFor(t, onlyLoopbackTrusted, "::1", "203.0.113.5, "+cloudflareEdge))
+	assert.Equal(t, cloudflareEdge, clientIpFor(t, onlyLoopbackTrusted, "::1", "198.51.100.9, "+cloudflareEdge))
+
+	// with them, each visitor is themselves, IPv4 and IPv6 alike
+	assert.Equal(t, "203.0.113.5", clientIpFor(t, withCloudflare, "::1", "203.0.113.5, "+cloudflareEdge))
+	assert.Equal(t, "198.51.100.9", clientIpFor(t, withCloudflare, "::1", "198.51.100.9, "+cloudflareEdge))
+	assert.Equal(t, "2001:db8::77", clientIpFor(t, withCloudflare, "::1", "2001:db8::77, 2606:4700:10::1"))
+
+	// a visitor still cannot choose their own address by sending a header
+	assert.Equal(t, "203.0.113.5", clientIpFor(t, withCloudflare, "::1", "9.9.9.9, 203.0.113.5, "+cloudflareEdge))
 }

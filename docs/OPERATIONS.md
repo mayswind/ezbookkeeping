@@ -35,6 +35,10 @@ networks, `::1/128` and Cloudflare's IPv4 and IPv6 ranges, 28 entries); paste it
 (it is also in `render.yaml`). `pkg/ext/clientip_test.go` shows the real visitor is found with it and cannot be faked. Run the script again every few
 months and update the setting if Cloudflare has added ranges; a visitor arriving through an unlisted Cloudflare range would again look like Cloudflare.
 
+**Confirmed on the live site, 9 Oct 2026:** after the setting above was applied in Render, the log shows each visitor's own address, and a
+different one from a second device. Repeat the check after changing proxy settings, after a move to another host, and when the Cloudflare list
+is refreshed.
+
 ### How to check (about five minutes, nothing is changed)
 1. Find your public address (search "what is my IP", or open https://ifconfig.me).
 2. Log in to the live site, then open the service's **Logs** in Render and find the line for that login (`POST /api/authorize.json`). Request lines look like

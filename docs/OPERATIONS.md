@@ -15,6 +15,18 @@ using `trusted_proxy_ips` (`EBK_SECURITY_TRUSTED_PROXY_IPS`; default: private ne
 - The risk: if the chain behind your host contains a proxy that is *not* trusted (for example a CDN's public address), that proxy's address is taken as the
   visitor. Everybody arriving through it then shares one counter, so five wrong passwords from anyone lock everyone out for a minute.
 
+### Finding on 9 Oct 2026: every visitor was `::1`
+Render's log showed every request, for every visitor, from `::1`: traffic reaches the app through something on the same machine, over IPv6 loopback.
+The default trusted list only has `127.0.0.0/8` (IPv4 loopback), so `::1` was not trusted, the forwarding header was ignored, and all visitors shared one
+failure counter (so five wrong passwords from anyone could block everyone's login attempts for a minute).
+Fix: add `::1/128` to `EBK_SECURITY_TRUSTED_PROXY_IPS` (done in `render.yaml`; set the same value in the Render dashboard to apply it without waiting for a deploy):
+
+    10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128
+
+Trusting loopback is safe: only a connection from the machine itself has that address, so an outside visitor cannot use it to fake an address
+(`pkg/ext/clientip_test.go`). After the change, repeat the check below. If the log then shows your own address, it is fixed; if it shows a CDN's
+address, add the CDN ranges (next section); if it still shows `::1`, the proxy sends no forwarding header and another approach is needed.
+
 ### How to check (about five minutes, nothing is changed)
 1. Find your public address (search "what is my IP", or open https://ifconfig.me).
 2. Log in to the live site, then open the service's **Logs** in Render and find the line for that login (`POST /api/authorize.json`). Request lines look like

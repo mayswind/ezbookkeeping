@@ -1,6 +1,7 @@
 package ext
 
 import (
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -31,7 +32,7 @@ func clientIpFor(t *testing.T, trusted string, peer string, forwardedFor string)
 	router.GET("/", func(c *gin.Context) { seen = c.ClientIP() })
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	req.RemoteAddr = peer + ":4000"
+	req.RemoteAddr = net.JoinHostPort(peer, "4000")
 
 	if forwardedFor != "" {
 		req.Header.Set("X-Forwarded-For", forwardedFor)
@@ -68,4 +69,23 @@ func TestClientIP_AnotherCompanysProxyInTheChainBecomesEveryonesAddress(t *testi
 	// trusting the cdn's published ranges as well makes the real visitor visible again
 	assert.Equal(t, "203.0.113.5", clientIpFor(t, withCloudflare, "10.20.30.40", "203.0.113.5, 172.70.1.1"))
 	assert.Equal(t, "198.51.100.9", clientIpFor(t, withCloudflare, "10.20.30.40", "198.51.100.9, 172.70.1.1"))
+}
+
+// What Render shows: every request arrives from ::1 (the machine's own IPv6 loopback address, so a proxy on the same machine
+// hands the traffic over). The default trusted list has 127.0.0.0/8, which is the IPv4 loopback only, so ::1 is not trusted,
+// the forwarding header is ignored and every visitor is "::1".
+func TestClientIP_IPv6LoopbackProxyIsNotTrustedByDefault(t *testing.T) {
+	assert.Equal(t, "::1", clientIpFor(t, defaultTrusted, "::1", "203.0.113.5"))
+	assert.Equal(t, "::1", clientIpFor(t, defaultTrusted, "::1", "198.51.100.9"), "a different visitor, the same address: they share one failure counter")
+
+	// trusting ::1 as well lets the app read the real visitor from the header
+	assert.Equal(t, "203.0.113.5", clientIpFor(t, defaultTrusted+",::1/128", "::1", "203.0.113.5"))
+	assert.Equal(t, "198.51.100.9", clientIpFor(t, defaultTrusted+",::1/128", "::1", "198.51.100.9"))
+}
+
+func TestClientIP_TrustingLoopbackDoesNotLetOutsidersFakeAnAddress(t *testing.T) {
+	// only a connection that really comes from the machine itself is believed; a remote visitor's header is still ignored
+	assert.Equal(t, "198.51.100.7", clientIpFor(t, defaultTrusted+",::1/128", "198.51.100.7", "1.2.3.4"))
+	// and even from the proxy, extra addresses added on the left by the visitor do not count
+	assert.Equal(t, "203.0.113.5", clientIpFor(t, defaultTrusted+",::1/128", "::1", "9.9.9.9, 203.0.113.5"))
 }

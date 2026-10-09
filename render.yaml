@@ -19,6 +19,10 @@ services:
         value: sqlite3
       - key: EBK_SECURITY_ENABLE_API_TOKEN
         value: "true"
+      # Render hands traffic to the app from the machine's own IPv6 loopback address (::1), which the default list does not
+      # trust, so every visitor looked like "::1" and shared one login-failure counter. See docs/OPERATIONS.md.
+      - key: EBK_SECURITY_TRUSTED_PROXY_IPS
+        value: "10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128"
       - key: EBK_SECURITY_SECRET_KEY
         sync: false
       # Mail through regular SES SMTP on port 2587 (Render blocks 25, 465 and 587 on the free plan)

@@ -74,3 +74,9 @@ var (
 	ErrStockTooLarge       = errs.NewNormalError(SubcategoryExt, 36, http.StatusBadRequest, "stock quantity or unit cost is too large")
 	ErrNotPermittedForRole = errs.NewNormalError(SubcategoryExt, 60, http.StatusForbidden, "your role cannot override prices or give discounts")
 )
+
+// Error codes added with receipts
+var (
+	ErrProfileFieldTooLong = errs.NewNormalError(SubcategoryExt, 61, http.StatusBadRequest, "business name (max 128), address (max 255), phone (max 32) or footer (max 255) is too long")
+	ErrRepaymentNotFound   = errs.NewNormalError(SubcategoryExt, 62, http.StatusNotFound, "repayment not found")
+)

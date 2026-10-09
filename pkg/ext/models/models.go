@@ -97,6 +97,19 @@ type AuditLog struct {
 // TableName returns the table name
 func (AuditLog) TableName() string { return "ext_audit_log" }
 
+// BusinessProfile holds what a business prints on its receipts. One row per owner.
+type BusinessProfile struct {
+	OwnerUid        int64  `xorm:"PK"`
+	ReceiptName     string `xorm:"VARCHAR(128) NOT NULL"` // shown at the top; empty means the owner's name
+	Address         string `xorm:"VARCHAR(255) NOT NULL"`
+	Phone           string `xorm:"VARCHAR(32) NOT NULL"`
+	Footer          string `xorm:"VARCHAR(255) NOT NULL"` // for example "Thank you for your business"
+	UpdatedUnixTime int64
+}
+
+// TableName returns the table name
+func (BusinessProfile) TableName() string { return "ext_business_profile" }
+
 // Location is a store, warehouse or any place where stock is kept
 type Location struct {
 	LocationId      int64  `xorm:"PK AUTOINCR"`
@@ -260,6 +273,7 @@ func GlobalTables() []any {
 // OwnerTables lists the tables that live next to the owner's business data
 func OwnerTables() []any {
 	return []any{
+		new(BusinessProfile),
 		new(Location),
 		new(Item),
 		new(StockMovement),

@@ -249,7 +249,7 @@ func (h *Handlers) RepaymentCreateHandler(c *core.WebContext) (any, *errs.Error)
 }
 
 func repaymentView(r *extmodels.Repayment) *RepaymentView {
-	return &RepaymentView{Id: r.RepaymentId, CustomerId: r.CustomerId, Amount: r.Amount, TransactionId: r.TransactionId, Time: r.RepaymentTime, Note: r.Note, ActorUid: r.ActorUid}
+	return &RepaymentView{Id: r.RepaymentId, CustomerId: r.CustomerId, Amount: r.Amount, TransactionId: r.TransactionId, PaymentAccountId: r.PaymentAccountId, ReceivableAccountId: r.ReceivableAccountId, Time: r.RepaymentTime, Note: r.Note, ActorUid: r.ActorUid}
 }
 
 // RepaymentListHandler lists repayments

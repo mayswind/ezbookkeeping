@@ -488,3 +488,47 @@ func TestHTTP_MyPeopleIsAlwaysAboutTheCallersOwnBusiness(t *testing.T) {
 	require.Equal(t, http.StatusOK, code)
 	assert.Len(t, body["result"].([]any), 3)
 }
+
+func TestHTTP_ReceiptDetails(t *testing.T) {
+	w := newWorld(t)
+
+	// nothing saved: the receipt name falls back to the owner's name
+	code, body := w.call(w.staff, w.owner, "GET", "/ext/business/profile.json", nil)
+	require.Equal(t, http.StatusOK, code, "staff need the business details to print a receipt")
+	assert.Equal(t, "owner", result(t, body)["name"])
+	assert.Equal(t, "", result(t, body)["receiptName"])
+
+	// the owner saves their details
+	code, body = w.call(w.owner, 0, "POST", "/ext/me/business_profile/update.json", map[string]any{"receiptName": "Ada Stores", "address": "12 Market Road", "phone": "0800", "footer": "Thank you"})
+	require.Equal(t, http.StatusOK, code, body)
+
+	code, body = w.call(w.staff, w.owner, "GET", "/ext/business/profile.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, "Ada Stores", result(t, body)["name"])
+	assert.Equal(t, "Thank you", result(t, body)["footer"])
+
+	// a manager editing "their" profile while working in the owner's business changes only their own
+	code, _ = w.call(w.manager, w.owner, "POST", "/ext/me/business_profile/update.json", map[string]any{"receiptName": "Hijacked", "address": "", "phone": "", "footer": ""})
+	require.Equal(t, http.StatusOK, code)
+
+	code, body = w.call(w.staff, w.owner, "GET", "/ext/business/profile.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, "Ada Stores", result(t, body)["name"], "the owner's receipts are untouched")
+
+	code, body = w.call(w.manager, 0, "GET", "/ext/me/business_profile.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Equal(t, "Hijacked", result(t, body)["receiptName"], "it went into the manager's own business profile")
+
+	// over-long text is refused
+	long := make([]byte, 200)
+	for i := range long {
+		long[i] = 'x'
+	}
+
+	code, _ = w.call(w.owner, 0, "POST", "/ext/me/business_profile/update.json", map[string]any{"receiptName": string(long)})
+	assert.Equal(t, http.StatusBadRequest, code)
+
+	// strangers cannot read someone's business details
+	code, _ = w.call(w.other, w.owner, "GET", "/ext/business/profile.json", nil)
+	assert.Equal(t, http.StatusForbidden, code)
+}

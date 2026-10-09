@@ -191,3 +191,23 @@ func (s *RepaymentService) List(c core.Context, ownerUid int64, customerId int64
 
 	return repayments, err
 }
+
+// Get returns one repayment with the sales it paid off, for printing a receipt
+func (s *RepaymentService) Get(c core.Context, ownerUid int64, repaymentId int64) (*RepaymentResult, error) {
+	repayment := &extmodels.Repayment{}
+	has, err := ownerDB(ownerUid).NewSession(c).Where("owner_uid=? AND repayment_id=?", ownerUid, repaymentId).Get(repayment)
+
+	if err != nil {
+		return nil, err
+	} else if !has {
+		return nil, exterrs.ErrRepaymentNotFound
+	}
+
+	allocations := make([]*extmodels.RepaymentAllocation, 0)
+
+	if err = ownerDB(ownerUid).NewSession(c).Where("owner_uid=? AND repayment_id=?", ownerUid, repaymentId).OrderBy("allocation_id").Find(&allocations); err != nil {
+		return nil, err
+	}
+
+	return &RepaymentResult{Repayment: repayment, Allocations: allocations}, nil
+}

@@ -29,11 +29,12 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Frontend: customers page (balances, history, edit, **repayments**) | Done: type-check, lint, build, unit tests and an API smoke test pass; **not yet clicked through in a browser** |
 | Frontend: opt-in Business Features setting, i18n of all labels | Done |
 | Reports: stock value, low stock, who owes what (with CSV download) | Done: backend tests pass on SQLite, API smoke test passes, UI **not yet clicked through in a browser** |
+| Receipts: printable sale and repayment receipts (80 mm or A4), Save as PDF, copy as text, business details on them | Done: unit tests, API smoke test; **printing not yet tried on a real printer or in a browser** |
 | Who did what: "by <name>" mark in transaction comments, "recorded by" columns, stock history, activity log with the thing changed | Done, same caveat |
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
-Tests: `go test ./pkg/ext/...` (104 tests, all passing on SQLite). The service tests take several seconds each because every test boots a fresh database and syncs all tables, so the package needs several minutes; run a single test with `-run`.
+Tests: `go test ./pkg/ext/...` (111 tests, all passing on SQLite). The service tests take several seconds each because every test boots a fresh database and syncs all tables, so the package needs several minutes; run a single test with `-run`.
 
 **Other databases:** the same tests run unchanged on PostgreSQL or MySQL by setting `EXT_TEST_DB` (`postgres` or `mysql`), `EXT_TEST_DB_HOST`, `EXT_TEST_DB_USER` and `EXT_TEST_DB_PASSWD` (see `pkg/ext/testdb`); each test gets its own throw-away database. Results so far: PostgreSQL 17 passed all 54 service tests and the HTTP suites, and MySQL 8.4 passed the HTTP suites and 45 of 54 service tests with no failures (that run was stopped early). The tests added since (reports, attribution, people) have not yet been run on PostgreSQL or MySQL. The whole backend suite passes except
 `TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfUkraineDataSource`, which calls a live third-party API and fails
@@ -152,6 +153,9 @@ Send `X-Business-Id` to work in somebody else's business.
 | POST `/ext/staff/respond.json` `{ownerUid, accept}` | any | Accept or decline an invitation |
 | POST `/ext/staff/leave.json` `{ownerUid}` | any | Leave a business |
 | GET `/ext/audit/list.json?limit&beforeId` | owner | What managers and staff changed |
+| GET `/ext/business/profile.json` | staff | What the business prints on receipts (name falls back to the owner's name) |
+| GET `/ext/me/business_profile.json`, POST `/ext/me/business_profile/update.json` | any | My own business's receipt details |
+| GET `/ext/repayments/get.json?id` | staff | One repayment with the sales it paid off |
 | GET `/ext/people/list.json` | staff | The owner and everyone who has worked in the business (name, role, still active) |
 | GET `/ext/staff/people.json` | any | The same for my own business, whichever business I am working in |
 | GET `/ext/reports/stock_value.json`, `low_stock.json` (`?locationId`), `receivables.json` | manager | Reports |
@@ -205,6 +209,26 @@ button (managers) listing movements with who and why, and the Team page's **Rece
 Names come from `GET /ext/people/list.json` (the owner, members and removed members, so old records keep a name) and, for the Team page,
 `GET /ext/staff/people.json`, which is always about the caller's own business.
 
+### Receipts
+
+A receipt opens automatically when a sale or a repayment is recorded, and from a **Receipt** button on every sale in the history and every
+repayment in a customer's dialog (so any receipt can be reprinted).
+- **Content** (`src/ext/receipt.ts`, plain data first and so unit tested): the business name, address and phone, receipt number (`#` and the sale
+  or repayment id), date, customer, location (only when there are several), who served, where the money went, the lines (`2.5 kg x 1,500.00`),
+  subtotal and discount when there is one, total, paid, **balance owed** when part is on credit, a note for credit or cancelled sales, a diagonal
+  VOID mark for voided sales, and the footer message. A repayment receipt lists the sales it paid off, the amount received and what is still owed.
+- **Print:** the dialog offers a small receipt for 80 mm thermal printers or a full A4 page. *Print* copies the receipt into its own element and hides
+  everything else while the browser's print dialog is open, with a matching `@page` size, so only the receipt comes out; *Save as PDF* is in the same dialog.
+  The paper choice is remembered in the browser.
+- **Copy as text** puts a 32 (small) or 42 (A4) column plain-text version on the clipboard for WhatsApp, SMS or email, amounts lined up on the right.
+- **Business details** (name on receipts, address, phone, footer message) are edited by the owner in *Settings > Business Features > Receipt details* and
+  stored in `ext_business_profile` (one row per business). Staff and managers print with the owner's details (`GET /ext/business/profile.json`);
+  `GET/POST /ext/me/business_profile...` always act on the caller's own business. Without a name the owner's name is used.
+- A repayment receipt can be fetched again with `GET /ext/repayments/get.json?id` (it includes the sales it paid off and the accounts).
+- Limits: the amount of "still owed" on a repayment receipt is the balance *at the time it is printed*, so a reprint after later sales or
+  repayments shows the newer balance; the sale receipt shows what that sale still owes now. Receipts are not stored as documents; they are
+  rebuilt from the sale each time, so a reprint always reflects the sale as it is now (including a later void).
+
 ### Reports
 
 All read-only and computed from the stock ledger and the sales, so they cannot disagree with them (managers and owners; staff get a 403).
@@ -223,7 +247,7 @@ CSV cells that start with `=`, `+`, `-` or `@` get a quote in front so a spreads
 Tables (all `ext_` prefixed, created by `SyncTables()` during `ezbookkeeping database update` or on start when `auto_update_database` is true; additive only):
 
 - User database (looked up across owners): `ext_membership`, `ext_audit_log` (with `action`, `entity_type`, `entity_id`, added later as extra columns), `ext_user_setting` (one row per person: whether the business features are on).
-- Business data (next to the owner's data): `ext_location`, `ext_item`, `ext_stock_movement`, `ext_customer`, `ext_sale`, `ext_sale_line`, `ext_repayment`, `ext_repayment_allocation`.
+- Business data (next to the owner's data): `ext_business_profile` (receipt details), `ext_location`, `ext_item`, `ext_stock_movement`, `ext_customer`, `ext_sale`, `ext_sale_line`, `ext_repayment`, `ext_repayment_allocation`.
 
 Works on SQLite, MySQL and PostgreSQL through the same ORM as upstream. Tests run on SQLite only.
 Deployment: nothing to change; the next deploy creates the tables. Back up the database first, as always.
@@ -243,7 +267,7 @@ Deployment: nothing to change; the next deploy creates the tables. Back up the d
 
    **Translations:** all labels are registered in `src/ext/locales/en.json`, with the English sentence as the key like the app's own `en.json`. Other languages: add `src/ext/locales/<code>.json` (underscore in the file name for a hyphenated code, e.g. `zh_Hans.json`) with the same keys; missing keys fall back to English. After adding a label run `python3 scripts/ext-extract-i18n.py`; a unit test (`src/ext/__tests__/locales.test.ts`) fails if a label or placeholder is not registered.
 
-   Still to build: receipts / printing and a sale detail view. Possible next steps for reports: sales by day / by person, profit using cost of goods sold, charts.
+   Still to build: a sale detail view (a printable receipt exists), sending receipts by email. Possible next steps for reports: sales by day / by person, profit using cost of goods sold, charts.
    Known gaps: prices are shown in the *user's* default currency because the API does not yet return the business currency; new strings use English text as the key and are not translated; the pages have been type-checked and built but not exercised in a browser, so expect layout fixes; the mobile app has no ext screens.
 2. **Registration and invitations for new people.** Invitees must already have an account, and public registration is closed (paywall plan).
    Decide how a new staff member gets an account: invitation links that allow registration, or the owner creates the account.
@@ -273,7 +297,7 @@ Code review findings were fixed in this branch (see git history); what remains:
 
 ## 11. Working on it
 
-API smoke test against a running local server: `python3 scripts/ext-smoke.py` (54 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
+API smoke test against a running local server: `python3 scripts/ext-smoke.py` (59 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
 
 ```sh
 export PATH=$HOME/sdk/go/bin:$PATH GOTOOLCHAIN=local     # Go 1.27.1 (see go.mod)

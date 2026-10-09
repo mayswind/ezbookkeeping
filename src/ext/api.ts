@@ -5,6 +5,8 @@ import type { ApiResponse } from '@/core/api.ts';
 import type {
     BusinessInfo,
     MySettings,
+    BusinessProfileInfo,
+    BusinessProfileRequest,
     PersonInfo,
     StockValueReport,
     LowStockRow,
@@ -69,6 +71,12 @@ export default {
     respondToInvitation: (ownerUid: string, accept: boolean) => post<boolean>('staff/respond.json', { ownerUid, accept }),
     leaveBusiness: (ownerUid: string) => post<boolean>('staff/leave.json', { ownerUid }),
     listAudit: (beforeId?: string) => get<AuditEntry[]>('audit/list.json', { limit: 50, beforeId }),
+
+    // what the business prints on receipts: the business being worked in, and my own (edited in Settings)
+    getBusinessProfile: () => get<BusinessProfileInfo>('business/profile.json'),
+    getMyBusinessProfile: () => get<BusinessProfileInfo>('me/business_profile.json'),
+    updateMyBusinessProfile: (req: BusinessProfileRequest) => post<BusinessProfileInfo>('me/business_profile/update.json', req),
+    getRepayment: (id: string) => get<RepaymentInfo>('repayments/get.json', { id }),
 
     // who works in the business, for showing who did what
     listPeople: () => get<PersonInfo[]>('people/list.json'),

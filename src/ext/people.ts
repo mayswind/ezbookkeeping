@@ -37,6 +37,11 @@ export function usePeople() {
         return person.active ? name : tt('{name} (no longer here)', { name });
     }
 
+    /** The name as stored, without "(you)" or "(no longer here)"; for receipts and exports. */
+    function plainNameOf(uid: string): string {
+        return people.value.find(p => p.uid === uid)?.name ?? '';
+    }
+
     /** People of the business being worked in. */
     async function load(): Promise<void> {
         people.value = await api.listPeople();
@@ -59,5 +64,5 @@ export function usePeople() {
         };
     }
 
-    return { people, load, nameOf, ownTeam };
+    return { people, load, nameOf, plainNameOf, ownTeam };
 }

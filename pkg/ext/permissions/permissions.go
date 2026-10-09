@@ -69,7 +69,7 @@ func buildRules() []rule {
 		"/ext/items/list.json", "/ext/items/stock.json",
 		"/ext/customers/list.json", "/ext/customers/balances.json",
 		"/ext/sales/list.json", "/ext/sales/get.json",
-		"/ext/repayments/list.json",
+		"/ext/repayments/list.json", "/ext/repayments/get.json", "/ext/business/profile.json",
 	))
 	// Staff record money through sales and repayments only. A raw "add transaction" could be an expense or a transfer
 	// between the owner's accounts, so it needs a manager.

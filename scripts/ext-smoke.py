@@ -63,8 +63,13 @@ s, b = o("POST", "ext/sales/add.json", sale_req(amountPaid=0)); check("walk-in o
 s, b = o("POST", "ext/sales/add.json", sale_req(lines=[{"itemId": item, "qty": 99000}], amountPaid=1, paymentAccountId=cash)); check("oversell refused", s == 400, (s, b))
 
 s, b = o("POST", "ext/repayments/add.json", {"customerId": cust, "amount": 75000, "saleId": "0", "time": int(time.time()), "utcOffset": 60, "paymentAccountId": cash, "receivableAccountId": recv, "categoryId": xfer, "note": ""})
-check("repayment accepted", s == 200, b); check("receivables now 200000", balance(recv) == 200000, balance(recv)); check("cash now 175000", balance(cash) == 175000, balance(cash))
+check("repayment accepted", s == 200, b); rep_id = b["result"]["id"]; check("receivables now 200000", balance(recv) == 200000, balance(recv)); check("cash now 175000", balance(cash) == 175000, balance(cash))
 s, b = o("POST", "ext/sales/void.json", {"id": sale["id"]}); check("void refused after repayment", s == 400, (s, b))
+
+# what receipts rely on
+s, b = o("GET", "ext/repayments/get.json?id=" + rep_id); check("repayment with its allocations", s == 200 and b["result"]["amount"] == 75000 and len(b["result"]["allocations"]) == 1 and b["result"]["paymentAccountId"] == cash, (s, b))
+s, b = o("GET", "ext/business/profile.json"); check("receipt name falls back to the owner's name", s == 200 and b["result"]["name"] == owner_name.upper() and b["result"]["receiptName"] == "", (s, b))
+s, b = o("POST", "ext/me/business_profile/update.json", {"receiptName": "Ada Stores", "address": "12 Market Road", "phone": "0800", "footer": "Thank you"}); check("save receipt details", s == 200 and b["result"]["name"] == "Ada Stores", (s, b))
 
 # what the customers page relies on
 s, b = o("GET", "ext/sales/list.json?customerId=" + cust + "&onlyOpen=true"); check("open sales of a customer", s == 200 and len(b["result"]) == 1 and b["result"][0]["outstanding"] == 200000, (s, b))
@@ -117,6 +122,8 @@ s, b = st("POST", "ext/customers/modify.json", {"id": cust, "name": "Hacked", "p
 s, b = st("POST", "ext/customers/add.json", {"name": "Walk up"}); check("staff can add a customer", s == 200, (s, b))
 s, b = st("POST", "ext/me/settings/update.json", {"businessFeatures": True}); check("staff changes only their own setting", s == 200, (s, b))
 s, b = o("GET", "ext/me/settings.json"); check("owner setting unaffected by staff", s == 200 and b["result"]["businessFeatures"] is True, (s, b))
+s, b = st("GET", "ext/business/profile.json"); check("staff print the owner's receipt details", s == 200 and b["result"]["name"] == "Ada Stores" and b["result"]["footer"] == "Thank you", (s, b))
+s, b = st("GET", "ext/repayments/get.json?id=" + rep_id); check("staff can reprint a repayment receipt", s == 200, (s, b))
 s, b = st("GET", "ext/staff/list.json"); check("staff sees no team of the owner", s == 200 and b["result"] == [], (s, b))
 s, b = o("GET", "ext/audit/list.json"); check("owner audit shows staff sale", s == 200 and any(e["method"] == "POST" and "sales/add" in e["path"] for e in b["result"]), b)
 s, b = call("GET", "v1/ext/items/list.json", None, staff, "999999"); check("staff cannot use a business they don't belong to", s == 403, (s, b))

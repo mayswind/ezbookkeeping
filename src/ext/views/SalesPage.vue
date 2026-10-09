@@ -160,7 +160,7 @@
                                     <th class="text-end">{{ tt('Owed') }}</th>
                                     <th>{{ tt('Status') }}</th>
                                     <th>{{ tt('Recorded by') }}</th>
-                                    <th v-if="canManage"></th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -175,13 +175,14 @@
                                         <v-chip size="small" color="success" v-else>{{ tt('Paid') }}</v-chip>
                                     </td>
                                     <td>{{ nameOf(sale.actorUid) || '–' }}</td>
-                                    <td class="text-end" v-if="canManage">
-                                        <v-btn size="small" variant="text" color="error" :disabled="sale.voided"
+                                    <td class="text-end text-no-wrap">
+                                        <v-btn size="small" variant="text" :disabled="preparingReceipt" @click="showSaleReceipt(sale)">{{ tt('Receipt') }}</v-btn>
+                                        <v-btn size="small" variant="text" color="error" v-if="canManage" :disabled="sale.voided"
                                                @click="voidSale(sale)">{{ tt('Void') }}</v-btn>
                                     </td>
                                 </tr>
                                 <tr v-if="sales.length < 1">
-                                    <td :colspan="canManage ? 7 : 6" class="text-center text-medium-emphasis py-6">{{ tt('No sales yet.') }}</td>
+                                    <td colspan="7" class="text-center text-medium-emphasis py-6">{{ tt('No sales yet.') }}</td>
                                 </tr>
                             </tbody>
                         </v-table>
@@ -190,6 +191,7 @@
             </v-row>
 
             <ext-customer-dialog v-model:show="showCustomerDialog" @saved="onCustomerSaved" @error="onError" />
+            <ext-receipt-dialog :receipt="receipt" v-model:show="showReceipt" />
             <confirm-dialog ref="confirmDialog" />
             <ext-snack-bar ref="snackbar" />
         </template>
@@ -200,6 +202,7 @@
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import ExtSnackBar from '@/ext/components/ExtSnackBar.vue';
 import ExtCustomerDialog from '@/ext/components/ExtCustomerDialog.vue';
+import ExtReceiptDialog from '@/ext/components/ExtReceiptDialog.vue';
 
 import { ref, reactive, computed, watch, onMounted, useTemplateRef } from 'vue';
 
@@ -211,6 +214,7 @@ import api from '@/ext/api.ts';
 import { useBusiness } from '@/ext/business.ts';
 import { useBusinessAccounts } from '@/ext/accounts.ts';
 import { usePeople } from '@/ext/people.ts';
+import { useReceipts } from '@/ext/useReceipts.ts';
 import { loadFormDefaults, saveFormDefaults } from '@/ext/defaults.ts';
 import { formatQty, parseQty } from '@/ext/qty.ts';
 import { computeTotals, lineTotal, type PayMode } from '@/ext/money.ts';
@@ -235,6 +239,7 @@ interface CartLine {
 const { tt, formatAmountToLocalizedNumeralsWithCurrency, formatDateTimeToLongDateTime } = useExtI18n();
 const { canManage, current, ensureLoaded } = useBusiness();
 const { load: loadPeople, nameOf } = usePeople();
+const { receipt, show: showReceipt, preparing: preparingReceipt, openSale } = useReceipts();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -463,10 +468,19 @@ async function submit(): Promise<void> {
         snackbar.value?.showMessage(tt('Sale #{id} recorded: {total}', { id: sale.id, total: money(sale.total) }));
         clearCart();
         await Promise.all([loadStockAndSales(), api.listCustomers().then(list => { customers.value = list; }), loadAccounts(true)]);
+        await showSaleReceipt(sale); // the receipt is what the customer takes away
     } catch (error) {
         snackbar.value?.showError(error);
     } finally {
         submitting.value = false;
+    }
+}
+
+async function showSaleReceipt(sale: SaleInfo): Promise<void> {
+    try {
+        await openSale(sale);
+    } catch (error) {
+        snackbar.value?.showError(error);
     }
 }
 

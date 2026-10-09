@@ -56,7 +56,7 @@ import api from '@/ext/api.ts';
 import { useBusiness } from '@/ext/business.ts';
 import { useBusinessAccounts } from '@/ext/accounts.ts';
 import { loadFormDefaults, saveFormDefaults } from '@/ext/defaults.ts';
-import type { CustomerInfo, SaleInfo } from '@/ext/types.ts';
+import type { CustomerInfo, RepaymentInfo, SaleInfo } from '@/ext/types.ts';
 
 const props = defineProps<{
     show: boolean;
@@ -65,7 +65,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
-    (e: 'saved'): void;
+    (e: 'saved', repayment: RepaymentInfo): void;
     (e: 'error', error: unknown): void;
 }>();
 
@@ -166,7 +166,7 @@ async function save(): Promise<void> {
     saving.value = true;
 
     try {
-        await api.addRepayment({
+        const repayment = await api.addRepayment({
             customerId: props.customer.id,
             amount: amount.value,
             saleId: saleId.value,
@@ -179,7 +179,7 @@ async function save(): Promise<void> {
         });
 
         saveFormDefaults(current.value?.ownerUid ?? 'own', { payment: paymentAccountId.value, receivable: receivableAccountId.value, transfer: categoryId.value });
-        emit('saved');
+        emit('saved', repayment);
         close(false);
     } catch (error) {
         emit('error', error);

@@ -163,6 +163,8 @@ export interface RepaymentInfo {
     readonly customerId: string;
     readonly amount: number;
     readonly transactionId: string;
+    readonly paymentAccountId: string;
+    readonly receivableAccountId: string;
     readonly time: number;
     readonly note: string;
     readonly actorUid: string;
@@ -226,6 +228,21 @@ export interface ReceivablesReport {
     readonly days31To60: number;
     readonly days61To90: number;
     readonly over90: number;
+}
+
+export interface BusinessProfileInfo {
+    readonly receiptName: string;
+    readonly name: string; // the receipt name, or the owner's name when none is set
+    readonly address: string;
+    readonly phone: string;
+    readonly footer: string;
+}
+
+export interface BusinessProfileRequest {
+    readonly receiptName: string;
+    readonly address: string;
+    readonly phone: string;
+    readonly footer: string;
 }
 
 export interface MySettings {

@@ -30,6 +30,24 @@
                     </div>
                 </v-card-text>
             </v-card>
+            <v-card class="mt-4" :title="tt('Receipt details')" v-if="available">
+                <template #subtitle>
+                    {{ tt('This is printed at the top and bottom of your receipts.') }}
+                </template>
+                <v-card-text>
+                    <v-form class="d-flex flex-column ga-4" @submit.prevent="saveProfile">
+                        <v-text-field density="compact" hide-details="auto" :label="tt('Business name on receipts')"
+                                      :hint="tt('Leave empty to use your own name.')" :disabled="savingProfile" v-model="profileForm.receiptName" />
+                        <v-text-field density="compact" hide-details="auto" :label="tt('Address')" :disabled="savingProfile" v-model="profileForm.address" />
+                        <v-text-field density="compact" hide-details="auto" :label="tt('Phone')" :disabled="savingProfile" v-model="profileForm.phone" />
+                        <v-text-field density="compact" hide-details="auto" :label="tt('Message at the bottom')"
+                                      :hint="tt('For example: Thank you for your business')" :disabled="savingProfile" v-model="profileForm.footer" />
+                        <div>
+                            <v-btn color="primary" type="submit" :loading="savingProfile">{{ tt('Save receipt details') }}</v-btn>
+                        </div>
+                    </v-form>
+                </v-card-text>
+            </v-card>
             <ext-snack-bar ref="snackbar" />
         </v-col>
     </v-row>
@@ -38,9 +56,10 @@
 <script setup lang="ts">
 import ExtSnackBar from '@/ext/components/ExtSnackBar.vue';
 
-import { ref, onMounted, useTemplateRef } from 'vue';
+import { ref, reactive, watch, onMounted, useTemplateRef } from 'vue';
 
 import { useExtI18n } from '@/ext/i18n.ts';
+import api from '@/ext/api.ts';
 import { useBusiness } from '@/ext/business.ts';
 import { useBusinessFeatures } from '@/ext/features.ts';
 
@@ -52,6 +71,41 @@ const { available, worksForSomeoneElse, loadFeatureSetting, setEnabled } = useBu
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const saving = ref<boolean>(false);
+
+// receipt details belong to the person's own business
+const savingProfile = ref<boolean>(false);
+const profileForm = reactive({ receiptName: '', address: '', phone: '', footer: '' });
+
+async function loadProfile(): Promise<void> {
+    try {
+        const profile = await api.getMyBusinessProfile();
+        profileForm.receiptName = profile.receiptName;
+        profileForm.address = profile.address;
+        profileForm.phone = profile.phone;
+        profileForm.footer = profile.footer;
+    } catch (error) {
+        snackbar.value?.showError(error);
+    }
+}
+
+async function saveProfile(): Promise<void> {
+    savingProfile.value = true;
+
+    try {
+        await api.updateMyBusinessProfile({ ...profileForm });
+        snackbar.value?.showMessage(tt('Receipt details saved'));
+    } catch (error) {
+        snackbar.value?.showError(error);
+    } finally {
+        savingProfile.value = false;
+    }
+}
+
+watch(available, isAvailable => {
+    if (isAvailable) {
+        loadProfile();
+    }
+});
 
 async function change(value: boolean): Promise<void> {
     saving.value = true;
@@ -72,5 +126,9 @@ onMounted(() => {
     });
 
     loadFeatureSetting().catch(error => snackbar.value?.showError(error));
+
+    if (available.value) {
+        loadProfile();
+    }
 });
 </script>

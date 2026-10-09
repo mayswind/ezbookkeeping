@@ -50,6 +50,7 @@
                             <th class="text-end">{{ tt('Amount') }}</th>
                             <th>{{ tt('Received by') }}</th>
                             <th>{{ tt('Note') }}</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,9 +59,10 @@
                             <td class="text-end">{{ money(repayment.amount) }}</td>
                             <td>{{ nameOf(repayment.actorUid) || '–' }}</td>
                             <td>{{ repayment.note }}</td>
+                            <td class="text-end"><v-btn size="small" variant="text" @click="emit('receipt', repayment)">{{ tt('Receipt') }}</v-btn></td>
                         </tr>
                         <tr v-if="!loading && repayments.length < 1">
-                            <td colspan="4" class="text-medium-emphasis">{{ tt('No repayments yet.') }}</td>
+                            <td colspan="5" class="text-medium-emphasis">{{ tt('No repayments yet.') }}</td>
                         </tr>
                     </tbody>
                 </v-table>
@@ -94,6 +96,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void;
     (e: 'repay'): void;
+    (e: 'receipt', repayment: RepaymentInfo): void;
     (e: 'error', error: unknown): void;
 }>();
 

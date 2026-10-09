@@ -49,6 +49,17 @@ type UserSettingsRequest struct {
 	BusinessFeatures bool `json:"businessFeatures"`
 }
 
+type BusinessProfileRequest struct {
+	ReceiptName string `json:"receiptName" binding:"max=128"`
+	Address     string `json:"address" binding:"max=255"`
+	Phone       string `json:"phone" binding:"max=32"`
+	Footer      string `json:"footer" binding:"max=255"`
+}
+
+type RepaymentGetRequest struct {
+	Id int64 `form:"id,string" binding:"required,min=1"`
+}
+
 type LeaveBusinessRequest struct {
 	OwnerUid int64 `json:"ownerUid,string" binding:"required,min=1"`
 }
@@ -274,14 +285,16 @@ type RepaymentAllocationView struct {
 }
 
 type RepaymentView struct {
-	Id            int64                     `json:"id,string"`
-	CustomerId    int64                     `json:"customerId,string"`
-	Amount        int64                     `json:"amount"`
-	TransactionId int64                     `json:"transactionId,string"`
-	Time          int64                     `json:"time"`
-	Note          string                    `json:"note"`
-	ActorUid      int64                     `json:"actorUid,string"`
-	Allocations   []RepaymentAllocationView `json:"allocations,omitempty"`
+	Id                  int64                     `json:"id,string"`
+	CustomerId          int64                     `json:"customerId,string"`
+	Amount              int64                     `json:"amount"`
+	TransactionId       int64                     `json:"transactionId,string"`
+	PaymentAccountId    int64                     `json:"paymentAccountId,string"`
+	ReceivableAccountId int64                     `json:"receivableAccountId,string"`
+	Time                int64                     `json:"time"`
+	Note                string                    `json:"note"`
+	ActorUid            int64                     `json:"actorUid,string"`
+	Allocations         []RepaymentAllocationView `json:"allocations,omitempty"`
 }
 
 type ReportLocationRequest struct {
@@ -338,4 +351,13 @@ type ReceivablesReportView struct {
 	Days31To60       int64               `json:"days31To60"`
 	Days61To90       int64               `json:"days61To90"`
 	Over90           int64               `json:"over90"`
+}
+
+// BusinessProfileView is what a business prints on its receipts. Name is the receipt name, or the owner's name when none is set.
+type BusinessProfileView struct {
+	ReceiptName string `json:"receiptName"`
+	Name        string `json:"name"`
+	Address     string `json:"address"`
+	Phone       string `json:"phone"`
+	Footer      string `json:"footer"`
 }

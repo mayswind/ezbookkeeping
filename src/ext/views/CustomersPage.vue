@@ -62,9 +62,10 @@
             <ext-customer-dialog :customer="editingCustomer" v-model:show="showCustomerDialog"
                                  @saved="onSaved(tt('Customer saved'))" @error="onError" />
             <ext-customer-detail-dialog :customer="detailCustomer" :currency="currency" v-model:show="showDetail"
-                                        @repay="repayFromDetail" @error="onError" />
+                                        @repay="repayFromDetail" @receipt="showRepaymentReceipt" @error="onError" />
             <ext-repayment-dialog :customer="repaymentCustomer" v-model:show="showRepayment"
-                                  @saved="onSaved(tt('Repayment recorded'))" @error="onError" />
+                                  @saved="onRepaymentSaved" @error="onError" />
+            <ext-receipt-dialog :receipt="receipt" v-model:show="showReceipt" />
             <confirm-dialog ref="confirmDialog" />
             <ext-snack-bar ref="snackbar" />
         </template>
@@ -77,6 +78,7 @@ import ExtSnackBar from '@/ext/components/ExtSnackBar.vue';
 import ExtCustomerDialog from '@/ext/components/ExtCustomerDialog.vue';
 import ExtCustomerDetailDialog from '@/ext/components/ExtCustomerDetailDialog.vue';
 import ExtRepaymentDialog from '@/ext/components/ExtRepaymentDialog.vue';
+import ExtReceiptDialog from '@/ext/components/ExtReceiptDialog.vue';
 
 import { ref, computed, onMounted, useTemplateRef } from 'vue';
 
@@ -87,7 +89,8 @@ import { parseBigDecimal } from '@/lib/numeral.ts';
 
 import api from '@/ext/api.ts';
 import { useBusiness } from '@/ext/business.ts';
-import type { CustomerInfo } from '@/ext/types.ts';
+import { useReceipts } from '@/ext/useReceipts.ts';
+import type { CustomerInfo, RepaymentInfo } from '@/ext/types.ts';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof ExtSnackBar>;
@@ -95,6 +98,7 @@ type SnackBarType = InstanceType<typeof ExtSnackBar>;
 const { tt, formatAmountToLocalizedNumeralsWithCurrency } = useExtI18n();
 const userStore = useUserStore();
 const { canManage, ensureLoaded } = useBusiness();
+const { receipt, show: showReceipt, openRepayment: openRepaymentReceipt } = useReceipts();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -185,6 +189,21 @@ function removeCustomer(customer: CustomerInfo): void {
     }).catch(() => {
         // cancelled
     });
+}
+
+async function showRepaymentReceipt(repayment: RepaymentInfo): Promise<void> {
+    try {
+        await openRepaymentReceipt(repayment);
+    } catch (error) {
+        snackbar.value?.showError(error);
+    }
+}
+
+// after money is received, the receipt is what the customer takes away
+async function onRepaymentSaved(repayment: RepaymentInfo): Promise<void> {
+    snackbar.value?.showMessage(tt('Repayment recorded'));
+    await load();
+    await showRepaymentReceipt(repayment);
 }
 
 function onSaved(message: string): void {

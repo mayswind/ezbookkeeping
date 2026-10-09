@@ -94,3 +94,7 @@ func stamped(c core.Context, ownerUid int64, actorUid int64, comment string) str
 func fmtInt(n int64) string {
 	return strconv.FormatInt(n, 10)
 }
+
+func trimmed(text string) string {
+	return strings.TrimSpace(text)
+}

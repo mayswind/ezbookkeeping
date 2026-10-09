@@ -159,6 +159,7 @@
                                     <th class="text-end">{{ tt('Total') }}</th>
                                     <th class="text-end">{{ tt('Owed') }}</th>
                                     <th>{{ tt('Status') }}</th>
+                                    <th>{{ tt('Recorded by') }}</th>
                                     <th v-if="canManage"></th>
                                 </tr>
                             </thead>
@@ -173,13 +174,14 @@
                                         <v-chip size="small" color="warning" v-else-if="sale.outstanding > 0">{{ tt('On credit') }}</v-chip>
                                         <v-chip size="small" color="success" v-else>{{ tt('Paid') }}</v-chip>
                                     </td>
+                                    <td>{{ nameOf(sale.actorUid) || '–' }}</td>
                                     <td class="text-end" v-if="canManage">
                                         <v-btn size="small" variant="text" color="error" :disabled="sale.voided"
                                                @click="voidSale(sale)">{{ tt('Void') }}</v-btn>
                                     </td>
                                 </tr>
                                 <tr v-if="sales.length < 1">
-                                    <td :colspan="canManage ? 6 : 5" class="text-center text-medium-emphasis py-6">{{ tt('No sales yet.') }}</td>
+                                    <td :colspan="canManage ? 7 : 6" class="text-center text-medium-emphasis py-6">{{ tt('No sales yet.') }}</td>
                                 </tr>
                             </tbody>
                         </v-table>
@@ -208,6 +210,7 @@ import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 import api from '@/ext/api.ts';
 import { useBusiness } from '@/ext/business.ts';
 import { useBusinessAccounts } from '@/ext/accounts.ts';
+import { usePeople } from '@/ext/people.ts';
 import { loadFormDefaults, saveFormDefaults } from '@/ext/defaults.ts';
 import { formatQty, parseQty } from '@/ext/qty.ts';
 import { computeTotals, lineTotal, type PayMode } from '@/ext/money.ts';
@@ -231,6 +234,7 @@ interface CartLine {
 
 const { tt, formatAmountToLocalizedNumeralsWithCurrency, formatDateTimeToLongDateTime } = useExtI18n();
 const { canManage, current, ensureLoaded } = useBusiness();
+const { load: loadPeople, nameOf } = usePeople();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
@@ -419,7 +423,7 @@ async function load(): Promise<void> {
     try {
         await ensureLoaded();
         [items.value, locations.value, customers.value] = await Promise.all([api.listItems(), api.listLocations(), api.listCustomers()]);
-        await Promise.all([loadStockAndSales(), loadAccounts()]);
+        await Promise.all([loadStockAndSales(), loadAccounts(), loadPeople()]);
 
         locationId.value = (locations.value.find(l => l.isDefault) ?? locations.value[0])?.id ?? '';
         loadDefaults();

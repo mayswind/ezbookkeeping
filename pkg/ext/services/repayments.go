@@ -114,6 +114,7 @@ func (s *RepaymentService) Add(c core.Context, ownerUid int64, actorUid int64, i
 		comment = truncate(comment+": "+note, 255)
 	}
 
+	comment = stamped(c, ownerUid, actorUid, comment)
 	tx := newTransferTransaction(ownerUid, in.ReceivableAccountId, in.PaymentAccountId, in.CategoryId, in.Amount, in.Time, in.UtcOffset, comment)
 
 	if err = services.Transactions.CreateTransaction(c, tx, nil, nil); err != nil {

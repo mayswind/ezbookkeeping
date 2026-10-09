@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -21,9 +20,9 @@ import (
 	extmodels "github.com/mayswind/ezbookkeeping/pkg/ext/models"
 	extperm "github.com/mayswind/ezbookkeeping/pkg/ext/permissions"
 	extservices "github.com/mayswind/ezbookkeeping/pkg/ext/services"
+	"github.com/mayswind/ezbookkeeping/pkg/ext/testdb"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
@@ -43,11 +42,7 @@ func newWorld(t *testing.T) *world {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 
-	config := &settings.Config{
-		DatabaseConfig:    &settings.DatabaseConfig{DatabaseType: settings.Sqlite3DbType, DatabasePath: filepath.Join(t.TempDir(), "http.db")},
-		UuidGeneratorType: settings.InternalUuidGeneratorType,
-		UuidServerId:      1,
-	}
+	config := testdb.Config(t)
 	require.NoError(t, datastore.InitializeDataStore(config))
 	require.NoError(t, uuid.InitializeUuidGenerator(config))
 	require.NoError(t, datastore.Container.UserStore.SyncStructs(new(models.User)))
@@ -101,7 +96,17 @@ func newWorld(t *testing.T) *world {
 	}
 	v1.GET("/accounts/list.json", bindApi(whoami))
 	v1.POST("/transactions/delete.json", bindApi(whoami))
-	v1.POST("/transactions/add.json", bindApi(whoami))
+	v1.POST("/transactions/add.json", bindApi(func(wc *core.WebContext) (any, *errs.Error) {
+		var req struct {
+			Comment string `json:"comment"`
+		}
+
+		if err := wc.ShouldBindJSON(&req); err != nil {
+			return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+		}
+
+		return map[string]any{"id": "77", "comment": req.Comment, "uid": wc.GetCurrentUid()}, nil
+	}))
 	v1.POST("/data/clear/all.json", bindApi(whoami))
 	v1.POST("/users/profile/update.json", bindApi(whoami))
 
@@ -372,4 +377,114 @@ func TestHTTP_BusinessFeaturesSettingIsPerPersonAndIgnoresTheBusinessHeader(t *t
 	require.Equal(t, http.StatusOK, code)
 	assert.Equal(t, false, result(t, body)["businessFeatures"])
 	assert.Equal(t, true, result(t, body)["configured"])
+}
+
+func TestHTTP_TransactionsAddedByAManagerAreMarkedWithTheirName(t *testing.T) {
+	w := newWorld(t)
+
+	code, body := w.call(w.manager, w.owner, "POST", "/transactions/add.json", map[string]any{"comment": "lunch", "sourceAmount": 100})
+	require.Equal(t, http.StatusOK, code, body)
+	assert.Equal(t, "lunch · by manager", result(t, body)["comment"], "the upstream handler sees the marked comment")
+	assert.Equal(t, float64(w.owner), result(t, body)["uid"], "and it is booked to the owner")
+
+	code, body = w.call(w.manager, w.owner, "POST", "/transactions/add.json", map[string]any{"sourceAmount": 100})
+	require.Equal(t, http.StatusOK, code, body)
+	assert.Equal(t, "by manager", result(t, body)["comment"], "a transaction without a comment still gets the mark")
+
+	// the owner's own entries are left exactly as typed
+	code, body = w.call(w.owner, 0, "POST", "/transactions/add.json", map[string]any{"comment": "lunch"})
+	require.Equal(t, http.StatusOK, code, body)
+	assert.Equal(t, "lunch", result(t, body)["comment"])
+
+	// and so is a manager's entry in their own books
+	code, body = w.call(w.manager, 0, "POST", "/transactions/add.json", map[string]any{"comment": "mine"})
+	require.Equal(t, http.StatusOK, code, body)
+	assert.Equal(t, "mine", result(t, body)["comment"])
+}
+
+func TestHTTP_AuditLogSaysWhatWasDoneAndToWhich(t *testing.T) {
+	w := newWorld(t)
+
+	code, body := w.call(w.manager, w.owner, "POST", "/transactions/add.json", map[string]any{"comment": "x"})
+	require.Equal(t, http.StatusOK, code, body)
+
+	code, body = w.call(w.manager, w.owner, "POST", "/transactions/delete.json", map[string]any{"id": "123"})
+	require.Equal(t, http.StatusOK, code, body)
+
+	code, body = w.call(w.manager, w.owner, "POST", "/ext/locations/add.json", map[string]any{"name": "Shop 2"})
+	require.Equal(t, http.StatusOK, code, body)
+	locationId := result(t, body)["id"].(string)
+
+	code, body = w.call(w.owner, 0, "GET", "/ext/audit/list.json", nil)
+	require.Equal(t, http.StatusOK, code)
+
+	entries := body["result"].([]any) // newest first
+	require.Len(t, entries, 3)
+
+	location := entries[0].(map[string]any)
+	assert.Equal(t, "locations.add", location["action"])
+	assert.Equal(t, "locations", location["entityType"])
+	assert.Equal(t, locationId, location["entityId"], "created things are found in the response")
+
+	deleted := entries[1].(map[string]any)
+	assert.Equal(t, "transactions.delete", deleted["action"])
+	assert.Equal(t, "123", deleted["entityId"], "changed things are found in the request")
+
+	added := entries[2].(map[string]any)
+	assert.Equal(t, "transactions.add", added["action"])
+	assert.Equal(t, "77", added["entityId"])
+	assert.Equal(t, strconv.FormatInt(w.manager, 10), added["actorUid"])
+}
+
+func TestHTTP_PeopleAreListedForEveryRole(t *testing.T) {
+	w := newWorld(t)
+
+	for _, uid := range []int64{w.owner, w.manager, w.staff} {
+		business := int64(0)
+		if uid != w.owner {
+			business = w.owner
+		}
+
+		code, body := w.call(uid, business, "GET", "/ext/people/list.json", nil)
+		require.Equal(t, http.StatusOK, code)
+
+		people := body["result"].([]any)
+		require.Len(t, people, 3)
+		assert.Equal(t, "owner", people[0].(map[string]any)["role"])
+		assert.Equal(t, strconv.FormatInt(w.owner, 10), people[0].(map[string]any)["uid"])
+	}
+
+	code, _ := w.call(w.other, w.owner, "GET", "/ext/people/list.json", nil)
+	assert.Equal(t, http.StatusForbidden, code, "strangers cannot list a business's people")
+}
+
+func TestHTTP_ReportsAreForManagersAndOwners(t *testing.T) {
+	w := newWorld(t)
+
+	for _, path := range []string{"/ext/reports/stock_value.json", "/ext/reports/low_stock.json", "/ext/reports/receivables.json"} {
+		code, _ := w.call(w.owner, 0, "GET", path, nil)
+		assert.Equal(t, http.StatusOK, code, "owner "+path)
+
+		code, _ = w.call(w.manager, w.owner, "GET", path, nil)
+		assert.Equal(t, http.StatusOK, code, "manager "+path)
+
+		code, _ = w.call(w.staff, w.owner, "GET", path, nil)
+		assert.Equal(t, http.StatusForbidden, code, "staff "+path)
+	}
+}
+
+func TestHTTP_MyPeopleIsAlwaysAboutTheCallersOwnBusiness(t *testing.T) {
+	w := newWorld(t)
+
+	// a manager working in the owner's business still gets their own business (just themselves)
+	code, body := w.call(w.manager, w.owner, "GET", "/ext/staff/people.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	people := body["result"].([]any)
+	require.Len(t, people, 1)
+	assert.Equal(t, strconv.FormatInt(w.manager, 10), people[0].(map[string]any)["uid"])
+
+	// while the business-scoped list is the owner's team
+	code, body = w.call(w.manager, w.owner, "GET", "/ext/people/list.json", nil)
+	require.Equal(t, http.StatusOK, code)
+	assert.Len(t, body["result"].([]any), 3)
 }

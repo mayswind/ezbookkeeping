@@ -48,6 +48,7 @@
                         <tr>
                             <th>{{ tt('Date') }}</th>
                             <th class="text-end">{{ tt('Amount') }}</th>
+                            <th>{{ tt('Received by') }}</th>
                             <th>{{ tt('Note') }}</th>
                         </tr>
                     </thead>
@@ -55,10 +56,11 @@
                         <tr :key="repayment.id" v-for="repayment in repayments">
                             <td>{{ formatTime(repayment.time) }}</td>
                             <td class="text-end">{{ money(repayment.amount) }}</td>
+                            <td>{{ nameOf(repayment.actorUid) || '–' }}</td>
                             <td>{{ repayment.note }}</td>
                         </tr>
                         <tr v-if="!loading && repayments.length < 1">
-                            <td colspan="3" class="text-medium-emphasis">{{ tt('No repayments yet.') }}</td>
+                            <td colspan="4" class="text-medium-emphasis">{{ tt('No repayments yet.') }}</td>
                         </tr>
                     </tbody>
                 </v-table>
@@ -80,6 +82,7 @@ import { parseBigDecimal } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTime } from '@/lib/datetime.ts';
 
 import api from '@/ext/api.ts';
+import { usePeople } from '@/ext/people.ts';
 import type { CustomerInfo, RepaymentInfo, SaleInfo } from '@/ext/types.ts';
 
 const props = defineProps<{
@@ -95,6 +98,7 @@ const emit = defineEmits<{
 }>();
 
 const { tt, formatAmountToLocalizedNumeralsWithCurrency, formatDateTimeToLongDateTime } = useExtI18n();
+const { load: loadPeople, nameOf } = usePeople();
 
 const loading = ref<boolean>(false);
 const openSales = ref<SaleInfo[]>([]);
@@ -122,7 +126,8 @@ async function load(): Promise<void> {
     try {
         [openSales.value, repayments.value] = await Promise.all([
             api.listSales({ customerId: props.customer.id, onlyOpen: true }),
-            api.listRepayments(props.customer.id)
+            api.listRepayments(props.customer.id),
+            loadPeople()
         ]);
     } catch (error) {
         emit('error', error);

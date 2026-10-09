@@ -61,6 +61,7 @@
                                             <v-btn size="small" variant="text" v-if="locations.length > 1"
                                                    @click="openStockDialog('transfer', item)">{{ tt('Transfer') }}</v-btn>
                                         </template>
+                                        <v-btn size="small" variant="text" v-if="item.trackStock" @click="openHistory(item)">{{ tt('History') }}</v-btn>
                                         <v-btn size="small" variant="text" @click="openItemDialog(item)">{{ tt('Edit') }}</v-btn>
                                         <v-btn size="small" variant="text" color="error" @click="removeItem(item)">{{ tt('Delete') }}</v-btn>
                                     </td>
@@ -80,6 +81,7 @@
                              @saved="onSaved(tt('Item saved'))" @error="onError" />
             <ext-stock-dialog :mode="stockMode" :item="stockItem" :locations="locations" :currency="currency"
                               v-model:show="showStockDialog" @saved="onSaved(tt('Stock updated'))" @error="onError" />
+            <ext-stock-history-dialog :item="historyItem" :locations="locations" v-model:show="showHistory" @error="onError" />
             <ext-locations-dialog :locations="locations" v-model:show="showLocations" @changed="load" @error="onError" />
             <confirm-dialog ref="confirmDialog" />
             <ext-snack-bar ref="snackbar" />
@@ -93,6 +95,7 @@ import ExtSnackBar from '@/ext/components/ExtSnackBar.vue';
 import ExtItemDialog from '@/ext/components/ExtItemDialog.vue';
 import ExtStockDialog, { type StockDialogMode } from '@/ext/components/ExtStockDialog.vue';
 import ExtLocationsDialog from '@/ext/components/ExtLocationsDialog.vue';
+import ExtStockHistoryDialog from '@/ext/components/ExtStockHistoryDialog.vue';
 
 import { ref, computed, onMounted, useTemplateRef } from 'vue';
 
@@ -131,6 +134,8 @@ const showStockDialog = ref<boolean>(false);
 const stockMode = ref<StockDialogMode>('receive');
 const stockItem = ref<ItemInfo | null>(null);
 const showLocations = ref<boolean>(false);
+const showHistory = ref<boolean>(false);
+const historyItem = ref<ItemInfo | null>(null);
 
 // Prices are in the business currency; until the server tells us otherwise we show them in the user's default currency
 const currency = computed<string>(() => userStore.currentUserDefaultCurrency);
@@ -194,6 +199,11 @@ function openStockDialog(mode: StockDialogMode, item: ItemInfo): void {
     stockMode.value = mode;
     stockItem.value = item;
     showStockDialog.value = true;
+}
+
+function openHistory(item: ItemInfo): void {
+    historyItem.value = item;
+    showHistory.value = true;
 }
 
 function removeItem(item: ItemInfo): void {

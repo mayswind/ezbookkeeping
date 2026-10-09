@@ -28,10 +28,14 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Frontend: sales screen (cart, cash / part / credit, sales history, void) | Done: type-check, lint, build, unit tests and an API smoke test pass; **not yet clicked through in a browser** |
 | Frontend: customers page (balances, history, edit, **repayments**) | Done: type-check, lint, build, unit tests and an API smoke test pass; **not yet clicked through in a browser** |
 | Frontend: opt-in Business Features setting, i18n of all labels | Done |
+| Reports: stock value, low stock, who owes what (with CSV download) | Done: backend tests pass on SQLite, API smoke test passes, UI **not yet clicked through in a browser** |
+| Who did what: "by <name>" mark in transaction comments, "recorded by" columns, stock history, activity log with the thing changed | Done, same caveat |
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
-Tests: `go test ./pkg/ext/...` (80 tests, all passing). The service tests take about 4 seconds each because every test boots a fresh SQLite database and syncs all tables, so the package needs several minutes; run a single test with `-run`. The whole backend suite passes except
+Tests: `go test ./pkg/ext/...` (104 tests, all passing on SQLite). The service tests take several seconds each because every test boots a fresh database and syncs all tables, so the package needs several minutes; run a single test with `-run`.
+
+**Other databases:** the same tests run unchanged on PostgreSQL or MySQL by setting `EXT_TEST_DB` (`postgres` or `mysql`), `EXT_TEST_DB_HOST`, `EXT_TEST_DB_USER` and `EXT_TEST_DB_PASSWD` (see `pkg/ext/testdb`); each test gets its own throw-away database. Results so far: PostgreSQL 17 passed all 54 service tests and the HTTP suites, and MySQL 8.4 passed the HTTP suites and 45 of 54 service tests with no failures (that run was stopped early). The tests added since (reports, attribution, people) have not yet been run on PostgreSQL or MySQL. The whole backend suite passes except
 `TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfUkraineDataSource`, which calls a live third-party API and fails
 on `main` too (not related to this work).
 
@@ -148,6 +152,9 @@ Send `X-Business-Id` to work in somebody else's business.
 | POST `/ext/staff/respond.json` `{ownerUid, accept}` | any | Accept or decline an invitation |
 | POST `/ext/staff/leave.json` `{ownerUid}` | any | Leave a business |
 | GET `/ext/audit/list.json?limit&beforeId` | owner | What managers and staff changed |
+| GET `/ext/people/list.json` | staff | The owner and everyone who has worked in the business (name, role, still active) |
+| GET `/ext/staff/people.json` | any | The same for my own business, whichever business I am working in |
+| GET `/ext/reports/stock_value.json`, `low_stock.json` (`?locationId`), `receivables.json` | manager | Reports |
 | GET `/ext/locations/list.json` | staff | Locations |
 | POST `/ext/locations/add.json`, `modify.json`, `delete.json` | manager | Manage locations |
 | GET `/ext/items/list.json`, `/ext/items/stock.json?itemId&locationId` | staff | Items, stock on hand |
@@ -177,11 +184,45 @@ X-Business-Id: 123456789
 
 Errors use upstream's format. Ext errors are in sub category `100` (`pkg/ext/errors/errors.go`).
 
+### Who did what
+
+Every record made through the ext module remembers its person: sales, repayments and stock movements have an `actor`, and the audit log
+says what a manager or staff member did and to which sale, transaction, item and so on (`action`, `entityType`, `entityId`, found in the
+response for things created and in the request for things changed).
+
+For the books themselves, a transaction recorded by somebody other than the owner gets **"by <name>" at the end of its comment**:
+- sales and repayments recorded by staff or managers (both the paid and the on-credit transaction): `Sale #12: weekend · by Sam`,
+- a transaction added by a manager through the app's own "add transaction" call (the delegation middleware edits the `comment` of the request
+  before it reaches the handler, using `StampText`, which shortens the original text and never the mark, up to the 255 character limit).
+
+So the attribution shows everywhere the comment does, including the app's own transaction list and exports, with no change to upstream screens.
+**No mark means the owner did it**: every non-owner write goes through delegation, which always marks. Limits: it is plain text, so
+a manager can edit the comment later and remove it (the audit log still has the entry); only *adding* a transaction is marked, not editing one;
+and transactions made before this feature are unmarked.
+
+Screens: the sales history has a **Recorded by** column, the customer dialog **Received by** on repayments, each stock-tracked item a **History**
+button (managers) listing movements with who and why, and the Team page's **Recent activity** reads like "Sam (Staff) - Recorded a sale #45".
+Names come from `GET /ext/people/list.json` (the owner, members and removed members, so old records keep a name) and, for the Team page,
+`GET /ext/staff/people.json`, which is always about the caller's own business.
+
+### Reports
+
+All read-only and computed from the stock ledger and the sales, so they cannot disagree with them (managers and owners; staff get a 403).
+- **Stock value** (`GET /ext/reports/stock_value.json?locationId`): per stock-tracked item, quantity x current cost price and x selling price, totals,
+  and the stock per location. Items without stock are left out. Valuation uses the item's *current* prices, not what was paid for each purchase.
+- **Low stock** (`GET /ext/reports/low_stock.json?locationId`): items at or below their reorder level (items without a level are never listed), most
+  urgent first, with how much they are short by.
+- **Who owes what** (`GET /ext/reports/receivables.json`): every customer with unpaid sales, largest debt first, aged from the sale date into up to 30,
+  31 to 60, 61 to 90 and over 90 days, with the oldest unpaid sale. Voided sales and repaid amounts are excluded; the total always equals the sum of customer balances.
+
+The Reports page (`/ext/reports`, chart icon in the toolbar for managers and owners) has a tab for each, a location filter for the stock reports, and **Download CSV**.
+CSV cells that start with `=`, `+`, `-` or `@` get a quote in front so a spreadsheet never runs them as formulas.
+
 ## 8. Database
 
 Tables (all `ext_` prefixed, created by `SyncTables()` during `ezbookkeeping database update` or on start when `auto_update_database` is true; additive only):
 
-- User database (looked up across owners): `ext_membership`, `ext_audit_log`, `ext_user_setting` (one row per person: whether the business features are on).
+- User database (looked up across owners): `ext_membership`, `ext_audit_log` (with `action`, `entity_type`, `entity_id`, added later as extra columns), `ext_user_setting` (one row per person: whether the business features are on).
 - Business data (next to the owner's data): `ext_location`, `ext_item`, `ext_stock_movement`, `ext_customer`, `ext_sale`, `ext_sale_line`, `ext_repayment`, `ext_repayment_allocation`.
 
 Works on SQLite, MySQL and PostgreSQL through the same ORM as upstream. Tests run on SQLite only.
@@ -202,7 +243,7 @@ Deployment: nothing to change; the next deploy creates the tables. Back up the d
 
    **Translations:** all labels are registered in `src/ext/locales/en.json`, with the English sentence as the key like the app's own `en.json`. Other languages: add `src/ext/locales/<code>.json` (underscore in the file name for a hyphenated code, e.g. `zh_Hans.json`) with the same keys; missing keys fall back to English. After adding a label run `python3 scripts/ext-extract-i18n.py`; a unit test (`src/ext/__tests__/locales.test.ts`) fails if a label or placeholder is not registered.
 
-   Still to build: receipts / printing, a sale detail view, and reports.
+   Still to build: receipts / printing and a sale detail view. Possible next steps for reports: sales by day / by person, profit using cost of goods sold, charts.
    Known gaps: prices are shown in the *user's* default currency because the API does not yet return the business currency; new strings use English text as the key and are not translated; the pages have been type-checked and built but not exercised in a browser, so expect layout fixes; the mobile app has no ext screens.
 2. **Registration and invitations for new people.** Invitees must already have an account, and public registration is closed (paywall plan).
    Decide how a new staff member gets an account: invitation links that allow registration, or the owner creates the account.
@@ -232,7 +273,7 @@ Code review findings were fixed in this branch (see git history); what remains:
 
 ## 11. Working on it
 
-API smoke test against a running local server: `python3 scripts/ext-smoke.py` (41 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
+API smoke test against a running local server: `python3 scripts/ext-smoke.py` (54 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
 
 ```sh
 export PATH=$HOME/sdk/go/bin:$PATH GOTOOLCHAIN=local     # Go 1.27.1 (see go.mod)

@@ -248,6 +248,9 @@ func (s *SaleService) Create(c core.Context, ownerUid int64, actorUid int64, in 
 		comment = truncate(comment+": "+sale.Note, 255)
 	}
 
+	comment = stamped(c, ownerUid, actorUid, comment)
+
+	creditComment := stamped(c, ownerUid, actorUid, truncate(fmt.Sprintf("Sale #%d (on credit)", sale.SaleId)+noteSuffix(sale.Note), 255))
 	var createdIds []int64
 
 	rollback := func(cause error) (*SaleDetail, error) {
@@ -276,7 +279,7 @@ func (s *SaleService) Create(c core.Context, ownerUid int64, actorUid int64, in 
 	}
 
 	if credit > 0 {
-		tx := newIncomeTransaction(ownerUid, in.ReceivableAccountId, in.CategoryId, credit, in.Time, in.UtcOffset, comment+" (on credit)")
+		tx := newIncomeTransaction(ownerUid, in.ReceivableAccountId, in.CategoryId, credit, in.Time, in.UtcOffset, creditComment)
 
 		if err = services.Transactions.CreateTransaction(c, tx, nil, nil); err != nil {
 			return rollback(err)
@@ -530,4 +533,13 @@ func (s *SaleService) openSalesOldestFirst(c core.Context, ownerUid int64, custo
 	err := ownerDB(ownerUid).NewSession(c).Where("owner_uid=? AND customer_id=? AND voided=? AND paid<total", ownerUid, customerId, false).OrderBy("sale_time, sale_id").Find(&sales)
 
 	return sales, err
+}
+
+// noteSuffix is ": note" for a sale note, or nothing
+func noteSuffix(note string) string {
+	if note == "" {
+		return ""
+	}
+
+	return ": " + note
 }

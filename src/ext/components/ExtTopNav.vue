@@ -18,6 +18,15 @@
             </v-btn>
         </router-link>
 
+        <router-link to="/ext/reports" :aria-current="isActive('/ext/reports') ? 'page' : undefined" v-if="canManage">
+            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                   :aria-label="tt('Reports')" :icon="true"
+                   :active="isActive('/ext/reports')" :color="isActive('/ext/reports') ? 'primary' : 'default'">
+                <v-icon :icon="isActive('/ext/reports') ? mdiChartBox : mdiChartBoxOutline" size="24" />
+                <v-tooltip activator="parent">{{ tt('Reports') }}</v-tooltip>
+            </v-btn>
+        </router-link>
+
         <router-link to="/ext/inventory" :aria-current="isActive('/ext/inventory') ? 'page' : undefined">
             <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
                    :aria-label="tt('Inventory')" :icon="true"
@@ -48,13 +57,15 @@ import {
     mdiAccountCashOutline,
     mdiCart,
     mdiCartOutline,
+    mdiChartBox,
+    mdiChartBoxOutline,
     mdiPackageVariantClosed,
     mdiStorefrontOutline
 } from '@mdi/js';
 
 const route = useRoute();
 const { tt, roleLabel } = useExtI18n();
-const { working, current, workingForSomeoneElse, ensureLoaded } = useBusiness();
+const { working, current, workingForSomeoneElse, canManage, ensureLoaded } = useBusiness();
 const { available, loadFeatureSetting } = useBusinessFeatures();
 
 function isActive(prefix: string): boolean {

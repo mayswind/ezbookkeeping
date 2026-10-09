@@ -8,6 +8,7 @@ import TeamPage from '@/ext/views/TeamPage.vue';
 import InventoryPage from '@/ext/views/InventoryPage.vue';
 import SalesPage from '@/ext/views/SalesPage.vue';
 import CustomersPage from '@/ext/views/CustomersPage.vue';
+import ReportsPage from '@/ext/views/ReportsPage.vue';
 import BusinessSettingsPage from '@/ext/views/BusinessSettingsPage.vue';
 
 // Same rule as the upstream pages: be logged in and unlocked
@@ -50,7 +51,8 @@ export const extRoutes: RouteRecordRaw[] = [
     { path: '/ext/team', component: TeamPage, beforeEnter: checkTeamAccess },
     { path: '/ext/sales', component: SalesPage, beforeEnter: checkBusinessFeatures },
     { path: '/ext/customers', component: CustomersPage, beforeEnter: checkBusinessFeatures },
-    { path: '/ext/inventory', component: InventoryPage, beforeEnter: checkBusinessFeatures }
+    { path: '/ext/inventory', component: InventoryPage, beforeEnter: checkBusinessFeatures },
+    { path: '/ext/reports', component: ReportsPage, beforeEnter: checkBusinessFeatures }
 ];
 
 /** Settings page of the ext module, spread into the children of the settings route (one line in src/router/desktop.ts). */

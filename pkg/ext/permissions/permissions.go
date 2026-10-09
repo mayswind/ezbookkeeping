@@ -65,7 +65,7 @@ func buildRules() []rule {
 		"/transaction/templates/list.json", "/transaction/templates/get.json",
 		"/transactions/list.json", "/transactions/list/by_month.json", "/transactions/get.json", "/transactions/count.json",
 		"/exchange_rates/latest.json",
-		"/ext/locations/list.json",
+		"/ext/locations/list.json", "/ext/people/list.json",
 		"/ext/items/list.json", "/ext/items/stock.json",
 		"/ext/customers/list.json", "/ext/customers/balances.json",
 		"/ext/sales/list.json", "/ext/sales/get.json",

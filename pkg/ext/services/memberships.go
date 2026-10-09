@@ -158,6 +158,15 @@ func (s *MembershipService) ListByOwner(c core.Context, ownerUid int64) ([]*extm
 	return memberships, err
 }
 
+// ListAllByOwner returns every membership of a business including removed members, so records written by
+// somebody who has since left can still show their name
+func (s *MembershipService) ListAllByOwner(c core.Context, ownerUid int64) ([]*extmodels.Membership, error) {
+	memberships := make([]*extmodels.Membership, 0)
+	err := globalDB().NewSession(c).Where("owner_uid=? AND status<>?", ownerUid, extmodels.MembershipStatusPending).OrderBy("membership_id").Find(&memberships)
+
+	return memberships, err
+}
+
 // ListByStaff returns the businesses a user has been invited to or works in
 func (s *MembershipService) ListByStaff(c core.Context, staffUid int64) ([]*extmodels.Membership, error) {
 	memberships := make([]*extmodels.Membership, 0)

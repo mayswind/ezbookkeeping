@@ -88,6 +88,9 @@ type AuditLog struct {
 	Path        string `xorm:"VARCHAR(255) NOT NULL"`
 	Status      int    `xorm:"NOT NULL"`
 	ClientIp    string `xorm:"VARCHAR(45)"`
+	Action      string `xorm:"VARCHAR(64) NOT NULL DEFAULT ''"` // for example "sales.add"
+	EntityType  string `xorm:"VARCHAR(32) NOT NULL DEFAULT ''"` // for example "sales" or "transactions"
+	EntityId    int64  `xorm:"NOT NULL DEFAULT 0"`              // the sale, transaction, item ... the request created or changed
 	CreatedUnix int64  `xorm:"INDEX(IDX_ext_audit_log_owner_time) NOT NULL"`
 }
 

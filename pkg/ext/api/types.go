@@ -182,13 +182,16 @@ type StaffView struct {
 }
 
 type AuditView struct {
-	Id       int64  `json:"id,string"`
-	ActorUid int64  `json:"actorUid,string"`
-	Role     string `json:"role"`
-	Method   string `json:"method"`
-	Path     string `json:"path"`
-	Status   int    `json:"status"`
-	Time     int64  `json:"time"`
+	Id         int64  `json:"id,string"`
+	Action     string `json:"action"`
+	EntityType string `json:"entityType"`
+	EntityId   int64  `json:"entityId,string"`
+	ActorUid   int64  `json:"actorUid,string"`
+	Role       string `json:"role"`
+	Method     string `json:"method"`
+	Path       string `json:"path"`
+	Status     int    `json:"status"`
+	Time       int64  `json:"time"`
 }
 
 type LocationView struct {
@@ -279,4 +282,60 @@ type RepaymentView struct {
 	Note          string                    `json:"note"`
 	ActorUid      int64                     `json:"actorUid,string"`
 	Allocations   []RepaymentAllocationView `json:"allocations,omitempty"`
+}
+
+type ReportLocationRequest struct {
+	LocationId int64 `form:"locationId,string"`
+}
+
+type PersonView struct {
+	Uid    int64  `json:"uid,string"`
+	Name   string `json:"name"`
+	Role   string `json:"role"`
+	Active bool   `json:"active"` // false for people who were removed or left
+}
+
+type LocationQtyView struct {
+	LocationId int64 `json:"locationId,string"`
+	Qty        int64 `json:"qty"`
+}
+
+type StockValueRowView struct {
+	Item        *ItemView         `json:"item"`
+	Qty         int64             `json:"qty"`
+	CostValue   int64             `json:"costValue"`
+	RetailValue int64             `json:"retailValue"`
+	Locations   []LocationQtyView `json:"locations,omitempty"`
+}
+
+type StockValueReportView struct {
+	Rows             []StockValueRowView `json:"rows"`
+	TotalCostValue   int64               `json:"totalCostValue"`
+	TotalRetailValue int64               `json:"totalRetailValue"`
+}
+
+type LowStockRowView struct {
+	Item      *ItemView `json:"item"`
+	Qty       int64     `json:"qty"`
+	Shortfall int64     `json:"shortfall"`
+}
+
+type ReceivableRowView struct {
+	Customer       *CustomerView `json:"customer"`
+	Outstanding    int64         `json:"outstanding"`
+	Current        int64         `json:"current"`
+	Days31To60     int64         `json:"days31To60"`
+	Days61To90     int64         `json:"days61To90"`
+	Over90         int64         `json:"over90"`
+	OldestSaleTime int64         `json:"oldestSaleTime"`
+	OpenSales      int           `json:"openSales"`
+}
+
+type ReceivablesReportView struct {
+	Rows             []ReceivableRowView `json:"rows"`
+	TotalOutstanding int64               `json:"totalOutstanding"`
+	Current          int64               `json:"current"`
+	Days31To60       int64               `json:"days31To60"`
+	Days61To90       int64               `json:"days61To90"`
+	Over90           int64               `json:"over90"`
 }

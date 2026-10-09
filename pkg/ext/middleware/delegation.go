@@ -2,6 +2,8 @@
 package extmw
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -100,16 +102,42 @@ func Delegation() core.MiddlewareHandlerFunc {
 		c.Set(contextDelegatedKey, true)
 		c.Set(contextRoleKey, decision.Role)
 
+		isWrite := c.Request.Method != http.MethodGet && c.Request.Method != http.MethodHead && c.Request.Method != http.MethodOptions
+		relativePath := extperm.RelativePath(c.Request.URL.Path)
+		var requestBody []byte
+		var capture *captureWriter
+
+		if isWrite {
+			requestBody = readJSONBody(c)
+
+			// a transaction added through the app's own screen gets a "by <name>" mark in its comment, so everybody
+			// who looks at the books can see who recorded it (sales and repayments are marked by the ext services)
+			if c.Request.Method == http.MethodPost && relativePath == "/transactions/add.json" && requestBody != nil {
+				if stamped, ok := StampCommentInBody(requestBody, extservices.DisplayName(c, actualUid)); ok {
+					requestBody = stamped
+					c.Request.Body = io.NopCloser(bytes.NewReader(stamped))
+					c.Request.ContentLength = int64(len(stamped))
+				}
+			}
+
+			capture = &captureWriter{ResponseWriter: c.Writer}
+			c.Writer = capture
+		}
+
 		c.Next()
 
-		if c.Request.Method == http.MethodGet || c.Request.Method == http.MethodHead || c.Request.Method == http.MethodOptions {
+		if !isWrite {
 			return
 		}
 
-		err := extservices.Audit.Record(c, &extmodels.AuditLog{
+		action, entityType := DescribeRequest(relativePath)
+		entry := &extmodels.AuditLog{
 			OwnerUid: decision.OwnerUid, ActorUid: actualUid, Role: decision.Role, Method: c.Request.Method,
 			Path: c.Request.URL.Path, Status: c.Writer.Status(), ClientIp: c.ClientIP(),
-		})
+			Action: action, EntityType: entityType, EntityId: ExtractEntityId(requestBody, capture.head.Bytes()),
+		}
+
+		err := extservices.Audit.Record(c, entry)
 
 		if err != nil {
 			log.Errorf(c, "[ext.delegation] failed to write audit log for user \"uid:%d\" in business \"uid:%d\", because %s", actualUid, decision.OwnerUid, err.Error())
@@ -133,4 +161,22 @@ func IsDelegated(c *core.WebContext) bool {
 	delegated, exists := c.Get(contextDelegatedKey)
 
 	return exists && delegated == true
+}
+
+// readJSONBody reads a small JSON request body and puts it back so the handler can read it again.
+// Anything else (uploads, large or unknown-length bodies) is left alone and nil is returned.
+func readJSONBody(c *core.WebContext) []byte {
+	if c.Request.Body == nil || c.Request.ContentLength <= 0 || c.Request.ContentLength > maxCapturedRequestBody ||
+		!strings.Contains(c.GetHeader("Content-Type"), "json") {
+		return nil
+	}
+
+	body, err := io.ReadAll(io.LimitReader(c.Request.Body, maxCapturedRequestBody+1))
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	if err != nil || len(body) > maxCapturedRequestBody {
+		return nil
+	}
+
+	return body
 }

@@ -31,11 +31,18 @@ func RegisterRoutes(group *gin.RouterGroup, bind ApiBinder) {
 	group.POST("/ext/me/settings/update.json", bind(h.MySettingsUpdateHandler))
 	group.POST("/ext/staff/invite.json", bind(h.StaffInviteHandler))
 	group.GET("/ext/staff/list.json", bind(h.StaffListHandler))
+	group.GET("/ext/staff/people.json", bind(h.MyPeopleListHandler))
 	group.POST("/ext/staff/set_role.json", bind(h.StaffSetRoleHandler))
 	group.POST("/ext/staff/remove.json", bind(h.StaffRemoveHandler))
 	group.POST("/ext/staff/respond.json", bind(h.StaffRespondHandler))
 	group.POST("/ext/staff/leave.json", bind(h.StaffLeaveHandler))
 	group.GET("/ext/audit/list.json", bind(h.AuditListHandler))
+
+	// People (names for "recorded by") and reports
+	group.GET("/ext/people/list.json", bind(h.PeopleListHandler))
+	group.GET("/ext/reports/stock_value.json", bind(h.StockValueReportHandler))
+	group.GET("/ext/reports/low_stock.json", bind(h.LowStockReportHandler))
+	group.GET("/ext/reports/receivables.json", bind(h.ReceivablesReportHandler))
 
 	// Locations
 	group.GET("/ext/locations/list.json", bind(h.LocationListHandler))

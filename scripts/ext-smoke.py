@@ -28,7 +28,7 @@ def register(name):
     return b["result"]["token"]
 
 owner_name, staff_name = "smkown" + sfx, "smkstf" + sfx
-owner = register(owner_name); staff = register(staff_name)
+owner = register(owner_name); staff = register(staff_name); mgr_name = "smkmgr" + sfx; mgr = register(mgr_name)
 o = lambda m, p, b=None: call(m, "v1/" + p, b, owner)
 
 def account(name, category):
@@ -88,6 +88,28 @@ s, b = st("GET", "ext/items/list.json"); check("staff lists owner's items", s ==
 s, b = st("POST", "ext/sales/add.json", sale_req(amountPaid=150000 * 1, lines=[{"itemId": item, "qty": 1000}], paymentAccountId=cash))
 check("staff records a cash sale", s == 200, (s, b)); staff_sale = b["result"]
 check("sale belongs to owner, actor is staff", staff_sale["actorUid"] != uid_owner, staff_sale)
+# who did it: the books say so, and so do the records
+s, b = o("GET", "transactions/get.json?id=" + staff_sale["paidTransactionId"]); check("staff sale is marked in the books", s == 200 and ("by " + staff_name.upper()) in b["result"]["comment"], (s, b))
+s, b = o("GET", "transactions/get.json?id=" + sale["paidTransactionId"]); check("owner sale carries no mark", s == 200 and " by " not in b["result"]["comment"], (s, b))
+s, b = o("GET", "ext/people/list.json"); check("people: owner first, then staff", s == 200 and [p["role"] for p in b["result"]] == ["owner", "staff"] and b["result"][1]["name"] == staff_name.upper(), (s, b))
+s, b = st("GET", "ext/people/list.json"); check("staff can see who works there", s == 200 and len(b["result"]) == 2, (s, b))
+s, b = o("GET", "ext/audit/list.json"); check("audit names the sale", s == 200 and any(e["action"] == "sales.add" and e["entityId"] == staff_sale["id"] for e in b["result"]), b)
+
+# a manager adds a transaction through the app's own API: it is booked to the owner and marked with their name
+s, b = o("POST", "ext/staff/invite.json", {"email": mgr_name + "@example.com", "role": "manager"}); check("invite manager", s == 200, b)
+s, b = call("POST", "v1/ext/staff/respond.json", {"ownerUid": uid_owner, "accept": True}, mgr); check("manager accepts", s == 200, b)
+s, b = call("POST", "v1/transactions/add.json", {"type": 2, "categoryId": inc, "time": int(time.time()), "utcOffset": 60, "sourceAccountId": cash, "destinationAccountId": "0",
+            "sourceAmount": 5000, "destinationAmount": 0, "hideAmount": False, "tagIds": [], "pictureIds": [], "comment": "petty cash"}, mgr, uid_owner)
+check("manager adds a transaction to the owner's books", s == 200, (s, b))
+if s == 200:
+    s, b = o("GET", "transactions/get.json?id=" + b["result"]["id"]); check("manager's transaction is marked with their name", s == 200 and b["result"]["comment"] == "petty cash · by " + mgr_name.upper(), (s, b))
+
+# reports (6.5 kg left: 6.5 x 700.00 cost, 6.5 x 1500.00 selling price)
+s, b = o("GET", "ext/reports/stock_value.json"); check("stock value report", s == 200 and b["result"]["totalCostValue"] == 455000 and b["result"]["totalRetailValue"] == 975000 and b["result"]["rows"][0]["qty"] == 6500, (s, b))
+s, b = o("GET", "ext/reports/low_stock.json"); check("nothing low without a reorder level", s == 200 and b["result"] == [], (s, b))
+s, b = o("GET", "ext/reports/receivables.json"); check("who owes what", s == 200 and b["result"]["totalOutstanding"] == 200000 and b["result"]["current"] == 200000 and len(b["result"]["rows"]) == 1 and b["result"]["rows"][0]["customer"]["name"] == "Ada Obi Jr", (s, b))
+s, b = st("GET", "ext/reports/stock_value.json"); check("staff cannot read reports (403)", s == 403, (s, b))
+
 s, b = st("POST", "ext/sales/add.json", sale_req(discount=100, amountPaid=1, lines=[{"itemId": item, "qty": 1000}], paymentAccountId=cash)); check("staff discount refused (403)", s == 403, (s, b))
 s, b = st("POST", "ext/sales/void.json", {"id": staff_sale["id"]}); check("staff void refused (403)", s == 403, (s, b))
 s, b = st("POST", "ext/items/add.json", {"sku": "X", "name": "X", "unit": "", "costPrice": 0, "salePrice": 0, "reorderLevel": 0, "trackStock": False}); check("staff add item refused (403)", s == 403, (s, b))

@@ -22,6 +22,9 @@ export interface StaffInfo {
 
 export interface AuditEntry {
     readonly id: string;
+    readonly action: string;
+    readonly entityType: string;
+    readonly entityId: string;
     readonly actorUid: string;
     readonly role: BusinessRole;
     readonly method: string;
@@ -176,6 +179,53 @@ export interface RepaymentRequest {
     readonly receivableAccountId: string;
     readonly categoryId: string;
     readonly note: string;
+}
+
+export interface PersonInfo {
+    readonly uid: string;
+    readonly name: string;
+    readonly role: BusinessRole;
+    readonly active: boolean;
+}
+
+export interface StockValueRow {
+    readonly item: ItemInfo;
+    readonly qty: number;
+    readonly costValue: number;
+    readonly retailValue: number;
+    readonly locations?: { readonly locationId: string, readonly qty: number }[];
+}
+
+export interface StockValueReport {
+    readonly rows: StockValueRow[];
+    readonly totalCostValue: number;
+    readonly totalRetailValue: number;
+}
+
+export interface LowStockRow {
+    readonly item: ItemInfo;
+    readonly qty: number;
+    readonly shortfall: number;
+}
+
+export interface ReceivableRow {
+    readonly customer: CustomerInfo;
+    readonly outstanding: number;
+    readonly current: number;
+    readonly days31To60: number;
+    readonly days61To90: number;
+    readonly over90: number;
+    readonly oldestSaleTime: number;
+    readonly openSales: number;
+}
+
+export interface ReceivablesReport {
+    readonly rows: ReceivableRow[];
+    readonly totalOutstanding: number;
+    readonly current: number;
+    readonly days31To60: number;
+    readonly days61To90: number;
+    readonly over90: number;
 }
 
 export interface MySettings {

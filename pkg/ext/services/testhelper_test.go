@@ -1,7 +1,6 @@
 package extservices
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,9 +8,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	extmodels "github.com/mayswind/ezbookkeeping/pkg/ext/models"
+	"github.com/mayswind/ezbookkeeping/pkg/ext/testdb"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/uuid"
 )
 
@@ -30,11 +29,7 @@ type fixture struct {
 func newFixture(t *testing.T) *fixture {
 	t.Helper()
 
-	config := &settings.Config{
-		DatabaseConfig:    &settings.DatabaseConfig{DatabaseType: settings.Sqlite3DbType, DatabasePath: filepath.Join(t.TempDir(), "test.db")},
-		UuidGeneratorType: settings.InternalUuidGeneratorType,
-		UuidServerId:      1,
-	}
+	config := testdb.Config(t)
 	require.NoError(t, datastore.InitializeDataStore(config))
 	require.NoError(t, uuid.InitializeUuidGenerator(config))
 

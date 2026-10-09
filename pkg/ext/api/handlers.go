@@ -205,7 +205,7 @@ func (h *Handlers) AuditListHandler(c *core.WebContext) (any, *errs.Error) {
 	result := make([]*AuditView, 0, len(entries))
 
 	for _, e := range entries {
-		result = append(result, &AuditView{Id: e.AuditId, ActorUid: e.ActorUid, Role: e.Role.String(), Method: e.Method, Path: e.Path, Status: e.Status, Time: e.CreatedUnix})
+		result = append(result, &AuditView{Id: e.AuditId, Action: e.Action, EntityType: e.EntityType, EntityId: e.EntityId, ActorUid: e.ActorUid, Role: e.Role.String(), Method: e.Method, Path: e.Path, Status: e.Status, Time: e.CreatedUnix})
 	}
 
 	return result, nil

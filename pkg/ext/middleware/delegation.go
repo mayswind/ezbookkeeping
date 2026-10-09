@@ -95,6 +95,8 @@ func Delegation() core.MiddlewareHandlerFunc {
 
 		if !decision.Delegated {
 			c.Next()
+			clearBusinessRecordsAfterClearAll(c)
+
 			return
 		}
 
@@ -179,4 +181,24 @@ func readJSONBody(c *core.WebContext) []byte {
 	}
 
 	return body
+}
+
+// clearBusinessRecordsAfterClearAll makes the app's "Clear All Data" also remove the business records (items, stock,
+// customers, sales, repayments). It runs only after the app's own handler answered success, so a wrong password or any
+// other refusal deletes nothing. If this step fails the data stays and the person is not told by the response, which was
+// already sent: it is logged, and running "Clear All Data" again finishes the job.
+func clearBusinessRecordsAfterClearAll(c *core.WebContext) {
+	if c.Request.Method != http.MethodPost || extperm.RelativePath(c.Request.URL.Path) != "/data/clear/all.json" || c.Writer.Status() != http.StatusOK {
+		return
+	}
+
+	uid := c.GetActualUid()
+	counts, err := extservices.Clear.ClearBusinessRecords(c, uid, uid, c.ClientIP())
+
+	if err != nil {
+		log.Errorf(c, "[ext.clear] user \"uid:%d\" cleared all data but the business records could not be removed, run Clear All Data again, because %s", uid, err.Error())
+		return
+	}
+
+	log.Infof(c, "[ext.clear] user \"uid:%d\" cleared all data, business records removed: %+v", uid, *counts)
 }

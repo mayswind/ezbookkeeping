@@ -130,6 +130,7 @@
                     <v-alert type="error" variant="tonal" :icon="mdiAlert">
                         {{ tt('You CANNOT undo this action. "Clear All Transactions" will clear all your transactions data, and "Clear All Data" will clear your accounts, categories, tags and transactions data. Please enter your current password to confirm.') }}
                     </v-alert>
+                    <ext-clear-data-notice /> <!-- [ext] -->
                 </v-card-text>
 
                 <v-card-text class="pb-0">
@@ -176,6 +177,7 @@
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import ExtClearDataNotice from '@/ext/components/ExtClearDataNotice.vue'; // [ext]
 
 import { ref, useTemplateRef } from 'vue';
 

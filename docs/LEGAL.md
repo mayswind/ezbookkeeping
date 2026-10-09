@@ -43,6 +43,6 @@ the app. A change that is only a typo fix can keep the same version.
 - **Deleting an account on request.** The Privacy Policy promises deletion within 30 days. The app has no self-service "delete my account" and the
   command-line tool is not available on Render's free plan, so today a deletion has to be done by a developer with access to the database. Plan a way
   to do it before customers ask.
-- **"Clear all data" does not clear business records.** The app's own clear-data button removes accounts and transactions but not items, stock, sales or
-  customers. A full erasure must cover the `ext_` tables too.
+- **"Clear All Data" now also clears the business records** (items, stock, customers, sales, repayments), but keeps the team, receipt details, settings, Terms
+  acceptances and the activity log. A full erasure of a person (account deletion) must cover all `ext_` tables, including those.
 - The pages are English only.

@@ -146,4 +146,17 @@ s, b = st("GET", "ext/staff/list.json"); check("staff sees no team of the owner"
 s, b = o("GET", "ext/audit/list.json"); check("owner audit shows staff sale", s == 200 and any(e["method"] == "POST" and "sales/add" in e["path"] for e in b["result"]), b)
 s, b = call("GET", "v1/ext/items/list.json", None, staff, "999999"); check("staff cannot use a business they don't belong to", s == 403, (s, b))
 s, b = o("POST", "ext/sales/void.json", {"id": staff_sale["id"]}); check("owner voids the staff sale", s == 200, (s, b))
+# the app's own "Clear All Data" also clears the business records, but only when it succeeds
+s, b = o("POST", "data/clear/all.json", {"password": "not-the-password"}); check("clear all data refused with a wrong password", s == 400, (s, b))
+s, b = o("GET", "ext/items/list.json"); check("a refused clear-all leaves the business alone", s == 200 and len(b["result"]) == 1, (s, b))
+s, b = st("POST", "data/clear/all.json", {"password": "secret123"}); check("a staff member cannot clear the owner's data (403)", s == 403, (s, b))
+s, b = o("POST", "data/clear/all.json", {"password": "secret123"}); check("clear all data accepted", s == 200, (s, b))
+s, b = o("GET", "ext/items/list.json"); check("items are gone", s == 200 and b["result"] == [], (s, b))
+s, b = o("GET", "ext/customers/list.json"); check("customers are gone", s == 200 and b["result"] == [], (s, b))
+s, b = o("GET", "ext/sales/list.json"); check("sales are gone", s == 200 and b["result"] == [], (s, b))
+s, b = o("GET", "ext/reports/receivables.json"); check("nobody owes anything", s == 200 and b["result"]["totalOutstanding"] == 0, (s, b))
+s, b = o("GET", "ext/audit/list.json"); check("the clearing is on the activity log", s == 200 and b["result"][0]["action"] == "data.clear_all", b)
+s, b = o("GET", "ext/staff/list.json"); check("the team survives", s == 200 and len(b["result"]) == 2, (s, b))
+s, b = o("GET", "ext/business/profile.json"); check("receipt details survive", s == 200 and b["result"]["name"] == "Ada Stores", (s, b))
+
 print("\n%d failure(s)" % len(fails)); sys.exit(1 if fails else 0)

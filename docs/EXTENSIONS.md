@@ -31,12 +31,13 @@ Individuals are unaffected: with no business header every request behaves exactl
 | Reports: stock value, low stock, who owes what (with CSV download) | Done: backend tests pass on SQLite, API smoke test passes, UI **not yet clicked through in a browser** |
 | Terms of Service and Privacy Policy pages, recorded acceptance, notices on login and signup | Done, see `docs/LEGAL.md`; **the wording is generic and `legal/details.json` must be filled in before deploying** |
 | Export of business data (ZIP of CSV files) | Done, see below |
+| "Clear All Data" also clears business records | Done, see below |
 | Receipts: printable sale and repayment receipts (80 mm or A4), Save as PDF, copy as text, business details on them | Done: unit tests, API smoke test; **printing not yet tried on a real printer or in a browser** |
 | Who did what: "by <name>" mark in transaction comments, "recorded by" columns, stock history, activity log with the thing changed | Done, same caveat |
 | Paywall, signup codes, billing | Not started (separate track) |
 | Reports (stock valuation, profit, ageing) | Not started |
 
-Tests: `go test ./pkg/ext/...` (133 tests, all passing on SQLite). The service tests take several seconds each because every test boots a fresh database and syncs all tables, so the package needs several minutes; run a single test with `-run`.
+Tests: `go test ./pkg/ext/...` (139 tests, all passing on SQLite). The service tests take several seconds each because every test boots a fresh database and syncs all tables, so the package needs several minutes; run a single test with `-run`.
 
 **Other databases:** the same tests run unchanged on PostgreSQL or MySQL by setting `EXT_TEST_DB` (`postgres` or `mysql`), `EXT_TEST_DB_HOST`, `EXT_TEST_DB_USER` and `EXT_TEST_DB_PASSWD` (see `pkg/ext/testdb`); each test gets its own throw-away database. Results so far: PostgreSQL 17 passed all 54 service tests and the HTTP suites, and MySQL 8.4 passed the HTTP suites and 45 of 54 service tests with no failures (that run was stopped early). The tests added since (reports, attribution, people) have not yet been run on PostgreSQL or MySQL. The whole backend suite passes except
 `TestExchangeRatesApiLatestExchangeRateHandler_NationalBankOfUkraineDataSource`, which calls a live third-party API and fails
@@ -246,6 +247,19 @@ transactions) leaves out.
   owner's records (tested at HTTP level and in the live smoke test).
 - It streams in pages of 1000 rows (`exportChunkSize`), so a large business does not have to fit in memory; the response is `no-store`.
 
+### Clear All Data and business records
+
+The app's *Settings > Data management > Clear All Data* (also available in the mobile app) clears accounts, categories, tags and transactions. It now also removes
+the business records: items, locations, stock history, customers, sales and their lines, repayments and what they paid off (`Clear.ClearBusinessRecords`).
+- It runs **only after the app's own handler has answered success**, from the delegation middleware, so a wrong password or any other refusal deletes nothing.
+  If the extra step fails, the response has already been sent: the failure is logged (`[ext.clear]`) and running Clear All Data again finishes the job.
+- Kept on purpose: the team and their roles, the receipt details, each person's settings and Terms acceptances, and the activity log (which gets one line,
+  `data.clear_all`, saying who cleared the data).
+- Only the owner can do it (the route is owner-only), it only ever affects the caller's own business, and clearing an empty business is harmless.
+  After clearing, the default location is created again on first use and old item codes can be reused.
+- **Not changed:** *Clear All Transactions* and clearing the transactions of one account leave business records alone, so sales and what customers owe stay while
+  the transactions behind them are gone (voiding such a sale still works). The Data management page now says so (`ExtClearDataNotice`).
+
 ### Reports
 
 All read-only and computed from the stock ledger and the sales, so they cannot disagree with them (managers and owners; staff get a 403).
@@ -314,7 +328,7 @@ Code review findings were fixed in this branch (see git history); what remains:
 
 ## 11. Working on it
 
-API smoke test against a running local server: `python3 scripts/ext-smoke.py` (66 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
+API smoke test against a running local server: `python3 scripts/ext-smoke.py` (77 checks: stock, credit sale, repayment, void rules, staff role limits, audit log). It creates throw-away users, so use a development database.
 
 ```sh
 export PATH=$HOME/sdk/go/bin:$PATH GOTOOLCHAIN=local     # Go 1.27.1 (see go.mod)

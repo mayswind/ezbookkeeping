@@ -1,4 +1,6 @@
 {
+    "\"Clear All Data\" also removes your business records: items, stock, locations, customers, sales and repayments. Your team, receipt details and activity log are kept.": "\"Clear All Data\" also removes your business records: items, stock, locations, customers, sales and repayments. Your team, receipt details and activity log are kept.",
+    "\"Clear All Transactions\" does not remove them, so sales and what customers owe stay as they are.": "\"Clear All Transactions\" does not remove them, so sales and what customers owe stay as they are.",
     "31 to 60 days": "31 to 60 days",
     "61 to 90 days": "61 to 90 days",
     "A location can only be deleted when it holds no stock. Move stock out with a transfer first.": "A location can only be deleted when it holds no stock. Move stock out with a transfer first.",
@@ -80,6 +82,7 @@
     "Deleted a transaction": "Deleted a transaction",
     "Deleted an item": "Deleted an item",
     "Discount": "Discount",
+    "Download a copy of your business data first": "Download a copy of your business data first",
     "Download CSV": "Download CSV",
     "Download my business data": "Download my business data",
     "Edit": "Edit",

@@ -33,5 +33,5 @@ The new features live on the branch `feature/ext-staff-inventory`; merge it into
 - Tables are only ever added or extended by the upgrade step, never dropped, so an older version of the app still starts on a newer database.
 
 ## Known gaps you accept by deploying now
-No self-service account deletion; "Clear all data" does not clear business records; legal wording is generic; free hosting (cold starts, one instance).
+No self-service account deletion; "Clear All Transactions" leaves business records (sales, balances) in place; legal wording is generic and its company name is to be confirmed; free hosting (cold starts, one instance).
 See `docs/LEGAL.md`, `docs/BACKUP.md`, `docs/OPERATIONS.md` and `docs/EXTENSIONS.md`.

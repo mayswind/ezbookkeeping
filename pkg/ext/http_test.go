@@ -109,7 +109,22 @@ func newWorld(t *testing.T) *world {
 
 		return map[string]any{"id": "77", "comment": req.Comment, "uid": wc.GetCurrentUid()}, nil
 	}))
-	v1.POST("/data/clear/all.json", bindApi(whoami))
+	// stand-in for the app's "Clear All Data": it refuses a wrong password and says yes otherwise
+	v1.POST("/data/clear/all.json", bindApi(func(wc *core.WebContext) (any, *errs.Error) {
+		var req struct {
+			Password string `json:"password"`
+		}
+
+		if err := wc.ShouldBindJSON(&req); err != nil {
+			return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+		}
+
+		if req.Password == "wrong" {
+			return nil, errs.ErrUserPasswordWrong
+		}
+
+		return true, nil
+	}))
 	v1.POST("/users/profile/update.json", bindApi(whoami))
 
 	return w
@@ -631,4 +646,51 @@ func TestHTTP_BusinessExportIsAFileOfTheCallersOwnBusiness(t *testing.T) {
 	rec = w.raw(w.other, 0, "GET", "/ext/export/business.zip")
 	require.Equal(t, http.StatusOK, rec.Code)
 	assert.NotContains(t, zipFiles(t, rec)["items.csv"], "RICE")
+}
+
+func TestHTTP_ClearAllDataAlsoClearsBusinessRecordsButOnlyWhenItSucceeds(t *testing.T) {
+	w := newWorld(t)
+
+	code, _ := w.call(w.owner, 0, "POST", "/ext/items/add.json", map[string]any{"sku": "RICE", "name": "Rice", "salePrice": 100, "trackStock": true})
+	require.Equal(t, http.StatusOK, code)
+	code, _ = w.call(w.owner, 0, "POST", "/ext/customers/add.json", map[string]any{"name": "Ada"})
+	require.Equal(t, http.StatusOK, code)
+
+	items := func() int {
+		_, body := w.call(w.owner, 0, "GET", "/ext/items/list.json", nil)
+		return len(body["result"].([]any))
+	}
+
+	// a wrong password is refused by the app, and nothing of the business may be touched
+	code, _ = w.call(w.owner, 0, "POST", "/data/clear/all.json", map[string]any{"password": "wrong"})
+	assert.Equal(t, http.StatusBadRequest, code)
+	assert.Equal(t, 1, items(), "a refused request deletes nothing")
+
+	// a manager cannot clear the owner's data, and their attempt must not touch it either
+	code, _ = w.call(w.manager, w.owner, "POST", "/data/clear/all.json", map[string]any{"password": "right"})
+	assert.Equal(t, http.StatusForbidden, code)
+	assert.Equal(t, 1, items())
+
+	// a manager clearing their own data leaves the owner's business alone
+	code, _ = w.call(w.manager, 0, "POST", "/data/clear/all.json", map[string]any{"password": "right"})
+	assert.Equal(t, http.StatusOK, code)
+	assert.Equal(t, 1, items(), "another person's clear-all never reaches this business")
+
+	// the owner's successful clear removes the records
+	code, _ = w.call(w.owner, 0, "POST", "/data/clear/all.json", map[string]any{"password": "right"})
+	assert.Equal(t, http.StatusOK, code)
+	assert.Equal(t, 0, items())
+
+	_, body := w.call(w.owner, 0, "GET", "/ext/customers/list.json", nil)
+	assert.Empty(t, body["result"].([]any))
+
+	// and the clearing is on the activity log
+	_, body = w.call(w.owner, 0, "GET", "/ext/audit/list.json", nil)
+	entries := body["result"].([]any)
+	require.NotEmpty(t, entries)
+	assert.Equal(t, "data.clear_all", entries[0].(map[string]any)["action"])
+
+	// the team and settings survive
+	_, body = w.call(w.owner, 0, "GET", "/ext/staff/list.json", nil)
+	assert.Len(t, body["result"].([]any), 2)
 }

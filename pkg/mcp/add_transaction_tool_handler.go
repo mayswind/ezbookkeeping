@@ -31,12 +31,14 @@ type MCPAddTransactionRequest struct {
 	Tags                   []string `json:"tags,omitempty" jsonschema_description:"List of tags associated with the transaction (optional, maximum 10 tags allowed)"`
 	Comment                string   `json:"comment,omitempty" jsonschema_description:"Transaction description"`
 	DryRun                 bool     `json:"dry_run,omitempty" jsonschema_description:"If true, the transaction will not be saved, only validated (optional)"`
+	AsDraft                bool     `json:"as_draft,omitempty" jsonschema_description:"If true, the transaction is pushed into the draft queue of the user for review instead of being recorded, so it affects no account balance until the user accepts it (optional)"`
 }
 
 // MCPAddTransactionResponse represents the response structure for add transaction
 type MCPAddTransactionResponse struct {
 	Success                   bool   `json:"success" jsonschema_description:"Indicates whether this operation is successful"`
 	DryRun                    bool   `json:"dry_run,omitempty" jsonschema_description:"Indicates whether this operation is a dry run (transaction not saved actually)"`
+	Queued                    bool   `json:"queued,omitempty" jsonschema_description:"Indicates whether this transaction was pushed into the draft queue instead of being recorded"`
 	AccountBalance            string `json:"account_balance,omitempty" jsonschema_description:"Account balance (or outstanding balance for debt accounts) after the transaction"`
 	DestinationAccountBalance string `json:"destination_account_balance,omitempty" jsonschema_description:"Destination account balance (or outstanding balance for debt accounts) after the transaction (only for transfer transactions)"`
 }
@@ -184,6 +186,12 @@ func (h *mcpAddTransactionToolHandler) Handle(c *core.WebContext, callToolReq *M
 		return nil, nil, err
 	}
 
+	// A draft is not booked, so the editable transaction range of the user does not restrict it: it
+	// only enters the queue and affects no balance until the user accepts it.
+	if addTransactionRequest.AsDraft {
+		return h.handleAsDraft(c, uid, transaction, tagIds, addTransactionRequest.DryRun, services)
+	}
+
 	transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, time.FixedZone("Transaction Timezone", int(transaction.TimezoneUtcOffset)*60), sourceAccount, destinationAccount)
 
 	if !transactionEditable {
@@ -270,6 +278,57 @@ func (h *mcpAddTransactionToolHandler) getAccountBalanceAfterUpdate(balance int6
 	}
 
 	return newBalance, nil
+}
+
+func (h *mcpAddTransactionToolHandler) handleAsDraft(c *core.WebContext, uid int64, transaction *models.Transaction, tagIds []int64, dryRun bool, services MCPAvailableServices) (any, []*MCPTextContent, error) {
+	transactionType, err := transaction.Type.ToTransactionType()
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	queuedTransaction := &models.QueuedTransaction{
+		Uid:                  uid,
+		Source:               models.QUEUED_TRANSACTION_SOURCE_MCP,
+		Type:                 transactionType,
+		CategoryId:           transaction.CategoryId,
+		AccountId:            transaction.AccountId,
+		TransactionTime:      transaction.TransactionTime,
+		TimezoneUtcOffset:    transaction.TimezoneUtcOffset,
+		Amount:               transaction.Amount,
+		RelatedAccountId:     transaction.RelatedAccountId,
+		RelatedAccountAmount: transaction.RelatedAccountAmount,
+		HideAmount:           transaction.HideAmount,
+		Comment:              transaction.Comment,
+		CreatedIp:            transaction.CreatedIp,
+	}
+
+	if !dryRun {
+		err = services.GetQueuedTransactionService().CreateQueuedTransaction(c, queuedTransaction, tagIds)
+
+		if err != nil {
+			log.Errorf(c, "[add_transaction_tool_handler.handleAsDraft] failed to queue draft transaction for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, nil, err
+		}
+
+		log.Infof(c, "[add_transaction_tool_handler.handleAsDraft] user \"uid:%d\" has queued a new draft transaction \"id:%d\" successfully", uid, queuedTransaction.QueuedTransactionId)
+	}
+
+	structuredResponse := &MCPAddTransactionResponse{
+		Success: true,
+		DryRun:  dryRun,
+		Queued:  true,
+	}
+
+	message := "The transaction has been added to the draft queue. It affects no account balance until it is accepted from the queue."
+
+	if dryRun {
+		message = "The transaction is valid and would be added to the draft queue, but it was not saved because this is a dry run."
+	}
+
+	return structuredResponse, []*MCPTextContent{
+		NewMCPTextContent(message),
+	}, nil
 }
 
 func (h *mcpAddTransactionToolHandler) createNewTransactionModel(c *core.WebContext, uid int64, addTransactionRequest *MCPAddTransactionRequest, categoryId int64, sourceAccountId int64, destinationAccountId int64, clientIp string) (*models.Transaction, error) {

@@ -56,21 +56,34 @@ export class TransactionListPageType implements TypeAndName {
     public static readonly Calendar = new TransactionListPageType(1, 'Transaction Calendar');
     public static readonly Gallery = new TransactionListPageType(2, 'Transaction Gallery');
 
+    // The draft queue is only implemented on desktop, so it is not part of values(): the mobile
+    // page type switcher is built from that list. valueOf() still resolves it, so a desktop url
+    // carrying this page type keeps working.
+    public static readonly Queue = new TransactionListPageType(3, 'Queue', false);
+
     public static readonly Default = TransactionListPageType.List;
 
     public readonly type: number;
     public readonly name: string;
 
-    private constructor(type: number, name: string) {
+    private constructor(type: number, name: string, availableOnAllPlatforms: boolean = true) {
         this.type = type;
         this.name = name;
 
-        TransactionListPageType.allInstances.push(this);
+        if (availableOnAllPlatforms) {
+            TransactionListPageType.allInstances.push(this);
+        }
+
         TransactionListPageType.allInstancesByType[type] = this;
     }
 
     public static values(): TransactionListPageType[] {
         return TransactionListPageType.allInstances;
+    }
+
+    /** All page types the desktop page offers, which includes the desktop-only draft queue */
+    public static desktopValues(): TransactionListPageType[] {
+        return [...TransactionListPageType.allInstances, TransactionListPageType.Queue];
     }
 
     public static valueOf(type: number): TransactionListPageType | undefined {

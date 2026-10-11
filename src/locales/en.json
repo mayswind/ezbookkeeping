@@ -160,7 +160,9 @@
             "clearTransactionsTagsTip": "You CANNOT undo this action. This will clear all tags from {count} transactions.",
             "accountActivationAndResendValidationEmailTip": "Account activation link has been sent to your email address: {email}, If you don't receive the mail, please fill password again and click the button below to resend the validation mail.",
             "resendValidationEmailTip": "If you don't receive the mail, please fill password again and click the button below to resend the validation mail to: {email}",
-            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your ezBookkeeping password to verify."
+            "oauth2bindTip": "You're signing in to the {userName} user using {providerName}. Please enter your ezBookkeeping password to verify.",
+            "deletedAt": "Deleted at {time}",
+            "acceptedDraftCount": "{count} draft(s) accepted"
         }
     },
     "dataExport": {
@@ -1341,7 +1343,11 @@
         "failure count exceeded maximum limit": "Failure count exceeded maximum limit, please try again after some time",
         "repeated request": "Repeated Request",
         "ip address is forbidden to access this resource": "IP address is forbidden to access this resource",
-        "numeric overflow": "Numeric Overflow"
+        "numeric overflow": "Numeric Overflow",
+        "queued transaction id is invalid": "Draft ID is invalid",
+        "queued transaction not found": "Draft is not found",
+        "queued transaction is not archived": "Draft is not archived",
+        "queued transaction has too many tags": "Draft has too many tags"
     },
     "parameter": {
         "id": "ID",
@@ -2788,5 +2794,32 @@
     "An error occurred": "An error occurred",
     "Parameter Invalid": "Parameter Invalid",
     "Numeric Overflow": "Numeric Overflow",
-    "Click to close": "Click to close"
+    "Click to close": "Click to close",
+    "Queue": "Queue",
+    "Accept": "Accept",
+    "Accept All": "Accept All",
+    "Reject": "Reject",
+    "Reject All": "Reject All",
+    "Restore": "Restore",
+    "Archived": "Archived",
+    "Incomplete": "Incomplete",
+    "Source": "Source",
+    "Show Archived Drafts": "Show Archived Drafts",
+    "Hide Archived Drafts": "Hide Archived Drafts",
+    "The transaction queue is empty": "The transaction queue is empty",
+    "Drafts created by scheduled transactions or by the API show up here": "Drafts created by scheduled transactions or by the API show up here",
+    "Scheduled Transaction": "Scheduled Transaction",
+    "API": "API",
+    "MCP": "MCP",
+    "Create as Draft": "Create as Draft",
+    "Add the transaction to the queue for review instead of recording it": "Add the transaction to the queue for review instead of recording it",
+    "Are you sure you want to reject this draft? It will be archived and permanently deleted after 24 hours.": "Are you sure you want to reject this draft? It will be archived and permanently deleted after 24 hours.",
+    "Are you sure you want to reject all drafts? They will be archived and permanently deleted after 24 hours.": "Are you sure you want to reject all drafts? They will be archived and permanently deleted after 24 hours.",
+    "Unable to retrieve the transaction queue": "Unable to retrieve the transaction queue",
+    "Unable to retrieve the transaction queue count": "Unable to retrieve the transaction queue count",
+    "Unable to add the draft to the transaction queue": "Unable to add the draft to the transaction queue",
+    "Unable to reject this draft": "Unable to reject this draft",
+    "Unable to reject all drafts": "Unable to reject all drafts",
+    "Unable to restore this draft": "Unable to restore this draft",
+    "Unable to remove this draft from the queue": "Unable to remove this draft from the queue"
 }

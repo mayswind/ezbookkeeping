@@ -473,6 +473,15 @@ func startWebServer(c *core.CliContext) error {
 			apiV1Route.POST("/transaction/templates/move.json", bindApi(api.TransactionTemplates.TemplateMoveHandler, config))
 			apiV1Route.POST("/transaction/templates/delete.json", bindApi(api.TransactionTemplates.TemplateDeleteHandler, config))
 
+			apiV1Route.GET("/transaction/queue/list.json", bindApi(api.QueuedTransactions.QueuedTransactionListHandler, config))
+			apiV1Route.GET("/transaction/queue/count.json", bindApi(api.QueuedTransactions.QueuedTransactionCountHandler, config))
+			apiV1Route.GET("/transaction/queue/get.json", bindApi(api.QueuedTransactions.QueuedTransactionGetHandler, config))
+			apiV1Route.POST("/transaction/queue/add.json", bindApi(api.QueuedTransactions.QueuedTransactionCreateHandler, config))
+			apiV1Route.POST("/transaction/queue/archive.json", bindApi(api.QueuedTransactions.QueuedTransactionArchiveHandler, config))
+			apiV1Route.POST("/transaction/queue/archive/all.json", bindApi(api.QueuedTransactions.QueuedTransactionArchiveAllHandler, config))
+			apiV1Route.POST("/transaction/queue/restore.json", bindApi(api.QueuedTransactions.QueuedTransactionRestoreHandler, config))
+			apiV1Route.POST("/transaction/queue/delete.json", bindApi(api.QueuedTransactions.QueuedTransactionDeleteHandler, config))
+
 			// Insights Explorers
 			apiV1Route.GET("/insights/explorers/list.json", bindApi(api.InsightsExplorers.InsightsExplorerListHandler, config))
 			apiV1Route.GET("/insights/explorers/get.json", bindApi(api.InsightsExplorers.InsightsExplorerGetHandler, config))

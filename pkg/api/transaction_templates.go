@@ -292,6 +292,7 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 		newTemplate.ScheduledFrequency = a.getOrderedFrequencyValues(*templateModifyReq.ScheduledFrequency)
 		newTemplate.ScheduledAt = a.getUTCScheduledAt(*templateModifyReq.ScheduledTimezoneUtcOffset)
 		newTemplate.ScheduledTimezoneUtcOffset = *templateModifyReq.ScheduledTimezoneUtcOffset
+		newTemplate.ScheduledCreateAsDraft = templateModifyReq.ScheduledCreateAsDraft != nil && *templateModifyReq.ScheduledCreateAsDraft
 
 		if templateModifyReq.ScheduledStartDate != nil {
 			startTime, err := utils.ParseFromLongDateFirstTime(*templateModifyReq.ScheduledStartDate, *templateModifyReq.ScheduledTimezoneUtcOffset)
@@ -340,7 +341,8 @@ func (a *TransactionTemplatesApi) TemplateModifyHandler(c *core.WebContext) (any
 				newTemplate.ScheduledStartTime == template.ScheduledStartTime &&
 				newTemplate.ScheduledEndTime == template.ScheduledEndTime &&
 				newTemplate.ScheduledAt == template.ScheduledAt &&
-				newTemplate.ScheduledTimezoneUtcOffset == template.ScheduledTimezoneUtcOffset {
+				newTemplate.ScheduledTimezoneUtcOffset == template.ScheduledTimezoneUtcOffset &&
+				newTemplate.ScheduledCreateAsDraft == template.ScheduledCreateAsDraft {
 				return nil, errs.ErrNothingWillBeUpdated
 			}
 		}
@@ -503,6 +505,7 @@ func (a *TransactionTemplatesApi) createNewTemplateModel(uid int64, templateCrea
 		template.ScheduledFrequency = a.getOrderedFrequencyValues(*templateCreateReq.ScheduledFrequency)
 		template.ScheduledAt = a.getUTCScheduledAt(*templateCreateReq.ScheduledTimezoneUtcOffset)
 		template.ScheduledTimezoneUtcOffset = *templateCreateReq.ScheduledTimezoneUtcOffset
+		template.ScheduledCreateAsDraft = templateCreateReq.ScheduledCreateAsDraft != nil && *templateCreateReq.ScheduledCreateAsDraft
 
 		if templateCreateReq.ScheduledStartDate != nil {
 			startTime, err := utils.ParseFromLongDateFirstTime(*templateCreateReq.ScheduledStartDate, *templateCreateReq.ScheduledTimezoneUtcOffset)

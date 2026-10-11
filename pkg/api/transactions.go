@@ -36,6 +36,7 @@ type TransactionsApi struct {
 	transactionCategories *services.TransactionCategoryService
 	transactionTags       *services.TransactionTagService
 	transactionPictures   *services.TransactionPictureService
+	queuedTransactions    *services.QueuedTransactionService
 	accounts              *services.AccountService
 	users                 *services.UserService
 }
@@ -56,6 +57,7 @@ var (
 		transactionCategories: services.TransactionCategories,
 		transactionTags:       services.TransactionTags,
 		transactionPictures:   services.TransactionPictures,
+		queuedTransactions:    services.QueuedTransactions,
 		accounts:              services.Accounts,
 		users:                 services.Users,
 	}
@@ -1069,6 +1071,12 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 		return nil, errs.ErrTransactionDestinationAmountCannotBeSet
 	}
 
+	// A request flagged as a draft is pushed into the draft queue of the user instead of being
+	// booked, so it affects no balance until the user accepts it from the queue.
+	if transactionCreateReq.CreateAsDraft {
+		return a.createQueuedTransactionFromRequest(c, &transactionCreateReq, tagIds)
+	}
+
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 
@@ -1150,6 +1158,47 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 	transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos)
 
 	return transactionResp, nil
+}
+
+// createQueuedTransactionFromRequest pushes a transaction creation request into the draft queue of
+// the current user instead of booking it as a real transaction
+func (a *TransactionsApi) createQueuedTransactionFromRequest(c *core.WebContext, transactionCreateReq *models.TransactionCreateRequest, tagIds []int64) (any, *errs.Error) {
+	uid := c.GetCurrentUid()
+
+	queuedTransaction := &models.QueuedTransaction{
+		Uid:               uid,
+		Source:            models.QUEUED_TRANSACTION_SOURCE_API,
+		Type:              transactionCreateReq.Type,
+		CategoryId:        transactionCreateReq.CategoryId,
+		AccountId:         transactionCreateReq.SourceAccountId,
+		TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionCreateReq.Time),
+		TimezoneUtcOffset: transactionCreateReq.UtcOffset,
+		Amount:            transactionCreateReq.SourceAmount,
+		HideAmount:        transactionCreateReq.HideAmount,
+		Comment:           transactionCreateReq.Comment,
+		CreatedIp:         c.ClientIP(),
+	}
+
+	if transactionCreateReq.Type == models.TRANSACTION_TYPE_TRANSFER {
+		queuedTransaction.RelatedAccountId = transactionCreateReq.DestinationAccountId
+		queuedTransaction.RelatedAccountAmount = transactionCreateReq.DestinationAmount
+	}
+
+	if transactionCreateReq.GeoLocation != nil {
+		queuedTransaction.GeoLongitude = transactionCreateReq.GeoLocation.Longitude
+		queuedTransaction.GeoLatitude = transactionCreateReq.GeoLocation.Latitude
+	}
+
+	err := a.queuedTransactions.CreateQueuedTransaction(c, queuedTransaction, tagIds)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.createQueuedTransactionFromRequest] failed to queue draft transaction for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[transactions.createQueuedTransactionFromRequest] user \"uid:%d\" has queued a new draft transaction \"id:%d\" successfully", uid, queuedTransaction.QueuedTransactionId)
+
+	return queuedTransaction.ToQueuedTransactionInfoResponse(), nil
 }
 
 // TransactionModifyHandler saves an existed transaction by request parameters for current user

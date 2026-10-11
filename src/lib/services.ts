@@ -135,6 +135,15 @@ import type {
     TransactionTemplateInfoResponse
 } from '@/models/transaction_template.ts';
 import type {
+    QueuedTransactionCreateRequest,
+    QueuedTransactionArchiveRequest,
+    QueuedTransactionRestoreRequest,
+    QueuedTransactionDeleteRequest,
+    QueuedTransactionInfoResponse,
+    QueuedTransactionCountResponse,
+    QueuedTransactionBatchOperationResponse
+} from '@/models/queued_transaction.ts';
+import type {
     InsightsExplorerCreateRequest,
     InsightsExplorerModifyRequest,
     InsightsExplorerHideRequest,
@@ -851,6 +860,30 @@ export default {
     },
     deleteTransactionTemplate: (req: TransactionTemplateDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/templates/delete.json', req);
+    },
+    getAllQueuedTransactions: ({ includeArchived }: { includeArchived: boolean }): ApiResponsePromise<QueuedTransactionInfoResponse[]> => {
+        return axios.get<ApiResponse<QueuedTransactionInfoResponse[]>>('v1/transaction/queue/list.json?includeArchived=' + !!includeArchived);
+    },
+    getQueuedTransactionCount: (): ApiResponsePromise<QueuedTransactionCountResponse> => {
+        return axios.get<ApiResponse<QueuedTransactionCountResponse>>('v1/transaction/queue/count.json');
+    },
+    getQueuedTransaction: ({ id }: { id: string }): ApiResponsePromise<QueuedTransactionInfoResponse> => {
+        return axios.get<ApiResponse<QueuedTransactionInfoResponse>>('v1/transaction/queue/get.json?id=' + id);
+    },
+    addQueuedTransaction: (req: QueuedTransactionCreateRequest): ApiResponsePromise<QueuedTransactionInfoResponse> => {
+        return axios.post<ApiResponse<QueuedTransactionInfoResponse>>('v1/transaction/queue/add.json', req);
+    },
+    archiveQueuedTransaction: (req: QueuedTransactionArchiveRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/queue/archive.json', req);
+    },
+    archiveAllQueuedTransactions: (): ApiResponsePromise<QueuedTransactionBatchOperationResponse> => {
+        return axios.post<ApiResponse<QueuedTransactionBatchOperationResponse>>('v1/transaction/queue/archive/all.json', {});
+    },
+    restoreQueuedTransaction: (req: QueuedTransactionRestoreRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/queue/restore.json', req);
+    },
+    deleteQueuedTransaction: (req: QueuedTransactionDeleteRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/transaction/queue/delete.json', req);
     },
     getAllExplorations: (): ApiResponsePromise<InsightsExplorerInfoResponse[]> => {
         return axios.get<ApiResponse<InsightsExplorerInfoResponse[]>>('v1/insights/explorers/list.json');

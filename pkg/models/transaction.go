@@ -176,6 +176,7 @@ type TransactionCreateRequest struct {
 	PictureIds           []string                       `json:"pictureIds"`
 	Comment              string                         `json:"comment" binding:"max=255"`
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
+	CreateAsDraft        bool                           `json:"createAsDraft"`
 	ClientSessionId      string                         `json:"clientSessionId"`
 }
 

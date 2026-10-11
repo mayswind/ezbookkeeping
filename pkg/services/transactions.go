@@ -880,6 +880,44 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			continue
 		}
 
+		tagIds := template.GetTagIds()
+
+		// A template flagged to create drafts pushes the transaction into the draft queue of the
+		// user instead of booking it, so it affects no balance until the user accepts it.
+		if template.ScheduledCreateAsDraft {
+			queuedTransaction := &models.QueuedTransaction{
+				Uid:               template.Uid,
+				Source:            models.QUEUED_TRANSACTION_SOURCE_SCHEDULED_TEMPLATE,
+				SourceTemplateId:  template.TemplateId,
+				Type:              template.Type,
+				CategoryId:        template.CategoryId,
+				TransactionTime:   utils.GetMinTransactionTimeFromUnixTime(transactionTime.Unix()),
+				TimezoneUtcOffset: template.ScheduledTimezoneUtcOffset,
+				AccountId:         template.AccountId,
+				Amount:            template.Amount,
+				HideAmount:        template.HideAmount,
+				Comment:           template.Comment,
+				CreatedIp:         c.ClientIP(),
+			}
+
+			if template.Type == models.TRANSACTION_TYPE_TRANSFER {
+				queuedTransaction.RelatedAccountId = template.RelatedAccountId
+				queuedTransaction.RelatedAccountAmount = template.RelatedAccountAmount
+			}
+
+			err = QueuedTransactions.CreateQueuedTransaction(c, queuedTransaction, tagIds)
+
+			if err == nil {
+				successCount++
+				log.Infof(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" has queued a new draft transaction \"id:%d\"", template.TemplateId, queuedTransaction.QueuedTransactionId)
+			} else {
+				failedCount++
+				log.Errorf(c, "[transactions.CreateScheduledTransactions] transaction template \"id:%d\" failed to queue new draft transaction, because %s", template.TemplateId, err.Error())
+			}
+
+			continue
+		}
+
 		transaction := &models.Transaction{
 			Uid:               template.Uid,
 			Type:              transactionDbType,
@@ -899,7 +937,6 @@ func (s *TransactionService) CreateScheduledTransactions(c core.Context, current
 			transaction.RelatedAccountAmount = template.RelatedAccountAmount
 		}
 
-		tagIds := template.GetTagIds()
 		err = s.CreateTransaction(c, transaction, tagIds, nil)
 
 		if err == nil {

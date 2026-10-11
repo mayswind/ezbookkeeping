@@ -12,10 +12,11 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
     public scheduledStartDate?: TextualYearMonthDay;
     public scheduledEndDate?: TextualYearMonthDay;
     public scheduledAt?: number;
+    public scheduledCreateAsDraft?: boolean;
     public displayOrder: number;
     public hidden: boolean;
 
-    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: TextualYearMonthDay | undefined, scheduledEndDate: TextualYearMonthDay | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
+    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: TextualYearMonthDay | undefined, scheduledEndDate: TextualYearMonthDay | undefined, scheduledAt: number | undefined, scheduledCreateAsDraft: boolean | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
         super(id, '', type, categoryId, 0, timeZone, utcOffset, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, editable);
         this.templateType = templateType;
         this.name = name;
@@ -24,6 +25,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
         this.scheduledStartDate = scheduledStartDate;
         this.scheduledEndDate = scheduledEndDate;
         this.scheduledAt = scheduledAt;
+        this.scheduledCreateAsDraft = scheduledCreateAsDraft;
         this.displayOrder = displayOrder;
         this.hidden = hidden;
     }
@@ -37,6 +39,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             this.scheduledFrequency = other.scheduledFrequency;
             this.scheduledStartDate = other.scheduledStartDate;
             this.scheduledEndDate = other.scheduledEndDate;
+            this.scheduledCreateAsDraft = other.scheduledCreateAsDraft;
             this.utcOffset = other.utcOffset;
             this.timeZone = undefined;
         }
@@ -60,6 +63,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             scheduledStartDate: this.templateType === TemplateType.Schedule.type && this.scheduledStartDate ? this.scheduledStartDate : undefined,
             scheduledEndDate: this.templateType === TemplateType.Schedule.type && this.scheduledEndDate ? this.scheduledEndDate : undefined,
             utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined,
+            scheduledCreateAsDraft: this.templateType === TemplateType.Schedule.type ? !!this.scheduledCreateAsDraft : undefined,
             clientSessionId: clientSessionId
         };
     }
@@ -81,7 +85,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             scheduledFrequency: this.templateType === TemplateType.Schedule.type ? this.scheduledFrequency : undefined,
             scheduledStartDate: this.templateType === TemplateType.Schedule.type && this.scheduledStartDate ? this.scheduledStartDate : undefined,
             scheduledEndDate: this.templateType === TemplateType.Schedule.type && this.scheduledEndDate ? this.scheduledEndDate : undefined,
-            utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined
+            utcOffset: this.templateType === TemplateType.Schedule.type ? this.utcOffset : undefined,
+            scheduledCreateAsDraft: this.templateType === TemplateType.Schedule.type ? !!this.scheduledCreateAsDraft : undefined
         };
     }
 
@@ -104,6 +109,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             undefined, // scheduledStartDate
             undefined, // scheduledEndDate
             undefined, // scheduledAt
+            undefined, // scheduledCreateAsDraft
             transaction.tagIds,
             transaction.comment,
             true,
@@ -131,6 +137,7 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             templateResponse.scheduledStartDate ?? undefined,
             templateResponse.scheduledEndDate ?? undefined,
             templateResponse.scheduledAt,
+            templateResponse.scheduledCreateAsDraft,
             templateResponse.tagIds,
             templateResponse.comment,
             true, // editable
@@ -167,6 +174,7 @@ export interface TransactionTemplateCreateRequest {
     readonly scheduledStartDate?: string;
     readonly scheduledEndDate?: string;
     readonly utcOffset?: number;
+    readonly scheduledCreateAsDraft?: boolean;
     readonly clientSessionId: string;
 }
 
@@ -187,6 +195,7 @@ export interface TransactionTemplateModifyRequest {
     readonly scheduledStartDate?: string;
     readonly scheduledEndDate?: string;
     readonly utcOffset?: number;
+    readonly scheduledCreateAsDraft?: boolean;
 }
 
 export interface TransactionTemplateHideRequest {
@@ -215,6 +224,7 @@ export interface TransactionTemplateInfoResponse extends TransactionInfoResponse
     readonly scheduledStartDate?: TextualYearMonthDay;
     readonly scheduledEndDate?: TextualYearMonthDay;
     readonly scheduledAt?: number;
+    readonly scheduledCreateAsDraft?: boolean;
     readonly displayOrder: number;
     readonly hidden: boolean;
 }

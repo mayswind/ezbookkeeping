@@ -31,6 +31,7 @@ type DataManagementsApi struct {
 	tagGroups               *services.TransactionTagGroupService
 	pictures                *services.TransactionPictureService
 	templates               *services.TransactionTemplateService
+	queuedTransactions      *services.QueuedTransactionService
 	userCustomExchangeRates *services.UserCustomExchangeRatesService
 	insightsExploreres      *services.InsightsExplorerService
 }
@@ -50,6 +51,7 @@ var (
 		tagGroups:               services.TransactionTagGroups,
 		pictures:                services.TransactionPictures,
 		templates:               services.TransactionTemplates,
+		queuedTransactions:      services.QueuedTransactions,
 		userCustomExchangeRates: services.UserCustomExchangeRates,
 		insightsExploreres:      services.InsightsExplorers,
 	}
@@ -174,6 +176,13 @@ func (a *DataManagementsApi) ClearAllDataHandler(c *core.WebContext) (any, *errs
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
+	err = a.queuedTransactions.DeleteAllQueuedTransactions(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearAllDataHandler] failed to delete all queued transactions, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	err = a.transactions.DeleteAllTransactions(c, uid, true)
 
 	if err != nil {
@@ -247,6 +256,13 @@ func (a *DataManagementsApi) ClearAllTransactionsHandler(c *core.WebContext) (an
 
 	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_CLEAR_ALL_DATA) {
 		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	err = a.queuedTransactions.DeleteAllQueuedTransactions(c, uid)
+
+	if err != nil {
+		log.Errorf(c, "[data_managements.ClearAllTransactionsHandler] failed to delete all queued transactions, because %s", err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	err = a.transactions.DeleteAllTransactions(c, uid, false)

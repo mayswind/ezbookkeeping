@@ -6,6 +6,9 @@
                v-for="(button, idx) in buttons"
                @click="value = button.value">
             {{ button.name }}
+            <v-chip class="ms-2 btn-vertical-group-badge" size="x-small" label
+                    :color="value === button.value ? 'primary' : 'default'"
+                    v-if="button.badge">{{ button.badge }}</v-chip>
         </v-btn>
     </div>
 </template>
@@ -16,6 +19,7 @@ import { computed } from 'vue';
 interface Button {
     name: string;
     value: unknown;
+    badge?: string;
 }
 
 const props = defineProps<{
@@ -43,6 +47,10 @@ const value = computed<unknown>({
 </script>
 
 <style>
+.btn-vertical-group-badge {
+    pointer-events: none;
+}
+
 .btn-vertical-group .v-btn:not(:first-child) {
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;

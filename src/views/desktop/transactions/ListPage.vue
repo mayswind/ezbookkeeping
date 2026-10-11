@@ -5,49 +5,52 @@
                 <v-layout class="page-with-navigation-drawer">
                     <v-navigation-drawer :permanent="alwaysShowNav" v-model="showNav">
                         <div class="mx-4 my-3">
-                            <btn-vertical-group :disabled="loading" :buttons="TransactionListPageType.values().map(item => {
+                            <btn-vertical-group :disabled="loading" :buttons="TransactionListPageType.desktopValues().map(item => {
                                 return {
                                     name: tt(item.name),
-                                    value: item.type
+                                    value: item.type,
+                                    badge: item.type === TransactionListPageType.Queue.type && queuedTransactionsStore.pendingCount > 0 ? queuedTransactionsStore.displayPendingCount : undefined
                                 }
                             })" v-model="queryPageType" />
                         </div>
-                        <v-divider />
-                        <div class="mx-4 mt-3">
-                            <span class="text-body-medium">{{ tt('Transaction Type') }}</span>
-                            <v-select
-                                item-title="displayName"
-                                item-value="type"
-                                class="mt-1"
-                                density="compact"
-                                :disabled="loading"
-                                :items="[
-                                    { displayName: tt('All Types'), type: 0 },
-                                    { displayName: tt('Modify Balance'), type: 1 },
-                                    { displayName: tt('Income'), type: 2 },
-                                    { displayName: tt('Expense'), type: 3 },
-                                    { displayName: tt('Transfer'), type: 4 }
-                                ]"
-                                v-model="queryType"
-                            />
-                        </div>
-                        <div class="mx-4 mt-3" v-if="pageType === TransactionListPageType.List.type || pageType === TransactionListPageType.Gallery.type">
-                            <span class="text-body-medium">{{ tt('Transactions Per Page') }}</span>
-                            <v-select class="mt-1" density="compact"
-                                      item-title="name"
-                                      item-value="value"
-                                      :disabled="loading"
-                                      :items="allPageCounts"
-                                      v-model="countPerPage"
-                            />
-                        </div>
-                        <v-tabs show-arrows class="my-3" direction="vertical"
-                                :disabled="loading" v-model="recentDateRangeIndex">
-                            <v-tab class="tab-text-truncate" :key="idx" :value="idx" v-for="(recentDateRange, idx) in recentMonthDateRanges"
-                                   @click="changeDateFilter(recentDateRange)">
-                                <span class="text-truncate">{{ recentDateRange.displayName }}</span>
-                            </v-tab>
-                        </v-tabs>
+                        <template v-if="pageType !== TransactionListPageType.Queue.type">
+                            <v-divider />
+                            <div class="mx-4 mt-3">
+                                <span class="text-body-medium">{{ tt('Transaction Type') }}</span>
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    class="mt-1"
+                                    density="compact"
+                                    :disabled="loading"
+                                    :items="[
+                                        { displayName: tt('All Types'), type: 0 },
+                                        { displayName: tt('Modify Balance'), type: 1 },
+                                        { displayName: tt('Income'), type: 2 },
+                                        { displayName: tt('Expense'), type: 3 },
+                                        { displayName: tt('Transfer'), type: 4 }
+                                    ]"
+                                    v-model="queryType"
+                                />
+                            </div>
+                            <div class="mx-4 mt-3" v-if="pageType === TransactionListPageType.List.type || pageType === TransactionListPageType.Gallery.type">
+                                <span class="text-body-medium">{{ tt('Transactions Per Page') }}</span>
+                                <v-select class="mt-1" density="compact"
+                                          item-title="name"
+                                          item-value="value"
+                                          :disabled="loading"
+                                          :items="allPageCounts"
+                                          v-model="countPerPage"
+                                />
+                            </div>
+                            <v-tabs show-arrows class="my-3" direction="vertical"
+                                    :disabled="loading" v-model="recentDateRangeIndex">
+                                <v-tab class="tab-text-truncate" :key="idx" :value="idx" v-for="(recentDateRange, idx) in recentMonthDateRanges"
+                                       @click="changeDateFilter(recentDateRange)">
+                                    <span class="text-truncate">{{ recentDateRange.displayName }}</span>
+                                </v-tab>
+                            </v-tabs>
+                        </template>
                     </v-navigation-drawer>
                     <v-main>
                         <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
@@ -666,6 +669,10 @@
                                     </div>
                                 </v-card>
                             </v-window-item>
+
+                            <v-window-item value="queuePage">
+                                <queue-card ref="queueCard" @toggle:nav="showNav = !showNav" />
+                            </v-window-item>
                         </v-window>
                     </v-main>
                 </v-layout>
@@ -713,6 +720,7 @@ import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
+import QueueCard from './list/QueueCard.vue';
 import AIImageRecognitionDialog from './list/dialogs/AIImageRecognitionDialog.vue';
 import ImportDialog from './import/ImportDialog.vue';
 import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
@@ -734,6 +742,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
+import { useQueuedTransactionsStore } from '@/stores/queuedTransaction.ts';
 import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import {
@@ -842,6 +851,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type AIImageRecognitionDialogType = InstanceType<typeof AIImageRecognitionDialog>;
 type ImportDialogType = InstanceType<typeof ImportDialog>;
+type QueueCardType = InstanceType<typeof QueueCard>;
 
 interface TransactionListDisplayTotalAmount {
     incomeIsZero: boolean;
@@ -926,6 +936,7 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
+const queuedTransactionsStore = useQueuedTransactionsStore();
 const desktopPageStore = useDesktopPageStore();
 
 const timeFilterMenu = useTemplateRef<VMenu>('timeFilterMenu');
@@ -939,8 +950,14 @@ const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 const aiImageRecognitionDialog = useTemplateRef<AIImageRecognitionDialogType>('aiImageRecognitionDialog');
 const importDialog = useTemplateRef<ImportDialogType>('importDialog');
+const queueCard = useTemplateRef<QueueCardType>('queueCard');
 
-const activeTab = ref<string>('transactionPage');
+// The window shown always follows the selected page type; it is never navigated on its own
+const activeTab = computed<string>({
+    get: () => pageType.value === TransactionListPageType.Queue.type ? 'queuePage' : 'transactionPage',
+    set: () => { /* the window only echoes the current page type back */ }
+});
+
 const currentPage = ref<number>(1);
 const temporaryCountPerPage = ref<number | null>(null);
 const totalCount = ref<number>(1);
@@ -1260,9 +1277,21 @@ function init(initProps: TransactionListProps): void {
         templateType: TemplateType.Normal.type,
         force: false
     });
+
+    queuedTransactionsStore.loadQueuedTransactionCount().catch(() => {
+        // the queue button simply shows no badge when the count cannot be retrieved
+    });
 }
 
 function reload(force: boolean, init: boolean): void {
+    // The queue is not a transaction listing: it loads its own data, so there is nothing to fetch
+    // here beyond the draft count the queue button shows.
+    if (pageType.value === TransactionListPageType.Queue.type) {
+        loading.value = false;
+        queueCard.value?.reload(force);
+        return;
+    }
+
     loading.value = true;
 
     const isGalleryMode = pageType.value === TransactionListPageType.Gallery.type;

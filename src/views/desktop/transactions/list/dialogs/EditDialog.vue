@@ -323,6 +323,15 @@
                                         :no-data-text="tt('No limit')"
                                         v-model="transaction.scheduledEndDate" />
                                 </v-col>
+                                <v-col cols="12" md="12" v-if="type === TransactionEditPageType.Template && transaction instanceof TransactionTemplate && transaction.templateType === TemplateType.Schedule.type">
+                                    <v-switch class="mt-0" color="primary"
+                                              :readonly="mode === TransactionEditPageMode.View"
+                                              :disabled="loading || submitting || recognizing"
+                                              :label="tt('Create as Draft')"
+                                              :hint="tt('Add the transaction to the queue for review instead of recording it')"
+                                              :persistent-hint="true"
+                                              v-model="transaction.scheduledCreateAsDraft" />
+                                </v-col>
                                 <v-col cols="12" md="12" v-if="type === TransactionEditPageType.Transaction">
                                     <v-select
                                         persistent-placeholder

@@ -19,6 +19,7 @@ const mcpServerName = core.ApplicationName + "-mcp"
 type ModelContextProtocolAPI struct {
 	ApiUsingConfig
 	transactions          *services.TransactionService
+	queuedTransactions    *services.QueuedTransactionService
 	transactionCategories *services.TransactionCategoryService
 	transactionTags       *services.TransactionTagService
 	accounts              *services.AccountService
@@ -33,6 +34,7 @@ var (
 			container: settings.Container,
 		},
 		transactions:          services.Transactions,
+		queuedTransactions:    services.QueuedTransactions,
 		transactionCategories: services.TransactionCategories,
 		transactionTags:       services.TransactionTags,
 		accounts:              services.Accounts,
@@ -237,6 +239,11 @@ func (a *ModelContextProtocolAPI) PingHandler(c *core.WebContext, jsonRPCRequest
 // GetTransactionService implements the MCPAvailableServices interface
 func (a *ModelContextProtocolAPI) GetTransactionService() *services.TransactionService {
 	return a.transactions
+}
+
+// GetQueuedTransactionService implements the MCPAvailableServices interface
+func (a *ModelContextProtocolAPI) GetQueuedTransactionService() *services.QueuedTransactionService {
+	return a.queuedTransactions
 }
 
 // GetTransactionCategoryService implements the MCPAvailableServices interface

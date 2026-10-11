@@ -45,6 +45,7 @@ type TransactionTemplate struct {
 	ScheduledEndTime           *int64                           `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
 	ScheduledAt                int16                            `xorm:"INDEX(IDX_transaction_template_deleted_type_freqtype_scheduled_time)"`
 	ScheduledTimezoneUtcOffset int16
+	ScheduledCreateAsDraft     bool
 	TagIds                     string `xorm:"VARCHAR(255) NOT NULL"`
 	Amount                     int64  `xorm:"NOT NULL"`
 	RelatedAccountId           int64  `xorm:"NOT NULL"`
@@ -86,6 +87,7 @@ type TransactionTemplateCreateRequest struct {
 	ScheduledStartDate         *string                           `json:"scheduledStartDate" binding:"omitempty"`
 	ScheduledEndDate           *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledTimezoneUtcOffset *int16                            `json:"utcOffset" binding:"omitempty,min=-720,max=840"`
+	ScheduledCreateAsDraft     *bool                             `json:"scheduledCreateAsDraft" binding:"omitempty"`
 	ClientSessionId            string                            `json:"clientSessionId"`
 }
 
@@ -113,6 +115,7 @@ type TransactionTemplateModifyRequest struct {
 	ScheduledStartDate         *string                           `json:"scheduledStartDate" binding:"omitempty"`
 	ScheduledEndDate           *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledTimezoneUtcOffset *int16                            `json:"utcOffset" binding:"omitempty,min=-720,max=840"`
+	ScheduledCreateAsDraft     *bool                             `json:"scheduledCreateAsDraft" binding:"omitempty"`
 }
 
 // TransactionTemplateHideRequest represents all parameters of transaction template hiding request
@@ -146,6 +149,7 @@ type TransactionTemplateInfoResponse struct {
 	ScheduledStartDate     *string                           `json:"scheduledStartDate" binding:"omitempty"`
 	ScheduledEndDate       *string                           `json:"scheduledEndDate" binding:"omitempty"`
 	ScheduledAt            *int16                            `json:"scheduledAt,omitempty"`
+	ScheduledCreateAsDraft *bool                             `json:"scheduledCreateAsDraft,omitempty"`
 	DisplayOrder           int32                             `json:"displayOrder"`
 	Hidden                 bool                              `json:"hidden"`
 }
@@ -183,6 +187,7 @@ func (t *TransactionTemplate) ToTransactionTemplateInfoResponse(serverUtcOffset 
 		response.ScheduledFrequencyType = &t.ScheduledFrequencyType
 		response.ScheduledFrequency = &t.ScheduledFrequency
 		response.ScheduledAt = &t.ScheduledAt
+		response.ScheduledCreateAsDraft = &t.ScheduledCreateAsDraft
 
 		templateTimeZone := time.FixedZone("Template Timezone", int(t.ScheduledTimezoneUtcOffset)*60)
 

@@ -160,7 +160,9 @@
             "clearTransactionsTagsTip": "You CANNOT undo this action. This will clear all tags from {count} transactions.",
             "accountActivationAndResendValidationEmailTip": "El enlace de activación de la cuenta se envió a tu dirección de correo electrónico: {email}. Si no recibes el correo, introduce nuevamente la contraseña y haz clic en el botón de abajo para reenviar el correo de validación.",
             "resendValidationEmailTip": "Si no recibes el correo, introduce nuevamente la contraseña y haz clic en el botón de abajo para reenviar el correo de validación a: {email}",
-            "oauth2bindTip": "Estás iniciando sesión con el usuario {userName} usando {providerName}. Porfavor introduce tu contraseña de ezBookkeeping para verificar."
+            "oauth2bindTip": "Estás iniciando sesión con el usuario {userName} usando {providerName}. Porfavor introduce tu contraseña de ezBookkeeping para verificar.",
+            "deletedAt": "Se elimina el {time}",
+            "acceptedDraftCount": "{count} borrador(es) aceptado(s)"
         }
     },
     "dataExport": {
@@ -1341,7 +1343,11 @@
         "failure count exceeded maximum limit": "Se ha superado el límite máximo de intentos fallidos, vuelva a intentarlo más tarde",
         "repeated request": "Petición repetida",
         "ip address is forbidden to access this resource": "La dirección IP tiene prohibido acceder a este recurso",
-        "numeric overflow": "Desbordamiento Numérico"
+        "numeric overflow": "Desbordamiento Numérico",
+        "queued transaction id is invalid": "El ID del borrador no es válido",
+        "queued transaction not found": "No se encontró el borrador",
+        "queued transaction is not archived": "El borrador no está archivado",
+        "queued transaction has too many tags": "El borrador tiene demasiadas etiquetas"
     },
     "parameter": {
         "id": "IDENTIFICACIÓN",
@@ -2788,5 +2794,32 @@
     "An error occurred": "Se produjo un error",
     "Parameter Invalid": "Parámetro No Válido",
     "Numeric Overflow": "Desbordamiento Numérico",
-    "Click to close": "Haz clic para cerrar"
+    "Click to close": "Haz clic para cerrar",
+    "Queue": "Cola",
+    "Accept": "Aceptar",
+    "Accept All": "Aceptar todas",
+    "Reject": "Rechazar",
+    "Reject All": "Rechazar todas",
+    "Restore": "Restaurar",
+    "Archived": "Archivada",
+    "Incomplete": "Incompleto",
+    "Source": "Origen",
+    "Show Archived Drafts": "Mostrar borradores archivados",
+    "Hide Archived Drafts": "Ocultar borradores archivados",
+    "The transaction queue is empty": "La cola de transacciones está vacía",
+    "Drafts created by scheduled transactions or by the API show up here": "Aquí aparecen los borradores creados por transacciones programadas o por la API",
+    "Scheduled Transaction": "Transacción Programada",
+    "API": "API",
+    "MCP": "MCP",
+    "Create as Draft": "Crear como borrador",
+    "Add the transaction to the queue for review instead of recording it": "Agrega la transacción a la cola para revisarla en lugar de registrarla",
+    "Are you sure you want to reject this draft? It will be archived and permanently deleted after 24 hours.": "¿Seguro que quieres rechazar este borrador? Se archivará y se eliminará definitivamente después de 24 horas.",
+    "Are you sure you want to reject all drafts? They will be archived and permanently deleted after 24 hours.": "¿Seguro que quieres rechazar todos los borradores? Se archivarán y se eliminarán definitivamente después de 24 horas.",
+    "Unable to retrieve the transaction queue": "No se pudo obtener la cola de transacciones",
+    "Unable to retrieve the transaction queue count": "No se pudo obtener la cantidad de la cola de transacciones",
+    "Unable to add the draft to the transaction queue": "No se pudo agregar el borrador a la cola de transacciones",
+    "Unable to reject this draft": "No se pudo rechazar este borrador",
+    "Unable to reject all drafts": "No se pudieron rechazar todos los borradores",
+    "Unable to restore this draft": "No se pudo restaurar este borrador",
+    "Unable to remove this draft from the queue": "No se pudo quitar este borrador de la cola"
 }

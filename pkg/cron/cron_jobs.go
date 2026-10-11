@@ -30,3 +30,16 @@ var CreateScheduledTransactionJob = &CronJob{
 		return services.Transactions.CreateScheduledTransactions(c, time.Now().Unix(), c.GetInterval())
 	},
 }
+
+// RemoveExpiredArchivedQueuedTransactionsJob represents the cron job which periodically removes the
+// rejected draft transactions whose retention period has elapsed
+var RemoveExpiredArchivedQueuedTransactionsJob = &CronJob{
+	Name:        "RemoveExpiredArchivedQueuedTransactions",
+	Description: "Periodically remove rejected draft transactions from the database once their retention period has elapsed.",
+	Period: CronJobIntervalPeriod{
+		Interval: time.Hour,
+	},
+	Run: func(c *core.CronContext) error {
+		return services.QueuedTransactions.DeleteAllExpiredArchivedQueuedTransactions(c, time.Now().Unix())
+	},
+}

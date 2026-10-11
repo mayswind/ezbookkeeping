@@ -307,6 +307,121 @@ func TestRemoveTransferTotalAmounts(t *testing.T) {
 	assert.False(t, exists)
 }
 
+// --- opening balance ------------------------------------------------------------------------
+
+// GetProjectionOpeningBalances needs the user databases, which this package has no harness for, so
+// these cover the two pieces it is made of that do not: the per-account balance delta of every
+// transaction type, and the simulation of the stretch between "now" and a period that opens later.
+// The remaining piece is the walk back from the current balance of each account, which is verified
+// against a real database.
+
+func TestGetAccountBalanceDelta_EveryType(t *testing.T) {
+	// a balance modification moves the account by the delta it recorded, not by the balance it set
+	delta, err := getAccountBalanceDelta(&models.Transaction{
+		Type:                 models.TRANSACTION_DB_TYPE_MODIFY_BALANCE,
+		Amount:               100000,
+		RelatedAccountAmount: 25000,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(25000), delta.Int64())
+
+	delta, err = getAccountBalanceDelta(&models.Transaction{Type: models.TRANSACTION_DB_TYPE_INCOME, Amount: 30000})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(30000), delta.Int64())
+
+	delta, err = getAccountBalanceDelta(&models.Transaction{Type: models.TRANSACTION_DB_TYPE_EXPENSE, Amount: 30000})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(-30000), delta.Int64())
+
+	// each leg of a transfer moves its own account by its own amount
+	delta, err = getAccountBalanceDelta(&models.Transaction{
+		Type:                 models.TRANSACTION_DB_TYPE_TRANSFER_OUT,
+		Amount:               30000,
+		RelatedAccountAmount: 29000,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(-30000), delta.Int64())
+
+	delta, err = getAccountBalanceDelta(&models.Transaction{
+		Type:                 models.TRANSACTION_DB_TYPE_TRANSFER_IN,
+		Amount:               29000,
+		RelatedAccountAmount: 30000,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(29000), delta.Int64())
+}
+
+func TestGetAccountBalanceDelta_InvalidType(t *testing.T) {
+	delta, err := getAccountBalanceDelta(&models.Transaction{Type: models.TransactionDbType(99), Amount: 1})
+
+	assert.Nil(t, delta)
+	assert.Equal(t, errs.ErrTransactionTypeInvalid, err)
+}
+
+func TestProjectScheduledAccountAmounts_IncomeAddsAndExpenseSubtracts(t *testing.T) {
+	income := newProjectionTemplateForTest(models.TRANSACTION_TYPE_INCOME, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, "1", 500000)
+	expense := newProjectionTemplateForTest(models.TRANSACTION_TYPE_EXPENSE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, "5", 120000)
+
+	// two occurrences of each between these two instants: 2026-09-01, 2026-10-01 and 2026-09-05,
+	// 2026-10-05
+	from := time.Unix(utcUnixTime(2026, 8, 17, 12, 0), 0)
+	to := time.Unix(utcUnixTime(2026, 10, 10, 12, 0), 0)
+
+	amounts := projectScheduledAccountAmounts(core.NewNullContext(), []*models.TransactionTemplate{income, expense}, from, to)
+
+	assert.Equal(t, 1, len(amounts))
+	assert.Equal(t, int64(2*500000-2*120000), amounts[projectionTestAccountId].Int64())
+}
+
+func TestProjectScheduledAccountAmounts_KeepsAccountsApart(t *testing.T) {
+	first := newProjectionTemplateForTest(models.TRANSACTION_TYPE_INCOME, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, "1", 500000)
+	second := newProjectionTemplateForTest(models.TRANSACTION_TYPE_EXPENSE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, "1", 120000)
+	second.AccountId = projectionTestOtherAccountId
+
+	from := time.Unix(utcUnixTime(2026, 8, 17, 12, 0), 0)
+	to := time.Unix(utcUnixTime(2026, 9, 10, 12, 0), 0)
+
+	amounts := projectScheduledAccountAmounts(core.NewNullContext(), []*models.TransactionTemplate{first, second}, from, to)
+
+	assert.Equal(t, int64(500000), amounts[projectionTestAccountId].Int64())
+	assert.Equal(t, int64(-120000), amounts[projectionTestOtherAccountId].Int64())
+}
+
+func TestProjectScheduledAccountAmounts_TransferTemplatesAreExcluded(t *testing.T) {
+	template := newProjectionTemplateForTest(models.TRANSACTION_TYPE_TRANSFER, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, "1", 500000)
+
+	from := time.Unix(utcUnixTime(2026, 8, 17, 12, 0), 0)
+	to := time.Unix(utcUnixTime(2026, 9, 10, 12, 0), 0)
+
+	amounts := projectScheduledAccountAmounts(core.NewNullContext(), []*models.TransactionTemplate{template}, from, to)
+
+	assert.Equal(t, 0, len(amounts))
+}
+
+func TestProjectScheduledAccountAmounts_MalformedTemplateIsSkipped(t *testing.T) {
+	malformed := newProjectionTemplateForTest(models.TRANSACTION_TYPE_EXPENSE, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, "not-a-day", 120000)
+	valid := newProjectionTemplateForTest(models.TRANSACTION_TYPE_INCOME, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_MONTHLY, "1", 500000)
+
+	from := time.Unix(utcUnixTime(2026, 8, 17, 12, 0), 0)
+	to := time.Unix(utcUnixTime(2026, 9, 10, 12, 0), 0)
+
+	amounts := projectScheduledAccountAmounts(core.NewNullContext(), []*models.TransactionTemplate{malformed, valid}, from, to)
+
+	assert.Equal(t, int64(500000), amounts[projectionTestAccountId].Int64())
+}
+
+// A period that opens in the past has nothing to simulate, so the opening balance is whatever the
+// recorded transactions left behind
+func TestProjectScheduledAccountAmounts_EmptyStretchYieldsNothing(t *testing.T) {
+	template := newProjectionTemplateForTest(models.TRANSACTION_TYPE_INCOME, models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DAILY, "1", 500000)
+
+	now := time.Unix(utcUnixTime(2026, 8, 17, 12, 0), 0)
+
+	amounts := projectScheduledAccountAmounts(core.NewNullContext(), []*models.TransactionTemplate{template}, now, now)
+
+	assert.Equal(t, 0, len(amounts))
+}
+
 // --- merge ------------------------------------------------------------------------------------
 
 // TestMergeMonthlyTotalAmounts_PastPresentAndFuture walks the three shapes a projected month can

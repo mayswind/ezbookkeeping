@@ -157,6 +157,220 @@ func projectScheduledCategoryAmountsByMonth(c core.Context, templates []*models.
 	return groupTotalAmountsByYearMonth(amountsMap), nil
 }
 
+// GetProjectionOpeningBalances returns the balance every account of the specified user holds just
+// before the specified period starts, keyed by account id.
+//
+// The projection table needs it to turn its accumulated row from a running sum of the flows of the
+// period into the net worth reached at the end of every month. The instant it stops at is the one
+// GetAccountsAndCategoriesMonthlyInflowAndOutflow starts the real half at, so between the opening
+// balance and the first month of the projection no transaction is counted twice nor left out.
+//
+// It is derived from the current balance of every account instead of being replayed from the first
+// transaction of the user: walking back from a known balance only reads the transactions of the
+// period, while replaying forward would read the whole history of the user. Every transaction type
+// takes part, balance modifications and both legs of every transfer included, because the result has
+// to be the balance of an account rather than the flow of its categories -- which is also why the
+// amounts are keyed by account and not by category.
+//
+// When the period starts in the future, the occurrences the scheduled templates would produce
+// between now and that instant are added as well, so the period opens at the balance the user is
+// expected to hold by then and the accumulated row stays continuous whichever period is asked for.
+func (s *TransactionService) GetProjectionOpeningBalances(c core.Context, uid int64, startYear int32, startMonth int32, currentUnixTime int64) (map[int64]*big.Int, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	if currentUnixTime <= 0 {
+		return nil, errs.ErrSystemError
+	}
+
+	err := validateTransactionProjectionRange(startYear, startMonth, startYear, startMonth)
+
+	if err != nil {
+		return nil, err
+	}
+
+	periodStartTransactionTime, _, err := utils.GetTransactionTimeRangeByYearMonth(startYear, startMonth)
+
+	if err != nil {
+		return nil, errs.ErrSystemError
+	}
+
+	openingBalances, err := s.getAccountBalancesBeforeTransactionTime(c, uid, periodStartTransactionTime)
+
+	if err != nil {
+		return nil, err
+	}
+
+	periodStartUnixTime := utils.GetUnixTimeFromTransactionTime(periodStartTransactionTime)
+
+	if periodStartUnixTime <= currentUnixTime {
+		return openingBalances, nil
+	}
+
+	// The period opens after the cutoff, so the stretch between them is simulated exactly like the
+	// future half of the projection is
+	templates, err := s.getActiveScheduledTemplates(c, uid)
+
+	if err != nil {
+		return nil, err
+	}
+
+	projectedAmounts := projectScheduledAccountAmounts(c, templates, time.Unix(currentUnixTime, 0), time.Unix(periodStartUnixTime-1, 0))
+
+	for accountId, projectedAmount := range projectedAmounts {
+		openingBalance, exists := openingBalances[accountId]
+
+		// getAccountBalancesBeforeTransactionTime returns an entry for every account of the user, so
+		// a missing one is a template left pointing at a deleted account. A deleted account holds no
+		// balance to open the period with, and the client could not convert its currency either.
+		if !exists {
+			continue
+		}
+
+		openingBalance.Add(openingBalance, projectedAmount)
+	}
+
+	return openingBalances, nil
+}
+
+// getAccountBalancesBeforeTransactionTime returns the balance every account of the specified user
+// held before the specified transaction time, by taking its current balance and undoing every
+// transaction recorded at or after that instant.
+func (s *TransactionService) getAccountBalancesBeforeTransactionTime(c core.Context, uid int64, minTransactionTime int64) (map[int64]*big.Int, error) {
+	var accounts []*models.Account
+	err := s.UserDataDB(uid).NewSession(c).Select("account_id, balance").Where("uid=? AND deleted=?", uid, false).Find(&accounts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	balances := make(map[int64]*big.Int, len(accounts))
+
+	for i := 0; i < len(accounts); i++ {
+		balances[accounts[i].AccountId] = big.NewInt(accounts[i].Balance)
+	}
+
+	// Paginated the same way the other amount aggregations of this service are, so a long period
+	// cannot load an unbounded number of rows at once
+	maxTransactionTime := int64(0)
+
+	for {
+		var transactions []*models.Transaction
+		condition := "uid=? AND deleted=? AND transaction_time>=?"
+		conditionParams := []any{uid, false, minTransactionTime}
+
+		if maxTransactionTime > 0 {
+			condition = condition + " AND transaction_time<=?"
+			conditionParams = append(conditionParams, maxTransactionTime)
+		}
+
+		err = s.UserDataDB(uid).NewSession(c).Select("type, account_id, transaction_time, amount, related_account_amount").
+			Where(condition, conditionParams...).
+			Limit(pageCountForLoadTransactionAmounts, 0).
+			OrderBy("transaction_time desc").
+			Find(&transactions)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for i := 0; i < len(transactions); i++ {
+			transaction := transactions[i]
+			balance, exists := balances[transaction.AccountId]
+
+			if !exists {
+				// a transaction of an account that no longer exists cannot be undone against any
+				// balance, and its account is not shown by the table either
+				continue
+			}
+
+			delta, err := getAccountBalanceDelta(transaction)
+
+			if err != nil {
+				log.Errorf(c, "[transactions.getAccountBalancesBeforeTransactionTime] transaction \"id:%d\" of user \"uid:%d\" has invalid transaction type %d", transaction.TransactionId, uid, transaction.Type)
+				return nil, err
+			}
+
+			balance.Sub(balance, delta)
+		}
+
+		if len(transactions) < pageCountForLoadTransactionAmounts {
+			break
+		}
+
+		maxTransactionTime = transactions[len(transactions)-1].TransactionTime - 1
+
+		if maxTransactionTime < minTransactionTime {
+			break
+		}
+	}
+
+	return balances, nil
+}
+
+// getAccountBalanceDelta returns how much the specified transaction moved the balance of its own
+// account, which is how CreateTransaction keeps the account table up to date.
+func getAccountBalanceDelta(transaction *models.Transaction) (*big.Int, error) {
+	switch transaction.Type {
+	case models.TRANSACTION_DB_TYPE_MODIFY_BALANCE:
+		return big.NewInt(transaction.RelatedAccountAmount), nil
+	case models.TRANSACTION_DB_TYPE_INCOME, models.TRANSACTION_DB_TYPE_TRANSFER_IN:
+		return big.NewInt(transaction.Amount), nil
+	case models.TRANSACTION_DB_TYPE_EXPENSE, models.TRANSACTION_DB_TYPE_TRANSFER_OUT:
+		return new(big.Int).Neg(big.NewInt(transaction.Amount)), nil
+	default:
+		return nil, errs.ErrTransactionTypeInvalid
+	}
+}
+
+// projectScheduledAccountAmounts accumulates, per account, the net amount the specified templates
+// would produce between from (exclusive) and to (inclusive).
+//
+// Unlike the monthly projection this one does not bucket anything by month, so it needs no timezone:
+// an occurrence either falls inside the stretch or it does not. Templates of type transfer are
+// skipped, as they are everywhere else in a projection, and a template whose frequency is malformed
+// is skipped rather than failing the whole projection.
+func projectScheduledAccountAmounts(c core.Context, templates []*models.TransactionTemplate, from time.Time, to time.Time) map[int64]*big.Int {
+	amounts := make(map[int64]*big.Int)
+
+	for i := 0; i < len(templates); i++ {
+		template := templates[i]
+
+		if template.Type != models.TRANSACTION_TYPE_INCOME && template.Type != models.TRANSACTION_TYPE_EXPENSE {
+			continue
+		}
+
+		occurrences, err := GetScheduledOccurrences(template, from, to)
+
+		if err != nil {
+			log.Warnf(c, "[transactions.projectScheduledAccountAmounts] transaction template \"id:%d\" has invalid scheduled transaction frequency, because %s", template.TemplateId, err.Error())
+			continue
+		}
+
+		if len(occurrences) < 1 {
+			continue
+		}
+
+		amount, exists := amounts[template.AccountId]
+
+		if !exists {
+			amount = big.NewInt(0)
+			amounts[template.AccountId] = amount
+		}
+
+		occurrencesAmount := new(big.Int).Mul(big.NewInt(int64(len(occurrences))), big.NewInt(template.Amount))
+
+		if template.Type == models.TRANSACTION_TYPE_INCOME {
+			amount.Add(amount, occurrencesAmount)
+		} else {
+			amount.Sub(amount, occurrencesAmount)
+		}
+	}
+
+	return amounts
+}
+
 // getActiveScheduledTemplates returns the scheduled transaction templates of the specified user that
 // the cron would consider for creating transactions.
 //

@@ -4,7 +4,7 @@ import type { BigDecimal } from '@/core/numeral.ts';
 import { CategoryType } from '@/core/category.ts';
 import { ProjectionMonthKind } from '@/core/projection.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
-import type { TransactionStatisticTrendsResponseItem } from '@/models/transaction.ts';
+import type { TransactionProjectionResponse, TransactionStatisticTrendsResponseItem } from '@/models/transaction.ts';
 
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import { buildProjectionTableData, getProjectionMonths, type ProjectionTableOptions } from '@/lib/projection.ts';
@@ -59,6 +59,18 @@ function month(year: number, month1base: number, items: [string, string, string]
     };
 }
 
+// wraps monthly amounts into an api response, optionally opening the period with the balance of one
+// or more accounts
+function projection(months: TransactionStatisticTrendsResponseItem[], openingBalance: [string, string][] = []): TransactionProjectionResponse {
+    return {
+        openingBalance: openingBalance.map(([accountId, amount]) => ({
+            accountId: accountId,
+            amount: amount
+        })),
+        months: months
+    };
+}
+
 function amounts(values: BigDecimal[]): string[] {
     return values.map(value => value.toString());
 }
@@ -93,10 +105,10 @@ describe('getProjectionMonths', () => {
 
 describe('buildProjectionTableData', () => {
     it('should group amounts into sections, categories and sub-categories', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1000'], ['21', ARS_ACCOUNT_ID, '600']]),
             month(2026, 9, [['11', ARS_ACCOUNT_ID, '1000'], ['12', ARS_ACCOUNT_ID, '500'], ['21', ARS_ACCOUNT_ID, '600']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.income.categories.map(c => c.name)).toEqual(['Trabajo']);
         expect(data.income.categories[0]!.subCategories.map(c => c.name)).toEqual(['Salario', 'Bonos']);
@@ -109,9 +121,9 @@ describe('buildProjectionTableData', () => {
     });
 
     it('should subtotal every category and total every section', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1000'], ['12', ARS_ACCOUNT_ID, '500'], ['21', ARS_ACCOUNT_ID, '600'], ['31', ARS_ACCOUNT_ID, '200']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         // Trabajo = Salario + Bonos
         expect(amounts(data.income.categories[0]!.monthlyAmounts)).toEqual(['1500', '0', '0', '0', '0']);
@@ -123,32 +135,32 @@ describe('buildProjectionTableData', () => {
     });
 
     it('should sort categories and sub-categories by display order', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['31', ARS_ACCOUNT_ID, '200'], ['21', ARS_ACCOUNT_ID, '600']]),
             month(2026, 9, [['12', ARS_ACCOUNT_ID, '500'], ['11', ARS_ACCOUNT_ID, '1000']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.expense.categories.map(c => c.name)).toEqual(['Casa', 'Entretenimiento']);
         expect(data.income.categories[0]!.subCategories.map(c => c.name)).toEqual(['Salario', 'Bonos']);
     });
 
     it('should compute the net of every month as income minus expense', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']]),
             month(2026, 9, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '2000']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(amounts(data.net.monthlyAmounts)).toEqual(['500', '-500', '0', '0', '0']);
         expect(data.net.totalAmount.toString()).toEqual('0');
     });
 
     it('should accumulate the net month after month', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']]),
             month(2026, 9, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']]),
             month(2026, 10, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']]),
             month(2026, 11, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(amounts(data.net.monthlyAmounts)).toEqual(['500', '500', '500', '500', '0']);
         expect(amounts(data.accumulated.monthlyAmounts)).toEqual(['500', '1000', '1500', '2000', '2000']);
@@ -157,21 +169,21 @@ describe('buildProjectionTableData', () => {
     // the accumulated row is already a running total, so summing it across the columns would be
     // meaningless: its total column is the value it reached at the end of the period
     it('should use the value of the last month as the total of the accumulated row', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']]),
             month(2026, 9, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.accumulated.totalAmount.toString()).toEqual('1000');
         expect(data.net.totalAmount.toString()).toEqual('1000');
     });
 
     it('should total every row across the months of the period', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1000']]),
             month(2026, 9, [['11', ARS_ACCOUNT_ID, '1000']]),
             month(2026, 10, [['11', ARS_ACCOUNT_ID, '1000']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.income.categories[0]!.subCategories[0]!.totalAmount.toString()).toEqual('3000');
         expect(data.income.totalAmount.toString()).toEqual('3000');
@@ -186,12 +198,12 @@ describe('buildProjectionTableData', () => {
             ['21', ARS_ACCOUNT_ID, '600']
         ];
 
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, monthlyItems),
             month(2026, 9, monthlyItems),
             month(2026, 10, monthlyItems),
             month(2026, 11, monthlyItems)
-        ], months, IDENTITY_OPTIONS);
+        ]), months, IDENTITY_OPTIONS);
 
         expect(amounts(data.income.monthlyAmounts)).toEqual(['1500', '1500', '1500', '1500']);
         expect(data.income.totalAmount.toString()).toEqual('6000');
@@ -205,9 +217,9 @@ describe('buildProjectionTableData', () => {
     });
 
     it('should convert amounts of accounts held in another currency', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['21', ARS_ACCOUNT_ID, '600'], ['21', USD_ACCOUNT_ID, '10']])
-        ], MONTHS_2026_08_TO_12, {
+        ]), MONTHS_2026_08_TO_12, {
             ...IDENTITY_OPTIONS,
             convertAmount: (amount: string, accountId: string) => {
                 const value = parseBigDecimal(amount);
@@ -223,9 +235,9 @@ describe('buildProjectionTableData', () => {
     // an amount that cannot be converted is left out rather than added raw, which would mix
     // currencies, and the flag lets the table say so
     it('should leave out amounts it cannot convert and report it', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['21', ARS_ACCOUNT_ID, '600'], ['21', USD_ACCOUNT_ID, '10']])
-        ], MONTHS_2026_08_TO_12, {
+        ]), MONTHS_2026_08_TO_12, {
             ...IDENTITY_OPTIONS,
             convertAmount: (amount: string, accountId: string) => accountId === USD_ACCOUNT_ID ? null : parseBigDecimal(amount)
         });
@@ -235,9 +247,9 @@ describe('buildProjectionTableData', () => {
     });
 
     it('should ignore transfer categories', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1000'], ['41', ARS_ACCOUNT_ID, '9999']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.income.totalAmount.toString()).toEqual('1000');
         expect(data.expense.totalAmount.toString()).toEqual('0');
@@ -245,25 +257,25 @@ describe('buildProjectionTableData', () => {
     });
 
     it('should ignore unknown categories and months outside the period', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['11', ARS_ACCOUNT_ID, '1000'], ['999', ARS_ACCOUNT_ID, '9999']]),
             month(2026, 7, [['11', ARS_ACCOUNT_ID, '7777']]),
             month(2027, 1, [['11', ARS_ACCOUNT_ID, '8888']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.income.totalAmount.toString()).toEqual('1000');
     });
 
     it('should add up several accounts of the same sub-category in the same month', () => {
-        const data = buildProjectionTableData([
+        const data = buildProjectionTableData(projection([
             month(2026, 8, [['21', ARS_ACCOUNT_ID, '600'], ['21', USD_ACCOUNT_ID, '400']])
-        ], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(amounts(data.expense.categories[0]!.subCategories[0]!.monthlyAmounts)).toEqual(['1000', '0', '0', '0', '0']);
     });
 
     it('should return empty sections and zeroed rows when there is no data', () => {
-        const data = buildProjectionTableData([], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        const data = buildProjectionTableData(projection([]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.income.categories).toEqual([]);
         expect(data.expense.categories).toEqual([]);
@@ -273,8 +285,99 @@ describe('buildProjectionTableData', () => {
         expect(data.hasUnconvertedAmounts).toEqual(false);
     });
 
+    // --- opening balance -------------------------------------------------------------------
+
+    it('should start the accumulated row from the opening balance', () => {
+        const data = buildProjectionTableData(projection([
+            month(2026, 8, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']]),
+            month(2026, 9, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']])
+        ], [[ARS_ACCOUNT_ID, '10000']]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+
+        expect(data.openingBalance.toString()).toEqual('10000');
+        expect(amounts(data.accumulated.monthlyAmounts)).toEqual(['10500', '11000', '11000', '11000', '11000']);
+        expect(data.accumulated.totalAmount.toString()).toEqual('11000');
+    });
+
+    // the opening balance is a balance, not a flow of the period: adding it to the net row would
+    // count it again in every month
+    it('should keep the opening balance out of the net row', () => {
+        const data = buildProjectionTableData(projection([
+            month(2026, 8, [['11', ARS_ACCOUNT_ID, '1500'], ['21', ARS_ACCOUNT_ID, '1000']])
+        ], [[ARS_ACCOUNT_ID, '10000']]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+
+        expect(amounts(data.net.monthlyAmounts)).toEqual(['500', '0', '0', '0', '0']);
+        expect(data.net.totalAmount.toString()).toEqual('500');
+    });
+
+    it('should add up the opening balance of every account', () => {
+        const data = buildProjectionTableData(projection([], [
+            [ARS_ACCOUNT_ID, '10000'],
+            [USD_ACCOUNT_ID, '400']
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+
+        expect(data.openingBalance.toString()).toEqual('10400');
+        expect(amounts(data.accumulated.monthlyAmounts)).toEqual(['10400', '10400', '10400', '10400', '10400']);
+    });
+
+    it('should convert the opening balance of accounts held in another currency', () => {
+        const data = buildProjectionTableData(projection([], [
+            [ARS_ACCOUNT_ID, '600'],
+            [USD_ACCOUNT_ID, '10']
+        ]), MONTHS_2026_08_TO_12, {
+            ...IDENTITY_OPTIONS,
+            convertAmount: (amount: string, accountId: string) => {
+                const value = parseBigDecimal(amount);
+                return accountId === USD_ACCOUNT_ID ? value.multiply(1000) : value;
+            }
+        });
+
+        expect(data.openingBalance.toString()).toEqual('10600');
+    });
+
+    it('should leave out an opening balance it cannot convert and report it', () => {
+        const data = buildProjectionTableData(projection([], [
+            [ARS_ACCOUNT_ID, '600'],
+            [USD_ACCOUNT_ID, '10']
+        ]), MONTHS_2026_08_TO_12, {
+            ...IDENTITY_OPTIONS,
+            convertAmount: (amount: string, accountId: string) => accountId === USD_ACCOUNT_ID ? null : parseBigDecimal(amount)
+        });
+
+        expect(data.openingBalance.toString()).toEqual('600');
+        expect(data.hasUnconvertedAmounts).toEqual(true);
+    });
+
+    it('should carry a negative opening balance through the accumulated row', () => {
+        const data = buildProjectionTableData(projection([
+            month(2026, 8, [['11', ARS_ACCOUNT_ID, '1000']])
+        ], [[ARS_ACCOUNT_ID, '-2500']]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+
+        expect(data.openingBalance.toString()).toEqual('-2500');
+        expect(amounts(data.accumulated.monthlyAmounts)).toEqual(['-1500', '-1500', '-1500', '-1500', '-1500']);
+    });
+
+    it('should open at zero when the api sends no opening balance', () => {
+        const data = buildProjectionTableData(projection([
+            month(2026, 8, [['11', ARS_ACCOUNT_ID, '1000']])
+        ]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+
+        expect(data.openingBalance.toString()).toEqual('0');
+        expect(amounts(data.accumulated.monthlyAmounts)).toEqual(['1000', '1000', '1000', '1000', '1000']);
+    });
+
+    // with no month to walk through, the period still opens at the balance it opened with, so the
+    // total column of the accumulated row cannot fall back to zero
+    it('should keep the opening balance as the accumulated total of an empty period', () => {
+        const data = buildProjectionTableData(projection([], [[ARS_ACCOUNT_ID, '10000']]),
+            getProjectionMonths('', '', 202608), IDENTITY_OPTIONS);
+
+        expect(data.months).toEqual([]);
+        expect(data.openingBalance.toString()).toEqual('10000');
+        expect(data.accumulated.totalAmount.toString()).toEqual('10000');
+    });
+
     it('should carry the month columns through to the table data', () => {
-        const data = buildProjectionTableData([], MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
+        const data = buildProjectionTableData(projection([]), MONTHS_2026_08_TO_12, IDENTITY_OPTIONS);
 
         expect(data.months.map(m => m.yearMonth)).toEqual([202608, 202609, 202610, 202611, 202612]);
         expect(data.months[0]!.kind).toEqual(ProjectionMonthKind.Mixed);

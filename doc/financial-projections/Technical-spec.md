@@ -135,28 +135,31 @@ Estructura:
 Una columna por mes del período, más una columna **Total** al final.
 
 ```
-                              | Mes 1 | Mes 2 | Mes 3 | Mes 4 | Total |
+                              | Inic. | Mes 1 | Mes 2 | Mes 3 | Mes 4 | Total |
 ▼ INGRESOS
   ▼ Trabajo
-      Salario                 |  1000 |  1000 |  1000 |  1000 |  4000 |
-      Bonos                   |   500 |   500 |   500 |   500 |  2000 |
-    Subtotal Trabajo          |  1500 |  1500 |  1500 |  1500 |  6000 |
-  Total Ingresos              |  1500 |  1500 |  1500 |  1500 |  6000 |
+      Salario                 |       |  1000 |  1000 |  1000 |  1000 |  4000 |
+      Bonos                   |       |   500 |   500 |   500 |   500 |  2000 |
+    Subtotal Trabajo          |       |  1500 |  1500 |  1500 |  1500 |  6000 |
+  Total Ingresos              |       |  1500 |  1500 |  1500 |  1500 |  6000 |
 ▼ EGRESOS
   ▼ Entretenimiento
-      Suscripciones           |   200 |   200 |   200 |   200 |   800 |
-    Subtotal Entretenimiento  |   200 |   200 |   200 |   200 |   800 |
+      Suscripciones           |       |   200 |   200 |   200 |   200 |   800 |
+    Subtotal Entretenimiento  |       |   200 |   200 |   200 |   200 |   800 |
   ▼ Trabajo
-      Suscripciones           |   200 |   200 |   200 |   200 |   800 |
-    Subtotal Trabajo          |   200 |   200 |   200 |   200 |   800 |
+      Suscripciones           |       |   200 |   200 |   200 |   200 |   800 |
+    Subtotal Trabajo          |       |   200 |   200 |   200 |   200 |   800 |
   ▼ Casa
-      Recibos                 |   600 |   600 |   600 |   600 |  2400 |
-    Subtotal Casa             |   600 |   600 |   600 |   600 |  2400 |
-  Total Egresos               |  1000 |  1000 |  1000 |  1000 |  4000 |
-─────────────────────────────────────────────────────────────────────
-  Neto del mes                |   500 |   500 |   500 |   500 |  2000 |
-  Acumulado                   |   500 |  1000 |  1500 |  2000 |  2000 |
+      Recibos                 |       |   600 |   600 |   600 |   600 |  2400 |
+    Subtotal Casa             |       |   600 |   600 |   600 |   600 |  2400 |
+  Total Egresos               |       |  1000 |  1000 |  1000 |  1000 |  4000 |
+─────────────────────────────────────────────────────────────────────────────
+  Neto del mes                |       |   500 |   500 |   500 |   500 |  2000 |
+  Acumulado                   | 10000 | 10500 | 11000 | 11500 | 12000 | 12000 |
 ```
+
+La columna `Inic.` (**Saldo de Apertura**) va antes del primer mes y solo la rellena la fila
+`Acumulado`: es un saldo previo al período, no un flujo de ninguno de sus meses.
 
 **Jerarquía de filas (3 niveles + 2 filas de cierre):**
 
@@ -166,12 +169,12 @@ Una columna por mes del período, más una columna **Total** al final.
 | 1 | Categoría (*Trabajo*, *Casa*…) | Sí | Se ocultan sus subcategorías; **la fila `Subtotal <categoría>` permanece visible** |
 | 2 | Subcategoría (*Salario*, *Recibos*…) | No | — |
 | — | `Neto del mes` = Total Ingresos − Total Egresos | No | Siempre visible |
-| — | `Acumulado` = suma corrida del Neto | No | Siempre visible |
+| — | `Acumulado` = Saldo de Apertura + suma corrida del Neto | No | Siempre visible |
 
 **Celdas de la columna Total:**
 
 - Filas de categoría / subcategoría / totales / neto → suma horizontal de los meses.
-- Fila `Acumulado` → el valor del **último mes** del período (no la suma), porque ya es un acumulado.
+- Fila `Acumulado` → el valor del **último mes** del período (no la suma), porque ya es un acumulado. Con un período vacío es el propio Saldo de Apertura.
 
 **Acordeón:** `v-expansion-panels multiple` de Vuetify, mismo patrón que [PresetDialog.vue](../../src/views/desktop/categories/list/dialogs/PresetDialog.vue). Cada nivel se controla de forma independiente; el estado de expansión vive en el componente, no en el store.
 
@@ -212,4 +215,20 @@ Claves nuevas a agregar en los 20 archivos de `src/locales/`:
 
 - **Mobile.** No se agrega página en `src/views/mobile/`. Insights Explorer tampoco la tiene, así que no rompe la paridad existente del proyecto.
 - **Transferencias.** Excluidas de ambos lados del cálculo.
-- **Saldo inicial en el acumulado.** `Neto` y `Acumulado` reflejan solo el *flujo* del período, no el patrimonio absoluto. Sumar el saldo actual (`getNetAssets()`, [src/stores/account.ts:472](../../src/stores/account.ts#L472)) queda para v2.
+- **Cuentas ocultas y excluidas de los totales.** La tabla incluye todas las cuentas no borradas, tanto en el Saldo de Apertura como en los meses, para ser coherente consigo misma. `getNetAssets()` ([src/stores/account.ts:472](../../src/stores/account.ts#L472)) en cambio salta las cuentas ocultas y las de `totalAmountExcludeAccountIds`, así que con alguna de ellas las dos cifras no son comparables.
+- **Transacciones con fecha futura.** La mitad real se corta en `now` y la simulada solo lee plantillas, así que una transacción ya registrada con fecha posterior a hoy no aparece en ningún mes de la tabla. Sí entra en el Saldo de Apertura de un período que empiece después de ella.
+
+## Saldo de Apertura (v2)
+
+El `Acumulado` arranca del patrimonio que el usuario tiene el instante antes del primer mes del
+período, en vez de arrancar de cero, de modo que cada mes muestra el patrimonio alcanzado a su
+cierre y no el flujo acumulado.
+
+`GetProjectionOpeningBalances` ([pkg/services/transaction_projections.go](../../pkg/services/transaction_projections.go)) lo calcula **hacia atrás** desde el saldo actual de cada cuenta, deshaciendo las transacciones registradas a partir del inicio del período. Replayearlo hacia adelante desde la primera transacción del usuario leería todo su historial; hacia atrás solo lee las del período.
+
+- El instante de corte es el mismo `startTransactionTime` con el que la mitad real arranca, así que entre el Saldo de Apertura y el primer mes no se cuenta nada dos veces ni se pierde nada.
+- Participan **todos** los tipos de transacción, incluidas las modificaciones de saldo y las dos patas de cada transferencia: el resultado tiene que ser el saldo de la cuenta, no el flujo de sus categorías. Por eso los importes van por cuenta y no por categoría.
+- Si el período empieza en el futuro se añaden las ocurrencias que las plantillas producirían entre `now` y ese instante, con el mismo reparto que el resto de la proyección: lo registrado hasta `now`, lo simulado después.
+- Se envía **por cuenta** (`openingBalance: [{accountId, amount}]`) porque el cliente tiene que convertir cada moneda por separado, igual que hace con los importes mensuales. Las cuentas que abren en cero no se envían.
+
+Conciliación: Saldo de Apertura + la parte ya registrada del mes en curso = `getNetAssets()`. La celda del mes en curso además arrastra lo que las plantillas aún producirán antes de que el mes termine, porque la fila muestra el cierre de cada mes.

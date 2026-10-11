@@ -486,6 +486,42 @@ type TransactionStatisticTrendsResponseItem struct {
 	Items []*TransactionStatisticResponseItem `json:"items"`
 }
 
+// TransactionProjectionResponse represents the response of a transaction projection request.
+//
+// The monthly amounts are shaped exactly like the ones of TransactionStatisticsTrendsHandler, so the
+// client reads them with the same code, and the opening balance comes alongside them because the
+// accumulated row of the projection table starts from it instead of from zero.
+type TransactionProjectionResponse struct {
+	OpeningBalance []*TransactionProjectionOpeningBalanceItem  `json:"openingBalance"`
+	Months         TransactionStatisticTrendsResponseItemSlice `json:"months"`
+}
+
+// TransactionProjectionOpeningBalanceItem represents the balance of one account just before the
+// period of a projection starts. It is sent per account, rather than as a single total, because the
+// client has to convert the balance of every account held in another currency on its own.
+type TransactionProjectionOpeningBalanceItem struct {
+	AccountId int64  `json:"accountId,string"`
+	Amount    string `json:"amount"`
+}
+
+// TransactionProjectionOpeningBalanceItemSlice represents the slice data structure of TransactionProjectionOpeningBalanceItem
+type TransactionProjectionOpeningBalanceItemSlice []*TransactionProjectionOpeningBalanceItem
+
+// Len returns the count of items
+func (s TransactionProjectionOpeningBalanceItemSlice) Len() int {
+	return len(s)
+}
+
+// Swap swaps two items
+func (s TransactionProjectionOpeningBalanceItemSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less reports whether the first item is before the second one
+func (s TransactionProjectionOpeningBalanceItemSlice) Less(i, j int) bool {
+	return s[i].AccountId < s[j].AccountId
+}
+
 // TransactionStatisticAssetTrendsResponseItem represents the data within each statistic interval
 type TransactionStatisticAssetTrendsResponseItem struct {
 	Year  int32                                              `json:"year"`

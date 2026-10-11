@@ -10,7 +10,7 @@ import {
     ProjectionMonthKind
 } from '@/core/projection.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
-import type { TransactionStatisticTrendsResponseItem } from '@/models/transaction.ts';
+import type { TransactionProjectionResponse } from '@/models/transaction.ts';
 
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import { getAllMonthsStartAndEndUnixTimes } from '@/lib/datetime.ts';
@@ -65,13 +65,14 @@ function getProjectionMonthKind(yearMonth: number, currentYearMonth: number): Pr
 }
 
 // buildProjectionTableData turns the response of the projections api into the rows of the projection
-// table: two collapsible sections with their categories and sub-categories, the net of every month
-// and the running total of the period.
+// table: two collapsible sections with their categories and sub-categories, the net of every month,
+// the opening balance of the period and the net worth reached at the end of every month.
 //
 // Whether an amount is an income or an expense comes from the type of its category, because the api
 // does not send it. Amounts of accounts held in a currency that cannot be converted are left out and
-// reported through hasUnconvertedAmounts, so the table never mixes currencies silently.
-export function buildProjectionTableData(items: TransactionStatisticTrendsResponseItem[], months: ProjectionMonth[], options: ProjectionTableOptions): ProjectionTableData {
+// reported through hasUnconvertedAmounts, so the table never mixes currencies silently -- which
+// applies to the opening balance as well, as it is sent per account for exactly that reason.
+export function buildProjectionTableData(response: TransactionProjectionResponse, months: ProjectionMonth[], options: ProjectionTableOptions): ProjectionTableData {
     const monthIndexMap: Record<number, number> = {};
 
     for (let i = 0; i < months.length; i++) {
@@ -82,7 +83,20 @@ export function buildProjectionTableData(items: TransactionStatisticTrendsRespon
     const expenseCategories: Record<string, WritableProjectionRow> = {};
     let hasUnconvertedAmounts = false;
 
-    for (const monthItem of items) {
+    let openingBalance: BigDecimal = ZERO;
+
+    for (const openingBalanceItem of response.openingBalance ?? []) {
+        const amount = options.convertAmount(openingBalanceItem.amount, openingBalanceItem.accountId);
+
+        if (amount === null) {
+            hasUnconvertedAmounts = true;
+            continue;
+        }
+
+        openingBalance = openingBalance.add(amount);
+    }
+
+    for (const monthItem of response.months ?? []) {
         const monthIndex = monthIndexMap[monthItem.year * 100 + monthItem.month];
 
         if (monthIndex === undefined) {
@@ -128,7 +142,9 @@ export function buildProjectionTableData(items: TransactionStatisticTrendsRespon
 
     const netAmounts: BigDecimal[] = [];
     const accumulatedAmounts: BigDecimal[] = [];
-    let runningTotal: BigDecimal = ZERO;
+    // the accumulated row is a net worth, so it walks forward from what the period opens with rather
+    // than from zero
+    let runningTotal: BigDecimal = openingBalance;
 
     for (let i = 0; i < months.length; i++) {
         const net = income.monthlyAmounts[i]!.subtract(expense.monthlyAmounts[i]!);
@@ -148,12 +164,14 @@ export function buildProjectionTableData(items: TransactionStatisticTrendsRespon
             monthlyAmounts: netAmounts,
             totalAmount: sumAmounts(netAmounts)
         },
+        openingBalance: openingBalance,
         accumulated: {
             id: 'accumulated',
             name: 'Accumulated',
             monthlyAmounts: accumulatedAmounts,
-            // already a running total, so the total column is the value it reached, not the sum
-            totalAmount: accumulatedAmounts.length ? accumulatedAmounts[accumulatedAmounts.length - 1]! : ZERO
+            // already a running total, so the total column is the value it reached, not the sum. With
+            // no month at all it is still whatever the period opened with.
+            totalAmount: accumulatedAmounts.length ? accumulatedAmounts[accumulatedAmounts.length - 1]! : openingBalance
         },
         hasUnconvertedAmounts: hasUnconvertedAmounts
     };

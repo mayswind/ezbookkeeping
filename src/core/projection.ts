@@ -40,10 +40,15 @@ export interface ProjectionTableData {
     readonly months: ProjectionMonth[];
     readonly income: ProjectionSectionRow;
     readonly expense: ProjectionSectionRow;
-    // income minus expense, month by month
+    // income minus expense, month by month. The opening balance is not part of it: it is a balance,
+    // not a flow of the period.
     readonly net: ProjectionRow;
-    // running sum of net. Its total column is the value of the last month rather than the sum of the
-    // row, because the row is already accumulated.
+    // the net worth the user holds the instant before the first month of the period starts, which is
+    // what the accumulated row starts from. Shown in its own leading column of the table.
+    readonly openingBalance: BigDecimal;
+    // opening balance plus the running sum of net, so every month holds the net worth reached by its
+    // end. Its total column is the value of the last month rather than the sum of the row, because
+    // the row is already accumulated.
     readonly accumulated: ProjectionRow;
     // true when at least one amount was left out because its account currency could not be converted
     // to the default currency of the user, so the totals are known to be incomplete

@@ -11,7 +11,7 @@ import type { BigDecimal } from '@/core/numeral.ts';
 import type { TextualYearMonth } from '@/core/datetime.ts';
 import { TimezoneTypeForStatistics } from '@/core/timezone.ts';
 import type { ProjectionTableData } from '@/core/projection.ts';
-import type { TransactionStatisticTrendsResponseItem } from '@/models/transaction.ts';
+import type { TransactionProjectionResponse } from '@/models/transaction.ts';
 
 import { parseBigDecimal } from '@/lib/numeral.ts';
 import { getCurrentUnixTime, getGregorianCalendarYearAndMonthFromUnixTime } from '@/lib/datetime.ts';
@@ -28,7 +28,7 @@ export const useProjectionsStore = defineStore('projections', () => {
 
     const projectionStartYearMonth = ref<TextualYearMonth | ''>('');
     const projectionEndYearMonth = ref<TextualYearMonth | ''>('');
-    const projectionData = ref<TransactionStatisticTrendsResponseItem[]>([]);
+    const projectionData = ref<TransactionProjectionResponse>({ openingBalance: [], months: [] });
 
     // A projection depends on the instant it was built at and on the set of scheduled templates, not
     // only on the period asked for, so it cannot be cached by period alone. The state is invalidated
@@ -105,7 +105,7 @@ export const useProjectionsStore = defineStore('projections', () => {
     function resetProjections(): void {
         projectionStartYearMonth.value = '';
         projectionEndYearMonth.value = '';
-        projectionData.value = [];
+        projectionData.value = { openingBalance: [], months: [] };
         projectionDataPeriodKey.value = '';
         projectionDataDay.value = 0;
         projectionStateInvalid.value = true;
@@ -120,7 +120,7 @@ export const useProjectionsStore = defineStore('projections', () => {
             && projectionDataDay.value === getCurrentDayNumber();
     }
 
-    function loadProjections({ force }: { force?: boolean }): Promise<TransactionStatisticTrendsResponseItem[]> {
+    function loadProjections({ force }: { force?: boolean }): Promise<TransactionProjectionResponse> {
         if (!force && isProjectionDataUpToDate()) {
             return Promise.resolve(projectionData.value);
         }

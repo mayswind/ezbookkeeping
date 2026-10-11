@@ -851,6 +851,21 @@ export interface TransactionStatisticTrendsResponseItem {
     readonly items: TransactionStatisticResponseItem[];
 }
 
+// The response of the projections api: the monthly amounts, shaped like the ones of the trends api,
+// plus the balance every account holds just before the period starts.
+export interface TransactionProjectionResponse {
+    readonly openingBalance: TransactionProjectionOpeningBalanceItem[];
+    readonly months: TransactionStatisticTrendsResponseItem[];
+}
+
+// The balance of one account just before the period of a projection starts. It comes per account,
+// rather than as a single total, so amounts of accounts held in another currency can be converted
+// before being added up. Accounts opening at zero are not sent at all.
+export interface TransactionProjectionOpeningBalanceItem {
+    readonly accountId: string;
+    readonly amount: string;
+}
+
 export interface TransactionStatisticAssetTrendsResponseItem extends YearMonthDay {
     readonly year: number;
     readonly month: number; // 1-based (1 = January, 12 = December)

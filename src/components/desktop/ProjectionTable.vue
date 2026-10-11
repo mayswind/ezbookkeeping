@@ -4,6 +4,10 @@
             <thead>
                 <tr>
                     <th class="projection-row-label">{{ tt('Category') }}</th>
+                    <th class="projection-amount projection-opening-column">
+                        <span>{{ tt('Opening Balance') }}</span>
+                        <v-tooltip activator="parent">{{ tt('Your balance before the first month of the period') }}</v-tooltip>
+                    </th>
                     <th class="projection-amount" :class="{ 'projection-month-projected': month.kind !== ProjectionMonthKind.Actual }"
                         :key="month.yearMonth" v-for="month in data.months">
                         <span>{{ getMonthDisplayName(month) }}</span>
@@ -21,6 +25,7 @@
                         <v-icon size="20" :icon="expandedSections[section.id] ? mdiChevronDown : mdiChevronRight"/>
                         <span>{{ section.categoryType === CategoryType.Income ? tt('Income') : tt('Expense') }}</span>
                     </th>
+                    <td class="projection-opening-column"></td>
                     <td :key="month.yearMonth" v-for="month in data.months"></td>
                     <td class="projection-total-column"></td>
                 </tr>
@@ -32,6 +37,7 @@
                                 <v-icon size="18" :icon="isCategoryExpanded(category.id) ? mdiChevronDown : mdiChevronRight"/>
                                 <span>{{ category.name }}</span>
                             </th>
+                            <td class="projection-opening-column"></td>
                             <td :key="month.yearMonth" v-for="month in data.months"></td>
                             <td class="projection-total-column"></td>
                         </tr>
@@ -40,6 +46,7 @@
                             <tr class="projection-subcategory-row" :key="subCategory.id"
                                 v-for="subCategory in category.subCategories">
                                 <th class="projection-row-label">{{ subCategory.name }}</th>
+                                <td class="projection-opening-column"></td>
                                 <td class="projection-amount" :key="index" v-for="(amount, index) in subCategory.monthlyAmounts">
                                     {{ formatAmount(amount) }}
                                 </td>
@@ -49,6 +56,7 @@
 
                         <tr class="projection-subtotal-row">
                             <th class="projection-row-label">{{ tt('Subtotal') }} {{ category.name }}</th>
+                            <td class="projection-opening-column"></td>
                             <td class="projection-amount" :key="index" v-for="(amount, index) in category.monthlyAmounts">
                                 {{ formatAmount(amount) }}
                             </td>
@@ -61,6 +69,7 @@
                     <th class="projection-row-label">
                         {{ section.categoryType === CategoryType.Income ? tt('Total Income') : tt('Total Expense') }}
                     </th>
+                    <td class="projection-opening-column"></td>
                     <td class="projection-amount" :key="index" v-for="(amount, index) in section.monthlyAmounts">
                         {{ formatAmount(amount) }}
                     </td>
@@ -71,6 +80,7 @@
             <tfoot>
                 <tr class="projection-net-row">
                     <th class="projection-row-label">{{ tt('Net') }}</th>
+                    <td class="projection-opening-column"></td>
                     <td class="projection-amount" :class="getAmountClass(amount)" :key="index"
                         v-for="(amount, index) in data.net.monthlyAmounts">
                         {{ formatAmount(amount) }}
@@ -81,6 +91,9 @@
                 </tr>
                 <tr class="projection-accumulated-row">
                     <th class="projection-row-label">{{ tt('Accumulated') }}</th>
+                    <td class="projection-amount projection-opening-column" :class="getAmountClass(data.openingBalance)">
+                        {{ formatAmount(data.openingBalance) }}
+                    </td>
                     <td class="projection-amount" :class="getAmountClass(amount)" :key="index"
                         v-for="(amount, index) in data.accumulated.monthlyAmounts">
                         {{ formatAmount(amount) }}
@@ -209,6 +222,15 @@ function getAmountClass(amount: BigDecimal): string {
 
 .projection-table .projection-total-column {
     border-inline-start: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    font-weight: 500;
+}
+
+/* the opening balance sits before the period, so it is fenced off from the months of the table */
+.projection-table .projection-opening-column {
+    border-inline-end: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.projection-table thead .projection-opening-column {
     font-weight: 500;
 }
 

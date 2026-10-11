@@ -87,6 +87,7 @@ import type {
     TransactionStatisticResponse,
     TransactionStatisticTrendsRequest,
     TransactionProjectionRequest,
+    TransactionProjectionResponse,
     TransactionStatisticTrendsResponseItem,
     TransactionStatisticAssetTrendsRequest,
     TransactionStatisticAssetTrendsResponseItem,
@@ -596,7 +597,7 @@ export default {
 
         return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/trends.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
-    getTransactionProjections: (req: TransactionProjectionRequest): ApiResponsePromise<TransactionStatisticTrendsResponseItem[]> => {
+    getTransactionProjections: (req: TransactionProjectionRequest): ApiResponsePromise<TransactionProjectionResponse> => {
         const queryParams: string[] = [];
 
         if (req.startYearMonth) {
@@ -607,7 +608,7 @@ export default {
             queryParams.push(`end_year_month=${req.endYearMonth}`);
         }
 
-        return axios.get<ApiResponse<TransactionStatisticTrendsResponseItem[]>>(`v1/transactions/statistics/projections.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
+        return axios.get<ApiResponse<TransactionProjectionResponse>>(`v1/transactions/statistics/projections.json?use_transaction_timezone=${req.useTransactionTimezone}` + (queryParams.length ? '&' + queryParams.join('&') : ''));
     },
     getTransactionStatisticsAssetTrends: (req: TransactionStatisticAssetTrendsRequest): ApiResponsePromise<TransactionStatisticAssetTrendsResponseItem[]> => {
         const queryParams: string[] = [];

@@ -93,6 +93,19 @@ func (t *ofxTransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allData)
 }
 
+// CurrentRowId returns current row id
+func (t *ofxTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentIndex < 0 || t.currentIndex >= len(t.dataTable.allData) {
+		return ""
+	}
+
+	if t.dataTable.allData[t.currentIndex].TransactionId != "" {
+		return fmt.Sprintf("id:%s", t.dataTable.allData[t.currentIndex].TransactionId)
+	}
+
+	return fmt.Sprintf("record:%d", t.currentIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *ofxTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	if t.currentIndex+1 >= len(t.dataTable.allData) {
@@ -105,7 +118,7 @@ func (t *ofxTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 	rowItems, err := t.parseTransaction(ctx, user, data)
 
 	if err != nil {
-		log.Errorf(ctx, "[ofx_transaction_table.Next] cannot parsing transaction in row#%d, because %s", t.currentIndex, err.Error())
+		log.Errorf(ctx, "[ofx_transaction_table.Next] cannot parsing transaction in %s, because %s", t.CurrentRowId(), err.Error())
 		return nil, err
 	}
 
@@ -120,7 +133,7 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	data := make(map[datatable.TransactionDataTableColumn]string, len(ofxTransactionSupportedColumns))
 
 	if ofxTransaction.PostedDate == "" {
-		return nil, errs.ErrMissingTransactionTime
+		return nil, errs.NewImportError(errs.ErrMissingTransactionTime, t.CurrentRowId())
 	}
 
 	datetime, timezone, err := t.parseTransactionTimeAndTimeZone(ctx, ofxTransaction.PostedDate)
@@ -133,11 +146,11 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = timezone
 
 	if ofxTransaction.TransactionType == "" {
-		return nil, errs.ErrTransactionTypeInvalid
+		return nil, errs.NewImportError(errs.ErrTransactionTypeInvalid, t.CurrentRowId())
 	}
 
 	if ofxTransaction.FromAccountId == "" {
-		return nil, errs.ErrMissingAccountData
+		return nil, errs.NewImportError(errs.ErrMissingAccountData, t.CurrentRowId())
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ofxTransaction.FromAccountId
@@ -149,18 +162,18 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	}
 
 	if data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] == "" {
-		return nil, errs.ErrAccountCurrencyInvalid
+		return nil, errs.NewImportError(errs.ErrAccountCurrencyInvalid, t.CurrentRowId())
 	}
 
 	if ofxTransaction.Amount == "" {
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId())
 	}
 
 	amount, err := utils.ParseAmount(utils.TrimTrailingZerosInDecimal(strings.ReplaceAll(ofxTransaction.Amount, ",", "."))) // ofx supports decimal point or comma to indicate the start of the fractional amount
 
 	if err != nil {
 		log.Errorf(ctx, "[ofx_transaction_table.parseTransaction] cannot parsing transaction amount \"%s\", because %s", ofxTransaction.Amount, err.Error())
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), ofxTransaction.Amount)
 	}
 
 	if transactionType, exists := ofxTransactionTypeMapping[ofxTransaction.TransactionType]; exists { // known transaction type
@@ -225,7 +238,7 @@ func (t *ofxTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 
 func (t *ofxTransactionDataRowIterator) parseTransactionTimeAndTimeZone(ctx core.Context, datetime string) (string, string, error) {
 	if len(datetime) < 8 {
-		return "", "", errs.ErrTransactionTimeInvalid
+		return "", "", errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), datetime)
 	}
 
 	var err error
@@ -238,7 +251,7 @@ func (t *ofxTransactionDataRowIterator) parseTransactionTimeAndTimeZone(ctx core
 	if len(datetime) >= 8 { // YYYYMMDD
 		if !utils.IsStringOnlyContainsDigits(datetime[0:8]) {
 			log.Errorf(ctx, "[ofx_transaction_table.parseTransactionTimeAndTimeZone] cannot parse time \"%s\", because contains non-digit character", datetime)
-			return "", "", errs.ErrTransactionTimeInvalid
+			return "", "", errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), datetime)
 		}
 
 		year = datetime[0:4]
@@ -249,7 +262,7 @@ func (t *ofxTransactionDataRowIterator) parseTransactionTimeAndTimeZone(ctx core
 	if len(datetime) >= 14 { // YYYYMMDDHHMMSS
 		if !utils.IsStringOnlyContainsDigits(datetime[8:14]) {
 			log.Errorf(ctx, "[ofx_transaction_table.parseTransactionTimeAndTimeZone] cannot parse time \"%s\", because contains non-digit character", datetime)
-			return "", "", errs.ErrTransactionTimeInvalid
+			return "", "", errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), datetime)
 		}
 
 		hour = datetime[8:10]
@@ -266,7 +279,7 @@ func (t *ofxTransactionDataRowIterator) parseTransactionTimeAndTimeZone(ctx core
 
 		if err != nil {
 			log.Errorf(ctx, "[ofx_transaction_table.parseTransactionTimeAndTimeZone] cannot parse timezone offset \"%s\", because %s", timezoneInfo, err.Error())
-			return "", "", errs.ErrTransactionTimeZoneInvalid
+			return "", "", errs.NewImportError(errs.ErrTransactionTimeZoneInvalid, t.CurrentRowId(), datetime)
 		}
 	}
 

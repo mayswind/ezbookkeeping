@@ -3,6 +3,7 @@ package iif
 import (
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"strings"
 
@@ -50,20 +51,23 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 			return nil, nil, errs.ErrInvalidIIFFile
 		}
 
+		lineNumber, _ := r.reader.FieldPos(0)
+		recordId := fmt.Sprintf("line:%d", lineNumber)
+
 		if len(items) == 1 && items[0] == "" {
 			continue
 		}
 
 		if len(items[0]) < 1 {
 			log.Errorf(ctx, "[iif_data_reader.read] line first column is empty")
-			return nil, nil, errs.ErrInvalidIIFFile
+			return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 		}
 
 		// read sample line
 		if items[0][0] == '!' {
 			if lastLineSign != "" {
 				log.Errorf(ctx, "[iif_data_reader.read] iif missing transaction end line")
-				return nil, nil, errs.ErrInvalidIIFFile
+				return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 			}
 
 			if currentAccountDataset != nil {
@@ -78,7 +82,7 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 
 			if items[0] == iifTransactionSplitSampleLineSignColumnName || items[0] == iifTransactionEndSampleLineSignColumnName {
 				log.Errorf(ctx, "[iif_data_reader.read] read transaction split sample line or transaction end sample line sign before transaction sample line sign")
-				return nil, nil, errs.ErrInvalidIIFFile
+				return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 			} else {
 				currentDatasetType = items[0]
 				lastLineSign = ""
@@ -104,7 +108,7 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 		// read data lines
 		if currentDatasetType == "" {
 			log.Errorf(ctx, "[iif_data_reader.read] cannot read data line before sample line")
-			return nil, nil, errs.ErrInvalidIIFFile
+			return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 		} else if currentDatasetType == iifAccountSampleLineSignColumnName && currentAccountDataset != nil {
 			if items[0] == iifAccountLineSignColumnName {
 				accountData := &iifAccountData{
@@ -113,7 +117,7 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 				currentAccountDataset.accounts = append(currentAccountDataset.accounts, accountData)
 			} else {
 				log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading account sign, but actual is \"%s\"", items[0])
-				return nil, nil, errs.ErrInvalidIIFFile
+				return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 			}
 		} else if currentDatasetType == iifTransactionSampleLineSignColumnName && currentTransactionDataset != nil {
 			if lastLineSign == "" {
@@ -125,13 +129,13 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 					lastLineSign = items[0]
 				} else {
 					log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading transaction sign, but actual is \"%s\"", items[0])
-					return nil, nil, errs.ErrInvalidIIFFile
+					return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 				}
 			} else if lastLineSign == iifTransactionLineSignColumnName || lastLineSign == iifTransactionSplitLineSignColumnName {
 				if items[0] == iifTransactionSplitLineSignColumnName {
 					if currentTransactionData == nil {
 						log.Errorf(ctx, "[iif_data_reader.read] expected current transaction data is not nil, but read \"%s\"", items[0])
-						return nil, nil, errs.ErrInvalidIIFFile
+						return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 					}
 
 					currentTransactionData.SplitData = append(currentTransactionData.SplitData, &iifTransactionSplitData{
@@ -141,23 +145,23 @@ func (r *iifDataReader) read(ctx core.Context) ([]*iifAccountDataset, []*iifTran
 				} else if items[0] == iifTransactionEndLineSignColumnName {
 					if currentTransactionData == nil {
 						log.Errorf(ctx, "[iif_data_reader.read] expected current transaction data is not nil, but read \"%s\"", items[0])
-						return nil, nil, errs.ErrInvalidIIFFile
+						return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 					}
 
 					if len(currentTransactionData.SplitData) < 1 {
 						log.Errorf(ctx, "[iif_data_reader.read] expected reading transaction split line, but read \"%s\"", items[0])
-						return nil, nil, errs.ErrInvalidIIFFile
+						return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 					}
 
 					currentTransactionDataset.Transactions = append(currentTransactionDataset.Transactions, currentTransactionData)
 					lastLineSign = ""
 				} else {
 					log.Errorf(ctx, "[iif_data_reader.read] iif line expected reading split sign or transaction end sign, but actual is \"%s\"", items[0])
-					return nil, nil, errs.ErrInvalidIIFFile
+					return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 				}
 			} else {
 				log.Errorf(ctx, "[iif_data_reader.read] iif missing transaction sample end line")
-				return nil, nil, errs.ErrInvalidIIFFile
+				return nil, nil, errs.NewImportError(errs.ErrInvalidIIFFile, recordId)
 			}
 		} // not process (read data line) for other dataset type
 	}

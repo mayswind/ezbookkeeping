@@ -183,7 +183,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidType(t *testin
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,交易成功,转账\n"
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
+	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_ParseInvalidAmount(t *testing.T) {
@@ -354,7 +354,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_ParseDescription(t *testin
 	assert.Equal(t, "Test", allNewTransactions[0].Comment)
 }
 
-func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownStatusTransaction(t *testing.T) {
+func TestJDComFinanceCsvFileImporterParseImportedData_UnknownStatusTransaction(t *testing.T) {
 	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
@@ -370,10 +370,10 @@ func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownStatusTransacti
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,xxxx,支出\n"
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
+	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
-func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownMemoTransferTransaction(t *testing.T) {
+func TestJDComFinanceCsvFileImporterParseImportedData_UnknownMemoTransferTransaction(t *testing.T) {
 	importer := JDComFinanceTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
@@ -389,7 +389,7 @@ func TestJDComFinanceCsvFileImporterParseImportedData_SkipUnknownMemoTransferTra
 		"交易时间,商户名称,交易说明,金额,收/付款方式,交易状态,收/支\n" +
 		"2025-09-01 01:23:45,xxx,xxx,0.12,银行卡,交易成功,不计收支\n"
 	_, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
+	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
 func TestJDComFinanceCsvFileImporterParseImportedData_MissingFileHeader(t *testing.T) {

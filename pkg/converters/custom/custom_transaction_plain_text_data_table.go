@@ -84,6 +84,11 @@ func (t *customPlainTextDataRowIterator) HasNext() bool {
 	return t.innerIterator.HasNext()
 }
 
+// CurrentRowId returns current row id
+func (t *customPlainTextDataRowIterator) CurrentRowId() string {
+	return t.innerIterator.CurrentRowId()
+}
+
 // Next returns the next transaction data row
 func (t *customPlainTextDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	importedRow := t.innerIterator.Next()
@@ -95,7 +100,7 @@ func (t *customPlainTextDataRowIterator) Next(ctx core.Context, user *models.Use
 	rowData, isValid, err := t.parseTransaction(ctx, user, importedRow)
 
 	if err != nil {
-		log.Errorf(ctx, "[custom_transaction_plain_text_data_table.Next] cannot parsing transaction in row \"%s\", because %s", t.innerIterator.CurrentRowId(), err.Error())
+		log.Errorf(ctx, "[custom_transaction_plain_text_data_table.Next] cannot parsing transaction in \"%s\", because %s", t.innerIterator.CurrentRowId(), err.Error())
 		return nil, err
 	}
 
@@ -132,7 +137,7 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 
 		if !exists {
 			log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction type \"%s\", because type \"%d\" is invalid", rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE], transactionType)
-			return nil, false, errs.ErrTransactionTypeInvalid
+			return nil, false, errs.NewImportError(errs.ErrTransactionTypeInvalid, t.CurrentRowId(), rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE])
 		}
 
 		rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = mappedTransactionType
@@ -143,7 +148,7 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 		dateTime, err := time.Parse(t.transactionDataTable.timeFormat, rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME])
 
 		if err != nil {
-			return nil, false, errs.ErrTransactionTimeInvalid
+			return nil, false, errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME])
 		}
 
 		transactionTime = &dateTime
@@ -162,7 +167,7 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 			timezone := rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE]
 
 			if len(timezone) != 5 {
-				return nil, false, errs.ErrTransactionTimeZoneInvalid
+				return nil, false, errs.NewImportError(errs.ErrTransactionTimeZoneInvalid, t.CurrentRowId(), timezone)
 			}
 
 			timezone = timezone[:3] + ":" + timezone[3:]
@@ -172,11 +177,11 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 			timezone, err := time.LoadLocation(timezoneName)
 
 			if err != nil {
-				return nil, false, errs.ErrTransactionTimeZoneInvalid
+				return nil, false, errs.NewImportError(errs.ErrTransactionTimeZoneInvalid, t.CurrentRowId(), timezoneName)
 			}
 
 			if transactionTime == nil {
-				return nil, false, errs.ErrTransactionTimeInvalid
+				return nil, false, errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), timezoneName)
 			}
 
 			rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = utils.FormatTimezoneOffset(transactionTime.Unix(), timezone)
@@ -234,7 +239,7 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 
 			if len(geoLocationItems) != 2 {
 				log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction geographic location \"%s\", because it does not contain two parts separated by \"%s\"", geoLocation, t.transactionDataTable.geoLocationSeparator)
-				return nil, false, errs.ErrGeographicLocationInvalid
+				return nil, false, errs.NewImportError(errs.ErrGeographicLocationInvalid, t.CurrentRowId(), geoLocation)
 			}
 
 			item1 := strings.TrimSpace(geoLocationItems[0])
@@ -242,7 +247,7 @@ func (t *customPlainTextDataRowIterator) parseTransaction(ctx core.Context, user
 
 			if item1 == "" || item2 == "" {
 				log.Errorf(ctx, "[custom_transaction_plain_text_data_table.parseTransaction] cannot parsing transaction geographic location \"%s\", because it contains empty part", geoLocation)
-				return nil, false, errs.ErrGeographicLocationInvalid
+				return nil, false, errs.NewImportError(errs.ErrGeographicLocationInvalid, t.CurrentRowId(), geoLocation)
 			}
 
 			if !strings.Contains(item1, ".") && !strings.Contains(item2, ".") {
@@ -275,7 +280,7 @@ func (t *customPlainTextDataRowIterator) parseAmount(ctx core.Context, amountVal
 
 	if t.transactionDataTable.amountDecimalSeparator != "" && t.transactionDataTable.amountDecimalSeparator != "." {
 		if strings.Contains(amountValue, ".") {
-			return "", errs.ErrAmountInvalid
+			return "", errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), amountValue)
 		}
 
 		amountValue = strings.ReplaceAll(amountValue, t.transactionDataTable.amountDecimalSeparator, ".")
@@ -285,7 +290,7 @@ func (t *customPlainTextDataRowIterator) parseAmount(ctx core.Context, amountVal
 	amount, err := utils.ParseAmount(amountValue)
 
 	if err != nil {
-		return "", errs.ErrAmountInvalid
+		return "", errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), amountValue)
 	}
 
 	return utils.FormatAmount(amount), nil

@@ -11,7 +11,7 @@ import (
 type testTransactionDataRowParser struct {
 }
 
-func (p *testTransactionDataRowParser) Parse(rowData map[TransactionDataTableColumn]string) (map[TransactionDataTableColumn]string, bool, error) {
+func (p *testTransactionDataRowParser) Parse(rowData map[TransactionDataTableColumn]string, rowId string) (map[TransactionDataTableColumn]string, bool, error) {
 	rowData[TRANSACTION_DATA_TABLE_DESCRIPTION] = "Test Description"
 	return rowData, true, nil
 }
@@ -182,7 +182,7 @@ func TestBasicDataTableToTransactionDataTableWrapper_TransactionRowIterator_Inva
 	assert.True(t, iterator.HasNext())
 	row, err := iterator.Next(nil, nil)
 	assert.NotNil(t, err)
-	assert.Equal(t, errs.ErrFewerFieldsInDataRowThanInHeaderRow, err)
+	assert.Equal(t, errs.ErrFewerFieldsInDataRowThanInHeaderRow.Error(), err.Error())
 	assert.Nil(t, row)
 }
 

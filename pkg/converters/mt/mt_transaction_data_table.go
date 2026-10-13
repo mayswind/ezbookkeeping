@@ -1,6 +1,7 @@
 package mt
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
@@ -79,6 +80,15 @@ func (t *mt940TransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.data.Statements)
 }
 
+// CurrentRowId returns current row id
+func (t *mt940TransactionDataRowIterator) CurrentRowId() string {
+	if t.currentIndex < 0 || t.currentIndex >= len(t.dataTable.data.Statements) {
+		return ""
+	}
+
+	return fmt.Sprintf("record:%d", t.currentIndex+1)
+}
+
 // Next implements TransactionDataRowIterator.Next
 func (t *mt940TransactionDataRowIterator) Next(ctx core.Context, user *models.User) (datatable.TransactionDataRow, error) {
 	if t.currentIndex+1 >= len(t.dataTable.data.Statements) {
@@ -91,7 +101,7 @@ func (t *mt940TransactionDataRowIterator) Next(ctx core.Context, user *models.Us
 	rowItems, err := t.parseTransaction(ctx, user, t.dataTable.data, data)
 
 	if err != nil {
-		log.Errorf(ctx, "[mt_transaction_data_table.Next] cannot parsing transaction in row#%d, because %s", t.currentIndex, err.Error())
+		log.Errorf(ctx, "[mt_transaction_data_table.Next] cannot parsing transaction in %s, because %s", t.CurrentRowId(), err.Error())
 		return nil, err
 	}
 
@@ -105,14 +115,14 @@ func (t *mt940TransactionDataRowIterator) parseTransaction(ctx core.Context, use
 	data := make(map[datatable.TransactionDataTableColumn]string, len(mt940TransactionSupportedColumns))
 
 	if statement.ValueDate == "" && len(statement.ValueDate) != 6 {
-		return nil, errs.ErrTransactionTimeInvalid
+		return nil, errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), statement.ValueDate)
 	}
 
 	transactionTime, err := utils.FormatYearMonthDayToLongDateTime(statement.ValueDate[0:2], statement.ValueDate[2:4], statement.ValueDate[4:6])
 
 	if err != nil {
-		log.Errorf(ctx, "[mt_transaction_data_table.parseTransaction] cannot format transaction time in row#%d, because %s", t.currentIndex, err.Error())
-		return nil, errs.ErrTransactionTimeInvalid
+		log.Errorf(ctx, "[mt_transaction_data_table.parseTransaction] cannot format transaction time in %s, because %s", t.CurrentRowId(), err.Error())
+		return nil, errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), statement.ValueDate)
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = transactionTime
@@ -123,7 +133,7 @@ func (t *mt940TransactionDataRowIterator) parseTransaction(ctx core.Context, use
 	} else if mt940Data.ClosingBalance != nil && mt940Data.ClosingBalance.Currency != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = mt940Data.ClosingBalance.Currency
 	} else {
-		return nil, errs.ErrAccountCurrencyInvalid
+		return nil, errs.NewImportError(errs.ErrAccountCurrencyInvalid, t.CurrentRowId())
 	}
 
 	amountValue := strings.ReplaceAll(statement.Amount, ",", ".") // decimal separator is comma in mt data
@@ -136,7 +146,7 @@ func (t *mt940TransactionDataRowIterator) parseTransaction(ctx core.Context, use
 
 	if err != nil {
 		log.Errorf(ctx, "[mt_transaction_data_table.parseTransaction] cannot parsing transaction amount \"%s\", because %s", statement.Amount, err.Error())
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), statement.Amount)
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
@@ -150,7 +160,7 @@ func (t *mt940TransactionDataRowIterator) parseTransaction(ctx core.Context, use
 	} else if statement.CreditDebitMark == MT_MARK_REVERSAL_DEBIT {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(models.TRANSACTION_TYPE_INCOME))
 	} else {
-		return nil, errs.ErrTransactionTypeInvalid
+		return nil, errs.NewImportError(errs.ErrTransactionTypeInvalid, t.CurrentRowId())
 	}
 
 	informationToAccountOwnerMap := statement.GetInformationToAccountOwnerMap()

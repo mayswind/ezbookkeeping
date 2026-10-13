@@ -3,6 +3,7 @@ package qif
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"strings"
 
 	"golang.org/x/text/encoding/unicode"
@@ -56,7 +57,7 @@ func (r *qifDataReader) read(ctx core.Context) (*qifData, error) {
 		if line[0] == qifEntryStartRune {
 			if len(currentEntryData) > 0 {
 				log.Errorf(ctx, "[qif_data_reader.read] read new entry header \"%s\" after unclosed entry", line)
-				return nil, errs.ErrInvalidQIFFile
+				return nil, errs.NewImportError(errs.ErrInvalidQIFFile, fmt.Sprintf("line:%d", i+1), line)
 			}
 
 			line = strings.TrimRight(line, " ")

@@ -56,8 +56,8 @@ func (p *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 	if dataRow.GetData(wechatPayTransactionTypeColumnName) != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] &&
 		dataRow.GetData(wechatPayTransactionTypeColumnName) != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] &&
 		dataRow.GetData(wechatPayTransactionTypeColumnName) != wechatPayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
-		log.Warnf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because type is \"%s\"", rowId, dataRow.GetData(wechatPayTransactionTypeColumnName))
-		return nil, false, nil
+		log.Warnf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] skip parsing transaction in \"%s\", because type is \"%s\"", rowId, dataRow.GetData(wechatPayTransactionTypeColumnName))
+		return nil, false, errs.NewImportError(errs.ErrTransactionTypeInvalid, rowId, dataRow.GetData(wechatPayTransactionTypeColumnName))
 	}
 
 	data := make(map[datatable.TransactionDataTableColumn]string, len(wechatPayTransactionSupportedColumns))
@@ -74,8 +74,8 @@ func (p *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 		amount, success := utils.ParseFirstConsecutiveNumber(strings.ReplaceAll(dataRow.GetData(wechatPayTransactionAmountColumnName), ",", ""))
 
 		if !success {
-			log.Errorf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] cannot parse amount \"%s\" of transaction in row \"%s\"", dataRow.GetData(wechatPayTransactionAmountColumnName), rowId)
-			return nil, false, errs.ErrAmountInvalid
+			log.Errorf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] cannot parse amount \"%s\" of transaction in \"%s\"", dataRow.GetData(wechatPayTransactionAmountColumnName), rowId)
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, rowId, dataRow.GetData(wechatPayTransactionAmountColumnName))
 		}
 
 		data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = amount
@@ -130,8 +130,8 @@ func (p *weChatPayTransactionDataRowParser) Parse(ctx core.Context, user *models
 				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
 				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 			} else {
-				log.Warnf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because unknown transfer transaction category \"%s\"", rowId, data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY])
-				return nil, false, nil
+				log.Warnf(ctx, "[wechat_pay_transaction_data_row_parser.Parse] skip parsing transaction in \"%s\", because unknown transfer transaction category \"%s\"", rowId, data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY])
+				return nil, false, errs.NewImportError(errs.ErrTransactionTypeInvalid, rowId, dataRow.GetData(wechatPayTransactionTypeColumnName))
 			}
 		} else {
 			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName

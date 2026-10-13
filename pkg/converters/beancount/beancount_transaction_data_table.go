@@ -1,6 +1,7 @@
 package beancount
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
@@ -85,6 +86,15 @@ func (t *beancountTransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allData)
 }
 
+// CurrentRowId returns current row id
+func (t *beancountTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentIndex < 0 || t.currentIndex >= len(t.dataTable.allData) {
+		return ""
+	}
+
+	return fmt.Sprintf("record:%d", t.currentIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *beancountTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	if t.currentIndex+1 >= len(t.dataTable.allData) {
@@ -132,14 +142,14 @@ func (t *beancountTransactionDataRowIterator) parseTransaction(ctx core.Context,
 
 		if err != nil {
 			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse amount \"%s\", because %s", splitData1.Amount, err.Error())
-			return nil, errs.ErrAmountInvalid
+			return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitData1.OriginalAmount)
 		}
 
 		amount2, err := utils.ParseAmount(splitData2.Amount)
 
 		if err != nil {
 			log.Errorf(ctx, "[beancount_transaction_data_table.parseTransaction] cannot parse amount \"%s\", because %s", splitData2.Amount, err.Error())
-			return nil, errs.ErrAmountInvalid
+			return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitData2.OriginalAmount)
 		}
 
 		if ((account1.AccountType == beancountEquityAccountType || account1.AccountType == beancountIncomeAccountType) && (account2.AccountType == beancountAssetsAccountType || account2.AccountType == beancountLiabilitiesAccountType)) ||

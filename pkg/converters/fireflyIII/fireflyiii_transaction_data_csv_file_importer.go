@@ -1,8 +1,9 @@
 package fireflyIII
 
 import (
-	"bytes"
 	"time"
+
+	"golang.org/x/text/encoding/unicode"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
@@ -42,8 +43,8 @@ var (
 
 // ParseImportedData returns the imported data by parsing the firefly III transaction csv data
 func (c *fireflyIIITransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	reader := bytes.NewReader(data)
-	dataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader, true)
+	csvReader := csv.CreateNewCsvReaderFromData(data, unicode.UTF8.NewDecoder(), ',', true)
+	dataTable, err := csvReader.ReadToCsvFileBasicDataTable(ctx, true)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err

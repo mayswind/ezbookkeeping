@@ -138,6 +138,27 @@ func (t *camtStatementTransactionDataRowIterator) HasNext() bool {
 	return false
 }
 
+// CurrentRowId returns current row id
+func (t *camtStatementTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentStatementIndex < 0 || t.currentStatementIndex >= len(t.dataTable.allStatements) {
+		return ""
+	}
+
+	statement := t.dataTable.allStatements[t.currentStatementIndex]
+
+	if statement == nil || t.currentEntryIndex < 0 || t.currentEntryIndex >= len(statement.Entries) {
+		return ""
+	}
+
+	entry := statement.Entries[t.currentEntryIndex]
+
+	if entry == nil || entry.EntryDetails == nil || t.currentTransactionDetailsIndex < 0 || t.currentTransactionDetailsIndex >= len(entry.EntryDetails.TransactionDetails) {
+		return ""
+	}
+
+	return fmt.Sprintf("statement:%d-entry:%d-record:%d", t.currentStatementIndex+1, t.currentEntryIndex+1, t.currentTransactionDetailsIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *camtStatementTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	allStatements := t.dataTable.allStatements
@@ -203,7 +224,7 @@ func (t *camtStatementTransactionDataRowIterator) Next(ctx core.Context, user *m
 	rowItems, err := t.parseTransaction(ctx, user, account, entry, transactionDetails)
 
 	if err != nil {
-		log.Errorf(ctx, "[camt_statement_transaction_data_table.Next] cannot parsing transaction in entry#%d-transaction_detail#%d (statement#%d), because %s", t.currentEntryIndex, t.currentTransactionDetailsIndex, t.currentStatementIndex, err.Error())
+		log.Errorf(ctx, "[camt_statement_transaction_data_table.Next] cannot parsing transaction in %s, because %s", t.CurrentRowId(), err.Error())
 		return nil, err
 	}
 
@@ -220,14 +241,14 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 	data := make(map[datatable.TransactionDataTableColumn]string, len(camtTransactionSupportedColumns))
 
 	if account == nil {
-		return nil, errs.ErrMissingAccountData
+		return nil, errs.NewImportError(errs.ErrMissingAccountData, t.CurrentRowId())
 	}
 
 	if entry.BookingDate != nil && entry.BookingDate.DateTime != "" {
 		dateTime, err := utils.ParseFromLongDateTimeWithTimezoneRFC3339Format(entry.BookingDate.DateTime)
 
 		if err != nil {
-			return nil, errs.ErrTransactionTimeInvalid
+			return nil, errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), entry.BookingDate.DateTime)
 		}
 
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
@@ -236,7 +257,7 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = fmt.Sprintf("%s 00:00:00", entry.BookingDate.Date)
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIMEZONE] = datatable.TRANSACTION_DATA_TABLE_TIMEZONE_NOT_AVAILABLE
 	} else {
-		return nil, errs.ErrMissingTransactionTime
+		return nil, errs.NewImportError(errs.ErrMissingTransactionTime, t.CurrentRowId())
 	}
 
 	if account.IBAN != "" {
@@ -252,7 +273,7 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 	} else if account.Currency != "" {
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = account.Currency
 	} else {
-		return nil, errs.ErrAccountCurrencyInvalid
+		return nil, errs.NewImportError(errs.ErrAccountCurrencyInvalid, t.CurrentRowId())
 	}
 
 	amountValue := ""
@@ -263,21 +284,21 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 		} else if transactionDetails.AmountDetails != nil && transactionDetails.AmountDetails.TransactionAmount != nil && transactionDetails.AmountDetails.TransactionAmount.Value != "" {
 			amountValue = transactionDetails.AmountDetails.TransactionAmount.Value
 		} else {
-			return nil, errs.ErrAmountInvalid
+			return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId())
 		}
 	} else if entry.Amount != nil && entry.Amount.Value != "" {
 		amountValue = entry.Amount.Value
 	}
 
 	if amountValue == "" {
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId())
 	}
 
 	amount, err := utils.ParseAmount(amountValue)
 
 	if err != nil {
 		log.Errorf(ctx, "[camt_statement_transaction_data_table.parseTransaction] cannot parsing transaction amount \"%s\", because %s", amountValue, err.Error())
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), amountValue)
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
@@ -287,7 +308,7 @@ func (t *camtStatementTransactionDataRowIterator) parseTransaction(ctx core.Cont
 	} else if entry.CreditDebitIndicator == CAMT_INDICATOR_DEBIT {
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = utils.IntToString(int(models.TRANSACTION_TYPE_EXPENSE))
 	} else {
-		return nil, errs.ErrTransactionTypeInvalid
+		return nil, errs.NewImportError(errs.ErrTransactionTypeInvalid, t.CurrentRowId())
 	}
 
 	if transactionDetails != nil && transactionDetails.AdditionalTransactionInformation != "" {

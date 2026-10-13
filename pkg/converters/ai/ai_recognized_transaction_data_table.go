@@ -1,6 +1,8 @@
 package ai
 
 import (
+	"fmt"
+
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -78,6 +80,15 @@ func (t *aiRecognizedTransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allData)
 }
 
+// CurrentRowId returns current row id
+func (t *aiRecognizedTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentIndex < 0 || t.currentIndex >= len(t.dataTable.allData) {
+		return ""
+	}
+
+	return fmt.Sprintf("record:%d", t.currentIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *aiRecognizedTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	if t.currentIndex+1 >= len(t.dataTable.allData) {
@@ -90,7 +101,7 @@ func (t *aiRecognizedTransactionDataRowIterator) Next(ctx core.Context, user *mo
 	rowItems, err := t.parseTransaction(ctx, user, data)
 
 	if err != nil {
-		log.Errorf(ctx, "[ai_recognized_transaction_data_table.Next] cannot parsing transaction in row#%d, because %s", t.currentIndex, err.Error())
+		log.Errorf(ctx, "[ai_recognized_transaction_data_table.Next] cannot parsing transaction in %s, because %s", t.CurrentRowId(), err.Error())
 		return nil, err
 	}
 

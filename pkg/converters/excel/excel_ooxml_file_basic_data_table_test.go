@@ -678,3 +678,124 @@ func TestCreateNewExcelOOXMLFileBasicDataTables_DataRowIterator_DifferentHeaders
 	assert.Equal(t, "2-B2", row.GetData(1))
 	assert.False(t, iterator1.HasNext())
 }
+
+func TestExcelOOXMLFileBasicDataRowIteratorCurrentRowId(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelOOXMLFileBasicDataTable(testdata, false)
+	assert.Nil(t, err)
+	iterator := datatable.DataRowIterator()
+
+	// not started
+	assert.Equal(t, "", iterator.CurrentRowId())
+
+	// data row 1
+	assert.NotNil(t, iterator.Next())
+	assert.Equal(t, "row:1", iterator.CurrentRowId())
+
+	// data row 2
+	assert.NotNil(t, iterator.Next())
+	assert.Equal(t, "row:2", iterator.CurrentRowId())
+
+	// data row 3
+	assert.NotNil(t, iterator.Next())
+	assert.Equal(t, "row:3", iterator.CurrentRowId())
+
+	// not existed data row 4
+	assert.Nil(t, iterator.Next())
+	assert.Equal(t, "", iterator.CurrentRowId())
+}
+
+func TestExcelOOXMLFileBasicDataRowIteratorCurrentRowId_HasTitleLine(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelOOXMLFileBasicDataTable(testdata, true)
+	assert.Nil(t, err)
+	iterator := datatable.DataRowIterator()
+
+	// data row 1
+	assert.NotNil(t, iterator.Next())
+	assert.Equal(t, "row:2", iterator.CurrentRowId())
+
+	// data row 2
+	assert.NotNil(t, iterator.Next())
+	assert.Equal(t, "row:3", iterator.CurrentRowId())
+
+	// not existed data row 3
+	assert.Nil(t, iterator.Next())
+	assert.Equal(t, "", iterator.CurrentRowId())
+}
+
+func TestExcelOOXMLFileBasicDataRowIteratorCurrentRowId_MultipleSheets(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelOOXMLFileBasicDataTable(testdata, false)
+	assert.Nil(t, err)
+	iterator := datatable.DataRowIterator()
+
+	// not started
+	assert.Equal(t, "", iterator.CurrentRowId())
+
+	expectedRowIds := []string{
+		"sheet:1-row:1",
+		"sheet:1-row:2",
+		"sheet:1-row:3",
+		"sheet:2-row:1",
+		"sheet:2-row:2",
+		"sheet:3-row:1",
+		"sheet:4-row:1",
+		"sheet:4-row:2",
+		"sheet:4-row:3",
+	}
+
+	for _, expectedRowId := range expectedRowIds {
+		assert.NotNil(t, iterator.Next())
+		assert.Equal(t, expectedRowId, iterator.CurrentRowId())
+	}
+
+	// not existed data row
+	assert.Nil(t, iterator.Next())
+	assert.Equal(t, "", iterator.CurrentRowId())
+}
+
+func TestExcelOOXMLFileBasicDataRowIteratorCurrentRowId_MultipleSheets_HasTitleLine(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelOOXMLFileBasicDataTable(testdata, true)
+	assert.Nil(t, err)
+	iterator := datatable.DataRowIterator()
+
+	expectedRowIds := []string{
+		"sheet:1-row:2",
+		"sheet:1-row:3",
+		"sheet:2-row:2",
+		"sheet:4-row:2",
+		"sheet:4-row:3",
+	}
+
+	for _, expectedRowId := range expectedRowIds {
+		assert.NotNil(t, iterator.Next())
+		assert.Equal(t, expectedRowId, iterator.CurrentRowId())
+	}
+
+	// not existed data row
+	assert.Nil(t, iterator.Next())
+	assert.Equal(t, "", iterator.CurrentRowId())
+}
+
+func TestExcelOOXMLFileBasicDataRowIteratorCurrentRowId_EmptyContent(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/empty_excel_file.xlsx")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelOOXMLFileBasicDataTable(testdata, false)
+	assert.Nil(t, err)
+	iterator := datatable.DataRowIterator()
+	assert.Equal(t, "", iterator.CurrentRowId())
+
+	assert.Nil(t, iterator.Next())
+	assert.Equal(t, "", iterator.CurrentRowId())
+}

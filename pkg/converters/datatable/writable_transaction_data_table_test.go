@@ -23,7 +23,7 @@ func (p *testDataRowParser) GetAddedColumns() []TransactionDataTableColumn {
 }
 
 // Parse returns the converted transaction data row
-func (p *testDataRowParser) Parse(data map[TransactionDataTableColumn]string) (rowData map[TransactionDataTableColumn]string, rowDataValid bool, err error) {
+func (p *testDataRowParser) Parse(data map[TransactionDataTableColumn]string, rowId string) (rowData map[TransactionDataTableColumn]string, rowDataValid bool, err error) {
 	rowData = make(map[TransactionDataTableColumn]string, len(data))
 
 	for column, value := range data {

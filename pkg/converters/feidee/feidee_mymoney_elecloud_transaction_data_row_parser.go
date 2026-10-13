@@ -39,7 +39,7 @@ func (p *feideeMymoneyElecloudTransactionDataRowParser) GetAddedColumns() []data
 }
 
 // Parse returns the converted transaction data row
-func (p *feideeMymoneyElecloudTransactionDataRowParser) Parse(data map[datatable.TransactionDataTableColumn]string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
+func (p *feideeMymoneyElecloudTransactionDataRowParser) Parse(data map[datatable.TransactionDataTableColumn]string, rowId string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
 	rowData = make(map[datatable.TransactionDataTableColumn]string, len(data))
 
 	for column, value := range data {
@@ -52,7 +52,7 @@ func (p *feideeMymoneyElecloudTransactionDataRowParser) Parse(data map[datatable
 		amount, err := utils.ParseAmount(rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 
 		if err != nil {
-			return nil, false, errs.ErrAmountInvalid
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, rowId, rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 		}
 
 		// balance modification transaction in feidee mymoney (elecloud) is not the opening balance transaction, it can be added many times
@@ -66,7 +66,7 @@ func (p *feideeMymoneyElecloudTransactionDataRowParser) Parse(data map[datatable
 		amount, err := utils.ParseAmount(rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 
 		if err != nil {
-			return nil, false, errs.ErrAmountInvalid
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, rowId, rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 		}
 
 		// outstanding balance modification transaction in feidee mymoney app is not the opening balance transaction, it can be added many times

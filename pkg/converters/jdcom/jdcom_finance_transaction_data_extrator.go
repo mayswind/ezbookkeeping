@@ -3,7 +3,6 @@ package jdcom
 import (
 	"strings"
 
-	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -12,12 +11,16 @@ import (
 
 func createNewJDComFinanceTransactionBasicDataTable(ctx core.Context, originalDataTable datatable.BasicDataTable) (datatable.BasicDataTable, error) {
 	iterator := originalDataTable.DataRowIterator()
-	allOriginalLines := make([][]string, 0)
 	hasFileHeader := false
 	foundDataHeaderLine := false
+	headerColumnCount := 0
+	fromIndex := 0
+	toIndex := originalDataTable.DataRowCount()
+	currentIndex := -1
 
 	for iterator.HasNext() {
 		row := iterator.Next()
+		currentIndex++
 
 		if !hasFileHeader {
 			if row.ColumnCount() <= 0 {
@@ -26,7 +29,7 @@ func createNewJDComFinanceTransactionBasicDataTable(ctx core.Context, originalDa
 				hasFileHeader = true
 				continue
 			} else {
-				log.Warnf(ctx, "[jdcom_finance_transaction_data_extrator.createNewJDComFinanceTransactionBasicDataTable] read unexpected line in row \"%s\" before read file header", iterator.CurrentRowId())
+				log.Warnf(ctx, "[jdcom_finance_transaction_data_extrator.createNewJDComFinanceTransactionBasicDataTable] read unexpected line in \"%s\" before read file header", iterator.CurrentRowId())
 				continue
 			}
 		}
@@ -46,18 +49,13 @@ func createNewJDComFinanceTransactionBasicDataTable(ctx core.Context, originalDa
 				continue
 			}
 
-			items := make([]string, row.ColumnCount())
-
-			for i := 0; i < row.ColumnCount(); i++ {
-				items[i] = strings.TrimRight(strings.Trim(row.GetData(i), " "), "\t")
+			if headerColumnCount == 0 {
+				headerColumnCount = row.ColumnCount()
+				fromIndex = currentIndex
+			} else if headerColumnCount > 0 && row.ColumnCount() < headerColumnCount {
+				log.Errorf(ctx, "[jdcom_finance_transaction_data_extrator.createNewJDComFinanceTransactionBasicDataTable] cannot parse \"%s\", because may missing some columns (column count %d in data row is less than header column count %d)", iterator.CurrentRowId(), row.ColumnCount(), headerColumnCount)
+				return nil, errs.NewImportError(errs.ErrFewerFieldsInDataRowThanInHeaderRow, iterator.CurrentRowId())
 			}
-
-			if len(allOriginalLines) > 0 && len(items) < len(allOriginalLines[0]) {
-				log.Errorf(ctx, "[jdcom_finance_transaction_data_extrator.createNewJDComFinanceTransactionBasicDataTable] cannot parse row \"%s\", because may missing some columns (column count %d in data row is less than header column count %d)", iterator.CurrentRowId(), len(items), len(allOriginalLines[0]))
-				return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
-			}
-
-			allOriginalLines = append(allOriginalLines, items)
 		}
 	}
 
@@ -65,10 +63,12 @@ func createNewJDComFinanceTransactionBasicDataTable(ctx core.Context, originalDa
 		return nil, errs.ErrInvalidFileHeader
 	}
 
-	if len(allOriginalLines) < 2 {
+	if toIndex-fromIndex < 2 {
 		log.Errorf(ctx, "[jdcom_finance_transaction_data_extrator.createNewJDComFinanceTransactionBasicDataTable] cannot parse import data, because data table row count is less 1")
 		return nil, errs.ErrNotFoundTransactionDataInFile
 	}
 
-	return csv.CreateNewCustomCsvBasicDataTable(allOriginalLines, true), nil
+	return datatable.CreateSubBasicTableWithParser(originalDataTable, fromIndex, toIndex, true, func(data string) string {
+		return strings.TrimRight(data, "\t")
+	}), nil
 }

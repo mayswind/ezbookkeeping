@@ -1,12 +1,10 @@
 package feidee
 
 import (
-	"bytes"
 	"strings"
 	"time"
 
 	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
@@ -63,10 +61,9 @@ var (
 
 // ParseImportedData returns the imported data by parsing the feidee mymoney app transaction csv data
 func (c *feideeMymoneyAppTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	fallback := unicode.UTF8.NewDecoder()
-	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
-
-	csvDataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader, false)
+	fallbackDecoder := unicode.UTF8.NewDecoder()
+	csvReader := csv.CreateNewCsvReaderFromData(data, unicode.BOMOverride(fallbackDecoder), ',', true)
+	csvDataTable, err := csvReader.ReadToCsvFileBasicDataTable(ctx, false)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -153,8 +150,8 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 		rowId := commonDataTableIterator.CurrentRowId()
 
 		if dataRow.ColumnCount() < commonDataTable.HeaderColumnCount() {
-			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse row \"%s\", because may missing some columns (column count %d in data row is less than header column count %d)", rowId, dataRow.ColumnCount(), commonDataTable.HeaderColumnCount())
-			return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
+			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse \"%s\", because may missing some columns (column count %d in data row is less than header column count %d)", rowId, dataRow.ColumnCount(), commonDataTable.HeaderColumnCount())
+			return nil, errs.NewImportError(errs.ErrFewerFieldsInDataRowThanInHeaderRow, rowId)
 		}
 
 		data := make(map[datatable.TransactionDataTableColumn]string, 11)
@@ -191,8 +188,8 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 			}
 
 			if relatedId == "" {
-				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] transfer transaction has blank related id in row \"%s\"", rowId)
-				return nil, errs.ErrRelatedIdCannotBeBlank
+				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] transfer transaction has blank related id in \"%s\"", rowId)
+				return nil, errs.NewImportError(errs.ErrRelatedIdCannotBeBlank, rowId)
 			}
 
 			relatedData, exists := transferTransactionsMap[relatedId]
@@ -217,12 +214,12 @@ func (c *feideeMymoneyAppTransactionDataCsvFileImporter) createNewFeideeMymoneyA
 				transactionDataTable.Add(data)
 				delete(transferTransactionsMap, relatedId)
 			} else {
-				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] transfer transaction type \"%s\" is not expected in row \"%s\"", transactionType, rowId)
-				return nil, errs.ErrTransactionTypeInvalid
+				log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] transfer transaction type \"%s\" is not expected in \"%s\"", transactionType, rowId)
+				return nil, errs.NewImportError(errs.ErrTransactionTypeInvalid, rowId, transactionType)
 			}
 		} else {
-			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse transaction type \"%s\" in row \"%s\"", transactionType, rowId)
-			return nil, errs.ErrTransactionTypeInvalid
+			log.Errorf(ctx, "[feidee_mymoney_app_transaction_data_csv_file_importer.createNewFeideeMymoneyAppTransactionDataTable] cannot parse transaction type \"%s\" in \"%s\"", transactionType, rowId)
+			return nil, errs.NewImportError(errs.ErrTransactionTypeInvalid, rowId, transactionType)
 		}
 	}
 

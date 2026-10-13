@@ -198,7 +198,7 @@ import { AMOUNT_FACTOR, DISPLAY_HIDDEN_AMOUNT, INCOMPLETE_AMOUNT_SUFFIX } from '
 import { UTC_TIMEZONE, ALL_TIMEZONES } from '@/consts/timezone.ts';
 import { ALL_CURRENCIES, ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currency.ts';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
-import { KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS } from '@/consts/api.ts';
+import { PARSE_TRANSACTION_API_URL_PATH, KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS, SUPPORTED_PARSE_TRANSACTION_RECORD_ID_TYPES } from '@/consts/api.ts';
 import { OAUTH2_PROVIDER_DISPLAY_NAME } from '@/consts/oauth2.ts';
 import { DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE, SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE, SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES } from '@/consts/file.ts';
 
@@ -555,6 +555,61 @@ export function useI18n() {
         }
 
         return localizedParameters;
+    }
+
+    function getLocalizedErrorForParseImportTransactionsAPI(translatedMessage: string, recordId: string | undefined, originalData: unknown | undefined): string {
+        if (!isDefined(recordId) && !isDefined(originalData)) {
+            return translatedMessage;
+        }
+
+        const localizedRecordIds: string[] = [];
+
+        if (isString(recordId)) {
+            for (const recordIdItem of recordId.split('-')) {
+                const parts = recordIdItem.split(':');
+
+                if (parts.length !== 2) {
+                    localizedRecordIds.length = 0;
+                    break;
+                }
+
+                const recordIdType = parts[0]!;
+                const recordIdIndex = parts[1]!;
+                const recordIdTypeI18nKey = SUPPORTED_PARSE_TRANSACTION_RECORD_ID_TYPES[recordIdType];
+
+                if (!recordIdTypeI18nKey || !recordIdIndex) {
+                    localizedRecordIds.length = 0;
+                    break;
+                }
+
+                localizedRecordIds.push(t(recordIdTypeI18nKey, {
+                    index: recordIdIndex
+                }));
+            }
+        }
+
+        const textualOriginalData: string | undefined = isString(originalData) ? (originalData.length > 0 ? originalData : undefined) : (isDefined(originalData) ? JSON.stringify(originalData) : undefined);
+        const textualRecordId: string | undefined = localizedRecordIds.length > 0 ? localizedRecordIds.join(t('format.misc.multiIndexJoinSeparator')) : undefined;
+
+        if (isDefined(textualRecordId) && isDefined(textualOriginalData)) {
+            return t('format.misc.importTransactionParseErrorWithRecordIdAndData', {
+                error: translatedMessage,
+                recordId: textualRecordId,
+                data: textualOriginalData
+            });
+        } else if (isDefined(textualRecordId)) {
+            return t('format.misc.importTransactionParseErrorWithRecordId', {
+                error: translatedMessage,
+                recordId: textualRecordId
+            });
+        } else if (isDefined(textualOriginalData)) {
+            return t('format.misc.importTransactionParseErrorWithData', {
+                error: translatedMessage,
+                data: textualOriginalData
+            });
+        } else {
+            return translatedMessage;
+        }
     }
 
     function getDateTimeLocaleData(): DateTimeLocaleData {
@@ -1009,7 +1064,15 @@ export function useI18n() {
             return '';
         }
 
-        return t(finalMessage, parameters);
+        const translatedMessage = t(finalMessage, parameters);
+
+        if (isObject(message) && isObject(message.error) && isString(message.error.path) && isObject(message.error.context)) {
+            if (message.error.path.endsWith(PARSE_TRANSACTION_API_URL_PATH)) {
+                return getLocalizedErrorForParseImportTransactionsAPI(translatedMessage, message.error.context.recordId, message.error.context.originalData);
+            }
+        }
+
+        return translatedMessage;
     }
 
     function joinMultiText(textArray: string[]): string {

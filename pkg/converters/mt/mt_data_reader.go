@@ -3,6 +3,7 @@ package mt
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"strings"
 
 	"golang.org/x/text/encoding/unicode"
@@ -57,6 +58,7 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 
 	for i := 0; i < len(r.allLines); i++ {
 		line := strings.TrimSpace(r.allLines[i])
+		recordId := fmt.Sprintf("line:%d", i+1)
 
 		if len(line) < 1 {
 			continue
@@ -84,7 +86,7 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 			data.SequentialNumber = line[len(mtTagSequentialNumber):]
 			lastTag = mtTagSequentialNumber
 		} else if strings.HasPrefix(line, mtTagOpeningBalanceF) || strings.HasPrefix(line, mtTagOpeningBalanceM) {
-			balance, err := r.parseBalance(ctx, line[len(mtTagOpeningBalanceF):])
+			balance, err := r.parseBalance(ctx, recordId, line[len(mtTagOpeningBalanceF):])
 
 			if err != nil {
 				return nil, err
@@ -93,7 +95,7 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 			data.OpeningBalance = balance
 			lastTag = line[:len(mtTagOpeningBalanceF)]
 		} else if strings.HasPrefix(line, mtTagClosingBalanceF) || strings.HasPrefix(line, mtTagClosingBalanceM) {
-			balance, err := r.parseBalance(ctx, line[len(mtTagClosingBalanceF):])
+			balance, err := r.parseBalance(ctx, recordId, line[len(mtTagClosingBalanceF):])
 
 			if err != nil {
 				return nil, err
@@ -102,7 +104,7 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 			data.ClosingBalance = balance
 			lastTag = line[:len(mtTagClosingBalanceF)]
 		} else if strings.HasPrefix(line, mtTagClosingAvailableBalance) {
-			balance, err := r.parseBalance(ctx, line[len(mtTagClosingAvailableBalance):])
+			balance, err := r.parseBalance(ctx, recordId, line[len(mtTagClosingAvailableBalance):])
 
 			if err != nil {
 				return nil, err
@@ -115,7 +117,7 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 				data.Statements = append(data.Statements, currentStatement)
 			}
 
-			statement, err := r.parseStatement(ctx, line[len(mtTagStatementLine):])
+			statement, err := r.parseStatement(ctx, recordId, line[len(mtTagStatementLine):])
 
 			if err != nil {
 				return nil, err
@@ -145,18 +147,18 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 	return data, nil
 }
 
-func (r *mt940DataReader) parseBalance(ctx core.Context, data string) (*mtBalance, error) {
+func (r *mt940DataReader) parseBalance(ctx core.Context, recordId string, data string) (*mtBalance, error) {
 	// 1!a (debit/credit mark)
 	// 6!n (date)
 	// 3!a (currency)
 	// 15d (amount)
 	if len(data) < 9 {
-		return nil, errs.ErrInvalidMT940File
+		return nil, errs.NewImportError(errs.ErrInvalidMT940File, recordId, data)
 	}
 
 	if data[0] != MT_MARK_DEBIT[0] && data[0] != MT_MARK_CREDIT[0] {
 		log.Errorf(ctx, "[mt_data_reader.parseBalance] cannot parse unknown debit/credit mark, current line is %s", data)
-		return nil, errs.ErrTransactionTypeInvalid
+		return nil, errs.NewImportError(errs.ErrTransactionTypeInvalid, recordId, data)
 	}
 
 	balance := &mtBalance{
@@ -169,7 +171,7 @@ func (r *mt940DataReader) parseBalance(ctx core.Context, data string) (*mtBalanc
 	return balance, nil
 }
 
-func (r *mt940DataReader) parseStatement(ctx core.Context, data string) (*mtStatement, error) {
+func (r *mt940DataReader) parseStatement(ctx core.Context, recordId string, data string) (*mtStatement, error) {
 	// 6!n (value date)
 	// [4!n] (entry date, optional)
 	// 2a (debit/credit mark)
@@ -180,7 +182,7 @@ func (r *mt940DataReader) parseStatement(ctx core.Context, data string) (*mtStat
 	// [//16x] (reference of account servicing institution, optional)
 	// [34x] (supplementary details, optional)
 	if len(data) < 6 {
-		return nil, errs.ErrInvalidMT940File
+		return nil, errs.NewImportError(errs.ErrInvalidMT940File, recordId, data)
 	}
 
 	statement := &mtStatement{
@@ -204,7 +206,7 @@ func (r *mt940DataReader) parseStatement(ctx core.Context, data string) (*mtStat
 		currentIndex += 2
 	} else {
 		log.Errorf(ctx, "[mt_data_reader.parseStatement] cannot parse unknown debit/credit mark, current line is %s", data)
-		return nil, errs.ErrTransactionTypeInvalid
+		return nil, errs.NewImportError(errs.ErrTransactionTypeInvalid, recordId, data)
 	}
 
 	// parse funds code if available
@@ -227,7 +229,7 @@ func (r *mt940DataReader) parseStatement(ctx core.Context, data string) (*mtStat
 
 	if len(statement.Amount) < 1 {
 		log.Errorf(ctx, "[mt_data_reader.parseStatement] cannot parse amount, current line is %s", data)
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, recordId, data)
 	}
 
 	// parse transaction type identification code
@@ -236,7 +238,7 @@ func (r *mt940DataReader) parseStatement(ctx core.Context, data string) (*mtStat
 		currentIndex += 4
 	} else {
 		log.Errorf(ctx, "[mt_data_reader.parseStatement] cannot parse transaction type identification code, current line is %s", data)
-		return nil, errs.ErrInvalidMT940File
+		return nil, errs.NewImportError(errs.ErrInvalidMT940File, recordId, data)
 	}
 
 	// parse reference for account owner if available
@@ -253,7 +255,7 @@ func (r *mt940DataReader) parseStatement(ctx core.Context, data string) (*mtStat
 
 	if len(statement.ReferenceForAccountOwner) < 1 {
 		log.Errorf(ctx, "[mt_data_reader.parseStatement] cannot parse reference for account owner, current line is %s", data)
-		return nil, errs.ErrInvalidMT940File
+		return nil, errs.NewImportError(errs.ErrInvalidMT940File, recordId, data)
 	}
 
 	// parse reference of account servicing institution if available

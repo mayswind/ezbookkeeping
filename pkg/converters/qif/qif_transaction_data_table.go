@@ -1,6 +1,7 @@
 package qif
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
@@ -93,6 +94,15 @@ func (t *qifTransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allData)
 }
 
+// CurrentRowId returns current row id
+func (t *qifTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentIndex < 0 || t.currentIndex >= len(t.dataTable.allData) {
+		return ""
+	}
+
+	return fmt.Sprintf("record:%d", t.currentIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *qifTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	if t.currentIndex+1 >= len(t.dataTable.allData) {
@@ -105,7 +115,7 @@ func (t *qifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 	rowItems, err := t.parseTransaction(ctx, user, data)
 
 	if err != nil {
-		log.Errorf(ctx, "[qif_transaction_data_table.Next] cannot parsing transaction in row#%d, because %s", t.currentIndex, err.Error())
+		log.Errorf(ctx, "[qif_transaction_data_table.Next] cannot parsing transaction in %s, because %s", t.CurrentRowId(), err.Error())
 		return nil, err
 	}
 
@@ -120,7 +130,7 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	data := make(map[datatable.TransactionDataTableColumn]string, len(qifTransactionSupportedColumns))
 
 	if qifTransaction.Date == "" {
-		return nil, errs.ErrMissingTransactionTime
+		return nil, errs.NewImportError(errs.ErrMissingTransactionTime, t.CurrentRowId())
 	}
 
 	transactionTime, err := t.parseTransactionTime(ctx, qifTransaction.Date)
@@ -132,13 +142,13 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = transactionTime
 
 	if qifTransaction.Amount == "" {
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId())
 	}
 
 	amount, err := utils.ParseAmount(strings.ReplaceAll(qifTransaction.Amount, ",", "")) // trim thousands separator
 
 	if err != nil {
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), qifTransaction.Amount)
 	}
 
 	if qifTransaction.Account != nil {
@@ -222,7 +232,7 @@ func (t *qifTransactionDataRowIterator) parseTransactionTime(ctx core.Context, d
 
 	if year == "" || month == "" || day == "" {
 		log.Errorf(ctx, "[qif_transaction_data_table.parseTransactionTime] cannot parse date \"%s\"", date)
-		return "", errs.ErrTransactionTimeInvalid
+		return "", errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), date)
 	}
 
 	return utils.FormatYearMonthDayToLongDateTime(year, month, day)

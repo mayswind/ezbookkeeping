@@ -237,7 +237,7 @@ func TestAlipayCsvFileImporterParseImportedData_ParseInvalidType(t *testing.T) {
 	assert.Nil(t, err)
 
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
-	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
+	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
 }
 
 func TestAlipayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T) {
@@ -612,7 +612,7 @@ func TestAlipayCsvFileImporterParseImportedData_SkipUnknownProductTransferTransa
 	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
 }
 
-func TestAlipayCsvFileImporterParseImportedData_SkipUnknownStatusTransaction(t *testing.T) {
+func TestAlipayCsvFileImporterParseImportedData_UnknownStatusTransaction(t *testing.T) {
 	importer := AlipayWebTransactionDataCsvFileImporter
 	context := core.NewNullContext()
 
@@ -627,6 +627,38 @@ func TestAlipayCsvFileImporterParseImportedData_SkipUnknownStatusTransaction(t *
 		"---------------------------------交易记录明细列表------------------------------------\n" +
 		"交易创建时间              ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
 		"2024-09-01 01:23:45 ,xxxx            ,0.12   ,收入      ,xxxx    ,\n" +
+		"------------------------------------------------------------------------------------\n")
+	assert.Nil(t, err)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrTransactionTypeInvalid.Message)
+}
+
+func TestAlipayCsvFileImporterParseImportedData_SkipClosedTransaction(t *testing.T) {
+	importer := AlipayWebTransactionDataCsvFileImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	data, err := simplifiedchinese.GB18030.NewEncoder().String("支付宝交易记录明细查询\n" +
+		"账号:[xxx@xxx.xxx]\n" +
+		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
+		"---------------------------------交易记录明细列表------------------------------------\n" +
+		"交易创建时间              ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 01:23:45 ,xxxx            ,0.12   ,收入      ,交易关闭    ,\n" +
+		"------------------------------------------------------------------------------------\n")
+	assert.Nil(t, err)
+	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	assert.EqualError(t, err, errs.ErrNotFoundTransactionDataInFile.Message)
+
+	data, err = simplifiedchinese.GB18030.NewEncoder().String("支付宝交易记录明细查询\n" +
+		"账号:[xxx@xxx.xxx]\n" +
+		"起始日期:[2024-01-01 00:00:00]    终止日期:[2024-09-01 23:59:59]\n" +
+		"---------------------------------交易记录明细列表------------------------------------\n" +
+		"交易创建时间              ,商品名称                ,金额（元）,收/支     ,交易状态    ,\n" +
+		"2024-09-01 01:23:45 ,xxxx            ,0.12   ,收入      ,已关闭    ,\n" +
 		"------------------------------------------------------------------------------------\n")
 	assert.Nil(t, err)
 	_, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)

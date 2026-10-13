@@ -94,6 +94,11 @@ func (t *basicDataTableToTransactionDataTableWrapperRowIterator) HasNext() bool 
 	return t.innerIterator.HasNext()
 }
 
+// CurrentRowId returns current row id
+func (t *basicDataTableToTransactionDataTableWrapperRowIterator) CurrentRowId() string {
+	return t.innerIterator.CurrentRowId()
+}
+
 // Next returns the next transaction data row
 func (t *basicDataTableToTransactionDataTableWrapperRowIterator) Next(ctx core.Context, user *models.User) (daraRow TransactionDataRow, err error) {
 	basicDataRow := t.innerIterator.Next()
@@ -112,7 +117,7 @@ func (t *basicDataTableToTransactionDataTableWrapperRowIterator) Next(ctx core.C
 
 	if basicDataRow.ColumnCount() < len(t.transactionDataTable.dataColumnIndexes) {
 		log.Errorf(ctx, "[basic_data_table_to_transaction_data_table_wrapper.Next] cannot parse data row, because may missing some columns (column count %d in data row is less than header column count %d)", basicDataRow.ColumnCount(), len(t.transactionDataTable.dataColumnIndexes))
-		return nil, errs.ErrFewerFieldsInDataRowThanInHeaderRow
+		return nil, errs.NewImportError(errs.ErrFewerFieldsInDataRowThanInHeaderRow, t.innerIterator.CurrentRowId())
 	}
 
 	rowData := make(map[TransactionDataTableColumn]string, len(t.transactionDataTable.dataColumnIndexes))
@@ -128,7 +133,7 @@ func (t *basicDataTableToTransactionDataTableWrapperRowIterator) Next(ctx core.C
 	}
 
 	if t.transactionDataTable.rowParser != nil {
-		rowData, rowDataValid, err = t.transactionDataTable.rowParser.Parse(rowData)
+		rowData, rowDataValid, err = t.transactionDataTable.rowParser.Parse(rowData, t.innerIterator.CurrentRowId())
 
 		if err != nil {
 			log.Errorf(ctx, "[basic_data_table_to_transaction_data_table_wrapper.Next] cannot parse data row, because %s", err.Error())

@@ -1,11 +1,9 @@
 package jdcom
 
 import (
-	"bytes"
 	"time"
 
 	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
@@ -29,10 +27,9 @@ var (
 
 // ParseImportedData returns the imported data by parsing the jd.com finance transaction csv data
 func (c *jdComFinanceTransactionDataCsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	fallback := unicode.UTF8.NewDecoder()
-	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
-
-	csvDataTable, err := csv.CreateNewCsvBasicDataTable(ctx, reader, false)
+	fallbackDecoder := unicode.UTF8.NewDecoder()
+	csvReader := csv.CreateNewCsvReaderFromData(data, unicode.BOMOverride(fallbackDecoder), ',', true)
+	csvDataTable, err := csvReader.ReadToCsvFileBasicDataTable(ctx, false)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err

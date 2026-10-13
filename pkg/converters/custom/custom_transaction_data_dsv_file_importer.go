@@ -1,10 +1,6 @@
 package custom
 
 import (
-	"bytes"
-	"encoding/csv"
-	"io"
-	"strings"
 	"time"
 
 	"golang.org/x/text/encoding"
@@ -15,14 +11,12 @@ import (
 	"golang.org/x/text/encoding/traditionalchinese"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/encoding/unicode/utf32"
-	"golang.org/x/text/transform"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/converter"
-	csvconverter "github.com/mayswind/ezbookkeeping/pkg/converters/csv"
+	"github.com/mayswind/ezbookkeeping/pkg/converters/csv"
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
-	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
@@ -112,48 +106,26 @@ type customTransactionDataDsvFileImporter struct {
 
 // ParseDataLines returns the parsed file lines for specified the dsv file data
 func (c *customTransactionDataDsvFileImporter) ParseDataLines(ctx core.Context, data []byte) ([][]string, error) {
-	reader := transform.NewReader(bytes.NewReader(data), c.fileEncoding.NewDecoder())
-	csvReader := csv.NewReader(reader)
-	csvReader.Comma = c.separator
-	csvReader.FieldsPerRecord = -1
+	csvReader := csv.CreateNewCsvReaderFromData(data, c.fileEncoding.NewDecoder(), c.separator, true)
+	lines, err := csvReader.ReadAllLines(ctx)
+	textualLines := make([][]string, len(lines))
 
-	allLines := make([][]string, 0)
-
-	for {
-		items, err := csvReader.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			log.Errorf(ctx, "[custom_transaction_data_dsv_file_importer.ParseDataLines] cannot parse dsv data, because %s", err.Error())
-			return nil, errs.ErrInvalidCSVFile
-		}
-
-		if len(items) == 1 && items[0] == "" {
-			continue
-		}
-
-		for index := range items {
-			items[index] = strings.Trim(items[index], " ")
-		}
-
-		allLines = append(allLines, items)
+	for i := 0; i < len(lines); i++ {
+		textualLines[i] = lines[i].Items
 	}
 
-	return allLines, nil
+	return textualLines, err
 }
 
 // ParseImportedData returns the imported data by parsing the custom transaction dsv data
 func (c *customTransactionDataDsvFileImporter) ParseImportedData(ctx core.Context, user *models.User, data []byte, defaultTimezone *time.Location, additionalOptions converter.TransactionDataImporterOptions, accountMap map[string]*models.Account, expenseCategoryMap map[string]map[string]*models.TransactionCategory, incomeCategoryMap map[string]map[string]*models.TransactionCategory, transferCategoryMap map[string]map[string]*models.TransactionCategory, tagMap map[string]*models.TransactionTag) (models.ImportedTransactionSlice, []*models.Account, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionCategory, []*models.TransactionTag, error) {
-	allLines, err := c.ParseDataLines(ctx, data)
+	csvReader := csv.CreateNewCsvReaderFromData(data, c.fileEncoding.NewDecoder(), c.separator, true)
+	dataTable, err := csvReader.ReadToCsvFileBasicDataTable(ctx, c.hasHeaderLine)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	dataTable := csvconverter.CreateNewCustomCsvBasicDataTable(allLines, c.hasHeaderLine)
 	transactionDataTable := CreateNewCustomPlainTextDataTable(dataTable, c.columnIndexMapping, c.transactionTypeNameMapping, c.timeFormat, c.timezoneFormat, c.amountDecimalSeparator, c.amountDigitGroupingSymbol, c.geoLocationSeparator)
 	dataTableImporter := converter.CreateNewImporterWithTypeNameMapping(customTransactionTypeNameMapping, c.geoLocationSeparator, c.geoLocationOrder, c.transactionTagSeparator)
 

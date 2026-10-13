@@ -19,7 +19,7 @@ func (p *fireflyIIITransactionDataRowParser) GetAddedColumns() []datatable.Trans
 }
 
 // Parse returns the converted transaction data row
-func (p *fireflyIIITransactionDataRowParser) Parse(data map[datatable.TransactionDataTableColumn]string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
+func (p *fireflyIIITransactionDataRowParser) Parse(data map[datatable.TransactionDataTableColumn]string, rowId string) (rowData map[datatable.TransactionDataTableColumn]string, rowDataValid bool, err error) {
 	rowData = make(map[datatable.TransactionDataTableColumn]string, len(data))
 
 	for column, value := range data {
@@ -40,7 +40,7 @@ func (p *fireflyIIITransactionDataRowParser) Parse(data map[datatable.Transactio
 		dateTime, err := utils.ParseFromLongDateTimeWithTimezoneRFC3339Format(rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME])
 
 		if err != nil {
-			return nil, false, errs.ErrTransactionTimeInvalid
+			return nil, false, errs.NewImportError(errs.ErrTransactionTimeInvalid, rowId, rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME])
 		}
 
 		rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
@@ -53,7 +53,7 @@ func (p *fireflyIIITransactionDataRowParser) Parse(data map[datatable.Transactio
 		amount, err := utils.ParseAmount(rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 
 		if err != nil {
-			return nil, false, errs.ErrAmountInvalid
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, rowId, rowData[datatable.TRANSACTION_DATA_TABLE_AMOUNT])
 		}
 
 		if rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == fireflyIIITransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] {
@@ -68,7 +68,7 @@ func (p *fireflyIIITransactionDataRowParser) Parse(data map[datatable.Transactio
 		amount, err := utils.ParseAmount(rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT])
 
 		if err != nil {
-			return nil, false, errs.ErrAmountInvalid
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, rowId, rowData[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT])
 		}
 
 		if rowData[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] == fireflyIIITransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] {

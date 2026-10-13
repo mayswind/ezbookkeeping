@@ -1,6 +1,7 @@
 package gnucash
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
@@ -86,6 +87,19 @@ func (t *gnucashTransactionDataRowIterator) HasNext() bool {
 	return t.currentIndex+1 < len(t.dataTable.allData)
 }
 
+// CurrentRowId returns current row id
+func (t *gnucashTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentIndex < 0 || t.currentIndex >= len(t.dataTable.allData) {
+		return ""
+	}
+
+	if t.dataTable.allData[t.currentIndex].Id != "" {
+		return fmt.Sprintf("id:%s", t.dataTable.allData[t.currentIndex].Id)
+	}
+
+	return fmt.Sprintf("record:%d", t.currentIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *gnucashTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	if t.currentIndex+1 >= len(t.dataTable.allData) {
@@ -98,7 +112,7 @@ func (t *gnucashTransactionDataRowIterator) Next(ctx core.Context, user *models.
 	rowItems, isValid, err := t.parseTransaction(ctx, user, data)
 
 	if err != nil {
-		log.Errorf(ctx, "[gnucash_transaction_table.Next] cannot parsing transaction in row#%d, because %s", t.currentIndex, err.Error())
+		log.Errorf(ctx, "[gnucash_transaction_table.Next] cannot parsing transaction in %s, because %s", t.CurrentRowId(), err.Error())
 		return nil, err
 	}
 
@@ -114,13 +128,13 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 	data := make(map[datatable.TransactionDataTableColumn]string, len(gnucashTransactionSupportedColumns))
 
 	if gnucashTransaction.PostedDate == "" {
-		return nil, false, errs.ErrMissingTransactionTime
+		return nil, false, errs.NewImportError(errs.ErrMissingTransactionTime, t.CurrentRowId(), gnucashTransaction.PostedDate)
 	}
 
 	dateTime, err := utils.ParseFromLongDateTimeWithTimezone2(gnucashTransaction.PostedDate)
 
 	if err != nil {
-		return nil, false, errs.ErrTransactionTimeInvalid
+		return nil, false, errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), gnucashTransaction.PostedDate)
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TIME] = utils.FormatUnixTimeToLongDateTime(dateTime.Unix(), dateTime.Location())
@@ -133,12 +147,20 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 		account1 := t.dataTable.accountMap[splitData1.Account]
 		account2 := t.dataTable.accountMap[splitData2.Account]
 
-		if account1 == nil || account2 == nil {
-			return nil, false, errs.ErrMissingAccountData
+		if account1 == nil {
+			return nil, false, errs.NewImportError(errs.ErrMissingAccountData, t.CurrentRowId(), splitData1.Account)
 		}
 
-		if splitData1.Quantity == "" || splitData2.Quantity == "" {
-			return nil, false, errs.ErrAmountInvalid
+		if account2 == nil {
+			return nil, false, errs.NewImportError(errs.ErrMissingAccountData, t.CurrentRowId(), splitData2.Account)
+		}
+
+		if splitData1.Quantity == "" {
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitData1.Quantity)
+		}
+
+		if splitData2.Quantity == "" {
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitData2.Quantity)
 		}
 
 		amount1, err := t.parseAmount(splitData1.Quantity)
@@ -177,8 +199,10 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 
 			if toAccount.Commodity != nil && toAccount.Commodity.Space == gnucashCommodityCurrencySpace {
 				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = toAccount.Commodity.Id
+			} else if toAccount.Commodity != nil {
+				return nil, false, errs.NewImportError(errs.ErrAccountCurrencyInvalid, t.CurrentRowId(), toAccount.Commodity.Id)
 			} else {
-				return nil, false, errs.ErrAccountCurrencyInvalid
+				return nil, false, errs.NewImportError(errs.ErrAccountCurrencyInvalid, t.CurrentRowId())
 			}
 
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = toAmount
@@ -197,7 +221,7 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 			amount, err := utils.ParseAmount(fromAmount)
 
 			if err != nil {
-				return nil, false, errs.ErrAmountInvalid
+				return nil, false, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), fromAmount)
 			}
 
 			fromAmount = utils.FormatAmount(-amount)
@@ -209,8 +233,10 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 
 			if fromAccount.Commodity != nil && fromAccount.Commodity.Space == gnucashCommodityCurrencySpace {
 				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_CURRENCY] = fromAccount.Commodity.Id
+			} else if fromAccount.Commodity != nil {
+				return nil, false, errs.NewImportError(errs.ErrAccountCurrencyInvalid, t.CurrentRowId(), fromAccount.Commodity.Id)
 			} else {
-				return nil, false, errs.ErrAccountCurrencyInvalid
+				return nil, false, errs.NewImportError(errs.ErrAccountCurrencyInvalid, t.CurrentRowId())
 			}
 
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = fromAmount
@@ -252,18 +278,18 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 			data[datatable.TRANSACTION_DATA_TABLE_RELATED_AMOUNT] = toAmount
 		} else {
 			log.Errorf(ctx, "[gnucash_transaction_table.parseTransaction] cannot parse transaction \"id:%s\", because unexcepted account types \"%s\" and \"%s\"", gnucashTransaction.Id, account1.AccountType, account2.AccountType)
-			return nil, false, errs.ErrThereAreNotSupportedTransactionType
+			return nil, false, errs.NewImportError(errs.ErrThereAreNotSupportedTransactionType, t.CurrentRowId(), account1.AccountType+", "+account2.AccountType)
 		}
 	} else if len(gnucashTransaction.Splits) == 1 {
 		splitData := gnucashTransaction.Splits[0]
 		account := t.dataTable.accountMap[splitData.Account]
 
 		if account == nil {
-			return nil, false, errs.ErrMissingAccountData
+			return nil, false, errs.NewImportError(errs.ErrMissingAccountData, t.CurrentRowId(), splitData.Account)
 		}
 
 		if splitData.Quantity == "" {
-			return nil, false, errs.ErrAmountInvalid
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitData.Quantity)
 		}
 
 		amount, err := t.parseAmount(splitData.Quantity)
@@ -275,7 +301,7 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 		amountNum, err := utils.ParseAmount(amount)
 
 		if err != nil {
-			return nil, false, err
+			return nil, false, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitData.Quantity)
 		}
 
 		if amountNum == 0 {
@@ -284,13 +310,13 @@ func (t *gnucashTransactionDataRowIterator) parseTransaction(ctx core.Context, u
 		}
 
 		log.Errorf(ctx, "[gnucash_transaction_table.parseTransaction] cannot parse transaction \"id:%s\", because split count is %d", gnucashTransaction.Id, len(gnucashTransaction.Splits))
-		return nil, false, errs.ErrThereAreNotSupportedTransactionType
+		return nil, false, errs.NewImportError(errs.ErrThereAreNotSupportedTransactionType, t.CurrentRowId())
 	} else if len(gnucashTransaction.Splits) < 1 {
 		log.Errorf(ctx, "[gnucash_transaction_table.parseTransaction] cannot parse transaction \"id:%s\", because split count is %d", gnucashTransaction.Id, len(gnucashTransaction.Splits))
-		return nil, false, errs.ErrInvalidGnuCashFile
+		return nil, false, errs.NewImportError(errs.ErrInvalidGnuCashFile, t.CurrentRowId())
 	} else {
 		log.Errorf(ctx, "[gnucash_transaction_table.parseTransaction] cannot parse split transaction \"id:%s\", because split count is %d", gnucashTransaction.Id, len(gnucashTransaction.Splits))
-		return nil, false, errs.ErrNotSupportedSplitTransactions
+		return nil, false, errs.NewImportError(errs.ErrNotSupportedSplitTransactions, t.CurrentRowId())
 	}
 
 	data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = gnucashTransaction.Description
@@ -302,13 +328,13 @@ func (t *gnucashTransactionDataRowIterator) parseAmount(quantity string) (string
 	items := strings.Split(quantity, "/")
 
 	if len(items) != 2 {
-		return "", errs.ErrAmountInvalid
+		return "", errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), quantity)
 	}
 
 	value, err := utils.StringToInt64(items[0])
 
 	if err != nil {
-		return "", errs.ErrAmountInvalid
+		return "", errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), quantity)
 	}
 
 	if items[1] == "100" {
@@ -318,7 +344,7 @@ func (t *gnucashTransactionDataRowIterator) parseAmount(quantity string) (string
 	factor, err := utils.StringToInt64(items[1])
 
 	if err != nil {
-		return "", errs.ErrAmountInvalid
+		return "", errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), quantity)
 	}
 
 	value = value * 100 / factor

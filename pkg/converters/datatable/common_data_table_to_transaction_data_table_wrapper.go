@@ -76,6 +76,11 @@ func (t *commonDataTableToTransactionDataTableWrapperRowIterator) HasNext() bool
 	return t.innerIterator.HasNext()
 }
 
+// CurrentRowId returns current row id
+func (t *commonDataTableToTransactionDataTableWrapperRowIterator) CurrentRowId() string {
+	return t.innerIterator.CurrentRowId()
+}
+
 // Next returns the next transaction data row
 func (t *commonDataTableToTransactionDataTableWrapperRowIterator) Next(ctx core.Context, user *models.User) (daraRow TransactionDataRow, err error) {
 	commonDataRow := t.innerIterator.Next()

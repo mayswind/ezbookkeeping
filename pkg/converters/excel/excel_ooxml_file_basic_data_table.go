@@ -131,7 +131,15 @@ func (t *ExcelOOXMLFileBasicDataTableRowIterator) HasNext() bool {
 
 // CurrentRowId returns current index
 func (t *ExcelOOXMLFileBasicDataTableRowIterator) CurrentRowId() string {
-	return fmt.Sprintf("sheet#%d-row#%d", t.currentSheetIndex, t.currentRowIndexInSheet)
+	if t.currentRowIndexInSheet < 0 || t.currentSheetIndex >= len(t.dataTable.sheets) {
+		return ""
+	}
+
+	if len(t.dataTable.sheets) > 1 {
+		return fmt.Sprintf("sheet:%d-row:%d", t.currentSheetIndex+1, t.currentRowIndexInSheet+1)
+	} else {
+		return fmt.Sprintf("row:%d", t.currentRowIndexInSheet+1)
+	}
 }
 
 // Next returns the next basic data row

@@ -1,6 +1,8 @@
 package datatable
 
 import (
+	"fmt"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -53,7 +55,7 @@ func (t *WritableTransactionDataTable) Get(index int) (*WritableTransactionDataR
 
 	if t.rowParser != nil {
 		var err error
-		rowData, rowDataValid, err = t.rowParser.Parse(rowData)
+		rowData, rowDataValid, err = t.rowParser.Parse(rowData, fmt.Sprintf("record:%d", index+1))
 
 		if err != nil {
 			return nil, err
@@ -149,6 +151,15 @@ func (t *WritableTransactionDataRowIterator) HasNext() bool {
 	return t.nextIndex < len(t.dataTable.allData)
 }
 
+// CurrentRowId returns current row id
+func (t *WritableTransactionDataRowIterator) CurrentRowId() string {
+	if t.nextIndex < 0 || t.nextIndex >= len(t.dataTable.allData) {
+		return ""
+	}
+
+	return fmt.Sprintf("record:%d", t.nextIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *WritableTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow TransactionDataRow, err error) {
 	if t.nextIndex >= len(t.dataTable.allData) {
@@ -159,7 +170,7 @@ func (t *WritableTransactionDataRowIterator) Next(ctx core.Context, user *models
 	rowDataValid := true
 
 	if t.dataTable.rowParser != nil {
-		rowData, rowDataValid, err = t.dataTable.rowParser.Parse(rowData)
+		rowData, rowDataValid, err = t.dataTable.rowParser.Parse(rowData, t.CurrentRowId())
 
 		if err != nil {
 			log.Errorf(ctx, "[writable_transaction_data_table.Next] cannot parse data row, because %s", err.Error())

@@ -31,6 +31,9 @@ type TransactionDataRowIterator interface {
 	// HasNext returns whether the iterator does not reach the end
 	HasNext() bool
 
+	// CurrentRowId returns current row id
+	CurrentRowId() string
+
 	// Next returns the next transaction data row
 	Next(ctx core.Context, user *models.User) (daraRow TransactionDataRow, err error)
 }
@@ -41,7 +44,7 @@ type TransactionDataRowParser interface {
 	GetAddedColumns() []TransactionDataTableColumn
 
 	// Parse returns the converted transaction data row
-	Parse(data map[TransactionDataTableColumn]string) (rowData map[TransactionDataTableColumn]string, rowDataValid bool, err error)
+	Parse(data map[TransactionDataTableColumn]string, rowId string) (rowData map[TransactionDataTableColumn]string, rowDataValid bool, err error)
 }
 
 // TransactionDataTableBuilder defines the structure of data table builder

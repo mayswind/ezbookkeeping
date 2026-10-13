@@ -1,18 +1,22 @@
 package datatable
 
 import (
+	"fmt"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 )
 
 // mergedTransactionDataTable defines the structure of merged transaction data table which merges multiple transaction data tables
 type mergedTransactionDataTable struct {
-	dataTables []TransactionDataTable
+	dataTables  []TransactionDataTable
+	rowIdPrefix string
 }
 
 // mergedTransactionDataRowIterator defines the data row iterator structure of merged transaction data table
 type mergedTransactionDataRowIterator struct {
 	iterators    []TransactionDataRowIterator
+	rowIdPrefix  string
 	currentIndex int
 }
 
@@ -48,6 +52,7 @@ func (t *mergedTransactionDataTable) TransactionRowIterator() TransactionDataRow
 
 	return &mergedTransactionDataRowIterator{
 		iterators:    iterators,
+		rowIdPrefix:  t.rowIdPrefix,
 		currentIndex: 0,
 	}
 }
@@ -69,6 +74,25 @@ func (it *mergedTransactionDataRowIterator) HasNext() bool {
 	}
 
 	return false
+}
+
+// CurrentRowId returns current row id
+func (t *mergedTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentIndex >= len(t.iterators) {
+		return ""
+	}
+
+	innerRowId := t.iterators[t.currentIndex].CurrentRowId()
+
+	if innerRowId == "" {
+		return ""
+	}
+
+	if t.rowIdPrefix != "" {
+		return fmt.Sprintf("%s:%d-%s", t.rowIdPrefix, t.currentIndex+1, innerRowId)
+	} else {
+		return fmt.Sprintf("sheet:%d-%s", t.currentIndex+1, innerRowId)
+	}
 }
 
 // Next returns the next transaction data row
@@ -97,8 +121,9 @@ func (it *mergedTransactionDataRowIterator) Next(ctx core.Context, user *models.
 }
 
 // CreateNewMergedTransactionDataTable returns a merged transaction data table from multiple transaction data tables
-func CreateNewMergedTransactionDataTable(dataTables []TransactionDataTable) TransactionDataTable {
+func CreateNewMergedTransactionDataTable(dataTables []TransactionDataTable, rowIdPrefix string) TransactionDataTable {
 	return &mergedTransactionDataTable{
-		dataTables: dataTables,
+		dataTables:  dataTables,
+		rowIdPrefix: rowIdPrefix,
 	}
 }

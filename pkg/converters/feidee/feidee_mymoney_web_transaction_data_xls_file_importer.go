@@ -119,7 +119,7 @@ func (c *feideeMymoneyWebTransactionDataXlsFileImporter) ParseImportedData(ctx c
 		transactionDataTables = append(transactionDataTables, transactionDataTable)
 	}
 
-	mergedTransactionDataTable := datatable.CreateNewMergedTransactionDataTable(transactionDataTables)
+	mergedTransactionDataTable := datatable.CreateNewMergedTransactionDataTable(transactionDataTables, "sheet")
 	dataTableImporter := converter.CreateNewSimpleImporter(feideeMymoneyWebTransactionTypeNames)
 
 	return dataTableImporter.ParseImportedData(ctx, user, mergedTransactionDataTable, defaultTimezone, additionalOptions, accountMap, expenseCategoryMap, incomeCategoryMap, transferCategoryMap, tagMap)

@@ -34,7 +34,7 @@ func TestMergedTransactionDataTable_HasColumn(t *testing.T) {
 	table1 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable1, columnMapping1)
 	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping2)
 
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2}, "sheet")
 
 	assert.True(t, merged.HasColumn(TRANSACTION_DATA_TABLE_TRANSACTION_TIME))
 	assert.True(t, merged.HasColumn(TRANSACTION_DATA_TABLE_TRANSACTION_TYPE))
@@ -44,7 +44,7 @@ func TestMergedTransactionDataTable_HasColumn(t *testing.T) {
 }
 
 func TestMergedTransactionDataTable_HasColumn_Empty(t *testing.T) {
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{}, "sheet")
 
 	assert.False(t, merged.HasColumn(TRANSACTION_DATA_TABLE_TRANSACTION_TIME))
 	assert.False(t, merged.HasColumn(TRANSACTION_DATA_TABLE_AMOUNT))
@@ -75,13 +75,13 @@ func TestMergedTransactionDataTable_TransactionRowCount(t *testing.T) {
 	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping)
 	table3 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable3, columnMapping)
 
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2, table3})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2, table3}, "sheet")
 
 	assert.Equal(t, 3, merged.TransactionRowCount())
 }
 
 func TestMergedTransactionDataTable_TransactionRowCount_Empty(t *testing.T) {
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{}, "sheet")
 	assert.Equal(t, 0, merged.TransactionRowCount())
 }
 
@@ -108,7 +108,7 @@ func TestMergedTransactionDataTable_TransactionRowIterator(t *testing.T) {
 	table1 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable1, columnMapping)
 	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping)
 
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2}, "sheet")
 	iterator := merged.TransactionRowIterator()
 
 	assert.True(t, iterator.HasNext())
@@ -178,7 +178,7 @@ func TestMergedTransactionDataTable_TransactionRowIterator_WithEmptyTable(t *tes
 	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping)
 	table3 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable3, columnMapping)
 
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2, table3})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2, table3}, "sheet")
 	iterator := merged.TransactionRowIterator()
 
 	assert.True(t, iterator.HasNext())
@@ -200,7 +200,7 @@ func TestMergedTransactionDataTable_TransactionRowIterator_WithEmptyTable(t *tes
 }
 
 func TestMergedTransactionDataTable_TransactionRowIterator_Empty(t *testing.T) {
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{}, "sheet")
 	iterator := merged.TransactionRowIterator()
 
 	assert.False(t, iterator.HasNext())
@@ -223,7 +223,7 @@ func TestMergedTransactionDataTable_TransactionRowIterator_AllEmptyTables(t *tes
 	table1 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable1, columnMapping)
 	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping)
 
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2}, "sheet")
 	iterator := merged.TransactionRowIterator()
 
 	assert.False(t, iterator.HasNext())
@@ -259,7 +259,7 @@ func TestMergedTransactionDataTable_TransactionRowIterator_DifferentColumns(t *t
 	table1 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable1, columnMapping1)
 	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping2)
 
-	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2})
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2}, "sheet")
 	iterator := merged.TransactionRowIterator()
 
 	assert.True(t, iterator.HasNext())
@@ -279,4 +279,109 @@ func TestMergedTransactionDataTable_TransactionRowIterator_DifferentColumns(t *t
 	assert.Equal(t, "Food", row.GetData(TRANSACTION_DATA_TABLE_CATEGORY))
 
 	assert.False(t, iterator.HasNext())
+}
+
+func TestMergedTransactionDataTable_TransactionRowIterator_CurrentRowId(t *testing.T) {
+	columns := []string{"TransactionTime", "TransactionType", "Amount"}
+	rows1 := []*testBasicDataTableRow{
+		{rowId: "1", rowColumns: []string{"2026-07-01", "1", "100"}},
+		{rowId: "2", rowColumns: []string{"2026-07-02", "2", "200"}},
+	}
+	rows2 := []*testBasicDataTableRow{
+		{rowId: "3", rowColumns: []string{"2026-07-03", "1", "300"}},
+	}
+
+	basicDataTable1 := &testBasicDataTable{headerColumns: columns, rows: rows1}
+	basicDataTable2 := &testBasicDataTable{headerColumns: columns, rows: rows2}
+
+	columnMapping := map[TransactionDataTableColumn]string{
+		TRANSACTION_DATA_TABLE_TRANSACTION_TIME: "TransactionTime",
+		TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: "TransactionType",
+		TRANSACTION_DATA_TABLE_AMOUNT:           "Amount",
+	}
+
+	table1 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable1, columnMapping)
+	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping)
+
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2}, "file")
+	iterator := merged.TransactionRowIterator()
+
+	_, err := iterator.Next(nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "file:1-1", iterator.CurrentRowId())
+
+	_, err = iterator.Next(nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "file:1-2", iterator.CurrentRowId())
+
+	_, err = iterator.Next(nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "file:2-3", iterator.CurrentRowId())
+}
+
+func TestMergedTransactionDataTable_TransactionRowIterator_CurrentRowId_WithEmptyPrefix(t *testing.T) {
+	columns := []string{"TransactionTime", "TransactionType", "Amount"}
+	rows := []*testBasicDataTableRow{
+		{rowId: "5", rowColumns: []string{"2026-07-01", "1", "100"}},
+	}
+
+	basicDataTable := &testBasicDataTable{headerColumns: columns, rows: rows}
+
+	columnMapping := map[TransactionDataTableColumn]string{
+		TRANSACTION_DATA_TABLE_TRANSACTION_TIME: "TransactionTime",
+		TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: "TransactionType",
+		TRANSACTION_DATA_TABLE_AMOUNT:           "Amount",
+	}
+
+	table := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable, columnMapping)
+
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table}, "")
+	iterator := merged.TransactionRowIterator()
+
+	_, err := iterator.Next(nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "sheet:1-5", iterator.CurrentRowId())
+}
+
+func TestMergedTransactionDataTable_TransactionRowIterator_CurrentRowId_WithEmptyTable(t *testing.T) {
+	columns := []string{"TransactionTime", "TransactionType", "Amount"}
+	rows1 := []*testBasicDataTableRow{
+		{rowId: "1", rowColumns: []string{"2026-07-01", "1", "100"}},
+	}
+	rows2 := []*testBasicDataTableRow{}
+	rows3 := []*testBasicDataTableRow{
+		{rowId: "2", rowColumns: []string{"2026-07-02", "2", "200"}},
+	}
+
+	basicDataTable1 := &testBasicDataTable{headerColumns: columns, rows: rows1}
+	basicDataTable2 := &testBasicDataTable{headerColumns: columns, rows: rows2}
+	basicDataTable3 := &testBasicDataTable{headerColumns: columns, rows: rows3}
+
+	columnMapping := map[TransactionDataTableColumn]string{
+		TRANSACTION_DATA_TABLE_TRANSACTION_TIME: "TransactionTime",
+		TRANSACTION_DATA_TABLE_TRANSACTION_TYPE: "TransactionType",
+		TRANSACTION_DATA_TABLE_AMOUNT:           "Amount",
+	}
+
+	table1 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable1, columnMapping)
+	table2 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable2, columnMapping)
+	table3 := CreateNewTransactionDataTableFromBasicDataTable(basicDataTable3, columnMapping)
+
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{table1, table2, table3}, "sheet")
+	iterator := merged.TransactionRowIterator()
+
+	_, err := iterator.Next(nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "sheet:1-1", iterator.CurrentRowId())
+
+	_, err = iterator.Next(nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "sheet:3-2", iterator.CurrentRowId())
+}
+
+func TestMergedTransactionDataTable_TransactionRowIterator_CurrentRowId_Empty(t *testing.T) {
+	merged := CreateNewMergedTransactionDataTable([]TransactionDataTable{}, "sheet")
+	iterator := merged.TransactionRowIterator()
+
+	assert.Equal(t, "", iterator.CurrentRowId())
 }

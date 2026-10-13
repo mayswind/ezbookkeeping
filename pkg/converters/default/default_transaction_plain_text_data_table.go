@@ -80,7 +80,11 @@ func (t *defaultPlainTextDataRowIterator) HasNext() bool {
 
 // CurrentRowId returns current index
 func (t *defaultPlainTextDataRowIterator) CurrentRowId() string {
-	return fmt.Sprintf("line#%d", t.currentIndex)
+	if t.currentIndex < 0 || t.currentIndex >= len(t.dataTable.allLines) {
+		return ""
+	}
+
+	return fmt.Sprintf("line:%d", t.currentIndex+1)
 }
 
 // Next returns the next basic data row

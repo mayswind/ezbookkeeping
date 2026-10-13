@@ -1,6 +1,7 @@
 package iif
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
@@ -142,6 +143,27 @@ func (t *iifTransactionDataRowIterator) HasNext() bool {
 	return false
 }
 
+// CurrentRowId returns current row id
+func (t *iifTransactionDataRowIterator) CurrentRowId() string {
+	if t.currentDatasetIndex < 0 || t.currentDatasetIndex >= len(t.dataTable.transactionDatasets) {
+		return ""
+	}
+
+	dataset := t.dataTable.transactionDatasets[t.currentDatasetIndex]
+
+	if dataset == nil || t.currentIndexInDataset < 0 || t.currentIndexInDataset >= len(dataset.Transactions) {
+		return ""
+	}
+
+	transaction := dataset.Transactions[t.currentIndexInDataset]
+
+	if transaction == nil || t.currentSplitDataIndex < 0 || t.currentSplitDataIndex >= len(transaction.SplitData) {
+		return ""
+	}
+
+	return fmt.Sprintf("dataset:%d-record:%d-split:%d", t.currentDatasetIndex+1, t.currentIndexInDataset+1, t.currentSplitDataIndex+1)
+}
+
 // Next returns the next transaction data row
 func (t *iifTransactionDataRowIterator) Next(ctx core.Context, user *models.User) (daraRow datatable.TransactionDataRow, err error) {
 	allDatasets := t.dataTable.transactionDatasets
@@ -183,8 +205,8 @@ func (t *iifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 	data := currentDataset.Transactions[t.currentIndexInDataset]
 
 	if len(data.SplitData) < 1 {
-		log.Errorf(ctx, "[iif_transaction_data_table.Next] cannot parsing transaction in row#%d (dataset#%d), because split data is empty", t.currentIndexInDataset, t.currentDatasetIndex)
-		return nil, errs.ErrInvalidIIFFile
+		log.Errorf(ctx, "[iif_transaction_data_table.Next] cannot parsing transaction in %s, because split data is empty", t.CurrentRowId())
+		return nil, errs.NewImportError(errs.ErrInvalidIIFFile, t.CurrentRowId())
 	}
 
 	if t.currentSplitDataIndex >= len(data.SplitData) {
@@ -202,7 +224,7 @@ func (t *iifTransactionDataRowIterator) Next(ctx core.Context, user *models.User
 	rowItems, err := t.parseTransaction(ctx, user, currentDataset, data, t.currentSplitDataIndex)
 
 	if err != nil {
-		log.Errorf(ctx, "[iif_transaction_data_table.Next] cannot parsing transaction in row#%d-split#%d (dataset#%d), because %s", t.currentIndexInDataset, t.currentSplitDataIndex, t.currentDatasetIndex, err.Error())
+		log.Errorf(ctx, "[iif_transaction_data_table.Next] cannot parsing transaction in %s, because %s", t.CurrentRowId(), err.Error())
 		return nil, err
 	}
 
@@ -230,13 +252,13 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 	mainAmountNum, err := parseAmount(mainAmount)
 
 	if err != nil {
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), mainAmount)
 	}
 
 	splitAmountNum, err := parseAmount(splitAmount)
 
 	if err != nil {
-		return nil, errs.ErrAmountInvalid
+		return nil, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitAmount)
 	}
 
 	if transactionType == iifTransactionTypeBeginningBalance { // balance modification
@@ -270,7 +292,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			}
 		} else {
 			log.Errorf(ctx, "[iif_transaction_data_table.parseTransaction] cannot parse transaction, because main account \"%s\" and split account \"%s\" are all income account", mainAccountName, splitAccountName)
-			return nil, errs.ErrInvalidIIFFile
+			return nil, errs.NewImportError(errs.ErrInvalidIIFFile, t.CurrentRowId())
 		}
 
 		categoryNames := strings.Split(categoryName, iifTransactionCategorySeparator)
@@ -311,7 +333,7 @@ func (t *iifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			}
 		} else {
 			log.Errorf(ctx, "[iif_transaction_data_table.parseTransaction] cannot parse transaction, because main account \"%s\" and split account \"%s\" are all expense account", mainAccountName, splitAccountName)
-			return nil, errs.ErrInvalidIIFFile
+			return nil, errs.NewImportError(errs.ErrInvalidIIFFile, t.CurrentRowId())
 		}
 
 		categoryNames := strings.Split(categoryName, iifTransactionCategorySeparator)
@@ -390,14 +412,14 @@ func (t *iifTransactionDataRowIterator) isSplitTransactionSupported(ctx core.Con
 
 	if transactionType == iifTransactionTypeBeginningBalance { // balance modification
 		supportSplitTransactions = false
-		log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parse split balance modification transaction#%d (dataset#%d)", t.currentIndexInDataset, t.currentDatasetIndex)
+		log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parse split balance modification in %s", t.CurrentRowId())
 	} else {
 		transactionAmountStr, _ := dataset.getTransactionDataItemValue(transactionData, iifTransactionAmountColumnName)
 		transactionAmount, err := parseAmount(transactionAmountStr)
 
 		if err != nil {
-			log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parsing transaction in row#%d (dataset#%d), because transaction amount \"%s\" is invalid", t.currentIndexInDataset, t.currentDatasetIndex, transactionAmountStr)
-			return false, errs.ErrAmountInvalid
+			log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parsing transaction in %s, because transaction amount \"%s\" is invalid", t.CurrentRowId(), transactionAmountStr)
+			return false, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), transactionAmountStr)
 		}
 
 		splitTotalAmount := int64(0)
@@ -407,8 +429,8 @@ func (t *iifTransactionDataRowIterator) isSplitTransactionSupported(ctx core.Con
 			splitAmount, err := parseAmount(splitAmountStr)
 
 			if err != nil {
-				log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parsing transaction in row#%d-split#%d (dataset#%d), because split amount \"%s\" is invalid", t.currentIndexInDataset, i, t.currentDatasetIndex, splitAmountStr)
-				return false, errs.ErrAmountInvalid
+				log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parsing transaction in %s, because split amount \"%s\" is invalid", t.CurrentRowId(), splitAmountStr)
+				return false, errs.NewImportError(errs.ErrAmountInvalid, t.CurrentRowId(), splitAmountStr)
 			}
 
 			splitTotalAmount += splitAmount
@@ -416,12 +438,12 @@ func (t *iifTransactionDataRowIterator) isSplitTransactionSupported(ctx core.Con
 
 		if splitTotalAmount != -transactionAmount {
 			supportSplitTransactions = false
-			log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parse split transaction#%d (dataset#%d), because the sum amount of each split data \"%d\" not equal to the transaction amount \"%d\"", t.currentIndexInDataset, t.currentDatasetIndex, splitTotalAmount, -transactionAmount)
+			log.Errorf(ctx, "[iif_transaction_data_table.isSplitTransactionSupported] cannot parse split %s, because the sum amount of each split data \"%d\" not equal to the transaction amount \"%d\"", t.CurrentRowId(), splitTotalAmount, -transactionAmount)
 		}
 	}
 
 	if len(transactionData.SplitData) > 1 && !supportSplitTransactions {
-		return false, errs.ErrNotSupportedSplitTransactions
+		return false, errs.NewImportError(errs.ErrNotSupportedSplitTransactions, t.CurrentRowId())
 	}
 
 	return true, nil
@@ -432,7 +454,7 @@ func (t *iifTransactionDataRowIterator) parseTransactionTime(dataset *iifTransac
 	dateParts := strings.Split(date, "/")
 
 	if len(dateParts) != 3 {
-		return "", errs.ErrTransactionTimeInvalid
+		return "", errs.NewImportError(errs.ErrTransactionTimeInvalid, t.CurrentRowId(), date)
 	}
 
 	month := dateParts[0]

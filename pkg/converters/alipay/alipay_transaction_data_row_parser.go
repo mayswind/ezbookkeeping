@@ -5,6 +5,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/locales"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
@@ -16,6 +17,7 @@ const alipayTransactionDataStatusPaymentSuccessName = "支付成功"
 const alipayTransactionDataStatusPendingGoodsReceiptConfirmationName = "等待确认收货"
 const alipayTransactionDataStatusRepaymentSuccessName = "还款成功"
 const alipayTransactionDataStatusClosedName = "交易关闭"
+const alipayTransactionDataStatusClosedName2 = "已关闭"
 const alipayTransactionDataStatusRefundSuccessName = "退款成功"
 const alipayTransactionDataStatusTaxRefundSuccessName = "退税成功"
 
@@ -41,8 +43,8 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 	if dataRow.GetData(p.columns.typeColumnName) != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] &&
 		dataRow.GetData(p.columns.typeColumnName) != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_EXPENSE] &&
 		dataRow.GetData(p.columns.typeColumnName) != alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
-		log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because type is \"%s\"", rowId, dataRow.GetData(p.columns.typeColumnName))
-		return nil, false, nil
+		log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in \"%s\", because type is \"%s\"", rowId, dataRow.GetData(p.columns.typeColumnName))
+		return nil, false, errs.NewImportError(errs.ErrTransactionTypeInvalid, rowId, dataRow.GetData(p.columns.typeColumnName))
 	}
 
 	if dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusSuccessName &&
@@ -50,10 +52,11 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusPendingGoodsReceiptConfirmationName &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusRepaymentSuccessName &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusClosedName &&
+		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusClosedName2 &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusRefundSuccessName &&
 		dataRow.GetData(p.columns.statusColumnName) != alipayTransactionDataStatusTaxRefundSuccessName {
-		log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because status is \"%s\"", rowId, dataRow.GetData(p.columns.statusColumnName))
-		return nil, false, nil
+		log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in \"%s\", because status is \"%s\"", rowId, dataRow.GetData(p.columns.statusColumnName))
+		return nil, false, errs.NewImportError(errs.ErrTransactionTypeInvalid, rowId, dataRow.GetData(p.columns.statusColumnName))
 	}
 
 	data := make(map[datatable.TransactionDataTableColumn]string, len(alipayTransactionSupportedColumns))
@@ -104,8 +107,8 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 		data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = dataRow.GetData(p.columns.typeColumnName)
 
 		if dataRow.GetData(p.columns.typeColumnName) == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_INCOME] {
-			if statusName == alipayTransactionDataStatusClosedName {
-				log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because income transaction is closed", rowId)
+			if statusName == alipayTransactionDataStatusClosedName || statusName == alipayTransactionDataStatusClosedName2 {
+				log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in \"%s\", because income transaction is closed", rowId)
 				return nil, false, nil
 			}
 
@@ -117,8 +120,8 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = ""
 			}
 		} else if dataRow.GetData(p.columns.typeColumnName) == alipayTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER] {
-			if statusName == alipayTransactionDataStatusClosedName {
-				log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because non-income/expense transaction is closed", rowId)
+			if statusName == alipayTransactionDataStatusClosedName || statusName == alipayTransactionDataStatusClosedName2 {
+				log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in \"%s\", because non-income/expense transaction is closed", rowId)
 				return nil, false, nil
 			}
 
@@ -175,7 +178,7 @@ func (p *alipayTransactionDataRowParser) Parse(ctx core.Context, user *models.Us
 					data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = relatedAccountName
 					data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = targetName
 				} else {
-					log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in row \"%s\", because product name (\"%s\") is unknown", rowId, productName)
+					log.Warnf(ctx, "[alipay_transaction_data_row_parser.Parse] skip parsing transaction in \"%s\", because product name (\"%s\") is unknown", rowId, productName)
 					return nil, false, nil
 				}
 			}

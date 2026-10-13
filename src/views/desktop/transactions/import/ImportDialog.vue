@@ -215,9 +215,10 @@
                                         </template>
 
                                         <template #no-data>
-                                            <v-list class="py-0">
+                                            <v-list class="py-0" select-strategy="classic"
+                                                    :selected="objectFieldWithValueToArrayItem(importAdditionalOptions, true as (boolean | undefined))">
                                                 <template v-for="item in allSupportedAdditionalOptions">
-                                                    <v-list-item :key="item.key"
+                                                    <v-list-item class="text-body-medium" :key="item.key" :value="item.key"
                                                                  :append-icon="importAdditionalOptions[item.key] ? mdiCheck : undefined"
                                                                  @click="importAdditionalOptions[item.key] = !importAdditionalOptions[item.key]"
                                                                  v-if="isDefined(supportedAdditionalOptions[item.key])">{{ tt(item.name) }}</v-list-item>
@@ -385,7 +386,7 @@ import { UTF_8 } from '@/consts/file.ts';
 
 import { type ImportTransactionResponse, ImportTransaction } from '@/models/imported_transaction.ts';
 
-import { isDefined, isNumber } from '@/lib/common.ts';
+import { isDefined, isNumber, objectFieldWithValueToArrayItem } from '@/lib/common.ts';
 import { findExtensionByType, isFileExtensionSupported, detectFileEncoding } from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { isTransactionFromAITextRecognitionEnabled, isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';

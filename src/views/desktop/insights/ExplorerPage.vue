@@ -83,7 +83,7 @@
                         <v-spacer/>
                         <v-btn class="ms-3"
                                :color="isCurrentExplorationModified ? 'primary' : 'default'"
-                               :variant="isCurrentExplorationModified ? 'elevated' : 'outlined'"
+                               :variant="isCurrentExplorationModified ? 'flat' : 'outlined'"
                                :disabled="loading || updating || isCustomChartAIGenerating || isCurrentDataTableEditable" @click="saveExploration(false)">
                             {{ tt('Save Exploration') }}
                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="updating"></v-progress-circular>

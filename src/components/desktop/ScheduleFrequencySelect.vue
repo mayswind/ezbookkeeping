@@ -33,10 +33,11 @@
                                      :key="item.type" :value="hasFrequencyValues ? item.type : undefined" :title="item.displayName"
                                      :tabindex="hasFrequencyValues ? -2 : undefined"
                                      v-for="item in frequencyItems">
-                            <template #prepend="{ isSelected, select }" v-if="hasFrequencyValues">
-                                <v-list-item-action start>
-                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
-                                </v-list-item-action>
+                            <template #prepend="{ isSelected }" v-if="hasFrequencyValues">
+                                <svg style="margin-inline: -6px 6px" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"
+                                     :class="{ 'text-primary': isSelected }">
+                                    <path :d="isSelected ? mdiCheckboxMarked : mdiCheckboxBlankOutline" fill="currentColor"/>
+                                </svg>
                             </template>
                         </v-list-item>
                     </v-list>
@@ -64,6 +65,11 @@ import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
 import { sortNumbersArray } from '@/lib/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
 import { type TwoColumnListColumn, setTwoColumnItemFocusWhenKeydown } from '@/lib/ui/desktop.ts';
+
+import {
+    mdiCheckboxMarked,
+    mdiCheckboxBlankOutline
+} from '@mdi/js';
 
 const props = defineProps<CommonScheduleFrequencySelectionProps>();
 const emit = defineEmits<{

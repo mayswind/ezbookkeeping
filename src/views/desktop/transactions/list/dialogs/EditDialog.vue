@@ -334,7 +334,7 @@
                                         </template>
 
                                         <template #no-data>
-                                            <v-list class="py-0">
+                                            <v-list class="py-0" @keydown.up.stop @keydown.down.stop>
                                                 <v-list-item class="text-body-medium" v-if="mode !== TransactionEditPageMode.View" @click="updateGeoLocation(true)">{{ tt('Update Geographic Location') }}</v-list-item>
                                                 <v-list-item class="text-body-medium" v-if="mode !== TransactionEditPageMode.View" @click="clearGeoLocation">{{ tt('Clear Geographic Location') }}</v-list-item>
                                             </v-list>

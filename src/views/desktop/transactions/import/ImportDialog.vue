@@ -216,7 +216,8 @@
 
                                         <template #no-data>
                                             <v-list class="py-0" select-strategy="classic"
-                                                    :selected="objectFieldWithValueToArrayItem(importAdditionalOptions, true as (boolean | undefined))">
+                                                    :selected="objectFieldWithValueToArrayItem(importAdditionalOptions, true as (boolean | undefined))"
+                                                    @keydown.up.stop @keydown.down.stop>
                                                 <template v-for="item in allSupportedAdditionalOptions">
                                                     <v-list-item class="text-body-medium" :key="item.key" :value="item.key"
                                                                  :append-icon="importAdditionalOptions[item.key] ? mdiCheck : undefined"

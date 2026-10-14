@@ -1,6 +1,7 @@
-name: Build for Non-Main Branches
+name: Build for Non-Main Branches and Pull Requests
 
 on:
+  pull_request:
   push:
     branches-ignore:
       - main

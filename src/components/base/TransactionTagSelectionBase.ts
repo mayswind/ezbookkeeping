@@ -29,6 +29,7 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
 
     const clonedModelValue = ref<string[]>(useClonedModelValue ? Array.from(props.modelValue) : []);
     const tagSearchContent = ref<string>('');
+    const pinnedTagIds = ref<Record<string, boolean>>({});
 
     const selectedTagIds = computed<Record<string, boolean>>(() => {
         const ret: Record<string, boolean> = {};
@@ -93,13 +94,53 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
         return hiddenCount > 0;
     });
 
+    // Remembers the tags which are selected when the selection list is opened, so they can be shown on top of the list.
+    // The snapshot is not updated on every check or uncheck, so items don't jump around while the user is selecting them.
+    function pinSelectedTags(): void {
+        const ret: Record<string, boolean> = {};
+
+        for (const tagId of (useClonedModelValue ? clonedModelValue.value : props.modelValue)) {
+            ret[tagId] = true;
+        }
+
+        pinnedTagIds.value = ret;
+    }
+
     function getTagsWithGroupHeader(tagFilterFn: (tag: TransactionTag) => boolean): TransactionTagWithGroupHeader[] {
         const result: TransactionTagWithGroupHeader[] = [];
         const tagsInDefaultGroup = transactionTagsStore.allTransactionTagsByGroupMap[DEFAULT_TAG_GROUP_ID];
+        // keep the original order while searching, so the first matched tag is still the first one in its group
+        const shouldPinTags = !normalizedTagSearchContent.value && Object.keys(pinnedTagIds.value).length > 0;
+        const isTagPinned = (tag: TransactionTag): boolean => shouldPinTags && !!pinnedTagIds.value[tag.id];
         let addButtonAdded = false;
 
+        if (shouldPinTags) {
+            const pinnedTags: TransactionTag[] = [];
+
+            if (tagsInDefaultGroup) {
+                pinnedTags.push(...tagsInDefaultGroup.filter(tag => isTagPinned(tag) && tagFilterFn(tag)));
+            }
+
+            for (const tagGroup of transactionTagsStore.allTransactionTagGroups) {
+                const tags = transactionTagsStore.allTransactionTagsByGroupMap[tagGroup.id];
+
+                if (tags) {
+                    pinnedTags.push(...tags.filter(tag => isTagPinned(tag) && tagFilterFn(tag)));
+                }
+            }
+
+            if (pinnedTags.length > 0) {
+                result.push({
+                    type: 'subheader',
+                    title: tt('Selected Tags')
+                });
+
+                result.push(...pinnedTags);
+            }
+        }
+
         if (tagsInDefaultGroup && tagsInDefaultGroup.length > 0) {
-            const visibleTags = tagsInDefaultGroup.filter(tag => tagFilterFn(tag));
+            const visibleTags = tagsInDefaultGroup.filter(tag => !isTagPinned(tag) && tagFilterFn(tag));
 
             if (visibleTags.length > 0) {
                 result.push({
@@ -125,7 +166,7 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
                 continue;
             }
 
-            const visibleTags = tags.filter(tag => tagFilterFn(tag));
+            const visibleTags = tags.filter(tag => !isTagPinned(tag) && tagFilterFn(tag));
 
             if (visibleTags.length > 0) {
                 result.push({
@@ -153,6 +194,8 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
         // computed states
         selectedTagIds,
         allTagsWithGroupHeader,
-        filteredTagsWithGroupHeader
+        filteredTagsWithGroupHeader,
+        // functions
+        pinSelectedTags
     };
 }

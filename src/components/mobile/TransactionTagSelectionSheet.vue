@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue';
+import { ref, watch, nextTick, useTemplateRef } from 'vue';
 import type { Sheet, Searchbar } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -130,7 +130,8 @@ const {
     clonedModelValue,
     tagSearchContent,
     selectedTagIds,
-    filteredTagsWithGroupHeader
+    filteredTagsWithGroupHeader,
+    pinSelectedTags
 } = useTransactionTagSelectionBase(props, true, true);
 
 const transactionTagsStore = useTransactionTagsStore();
@@ -211,8 +212,11 @@ function onSearchBarFocus(): void {
 
 function onSheetOpen(event: { $el: Framework7Dom }): void {
     clonedModelValue.value = Array.from(props.modelValue);
+    pinSelectedTags();
     newTag.value = null;
-    scrollToSelectedItem(event.$el[0], '.sheet-modal-inner', '.page-content', 'li.list-item-selected');
+    nextTick(() => {
+        scrollToSelectedItem(event.$el[0], '.sheet-modal-inner', '.page-content', 'li.list-item-selected');
+    });
 }
 
 function onSheetClosed(): void {
@@ -220,6 +224,13 @@ function onSheetClosed(): void {
     tagSearchContent.value = '';
     searchbar.value?.clear();
 }
+
+watch(tagSearchContent, (newValue, oldValue) => {
+    // when the search is cleared, show the tags selected while searching on top as well
+    if (!newValue && oldValue) {
+        pinSelectedTags();
+    }
+});
 </script>
 
 <style>

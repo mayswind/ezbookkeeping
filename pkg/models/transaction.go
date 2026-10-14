@@ -203,6 +203,13 @@ type TransactionImportRequest struct {
 	ClientSessionId string                      `json:"clientSessionId"`
 }
 
+// TransactionImportResponse represents the result and committed progress of transaction import
+type TransactionImportResponse struct {
+	Finished      bool `json:"finished"`
+	ImportedCount int  `json:"importedCount"`
+	TotalCount    int  `json:"totalCount"`
+}
+
 // TransactionImportProcessRequest represents all parameters of transaction import process request
 type TransactionImportProcessRequest struct {
 	ClientSessionId string `form:"client_session_id"`

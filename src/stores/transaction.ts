@@ -18,9 +18,12 @@ import { CategoryType } from '@/core/category.ts';
 import type { ImportFileTypeSupportedAdditionalOptions } from '@/core/file.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
+import { KnownErrorCode } from '@/consts/api.ts';
+
 import {
     type TransactionDraft,
     type TransactionCreateRequest,
+    type TransactionImportResponse,
     type TransactionInfoResponse,
     type TransactionPageWrapper,
     type TransactionReconciliationStatementResponse,
@@ -1676,7 +1679,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function importTransactions({ transactions, clientSessionId }: { transactions: ImportTransaction[], clientSessionId: string }): Promise<number> {
+    function importTransactions({ transactions, clientSessionId }: { transactions: ImportTransaction[], clientSessionId: string }): Promise<TransactionImportResponse> {
         const submitTransactions: TransactionCreateRequest[] = [];
 
         if (transactions) {
@@ -1694,7 +1697,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
-                    reject({ message: 'Unable to import transactions' });
+                    reject({ message: 'Unable to import transactions', resultUnknown: true });
                     return;
                 }
 
@@ -1703,9 +1706,9 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 logger.error('Unable to import transactions', error);
 
                 if (error.response && error.response.data && error.response.data.errorMessage) {
-                    reject({ error: error.response.data });
+                    reject({ error: error.response.data, resultUnknown: error.response.data.success !== false || !isNumber(error.response.data.errorCode) || error.response.data.errorCode === KnownErrorCode.RepeatedRequest });
                 } else if (!error.processed) {
-                    reject({ message: 'Unable to import transactions' });
+                    reject({ message: 'Unable to import transactions', resultUnknown: true });
                 } else {
                     reject(error);
                 }
@@ -1713,12 +1716,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function getImportTransactionsProcess({ clientSessionId }: { clientSessionId: string }): Promise<number | null> {
+    function getImportTransactionsProcess({ clientSessionId, force }: { clientSessionId: string, force?: boolean }): Promise<TransactionImportResponse | null> {
         return new Promise((resolve, reject) => {
             services.getImportTransactionsProcess(clientSessionId).then(response => {
                 const data = response.data;
 
-                if (!data || !data.success || !data.result) {
+                if (!data || !data.success || (force && !data.result)) {
                     reject({ message: 'Unable to get transactions import process' });
                     return;
                 }

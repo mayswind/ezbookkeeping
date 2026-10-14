@@ -13,6 +13,8 @@ export interface ErrorResponse {
         readonly hasValidEmailVerifyToken?: boolean;
         readonly recordId?: string;
         readonly originalData?: unknown;
+        readonly importedCount?: number;
+        readonly totalCount?: number;
     };
 }
 

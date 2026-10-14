@@ -22,6 +22,7 @@ export enum KnownErrorCode {
     ApiNotFound = 100001,
     ValidatorError = 200000,
     NothingWillBeUpdated = 200004,
+    RepeatedRequest = 200019,
     UserEmailNotVerified = 201020,
     UserLastReconciledTimeNotEnabled = 201035,
     TwoFactorAuthorizationPasscodeEmpty = 203005,

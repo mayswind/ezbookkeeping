@@ -1,5 +1,6 @@
 <template>
     <v-select
+        ref="frequencySelect"
         persistent-placeholder
         :readonly="readonly"
         :disabled="disabled"
@@ -16,7 +17,7 @@
         <template #no-data>
             <div ref="dropdownMenu" class="schedule-frequency-container">
                 <div class="schedule-frequency-type-container">
-                    <v-list>
+                    <v-list ref="frequencyTypeList" @keydown.capture="onListKeydown($event, 'left')">
                         <v-list-item :class="{ 'v-list-item--active text-primary': type.type === frequencyType }"
                                      :key="type.type" :title="type.displayName"
                                      v-for="type in allTransactionScheduledFrequencyTypes"
@@ -25,54 +26,14 @@
                     </v-list>
                 </div>
                 <div class="schedule-frequency-value-container">
-                    <v-list v-if="frequencyType === ScheduledTemplateFrequencyType.Disabled.type">
-                        <v-list-item :title="tt('None')"></v-list-item>
-                    </v-list>
-                    <v-list v-if="frequencyType === ScheduledTemplateFrequencyType.Daily.type">
-                        <v-list-item :title="tt('Daily')"></v-list-item>
-                    </v-list>
-                    <v-list select-strategy="single-leaf" v-model:selected="frequencyValue"
-                            v-else-if="frequencyType === ScheduledTemplateFrequencyType.EveryNDays.type">
-                        <v-list-item :key="n.type" :value="n.type" :title="n.displayName"
-                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(n.type) }"
-                                     v-for="n in allAvailableNDays">
-                            <template #prepend="{ isSelected, select }">
-                                <v-list-item-action start>
-                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
-                                </v-list-item-action>
-                            </template>
-                        </v-list-item>
-                    </v-list>
-                    <v-list select-strategy="classic" v-model:selected="frequencyValue"
-                            v-else-if="frequencyType === ScheduledTemplateFrequencyType.Weekly.type">
-                        <v-list-item :key="weekDay.type" :value="weekDay.type" :title="weekDay.displayName"
-                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(weekDay.type) }"
-                                     v-for="weekDay in allWeekDays">
-                            <template #prepend="{ isSelected, select }">
-                                <v-list-item-action start>
-                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
-                                </v-list-item-action>
-                            </template>
-                        </v-list-item>
-                    </v-list>
-                    <v-list select-strategy="classic" v-model:selected="frequencyValue"
-                            v-else-if="frequencyType === ScheduledTemplateFrequencyType.Monthly.type">
-                        <v-list-item :key="monthDay.type" :value="monthDay.type" :title="monthDay.displayName"
-                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthDay.type) }"
-                                     v-for="monthDay in allAvailableMonthDays">
-                            <template #prepend="{ isSelected, select }">
-                                <v-list-item-action start>
-                                    <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
-                                </v-list-item-action>
-                            </template>
-                        </v-list-item>
-                    </v-list>
-                    <v-list select-strategy="classic" v-model:selected="frequencyValue"
-                            v-else-if="frequencyType === ScheduledTemplateFrequencyType.Yearly.type">
-                        <v-list-item :key="monthAndDay.type" :value="monthAndDay.type" :title="monthAndDay.displayName"
-                                     :class="{ 'frequency-value-selected v-list-item--active text-primary': isFrequencyValueSelected(monthAndDay.type) }"
-                                     v-for="monthAndDay in allAvailableMonthAndDays">
-                            <template #prepend="{ isSelected, select }">
+                    <v-list ref="frequencyValueList" :selectable="hasFrequencyValues"
+                            :select-strategy="frequencyType === ScheduledTemplateFrequencyType.EveryNDays.type ? 'single-leaf' : 'classic'"
+                            v-model:selected="frequencyValue" @keydown.capture="onListKeydown($event, 'right')">
+                        <v-list-item :class="{ 'frequency-value-selected v-list-item--active text-primary': hasFrequencyValues && isFrequencyValueSelected(item.type) }"
+                                     :key="item.type" :value="hasFrequencyValues ? item.type : undefined" :title="item.displayName"
+                                     :tabindex="hasFrequencyValues ? -2 : undefined"
+                                     v-for="item in frequencyItems">
+                            <template #prepend="{ isSelected, select }" v-if="hasFrequencyValues">
                                 <v-list-item-action start>
                                     <v-checkbox-btn density="compact" :model-value="isSelected" @update:model-value="select"></v-checkbox-btn>
                                 </v-list-item-action>
@@ -86,6 +47,9 @@
 </template>
 
 <script setup lang="ts">
+import { VSelect } from 'vuetify/components/VSelect';
+import { VList } from 'vuetify/components/VList';
+
 import { ref, computed, nextTick, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -93,10 +57,13 @@ import { type CommonScheduleFrequencySelectionProps, useScheduleFrequencySelecti
 
 import { useUserStore } from '@/stores/user.ts';
 
+import { type TypeAndDisplayName } from '@/core/base.ts';
 import { type WeekDayValue } from '@/core/datetime.ts';
 import { ScheduledTemplateFrequencyType } from '@/core/template.ts';
+
 import { sortNumbersArray } from '@/lib/common.ts';
 import { scrollToSelectedItem } from '@/lib/ui/common.ts';
+import { type TwoColumnListColumn, setTwoColumnItemFocusWhenKeydown } from '@/lib/ui/desktop.ts';
 
 const props = defineProps<CommonScheduleFrequencySelectionProps>();
 const emit = defineEmits<{
@@ -122,10 +89,34 @@ const {
 const userStore = useUserStore();
 
 const dropdownMenu = useTemplateRef<HTMLElement>('dropdownMenu');
+const frequencySelect = useTemplateRef<VSelect>('frequencySelect');
+const frequencyTypeList = useTemplateRef<VList>('frequencyTypeList');
+const frequencyValueList = useTemplateRef<VList>('frequencyValueList');
 
 const menuState = ref<boolean>(false);
 
 const firstDayOfWeek = computed<WeekDayValue>(() => userStore.currentUserFirstDayOfWeek);
+
+const hasFrequencyValues = computed<boolean>(() => frequencyType.value !== ScheduledTemplateFrequencyType.Disabled.type && frequencyType.value !== ScheduledTemplateFrequencyType.Daily.type);
+
+const frequencyItems = computed<TypeAndDisplayName[]>(() => {
+    switch (frequencyType.value) {
+        case ScheduledTemplateFrequencyType.Disabled.type:
+            return [{ type: 0, displayName: tt('None') }];
+        case ScheduledTemplateFrequencyType.Daily.type:
+            return [{ type: 0, displayName: tt('Daily') }];
+        case ScheduledTemplateFrequencyType.EveryNDays.type:
+            return allAvailableNDays.value;
+        case ScheduledTemplateFrequencyType.Weekly.type:
+            return allWeekDays.value;
+        case ScheduledTemplateFrequencyType.Monthly.type:
+            return allAvailableMonthDays.value;
+        case ScheduledTemplateFrequencyType.Yearly.type:
+            return allAvailableMonthAndDays.value;
+        default:
+            return [];
+    }
+});
 
 const frequencyType = computed<number>({
     get: () => props.type,
@@ -156,6 +147,54 @@ const frequencyValue = computed<number[]>({
         emit('update:modelValue', sortNumbersArray(value).join(','));
     }
 });
+
+function onListKeydown(event: KeyboardEvent, column: TwoColumnListColumn): void {
+    setTwoColumnItemFocusWhenKeydown(event, column, {
+        getList: column => {
+            if (column === 'left') {
+                return frequencyTypeList.value?.$el;
+            } else if (column === 'right') {
+                return frequencyValueList.value?.$el;
+            } else {
+                return null;
+            }
+        },
+        getSelectedIndex: column => {
+            if (column === 'left') {
+                return allTransactionScheduledFrequencyTypes.value.findIndex(item => item.type === frequencyType.value);
+            } else if (column === 'right') {
+                return frequencyItems.value.findIndex(item => isFrequencyValueSelected(item.type));
+            } else {
+                return -1;
+            }
+        },
+        onSelect: (column, index) => {
+            const item = (column === 'left' ? allTransactionScheduledFrequencyTypes.value : frequencyItems.value)[index];
+
+            if (!item) {
+                return;
+            }
+
+            if (column === 'left') {
+                frequencyType.value = item.type;
+            } else if (hasFrequencyValues.value) {
+                const value = item.type;
+
+                if (!isFrequencyValueSelected(value)) {
+                    if (frequencyType.value === ScheduledTemplateFrequencyType.EveryNDays.type) {
+                        frequencyValue.value = [value];
+                    } else {
+                        frequencyValue.value = [...frequencyValue.value, value];
+                    }
+                }
+            }
+        },
+        onLeave: () => {
+            menuState.value = false;
+            frequencySelect.value?.focus();
+        }
+    });
+}
 
 const displayFrequency = computed<string>(() => {
     if (frequencyType.value === ScheduledTemplateFrequencyType.Disabled.type) {

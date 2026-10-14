@@ -1,6 +1,22 @@
+import { nextTick } from 'vue';
+
 export type ComponentDensity = 'default' | 'comfortable' | 'compact';
 export type InputVariant = 'filled' | 'underlined' | 'outlined' | 'plain' | 'solo' | 'solo-inverted' | 'solo-filled';
 export type SnackBarVariant = 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain';
+
+export type TwoColumnListColumn = 'left' | 'right';
+
+export interface TwoColumnListKeyboardOptions {
+    getList: (column: TwoColumnListColumn) => HTMLElement | undefined;
+    getSelectedIndex: (column: TwoColumnListColumn) => number;
+    onSelect: (column: TwoColumnListColumn, index: number) => void;
+    onLeave: () => void;
+}
+
+function getListItems(list: HTMLElement | undefined): HTMLElement[] {
+    return Array.from(list?.children ?? [])
+        .filter((item): item is HTMLElement => item instanceof HTMLElement && item.hasAttribute('tabindex'));
+}
 
 export function getOuterHeight(element: HTMLElement | null): number {
     if (!element) {
@@ -104,4 +120,84 @@ export function focusTableScrollContainer(event: MouseEvent): void {
 
     wrapper.tabIndex = -1;
     wrapper.focus({ preventScroll: true });
+}
+
+export function setTwoColumnItemFocusWhenKeydown(event: KeyboardEvent, currentColumn: TwoColumnListColumn, options: TwoColumnListKeyboardOptions): void {
+    let targetColumn = currentColumn;
+    let direction: 'next' | 'prev' | 'first' | 'last' = 'first';
+
+    if (event.key === 'Tab') {
+        targetColumn = event.shiftKey ? 'left' : 'right';
+    } else if (event.key === 'ArrowRight') {
+        if (currentColumn !== 'left') {
+            return;
+        }
+        targetColumn = 'right';
+    } else if (event.key === 'ArrowLeft') {
+        if (currentColumn !== 'right') {
+            return;
+        }
+        targetColumn = 'left';
+    } else if (event.key === 'ArrowDown') {
+        direction = 'next';
+    } else if (event.key === 'ArrowUp') {
+        direction = 'prev';
+    } else if (event.key === 'Home') {
+        direction = 'first';
+    } else if (event.key === 'End') {
+        direction = 'last';
+    } else {
+        return;
+    }
+
+    event.stopPropagation();
+
+    const focusTargetItem = function (): void {
+        const items = getListItems(options.getList(targetColumn));
+
+        if (!items.length) {
+            if (event.key === 'Tab') {
+                options.onLeave();
+            }
+            return;
+        }
+
+        let index = items.findIndex(item => item.contains(document.activeElement));
+
+        if (targetColumn !== currentColumn) {
+            index = Math.max(options.getSelectedIndex(targetColumn), 0);
+        } else if (direction === 'first') {
+            index = 0;
+        } else if (direction === 'last') {
+            index = items.length - 1;
+        } else if (index < 0) {
+            index = direction === 'next' ? 0 : items.length - 1;
+        } else {
+            index = (index + (direction === 'next' ? 1 : -1) + items.length) % items.length;
+        }
+
+        const item = items[Math.min(index, items.length - 1)];
+        item?.focus({ preventScroll: true });
+        item?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+
+    if (event.key === 'Tab') {
+        const focusedIndex = getListItems(options.getList(currentColumn)).findIndex(item => item.contains(document.activeElement));
+
+        if (focusedIndex >= 0) {
+            options.onSelect(currentColumn, focusedIndex);
+        }
+
+        if (targetColumn === currentColumn) {
+            options.onLeave();
+            return;
+        }
+
+        event.preventDefault();
+        nextTick(focusTargetItem);
+        return;
+    }
+
+    event.preventDefault();
+    focusTargetItem();
 }

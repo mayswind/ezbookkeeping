@@ -68,6 +68,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     // Transaction Edit Page
     autoSaveTransactionDraft: string;
     autoGetCurrentGeoLocation: boolean;
+    showSelectedTagsOnTopInMobile: boolean;
     alwaysShowTransactionPicturesInMobileTransactionEditPage: boolean;
     transactionPictureQuality: number;
     // AI Clipboard Text Recognition
@@ -161,6 +162,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'quickAddButtonActionInMobileTransactionEditPage': UserApplicationCloudSettingType.Number,
     'autoSaveTransactionDraft': UserApplicationCloudSettingType.String,
     'autoGetCurrentGeoLocation': UserApplicationCloudSettingType.Boolean,
+    'showSelectedTagsOnTopInMobile': UserApplicationCloudSettingType.Boolean,
     'alwaysShowTransactionPicturesInMobileTransactionEditPage': UserApplicationCloudSettingType.Boolean,
     'transactionPictureQuality': UserApplicationCloudSettingType.Number,
     // AI Clipboard Text Recognition
@@ -236,6 +238,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     quickAddButtonActionInMobileTransactionEditPage: TransactionQuickAddButtonActionType.Default.type,
     autoSaveTransactionDraft: 'disabled',
     autoGetCurrentGeoLocation: false,
+    showSelectedTagsOnTopInMobile: false,
     alwaysShowTransactionPicturesInMobileTransactionEditPage: false,
     transactionPictureQuality: ImageUploadQualityType.Default.type,
     // AI Clipboard Text Recognition

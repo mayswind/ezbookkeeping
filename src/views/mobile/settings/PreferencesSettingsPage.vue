@@ -320,6 +320,15 @@
 
             <f7-list-item>
                 <template #after-title>
+                    {{ tt('Show Selected Tags on Top in Tag Picker') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="showSelectedTagsOnTopInMobile" @toggle:change="showSelectedTagsOnTopInMobile = $event"></f7-toggle>
+                </template>
+            </f7-list-item>
+
+            <f7-list-item>
+                <template #after-title>
                     {{ tt('Always Show Transaction Pictures') }}
                 </template>
                 <template #after>
@@ -575,6 +584,11 @@ const quickSaveButtonStyleInMobileTransactionListPage = computed<number>({
 const quickAddButtonActionInMobileTransactionEditPage = computed<number>({
     get: () => settingsStore.appSettings.quickAddButtonActionInMobileTransactionEditPage,
     set: (value) => settingsStore.setQuickAddButtonActionInMobileTransactionEditPage(value)
+});
+
+const showSelectedTagsOnTopInMobile = computed<boolean>({
+    get: () => settingsStore.appSettings.showSelectedTagsOnTopInMobile,
+    set: (value) => settingsStore.setShowSelectedTagsOnTopInMobile(value)
 });
 
 const alwaysShowTransactionPicturesInMobileTransactionEditPage = computed<boolean>({

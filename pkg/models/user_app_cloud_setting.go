@@ -40,6 +40,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"quickAddButtonActionInMobileTransactionEditPage":          USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"autoSaveTransactionDraft":                                 USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	"autoGetCurrentGeoLocation":                                USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"showSelectedTagsOnTopInMobile":                            USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"alwaysShowTransactionPicturesInMobileTransactionEditPage": USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"transactionPictureQuality":                                USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// AI Clipboard Text Recognition

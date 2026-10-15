@@ -48,7 +48,7 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
 
     const normalizedTagSearchContent = computed<string>(() => NormalizedText.normalizeForSearch(tagSearchContent.value));
 
-    const allTagsWithGroupHeader = computed<TransactionTagWithGroupHeader[]>(() => getTagsWithGroupHeader(tag => {
+    const allTagsWithGroupHeader = computed<TransactionTagWithGroupHeader[]>(() => getTagsWithGroupHeader(false, tag => {
         if (!tag.hidden) {
             return true;
         }
@@ -64,17 +64,8 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
         return false;
     }));
 
-    const filteredTagsWithGroupHeader = computed<TransactionTagWithGroupHeader[]>(() => getTagsWithGroupHeader(tag => {
-        if (normalizedTagSearchContent.value) {
-            if (NormalizedText.normalizeForSearch(tag.name).indexOf(normalizedTagSearchContent.value) >= 0 && (!tag.hidden || isAllFilteredTagHidden.value)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        return !tag.hidden || !!selectedTagIds.value[tag.id];
-    }));
+    const filteredTagsWithGroupHeader = computed<TransactionTagWithGroupHeader[]>(() => getTagsWithGroupHeader(false, filterTag));
+    const filteredTagsWithGroupHeaderAndSelectedTagsOnTop = computed<TransactionTagWithGroupHeader[]>(() => getTagsWithGroupHeader(true, filterTag));
 
     const isAllFilteredTagHidden = computed<boolean>(() => {
         const lowerCaseTagSearchContent = NormalizedText.normalizeForSearch(tagSearchContent.value);
@@ -93,13 +84,38 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
         return hiddenCount > 0;
     });
 
-    function getTagsWithGroupHeader(tagFilterFn: (tag: TransactionTag) => boolean): TransactionTagWithGroupHeader[] {
+    function filterTag(tag: TransactionTag): boolean {
+        if (normalizedTagSearchContent.value) {
+            if (NormalizedText.normalizeForSearch(tag.name).indexOf(normalizedTagSearchContent.value) >= 0 && (!tag.hidden || isAllFilteredTagHidden.value)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return !tag.hidden || !!selectedTagIds.value[tag.id];
+    }
+
+    function getTagsWithGroupHeader(showSelectedTagsOnTop: boolean, tagFilterFn: (tag: TransactionTag) => boolean): TransactionTagWithGroupHeader[] {
         const result: TransactionTagWithGroupHeader[] = [];
+        const selectedTags: TransactionTag[] = [];
         const tagsInDefaultGroup = transactionTagsStore.allTransactionTagsByGroupMap[DEFAULT_TAG_GROUP_ID];
         let addButtonAdded = false;
 
         if (tagsInDefaultGroup && tagsInDefaultGroup.length > 0) {
-            const visibleTags = tagsInDefaultGroup.filter(tag => tagFilterFn(tag));
+            const visibleTags: TransactionTag[] = [];
+
+            for (const tag of tagsInDefaultGroup) {
+                if (!tagFilterFn(tag)) {
+                    continue;
+                }
+
+                if (showSelectedTagsOnTop && selectedTagIds.value[tag.id]) {
+                    selectedTags.push(tag);
+                } else {
+                    visibleTags.push(tag);
+                }
+            }
 
             if (visibleTags.length > 0) {
                 result.push({
@@ -125,7 +141,19 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
                 continue;
             }
 
-            const visibleTags = tags.filter(tag => tagFilterFn(tag));
+            const visibleTags: TransactionTag[] = [];
+
+            for (const tag of tags) {
+                if (!tagFilterFn(tag)) {
+                    continue;
+                }
+
+                if (showSelectedTagsOnTop && selectedTagIds.value[tag.id]) {
+                    selectedTags.push(tag);
+                } else {
+                    visibleTags.push(tag);
+                }
+            }
 
             if (visibleTags.length > 0) {
                 result.push({
@@ -143,7 +171,18 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
             });
         }
 
-        return result;
+        if (showSelectedTagsOnTop && selectedTags.length > 0) {
+            return [
+                {
+                    type: 'subheader',
+                    title: tt('Selected Tags')
+                },
+                ...selectedTags,
+                ...result
+            ]
+        } else {
+            return result;
+        }
     }
 
     return {
@@ -153,6 +192,7 @@ export function useTransactionTagSelectionBase(props: CommonTransactionTagSelect
         // computed states
         selectedTagIds,
         allTagsWithGroupHeader,
-        filteredTagsWithGroupHeader
+        filteredTagsWithGroupHeader,
+        filteredTagsWithGroupHeaderAndSelectedTagsOnTop
     };
 }

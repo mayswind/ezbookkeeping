@@ -314,6 +314,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('autoGetCurrentGeoLocation', value);
     }
 
+    function setShowSelectedTagsOnTopInMobile(value: boolean): void {
+        updateApplicationSettingsValue('showSelectedTagsOnTopInMobile', value);
+        appSettings.value.showSelectedTagsOnTopInMobile = value;
+        updateUserApplicationCloudSettingValue('showSelectedTagsOnTopInMobile', value);
+    }
+
     function setAlwaysShowTransactionPicturesInMobileTransactionEditPage(value: boolean): void {
         updateApplicationSettingsValue('alwaysShowTransactionPicturesInMobileTransactionEditPage', value);
         appSettings.value.alwaysShowTransactionPicturesInMobileTransactionEditPage = value;
@@ -649,6 +655,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setQuickAddButtonActionInMobileTransactionEditPage,
         setAutoSaveTransactionDraft,
         setAutoGetCurrentGeoLocation,
+        setShowSelectedTagsOnTopInMobile,
         setAlwaysShowTransactionPicturesInMobileTransactionEditPage,
         setTransactionPictureQuality,
         // -- AI Clipboard Text Recognition

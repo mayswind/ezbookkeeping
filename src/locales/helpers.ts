@@ -2917,6 +2917,8 @@ export function useI18n() {
         getCurrentDigitGroupingType,
         getCurrentFiscalYearFormatType,
         getCurrencyName,
+        getLocalizedLongDateFormat,
+        getLocalizedLongTimeFormat,
         getLongDateFormatOrder,
         getShortDateFormatOrder,
         isLongDateMonthAfterYear,

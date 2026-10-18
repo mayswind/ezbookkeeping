@@ -117,6 +117,11 @@ You can also build a Docker image. Make sure you have [Docker](https://www.docke
 
     $ ./build.sh docker
 
+## One-Click Deploy
+
+<a href="https://repocloud.io/details/ezBookkeeping/"><img src="https://d16t0pc4846x52.cloudfront.net/deploylobe.svg" alt="Deploy on RepoCloud" height="42"></a>
+<a href="https://railway.com/deploy/ezbookkeeping-finance"><img src="https://railway.com/button.svg" alt="Deploy on Railway" height="42"></a>
+
 ## Contributing
 We welcome contributions of all kinds.
 

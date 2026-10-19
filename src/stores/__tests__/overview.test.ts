@@ -1,9 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import moment from 'moment-timezone';
 import { createPinia, setActivePinia } from 'pinia';
+import moment from 'moment-timezone';
 
-// The stores read window.location and localStorage when they are loaded,
-// and the test environment is node
+import { useRootStore } from '@/stores/index.ts';
+import { useUserStore } from '@/stores/user.ts';
+import { useOverviewStore } from '@/stores/overview.ts';
+
+import { EMPTY_USER_BASIC_INFO } from '@/models/user.ts';
+
+import services from '@/lib/services.ts';
+
+// The stores read window.location and localStorage when they are loaded and the test environment is node
 vi.hoisted(() => {
     const data = new Map<string, string>();
     const storage = {
@@ -22,11 +29,6 @@ vi.hoisted(() => {
     });
 });
 
-import services from '@/lib/services.ts';
-import { useRootStore } from '@/stores/index.ts';
-import { useUserStore } from '@/stores/user.ts';
-import { useOverviewStore } from '@/stores/overview.ts';
-
 describe('overview store', () => {
     beforeEach(() => {
         moment.tz.setDefault('UTC');
@@ -42,7 +44,7 @@ describe('overview store', () => {
     });
 
     it('uses the first day of week of a user known before the store is created', async () => {
-        useUserStore().storeUserBasicInfo({ username: 'test', firstDayOfWeek: 1 } as never);
+        useUserStore().storeUserBasicInfo({ ...EMPTY_USER_BASIC_INFO, username: 'test', firstDayOfWeek: 1 });
 
         const overviewStore = useOverviewStore();
         const getTransactionAmounts = vi.spyOn(services, 'getTransactionAmounts').mockResolvedValue({
@@ -69,7 +71,7 @@ describe('overview store', () => {
             data: { success: true, result: {} }
         } as never);
 
-        await rootStore.authorize({ loginName: 'test', password: 'password' } as never);
+        await rootStore.authorize({ loginName: 'test', password: 'password' });
         await overviewStore.loadTransactionOverview({ force: false });
 
         const monday = moment.utc('2026-10-12T00:00:00Z').unix();

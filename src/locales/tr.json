@@ -117,6 +117,7 @@
             "720p": "720p (approx. {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Currencies shown on the home page for quick switching (up to {count})",
             "nHour": "{n} Saat",
             "nHours": "{n} Saat",
             "nDay": "{n} Gün",
@@ -2586,6 +2587,7 @@
     "Accounts Included in Overview Statistics": "Genel Bakış İstatistiklerine Dahil Edilen Hesaplar",
     "Transaction Categories Included in Overview Statistics": "Genel Bakış İstatistiklerine Dahil Edilen İşlem Kategorileri",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Quick Switch Currencies",
     "Timezone Type": "Saat Dilimi Türü",
     "Application Timezone": "Uygulama Saat Dilimi",
     "Transaction List Page": "İşlem Listesi Sayfası",

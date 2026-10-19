@@ -159,6 +159,32 @@
                                 </template>
                             </v-btn>
                         </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Quick Switch Currencies') }}</span>
+                            <v-spacer/>
+                            <v-autocomplete
+                                class="ms-4"
+                                density="compact"
+                                item-title="displayName"
+                                item-value="currencyCode"
+                                multiple
+                                chips
+                                closable-chips
+                                persistent-placeholder
+                                max-width="600px"
+                                :placeholder="tt('Quick Switch Currencies')"
+                                :hint="tt('format.misc.quickSwitchCurrenciesHint', { count: MAX_QUICK_SWITCH_CURRENCIES_COUNT })"
+                                persistent-hint
+                                :items="allCurrencies"
+                                :no-data-text="tt('No results')"
+                                v-model="quickSwitchCurrencies"
+                            >
+                                <template #chip="{ props, item }">
+                                    <v-chip v-bind="props" :text="item.currencyCode"/>
+                                </template>
+                            </v-autocomplete>
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
@@ -458,12 +484,14 @@ import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase.ts';
+import { useCurrencyQuickSwitchBase } from '@/views/base/overview/CurrencyQuickSwitchBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import type { NameNumeralValue } from '@/core/base.ts';
+import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -473,6 +501,7 @@ import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP } from '@/core/s
 import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 
 import { isDefaultDesktopOverviewLayout, parseDesktopOverviewLayout } from '@/lib/overview_layout.ts';
+import { MAX_QUICK_SWITCH_CURRENCIES_COUNT } from '@/lib/currency.ts';
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -482,7 +511,8 @@ type AccountCategoryDisplayOrderDialogType = InstanceType<typeof AccountCategory
 const theme = useTheme();
 const router = useRouter();
 
-const { tt, getAllDateRanges, getTablePageOptions } = useI18n();
+const { tt, getAllDateRanges, getAllCurrencies, getTablePageOptions } = useI18n();
+const { quickSwitchCurrencies } = useCurrencyQuickSwitchBase();
 const {
     loadingAccounts,
     loadingTransactionCategories,
@@ -537,6 +567,7 @@ const showTransactionCategoriesIncludedInHomePageOverviewDialog = ref<boolean>(f
 const showTransactionTagsIncludedInHomePageOverviewDialog = ref<boolean>(false);
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 const allPageCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, undefined, false, true));
 const allInsightsExplorerDefaultDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, {}));
 

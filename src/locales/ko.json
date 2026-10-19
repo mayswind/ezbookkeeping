@@ -117,6 +117,7 @@
             "720p": "720p (approx. {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Currencies shown on the home page for quick switching (up to {count})",
             "nHour": "{n} Hour",
             "nHours": "{n} Hours",
             "nDay": "{n} Day",
@@ -2586,6 +2587,7 @@
     "Accounts Included in Overview Statistics": "개요 통계에 포함된 계좌",
     "Transaction Categories Included in Overview Statistics": "개요 통계에 포함된 거래 범주",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Quick Switch Currencies",
     "Timezone Type": "시간대 유형",
     "Application Timezone": "애플리케이션 시간대",
     "Transaction List Page": "거래 목록 페이지",

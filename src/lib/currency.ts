@@ -7,7 +7,7 @@ export function parseQuickSwitchCurrencies(value: string): string[] {
     const result: string[] = [];
 
     for (const currency of (value || '').split(',')) {
-        if (ALL_CURRENCIES[currency] && result.indexOf(currency) < 0 && result.length < MAX_QUICK_SWITCH_CURRENCIES_COUNT) {
+        if (ALL_CURRENCIES[currency] && result.length < MAX_QUICK_SWITCH_CURRENCIES_COUNT) {
             result.push(currency);
         }
     }

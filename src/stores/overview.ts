@@ -338,7 +338,8 @@ export const useOverviewStore = defineStore('overview', () => {
         let dateChanged: boolean = false;
         let rangeChanged: boolean = false;
 
-        if (transactionDataRange.value.today.startTime !== getTodayFirstUnixTime()) {
+        if (transactionDataRange.value.today.startTime !== getTodayFirstUnixTime()
+            || transactionDataRange.value.thisWeek.startTime !== getThisWeekFirstUnixTime(userStore.currentUserFirstDayOfWeek)) {
             dateChanged = true;
             updateTransactionDateRange();
         }

@@ -163,27 +163,11 @@
                         <div class="setting-item">
                             <span>{{ tt('Quick Switch Currencies') }}</span>
                             <v-spacer/>
-                            <v-autocomplete
-                                class="ms-4"
-                                density="compact"
-                                item-title="displayName"
-                                item-value="currencyCode"
-                                multiple
-                                chips
-                                closable-chips
-                                persistent-placeholder
-                                max-width="600px"
-                                :placeholder="tt('Quick Switch Currencies')"
-                                :hint="tt('format.misc.quickSwitchCurrenciesHint', { count: MAX_QUICK_SWITCH_CURRENCIES_COUNT })"
-                                persistent-hint
-                                :items="allCurrencies"
-                                :no-data-text="tt('No results')"
-                                v-model="quickSwitchCurrencies"
-                            >
-                                <template #chip="{ props, item }">
-                                    <v-chip v-bind="props" :text="item.currencyCode"/>
-                                </template>
-                            </v-autocomplete>
+                            <currency-select class="ms-4" density="compact" max-width="600px" multiple
+                                             :placeholder="tt('Quick Switch Currencies')"
+                                             :hint="tt('format.misc.quickSwitchCurrenciesHint', { count: MAX_QUICK_SWITCH_CURRENCIES_COUNT })"
+                                             persistent-hint
+                                             v-model="quickSwitchCurrencies" />
                         </div>
                     </v-card-text>
                 </v-form>
@@ -491,7 +475,6 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import type { NameNumeralValue } from '@/core/base.ts';
-import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
@@ -511,7 +494,7 @@ type AccountCategoryDisplayOrderDialogType = InstanceType<typeof AccountCategory
 const theme = useTheme();
 const router = useRouter();
 
-const { tt, getAllDateRanges, getAllCurrencies, getTablePageOptions } = useI18n();
+const { tt, getAllDateRanges, getTablePageOptions } = useI18n();
 const { quickSwitchCurrencies } = useCurrencyQuickSwitchBase();
 const {
     loadingAccounts,
@@ -567,7 +550,6 @@ const showTransactionCategoriesIncludedInHomePageOverviewDialog = ref<boolean>(f
 const showTransactionTagsIncludedInHomePageOverviewDialog = ref<boolean>(false);
 const showAccountsIncludedInTotalDialog = ref<boolean>(false);
 
-const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies());
 const allPageCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, undefined, false, true));
 const allInsightsExplorerDefaultDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.InsightsExplorer, {}));
 

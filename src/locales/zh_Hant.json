@@ -2904,6 +2904,7 @@
     "Query All Transaction Tags": "查詢所有交易標籤",
     "Query Latest Exchange Rates": "查詢最新匯率",
     "Query Transactions": "查詢交易",
+    "Delete Transaction": "Delete Transaction",
     "Your token does not expire, please keep it secure.": "您的令牌不會過期，請妥善保管。",
     "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "當連接至第三方應用程式時，請留意它們及其使用的大型語言模型（LLM）可以存取您的隱私資料。",
     "Unable to generate token": "無法產生令牌",

@@ -2904,6 +2904,7 @@
     "Query All Transaction Tags": "Query All Transaction Tags",
     "Query Latest Exchange Rates": "Query Latest Exchange Rates",
     "Query Transactions": "Query Transactions",
+    "Delete Transaction": "Delete Transaction",
     "Your token does not expire, please keep it secure.": "토큰은 만료되지 않으므로 안전하게 보관하십시오.",
     "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "타사 앱에 연결할 때 해당 앱과 그들이 사용하는 모든 대형 언어 모델이 귀하의 개인 데이터에 접근할 수 있음을 인지하십시오.",
     "Unable to generate token": "토큰을 생성할 수 없습니다.",

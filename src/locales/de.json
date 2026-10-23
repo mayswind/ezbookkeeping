@@ -2904,6 +2904,7 @@
     "Query All Transaction Tags": "Query All Transaction Tags",
     "Query Latest Exchange Rates": "Query Latest Exchange Rates",
     "Query Transactions": "Query Transactions",
+    "Delete Transaction": "Delete Transaction",
     "Your token does not expire, please keep it secure.": "Ihr Token läuft nicht ab, bitte bewahren Sie es sicher auf.",
     "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "Beachten Sie beim Verbinden mit Drittanbieter-Apps, dass diese und die von ihnen verwendeten großen Sprachmodelle auf Ihre privaten Daten zugreifen können.",
     "Unable to generate token": "Token kann nicht generiert werden",

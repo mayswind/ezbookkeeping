@@ -80,6 +80,7 @@ func InitializeMCPHandlers(config *settings.Config) error {
 	registerMCPTextContentToolHandler(container, MCPQueryLatestExchangeRatesToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryTransactionsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPAddTransactionToolHandler)
+	registerMCPTextContentToolHandler(container, MCPDeleteTransactionToolHandler)
 
 	Container = container
 	return nil

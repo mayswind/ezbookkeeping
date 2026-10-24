@@ -1204,12 +1204,15 @@ export function getShiftedDateRange(minTime: number, maxTime: number, scale: num
 
     const firstDayOfMonth = minDateTime.clone().startOf('month');
     const lastDayOfMonth = maxDateTime.clone().endOf('month');
+    const firstSecondOfMinDate = minDateTime.clone().startOf('day');
+    const lastSecondOfMaxDate = maxDateTime.clone().endOf('day');
+    const isMinTimeStartOfDay = firstSecondOfMinDate.unix() === minDateTime.unix();
 
     // check whether the date range matches full months
     if (firstDayOfMonth.unix() === minDateTime.unix() && lastDayOfMonth.unix() === maxDateTime.unix()) {
         const months = maxDateTime.year() * 12 + (maxDateTime.month() + 1) - minDateTime.year() * 12 - (minDateTime.month() + 1) + 1;
-        const newMinDateTime = minDateTime.add(months * scale, 'months');
-        const newMaxDateTime = newMinDateTime.clone().add(months, 'months').subtract(1, 'seconds');
+        const newMinDateTime = minDateTime.add(months * scale, 'months').startOf('day');
+        const newMaxDateTime = newMinDateTime.clone().add(months, 'months').startOf('day').subtract(1, 'seconds');
 
         return {
             minTime: newMinDateTime.unix(),
@@ -1223,6 +1226,10 @@ export function getShiftedDateRange(minTime: number, maxTime: number, scale: num
         const newMinDateTime = minDateTime.add(1 * scale, 'years');
         const newMaxDateTime = maxDateTime.add(1 * scale, 'years');
 
+        if (isMinTimeStartOfDay) {
+            newMinDateTime.startOf('day');
+        }
+
         return {
             minTime: newMinDateTime.unix(),
             maxTime: newMaxDateTime.unix()
@@ -1234,6 +1241,22 @@ export function getShiftedDateRange(minTime: number, maxTime: number, scale: num
         maxDateTime.clone().subtract(1, 'months').add(1, 'seconds').unix() === minDateTime.unix()) {
         const newMinDateTime = minDateTime.add(1 * scale, 'months');
         const newMaxDateTime = maxDateTime.add(1 * scale, 'months');
+
+        if (isMinTimeStartOfDay) {
+            newMinDateTime.startOf('day');
+        }
+
+        return {
+            minTime: newMinDateTime.unix(),
+            maxTime: newMaxDateTime.unix()
+        };
+    }
+
+    // check whether the date range matches full days
+    if (firstSecondOfMinDate.unix() === minDateTime.unix() && lastSecondOfMaxDate.unix() === maxDateTime.unix()) {
+        const days = maxDateTime.diff(minDateTime, 'days') + 1;
+        const newMinDateTime = minDateTime.add(days * scale, 'days').startOf('day');
+        const newMaxDateTime = newMinDateTime.clone().add(days, 'days').startOf('day').subtract(1, 'seconds');
 
         return {
             minTime: newMinDateTime.unix(),

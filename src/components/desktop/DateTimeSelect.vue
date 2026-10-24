@@ -1,78 +1,82 @@
 <template>
-    <v-select
+    <v-text-field
         persistent-placeholder
         :readonly="readonly"
         :disabled="disabled"
         :clearable="!emptyValue ? clearable : false"
         :label="label"
-        :menu-props="{ contentClass: 'date-time-select-menu' }"
-        v-model="dateTime"
+        :placeholder="typedFormatHint"
+        append-inner-icon="mdi-calendar-month"
+        v-model="typedText"
+        @click:append-inner="menuOpen = true"
+        @focus="onFieldFocus"
+        @blur="commitTypedText"
+        @keydown.enter="commitTypedText"
         @paste="onPaste"
+        @click:clear="onClear"
     >
-        <template #selection>
-            <span class="text-truncate cursor-pointer">{{ displayTime }}</span>
-        </template>
-
-        <template #no-data>
-            <date-time-picker :is-dark-mode="isDarkMode"
-                              :enable-time-picker="false"
-                              :vertical="true"
-                              :show-alternate-dates="true"
-                              v-model="dateTime">
-            </date-time-picker>
-            <div class="date-time-select-time-picker-container"
-                 @focusin="onFocused"
-                 @click="onFocused"
-                 @keydown="onKeyDown">
-                <v-btn class="px-3" color="primary" variant="flat"
-                       v-if="!is24Hour && isMeridiemIndicatorFirst"
-                       @click="toggleMeridiemIndicator">
-                    {{ tt(`datetime.${currentMeridiemIndicator}.content`) }}
-                </v-btn>
-                <v-autocomplete eager
-                                density="compact"
-                                max-width="70px"
-                                item-title="value"
-                                item-value="value"
-                                auto-select-first="exact"
-                                :items="hourItems"
-                                :hide-no-data="true"
-                                v-model="currentHour"
-                />
-                <span>:</span>
-                <v-autocomplete eager
-                                density="compact"
-                                max-width="70px"
-                                item-title="value"
-                                item-value="value"
-                                auto-select-first="exact"
-                                :items="minuteItems"
-                                :hide-no-data="true"
-                                v-model="currentMinute"
-                />
-                <span>:</span>
-                <v-autocomplete eager
-                                density="compact"
-                                max-width="70px"
-                                item-title="value"
-                                item-value="value"
-                                auto-select-first="exact"
-                                :items="secondItems"
-                                :hide-no-data="true"
-                                v-model="currentSecond"
-                />
-                <v-btn class="px-3" color="primary" variant="flat"
-                       v-if="!is24Hour && !isMeridiemIndicatorFirst"
-                       @click="toggleMeridiemIndicator">
-                    {{ tt(`datetime.${currentMeridiemIndicator}.content`) }}
-                </v-btn>
-            </div>
-        </template>
-    </v-select>
+        <v-menu activator="parent" content-class="date-time-select-menu" :open-on-click="false" :close-on-content-click="false" v-model="menuOpen">
+            <v-sheet>
+                <date-time-picker :is-dark-mode="isDarkMode"
+                                  :enable-time-picker="false"
+                                  :vertical="true"
+                                  :show-alternate-dates="true"
+                                  v-model="dateTime">
+                </date-time-picker>
+                <div class="date-time-select-time-picker-container"
+                     @focusin="onFocused"
+                     @click="onFocused"
+                     @keydown="onKeyDown">
+                    <v-btn class="px-3" color="primary" variant="flat"
+                           v-if="!is24Hour && isMeridiemIndicatorFirst"
+                           @click="toggleMeridiemIndicator">
+                        {{ tt(`datetime.${currentMeridiemIndicator}.content`) }}
+                    </v-btn>
+                    <v-autocomplete eager
+                                    density="compact"
+                                    max-width="70px"
+                                    item-title="value"
+                                    item-value="value"
+                                    auto-select-first="exact"
+                                    :items="hourItems"
+                                    :hide-no-data="true"
+                                    v-model="currentHour"
+                    />
+                    <span>:</span>
+                    <v-autocomplete eager
+                                    density="compact"
+                                    max-width="70px"
+                                    item-title="value"
+                                    item-value="value"
+                                    auto-select-first="exact"
+                                    :items="minuteItems"
+                                    :hide-no-data="true"
+                                    v-model="currentMinute"
+                    />
+                    <span>:</span>
+                    <v-autocomplete eager
+                                    density="compact"
+                                    max-width="70px"
+                                    item-title="value"
+                                    item-value="value"
+                                    auto-select-first="exact"
+                                    :items="secondItems"
+                                    :hide-no-data="true"
+                                    v-model="currentSecond"
+                    />
+                    <v-btn class="px-3" color="primary" variant="flat"
+                           v-if="!is24Hour && !isMeridiemIndicatorFirst"
+                           @click="toggleMeridiemIndicator">
+                        {{ tt(`datetime.${currentMeridiemIndicator}.content`) }}
+                    </v-btn>
+                </div>
+            </v-sheet>
+        </v-menu>
+    </v-text-field>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -80,18 +84,12 @@ import { type TimePickerValue, useDateTimeSelectionBase } from '@/components/bas
 
 import { ThemeType } from '@/core/theme.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
-import {
-    type DateTime,
-    type DateFormatOrder,
-    MeridiemIndicator,
-    KnownDateTimeFormat
-} from '@/core/datetime.ts';
+import { type DateTime, MeridiemIndicator } from '@/core/datetime.ts';
 import {
     getHourIn12HourFormat,
     getLocalDatetimeFromUnixTime,
     getSameDateTimeWithBrowserTimezone,
     parseDateTimeFromUnixTimeWithTimezoneOffset,
-    parseDateTimeFromKnownDateTimeFormat,
     getAMOrPM,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
@@ -116,10 +114,6 @@ const theme = useTheme();
 const {
     tt,
     getCurrentNumeralSystemType,
-    getLongDateFormatOrder,
-    getShortDateFormatOrder,
-    parseDateTimeFromLongDateTime,
-    parseDateTimeFromShortDateTime,
     formatDateTimeToLongDateTime
 } = useI18n();
 
@@ -129,17 +123,19 @@ const {
     isMinuteTwoDigits,
     isSecondTwoDigits,
     isMeridiemIndicatorFirst,
+    typedFormatHint,
     getLocalDatetimeFromSameDateTimeOfUnixTime,
     getUnixTimeFromSameDateTimeOfLocalDatetime,
     getDisplayTimeValue,
     generateAllHours,
-    generateAllMinutesOrSeconds
+    generateAllMinutesOrSeconds,
+    parseTypedDateTime
 } = useDateTimeSelectionBase();
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
-const longDateFormatOrder = computed<DateFormatOrder>(() => getLongDateFormatOrder());
-const shortDateFormatOrder = computed<DateFormatOrder>(() => getShortDateFormatOrder());
+
+const menuOpen = ref<boolean>(false);
 
 const dateTime = computed<Date>({
     get: () => {
@@ -163,6 +159,12 @@ const dateTime = computed<Date>({
 });
 
 const displayTime = computed<string>(() => props.emptyValue ? tt('None') : formatDateTimeToLongDateTime(parseDateTimeFromUnixTimeWithTimezoneOffset(props.modelValue, props.timezoneUtcOffset)));
+
+const typedText = ref<string>(displayTime.value);
+
+watch(displayTime, (newValue) => {
+    typedText.value = newValue;
+});
 
 const hourItems = computed<TimePickerValue[]>(() => generateAllHours(1, isHourTwoDigits.value));
 const minuteItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(1, isMinuteTwoDigits.value));
@@ -242,48 +244,79 @@ function toggleMeridiemIndicator(): void {
     }
 }
 
-function onPaste(event: ClipboardEvent): void {
-    if (!event.clipboardData || props.readonly || props.disabled) {
-        event.preventDefault();
+function onFieldFocus(e: FocusEvent): void {
+    if (props.readonly || props.disabled) {
         return;
     }
 
-    let text = event.clipboardData.getData('Text');
+    menuOpen.value = true;
+
+    if (e.target instanceof HTMLInputElement) {
+        const input = e.target;
+        nextTick(() => input.select());
+    }
+}
+
+function applyParsedDateTime(dt: DateTime): void {
+    dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
+}
+
+function commitTypedText(): void {
+    if (props.readonly || props.disabled) {
+        return;
+    }
+
+    const text = typedText.value;
+
+    if (text === displayTime.value) {
+        return;
+    }
+
+    if (!text.trim()) {
+        if (!props.emptyValue && props.clearable) {
+            emit('clear:modelValue');
+        } else {
+            typedText.value = displayTime.value;
+        }
+
+        return;
+    }
+
+    const dt = parseTypedDateTime(text);
+
+    if (!dt) {
+        typedText.value = displayTime.value;
+        return;
+    }
+
+    applyParsedDateTime(dt);
+    menuOpen.value = false;
+}
+
+function onClear(): void {
+    emit('clear:modelValue');
+}
+
+function onPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+
+    if (!event.clipboardData || props.readonly || props.disabled) {
+        return;
+    }
+
+    const text = event.clipboardData.getData('Text');
 
     if (!text) {
-        event.preventDefault();
         return;
     }
 
-    text = text.trim();
+    const dt = parseTypedDateTime(text);
 
-    const formats = KnownDateTimeFormat.detect(text, longDateFormatOrder.value, shortDateFormatOrder.value);
-    let dt: DateTime | undefined = undefined;
-
-    if (formats && (formats.length === 1 || (formats.length > 1 && formats[0]!.type === longDateFormatOrder.value && formats[0]!.type === shortDateFormatOrder.value))) {
-        dt = parseDateTimeFromKnownDateTimeFormat(text, formats[0] as KnownDateTimeFormat);
-
-        if (dt) {
-            dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
-            return;
-        }
-    }
-
-    dt = parseDateTimeFromLongDateTime(text);
-
-    if (dt) {
-        dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
+    if (!dt) {
         return;
     }
 
-    dt = parseDateTimeFromShortDateTime(text);
-
-    if (dt) {
-        dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
-        return;
-    }
-
-    event.preventDefault();
+    applyParsedDateTime(dt);
 }
 
 function onFocused(e: Event): void {

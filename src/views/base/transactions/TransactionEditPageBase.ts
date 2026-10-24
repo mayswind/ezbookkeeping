@@ -481,7 +481,12 @@ export function useTransactionEditPageBase(type: TransactionEditPageType, initMo
 
     function updateTransactionTime(newTime: number): void {
         transaction.value.time = newTime;
-        updateTransactionTimezone(transaction.value.timeZone ?? '');
+
+        if (type === TransactionEditPageType.Transaction && mode.value === TransactionEditPageMode.Edit && !transaction.value.timeZone) {
+            // When editing a transaction, preserve the original time zone offset unless a specific time zone name is explicitly set
+        } else {
+            updateTransactionTimezone(transaction.value.timeZone ?? '');
+        }
     }
 
     function updateTransactionTimezone(timezoneName: string | null): void {

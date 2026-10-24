@@ -40,6 +40,7 @@ type MCPQueryTransactionsResponse struct {
 
 // MCPTransactionInfo defines the structure of transaction information
 type MCPTransactionInfo struct {
+	TransactionId          string `json:"transaction_id" jsonschema_description:"Id of the transaction (used to update or delete the transaction)"`
 	Time                   string `json:"time,omitempty" jsonschema_description:"Time of the transaction in RFC 3339 format (e.g. 2023-01-01T12:00:00Z)"`
 	Type                   string `json:"type" jsonschema:"enum=income,enum=expense,enum=transfer,enum=balance_modification" jsonschema_description:"Transaction type (income, expense, transfer, balance_modification)"`
 	Amount                 string `json:"amount" jsonschema_description:"Amount of the transaction in the specified currency"`
@@ -202,7 +203,8 @@ func (h *mcpQueryTransactionsToolHandler) createNewMCPQueryTransactionsResponse(
 	for i := 0; i < len(transactions); i++ {
 		transaction := transactions[i]
 		transactionInfo := MCPTransactionInfo{
-			Amount: utils.FormatAmount(transaction.Amount),
+			TransactionId: utils.Int64ToString(transaction.TransactionId),
+			Amount:        utils.FormatAmount(transaction.Amount),
 		}
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {

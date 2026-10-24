@@ -117,6 +117,7 @@
             "720p": "720p (approx. {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Currencies shown on the home page for quick switching (up to {count})",
             "nHour": "{n} ಗಂಟೆ",
             "nHours": "{n} ಗಂಟೆಗಳು",
             "nDay": "{n} ದಿನ",
@@ -2586,6 +2587,7 @@
     "Accounts Included in Overview Statistics": "ಒವರ್‌ವ್ಯೂ ಸಂಖ್ಯಾಶಾಸ್ತ್ರದಲ್ಲಿ ಒಳಗೊಂಡ ಖಾತೆಗಳು",
     "Transaction Categories Included in Overview Statistics": "ಒವರ್‌ವ್ಯೂ ಸಂಖ್ಯಾಶಾಸ್ತ್ರದಲ್ಲಿ ಒಳಗೊಂಡ ವಹಿವಾಟು ವರ್ಗಗಳು",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Quick Switch Currencies",
     "Timezone Type": "ಸಮಯ ವಲಯ ಪ್ರಕಾರ",
     "Application Timezone": "ಅಪ್ಲಿಕೇಶನ್ ಸಮಯ ವಲಯ",
     "Transaction List Page": "ವಹಿವಾಟು ಪಟ್ಟಿ ಪುಟ",

@@ -117,6 +117,7 @@
             "720p": "720p (approx. {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Currencies shown on the home page for quick switching (up to {count})",
             "nHour": "{n} hora",
             "nHours": "{n} horas",
             "nDay": "{n} dia",
@@ -2586,6 +2587,7 @@
     "Accounts Included in Overview Statistics": "Contas Incluídas nas Estatísticas da Visão Geral",
     "Transaction Categories Included in Overview Statistics": "Categorias de Transação Incluídas nas Estatísticas da Visão Geral",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Quick Switch Currencies",
     "Timezone Type": "Tipo de Fuso Horário",
     "Application Timezone": "Fuso Horário do Aplicativo",
     "Transaction List Page": "Página de Lista de Transações",

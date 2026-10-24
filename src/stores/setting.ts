@@ -258,6 +258,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('overviewTransactionTagFilterInHomePage', value);
     }
 
+    function setQuickSwitchCurrenciesInHomePage(value: string): void {
+        updateApplicationSettingsValue('quickSwitchCurrenciesInHomePage', value);
+        appSettings.value.quickSwitchCurrenciesInHomePage = value;
+        updateUserApplicationCloudSettingValue('quickSwitchCurrenciesInHomePage', value);
+    }
+
     // Transaction List Page
     function setItemsCountInTransactionListPage(value: number): void {
         updateApplicationSettingsValue('itemsCountInTransactionListPage', value);
@@ -644,6 +650,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setOverviewAccountFilterInHomePage,
         setOverviewTransactionCategoryFilterInHomePage,
         setOverviewTransactionTagFilterInHomePage,
+        setQuickSwitchCurrenciesInHomePage,
         // -- Transaction List Page
         setItemsCountInTransactionListPage,
         setShowTotalAmountInTransactionListPage,

@@ -117,6 +117,7 @@
             "720p": "720p (approx. {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Currencies shown on the home page for quick switching (up to {count})",
             "nHour": "{n} Hour",
             "nHours": "{n} Hours",
             "nDay": "{n} Day",
@@ -2586,6 +2587,7 @@
     "Accounts Included in Overview Statistics": "บัญชีที่รวมในสถิติภาพรวม",
     "Transaction Categories Included in Overview Statistics": "หมวดรายการที่รวมในสถิติภาพรวม",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Quick Switch Currencies",
     "Timezone Type": "ประเภทโซนเวลา",
     "Application Timezone": "โซนเวลาแอปพลิเคชัน",
     "Transaction List Page": "หน้ารายการ",

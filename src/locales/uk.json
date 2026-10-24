@@ -117,6 +117,7 @@
             "720p": "720p (приблизно {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Валюти для швидкого перемикання на головній сторінці (до {count})",
             "nHour": "{n} год.",
             "nHours": "{n} год.",
             "nDay": "{n} дн.",
@@ -2586,6 +2587,7 @@
     "Accounts Included in Overview Statistics": "Рахунки, включені в статистику огляду",
     "Transaction Categories Included in Overview Statistics": "Категорії транзакцій, включені в статистику огляду",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Швидке перемикання валют",
     "Timezone Type": "Тип часового поясу",
     "Application Timezone": "Часовий пояс застосунку",
     "Transaction List Page": "Сторінка списку транзакцій",

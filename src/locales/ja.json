@@ -117,6 +117,7 @@
             "720p": "720p (約 {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Currencies shown on the home page for quick switching (up to {count})",
             "nHour": "{n}時間",
             "nHours": "{n}時間",
             "nDay": "{n}日",
@@ -2586,6 +2587,7 @@
     "Accounts Included in Overview Statistics": "概要統計に含める口座",
     "Transaction Categories Included in Overview Statistics": "概要統計に含める取引カテゴリ",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Quick Switch Currencies",
     "Timezone Type": "タイムゾーンタイプ",
     "Application Timezone": "アプリのタイムゾーン",
     "Transaction List Page": "取引リストページ",

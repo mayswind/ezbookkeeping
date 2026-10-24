@@ -159,6 +159,16 @@
                                 </template>
                             </v-btn>
                         </div>
+
+                        <div class="setting-item">
+                            <span>{{ tt('Quick Switch Currencies') }}</span>
+                            <v-spacer/>
+                            <currency-select class="ms-4" density="compact" max-width="600px" multiple
+                                             :placeholder="tt('Quick Switch Currencies')"
+                                             :hint="tt('format.misc.quickSwitchCurrenciesHint', { count: MAX_QUICK_SWITCH_CURRENCIES_COUNT })"
+                                             persistent-hint
+                                             v-model="quickSwitchCurrencies" />
+                        </div>
                     </v-card-text>
                 </v-form>
             </v-card>
@@ -458,6 +468,7 @@ import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useAppSettingPageBase } from '@/views/base/settings/AppSettingsPageBase.ts';
+import { useCurrencyQuickSwitchBase } from '@/views/base/overview/CurrencyQuickSwitchBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -473,6 +484,7 @@ import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP } from '@/core/s
 import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 
 import { isDefaultDesktopOverviewLayout, parseDesktopOverviewLayout } from '@/lib/overview_layout.ts';
+import { MAX_QUICK_SWITCH_CURRENCIES_COUNT } from '@/lib/currency.ts';
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
@@ -483,6 +495,7 @@ const theme = useTheme();
 const router = useRouter();
 
 const { tt, getAllDateRanges, getTablePageOptions } = useI18n();
+const { quickSwitchCurrencies } = useCurrencyQuickSwitchBase();
 const {
     loadingAccounts,
     loadingTransactionCategories,

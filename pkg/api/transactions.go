@@ -1609,6 +1609,120 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	return newTransactionResp, nil
 }
 
+// TransactionCreateBatchHandler saves a batch of new transactions by request parameters for current user
+func (a *TransactionsApi) TransactionCreateBatchHandler(c *core.WebContext) (any, *errs.Error) {
+	var transactionCreateBatchReq models.TransactionCreateBatchRequest
+	err := c.ShouldBindJSON(&transactionCreateBatchReq)
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionCreateBatchHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	clientTimezone, err := c.GetClientTimezone()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionCreateBatchHandler] cannot get client timezone, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	if len(transactionCreateBatchReq.Transactions) < 1 {
+		return nil, errs.ErrTransactionBatchCreateNoTransactions
+	}
+
+	if len(transactionCreateBatchReq.Transactions) > 10 {
+		return nil, errs.ErrTransactionBatchCreateTooManyTransactions
+	}
+
+	newTransactionTagIdsMap := make(map[int][]int64, len(transactionCreateBatchReq.Transactions))
+
+	for i := 0; i < len(transactionCreateBatchReq.Transactions); i++ {
+		transactionCreateReq := transactionCreateBatchReq.Transactions[i]
+		tagIds, err := utils.StringArrayToInt64Array(transactionCreateReq.TagIds)
+
+		if err != nil {
+			log.Warnf(c, "[transactions.TransactionCreateBatchHandler] parse tag ids failed of transaction \"index:%d\", because %s", i, err.Error())
+			return nil, errs.ErrTransactionTagIdInvalid
+		}
+
+		if len(tagIds) > models.MaximumTagsCountOfTransaction {
+			return nil, errs.ErrTransactionHasTooManyTags
+		}
+
+		if transactionCreateReq.Type != models.TRANSACTION_TYPE_INCOME && transactionCreateReq.Type != models.TRANSACTION_TYPE_EXPENSE {
+			log.Warnf(c, "[transactions.TransactionCreateBatchHandler] transaction type of transaction \"index:%d\" is invalid", i)
+			return nil, errs.ErrTransactionTypeInvalid
+		}
+
+		if transactionCreateReq.DestinationAccountId != 0 {
+			log.Warnf(c, "[transactions.TransactionCreateBatchHandler] non-transfer transaction \"index:%d\" destination account cannot be set", i)
+			return nil, errs.ErrTransactionDestinationAccountCannotBeSet
+		}
+
+		if transactionCreateReq.DestinationAmount != 0 {
+			log.Warnf(c, "[transactions.TransactionCreateBatchHandler] non-transfer transaction \"index:%d\" destination amount cannot be set", i)
+			return nil, errs.ErrTransactionDestinationAmountCannotBeSet
+		}
+
+		newTransactionTagIdsMap[i] = tagIds
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionCreateBatchHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
+	newTransactions := make([]*models.Transaction, len(transactionCreateBatchReq.Transactions))
+
+	for i := 0; i < len(transactionCreateBatchReq.Transactions); i++ {
+		transactionCreateReq := transactionCreateBatchReq.Transactions[i]
+		transaction := a.createNewTransactionModel(uid, transactionCreateReq, c.ClientIP())
+		newTransactions[i] = transaction
+	}
+
+	allUsedAccounts, err := a.getTransactionUsedAccounts(c, uid, newTransactions)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionCreateBatchHandler] failed to get transaction used accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	for i := 0; i < len(newTransactions); i++ {
+		transaction := newTransactions[i]
+		transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, clientTimezone, allUsedAccounts[transaction.AccountId], allUsedAccounts[transaction.RelatedAccountId])
+
+		if !transactionEditable {
+			log.Warnf(c, "[transactions.TransactionCreateBatchHandler] transaction \"index:%d\" is not editable for user \"uid:%d\"", i, uid)
+			return nil, errs.ErrCannotCreateTransactionWithThisTransactionTime
+		}
+	}
+
+	err = a.transactions.BatchCreateTransactions(c, user.Uid, newTransactions, newTransactionTagIdsMap, nil)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionCreateBatchHandler] failed to batch create transactions for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	log.Infof(c, "[transactions.TransactionCreateBatchHandler] user \"uid:%d\" has created %d transactions", uid, len(newTransactions))
+
+	transactionResps := make([]*models.TransactionInfoResponse, len(newTransactions))
+
+	for i := 0; i < len(newTransactions); i++ {
+		transaction := newTransactions[i]
+		transactionResp := transaction.ToTransactionInfoResponse(newTransactionTagIdsMap[i], true)
+		transactionResps[i] = transactionResp
+	}
+
+	return transactionResps, nil
+}
+
 // TransactionBatchUpdateCategoriesHandler batch updates categories of transactions by request parameters for current user
 func (a *TransactionsApi) TransactionBatchUpdateCategoriesHandler(c *core.WebContext) (any, *errs.Error) {
 	var transactionBatchUpdateReq models.TransactionBatchUpdateCategoryRequest

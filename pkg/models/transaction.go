@@ -197,6 +197,11 @@ type TransactionModifyRequest struct {
 	GeoLocation          *TransactionGeoLocationRequest `json:"geoLocation" binding:"omitempty"`
 }
 
+// TransactionCreateBatchRequest represents all parameters of transaction creation batch request
+type TransactionCreateBatchRequest struct {
+	Transactions    []*TransactionCreateRequest `json:"transactions"`
+}
+
 // TransactionImportRequest represents all parameters of transaction import request
 type TransactionImportRequest struct {
 	Transactions    []*TransactionCreateRequest `json:"transactions"`

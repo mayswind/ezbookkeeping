@@ -603,6 +603,10 @@ export interface TransactionBatchDeleteRequest {
     readonly password: string;
 }
 
+export interface TransactionCreateBatchRequest {
+    readonly transactions: TransactionCreateRequest[];
+}
+
 export interface TransactionImportRequest {
     readonly transactions: TransactionCreateRequest[];
     readonly clientSessionId: string;

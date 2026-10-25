@@ -57,8 +57,12 @@
                                 <v-btn class="ms-3" color="default" variant="outlined"
                                        :disabled="loading || !canAddTransaction" @click="add()">
                                     {{ tt('Add') }}
-                                    <v-menu activator="parent" max-height="500" :open-on-hover="true" v-if="isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates && allTransactionTemplates.length)">
+                                    <v-menu activator="parent" max-height="500" :open-on-hover="true">
                                         <v-list>
+                                            <v-list-item key="AddMultipleTransactions"
+                                                         :title="tt('Add Multiple Transactions')"
+                                                         :prepend-icon="mdiTablePlus"
+                                                         @click="addMultiple"></v-list-item>
                                             <v-list-item key="AIClipboardTextRecognition"
                                                          :title="tt('AI Clipboard Text Recognition')"
                                                          :prepend-icon="mdiMagicStaff"
@@ -69,6 +73,7 @@
                                                          :prepend-icon="mdiMagicStaff"
                                                          v-if="isTransactionFromAIImageRecognitionEnabled()"
                                                          @click="addByRecognizingImage"></v-list-item>
+                                            <v-divider class="my-1" v-if="allTransactionTemplates && allTransactionTemplates.length > 0" />
                                             <v-list-item :key="template.id"
                                                          :title="template.name"
                                                          :prepend-icon="mdiTextBoxOutline"
@@ -680,6 +685,7 @@
                             @error="onShowDateRangeError" />
 
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
+    <batch-add-dialog ref="batchAddDialog" />
     <a-i-image-recognition-dialog ref="aiImageRecognitionDialog" />
     <import-dialog ref="importDialog" :persistent="true" />
 
@@ -706,6 +712,7 @@ import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
+import BatchAddDialog from './list/dialogs/BatchAddDialog.vue';
 import AIImageRecognitionDialog from './list/dialogs/AIImageRecognitionDialog.vue';
 import ImportDialog from './import/ImportDialog.vue';
 import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
@@ -809,6 +816,7 @@ import {
     mdiArrowRight,
     mdiPound,
     mdiMagicStaff,
+    mdiTablePlus,
     mdiTextBoxOutline,
     mdiTextBoxEditOutline
 } from '@mdi/js';
@@ -832,6 +840,7 @@ const props = defineProps<TransactionListProps>();
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
+type BatchAddDialogType = InstanceType<typeof BatchAddDialog>;
 type AIImageRecognitionDialogType = InstanceType<typeof AIImageRecognitionDialog>;
 type ImportDialogType = InstanceType<typeof ImportDialog>;
 
@@ -922,6 +931,7 @@ const tagFilterMenu = useTemplateRef<VMenu>('tagFilterMenu');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
+const batchAddDialog = useTemplateRef<BatchAddDialogType>('batchAddDialog');
 const aiImageRecognitionDialog = useTemplateRef<AIImageRecognitionDialogType>('aiImageRecognitionDialog');
 const importDialog = useTemplateRef<ImportDialogType>('importDialog');
 
@@ -1636,6 +1646,35 @@ function add(template?: TransactionTemplate, autoRecognizeClipboardText?: string
         reload(false, false);
     }).catch(error => {
         if (error) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function addMultiple(): void {
+    const currentUnixTime = getCurrentUnixTime();
+    let newTransactionTime: number | undefined = undefined;
+
+    if (query.value.maxTime && query.value.minTime) {
+        if (query.value.maxTime < currentUnixTime) {
+            newTransactionTime = query.value.maxTime;
+        } else if (currentUnixTime < query.value.minTime) {
+            newTransactionTime = query.value.minTime;
+        }
+    }
+
+    batchAddDialog.value?.open({
+        time: newTransactionTime,
+        type: query.value.type,
+        categoryId: queryAllFilterCategoryIdsCount.value === 1 ? query.value.categoryIds : '',
+        accountId: queryAllFilterAccountIdsCount.value === 1 ? query.value.accountIds : '',
+        tagIds: objectFieldWithValueToArrayItem(queryAllFilterTagIds.value, true).join(',') || ''
+    }).then(changed => {
+        if (changed) {
+            reload(false, false);
+        }
+    }).catch(error => {
+        if (error && !error.processed) {
             snackbar.value?.showError(error);
         }
     });

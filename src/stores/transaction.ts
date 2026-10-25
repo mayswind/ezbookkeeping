@@ -1282,6 +1282,42 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
+    function batchCreateTransactions({ transactions }: { transactions: Transaction[] }): Promise<Transaction[]> {
+        return new Promise((resolve, reject) => {
+            services.addTransactionBatch({
+                transactions: transactions.map(transaction => transaction.toCreateRequest(''))
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to add transactions' });
+                    return;
+                }
+
+                updateStoreInvalidState({
+                    transactionList: true,
+                    reconciliationStatement: true,
+                    accountList: true,
+                    overview: true,
+                    statistics: true,
+                    explorer: true
+                });
+
+                resolve(data.result.map(transaction => Transaction.of(transaction)));
+            }).catch(error => {
+                logger.error('Unable to add transactions', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to add transactions' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
     function batchUpdateTransactionCategories({ transactionIds, categoryId }: { transactionIds: string[], categoryId: string }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             services.batchUpdateTransactionCategories({ transactionIds, categoryId }).then(response => {
@@ -1842,6 +1878,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         getReconciliationStatements,
         getTransaction,
         saveTransaction,
+        batchCreateTransactions,
         batchUpdateTransactionCategories,
         batchUpdateTransactionAccounts,
         batchAddTagsToTransaction,

@@ -74,6 +74,7 @@ import type {
     TransactionMoveBetweenAccountsRequest,
     TransactionDeleteRequest,
     TransactionBatchDeleteRequest,
+    TransactionCreateBatchRequest,
     TransactionImportRequest,
     TransactionImportResponse,
     TransactionListByMaxTimeRequest,
@@ -669,6 +670,9 @@ export default {
     },
     modifyTransaction: (req: TransactionModifyRequest): ApiResponsePromise<TransactionInfoResponse> => {
         return axios.post<ApiResponse<TransactionInfoResponse>>('v1/transactions/modify.json', req);
+    },
+    addTransactionBatch: (req: TransactionCreateBatchRequest): ApiResponsePromise<TransactionInfoResponse[]> => {
+        return axios.post<ApiResponse<TransactionInfoResponse[]>>('v1/transactions/add_batch.json', req);
     },
     batchUpdateTransactionCategories: (req: TransactionBatchUpdateCategoryRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transactions/batch_update/category.json', req, {

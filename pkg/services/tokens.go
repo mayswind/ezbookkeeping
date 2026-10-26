@@ -1,6 +1,8 @@
 package services
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"math"
@@ -20,6 +22,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const tokenPrefix = "ebk"
+const tokenIdentityMinimumSize = 8 + 8 + 8 + 1
 const tokenMaxExpiredAtUnixTime = int64(253402300799) // 9999-12-31 23:59:59 UTC
 
 // TokenService represents user token service
@@ -67,8 +71,14 @@ func (s *TokenService) GetAllUnexpiredNormalAndMCPTokensByUid(c core.Context, ui
 }
 
 // ParseToken returns the token model according to token content
-func (s *TokenService) ParseToken(c core.Context, token string) (*jwt.Token, *core.UserTokenClaims, string, error) {
-	return s.parseToken(c, token)
+func (s *TokenService) ParseToken(c core.Context, token string) (*core.UserTokenClaims, string, error) {
+	parts := strings.Split(token, "-")
+
+	if len(parts) == 3 && parts[0] == tokenPrefix {
+		return s.parseEncryptedToken(c, parts)
+	}
+
+	return s.parseLegacyJWTToken(c, token)
 }
 
 // CreateToken generates a new normal token and saves to database
@@ -361,7 +371,137 @@ func (s *TokenService) GenerateTokenId(tokenRecord *models.TokenRecord) string {
 	return fmt.Sprintf("%d:%d:%d", tokenRecord.Uid, tokenRecord.CreatedUnixTime, tokenRecord.UserTokenId)
 }
 
-func (s *TokenService) parseToken(c core.Context, tokenString string) (*jwt.Token, *core.UserTokenClaims, string, error) {
+func (s *TokenService) parseEncryptedToken(c core.Context, parts []string) (*core.UserTokenClaims, string, error) {
+	identity, encryptedAdditionalData, err := s.parseEncryptedTokenId(c, parts)
+
+	if err != nil {
+		return nil, "", err
+	}
+
+	record, err := s.getTokenRecord(c, identity.Uid, identity.UserTokenId, identity.CreatedUnixTime)
+
+	if err != nil {
+		log.Warnf(c, "[tokens.parseEncryptedToken] cannot get token \"utid:%d\" of user \"uid:%d\", because %s", identity.UserTokenId, identity.Uid, err.Error())
+		return nil, "", err
+	}
+
+	if record.TokenType != identity.TokenType {
+		log.Warnf(c, "[tokens.parseEncryptedToken] token \"utid:%d\" of user \"uid:%d\" record type is not match, because token type is %d but record type is %d", record.UserTokenId, record.Uid, identity.TokenType, record.TokenType)
+		return nil, "", errs.ErrCurrentInvalidToken
+	}
+
+	now := time.Now().Unix()
+
+	if record.ExpiredUnixTime < now {
+		log.Warnf(c, "[tokens.parseEncryptedToken] token \"utid:%d\" of user \"uid:%d\" record is expired", record.UserTokenId, record.Uid)
+		return nil, "", errs.ErrCurrentTokenExpired
+	}
+
+	if record.CreatedUnixTime > now {
+		log.Warnf(c, "[tokens.parseEncryptedToken] token \"utid:%d\" of user \"uid:%d\" record is invalid, because creation time is later than now", record.UserTokenId, record.Uid)
+		return nil, "", errs.ErrCurrentInvalidToken
+	}
+
+	var additionalData []byte
+
+	if len(encryptedAdditionalData) > 0 {
+		additionalData, err = utils.AESGCMDecrypt(utils.MD5Encode([]byte(record.Secret)), encryptedAdditionalData)
+
+		if err != nil {
+			log.Warnf(c, "[tokens.parseEncryptedToken] cannot decrypt additional data of token \"utid:%d\" of user \"uid:%d\", because %s", record.UserTokenId, record.Uid, err.Error())
+			return nil, "", errs.ErrCurrentInvalidToken
+		}
+	}
+
+	if record.TokenType == core.USER_TOKEN_TYPE_NORMAL {
+		if len(additionalData) < 1 {
+			log.Warnf(c, "[tokens.parseEncryptedToken] token \"utid:%d\" of user \"uid:%d\" record is invalid, because additional data is missing", record.UserTokenId, record.Uid)
+			return nil, "", errs.ErrCurrentInvalidToken
+		}
+
+		var tokenAdditionalData core.NormalTokenAdditionalData
+		err = tokenAdditionalData.UnmarshalBinary(additionalData)
+
+		if err != nil {
+			log.Warnf(c, "[tokens.parseEncryptedToken] cannot parse additional data of token \"utid:%d\" of user \"uid:%d\", because %s", record.UserTokenId, record.Uid, err.Error())
+			return nil, "", errs.ErrCurrentInvalidToken
+		}
+
+		if tokenAdditionalData.Scope != core.NormalTokenScopeAll {
+			log.Warnf(c, "[tokens.parseEncryptedToken] token \"utid:%d\" of user \"uid:%d\" record is invalid, because scope \"%d\" is invalid", record.UserTokenId, record.Uid, tokenAdditionalData.Scope)
+			return nil, "", errs.ErrCurrentInvalidToken
+		}
+	}
+
+	return &core.UserTokenClaims{
+		UserTokenId: utils.Int64ToString(record.UserTokenId),
+		Uid:         record.Uid,
+		Type:        record.TokenType,
+		IssuedAt:    record.CreatedUnixTime,
+		ExpiresAt:   record.ExpiredUnixTime,
+	}, record.Context, nil
+}
+
+func (s *TokenService) parseEncryptedTokenId(c core.Context, parts []string) (*models.TokenRecord, []byte, error) {
+	if len(parts) != 3 || parts[0] != tokenPrefix {
+		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token format is invalid")
+		return nil, nil, errs.ErrCurrentInvalidToken
+	}
+
+	tokenType, exists := core.TextualTokenTypesReverse[parts[1]]
+
+	if !exists {
+		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token type \"%s\" is not supported", parts[1])
+		return nil, nil, errs.ErrCurrentInvalidTokenType
+	}
+
+	decryptedFullTokenId, err := utils.DecryptSecretFromHex(parts[2], s.CurrentConfig().SecretKey)
+
+	if err != nil {
+		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because decrypting token id failed, %s", err.Error())
+		return nil, nil, errs.ErrCurrentInvalidToken
+	}
+
+	fullTokenId := []byte(decryptedFullTokenId)
+
+	if len(fullTokenId) < tokenIdentityMinimumSize {
+		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token id is too short")
+		return nil, nil, errs.ErrCurrentInvalidToken
+	}
+
+	buf := bytes.NewBuffer(fullTokenId)
+
+	var uid int64
+	var userTokenId int64
+	var createdUnixTime int64
+	var actualTokenType core.TokenType
+
+	_ = binary.Read(buf, binary.BigEndian, &uid)
+	_ = binary.Read(buf, binary.BigEndian, &userTokenId)
+	_ = binary.Read(buf, binary.BigEndian, &createdUnixTime)
+	_ = binary.Read(buf, binary.BigEndian, &actualTokenType)
+
+	if uid <= 0 || userTokenId <= 0 || createdUnixTime <= 0 {
+		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because uid, user token id or creation time is invalid")
+		return nil, nil, errs.ErrCurrentInvalidToken
+	}
+
+	if actualTokenType != tokenType {
+		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token type is not match, expected %d but got %d", tokenType, actualTokenType)
+		return nil, nil, errs.ErrCurrentInvalidToken
+	}
+
+	encryptedAdditionalData := buf.Bytes()
+
+	return &models.TokenRecord{
+		Uid:             uid,
+		UserTokenId:     userTokenId,
+		CreatedUnixTime: createdUnixTime,
+		TokenType:       tokenType,
+	}, encryptedAdditionalData, nil
+}
+
+func (s *TokenService) parseLegacyJWTToken(c core.Context, tokenString string) (*core.UserTokenClaims, string, error) {
 	claims := &core.UserTokenClaims{}
 	tokenContext := ""
 
@@ -395,27 +535,31 @@ func (s *TokenService) parseToken(c core.Context, tokenString string) (*jwt.Toke
 
 	if err != nil {
 		if errors.Is(err, request.ErrNoTokenInRequest) {
-			return nil, nil, "", errs.ErrTokenIsEmpty
+			return nil, "", errs.ErrTokenIsEmpty
 		}
 
 		if errors.Is(err, jwt.ErrTokenMalformed) || errors.Is(err, jwt.ErrTokenUnverifiable) || errors.Is(err, jwt.ErrTokenSignatureInvalid) {
 			log.Warnf(c, "[tokens.parseToken] token is invalid, because %s", err.Error())
-			return nil, nil, "", errs.ErrCurrentInvalidToken
+			return nil, "", errs.ErrCurrentInvalidToken
 		}
 
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, nil, "", errs.ErrCurrentTokenExpired
+			return nil, "", errs.ErrCurrentTokenExpired
 		}
 
 		if errors.Is(err, jwt.ErrTokenUsedBeforeIssued) {
 			log.Warnf(c, "[tokens.parseToken] token is invalid, because issue time is later than now")
-			return nil, nil, "", errs.ErrCurrentInvalidToken
+			return nil, "", errs.ErrCurrentInvalidToken
 		}
 
-		return nil, nil, "", err
+		return nil, "", err
 	}
 
-	return token, claims, tokenContext, err
+	if !token.Valid {
+		return nil, "", errs.ErrCurrentInvalidToken
+	}
+
+	return claims, tokenContext, nil
 }
 
 func (s *TokenService) createToken(c core.Context, user *models.User, tokenType core.TokenType, userAgent string, context string, expiryDate time.Duration) (string, *core.UserTokenClaims, *models.TokenRecord, error) {
@@ -446,8 +590,7 @@ func (s *TokenService) createToken(c core.Context, user *models.User, tokenType 
 		ExpiresAt:   tokenRecord.ExpiredUnixTime,
 	}
 
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := jwtToken.SignedString([]byte(tokenRecord.Secret))
+	tokenString, err := s.generateEncryptedToken(tokenRecord)
 
 	if err != nil {
 		return "", nil, nil, err
@@ -460,6 +603,52 @@ func (s *TokenService) createToken(c core.Context, user *models.User, tokenType 
 	}
 
 	return tokenString, claims, tokenRecord, err
+}
+
+func (s *TokenService) generateEncryptedToken(record *models.TokenRecord) (string, error) {
+	typeName, exists := core.TextualTokenTypes[record.TokenType]
+
+	if !exists {
+		return "", errs.ErrCurrentInvalidTokenType
+	}
+
+	var encryptedAdditionalData []byte
+
+	if record.TokenType == core.USER_TOKEN_TYPE_NORMAL {
+		additionalData := &core.NormalTokenAdditionalData{
+			Scope: core.NormalTokenScopeAll,
+		}
+		context, err := additionalData.MarshalBinary()
+
+		if err != nil {
+			return "", err
+		}
+
+		encryptedAdditionalData, err = utils.AESGCMEncrypt(utils.MD5Encode([]byte(record.Secret)), context)
+
+		if err != nil {
+			return "", err
+		}
+	}
+
+	buf := &bytes.Buffer{}
+	buf.Grow(tokenIdentityMinimumSize + len(encryptedAdditionalData))
+	_ = binary.Write(buf, binary.BigEndian, record.Uid)
+	_ = binary.Write(buf, binary.BigEndian, record.UserTokenId)
+	_ = binary.Write(buf, binary.BigEndian, record.CreatedUnixTime)
+	_ = binary.Write(buf, binary.BigEndian, record.TokenType)
+
+	if len(encryptedAdditionalData) > 0 {
+		_, _ = buf.Write(encryptedAdditionalData)
+	}
+
+	encryptedFullTokenId, err := utils.EncryptSecretToHex(buf.String(), s.CurrentConfig().SecretKey)
+
+	if err != nil {
+		return "", err
+	}
+
+	return tokenPrefix + "-" + typeName + "-" + encryptedFullTokenId, nil
 }
 
 func (s *TokenService) getTokenRecord(c core.Context, uid int64, userTokenId int64, createUnixTime int64) (*models.TokenRecord, error) {

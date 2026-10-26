@@ -64,7 +64,7 @@ func (s *TwoFactorAuthorizationService) GetUserTwoFactorSettingByUid(c core.Cont
 		return nil, errs.ErrTwoFactorIsNotEnabled
 	}
 
-	twoFactor.Secret, err = utils.DecryptSecret(twoFactor.Secret, s.CurrentConfig().SecretKey)
+	twoFactor.Secret, err = utils.DecryptSecretFromBase64(twoFactor.Secret, s.CurrentConfig().SecretKey)
 
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(c core.Context, t
 	}
 
 	var err error
-	twoFactor.Secret, err = utils.EncryptSecret(twoFactor.Secret, s.CurrentConfig().SecretKey)
+	twoFactor.Secret, err = utils.EncryptSecretToBase64(twoFactor.Secret, s.CurrentConfig().SecretKey)
 
 	if err != nil {
 		return err

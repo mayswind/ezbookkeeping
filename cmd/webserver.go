@@ -188,7 +188,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.AvatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
 		avatarRoute := router.Group("/avatar")
-		avatarRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString(config), config))
+		avatarRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
 		{
 			avatarRoute.GET("/:fileName", bindImage(api.Users.UserGetAvatarHandler, config))
 		}
@@ -196,7 +196,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.EnableTransactionPictures {
 		pictureRoute := router.Group("/pictures")
-		pictureRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString(config), config))
+		pictureRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
 		{
 			pictureRoute.GET("/:fileName", bindImage(api.TransactionPictures.TransactionPictureGetHandler, config))
 		}
@@ -204,7 +204,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.EnableUserCustomIcon {
 		customIconRoute := router.Group("/icons")
-		customIconRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString(config), config))
+		customIconRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
 		{
 			customIconRoute.GET("/:fileName", bindImage(api.UserCustomIcons.CustomIconGetHandler, config))
 		}
@@ -213,7 +213,7 @@ func startWebServer(c *core.CliContext) error {
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler, config))
 
 	proxyRoute := router.Group("/proxy")
-	proxyRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByQueryString(config), config))
+	proxyRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
 	{
 		if config.EnableMapDataFetchProxy {
 			if config.MapProvider == settings.OpenStreetMapProvider ||
@@ -237,7 +237,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod {
 		amapApiProxyRoute := router.Group("/_AMapService")
-		amapApiProxyRoute.Use(bindMiddleware(middlewares.JWTAuthorizationByCookie(config), config))
+		amapApiProxyRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByCookie(config), config))
 		{
 			amapApiProxyRoute.GET("/*action", bindProxy(api.AmapApis.AmapApiProxyHandler, config))
 		}
@@ -255,7 +255,7 @@ func startWebServer(c *core.CliContext) error {
 		mcpRoute.Use(bindMiddleware(middlewares.RequestId(config), config))
 		mcpRoute.Use(bindMiddleware(middlewares.RequestLog, config))
 		mcpRoute.Use(bindMiddleware(middlewares.MCPServerIpLimit(config), config))
-		mcpRoute.Use(bindMiddleware(middlewares.JWTMCPAuthorization(config), config))
+		mcpRoute.Use(bindMiddleware(middlewares.TokenMCPAuthorization(config), config))
 		{
 			mcpRoute.POST("", bindJSONRPCApi(map[string]core.JSONRPCApiHandlerFunc{
 				"initialize":     api.ModelContextProtocols.InitializeHandler,
@@ -292,7 +292,7 @@ func startWebServer(c *core.CliContext) error {
 
 		if config.EnableInternalAuth && config.EnableTwoFactor {
 			twoFactorRoute := apiRoute.Group("/2fa")
-			twoFactorRoute.Use(bindMiddleware(middlewares.JWTTwoFactorAuthorization(config), config))
+			twoFactorRoute.Use(bindMiddleware(middlewares.TokenTwoFactorAuthorization(config), config))
 			{
 				twoFactorRoute.POST("/authorize.json", bindApiWithTokenUpdate(api.Authorizations.TwoFactorAuthorizeHandler, config))
 				twoFactorRoute.POST("/recovery.json", bindApiWithTokenUpdate(api.Authorizations.TwoFactorAuthorizeByRecoveryCodeHandler, config))
@@ -301,7 +301,7 @@ func startWebServer(c *core.CliContext) error {
 
 		if config.EnableOAuth2Login {
 			oauth2Route := apiRoute.Group("/oauth2")
-			oauth2Route.Use(bindMiddleware(middlewares.JWTOAuth2CallbackAuthorization(config), config))
+			oauth2Route.Use(bindMiddleware(middlewares.TokenOAuth2CallbackAuthorization(config), config))
 			{
 				oauth2Route.POST("/authorize.json", bindApiWithTokenUpdate(api.Authorizations.OAuth2CallbackAuthorizeHandler, config))
 			}
@@ -315,7 +315,7 @@ func startWebServer(c *core.CliContext) error {
 			apiRoute.POST("/verify_email/resend.json", bindApi(api.Users.UserSendVerifyEmailByUnloginUserHandler, config))
 
 			emailVerifyRoute := apiRoute.Group("/verify_email")
-			emailVerifyRoute.Use(bindMiddleware(middlewares.JWTEmailVerifyAuthorization(config), config))
+			emailVerifyRoute.Use(bindMiddleware(middlewares.TokenEmailVerifyAuthorization(config), config))
 			{
 				emailVerifyRoute.POST("/by_token.json", bindApi(api.Users.UserEmailVerifyHandler, config))
 			}
@@ -325,7 +325,7 @@ func startWebServer(c *core.CliContext) error {
 			apiRoute.POST("/forget_password/request.json", bindApi(api.ForgetPasswords.UserForgetPasswordRequestHandler, config))
 
 			resetPasswordRoute := apiRoute.Group("/forget_password/reset")
-			resetPasswordRoute.Use(bindMiddleware(middlewares.JWTResetPasswordAuthorization(config), config))
+			resetPasswordRoute.Use(bindMiddleware(middlewares.TokenResetPasswordAuthorization(config), config))
 			{
 				resetPasswordRoute.POST("/by_token.json", bindApi(api.ForgetPasswords.UserResetPasswordHandler, config))
 			}
@@ -334,7 +334,7 @@ func startWebServer(c *core.CliContext) error {
 		apiRoute.GET("/logout.json", bindApiWithTokenUpdate(api.Tokens.TokenRevokeCurrentHandler, config))
 
 		apiV1Route := apiRoute.Group("/v1")
-		apiV1Route.Use(bindMiddleware(middlewares.JWTAuthorizationByHeader(config), config))
+		apiV1Route.Use(bindMiddleware(middlewares.TokenAuthorizationByHeader(config), config))
 		apiV1Route.Use(bindMiddleware(middlewares.APITokenIpLimit(config), config))
 		{
 			// Tokens

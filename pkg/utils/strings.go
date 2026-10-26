@@ -237,8 +237,8 @@ func EncodePassword(password string, salt string) string {
 	return strings.TrimRight(base64.StdEncoding.EncodeToString(encodedPassword), "=")
 }
 
-// EncryptSecret returns a encrypted secret
-func EncryptSecret(secret string, key string) (string, error) {
+// EncryptSecretToBase64 returns an encrypted secret encoded as Base64.
+func EncryptSecretToBase64(secret string, key string) (string, error) {
 	encryptedSecret, err := AESGCMEncrypt(MD5Encode([]byte(key)), []byte(secret)) // md5encode make the aes key's length to 16
 
 	if err != nil {
@@ -248,8 +248,19 @@ func EncryptSecret(secret string, key string) (string, error) {
 	return base64.StdEncoding.EncodeToString(encryptedSecret), nil
 }
 
-// DecryptSecret returns a decrypted secret
-func DecryptSecret(encyptedSecret string, key string) (string, error) {
+// EncryptSecretToHex returns an encrypted secret encoded as hexadecimal.
+func EncryptSecretToHex(secret string, key string) (string, error) {
+	encryptedSecret, err := AESGCMEncrypt(MD5Encode([]byte(key)), []byte(secret)) // md5encode make the aes key's length to 16
+
+	if err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(encryptedSecret), nil
+}
+
+// DecryptSecretFromBase64 returns the decrypted secret from Base64 ciphertext.
+func DecryptSecretFromBase64(encyptedSecret string, key string) (string, error) {
 	encyptedData, err := base64.StdEncoding.DecodeString(encyptedSecret)
 
 	if err != nil {
@@ -257,6 +268,23 @@ func DecryptSecret(encyptedSecret string, key string) (string, error) {
 	}
 
 	secret, err := AESGCMDecrypt(MD5Encode([]byte(key)), []byte(encyptedData))
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(secret), nil
+}
+
+// DecryptSecretFromHex returns the decrypted secret from hexadecimal ciphertext.
+func DecryptSecretFromHex(encryptedSecret string, key string) (string, error) {
+	encryptedData, err := hex.DecodeString(encryptedSecret)
+
+	if err != nil {
+		return "", err
+	}
+
+	secret, err := AESGCMDecrypt(MD5Encode([]byte(key)), encryptedData)
 
 	if err != nil {
 		return "", err

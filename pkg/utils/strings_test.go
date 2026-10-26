@@ -169,13 +169,92 @@ func TestEncodePassword(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
-func TestEncryptSecretAndDecryptSecret(t *testing.T) {
+func TestEncryptSecretToBase64AndDecryptSecretFromBase64(t *testing.T) {
 	str := "foo"
 	key := "bar"
 	expectedValue := str
 
-	encryptedStr, err := EncryptSecret(str, key)
-	actualValue, err := DecryptSecret(encryptedStr, key)
+	encryptedStr, err := EncryptSecretToBase64(str, key)
+	assert.Equal(t, nil, err)
+	actualValue, err := DecryptSecretFromBase64(encryptedStr, key)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestEncryptSecretToHexAndDecryptSecretFromHex(t *testing.T) {
+	str := "foo"
+	key := "bar"
+	expectedValue := str
+
+	encryptedStr, err := EncryptSecretToHex(str, key)
+	assert.Equal(t, nil, err)
+	assert.Regexp(t, `^[0-9a-f]+$`, encryptedStr)
+	actualValue, err := DecryptSecretFromHex(encryptedStr, key)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestEncryptSecretToHexAndDecryptSecretFromHex_EmptyString(t *testing.T) {
+	str := ""
+	key := "bar"
+	expectedValue := str
+
+	encryptedStr, err := EncryptSecretToHex(str, key)
+	assert.Equal(t, nil, err)
+	actualValue, err := DecryptSecretFromHex(encryptedStr, key)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestEncryptSecretToHexAndDecryptSecretFromHex_Unicode(t *testing.T) {
+	str := "图片:token/context?"
+	key := "bar"
+	expectedValue := str
+
+	encryptedStr, err := EncryptSecretToHex(str, key)
+	assert.Equal(t, nil, err)
+	actualValue, err := DecryptSecretFromHex(encryptedStr, key)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestDecryptSecretFromHex_WrongKey(t *testing.T) {
+	encryptedStr, err := EncryptSecretToHex("foo", "bar")
+	assert.Equal(t, nil, err)
+
+	_, err = DecryptSecretFromHex(encryptedStr, "wrong-key")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromHex_TamperedCiphertext(t *testing.T) {
+	encryptedStr, err := EncryptSecretToHex("foo", "bar")
+	assert.Equal(t, nil, err)
+
+	// Change the authentication tag while keeping valid hexadecimal encoding.
+	lastCharacter := "0"
+	if encryptedStr[len(encryptedStr)-1:] == lastCharacter {
+		lastCharacter = "1"
+	}
+	_, err = DecryptSecretFromHex(encryptedStr[:len(encryptedStr)-1]+lastCharacter, "bar")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromHex_EmptyString(t *testing.T) {
+	_, err := DecryptSecretFromHex("", "bar")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromHex_OddLength(t *testing.T) {
+	_, err := DecryptSecretFromHex("0", "bar")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromHex_InvalidHex(t *testing.T) {
+	_, err := DecryptSecretFromHex("zz", "bar")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromHex_ShortCiphertext(t *testing.T) {
+	_, err := DecryptSecretFromHex("00", "bar")
+	assert.NotNil(t, err)
 }

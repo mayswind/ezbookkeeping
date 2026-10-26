@@ -76,7 +76,7 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 	uid := int64(0)
 
 	if oauth2LoginReq.Token != "" {
-		_, claims, _, err := a.tokens.ParseToken(c, oauth2LoginReq.Token)
+		claims, _, err := a.tokens.ParseToken(c, oauth2LoginReq.Token)
 
 		if err != nil {
 			log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to parse token, because %s", err.Error())

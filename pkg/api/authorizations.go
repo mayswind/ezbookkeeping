@@ -518,7 +518,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 	var claims *core.UserTokenClaims
 
 	if credential.Token != "" {
-		_, claims, _, err = a.tokens.ParseToken(c, credential.Token)
+		claims, _, err = a.tokens.ParseToken(c, credential.Token)
 
 		if err != nil {
 			log.Errorf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] failed to parse token, because %s", err.Error())

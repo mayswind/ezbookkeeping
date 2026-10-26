@@ -205,7 +205,7 @@ func (a *TokensApi) TokenRevokeCurrentHandler(c *core.WebContext) (any, *errs.Er
 		return false, errs.ErrTokenIsEmpty
 	}
 
-	_, claims, _, err := a.tokens.ParseToken(c, tokenString)
+	claims, _, err := a.tokens.ParseToken(c, tokenString)
 
 	if err != nil {
 		return nil, errs.Or(err, errs.NewIncompleteOrIncorrectSubmissionError(err))

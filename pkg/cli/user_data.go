@@ -463,11 +463,24 @@ func (l *UserDataCli) DeleteUser(c *core.CliContext, username string) error {
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.DeleteUser(c, username)
+	uid, err := l.getUserIdByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.DeleteUser] error occurs when getting user id by user name")
+		return err
+	}
+
+	err = l.users.DeleteUser(c, username)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.DeleteUser] failed to delete user by user name \"%s\", because %s", username, err.Error())
 		return err
+	}
+
+	err = l.tokens.DeleteAllTokens(c, uid)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.DeleteUser] failed to revoke all tokens for user \"%s\", because %s", username, err.Error())
 	}
 
 	return nil

@@ -235,7 +235,7 @@ func (l *UserDataCli) EnableUser(c *core.CliContext, username string) error {
 }
 
 // DisableUser sets user disabled according to the specified user name
-func (l *UserDataCli) DisableUser(c *core.CliContext, username string) error {
+func (l *UserDataCli) DisableUser(c *core.CliContext, username string, remainSessions bool) error {
 	if username == "" {
 		log.CliErrorf(c, "[user_data.DisableUser] user name is empty")
 		return errs.ErrUsernameIsEmpty
@@ -258,6 +258,14 @@ func (l *UserDataCli) DisableUser(c *core.CliContext, username string) error {
 	if err != nil {
 		log.CliErrorf(c, "[user_data.DisableUser] failed to set user disabled by user name \"%s\", because %s", username, err.Error())
 		return err
+	}
+
+	if !remainSessions {
+		err = l.tokens.DeleteAllTokens(c, user.Uid)
+
+		if err != nil {
+			log.CliErrorf(c, "[user_data.DisableUser] failed to revoke all tokens for user \"%s\", because %s", username, err.Error())
+		}
 	}
 
 	return nil

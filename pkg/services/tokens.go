@@ -394,7 +394,7 @@ func (s *TokenService) parseEncryptedToken(c core.Context, parts []string) (*cor
 
 	if err != nil {
 		log.Warnf(c, "[tokens.parseEncryptedToken] cannot get token \"utid:%d\" of user \"uid:%d\", because %s", identity.UserTokenId, identity.Uid, err.Error())
-		return nil, "", err
+		return nil, "", errs.ErrCurrentInvalidToken
 	}
 
 	if record.TokenType != identity.TokenType {

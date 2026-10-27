@@ -27,6 +27,16 @@ func (r UserFeatureRestrictions) Contains(featureRestrictionType UserFeatureRest
 	return uint64(r)&typeValue == typeValue
 }
 
+// ContainsAll returns whether contains all the specified features
+func (r UserFeatureRestrictions) ContainsAll(featureRestriction UserFeatureRestrictions) bool {
+	return uint64(r)&uint64(featureRestriction) == uint64(featureRestriction)
+}
+
+// ContainsAny returns whether contains any of the specified features
+func (r UserFeatureRestrictions) ContainsAny(featureRestriction UserFeatureRestrictions) bool {
+	return uint64(r)&uint64(featureRestriction) != 0
+}
+
 // String returns a textual representation of all the restrictions of user features
 func (r UserFeatureRestrictions) String() string {
 	builder := strings.Builder{}
@@ -44,6 +54,17 @@ func (r UserFeatureRestrictions) String() string {
 	}
 
 	return builder.String()
+}
+
+// FromUserFeatureRestrictionTypes returns a new feature restrictions with the specified feature restriction types
+func FromUserFeatureRestrictionTypes(restrictionTypes ...UserFeatureRestrictionType) UserFeatureRestrictions {
+	restrictions := UserFeatureRestrictions(0)
+
+	for _, restrictionType := range restrictionTypes {
+		restrictions = restrictions.Add(restrictionType)
+	}
+
+	return restrictions
 }
 
 // ParseUserFeatureRestrictions returns restrictions of user features according to the textual restrictions of user features  separated by commas

@@ -212,7 +212,19 @@ func (l *UserDataCli) EnableUser(c *core.CliContext, username string) error {
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.EnableUser(c, username)
+	user, err := l.users.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.EnableUser] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if !user.Disabled {
+		log.CliErrorf(c, "[user_data.EnableUser] user \"%s\" is already enabled", username)
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	err = l.users.EnableUser(c, username)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.EnableUser] failed to set user enabled by user name \"%s\", because %s", username, err.Error())
@@ -229,7 +241,19 @@ func (l *UserDataCli) DisableUser(c *core.CliContext, username string) error {
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.DisableUser(c, username)
+	user, err := l.users.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.DisableUser] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if user.Disabled {
+		log.CliErrorf(c, "[user_data.DisableUser] user \"%s\" is already disabled", username)
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	err = l.users.DisableUser(c, username)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.DisableUser] failed to set user disabled by user name \"%s\", because %s", username, err.Error())
@@ -246,7 +270,19 @@ func (l *UserDataCli) SetUserFeatureRestrictions(c *core.CliContext, username st
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.UpdateUserFeatureRestriction(c, username, featureRestriction)
+	user, err := l.users.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.SetUserFeatureRestrictions] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if user.FeatureRestriction == featureRestriction {
+		log.CliErrorf(c, "[user_data.SetUserFeatureRestrictions] user \"%s\" already set the specified feature restrictions", username)
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	err = l.users.UpdateUserFeatureRestriction(c, username, featureRestriction)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.SetUserFeatureRestrictions] failed to set user feature restrictions by user name \"%s\", because %s", username, err.Error())
@@ -263,7 +299,19 @@ func (l *UserDataCli) AddUserFeatureRestrictions(c *core.CliContext, username st
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.AddUserFeatureRestriction(c, username, featureRestriction)
+	user, err := l.users.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.AddUserFeatureRestrictions] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if user.FeatureRestriction.ContainsAll(featureRestriction) {
+		log.CliErrorf(c, "[user_data.AddUserFeatureRestrictions] user \"%s\" already has the specified feature restrictions", username)
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	err = l.users.AddUserFeatureRestriction(c, username, featureRestriction)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.AddUserFeatureRestrictions] failed to add user feature restrictions by user name \"%s\", because %s", username, err.Error())
@@ -280,7 +328,19 @@ func (l *UserDataCli) RemoveUserFeatureRestrictions(c *core.CliContext, username
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.RemoveUserFeatureRestriction(c, username, featureRestriction)
+	user, err := l.users.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.RemoveUserFeatureRestrictions] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if !user.FeatureRestriction.ContainsAny(featureRestriction) {
+		log.CliErrorf(c, "[user_data.RemoveUserFeatureRestrictions] user \"%s\" does not have the specified feature restrictions", username)
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	err = l.users.RemoveUserFeatureRestriction(c, username, featureRestriction)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.RemoveUserFeatureRestrictions] failed to remove user feature restrictions by user name \"%s\", because %s", username, err.Error())
@@ -337,7 +397,19 @@ func (l *UserDataCli) SetUserEmailVerified(c *core.CliContext, username string) 
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.SetUserEmailVerified(c, username)
+	user, err := l.users.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.SetUserEmailVerified] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if user.EmailVerified {
+		log.CliErrorf(c, "[user_data.SetUserEmailVerified] user \"%s\" is already verified", username)
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	err = l.users.SetUserEmailVerified(c, username)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.SetUserEmailVerified] failed to set user email address verified by user name \"%s\", because %s", username, err.Error())
@@ -354,7 +426,19 @@ func (l *UserDataCli) SetUserEmailUnverified(c *core.CliContext, username string
 		return errs.ErrUsernameIsEmpty
 	}
 
-	err := l.users.SetUserEmailUnverified(c, username)
+	user, err := l.users.GetUserByUsername(c, username)
+
+	if err != nil {
+		log.CliErrorf(c, "[user_data.SetUserEmailUnverified] failed to get user by user name \"%s\", because %s", username, err.Error())
+		return err
+	}
+
+	if !user.EmailVerified {
+		log.CliErrorf(c, "[user_data.SetUserEmailUnverified] user \"%s\" is already unverified", username)
+		return errs.ErrNothingWillBeUpdated
+	}
+
+	err = l.users.SetUserEmailUnverified(c, username)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.SetUserEmailUnverified] failed to set user email address unverified by user name \"%s\", because %s", username, err.Error())

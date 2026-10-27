@@ -294,6 +294,18 @@ func (s *TokenService) DeleteTokensByType(c core.Context, uid int64, tokenType c
 	})
 }
 
+// DeleteAllTokens deletes all tokens of given user
+func (s *TokenService) DeleteAllTokens(c core.Context, uid int64) error {
+	if uid <= 0 {
+		return errs.ErrUserIdInvalid
+	}
+
+	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+		_, err := sess.Where("uid=?", uid).Delete(&models.TokenRecord{})
+		return err
+	})
+}
+
 // DeleteAllExpiredTokens deletes all expired tokens
 func (s *TokenService) DeleteAllExpiredTokens(c core.Context) error {
 	var errors []error

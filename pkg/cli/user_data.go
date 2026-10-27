@@ -585,8 +585,7 @@ func (l *UserDataCli) ClearUserTokens(c *core.CliContext, username string) error
 		return err
 	}
 
-	now := time.Now().Unix()
-	err = l.tokens.DeleteTokensBeforeTime(c, uid, now)
+	err = l.tokens.DeleteAllTokens(c, uid)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.ClearUserTokens] failed to delete tokens of user \"%s\", because %s", username, err.Error())

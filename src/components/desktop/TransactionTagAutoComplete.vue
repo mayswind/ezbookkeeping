@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 import { VAutocomplete } from 'vuetify/components/VAutocomplete';
-import { VSelect } from "vuetify/components/VSelect";
+import { VSelect } from 'vuetify/components/VSelect';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';

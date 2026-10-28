@@ -3,7 +3,7 @@
         <template #nav-items>
             <div class="mx-2 mb-2">
                 <span class="text-body-medium">{{ tt('Net assets') }}</span>
-                <div class="text-body-large text-income text-truncate mt-1 mb-2">
+                <div class="text-body-large text-primary text-truncate mt-1 mb-2">
                     <span v-if="!loading || allAccountCount > 0">{{ netAssets }}</span>
                     <span v-else-if="loading && allAccountCount <= 0">
                         <v-skeleton-loader class="skeleton-no-margin mt-1 mb-2" type="text" :loading="true"></v-skeleton-loader>

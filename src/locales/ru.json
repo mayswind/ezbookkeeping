@@ -117,6 +117,7 @@
             "720p": "720p (approx. {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Валюты для быстрого переключения на главной странице (до {count})",
             "nHour": "{n} час",
             "nHours": "{n} часов",
             "nDay": "{n} день",
@@ -2591,6 +2592,7 @@
     "Accounts Included in Overview Statistics": "Счета, включенные в обзорную статистику",
     "Transaction Categories Included in Overview Statistics": "Категории транзакций, включенные в обзорную статистику",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Быстрое переключение валют",
     "Timezone Type": "Тип часового пояса",
     "Application Timezone": "Часовой пояс приложения",
     "Transaction List Page": "Страница списка транзакций",

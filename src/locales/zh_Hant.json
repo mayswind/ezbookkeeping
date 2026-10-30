@@ -117,6 +117,7 @@
             "720p": "720p（約 {size} KiB）"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "首頁中可快速切換的貨幣（最多 {count} 個）",
             "nHour": "{n} 小時",
             "nHours": "{n} 小時",
             "nDay": "{n} 天",
@@ -2591,6 +2592,7 @@
     "Accounts Included in Overview Statistics": "概覽統計中包含的帳戶",
     "Transaction Categories Included in Overview Statistics": "概覽統計中包含的交易分類",
     "Transaction Tags Included in Overview Statistics": "概覽統計中包含的交易標籤",
+    "Quick Switch Currencies": "快速切換貨幣",
     "Timezone Type": "時區類型",
     "Application Timezone": "應用程式時區",
     "Transaction List Page": "交易清單頁面",

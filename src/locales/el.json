@@ -117,6 +117,7 @@
             "720p": "720p (approx. {size} KiB)"
         },
         "misc": {
+            "quickSwitchCurrenciesHint": "Currencies shown on the home page for quick switching (up to {count})",
             "nHour": "{n} ώρα",
             "nHours": "{n} ώρες",
             "nDay": "{n} ημέρα",
@@ -2591,6 +2592,7 @@
     "Accounts Included in Overview Statistics": "Λογαριασμοί που συμπεριλαμβάνονται στα στατιστικά επισκόπησης",
     "Transaction Categories Included in Overview Statistics": "Κατηγορίες συναλλαγών που συμπεριλαμβάνονται στα στατιστικά επισκόπησης",
     "Transaction Tags Included in Overview Statistics": "Transaction Tags Included in Overview Statistics",
+    "Quick Switch Currencies": "Quick Switch Currencies",
     "Timezone Type": "Τύπος ζώνης ώρας",
     "Application Timezone": "Ζώνη ώρας εφαρμογής",
     "Transaction List Page": "Σελίδα λίστας συναλλαγών",

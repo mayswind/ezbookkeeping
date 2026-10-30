@@ -1,6 +1,20 @@
 import { CurrencyDisplaySymbol, CurrencyDisplayLocation, type CurrencyPrependAndAppendText, CurrencyDisplayType } from '@/core/currency.ts';
 import { ALL_CURRENCIES, DEFAULT_CURRENCY_SYMBOL } from '@/consts/currency.ts';
 
+export const MAX_QUICK_SWITCH_CURRENCIES_COUNT: number = 6;
+
+export function parseQuickSwitchCurrencies(value: string): string[] {
+    const result: string[] = [];
+
+    for (const currency of (value || '').split(',')) {
+        if (ALL_CURRENCIES[currency] && result.length < MAX_QUICK_SWITCH_CURRENCIES_COUNT) {
+            result.push(currency);
+        }
+    }
+
+    return result;
+}
+
 export function getCurrencyFraction(currencyCode?: string): number | undefined {
     if (!currencyCode) {
         return undefined;

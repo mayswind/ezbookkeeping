@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :persistent="isModified" v-model="showState">
+    <v-dialog :persistent="loading || submitting || isModified" v-model="showState">
         <one-column-dialog-layout content-class="pa-0"
                                   :title="tt('Add Multiple Transactions')" :cancel-button-title="tt('Close')"
                                   :disabled="loading || submitting" :loading="loading"

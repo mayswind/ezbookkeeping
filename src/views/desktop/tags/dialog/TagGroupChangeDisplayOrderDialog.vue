@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="800" :persistent="displayOrderModified" v-model="showState">
+    <v-dialog width="800" :persistent="loading || updating || displayOrderModified" v-model="showState">
         <one-column-dialog-layout content-class="pa-0" :disabled="loading || updating"
                                   :title="tt('Change Group Display Order')" :cancel-button-title="tt('Close')"
                                   @cancel="close">

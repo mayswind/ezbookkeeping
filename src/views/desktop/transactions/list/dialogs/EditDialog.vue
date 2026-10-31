@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="1000" :persistent="isTransactionModified || recognizing" v-model="showState">
+    <v-dialog width="1000" :persistent="loading || submitting || recognizing || isTransactionModified" v-model="showState">
         <two-column-dialog-layout :disabled="loading || submitting || recognizing" :loading="loading"
                                   :title="tt(title)" :cancel-button-title="tt(cancelButtonTitle)"
                                   @cancel="cancel">

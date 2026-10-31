@@ -66,6 +66,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     showTotalAmountInTransactionListPage: boolean;
     totalAmountTypeInTransactionListPage: number;
     showTagInTransactionListPage: boolean;
+    showPictureIndicatorInTransactionListPage: boolean;
     defaultKeywordMatchModeInTransactionListPage: number;
     // Transaction Edit Page
     autoSaveTransactionDraft: string;
@@ -160,6 +161,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'showTotalAmountInTransactionListPage': UserApplicationCloudSettingType.Boolean,
     'totalAmountTypeInTransactionListPage': UserApplicationCloudSettingType.Number,
     'showTagInTransactionListPage': UserApplicationCloudSettingType.Boolean,
+    'showPictureIndicatorInTransactionListPage': UserApplicationCloudSettingType.Boolean,
     'defaultKeywordMatchModeInTransactionListPage': UserApplicationCloudSettingType.Number,
     // Transaction Edit Page
     'quickSaveButtonStyleInMobileTransactionListPage': UserApplicationCloudSettingType.Number,
@@ -236,6 +238,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     showTotalAmountInTransactionListPage: true,
     totalAmountTypeInTransactionListPage: TransactionAmountType.InflowsAndOutflows,
     showTagInTransactionListPage: true,
+    showPictureIndicatorInTransactionListPage: false,
     defaultKeywordMatchModeInTransactionListPage: KeywordMatchMode.Default.type,
     // Transaction Edit Page
     quickSaveButtonStyleInMobileTransactionListPage: TransactionQuickSaveButtonStyle.Default.type,

@@ -128,6 +128,11 @@ export function useAppSettingPageBase() {
         set: (value) => settingsStore.setShowTagInTransactionListPage(value)
     });
 
+    const showPictureIndicatorInTransactionListPage = computed<boolean>({
+        get: () => settingsStore.appSettings.showPictureIndicatorInTransactionListPage,
+        set: (value) => settingsStore.setShowPictureIndicatorInTransactionListPage(value)
+    });
+
     const defaultKeywordMatchModeInTransactionListPage = computed<number>({
         get: () => settingsStore.appSettings.defaultKeywordMatchModeInTransactionListPage,
         set: (value: number) => settingsStore.setDefaultKeywordMatchModeInTransactionListPage(value)
@@ -258,6 +263,7 @@ export function useAppSettingPageBase() {
         showTotalAmountInTransactionListPage,
         totalAmountTypeInTransactionListPage,
         showTagInTransactionListPage,
+        showPictureIndicatorInTransactionListPage,
         defaultKeywordMatchModeInTransactionListPage,
         autoSaveTransactionDraft,
         isAutoGetCurrentGeoLocation,

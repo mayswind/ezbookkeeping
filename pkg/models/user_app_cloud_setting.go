@@ -34,6 +34,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"showTotalAmountInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"totalAmountTypeInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"showTagInTransactionListPage":                 USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
+	"showPictureIndicatorInTransactionListPage":    USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,
 	"defaultKeywordMatchModeInTransactionListPage": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// Transaction Edit Page
 	"quickSaveButtonStyleInMobileTransactionListPage":          USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,

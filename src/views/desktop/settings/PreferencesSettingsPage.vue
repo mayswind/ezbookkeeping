@@ -216,6 +216,12 @@
                         </div>
 
                         <div class="setting-item">
+                            <span>{{ tt('Show Transaction Picture Indicator') }}</span>
+                            <v-spacer/>
+                            <v-switch class="ms-4" v-model="showPictureIndicatorInTransactionListPage"/>
+                        </div>
+
+                        <div class="setting-item">
                             <span>{{ tt('Default Keyword Search Matching Mode') }}</span>
                             <v-spacer/>
                             <v-select
@@ -508,6 +514,7 @@ const {
     showTotalAmountInTransactionListPage,
     totalAmountTypeInTransactionListPage,
     showTagInTransactionListPage,
+    showPictureIndicatorInTransactionListPage,
     defaultKeywordMatchModeInTransactionListPage,
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,

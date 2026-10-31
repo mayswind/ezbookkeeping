@@ -283,6 +283,12 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('showTagInTransactionListPage', value);
     }
 
+    function setShowPictureIndicatorInTransactionListPage(value: boolean): void {
+        updateApplicationSettingsValue('showPictureIndicatorInTransactionListPage', value);
+        appSettings.value.showPictureIndicatorInTransactionListPage = value;
+        updateUserApplicationCloudSettingValue('showPictureIndicatorInTransactionListPage', value);
+    }
+
     function setDefaultKeywordMatchModeInTransactionListPage(value: number): void {
         updateApplicationSettingsValue('defaultKeywordMatchModeInTransactionListPage', value);
         appSettings.value.defaultKeywordMatchModeInTransactionListPage = value;
@@ -651,6 +657,7 @@ export const useSettingsStore = defineStore('settings', () => {
         setShowTotalAmountInTransactionListPage,
         setTotalAmountTypeInTransactionListPage,
         setShowTagInTransactionListPage,
+        setShowPictureIndicatorInTransactionListPage,
         setDefaultKeywordMatchModeInTransactionListPage,
         // -- Transaction Edit Page
         setQuickSaveButtonStyleInMobileTransactionListPage,

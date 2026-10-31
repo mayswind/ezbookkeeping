@@ -608,6 +608,10 @@
                                                 v-if="!transaction.tagIds || !transaction.tagIds.length"/>
                                     </td>
                                     <td class="transaction-table-column-description text-truncate">
+                                        <v-icon class="transaction-picture-indicator" size="18" :icon="mdiImageOutline"
+                                                :aria-label="tt('Transaction Pictures')" role="img"
+                                                v-if="showPictureIndicatorInTransactionListPage && transaction.pictures?.length">
+                                        </v-icon>
                                         {{ transaction.comment }}
                                     </td>
                                 </tr>
@@ -815,6 +819,7 @@ import {
     mdiArrowLeft,
     mdiArrowRight,
     mdiPound,
+    mdiImageOutline,
     mdiMagicStaff,
     mdiTablePlus,
     mdiTextBoxOutline,
@@ -868,6 +873,7 @@ const {
     showTotalAmountInTransactionListPage,
     totalAmountTypeInTransactionListPage,
     showTagInTransactionListPage,
+    showPictureIndicatorInTransactionListPage,
     allDateRanges,
     allAccounts,
     allAccountsMap,
@@ -1267,7 +1273,7 @@ function reload(force: boolean, init: boolean): void {
                 year: currentYear,
                 month: currentMonth,
                 mustHavePictures: isGalleryMode,
-                withPictures: isGalleryMode,
+                withPictures: isGalleryMode || showPictureIndicatorInTransactionListPage.value,
                 autoExpand: true,
                 defaultCurrency: selectedAccountDefaultCurrency.value
             });
@@ -1278,7 +1284,7 @@ function reload(force: boolean, init: boolean): void {
                 page: page,
                 mustHavePictures: isGalleryMode,
                 withCount: page <= 1,
-                withPictures: isGalleryMode,
+                withPictures: isGalleryMode || showPictureIndicatorInTransactionListPage.value,
                 autoExpand: true,
                 defaultCurrency: selectedAccountDefaultCurrency.value
             });
@@ -1963,6 +1969,12 @@ init(props);
             max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+    }
+
+    .transaction-table-column-description {
+        > .transaction-picture-indicator {
+            vertical-align: text-bottom;
         }
     }
 }

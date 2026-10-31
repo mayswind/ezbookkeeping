@@ -5,20 +5,34 @@ import (
 	"sort"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
+	"github.com/mayswind/ezbookkeeping/pkg/duplicatechecker"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
+	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
 // InsightsExplorersApi represents insights explorer api
 type InsightsExplorersApi struct {
+	ApiUsingConfig
+	ApiUsingDuplicateChecker
 	insightsExploreres *services.InsightsExplorerService
 }
 
 // Initialize a insights explorer api singleton instance
 var (
 	InsightsExplorers = &InsightsExplorersApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
+		ApiUsingDuplicateChecker: ApiUsingDuplicateChecker{
+			ApiUsingConfig: ApiUsingConfig{
+				container: settings.Container,
+			},
+			container: duplicatechecker.Container,
+		},
 		insightsExploreres: services.InsightsExplorers,
 	}
 )
@@ -103,6 +117,33 @@ func (a *InsightsExplorersApi) InsightsExplorerCreateHandler(c *core.WebContext)
 		return nil, errs.ErrInsightsExplorerDataInvalid
 	}
 
+	if a.CurrentConfig().EnableDuplicateSubmissionsCheck && explorerCreateReq.ClientSessionId != "" {
+		found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_EXPLORER, uid, explorerCreateReq.ClientSessionId)
+
+		if found {
+			log.Infof(c, "[explorers.InsightsExplorerCreateHandler] another exploration \"id:%s\" has been created for user \"uid:%d\"", remark, uid)
+			explorerId, err := utils.StringToInt64(remark)
+
+			if err == nil {
+				explorer, err = a.insightsExploreres.GetExplorationByExplorationId(c, uid, explorerId)
+
+				if err != nil {
+					log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to get existed exploration \"id:%d\" for user \"uid:%d\", because %s", explorerId, uid, err.Error())
+					return nil, errs.Or(err, errs.ErrOperationFailed)
+				}
+
+				explorerResp, err := explorer.ToInsightsExplorerInfoResponse()
+
+				if err != nil {
+					log.Errorf(c, "[explorers.InsightsExplorerCreateHandler] failed to get exploration response for user \"uid:%d\", because %s", uid, err.Error())
+					return nil, errs.ErrInsightsExplorerDataInvalid
+				}
+
+				return explorerResp, nil
+			}
+		}
+	}
+
 	err = a.insightsExploreres.CreateExploration(c, explorer)
 
 	if err != nil {
@@ -112,6 +153,7 @@ func (a *InsightsExplorersApi) InsightsExplorerCreateHandler(c *core.WebContext)
 
 	log.Infof(c, "[explorers.InsightsExplorerCreateHandler] user \"uid:%d\" has created a new exploration \"id:%d\" successfully", uid, explorer.ExplorerId)
 
+	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_EXPLORER, uid, explorerCreateReq.ClientSessionId, utils.Int64ToString(explorer.ExplorerId))
 	explorerResp, err := explorer.ToInsightsExplorerInfoResponse()
 
 	if err != nil {

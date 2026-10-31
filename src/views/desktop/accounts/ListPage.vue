@@ -276,7 +276,7 @@
                                                                                  @click="moveAllTransactions(element.getAccountOrSubAccount(activeSubAccount[element.id]))"></v-list-item>
                                                                     <v-list-item class="text-body-medium" density="compact"
                                                                                  :title="tt('Clear All Transactions')"
-                                                                                 :prepend-icon="mdiEraser"
+                                                                                 :prepend-icon="mdiDeleteSweepOutline"
                                                                                  @click="clearAllTransactions(element.getAccountOrSubAccount(activeSubAccount[element.id]))"></v-list-item>
                                                                 </v-list>
                                                             </v-menu>
@@ -379,7 +379,7 @@ import {
     mdiDotsHorizontalCircleOutline,
     mdiReceiptTextCheckOutline,
     mdiSwapHorizontal,
-    mdiEraser,
+    mdiDeleteSweepOutline,
     mdiDeleteOutline,
     mdiListBoxOutline,
     mdiInvoiceListOutline,

@@ -29,6 +29,7 @@ export interface DataStatisticsResponse {
     readonly totalTransactionTemplateCount: string;
     readonly totalScheduledTransactionCount: string;
     readonly totalCustomIconCount: string;
+    readonly totalImportPresetCount: string;
 }
 
 export interface DisplayDataStatistics {
@@ -41,4 +42,5 @@ export interface DisplayDataStatistics {
     readonly totalTransactionTemplateCount: string;
     readonly totalScheduledTransactionCount: string;
     readonly totalCustomIconCount: string;
+    readonly totalImportPresetCount: string;
 }

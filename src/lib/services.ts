@@ -8,12 +8,12 @@ import type {
 import type {
     VersionInfo
 } from '@/core/version.ts';
-import type {
-    ImportFileTypeSupportedAdditionalOptions
-} from '@/core/file.ts';
 import {
     TransactionType
 } from '@/core/transaction.ts';
+import type {
+    ImportFileTypeSupportedAdditionalOptions
+} from '@/core/import_transaction.ts';
 
 import {
     BASE_API_URL_PATH,
@@ -192,6 +192,13 @@ import type {
     UserCustomIconMoveRequest,
     UserCustomIconDeleteRequest
 } from '@/models/user_custom_icon.ts';
+import type {
+    ImportPresetInfoResponse,
+    ImportPresetCreateRequest,
+    ImportPresetModifyRequest,
+    ImportPresetMoveRequest,
+    ImportPresetDeleteRequest
+} from '@/models/import_preset.ts';
 
 import {
     getCurrentToken,
@@ -934,6 +941,24 @@ export default {
     },
     deleteUserCustomIcon: (req: UserCustomIconDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/custom_icons/delete.json', req);
+    },
+    getImportPresets: (): ApiResponsePromise<ImportPresetInfoResponse[]> => {
+        return axios.get<ApiResponse<ImportPresetInfoResponse[]>>('v1/import_presets/list.json');
+    },
+    getImportPreset: ({ id }: { id: string }): ApiResponsePromise<ImportPresetInfoResponse> => {
+        return axios.get<ApiResponse<ImportPresetInfoResponse>>('v1/import_presets/get.json?id=' + id);
+    },
+    addImportPreset: (req: ImportPresetCreateRequest): ApiResponsePromise<ImportPresetInfoResponse> => {
+        return axios.post<ApiResponse<ImportPresetInfoResponse>>('v1/import_presets/add.json', req);
+    },
+    modifyImportPreset: (req: ImportPresetModifyRequest): ApiResponsePromise<ImportPresetInfoResponse> => {
+        return axios.post<ApiResponse<ImportPresetInfoResponse>>('v1/import_presets/modify.json', req);
+    },
+    moveImportPreset: (req: ImportPresetMoveRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/import_presets/move.json', req);
+    },
+    deleteImportPreset: (req: ImportPresetDeleteRequest): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('v1/import_presets/delete.json', req);
     },
     getLatestExchangeRates: (param: { ignoreError?: boolean }): ApiResponsePromise<LatestExchangeRateResponse> => {
         return axios.get<ApiResponse<LatestExchangeRateResponse>>('v1/exchange_rates/latest.json', {

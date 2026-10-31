@@ -189,7 +189,7 @@ import {
     type LocalizedImportFileTypeSubType,
     type LocalizedImportFileTypeSupportedEncodings,
     type LocalizedImportFileDocument
-} from '@/core/file.ts';
+} from '@/core/import_transaction.ts';
 
 import type { LocaleDefaultSettings } from '@/core/setting.ts';
 import type { ErrorResponse } from '@/core/api.ts';
@@ -200,7 +200,7 @@ import { ALL_CURRENCIES, ACCOUNT_CURRENCY_NOT_SET_VALUE } from '@/consts/currenc
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER_CATEGORIES } from '@/consts/category.ts';
 import { PARSE_TRANSACTION_API_URL_PATH, KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS, SUPPORTED_PARSE_TRANSACTION_RECORD_ID_TYPES } from '@/consts/api.ts';
 import { OAUTH2_PROVIDER_DISPLAY_NAME } from '@/consts/oauth2.ts';
-import { DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE, SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE, SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES } from '@/consts/file.ts';
+import { DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE, SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE, SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES } from '@/consts/import_transaction.ts';
 
 import {
     type CategorizedAccount,
@@ -298,7 +298,6 @@ import logger from '@/lib/logger.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
-
 
 interface PreviewLanguageMessages {
     [key: string]: string | PreviewLanguageMessages;
@@ -2666,6 +2665,46 @@ export function useI18n() {
         }
     }
 
+    function getLocalizedImportTransactionCustomSampleScript(currentTimezoneName: string): string {
+        return `// ${t('sample.importTransactionCustomScript.headerComment')}
+/**
+ * ${t('sample.importTransactionCustomScript.functionDescription')}
+ * @param {string[]} row - ${t('sample.importTransactionCustomScript.functionParamRowDescription')}
+ * @param {number} index - ${t('sample.importTransactionCustomScript.functionParamIndexDescription')}
+ * @returns {ImportTransaction|null} ${t('sample.importTransactionCustomScript.functionReturnDescription')}
+ */
+function parse(row, index) {
+    if (index < 1) {
+        return null;
+    }
+
+    return {
+        // ${t('sample.importTransactionCustomScript.fieldTimeDescription')}
+        time: row[0],
+        // ${t('sample.importTransactionCustomScript.fieldUtcOffsetDescription')}
+        utcOffset: ${currentTimezoneName ? 'parseUtcOffset(\'' + currentTimezoneName + '\')' : '\'' + getTimezoneOffsetMinutes(getCurrentUnixTime()) + '\''},
+        // ${t('sample.importTransactionCustomScript.fieldTypeDescription')}
+        type: TransactionType.Expense,
+        // ${t('sample.importTransactionCustomScript.fieldCategoryNameDescription')}
+        categoryName: row[4],
+        // ${t('sample.importTransactionCustomScript.fieldSourceAccountNameDescription')}
+        sourceAccountName: row[5],
+        // ${t('sample.importTransactionCustomScript.fieldDestinationAccountNameDescription')}
+        destinationAccountName: row[8],
+        // ${t('sample.importTransactionCustomScript.fieldSourceAmountDescription')}
+        sourceAmount: row[7],
+        // ${t('sample.importTransactionCustomScript.fieldDestinationAmountDescription')}
+        destinationAmount: row[10],
+        // ${t('sample.importTransactionCustomScript.fieldGeoLocationDescription')}
+        geoLocation: undefined,
+        // ${t('sample.importTransactionCustomScript.fieldTagNamesDescription')}
+        tagNames: '',
+        // ${t('sample.importTransactionCustomScript.fieldCommentDescription')}
+        description: row[13]
+    };
+}`;
+    }
+
     function setLanguage(languageKey: string | null, force?: boolean): LocaleDefaultSettings | null {
         if (!languageKey) {
             languageKey = getDefaultLanguage();
@@ -2996,6 +3035,7 @@ export function useI18n() {
         getLocalizedFileEncodingName,
         getLocalizedOAuth2ProviderName,
         getLocalizedOAuth2LoginText,
+        getLocalizedImportTransactionCustomSampleScript,
         // localization setting functions
         setLanguage,
         hasPreviewedConfiguration,

@@ -1,10 +1,10 @@
 <template>
-    <v-dialog :persistent="!!persistent || loading || submitting" v-model="showState">
+    <v-dialog :persistent="!!persistent || loading || loadingPreset || submitting || currentStep !== 'uploadFile' || isModifiedInUploadStep" v-model="showState">
         <one-column-dialog-layout :class="{ 'import-transaction-dialog-layout': currentStep === 'defineColumn' || currentStep === 'checkData' }"
                                   :content-class="currentStep === 'defineColumn' || currentStep === 'checkData' ? 'pa-0 import-transaction-dialog-content' : 'pa-0'"
                                   :title="tt('Import Transactions')" :cancel-button-title="currentStep === 'finalResult' ? tt('Close') : tt('Cancel')"
-                                  :disabled="loading || submitting"
-                                  :loading="currentStep !== 'checkData' && loading"
+                                  :disabled="loading || loadingPreset || submitting"
+                                  :loading="currentStep !== 'checkData' && (loading || loadingPreset)"
                                   @cancel="close(currentStep === 'finalResult')">
             <template #after-title>
                 <div class="ms-2 text-body-large text-truncate" v-if="currentStep === 'uploadFile' && exportFileGuideDocumentUrl">
@@ -17,8 +17,9 @@
                 </div>
 
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :aria-label="tt('Refresh Accounts, Categories and Tags')" :icon="true" :disabled="loading"
-                       :loading="loading"
+                       :aria-label="tt('Refresh Accounts, Categories and Tags')" :icon="true"
+                       :disabled="loading || loadingPreset"
+                       :loading="loading || loadingPreset"
                        @click="reloadBasisData"
                        v-if="currentStep === 'checkData'">
                     <template #loader>
@@ -29,7 +30,7 @@
                 </v-btn>
 
                 <v-btn class="ms-2" density="comfortable" color="primary" variant="outlined"
-                       :disabled="loading || submitting || importTransactionCheckDataTab?.isEditing"
+                       :disabled="loading || loadingPreset || submitting || importTransactionCheckDataTab?.isEditing"
                        @click="batchApplyRules"
                        v-if="currentStep === 'checkData'">
                     {{ tt('Batch Apply Rules') }}
@@ -38,7 +39,7 @@
 
             <template #toolbar>
                 <v-btn class="ms-2 me-1" density="comfortable" variant="outlined" color="primary"
-                       :disabled="loading || submitting || (!isImportDataFromTextbox && !isAIImageImport && !importFile) || (isImportDataFromTextbox && !importData) || (!isImportDataFromTextbox && !isAIImageImport && allSupportedEncodings && fileEncoding === 'auto' && !autoDetectedFileEncoding) || (!isImportDataFromTextbox && isAIImageImport && importImageFiles.length === 0)"
+                       :disabled="loading || loadingPreset || submitting || (!isImportDataFromTextbox && !isAIImageImport && !importFile) || (isImportDataFromTextbox && !importData) || (!isImportDataFromTextbox && !isAIImageImport && allSupportedEncodings && fileEncoding === 'auto' && !autoDetectedFileEncoding) || (!isImportDataFromTextbox && isAIImageImport && importImageFiles.length === 0)"
                        @click="parseData"
                        v-if="currentStep === 'defineColumn' || currentStep === 'executeCustomScript' || (currentStep === 'recognizeImages' && !submitting) || currentStep === 'uploadFile'">
                     {{ tt('Next') }}
@@ -46,7 +47,7 @@
                 </v-btn>
 
                 <v-btn class="ms-2 me-1" density="comfortable" variant="outlined" color="secondary"
-                       :disabled="loading"
+                       :disabled="loading || loadingPreset"
                        @click="cancelBatchRecognizeImages()"
                        v-if="currentStep === 'recognizeImages' && submitting">{{ tt('Cancel Recognition') }}</v-btn>
 
@@ -58,7 +59,7 @@
                     <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :aria-label="tt('More')" :disabled="loading || submitting" :icon="true"
+                       :aria-label="tt('More')" :disabled="loading || loadingPreset || submitting" :icon="true"
                        v-if="currentStep === 'defineColumn' && importTransactionDefineColumnTab?.menus">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent" max-height="500">
@@ -73,7 +74,7 @@
                     </v-menu>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :aria-label="tt('More')" :disabled="loading || submitting" :icon="true"
+                       :aria-label="tt('More')" :disabled="loading || loadingPreset || submitting" :icon="true"
                        v-if="currentStep === 'executeCustomScript' && importTransactionExecuteCustomScriptTab?.menus">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent" max-height="500">
@@ -88,7 +89,7 @@
                     </v-menu>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :aria-label="tt('Filter')" :icon="true" :disabled="loading || submitting || importTransactionCheckDataTab?.isEditing"
+                       :aria-label="tt('Filter')" :icon="true" :disabled="loading || loadingPreset || submitting || importTransactionCheckDataTab?.isEditing"
                        v-if="currentStep === 'checkData' && importTransactionCheckDataTab?.filterMenus">
                     <v-icon :icon="mdiFilterOutline" />
                     <v-menu activator="parent" max-height="500">
@@ -109,7 +110,7 @@
                     </v-menu>
                 </v-btn>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :aria-label="tt('More')" :icon="true" :disabled="loading || submitting"
+                       :aria-label="tt('More')" :icon="true" :disabled="loading || loadingPreset || submitting"
                        v-if="currentStep === 'checkData' && importTransactionCheckDataTab?.toolMenus">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent" max-height="500">
@@ -151,95 +152,32 @@
                                                        secondary-key-field="type"
                                                        secondary-value-field="type"
                                                        secondary-title-field="displayName"
-                                                       :disabled="submitting"
+                                                       :disabled="loading || loadingPreset || submitting"
                                                        :enable-filter="true"
                                                        :filter-placeholder="tt('Find file type')"
                                                        :filter-no-items-text="tt('No available file type')"
                                                        :label="tt('File Type')"
                                                        :placeholder="tt('File Type')"
-                                                       :items="allSupportedImportFileCategoryAndTypes"
+                                                       :items="allPresetsAndSupportedImportFileCategoryAndTypes"
                                                        :auto-update-menu-position="true"
-                                                       v-model="fileType">
+                                                       :disable-auto-select-first-secondary-item="true"
+                                                       v-model="selectedImportType">
                                     </two-column-select>
                                 </v-col>
 
-                                <v-col cols="12" md="12" v-if="allFileSubTypes">
-                                    <v-select
-                                        item-title="displayName"
-                                        item-value="type"
-                                        :disabled="submitting"
-                                        :label="tt('Format')"
-                                        :placeholder="tt('Format')"
-                                        :items="allFileSubTypes"
-                                        v-model="fileSubType"
-                                    />
-                                </v-col>
-
-                                <v-col cols="12" md="12" v-if="!isImportDataFromTextbox && allSupportedEncodings">
-                                    <v-select
-                                        item-title="displayName"
-                                        item-value="encoding"
-                                        :disabled="submitting"
-                                        :label="tt('File Encoding')"
-                                        :placeholder="tt('File Encoding')"
-                                        :items="allSupportedEncodings"
-                                        v-model="fileEncoding"
-                                    />
-                                </v-col>
-
-                                <v-col cols="12" md="12" v-if="isCustomFileFormat">
-                                    <v-select
-                                        item-title="displayName"
-                                        item-value="type"
-                                        :disabled="submitting"
-                                        :label="tt('Handling Method')"
-                                        :placeholder="tt('Handling Method')"
-                                        :items="[
-                                        { displayName: tt('Column Mapping'), type: ImportCustomFileFormatProcessMethod.ColumnMapping },
-                                        { displayName: tt('Custom Script'), type: ImportCustomFileFormatProcessMethod.CustomScript }
-                                     ]"
-                                        v-model="processCustomFileFormatMethod"
-                                    />
-                                </v-col>
-
-                                <v-col cols="12" md="12" v-if="supportedAdditionalOptions">
-                                    <v-select
-                                        :disabled="submitting"
-                                        :label="tt('Additional Options')"
-                                        :placeholder="tt('Additional Options')"
-                                        v-model="fileType"
-                                        v-model:menu="additionalOptionsMenuState"
-                                    >
-                                        <template #selection>
-                                            <span class="cursor-pointer">{{ displaySelectedAdditionalOptions }}</span>
-                                        </template>
-
-                                        <template #no-data>
-                                            <v-list class="py-0" select-strategy="classic"
-                                                    :selected="objectFieldWithValueToArrayItem(importAdditionalOptions, true as (boolean | undefined))"
-                                                    @keydown.up.stop @keydown.down.stop>
-                                                <template v-for="item in allSupportedAdditionalOptions">
-                                                    <v-list-item class="text-body-medium" :key="item.key" :value="item.key"
-                                                                 :append-icon="importAdditionalOptions[item.key] ? mdiCheck : undefined"
-                                                                 @click="importAdditionalOptions[item.key] = !importAdditionalOptions[item.key]"
-                                                                 v-if="isDefined(supportedAdditionalOptions[item.key])">{{ tt(item.name) }}</v-list-item>
-                                                </template>
-                                            </v-list>
-                                        </template>
-                                    </v-select>
-                                </v-col>
-
-                                <v-col cols="12" md="12" v-if="supportedAIAdditionalPrompt">
-                                    <v-textarea
-                                        type="text"
-                                        autocomplete="off"
-                                        persistent-placeholder
-                                        rows="2"
-                                        :disabled="submitting"
-                                        :placeholder="tt('Additional Prompt')"
-                                        v-model="importAIAdditionalPrompt"
-                                    />
-                                </v-col>
+                                <import-transaction-options
+                                    :file-type-info="allSupportedImportFileTypesMap[fileType]"
+                                    :supported-encodings="allSupportedEncodings"
+                                    :disabled="loading || loadingPreset || submitting"
+                                    :disabled-sub-type="!!selectedPreset"
+                                    :disabled-handling-method="!!selectedPreset"
+                                    v-model:file-type="fileType"
+                                    v-model:file-sub-type="fileSubType"
+                                    v-model:file-encoding="fileEncoding"
+                                    v-model:handling-method="processCustomFileFormatMethod"
+                                    v-model:additional-options="importAdditionalOptions"
+                                    v-model:additional-prompt="importAIAdditionalPrompt"
+                                />
 
                                 <v-col cols="12" md="12" v-if="!isImportDataFromTextbox && !isAIImageImport">
                                     <v-text-field
@@ -247,7 +185,7 @@
                                         persistent-placeholder
                                         type="text"
                                         class="always-cursor-pointer"
-                                        :disabled="submitting"
+                                        :disabled="loading || loadingPreset || submitting"
                                         :label="tt('Data File')"
                                         :placeholder="tt('format.misc.clickToSelectedFile', { extensions: supportedImportFileExtensions })"
                                         v-model="fileName"
@@ -261,7 +199,7 @@
                                         autocomplete="off"
                                         persistent-placeholder
                                         rows="5"
-                                        :disabled="submitting"
+                                        :disabled="loading || loadingPreset || submitting"
                                         :placeholder="tt('Data to import')"
                                         v-model="importData"
                                     />
@@ -299,20 +237,20 @@
                             ref="importTransactionDefineColumnTab"
                             :parsed-file-data="parsedFileData"
                             :parsed-file-column-separator="parsedFileColumnSeparator"
-                            :disabled="loading || submitting"
+                            :disabled="loading || loadingPreset || submitting"
                         />
                     </v-window-item>
                     <v-window-item value="executeCustomScript">
                         <import-transaction-execute-custom-script-tab
                             ref="importTransactionExecuteCustomScriptTab"
                             :parsed-file-data="parsedFileData"
-                            :disabled="loading || submitting"
+                            :disabled="loading || loadingPreset || submitting"
                         />
                     </v-window-item>
                     <v-window-item value="recognizeImages">
                         <import-transaction-recognize-images-tab
                             ref="importTransactionRecognizeImagesTab"
-                            :disabled="loading || submitting"
+                            :disabled="loading || loadingPreset || submitting"
                             :submitting="submitting"
                             :import-images="importImageFiles"
                         />
@@ -321,7 +259,7 @@
                         <import-transaction-check-data-tab
                             ref="importTransactionCheckDataTab"
                             :import-transactions="importTransactions"
-                            :disabled="loading || submitting"
+                            :disabled="loading || loadingPreset || submitting"
                         />
                     </v-window-item>
                     <v-window-item value="finalResult">
@@ -340,7 +278,7 @@
 
                             <div class="mt-4">
                                 <v-btn class="me-2" color="primary" variant="tonal"
-                                       :loading="submitting" :disabled="submitting"
+                                       :loading="submitting" :disabled="loading || loadingPreset || submitting"
                                        @click="checkImportResult(true)"
                                        v-if="importResultUnknown">
                                     <template #loader>
@@ -352,7 +290,7 @@
                                        @click="showRemainingTransactions"
                                        v-else-if="remainingTransactions.length">{{ tt('View Transactions Not Imported') }}</v-btn>
                                 <v-btn color="secondary" variant="tonal"
-                                       :disabled="submitting"
+                                       :disabled="loading || loadingPreset || submitting"
                                        @click="close(true)">{{ tt('Close') }}</v-btn>
                             </div>
                         </div>
@@ -382,12 +320,13 @@
 import type { StepBarItem } from '@/components/desktop/StepsBar.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
+import ImportTransactionOptions from '@/components/desktop/ImportTransactionOptions.vue';
 import ImportTransactionDefineColumnTab from './tabs/ImportTransactionDefineColumnTab.vue';
 import ImportTransactionExecuteCustomScriptTab from './tabs/ImportTransactionExecuteCustomScriptTab.vue';
 import ImportTransactionRecognizeImagesTab, { type BatchImportImageItem } from './tabs/ImportTransactionRecognizeImagesTab.vue';
 import ImportTransactionCheckDataTab from './tabs/ImportTransactionCheckDataTab.vue';
 
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -396,27 +335,32 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
+import { useImportPresetsStore } from '@/stores/importPreset.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
 import { useStatisticsStore } from '@/stores/statistics.ts';
 
-import { type KeyAndName, itemAndIndex } from '@/core/base.ts';
+import { itemAndIndex } from '@/core/base.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { KnownFileType } from '@/core/file.ts';
 import {
     type ImportFileTypeSupportedAdditionalOptions,
     type LocalizedImportFileCategoryAndTypes,
     type LocalizedImportFileType,
     type LocalizedImportFileTypeSubType,
     type LocalizedImportFileTypeSupportedEncodings,
-    KnownFileType
-} from '@/core/file.ts';
+    ImportCustomFileFormatProcessMethod
+} from '@/core/import_transaction.ts';
 import { ImageUploadQualityType } from '@/core/image.ts';
 import type { ErrorResponse } from '@/core/api.ts';
+import { IMPORT_FILE_PRESET_TYPE } from '@/consts/import_transaction.ts';
 import { UTF_8 } from '@/consts/file.ts';
 
+import type { ImportPresetBasicInfo, ImportPreset } from '@/models/import_preset.ts';
+import { type ImportTransactionReplaceRule, ImportTransactionReplaceRules } from '@/models/rule.ts';
 import type { TransactionImportResponse } from '@/models/transaction.ts';
 import { type ImportTransactionResponse, ImportTransaction } from '@/models/imported_transaction.ts';
 
-import { isDefined, isInteger, objectFieldWithValueToArrayItem } from '@/lib/common.ts';
+import { isDefined, isInteger, isBoolean } from '@/lib/common.ts';
 import { findExtensionByType, isFileExtensionSupported, detectFileEncoding } from '@/lib/file.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { isTransactionFromAITextRecognitionEnabled, isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
@@ -426,7 +370,6 @@ import logger from '@/lib/logger.ts';
 import {
     mdiRefresh,
     mdiFilterOutline,
-    mdiCheck,
     mdiDotsVertical,
     mdiHelpCircleOutline,
     mdiImagePlusOutline,
@@ -439,12 +382,7 @@ type ImportTransactionDefineColumnTabType = InstanceType<typeof ImportTransactio
 type ImportTransactionExecuteCustomScriptTabType = InstanceType<typeof ImportTransactionExecuteCustomScriptTab>;
 type ImportTransactionRecognizeImagesTabType = InstanceType<typeof ImportTransactionRecognizeImagesTab>;
 type ImportTransactionCheckDataTabType = InstanceType<typeof ImportTransactionCheckDataTab>;
-
 type ImportTransactionDialogStep = 'uploadFile' | 'defineColumn' | 'executeCustomScript' | 'recognizeImages' | 'checkData' | 'finalResult';
-enum ImportCustomFileFormatProcessMethod {
-    ColumnMapping,
-    CustomScript
-};
 
 defineProps<{
     persistent?: boolean;
@@ -453,7 +391,6 @@ defineProps<{
 const {
     tt,
     te,
-    joinMultiText,
     getAllSupportedImportFileCagtegoryAndTypes,
     formatNumberToLocalizedNumerals,
     getLocalizedFileEncodingName
@@ -464,6 +401,7 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
+const importPresetsStore = useImportPresetsStore();
 const overviewStore = useOverviewStore();
 const statisticsStore = useStatisticsStore();
 
@@ -475,34 +413,10 @@ const importTransactionRecognizeImagesTab = useTemplateRef<ImportTransactionReco
 const importTransactionCheckDataTab = useTemplateRef<ImportTransactionCheckDataTabType>('importTransactionCheckDataTab');
 const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
-const allSupportedAdditionalOptions: KeyAndName[] = [
-    {
-        key: 'payeeAsTag',
-        name: 'Parse Payee as Tag'
-    },
-    {
-        key: 'payeeAsDescription',
-        name: 'Parse Payee as Description'
-    },
-    {
-        key: 'memberAsTag',
-        name: 'Parse Member as Tag'
-    },
-    {
-        key: 'projectAsTag',
-        name: 'Parse Project as Tag'
-    },
-    {
-        key: 'merchantAsTag',
-        name: 'Parse Merchant as Tag'
-    }
-];
-
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const showState = ref<boolean>(false);
-const additionalOptionsMenuState = ref<boolean>(false);
 const clientSessionId = ref<string>('');
 const currentStep = ref<ImportTransactionDialogStep>('uploadFile');
 const importProcess = ref<number>(0);
@@ -512,6 +426,14 @@ const fileEncoding = ref<string>('auto');
 const detectingFileEncoding = ref<boolean>(false);
 const autoDetectedFileEncoding = ref<string | undefined>(undefined);
 const processCustomFileFormatMethod = ref<ImportCustomFileFormatProcessMethod>(ImportCustomFileFormatProcessMethod.ColumnMapping);
+
+const selectedPreset = ref<ImportPreset | undefined>(undefined);
+const presetDataMapping = ref<string>('');
+const presetCustomScript = ref<string>('');
+const presetAutoExecuteScript = ref<boolean>(false);
+const presetReplaceRules = ref<string>('');
+const presetRulesApplied = ref<boolean>(false);
+
 const importFile = ref<File | null>(null);
 const importImageFiles = ref<BatchImportImageItem[]>([]);
 const importData = ref<string>('');
@@ -530,9 +452,36 @@ const submittedTransactions = ref<ImportTransaction[]>([]);
 const remainingTransactions = ref<ImportTransaction[]>([]);
 const hasImportedTransactions = ref<boolean>(false);
 const loading = ref<boolean>(true);
+const loadingPreset = ref<boolean>(false);
 const submitting = ref<boolean>(false);
 
+const allPresets = computed<ImportPresetBasicInfo[]>(() => importPresetsStore.allImportPresetBasicInfos);
 const allSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => getAllSupportedImportFileCagtegoryAndTypes(isTransactionFromAITextRecognitionEnabled(), isTransactionFromAIImageRecognitionEnabled()));
+const allPresetsAndSupportedImportFileCategoryAndTypes = computed<LocalizedImportFileCategoryAndTypes[]>(() => {
+    if (!allPresets.value || !allPresets.value.length) {
+        return allSupportedImportFileCategoryAndTypes.value;
+    }
+
+    const ret: LocalizedImportFileCategoryAndTypes[] = [];
+    const presetCategoryAndTypes: LocalizedImportFileCategoryAndTypes = {
+        displayCategoryName: tt('User Presets'),
+        fileTypes: []
+    };
+
+    for (const preset of allPresets.value) {
+        presetCategoryAndTypes.fileTypes.push({
+            type: `${IMPORT_FILE_PRESET_TYPE}:${preset.id}`,
+            displayName: preset.name,
+            extensions: ''
+        });
+    }
+
+    ret.push(presetCategoryAndTypes);
+    ret.push(...allSupportedImportFileCategoryAndTypes.value);
+
+    return ret;
+});
+
 const allFileSubTypes = computed<LocalizedImportFileTypeSubType[] | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.subTypes);
 const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings[] | undefined>(() => {
     const supportedEncodings = allSupportedImportFileTypesMap.value[fileType.value]?.supportedEncodings;
@@ -567,6 +516,7 @@ const allSupportedEncodings = computed<LocalizedImportFileTypeSupportedEncodings
 
     return ret;
 });
+
 const isCustomFileFormat = computed<boolean>(() => fileType.value === 'dsv' || fileType.value === 'dsv_data' || fileType.value === 'excel');
 const isImportDataFromTextbox = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.dataFromTextbox ?? false);
 const needAITextRecognition = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.needAITextRecognition ?? false);
@@ -574,6 +524,52 @@ const isAIImageImport = computed<boolean>(() => fileType.value === 'ai_image');
 const needAIImageRecognition = computed<boolean>(() => allSupportedImportFileTypesMap.value[fileType.value]?.needAIImageRecognition ?? false);
 const supportedAdditionalOptions = computed<ImportFileTypeSupportedAdditionalOptions | undefined>(() => allSupportedImportFileTypesMap.value[fileType.value]?.supportedAdditionalOptions);
 const supportedAIAdditionalPrompt = computed<boolean>(() => !!allSupportedImportFileTypesMap.value[fileType.value]?.supportedAIAdditionalPrompt);
+
+const isModifiedInUploadStep = computed<boolean>(() => {
+    if (importFile.value || importImageFiles.value.length > 0 || importData.value) {
+        return true;
+    }
+
+    if (selectedPreset.value) {
+        if (importAIAdditionalPrompt.value !== selectedPreset.value.additionalPrompt) {
+            return true;
+        }
+    } else {
+        if (importAIAdditionalPrompt.value) {
+            return true;
+        }
+    }
+
+    return false;
+});
+
+const selectedImportType = computed<string>({
+    get: () => {
+        if (selectedPreset.value) {
+            return `${IMPORT_FILE_PRESET_TYPE}:${selectedPreset.value.id}`;
+        } else {
+            return fileType.value;
+        }
+    },
+    set: (value) => {
+        const preset: ImportPresetBasicInfo | undefined = allPresets.value.find(item => `${IMPORT_FILE_PRESET_TYPE}:${item.id}` === value);
+
+        if (preset) {
+            loadPreset(preset.id, false);
+        } else {
+            loadingPreset.value = false;
+            fileType.value = value;
+            importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
+            importAIAdditionalPrompt.value = '';
+
+            selectedPreset.value = undefined;
+            presetDataMapping.value = '';
+            presetCustomScript.value = '';
+            presetAutoExecuteScript.value = false;
+            presetReplaceRules.value = '';
+        }
+    }
+});
 
 const allSteps = computed<StepBarItem[]>(() => {
     const steps: StepBarItem[] = [
@@ -648,26 +644,6 @@ const supportedImportFileExtensions = computed<string | undefined>(() => {
     return allSupportedImportFileTypesMap.value[fileType.value]?.extensions;
 });
 
-const displaySelectedAdditionalOptions = computed<string>(() => {
-    if (!supportedAdditionalOptions.value) {
-        return tt('None');
-    }
-
-    const selectedOptions: string[] = [];
-
-    for (const option of allSupportedAdditionalOptions) {
-        if (isDefined(supportedAdditionalOptions.value[option.key]) && importAdditionalOptions.value[option.key]) {
-            selectedOptions.push(tt(option.name));
-        }
-    }
-
-    if (selectedOptions.length < 1) {
-        return tt('None');
-    }
-
-    return joinMultiText(selectedOptions);
-});
-
 const exportFileGuideDocumentUrl = computed<string | undefined>(() => {
     const document = allSupportedImportFileTypesMap.value[fileType.value]?.document;
 
@@ -686,6 +662,16 @@ const fileName = computed<string>(() => importFile.value?.name || '');
 
 function loadInitFileTypeFromSettings(): void {
     if (!settingsStore.appSettings.lastSelectedFileTypeInImportTransactionDialog) {
+        return;
+    }
+
+    if (settingsStore.appSettings.lastSelectedFileTypeInImportTransactionDialog.startsWith(IMPORT_FILE_PRESET_TYPE)) {
+        const items: string[] = settingsStore.appSettings.lastSelectedFileTypeInImportTransactionDialog.split(':');
+
+        if (items.length === 2 && items[1]) {
+            loadPreset(items[1], true);
+        }
+
         return;
     }
 
@@ -723,6 +709,8 @@ function loadInitFileTypeFromSettings(): void {
 }
 
 function open(): Promise<void> {
+    loading.value = true;
+    loadingPreset.value = false;
     fileType.value = 'ezbookkeeping';
     fileSubType.value = 'ezbookkeeping_csv';
 
@@ -735,6 +723,14 @@ function open(): Promise<void> {
     autoDetectedFileEncoding.value = undefined;
     processCustomFileFormatMethod.value = ImportCustomFileFormatProcessMethod.ColumnMapping;
     currentStep.value = 'uploadFile';
+
+    selectedPreset.value = undefined;
+    presetDataMapping.value = '';
+    presetCustomScript.value = '';
+    presetAutoExecuteScript.value = false;
+    presetReplaceRules.value = '';
+    presetRulesApplied.value = false;
+
     importProcess.value = 0;
     importedCount.value = null;
     totalImportCount.value = 0;
@@ -743,6 +739,7 @@ function open(): Promise<void> {
     submittedTransactions.value = [];
     remainingTransactions.value = [];
     hasImportedTransactions.value = false;
+
     importFile.value = null;
     importData.value = '';
     importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
@@ -757,10 +754,11 @@ function open(): Promise<void> {
     clientSessionId.value = generateRandomUUID();
     clearImportImageFiles();
 
-    const promises = [
+    const promises: Promise<unknown>[] = [
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false }),
-        transactionTagsStore.loadAllTags({ force: false })
+        transactionTagsStore.loadAllTags({ force: false }),
+        importPresetsStore.loadAllPresetBasicInfos({ force: false })
     ];
 
     Promise.all(promises).then(() => {
@@ -781,6 +779,74 @@ function open(): Promise<void> {
     return new Promise((resolve, reject) => {
         resolveFunc = resolve;
         rejectFunc = reject;
+    });
+}
+
+function loadPreset(presetId: string, silent: boolean): void {
+    loadingPreset.value = true;
+
+    importPresetsStore.getPreset({
+        presetId: presetId
+    }).then(preset => {
+        loadingPreset.value = false;
+
+        const originalFileType = allSupportedImportFileTypesMap.value[preset.fileType];
+
+        if (!originalFileType) {
+            logger.error(`failed to load preset ${preset.name} because the original file type ${preset.fileType} does not exist`);
+            if (!silent) {
+                snackbar.value?.showError('An error occurred');
+            }
+            return;
+        }
+
+        if (preset.fileSubType && !originalFileType.subTypes?.find(subType => subType.type === preset.fileSubType)) {
+            logger.error(`failed to load preset ${preset.name} because the original file type ${preset.fileType} does not support the sub type ${preset.fileSubType}`);
+            if (!silent) {
+                snackbar.value?.showError('An error occurred');
+            }
+            return;
+        }
+
+        selectedPreset.value = preset;
+        presetRulesApplied.value = false;
+        fileType.value = preset.fileType;
+        fileSubType.value = preset.fileSubType;
+
+        if (preset.fileEncoding && preset.fileEncoding !== 'auto') {
+            if (originalFileType.supportedEncodings?.find(encoding => encoding.encoding === preset.fileEncoding)) {
+                fileEncoding.value = preset.fileEncoding;
+            } else {
+                logger.warn(`failed to load preset ${preset.name} because the original file type ${preset.fileType} does not support the encoding ${preset.fileEncoding}`);
+                fileEncoding.value = 'auto';
+            }
+        } else {
+            fileEncoding.value = 'auto';
+        }
+
+        processCustomFileFormatMethod.value = ImportCustomFileFormatProcessMethod.ColumnMapping;
+
+        if (isCustomFileFormat.value) {
+            if (ImportCustomFileFormatProcessMethod[preset.handlingMethod]) {
+                processCustomFileFormatMethod.value = preset.handlingMethod;
+            } else {
+                logger.warn(`failed to load preset ${preset.name} because the handling method ${preset.handlingMethod} is not supported`);
+                processCustomFileFormatMethod.value = ImportCustomFileFormatProcessMethod.ColumnMapping;
+            }
+        }
+
+        importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {}, preset.additionalOptions);
+        importAIAdditionalPrompt.value = preset.additionalPrompt;
+        presetDataMapping.value = preset.dataMapping;
+        presetCustomScript.value = preset.customScript;
+        presetAutoExecuteScript.value = isBoolean(preset.autoExecuteScript) ? preset.autoExecuteScript : false;
+        presetReplaceRules.value = preset.replaceRules;
+    }).catch(error => {
+        loadingPreset.value = false;
+
+        if (!error.processed && !silent) {
+            snackbar.value?.showError(error);
+        }
     });
 }
 
@@ -1011,6 +1077,8 @@ function parseData(): void {
         type = fileSubType.value;
     }
 
+    presetRulesApplied.value = false;
+
     if (isAIImageImport.value && currentStep.value === 'uploadFile') {
         if (importImageFiles.value.length < 1) {
             snackbar.value?.showError('Please select a file to import');
@@ -1131,11 +1199,21 @@ function parseData(): void {
                     parsedFileData.value = response;
                     parsedFileColumnSeparator.value = columnSeparator;
                     currentStep.value = 'executeCustomScript';
+                    nextTick(() => {
+                        if (presetCustomScript.value) {
+                            importTransactionExecuteCustomScriptTab.value?.loadScript(presetCustomScript.value, presetAutoExecuteScript.value);
+                        }
+                    });
                 } else {
                     importTransactionDefineColumnTab.value?.reset();
                     parsedFileData.value = response;
                     parsedFileColumnSeparator.value = columnSeparator;
                     currentStep.value = 'defineColumn';
+                    nextTick(() => {
+                        if (presetDataMapping.value) {
+                            importTransactionDefineColumnTab.value?.loadColumnMapping(presetDataMapping.value);
+                        }
+                    });
                 }
             } else {
                 parsedFileData.value = undefined;
@@ -1246,7 +1324,13 @@ function batchApplyRules(): void {
         return;
     }
 
-    importTransactionCheckDataTab.value?.showBatchApplyRulesDialog();
+    let initialRules: ImportTransactionReplaceRule[] = [];
+
+    if (presetReplaceRules.value) {
+        initialRules = ImportTransactionReplaceRules.parseFromJson(presetReplaceRules.value, generateRandomUUID)?.getRules() || [];
+    }
+
+    importTransactionCheckDataTab.value?.showBatchApplyRulesDialog(initialRules);
 }
 
 function submit(): void {
@@ -1420,32 +1504,70 @@ function close(completed: boolean): void {
     showState.value = false;
 }
 
-watch(fileType, (newValue) => {
-    const subFileTypes = allSupportedImportFileTypesMap.value[newValue]?.subTypes;
+watch(currentStep, (newValue) => {
+    if (newValue === 'checkData' && !presetRulesApplied.value) {
+        nextTick().then(() => {
+            if (presetReplaceRules.value) {
+                const initialRules = ImportTransactionReplaceRules.parseFromJson(presetReplaceRules.value, generateRandomUUID)?.getRules();
 
-    if (subFileTypes && subFileTypes.length) {
-        if (fileSubType.value !== subFileTypes[0]!.type) {
-            fileSubType.value = subFileTypes[0]!.type;
-        } else if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
-            settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${newValue}|${fileSubType.value}`);
+                if (initialRules && initialRules.length > 0) {
+                    importTransactionCheckDataTab.value?.applyPresetRules(initialRules);
+                    presetRulesApplied.value = true;
+                }
+            }
+        });
+    }
+});
+
+watch(selectedPreset, (newValue) => {
+    if (newValue) {
+        if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
+            settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${IMPORT_FILE_PRESET_TYPE}:${newValue.id}`);
         }
     } else {
+        const subFileTypes = allSupportedImportFileTypesMap.value[fileType.value]?.subTypes;
+
         if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
-            settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${newValue}|`);
+            if (subFileTypes && subFileTypes.length) {
+                settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${fileType.value}|${fileSubType.value}`);
+            } else {
+                settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${fileType.value}|`);
+            }
         }
+    }
+});
+
+watch(fileType, (newValue) => {
+    if (!selectedPreset.value) {
+        const subFileTypes = allSupportedImportFileTypesMap.value[newValue]?.subTypes;
+
+        if (subFileTypes && subFileTypes.length) {
+            if (fileSubType.value !== subFileTypes[0]!.type && !subFileTypes.find(subType => subType.type === fileSubType.value)) {
+                fileSubType.value = subFileTypes[0]!.type;
+            } else if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
+                settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${newValue}|${fileSubType.value}`);
+            }
+        } else {
+            if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
+                settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${newValue}|`);
+            }
+        }
+
+        importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
     }
 
     importFile.value = null;
     parsedFileData.value = undefined;
     parsedFileColumnSeparator.value = undefined;
-    importAdditionalOptions.value = Object.assign({}, supportedAdditionalOptions.value ?? {});
     importTransactions.value = undefined;
     clearImportImageFiles();
 });
 
 watch(fileSubType, (newValue) => {
-    if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
-        settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${fileType.value}|${newValue}`);
+    if (!selectedPreset.value) {
+        if (settingsStore.appSettings.rememberLastSelectedFileTypeInImportTransactionDialog && !loading.value) {
+            settingsStore.setLastSelectedFileTypeInImportTransactionDialog(`${fileType.value}|${newValue}`);
+        }
     }
 
     let supportedExtensions: string | undefined = findExtensionByType(allFileSubTypes.value, newValue);

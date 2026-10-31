@@ -1,3 +1,4 @@
+import { itemAndIndex } from '@/core/base.ts';
 import { NormalizedText } from '@/core/text.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import {
@@ -233,6 +234,17 @@ export class ImportTransactionReplaceRule {
 
         return typeof targetValue === 'string' && (!checkValueHasContent || targetValue.length > 0);
     }
+
+    public static clone(rules: ImportTransactionReplaceRule[]): ImportTransactionReplaceRule[] {
+        const clonedRules: ImportTransactionReplaceRule[] = [];
+
+        for (const rule of rules) {
+            const clonedRule = rule.clone(rule.id);
+            clonedRules.push(clonedRule);
+        }
+
+        return clonedRules;
+    }
 }
 
 export class ImportTransactionReplaceRules {
@@ -262,6 +274,20 @@ export class ImportTransactionReplaceRules {
 
     public static of(rules: ImportTransactionReplaceRule[]): ImportTransactionReplaceRules {
         return new ImportTransactionReplaceRules(rules);
+    }
+
+    public static equals(rules1: ImportTransactionReplaceRule[], rules2: ImportTransactionReplaceRule[]): boolean {
+        if (rules1.length !== rules2.length) {
+            return false;
+        }
+
+        for (const [rule, index] of itemAndIndex(rules1)) {
+            if (!rule.equals(rules2[index]!, true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static parseFromJson(json: string, generateId: () => string): ImportTransactionReplaceRules | null {

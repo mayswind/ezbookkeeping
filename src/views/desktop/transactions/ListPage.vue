@@ -687,7 +687,7 @@
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
     <batch-add-dialog ref="batchAddDialog" />
     <a-i-image-recognition-dialog ref="aiImageRecognitionDialog" />
-    <import-dialog ref="importDialog" :persistent="true" />
+    <import-dialog ref="importDialog" />
 
     <account-filter-settings-dialog type="transactionListCurrent"
                                     v-model:show="showFilterAccountDialog"

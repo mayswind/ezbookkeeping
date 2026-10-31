@@ -15,8 +15,9 @@ import { type BigDecimal } from '@/core/numeral.ts';
 import { type TextualYearMonth, DateRange } from '@/core/datetime.ts';
 import { KeywordMatchMode } from '@/core/text.ts';
 import { CategoryType } from '@/core/category.ts';
-import type { ImportFileTypeSupportedAdditionalOptions } from '@/core/file.ts';
 import { TransactionType, TransactionTagFilterType } from '@/core/transaction.ts';
+import type { ImportFileTypeSupportedAdditionalOptions } from '@/core/import_transaction.ts';
+
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
 

@@ -452,6 +452,7 @@ import { Account, type CategorizedAccountWithDisplayBalance } from '@/models/acc
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
 import { ImportTransaction } from '@/models/imported_transaction.ts';
+import type { ImportTransactionReplaceRule } from '@/models/rule.ts';
 
 import {
     isString,
@@ -1998,7 +1999,7 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
     });
 }
 
-function showBatchApplyRulesDialog(): void {
+function showBatchApplyRulesDialog(initialRules: ImportTransactionReplaceRule[]): void {
     if (isEditing.value) {
         return;
     }
@@ -2010,6 +2011,7 @@ function showBatchApplyRulesDialog(): void {
         sourceAccountNames: allOriginalSourceAccountNames.value,
         destinationAccountNames: allOriginalDestinationAccountNames.value,
         tagNames: allOriginalTransactionTagNames.value,
+        initialRules: initialRules,
         selectedTransactionCount: selectedImportTransactionCount.value
     }).then(result => {
         if (!result || !result.rules || !result.scope) {
@@ -2100,6 +2102,21 @@ function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, inval
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
+    });
+}
+
+function applyPresetRules(rules: ImportTransactionReplaceRule[]): void {
+    if (!rules.length) {
+        return;
+    }
+
+    applyImportTransactionReplaceRules(props.importTransactions || [], rules, 'all', {
+        allCategoriesMap: allCategoriesMap.value,
+        allSecondaryCategoriesMapByName: allSecondaryCategoriesMapByName.value,
+        allAccountsMap: allAccountsMap.value,
+        allAccountsMapByName: allAccountsMapByName.value,
+        allTagsMap: allTagsMap.value,
+        updateTransaction: updateTransactionData
     });
 }
 
@@ -2245,6 +2262,7 @@ defineExpose({
     canImport,
     showBatchApplyRulesDialog,
     updateAllTransactionsIsValid,
+    applyPresetRules,
     reset,
     setCountPerPage
 });

@@ -60,6 +60,7 @@ const (
 	AMOUNT_COLOR_TYPE_RED            AmountColorType = 2
 	AMOUNT_COLOR_TYPE_YELLOW         AmountColorType = 3
 	AMOUNT_COLOR_TYPE_BLACK_OR_WHITE AmountColorType = 4
+	AMOUNT_COLOR_TYPE_BLUE           AmountColorType = 5
 	AMOUNT_COLOR_TYPE_INVALID        AmountColorType = 255
 )
 
@@ -76,6 +77,8 @@ func (s AmountColorType) String() string {
 		return "Yellow"
 	case AMOUNT_COLOR_TYPE_BLACK_OR_WHITE:
 		return "Black or White"
+	case AMOUNT_COLOR_TYPE_BLUE:
+		return "Blue"
 	case AMOUNT_COLOR_TYPE_INVALID:
 		return "Invalid"
 	default:
@@ -218,8 +221,8 @@ type UserProfileUpdateRequest struct {
 	DigitGroupingSymbol   *core.DigitGroupingSymbol   `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping         *core.DigitGroupingType     `json:"digitGrouping" binding:"omitempty,min=0,max=3"`
 	CoordinateDisplayType *core.CoordinateDisplayType `json:"coordinateDisplayType" binding:"omitempty,min=0,max=6"`
-	ExpenseAmountColor    *AmountColorType            `json:"expenseAmountColor" binding:"omitempty,min=0,max=4"`
-	IncomeAmountColor     *AmountColorType            `json:"incomeAmountColor" binding:"omitempty,min=0,max=4"`
+	ExpenseAmountColor    *AmountColorType            `json:"expenseAmountColor" binding:"omitempty,min=0,max=5"`
+	IncomeAmountColor     *AmountColorType            `json:"incomeAmountColor" binding:"omitempty,min=0,max=5"`
 }
 
 // UserProfileUpdateResponse represents the data returns to frontend after updating profile

@@ -21,6 +21,8 @@ import {
     DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE,
 } from './statistics.ts';
 import { DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE } from './explorer.ts';
+
+import { PresetAmountColor } from '@/core/color.ts';
 import { DEFAULT_CURRENCY_CODE } from '@/consts/currency.ts';
 
 export type ApplicationSettingKey = string;
@@ -124,6 +126,8 @@ export interface ApplicationCloudSetting {
 export interface LocaleDefaultSettings {
     currency: string;
     firstDayOfWeek: WeekDayValue;
+    preferredExpenseAmountColor: PresetAmountColor;
+    preferredIncomeAmountColor: PresetAmountColor;
 }
 
 export interface ApplicationLockState {
@@ -281,5 +285,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
 
 export const DEFAULT_LOCALE_SETTINGS: LocaleDefaultSettings = {
     currency: DEFAULT_CURRENCY_CODE,
-    firstDayOfWeek: WeekDay.DefaultFirstDay.type
+    firstDayOfWeek: WeekDay.DefaultFirstDay.type,
+    preferredExpenseAmountColor: PresetAmountColor.DefaultExpenseColor,
+    preferredIncomeAmountColor: PresetAmountColor.DefaultIncomeColor
 };

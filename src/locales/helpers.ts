@@ -2777,9 +2777,19 @@ function parse(row, index) {
             defaultFirstDayOfWeek = (WeekDay.parse(defaultFirstDayOfWeekName) as WeekDay).type;
         }
 
+        let preferredExpenseAmountColor = PresetAmountColor.DefaultExpenseColor;
+        let preferredIncomeAmountColor = PresetAmountColor.DefaultIncomeColor;
+
+        if (languageKey !== 'zh-Hans' && languageKey !== 'zh-Hant' && languageKey !== 'ja' && languageKey !== 'ko') {
+            preferredExpenseAmountColor = PresetAmountColor.Red;
+            preferredIncomeAmountColor = PresetAmountColor.Green;
+        }
+
         const localeDefaultSettings: LocaleDefaultSettings = {
             currency: defaultCurrency,
-            firstDayOfWeek: defaultFirstDayOfWeek
+            firstDayOfWeek: defaultFirstDayOfWeek,
+            preferredExpenseAmountColor: preferredExpenseAmountColor,
+            preferredIncomeAmountColor: preferredIncomeAmountColor
         };
 
         return localeDefaultSettings;

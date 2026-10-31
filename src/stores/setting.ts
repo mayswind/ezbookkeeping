@@ -609,6 +609,8 @@ export const useSettingsStore = defineStore('settings', () => {
 
         localeDefaultSettings.value.currency = newLocaleDefaultSettings.currency;
         localeDefaultSettings.value.firstDayOfWeek = newLocaleDefaultSettings.firstDayOfWeek;
+        localeDefaultSettings.value.preferredExpenseAmountColor = newLocaleDefaultSettings.preferredExpenseAmountColor;
+        localeDefaultSettings.value.preferredIncomeAmountColor = newLocaleDefaultSettings.preferredIncomeAmountColor;
     }
 
     return {

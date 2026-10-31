@@ -167,13 +167,15 @@ type UserLoginRequest struct {
 
 // UserRegisterRequest represents all parameters of user registering request
 type UserRegisterRequest struct {
-	Username        string       `json:"username" binding:"required,notBlank,max=32,validUsername"`
-	Email           string       `json:"email" binding:"required,notBlank,max=100,validEmail"`
-	Nickname        string       `json:"nickname" binding:"required,notBlank,max=64,validNickname"`
-	Password        string       `json:"password" binding:"required,min=6,max=128"`
-	Language        string       `json:"language" binding:"required,min=2,max=16"`
-	DefaultCurrency string       `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
-	FirstDayOfWeek  core.WeekDay `json:"firstDayOfWeek" binding:"min=0,max=6"`
+	Username           string          `json:"username" binding:"required,notBlank,max=32,validUsername"`
+	Email              string          `json:"email" binding:"required,notBlank,max=100,validEmail"`
+	Nickname           string          `json:"nickname" binding:"required,notBlank,max=64,validNickname"`
+	Password           string          `json:"password" binding:"required,min=6,max=128"`
+	Language           string          `json:"language" binding:"required,min=2,max=16"`
+	DefaultCurrency    string          `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
+	FirstDayOfWeek     core.WeekDay    `json:"firstDayOfWeek" binding:"min=0,max=6"`
+	ExpenseAmountColor AmountColorType `json:"expenseAmountColor" binding:"min=0,max=5"`
+	IncomeAmountColor  AmountColorType `json:"incomeAmountColor" binding:"min=0,max=5"`
 	TransactionCategoryCreateBatchRequest
 }
 

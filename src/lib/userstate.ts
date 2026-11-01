@@ -1,4 +1,6 @@
-import CryptoJS from 'crypto-js';
+import sha256 from 'crypto-js/sha256';
+import aes from 'crypto-js/aes';
+import utf8 from 'crypto-js/enc-utf8';
 
 import type { ApplicationLockState, WebAuthnConfig } from '@/core/setting.ts';
 import type { UserBasicInfo } from '@/models/user.ts';
@@ -20,19 +22,19 @@ const encryptedTokenSessionStorageKey: string = 'ebk_user_session_encrypted_toke
 const appLockStateSessionStorageKey: string = 'ebk_user_app_lock_state'; // { 'username': '', secret: '' }
 
 function getAppLockSecret(pinCode: string): string {
-    const hashedPinCode = CryptoJS.SHA256(appLockSecretBaseStringPrefix + pinCode).toString();
+    const hashedPinCode = sha256(appLockSecretBaseStringPrefix + pinCode).toString();
     return hashedPinCode.substring(0, 24); // put secret into user id of webauthn (user id total length must less 64 bytes)
 }
 
 function getEncryptedToken(token: string, appLockState: ApplicationLockState): string {
-    const key = CryptoJS.SHA256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
-    return CryptoJS.AES.encrypt(token, key).toString();
+    const key = sha256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
+    return aes.encrypt(token, key).toString();
 }
 
 function getDecryptedToken(encryptedToken: string, appLockState: ApplicationLockState): string {
-    const key = CryptoJS.SHA256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
-    const bytes = CryptoJS.AES.decrypt(encryptedToken, key);
-    return bytes.toString(CryptoJS.enc.Utf8);
+    const key = sha256(`${appLockSecretBaseStringPrefix}|${appLockState.username}|${appLockState.secret}`).toString();
+    const bytes = aes.decrypt(encryptedToken, key);
+    return bytes.toString(utf8);
 }
 
 export function isUserLogined(): boolean {

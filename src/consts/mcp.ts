@@ -2,14 +2,6 @@ import type { NameAndDisplayName } from '@/core/base.ts';
 
 export const ALL_MCP_TOOLS: NameAndDisplayName[] = [
     {
-        name: 'add_transaction',
-        displayName:'Add Transaction'
-    },
-    {
-        name: 'query_transactions',
-        displayName:'Query Transactions'
-    },
-    {
         name: 'query_all_accounts',
         displayName:'Query All Accounts'
     },
@@ -28,17 +20,25 @@ export const ALL_MCP_TOOLS: NameAndDisplayName[] = [
     {
         name: 'query_latest_exchange_rates',
         displayName:'Query Latest Exchange Rates'
+    },
+    {
+        name: 'query_transactions',
+        displayName:'Query Transactions'
+    },
+    {
+        name: 'add_transaction',
+        displayName:'Add Transaction'
     }
 ];
 
 export const ALL_MCP_TOOL_NAMES: string[] = ALL_MCP_TOOLS.map(tool => tool.name);
 
 export const DEFAULT_ENABLED_MCP_TOOL_NAMES: string[] = [
-    'add_transaction',
-    'query_transactions',
     'query_all_accounts',
     'query_all_accounts_balance',
     'query_all_transaction_categories',
     'query_all_transaction_tags',
-    'query_latest_exchange_rates'
+    'query_latest_exchange_rates',
+    'query_transactions',
+    'add_transaction'
 ]

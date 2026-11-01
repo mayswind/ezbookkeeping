@@ -361,7 +361,8 @@ import type { TransactionImportResponse } from '@/models/transaction.ts';
 import { type ImportTransactionResponse, ImportTransaction } from '@/models/imported_transaction.ts';
 
 import { isDefined, isInteger, isBoolean } from '@/lib/common.ts';
-import { findExtensionByType, isFileExtensionSupported, detectFileEncoding } from '@/lib/file.ts';
+import { findExtensionByType, isFileExtensionSupported } from '@/lib/file.ts';
+import { detectFileEncoding } from '@/lib/chardet/index.ts';
 import { generateRandomUUID } from '@/lib/misc.ts';
 import { isTransactionFromAITextRecognitionEnabled, isTransactionFromAIImageRecognitionEnabled } from '@/lib/server_settings.ts';
 import { compressJpgImageByQuality } from '@/lib/ui/common.ts';

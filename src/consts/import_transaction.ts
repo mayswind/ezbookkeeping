@@ -1,200 +1,346 @@
-import { entries } from '@/core/base.ts';
-import { TransactionType } from '@/core/transaction.ts';
-import { ImportTransactionColumnType } from '@/core/import_transaction.ts';
+import { type KeyAndName } from '@/core/base.ts';
+import type { ImportFileCategoryAndTypes } from '@/core/import_transaction.ts';
 
-export const KNOWN_COLUMN_NAME_MAPPING: Record<string, ImportTransactionColumnType> = ((mappings: Record<string, ImportTransactionColumnType>[]) => {
-    const result: Record<string, ImportTransactionColumnType> = {};
+import { SUPPORTED_FILE_ENCODINGS } from '@/consts/file.ts';
 
-    for (const mapping of mappings) {
-        for (const [key, value] of entries(mapping)) {
-            const normalizedKey = key.toLowerCase().replaceAll(' ', '').replaceAll('_', '').replaceAll('-', '');
+export const DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE: string = 'en';
+export const SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE: Record<string, string> = {
+    DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE: DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE,
+    'zh-Hans': 'zh-Hans',
+    'zh-Hant': 'zh-Hans',
+};
 
-            if (result[normalizedKey]) {
-                continue;
+export const IMPORT_FILE_PRESET_TYPE: string = 'preset';
+
+export const SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES: ImportFileCategoryAndTypes[] = [
+    {
+        categoryName: 'ezBookkeeping File Format',
+        fileTypes: [
+            {
+                type: 'ezbookkeeping',
+                name: 'ezbookkeeping Data Export File',
+                extensions: '.csv,.tsv',
+                subTypes: [
+                    {
+                        type: 'ezbookkeeping_csv',
+                        name: 'CSV (Comma-separated values) File',
+                        extensions: '.csv',
+                    },
+                    {
+                        type: 'ezbookkeeping_tsv',
+                        name: 'TSV (Tab-separated values) File',
+                        extensions: '.tsv',
+                    }
+                ],
+                document: {
+                    supportMultiLanguages: true,
+                    anchor: 'export-transactions'
+                }
             }
-
-            result[normalizedKey] = value;
-        }
-    }
-
-    return result;
-})([
-    // Columns of ezbookkeeping Data Export File
-    {
-        ['Time']: ImportTransactionColumnType.TransactionTime,
-        ['Timezone']: ImportTransactionColumnType.TransactionTimezone,
-        ['Type']: ImportTransactionColumnType.TransactionType,
-        ['Category']: ImportTransactionColumnType.Category,
-        ['Sub Category']: ImportTransactionColumnType.SubCategory,
-        ['Account']: ImportTransactionColumnType.AccountName,
-        ['Account Currency']: ImportTransactionColumnType.AccountCurrency,
-        ['Amount']: ImportTransactionColumnType.Amount,
-        ['Account2']: ImportTransactionColumnType.RelatedAccountName,
-        ['Account2 Currency']: ImportTransactionColumnType.RelatedAccountCurrency,
-        ['Account2 Amount']: ImportTransactionColumnType.RelatedAmount,
-        ['Geographic Location']: ImportTransactionColumnType.GeographicLocation,
-        ['Tags']: ImportTransactionColumnType.Tags,
-        ['Description']: ImportTransactionColumnType.Description
+        ]
     },
-    // Other common columns of transaction time
     {
-        // en
-        ['Date']: ImportTransactionColumnType.TransactionTime,
-        ['Datetime']: ImportTransactionColumnType.TransactionTime,
-        ['Timestamp']: ImportTransactionColumnType.TransactionTime,
-        // zh-Hans
-        ['日期']: ImportTransactionColumnType.TransactionTime,
-        ['时间']: ImportTransactionColumnType.TransactionTime,
-        ['交易日期']: ImportTransactionColumnType.TransactionTime,
-        ['交易时间']: ImportTransactionColumnType.TransactionTime,
+        categoryName: 'Custom File Format',
+        fileTypes: [
+            {
+                type: 'dsv',
+                name: 'Delimiter-separated Values (DSV) File',
+                extensions: '.csv,.tsv',
+                subTypes: [
+                    {
+                        type: 'custom_csv',
+                        name: 'CSV (Comma-separated values) File',
+                        extensions: '.csv',
+                    },
+                    {
+                        type: 'custom_tsv',
+                        name: 'TSV (Tab-separated values) File',
+                        extensions: '.tsv,.txt',
+                    },
+                    {
+                        type: 'custom_ssv',
+                        name: 'SSV (Semicolon-separated values) File',
+                        extensions: '.txt',
+                    }
+                ],
+                supportedEncodings: SUPPORTED_FILE_ENCODINGS,
+                document: {
+                    supportMultiLanguages: true,
+                    anchor: 'how-to-import-delimiter-separated-values-dsv-file-or-data'
+                }
+            },
+            {
+                type: 'dsv_data',
+                name: 'Delimiter-separated Values (DSV) Data',
+                extensions: '.csv,.tsv',
+                subTypes: [
+                    {
+                        type: 'custom_csv',
+                        name: 'CSV (Comma-separated values) File',
+                        extensions: '.csv',
+                    },
+                    {
+                        type: 'custom_tsv',
+                        name: 'TSV (Tab-separated values) File',
+                        extensions: '.tsv,.txt',
+                    },
+                    {
+                        type: 'custom_ssv',
+                        name: 'SSV (Semicolon-separated values) File',
+                        extensions: '.txt',
+                    }
+                ],
+                dataFromTextbox: true,
+                document: {
+                    supportMultiLanguages: true,
+                    anchor: 'how-to-import-delimiter-separated-values-dsv-file-or-data'
+                }
+            },
+            {
+                type: 'excel',
+                name: 'Excel Workbook File',
+                extensions: '.xlsx,.xls',
+                subTypes: [
+                    {
+                        type: 'custom_xlsx',
+                        name: 'Excel Workbook File (.xlsx)',
+                        extensions: '.xlsx',
+                    },
+                    {
+                        type: 'custom_xls',
+                        name: 'Excel 97-2003 Workbook File (.xls)',
+                        extensions: '.xls',
+                    }
+                ],
+                document: {
+                    supportMultiLanguages: true,
+                    anchor: 'how-to-import-delimiter-separated-values-dsv-file-or-data'
+                }
+            },
+            {
+                type: 'ai_txt',
+                name: 'AI Text Content Recognition',
+                extensions: '.txt',
+                dataFromTextbox: true,
+                needAITextRecognition: true,
+                supportedAIAdditionalPrompt: true
+            },
+            {
+                type: 'ai_image',
+                name: 'AI Batch Image Recognition',
+                extensions: '.jpg,.jpeg,.png,.gif,.webp',
+                needAIImageRecognition: true,
+                supportedAIAdditionalPrompt: true
+            },
+        ]
     },
-    // Other common columns of transaction timezone
     {
-
-    },
-    // Other common columns of transaction type
-    {
-        // en
-        ['Transaction Type']: ImportTransactionColumnType.TransactionType,
-        // zh-Hans
-        ['交易类型']: ImportTransactionColumnType.TransactionType,
-        ['类型']: ImportTransactionColumnType.TransactionType,
-        ['收/支']: ImportTransactionColumnType.TransactionType,
-    },
-    // Other common columns of category
-    {
-        // en
-        ['Category Name']: ImportTransactionColumnType.Category,
-        // zh-Hans
-        ['交易分类']: ImportTransactionColumnType.Category,
-        ['类别']: ImportTransactionColumnType.Category,
-        ['分类']: ImportTransactionColumnType.Category,
-    },
-    // Other common columns of sub category
-    {
-        // zh-Hans
-        ['子类别']: ImportTransactionColumnType.SubCategory,
-        ['子分类']: ImportTransactionColumnType.SubCategory,
-        ['二级分类']: ImportTransactionColumnType.SubCategory,
-    },
-    // Other common columns of account name
-    {
-        // en
-        ['Account Name']: ImportTransactionColumnType.AccountName,
-        ['Source Name']: ImportTransactionColumnType.AccountName,
-        // zh-Hans
-        ['账户']: ImportTransactionColumnType.AccountName,
-        ['账户1']: ImportTransactionColumnType.AccountName,
-    },
-    // Other common columns of account currency
-    {
-        // en
-        ['Currency']: ImportTransactionColumnType.AccountCurrency,
-        ['Currency Code']: ImportTransactionColumnType.AccountCurrency,
-        // zh-Hans
-        ['账户币种']: ImportTransactionColumnType.AccountCurrency,
-        ['币种']: ImportTransactionColumnType.AccountCurrency,
-    },
-    // Other common columns of amount
-    {
-        // zh-Hans
-        ['金额']: ImportTransactionColumnType.Amount,
-    },
-    // Other common columns of related account name
-    {
-        // en
-        ['Destination Name']: ImportTransactionColumnType.RelatedAccountName,
-        // zh-Hans
-        ['账户2']: ImportTransactionColumnType.RelatedAccountName,
-    },
-    // Other common columns of related account currency
-    {
-        // en
-        ['Foreign Currency']: ImportTransactionColumnType.RelatedAccountCurrency,
-        ['Foreign Currency Code']: ImportTransactionColumnType.RelatedAccountCurrency,
-    },
-    // Other common columns of related amount
-    {
-        // en
-        ['Foreign Amount']: ImportTransactionColumnType.RelatedAmount,
-    },
-    // Other common columns of geographic location
-    {
-
-    },
-    // Other common columns of tags
-    {
-        // zh-Hans
-        ['标签']: ImportTransactionColumnType.Tags,
-    },
-    // Other common columns of description
-    {
-        // en
-        ['Comment']: ImportTransactionColumnType.Description,
-        ['Note']: ImportTransactionColumnType.Description,
-        ['Memo']: ImportTransactionColumnType.Description,
-        // zh-Hans
-        ['备注']: ImportTransactionColumnType.Description,
-    }
-]);
-
-export const KNOWN_TRANSACTION_TYPE_NAME_MAPPING: Record<string, TransactionType> = ((mappings: Record<string, TransactionType>[]) => {
-    const result: Record<string, TransactionType> = {};
-
-    for (const mapping of mappings) {
-        for (const [key, value] of entries(mapping)) {
-            const normalizedKey = key.toLowerCase().replaceAll(' ', '').replaceAll('_', '').replaceAll('-', '');
-
-            if (result[normalizedKey]) {
-                continue;
+        categoryName: 'General Data Exchange Format',
+        fileTypes: [
+            {
+                type: 'ofx',
+                name: 'Open Financial Exchange (OFX) File',
+                extensions: '.ofx'
+            },
+            {
+                type: 'qfx',
+                name: 'Quicken Financial Exchange (QFX) File',
+                extensions: '.qfx'
+            },
+            {
+                type: 'qif',
+                name: 'Quicken Interchange Format (QIF) File',
+                extensions: '.qif',
+                subTypes: [
+                    {
+                        type: 'qif_ymd',
+                        name: 'Year-month-day format',
+                    },
+                    {
+                        type: 'qif_mdy',
+                        name: 'Month-day-year format',
+                    },
+                    {
+                        type: 'qif_dmy',
+                        name: 'Day-month-year format',
+                    }
+                ],
+                supportedAdditionalOptions: {
+                    payeeAsTag: false,
+                    payeeAsDescription: true
+                }
+            },
+            {
+                type: 'iif',
+                name: 'Intuit Interchange Format (IIF) File',
+                extensions: '.iif'
             }
-
-            result[normalizedKey] = value;
-        }
+        ]
+    },
+    {
+        categoryName: 'General Bank Statement Format',
+        fileTypes: [
+            {
+                type: 'camt052',
+                name: 'Camt.052 Bank to Customer Statement File',
+                extensions: '.xml'
+            },
+            {
+                type: 'camt053',
+                name: 'Camt.053 Bank to Customer Statement File',
+                extensions: '.xml'
+            },
+            {
+                type: 'mt940',
+                name: 'MT940 Consumer Statement Message File',
+                extensions: '.txt'
+            }
+        ]
+    },
+    {
+        categoryName: 'Other Bank/Payment App Statement File',
+        fileTypes: [
+            {
+                type: 'alipay_app_csv',
+                name: 'Alipay (App) Statement File',
+                extensions: '.csv',
+                document: {
+                    supportMultiLanguages: 'zh-Hans',
+                    anchor: '如何获取支付宝app交易流水文件'
+                }
+            },
+            {
+                type: 'alipay_web_csv',
+                name: 'Alipay (Web) Statement File',
+                extensions: '.csv',
+                document: {
+                    supportMultiLanguages: 'zh-Hans',
+                    anchor: '如何获取支付宝网页版交易流水文件'
+                }
+            },
+            {
+                type: 'wechat_pay_app',
+                name: 'WeChat Pay Statement File',
+                extensions: '.xlsx,.csv',
+                subTypes: [
+                    {
+                        type: 'wechat_pay_app_xlsx',
+                        name: 'Excel Workbook File',
+                        extensions: '.xlsx',
+                    },
+                    {
+                        type: 'wechat_pay_app_csv',
+                        name: 'CSV (Comma-separated values) File',
+                        extensions: '.csv',
+                    }
+                ],
+                document: {
+                    supportMultiLanguages: 'zh-Hans',
+                    anchor: '如何获取微信支付账单文件'
+                }
+            },
+            {
+                type: 'jdcom_finance_app_csv',
+                name: 'JD.com Finance Statement File',
+                extensions: '.csv',
+                document: {
+                    supportMultiLanguages: 'zh-Hans',
+                    anchor: '如何获取京东金融账单文件'
+                }
+            }
+        ]
+    },
+    {
+        categoryName: 'Other Finance App File Format',
+        fileTypes: [
+            {
+                type: 'gnucash',
+                name: 'GnuCash XML Database File',
+                extensions: '.gnucash',
+                document: {
+                    supportMultiLanguages: true,
+                    anchor: 'how-to-get-gnucash-xml-database-file'
+                }
+            },
+            {
+                type: 'firefly_iii_csv',
+                name: 'Firefly III Data Export File',
+                extensions: '.csv',
+                document: {
+                    supportMultiLanguages: true,
+                    anchor: 'how-to-get-firefly-iii-data-export-file'
+                }
+            },
+            {
+                type: 'beancount',
+                name: 'Beancount Data File',
+                extensions: '.beancount'
+            },
+            {
+                type: 'feidee_mymoney_csv',
+                name: 'Feidee MyMoney (App) Data Export File',
+                extensions: '.csv',
+                supportedAdditionalOptions: {
+                    memberAsTag: false,
+                    projectAsTag: false,
+                    merchantAsTag: false,
+                },
+                document: {
+                    supportMultiLanguages: 'zh-Hans',
+                    anchor: '如何获取随手记app数据导出文件'
+                }
+            },
+            {
+                type: 'feidee_mymoney_xls',
+                name: 'Feidee MyMoney (Web) Data Export File',
+                extensions: '.xls',
+                supportedAdditionalOptions: {
+                    memberAsTag: false,
+                    projectAsTag: false,
+                    merchantAsTag: false,
+                },
+                document: {
+                    supportMultiLanguages: 'zh-Hans',
+                    anchor: '如何获取随手记web版数据导出文件'
+                }
+            },
+            {
+                type: 'feidee_mymoney_elecloud_xlsx',
+                name: 'Feidee MyMoney (Elecloud) Data Export File',
+                extensions: '.xlsx',
+                supportedAdditionalOptions: {
+                    memberAsTag: false,
+                    projectAsTag: false,
+                    merchantAsTag: false,
+                },
+                document: {
+                    supportMultiLanguages: 'zh-Hans',
+                    anchor: '如何获取随手记神象云账本数据导出文件'
+                }
+            }
+        ]
     }
+];
 
-    return result;
-})([
-    // Transaction types of ezbookkeeping Data Export File
+export const ALL_IMPORT_FILE_ADDITIONAL_OPTIONS: KeyAndName[] = [
     {
-        ['Balance Modification']: TransactionType.ModifyBalance,
-        ['Income']: TransactionType.Income,
-        ['Expense']: TransactionType.Expense,
-        ['Transfer']: TransactionType.Transfer,
+        key: 'payeeAsTag',
+        name: 'Parse Payee as Tag'
     },
-    // Other common balance modification type
     {
-        // en
-        ['Opening balance']: TransactionType.ModifyBalance,
-        // zh-Hans
-        ['余额变更']: TransactionType.ModifyBalance,
-        ['负债变更']: TransactionType.ModifyBalance,
+        key: 'payeeAsDescription',
+        name: 'Parse Payee as Description'
     },
-    // Other common income type
     {
-        // en
-        ['Deposit']: TransactionType.Income,
-        // zh-Hans
-        ['收入']: TransactionType.Income,
+        key: 'memberAsTag',
+        name: 'Parse Member as Tag'
     },
-    // Other common expense type
     {
-        // en
-        ['Withdrawal']: TransactionType.Expense,
-        // zh-Hans
-        ['支出']: TransactionType.Expense,
+        key: 'projectAsTag',
+        name: 'Parse Project as Tag'
     },
-    // Other common transfer type
     {
-        // zh-Hans
-        ['转账']: TransactionType.Transfer,
-        ['还款']: TransactionType.Transfer,
-        ['借入']: TransactionType.Transfer,
-        ['借出']: TransactionType.Transfer,
-        ['收债']: TransactionType.Transfer,
-        ['还债']: TransactionType.Transfer,
-        ['代付']: TransactionType.Transfer,
-        ['报销']: TransactionType.Transfer,
-        ['退款']: TransactionType.Transfer,
+        key: 'merchantAsTag',
+        name: 'Parse Merchant as Tag'
     }
-]);
+];

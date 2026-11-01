@@ -2,6 +2,7 @@
     --ebk-amount-color-green: 0, 150, 136;
     --ebk-amount-color-red: 212, 63, 63;
     --ebk-amount-color-yellow: 226, 182, 10;
+    --ebk-amount-color-blue: 56, 115, 191;
 }
 
 :root.expense-amount-color-green {
@@ -97,6 +98,38 @@
     .bg-income {
         color: rgb(var(--v-theme-on-primary)) !important;
         background-color: rgb(var(--ebk-amount-color-yellow));
+    }
+}
+
+:root.expense-amount-color-blue {
+    .v-theme--light,
+    .v-theme--dark {
+        --v-theme-expense: var(--ebk-amount-color-blue);
+    }
+
+    .text-expense {
+        color: rgb(var(--ebk-amount-color-blue));
+    }
+
+    .bg-expense {
+        color: rgb(var(--v-theme-on-primary)) !important;
+        background-color: rgb(var(--ebk-amount-color-blue));
+    }
+}
+
+:root.income-amount-color-blue {
+    .v-theme--light,
+    .v-theme--dark {
+        --v-theme-income: var(--ebk-amount-color-blue);
+    }
+
+    .text-income {
+        color: rgb(var(--ebk-amount-color-blue));
+    }
+
+    .bg-income {
+        color: rgb(var(--v-theme-on-primary)) !important;
+        background-color: rgb(var(--ebk-amount-color-blue));
     }
 }
 

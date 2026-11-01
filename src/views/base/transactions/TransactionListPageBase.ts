@@ -123,6 +123,7 @@ export function useTransactionListPageBase() {
     const showTotalAmountInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTotalAmountInTransactionListPage);
     const totalAmountTypeInTransactionListPage = computed<number>(() => settingsStore.appSettings.totalAmountTypeInTransactionListPage);
     const showTagInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showTagInTransactionListPage);
+    const showPictureIndicatorInTransactionListPage = computed<boolean>(() => settingsStore.appSettings.showPictureIndicatorInTransactionListPage);
 
     const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, {
         includeCustom: true,
@@ -539,6 +540,7 @@ export function useTransactionListPageBase() {
         showTotalAmountInTransactionListPage,
         totalAmountTypeInTransactionListPage,
         showTagInTransactionListPage,
+        showPictureIndicatorInTransactionListPage,
         allDateRanges,
         allAccounts,
         allAccountsMap,

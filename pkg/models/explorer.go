@@ -25,11 +25,10 @@ type InsightsExplorerCreateRequest struct {
 
 // InsightsExplorerModifyRequest represents all parameters of exploration modification request
 type InsightsExplorerModifyRequest struct {
-	Id              int64          `json:"id,string" binding:"required,min=0"`
-	Name            string         `json:"name" binding:"required,notBlank,max=64"`
-	Data            map[string]any `json:"data" binding:"required"`
-	Hidden          bool           `json:"hidden"`
-	ClientSessionId string         `json:"clientSessionId"`
+	Id     int64          `json:"id,string" binding:"required,min=0"`
+	Name   string         `json:"name" binding:"required,notBlank,max=64"`
+	Data   map[string]any `json:"data" binding:"required"`
+	Hidden bool           `json:"hidden"`
 }
 
 // InsightsExplorerGetRequest represents all parameters of exploration getting request

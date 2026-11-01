@@ -511,6 +511,14 @@ func startWebServer(c *core.CliContext) error {
 				apiV1Route.POST("/custom_icons/delete.json", bindApi(api.UserCustomIcons.CustomIconDeleteHandler, config))
 			}
 
+			// Import Presets
+			apiV1Route.GET("/import_presets/list.json", bindApi(api.ImportPresets.ImportPresetListHandler, config))
+			apiV1Route.GET("/import_presets/get.json", bindApi(api.ImportPresets.ImportPresetGetHandler, config))
+			apiV1Route.POST("/import_presets/add.json", bindApi(api.ImportPresets.ImportPresetCreateHandler, config))
+			apiV1Route.POST("/import_presets/modify.json", bindApi(api.ImportPresets.ImportPresetModifyHandler, config))
+			apiV1Route.POST("/import_presets/move.json", bindApi(api.ImportPresets.ImportPresetMoveHandler, config))
+			apiV1Route.POST("/import_presets/delete.json", bindApi(api.ImportPresets.ImportPresetDeleteHandler, config))
+
 			// Exchange Rates
 			apiV1Route.GET("/exchange_rates/latest.json", bindApi(api.ExchangeRates.LatestExchangeRateHandler, config))
 			apiV1Route.POST("/exchange_rates/user_custom/update.json", bindApi(api.ExchangeRates.UserCustomExchangeRateUpdateHandler, config))

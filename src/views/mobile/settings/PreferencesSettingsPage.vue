@@ -189,6 +189,14 @@
                     <f7-toggle :checked="showTagInTransactionListPage" @toggle:change="showTagInTransactionListPage = $event"></f7-toggle>
                 </template>
             </f7-list-item>
+            <f7-list-item>
+                <template #after-title>
+                    {{ tt('Show Transaction Picture Indicator') }}
+                </template>
+                <template #after>
+                    <f7-toggle :checked="showPictureIndicatorInTransactionListPage" @toggle:change="showPictureIndicatorInTransactionListPage = $event"></f7-toggle>
+                </template>
+            </f7-list-item>
             <f7-list-item
                 link="#"
                 class="item-truncate-after-text"
@@ -540,6 +548,7 @@ const {
     showTotalAmountInTransactionListPage,
     totalAmountTypeInTransactionListPage,
     showTagInTransactionListPage,
+    showPictureIndicatorInTransactionListPage,
     defaultKeywordMatchModeInTransactionListPage,
     autoSaveTransactionDraft,
     isAutoGetCurrentGeoLocation,

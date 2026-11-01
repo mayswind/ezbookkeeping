@@ -352,11 +352,11 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 		updateCols = append(updateCols, "coordinate_display_type")
 	}
 
-	if models.AMOUNT_COLOR_TYPE_DEFAULT <= user.ExpenseAmountColor && user.ExpenseAmountColor <= models.AMOUNT_COLOR_TYPE_BLACK_OR_WHITE {
+	if models.AMOUNT_COLOR_TYPE_DEFAULT <= user.ExpenseAmountColor && user.ExpenseAmountColor <= models.AMOUNT_COLOR_TYPE_BLUE {
 		updateCols = append(updateCols, "expense_amount_color")
 	}
 
-	if models.AMOUNT_COLOR_TYPE_DEFAULT <= user.IncomeAmountColor && user.IncomeAmountColor <= models.AMOUNT_COLOR_TYPE_BLACK_OR_WHITE {
+	if models.AMOUNT_COLOR_TYPE_DEFAULT <= user.IncomeAmountColor && user.IncomeAmountColor <= models.AMOUNT_COLOR_TYPE_BLUE {
 		updateCols = append(updateCols, "income_amount_color")
 	}
 

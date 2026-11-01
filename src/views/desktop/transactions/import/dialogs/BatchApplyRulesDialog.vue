@@ -1,11 +1,12 @@
 <template>
     <v-dialog width="1000" :persistent="loading || isModified" v-model="showState">
-        <one-column-dialog-layout content-class="pa-0" :title="tt('Batch Apply Rules')"
+        <one-column-dialog-layout content-class="pa-0" :disabled="loading"
+                                  :title="tt('Batch Apply Rules')"
                                   :cancel-button-title="tt('Cancel')" @cancel="cancel">
             <template #after-title>
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
                        :aria-label="tt('Refresh')" :icon="true" :disabled="loading"
-                       :loading="loading" @click="reload">
+                       :loading="loading" @click="reload(true)">
                     <template #loader>
                         <v-progress-circular indeterminate size="20" />
                     </template>
@@ -17,7 +18,7 @@
             </template>
 
             <template #toolbar>
-                <v-btn-group class="ms-2" density="compact" variant="outlined" color="primary"
+                <v-btn-group v-if="!presetMode" class="ms-2" density="compact" variant="outlined" color="primary"
                              :disabled="loading || !!editingRule || !canApply">
                     <v-btn :disabled="loading || !!editingRule || !canApply"
                            @click="apply('selected')">
@@ -43,6 +44,9 @@
                                          @click="loadReplaceRuleFile()" />
                             <v-list-item :prepend-icon="mdiContentSaveOutline" :title="tt('Save Replace Rule File')"
                                          :disabled="rules.length < 1" @click="saveReplaceRuleFile()" />
+                            <v-divider />
+                            <v-list-item :prepend-icon="mdiDeleteSweepOutline" :title="tt('Clear All Rules')"
+                                         :disabled="rules.length < 1" @click="clearAllRules()" />
                         </v-list>
                     </v-menu>
                 </v-btn>
@@ -123,7 +127,14 @@
                                                         :items="getSourceItems(element.conditionField)"
                                                         :model-value="element.conditionValue"
                                                         @update:model-value="updateStringConditionValue(element, $event)"
-                                                        v-if="isItemCondition(element.conditionField)" />
+                                                        v-if="isItemCondition(element.conditionField) && !presetMode" />
+
+                                        <v-text-field class="flex-1-1" min-width="240" density="compact" autocomplete="off"
+                                                      :disabled="loading || !!editingRule"
+                                                      :placeholder="tt('None')"
+                                                      :model-value="element.conditionValue"
+                                                      @update:model-value="updateStringConditionValue(element, $event)"
+                                                      v-else-if="isItemCondition(element.conditionField) && presetMode" />
 
                                         <div class="d-flex flex-1-1 align-center gap-2" style="min-width: 280px"
                                              v-else-if="isAmountCondition(element.conditionField)">
@@ -238,6 +249,12 @@
                     </draggable-list>
                 </div>
             </template>
+            <template #footer v-if="presetMode">
+                <v-spacer/>
+                <v-btn :disabled="loading || !!editingRule || (rules.length > 0 && !canApply)" @click="apply('all')">
+                    {{ tt('Save') }}
+                </v-btn>
+            </template>
         </one-column-dialog-layout>
     </v-dialog>
     <snack-bar ref="snackbar" />
@@ -288,6 +305,7 @@ import {
     mdiDotsVertical,
     mdiFolderOpenOutline,
     mdiContentSaveOutline,
+    mdiDeleteSweepOutline,
     mdiPound,
     mdiFunctionVariant,
     mdiPencilOutline,
@@ -330,7 +348,9 @@ let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(false);
+const presetMode = ref<boolean>(false);
 const rules = ref<ImportTransactionReplaceRule[]>([]);
+const initRules = ref<ImportTransactionReplaceRule[] | undefined>(undefined);
 const editingRule = ref<ImportTransactionReplaceRule | undefined>(undefined);
 const editingRuleName = ref<string>('');
 const selectedTransactionCount = ref<number>(0);
@@ -375,7 +395,13 @@ const amountSigns = computed<NameNumeralValue[]>(() => [
 ]);
 
 const canApply = computed<boolean>(() => rules.value.length > 0 && rules.value.every(rule => rule.isValid()));
-const isModified = computed<boolean>(() => rules.value.length > 1 || (rules.value.length === 1 && !rules.value[0]?.equals(createNewRule(), false)));
+const isModified = computed<boolean>(() => {
+    if (!initRules.value) { // Add
+        return rules.value.length > 1 || (rules.value.length === 1 && !rules.value[0]?.equals(createNewRule(), false));
+    } else { // Edit
+        return !ImportTransactionReplaceRules.equals(rules.value, initRules.value);
+    }
+});
 
 function createNewRule(): ImportTransactionReplaceRule {
     return ImportTransactionReplaceRule.of(
@@ -535,8 +561,10 @@ function getAccountDisplayName(accountId: string | number): string {
     return typeof accountId === 'string' ? Account.findAccountNameById(allAccounts.value, accountId) || '' : '';
 }
 
-function open(options: { expenseCategoryNames: NameValue[], incomeCategoryNames: NameValue[], transferCategoryNames: NameValue[], sourceAccountNames: NameValue[], destinationAccountNames: NameValue[], tagNames: NameValue[], selectedTransactionCount: number }): Promise<BatchApplyRulesDialogResponse> {
-    rules.value = [];
+function open(options: { presetMode?: boolean, initialRules?: ImportTransactionReplaceRule[], expenseCategoryNames: NameValue[], incomeCategoryNames: NameValue[], transferCategoryNames: NameValue[], sourceAccountNames: NameValue[], destinationAccountNames: NameValue[], tagNames: NameValue[], selectedTransactionCount: number }): Promise<BatchApplyRulesDialogResponse> {
+    presetMode.value = !!options.presetMode;
+    rules.value = ImportTransactionReplaceRule.clone(options.initialRules || []);
+    initRules.value = options.initialRules;
     editingRule.value = undefined;
     editingRuleName.value = '';
     sourceExpenseCategoryNames.value = options.expenseCategoryNames;
@@ -548,7 +576,11 @@ function open(options: { expenseCategoryNames: NameValue[], incomeCategoryNames:
     selectedTransactionCount.value = options.selectedTransactionCount;
     showState.value = true;
 
-    addRule();
+    reload(false);
+
+    if (!rules.value.length && !presetMode.value) {
+        addRule();
+    }
 
     return new Promise((resolve, reject) => {
         resolveFunc = resolve;
@@ -556,13 +588,13 @@ function open(options: { expenseCategoryNames: NameValue[], incomeCategoryNames:
     });
 }
 
-function reload(): void {
+function reload(force: boolean): void {
     loading.value = true;
 
     Promise.allSettled([
-        accountsStore.loadAllAccounts({ force: true }),
-        transactionCategoriesStore.loadAllCategories({ force: true }),
-        transactionTagsStore.loadAllTags({ force: true })
+        accountsStore.loadAllAccounts({ force: force }),
+        transactionCategoriesStore.loadAllCategories({ force: force }),
+        transactionTagsStore.loadAllTags({ force: force })
     ]).then(results => {
         loading.value = false;
 
@@ -572,7 +604,7 @@ function reload(): void {
             && results[2].status === 'rejected' && results[2].reason?.isUpToDate;
 
         // show info if all up to date
-        if (isAllUpToDate) {
+        if (force && isAllUpToDate) {
             snackbar.value?.showMessage('Data is up to date');
             return;
         }
@@ -587,7 +619,7 @@ function reload(): void {
 
         // show info if one of them updated
         for (const result of results) {
-            if (result.status === 'fulfilled') {
+            if (force && result.status === 'fulfilled') {
                 snackbar.value?.showMessage('Data has been updated');
                 return;
             }
@@ -715,6 +747,10 @@ function loadReplaceRuleFile(): void {
 function saveReplaceRuleFile(): void {
     const fileName = KnownFileType.JSON.formatFileName(tt('dataExport.defaultImportReplaceRuleFileName'));
     startDownloadFile(fileName, KnownFileType.JSON.createBlob(ImportTransactionReplaceRules.of(rules.value).toJson()));
+}
+
+function clearAllRules(): void {
+    rules.value = [];
 }
 
 function apply(scope: ImportTransactionReplaceRuleApplyScope): void {

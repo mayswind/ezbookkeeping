@@ -1,6 +1,6 @@
 import chardet, { type Match } from 'chardet';
 
-import type { ImportFileTypeAndExtensions } from '@/core/file.ts';
+import type { ImportFileTypeAndExtensions } from '@/core/import_transaction.ts';
 
 import { UTF_8, CHARDET_ENCODING_NAME_MAPPING } from '@/consts/file.ts';
 

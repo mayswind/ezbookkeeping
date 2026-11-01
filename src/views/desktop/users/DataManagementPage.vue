@@ -72,6 +72,12 @@
                                 count: displayDataStatistics ? displayDataStatistics.totalCustomIconCount : '-',
                                 icon: mdiShapePlusOutline,
                                 color: 'purple'
+                            },
+                            {
+                                title: 'Import Presets',
+                                count: displayDataStatistics ? displayDataStatistics.totalImportPresetCount : '-',
+                                icon: mdiFileTableBoxOutline,
+                                color: 'info'
                             }
                         ]">
                             <div class="d-flex align-center">
@@ -200,6 +206,7 @@ import {
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,
     mdiShapePlusOutline,
+    mdiFileTableBoxOutline,
     mdiAlert
 } from '@mdi/js';
 

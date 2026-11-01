@@ -1762,9 +1762,9 @@ export const useExplorersStore = defineStore('explorers', () => {
                     return;
                 }
 
-                const transactionCategory = InsightsExplorer.of(data.result);
+                const insightsExplorer = InsightsExplorer.of(data.result);
 
-                resolve(transactionCategory);
+                resolve(insightsExplorer);
             }).catch(error => {
                 logger.error('failed to load exploration info', error);
 

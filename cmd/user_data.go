@@ -112,6 +112,12 @@ var UserData = &cli.Command{
 					Required: true,
 					Usage:    "Specific user name",
 				},
+				&cli.BoolFlag{
+					Name:     "remain-sessions",
+					Aliases:  []string{"r"},
+					Required: false,
+					Usage:    "Remain user sessions after disabling",
+				},
 			},
 		},
 		{
@@ -506,7 +512,8 @@ func disableUser(c *core.CliContext) error {
 	}
 
 	username := c.String("username")
-	err = clis.UserData.DisableUser(c, username)
+	remainSessions := c.Bool("remain-sessions")
+	err = clis.UserData.DisableUser(c, username, remainSessions)
 
 	if err != nil {
 		log.CliErrorf(c, "[user_data.disableUser] error occurs when setting user disabled")

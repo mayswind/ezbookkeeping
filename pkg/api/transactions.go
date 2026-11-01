@@ -3215,7 +3215,11 @@ func (a *TransactionsApi) getTransactionEssentialDataByTransactionIds(c *core.We
 		categoryIds = append(categoryIds, transactions[i].CategoryId)
 	}
 
-	accountMap, err = a.accounts.GetAccountsByAccountIds(c, uid, utils.ToUniqueInt64Slice(accountIds))
+	transactionIds = utils.ToUniqueInt64Slice(transactionIds)
+	accountIds = utils.ToUniqueInt64Slice(accountIds)
+	categoryIds = utils.ToUniqueInt64Slice(categoryIds)
+
+	accountMap, err = a.accounts.GetAccountsByAccountIds(c, uid, accountIds)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get accounts for user \"uid:%d\", because %s", uid, err.Error())
@@ -3230,7 +3234,7 @@ func (a *TransactionsApi) getTransactionEssentialDataByTransactionIds(c *core.We
 	}
 
 	if !trimCategory {
-		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(c, uid, utils.ToUniqueInt64Slice(categoryIds))
+		categoryMap, err = a.transactionCategories.GetCategoriesByCategoryIds(c, uid, categoryIds)
 
 		if err != nil {
 			log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get transactions categories for user \"uid:%d\", because %s", uid, err.Error())
@@ -3248,7 +3252,7 @@ func (a *TransactionsApi) getTransactionEssentialDataByTransactionIds(c *core.We
 	}
 
 	if withPictures && a.CurrentConfig().EnableTransactionPictures {
-		pictureInfoMap, err = a.transactionPictures.GetPictureInfosByTransactionIds(c, uid, utils.ToUniqueInt64Slice(a.transactions.GetTransactionIds(transactions)))
+		pictureInfoMap, err = a.transactionPictures.GetPictureInfosByTransactionIds(c, uid, transactionIds)
 
 		if err != nil {
 			log.Errorf(c, "[transactions.getTransactionEssentialDataByTransactionIds] failed to get transactions pictures for user \"uid:%d\", because %s", uid, err.Error())

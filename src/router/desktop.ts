@@ -29,6 +29,8 @@ import TransactionTemplateListPage from '@/views/desktop/templates/ListPage.vue'
 
 import UserCustomIconListPage from '@/views/desktop/customicons/ListPage.vue';
 
+import ImportPresetsListPage from '@/views/desktop/presets/ImportPresetsListPage.vue';
+
 import OverviewLayoutEditorPage from '@/views/desktop/overview/LayoutEditorPage.vue';
 
 import SettingsPageLayout from '@/views/desktop/settings/SettingsPageLayout.vue';
@@ -197,6 +199,11 @@ const router = createRouter({
                 {
                     path: '/custom_icon/list',
                     component: UserCustomIconListPage,
+                    beforeEnter: checkLogin
+                },
+                {
+                    path: '/presets/import/list',
+                    component: ImportPresetsListPage,
                     beforeEnter: checkLogin
                 },
                 {

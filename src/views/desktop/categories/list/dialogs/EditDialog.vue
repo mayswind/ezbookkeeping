@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="800" :persistent="isCategoryModified" v-model="showState">
+    <v-dialog width="800" :persistent="loading || submitting || isCategoryModified" v-model="showState">
         <one-column-dialog-layout :disabled="loading || submitting" :loading="loading"
                                   :title="tt(title)" :cancel-button-title="tt('Cancel')"
                                   @cancel="cancel">

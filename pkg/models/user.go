@@ -60,6 +60,7 @@ const (
 	AMOUNT_COLOR_TYPE_RED            AmountColorType = 2
 	AMOUNT_COLOR_TYPE_YELLOW         AmountColorType = 3
 	AMOUNT_COLOR_TYPE_BLACK_OR_WHITE AmountColorType = 4
+	AMOUNT_COLOR_TYPE_BLUE           AmountColorType = 5
 	AMOUNT_COLOR_TYPE_INVALID        AmountColorType = 255
 )
 
@@ -76,6 +77,8 @@ func (s AmountColorType) String() string {
 		return "Yellow"
 	case AMOUNT_COLOR_TYPE_BLACK_OR_WHITE:
 		return "Black or White"
+	case AMOUNT_COLOR_TYPE_BLUE:
+		return "Blue"
 	case AMOUNT_COLOR_TYPE_INVALID:
 		return "Invalid"
 	default:
@@ -164,13 +167,15 @@ type UserLoginRequest struct {
 
 // UserRegisterRequest represents all parameters of user registering request
 type UserRegisterRequest struct {
-	Username        string       `json:"username" binding:"required,notBlank,max=32,validUsername"`
-	Email           string       `json:"email" binding:"required,notBlank,max=100,validEmail"`
-	Nickname        string       `json:"nickname" binding:"required,notBlank,max=64,validNickname"`
-	Password        string       `json:"password" binding:"required,min=6,max=128"`
-	Language        string       `json:"language" binding:"required,min=2,max=16"`
-	DefaultCurrency string       `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
-	FirstDayOfWeek  core.WeekDay `json:"firstDayOfWeek" binding:"min=0,max=6"`
+	Username           string          `json:"username" binding:"required,notBlank,max=32,validUsername"`
+	Email              string          `json:"email" binding:"required,notBlank,max=100,validEmail"`
+	Nickname           string          `json:"nickname" binding:"required,notBlank,max=64,validNickname"`
+	Password           string          `json:"password" binding:"required,min=6,max=128"`
+	Language           string          `json:"language" binding:"required,min=2,max=16"`
+	DefaultCurrency    string          `json:"defaultCurrency" binding:"required,len=3,validCurrency"`
+	FirstDayOfWeek     core.WeekDay    `json:"firstDayOfWeek" binding:"min=0,max=6"`
+	ExpenseAmountColor AmountColorType `json:"expenseAmountColor" binding:"min=0,max=5"`
+	IncomeAmountColor  AmountColorType `json:"incomeAmountColor" binding:"min=0,max=5"`
 	TransactionCategoryCreateBatchRequest
 }
 
@@ -218,8 +223,8 @@ type UserProfileUpdateRequest struct {
 	DigitGroupingSymbol   *core.DigitGroupingSymbol   `json:"digitGroupingSymbol" binding:"omitempty,min=0,max=4"`
 	DigitGrouping         *core.DigitGroupingType     `json:"digitGrouping" binding:"omitempty,min=0,max=3"`
 	CoordinateDisplayType *core.CoordinateDisplayType `json:"coordinateDisplayType" binding:"omitempty,min=0,max=6"`
-	ExpenseAmountColor    *AmountColorType            `json:"expenseAmountColor" binding:"omitempty,min=0,max=4"`
-	IncomeAmountColor     *AmountColorType            `json:"incomeAmountColor" binding:"omitempty,min=0,max=4"`
+	ExpenseAmountColor    *AmountColorType            `json:"expenseAmountColor" binding:"omitempty,min=0,max=5"`
+	IncomeAmountColor     *AmountColorType            `json:"incomeAmountColor" binding:"omitempty,min=0,max=5"`
 }
 
 // UserProfileUpdateResponse represents the data returns to frontend after updating profile

@@ -288,6 +288,10 @@ export default defineConfig(() => {
                                 test: /[\\/]node_modules[\\/](echarts|zrender|tslib|resize-detector)[\\/]/i
                             },
                             {
+                                name:  'ua-parser',
+                                test: /[\\/]node_modules[\\/]ua-parser-js[\\/]/i
+                            },
+                            {
                                 name: 'monaco-editor',
                                 test: /[\\/]node_modules[\\/](monaco-editor|monaco-editor-core)[\\/]/i
                             },

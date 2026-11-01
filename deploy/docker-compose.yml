@@ -1,0 +1,97 @@
+# ezBookkeeping 部署用 compose
+# 用法：本目录下建 .env（照 .env.example 填真实值），然后 docker compose up -d
+# 敏感值一律用 ${变量} 引用 .env，绝不写死在本文件里（本文件会提交 git）。
+# 应用镜像由 CI（GitHub Actions）构建并推到 Docker Hub，服务器只 pull 成品镜像，不编译源码。
+
+# 钉死项目名：Compose 默认拿“运行所在目录名”当项目名，而项目名决定数据卷的前缀。
+# 钉死后，不管在哪个目录执行 docker compose，卷名前缀永远是 ezbookkeeping_*，
+# 不会因为换了运行目录而变成新空卷、导致 MySQL 重初始化、原数据“看起来消失”。
+name: ezbookkeeping
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: ezbookkeeping-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # 首次初始化时创建的库（init.sql 还会再建 stg + prod 两个库）
+      MYSQL_DATABASE: ${EBK_DATABASE_NAME}
+      MYSQL_USER: ${EBK_DATABASE_USER}
+      MYSQL_PASSWORD: ${EBK_DATABASE_PASSWD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ezbookkeeping:
+    # 默认指向自己 CI 产出的镜像；想临时跑作者镜像，在 .env 里设 EBK_IMAGE=mayswind/ezbookkeeping:latest
+    image: ${EBK_IMAGE:-gaofei211/bookkeeping:latest}
+    container_name: ezbookkeeping
+    restart: unless-stopped
+    expose:
+      - "8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # ---- 数据库 ----
+      EBK_DATABASE_TYPE: mysql
+      EBK_DATABASE_HOST: mysql:3306
+      EBK_DATABASE_USER: ${EBK_DATABASE_USER}
+      EBK_DATABASE_PASSWD: ${EBK_DATABASE_PASSWD}
+      EBK_DATABASE_NAME: ${EBK_DATABASE_NAME}   # 切 stg / prod 只改 .env 这一个值
+      # ---- 安全 ----
+      EBK_SECURITY_SECRET_KEY: ${EBK_SECURITY_SECRET_KEY}
+      # ---- 对外地址（头像/图片/邮件链接/回调/二维码都靠它生成，必须 https:// 不带 :8080）----
+      EBK_SERVER_DOMAIN: ${EBK_SERVER_DOMAIN}
+      EBK_SERVER_ROOT_URL: ${EBK_SERVER_ROOT_URL}
+      # ---- 日志：开启文件日志轮转（已挂持久卷，防止无限增长）----
+      EBK_LOG_LOG_FILE_ROTATE: "true"
+      # ---- 时区：让日志时间显示为本地时间（不影响定时任务按模板时区计算）----
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ezbookkeeping_data:/ezbookkeeping/data
+      - ezbookkeeping_storage:/ezbookkeeping/storage
+      - ezbookkeeping_log:/ezbookkeeping/log      # 日志持久化：重建容器后文件日志不丢
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  caddy:
+    image: caddy:2
+    container_name: ezbookkeeping-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - ezbookkeeping
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mysql_data:
+  ezbookkeeping_data:
+  ezbookkeeping_storage:
+  ezbookkeeping_log:
+  caddy_data:
+  caddy_config:

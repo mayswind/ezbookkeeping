@@ -1,0 +1,7 @@
+{
+    email 917562427@qq.com
+}
+
+bookkeeping.highfly-ai.com {
+    reverse_proxy ezbookkeeping:8080
+}

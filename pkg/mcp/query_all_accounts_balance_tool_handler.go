@@ -38,6 +38,11 @@ type mcpQueryAllAccountsBalanceToolHandler struct{}
 
 var MCPQueryAllAccountsBalanceToolHandler = &mcpQueryAllAccountsBalanceToolHandler{}
 
+// ToolType returns the MCP tool type
+func (h *mcpQueryAllAccountsBalanceToolHandler) ToolType() core.MCPToolType {
+	return core.MCP_TOOL_TYPE_QUERY_ALL_ACCOUNTS_BALANCE
+}
+
 // Name returns the name of the MCP tool
 func (h *mcpQueryAllAccountsBalanceToolHandler) Name() string {
 	return "query_all_accounts_balance"

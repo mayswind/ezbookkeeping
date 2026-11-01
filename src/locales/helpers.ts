@@ -8,6 +8,7 @@ import {
     type TypeAndName,
     type TypeAndNameWithAlternativeName,
     type TypeAndDisplayName,
+    type NameAndDisplayName,
     type LocalizedSwitchOption
 } from '@/core/base.ts';
 
@@ -201,6 +202,7 @@ import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_TRANSFER
 import { PARSE_TRANSACTION_API_URL_PATH, KnownErrorCode, SPECIFIED_API_NOT_FOUND_ERRORS, PARAMETERIZED_ERRORS, SUPPORTED_PARSE_TRANSACTION_RECORD_ID_TYPES } from '@/consts/api.ts';
 import { OAUTH2_PROVIDER_DISPLAY_NAME } from '@/consts/oauth2.ts';
 import { DEFAULT_DOCUMENT_LANGUAGE_FOR_IMPORT_FILE, SUPPORTED_DOCUMENT_LANGUAGES_FOR_IMPORT_FILE, SUPPORTED_IMPORT_FILE_CATEGORY_AND_TYPES } from '@/consts/import_transaction.ts';
+import { ALL_MCP_TOOLS } from '@/consts/mcp.ts';
 
 import {
     type CategorizedAccount,
@@ -762,6 +764,19 @@ export function useI18n() {
             ret.push({
                 type: typeAndName.type,
                 displayName: t(typeAndName.name)
+            });
+        }
+
+        return ret;
+    }
+
+    function getLocalizedNameDisplayName(nameDisplayNames: NameAndDisplayName[]): NameAndDisplayName[] {
+        const ret: NameAndDisplayName[] = [];
+
+        for (const item of nameDisplayNames) {
+            ret.push({
+                name: item.name,
+                displayName: t(item.displayName)
             });
         }
 
@@ -2937,6 +2952,7 @@ function parse(row, index) {
         getAllTransactionExplorerValueMetrics: (operators?: TransactionExplorerValueMetric[]) => getLocalizedNameValue(operators ?? TransactionExplorerValueMetric.values()),
         getAllTransactionExplorerChartTypes: (operators?: TransactionExplorerChartType[]) => getLocalizedNameValue(operators ?? TransactionExplorerChartType.values()),
         getAllTransactionExplorerCustomChartDisplayLayouts: () => getLocalizedDisplayNameAndType(TransactionExplorerCustomChartDisplayLayout.values()),
+        getAllMCPTools: () => getLocalizedNameDisplayName(ALL_MCP_TOOLS),
         // get localized info
         getLanguageInfo,
         getEnableDisableOption: (value: boolean) => t(value ? 'Enabled' : 'Disabled'),

@@ -36,6 +36,11 @@ type mcpQueryLatestExchangeRatesToolHandler struct{}
 
 var MCPQueryLatestExchangeRatesToolHandler = &mcpQueryLatestExchangeRatesToolHandler{}
 
+// ToolType returns the MCP tool type
+func (h *mcpQueryLatestExchangeRatesToolHandler) ToolType() core.MCPToolType {
+	return core.MCP_TOOL_TYPE_QUERY_LATEST_EXCHANGE_RATES
+}
+
 // Name returns the name of the MCP tool
 func (h *mcpQueryLatestExchangeRatesToolHandler) Name() string {
 	return "query_latest_exchange_rates"

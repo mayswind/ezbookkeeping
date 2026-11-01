@@ -74,14 +74,21 @@ export const useTokensStore = defineStore('tokens', () => {
         });
     }
 
-    function generateToken<T extends 'api' | 'mcp'>({ type, expiresInSeconds, password }: { type: T, expiresInSeconds: number, password: string }): Promise<{ 'api': TokenGenerateAPIResponse, 'mcp': TokenGenerateMCPResponse }[T]> {
+    function generateToken<T extends 'api' | 'mcp'>({ type, expiresInSeconds, password, enabledMCPTools }: { type: T, expiresInSeconds: number, password: string, enabledMCPTools?: string[] }): Promise<{ 'api': TokenGenerateAPIResponse, 'mcp': TokenGenerateMCPResponse }[T]> {
         return new Promise((resolve, reject) => {
             let promise = null;
 
             if (type === 'api') {
-                promise = services.generateAPIToken({ expiresInSeconds, password });
+                promise = services.generateAPIToken({
+                    expiresInSeconds: expiresInSeconds,
+                    password: password
+                });
             } else if (type === 'mcp') {
-                promise = services.generateMCPToken({ expiresInSeconds, password });
+                promise = services.generateMCPToken({
+                    expiresInSeconds: expiresInSeconds,
+                    password: password,
+                    enabledTools: enabledMCPTools
+                });
             } else {
                 reject({ message: 'An error occurred' });
                 return;

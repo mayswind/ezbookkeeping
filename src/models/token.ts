@@ -11,6 +11,7 @@ export interface TokenGenerateAPIRequest {
 }
 
 export interface TokenGenerateMCPRequest {
+    readonly enabledTools?: string[];
     readonly expiresInSeconds: number;
     readonly password: string;
 }

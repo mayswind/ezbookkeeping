@@ -8,6 +8,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
+	"github.com/mayswind/ezbookkeeping/pkg/mcp"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
@@ -180,7 +181,20 @@ func (a *TokensApi) TokenGenerateMCPHandler(c *core.WebContext) (any, *errs.Erro
 		return nil, errs.ErrUserPasswordWrong
 	}
 
-	token, claims, err := a.tokens.CreateMCPToken(c, user, generateMCPTokenReq.ExpiredInSeconds)
+	var enabledTools *int64
+
+	if generateMCPTokenReq.EnabledTools != nil {
+		mask, err := a.getMCPToolsMask(c, generateMCPTokenReq.EnabledTools)
+
+		if err != nil {
+			log.Errorf(c, "[tokens.TokenGenerateMCPHandler] failed to parse enabled tools mask from \"%s\", because %s", generateMCPTokenReq.EnabledTools, err.Error())
+			return nil, errs.Or(err, errs.ErrIncompleteOrIncorrectSubmission)
+		}
+
+		enabledTools = &mask
+	}
+
+	token, claims, err := a.tokens.CreateMCPToken(c, user, generateMCPTokenReq.ExpiredInSeconds, enabledTools)
 
 	if err != nil {
 		log.Errorf(c, "[tokens.TokenGenerateMCPHandler] failed to create mcp token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -464,4 +478,36 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 	}
 
 	return refreshResp, nil
+}
+
+// getMCPToolsMask converts registered tool names to their permanent permission bits.
+func (a *TokensApi) getMCPToolsMask(c core.Context, names []string) (int64, error) {
+	if len(names) == 0 {
+		return 0, errs.ErrMCPToolsEmpty
+	}
+
+	allMCPTools := make(map[string]*mcp.MCPTool)
+
+	for _, mcpTool := range mcp.Container.GetMCPTools() {
+		allMCPTools[mcpTool.Name] = mcpTool
+	}
+
+	var mask int64
+
+	for _, name := range names {
+		mcpTool, exists := allMCPTools[name]
+
+		if !exists {
+			log.Errorf(c, "[tokens.getMCPToolsMask] tool \"%s\" is not found", name)
+			return 0, errs.ErrIncompleteOrIncorrectSubmission
+		}
+
+		mask |= int64(1) << (mcpTool.ToolType - 1)
+	}
+
+	if mask <= 0 || mask & ^core.MCPAllTools != 0 {
+		return 0, errs.ErrIncompleteOrIncorrectSubmission
+	}
+
+	return mask, nil
 }

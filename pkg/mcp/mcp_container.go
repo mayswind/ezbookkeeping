@@ -1,11 +1,14 @@
 package mcp
 
 import (
+	"encoding/json/v2"
+
 	"github.com/invopop/jsonschema"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
@@ -70,13 +73,13 @@ func InitializeMCPHandlers(config *settings.Config) error {
 		mcpTools:                 make([]*MCPTool, 0),
 	}
 
-	registerMCPTextContentToolHandler(container, MCPAddTransactionToolHandler)
-	registerMCPTextContentToolHandler(container, MCPQueryTransactionsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllAccountsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllAccountsBalanceToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionCategoriesToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryAllTransactionTagsToolHandler)
 	registerMCPTextContentToolHandler(container, MCPQueryLatestExchangeRatesToolHandler)
+	registerMCPTextContentToolHandler(container, MCPQueryTransactionsToolHandler)
+	registerMCPTextContentToolHandler(container, MCPAddTransactionToolHandler)
 
 	Container = container
 	return nil
@@ -112,6 +115,24 @@ func registerMCPToolHandler[T MCPTextContent | MCPImageContent | MCPAudioContent
 }
 
 func handleTool[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResourceLink | MCPEmbeddedResource](ctx *core.WebContext, handler MCPToolHandler[T], currentConfig *settings.Config, services MCPAvailableServices, callToolReq *MCPCallToolRequest, user *models.User) (any, error) {
+	enabledTools := core.MCPAllTools
+
+	if context := ctx.GetTokenContext(); context != "" {
+		var tokenContext models.MCPTokenContext
+		err := json.Unmarshal([]byte(context), &tokenContext)
+
+		if err != nil {
+			log.Errorf(ctx, "[mcp_container.handleTool] failed to parse token context \"%s\", because %s", context, err.Error())
+			return nil, errs.ErrInvalidToken
+		}
+
+		enabledTools = tokenContext.EnabledTools
+	}
+
+	if !handler.ToolType().IsEnabled(enabledTools) {
+		return nil, errs.ErrMCPToolNotEnabled
+	}
+
 	structuredResponse, result, err := handler.Handle(ctx, callToolReq, user, currentConfig, services)
 
 	if err != nil {
@@ -132,6 +153,7 @@ func handleTool[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResour
 
 func createNewMCPToolInfo[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResourceLink | MCPEmbeddedResource](name string, handler MCPToolHandler[T]) *MCPTool {
 	mcpTool := &MCPTool{
+		ToolType:    handler.ToolType(),
 		Name:        name,
 		Description: handler.Description(),
 	}

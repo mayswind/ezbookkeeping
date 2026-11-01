@@ -20,6 +20,9 @@ type MCPAvailableServices interface {
 
 // MCPToolHandler defines the MCP tool handler
 type MCPToolHandler[T MCPTextContent | MCPImageContent | MCPAudioContent | MCPResourceLink | MCPEmbeddedResource] interface {
+	// ToolType returns the MCP tool type
+	ToolType() core.MCPToolType
+
 	// Name returns the name of the MCP tool
 	Name() string
 

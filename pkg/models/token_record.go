@@ -18,6 +18,11 @@ type TokenRecord struct {
 	LastSeenUnixTime int64
 }
 
+// MCPTokenContext represents the context data of an MCP token
+type MCPTokenContext struct {
+	EnabledTools int64 `json:"enabledTools,string"`
+}
+
 // OAuth2CallbackTokenContext represents the context data of oauth 2.0 callback token
 type OAuth2CallbackTokenContext struct {
 	ExternalAuthType core.UserExternalAuthType `json:"externalAuthType"`
@@ -33,8 +38,9 @@ type TokenGenerateAPIRequest struct {
 
 // TokenGenerateMCPRequest represents all parameters of mcp token generation request
 type TokenGenerateMCPRequest struct {
-	ExpiredInSeconds int64  `json:"expiresInSeconds" binding:"omitempty,min=0,max=4294967295"`
-	Password         string `json:"password" binding:"omitempty,min=6,max=128"`
+	EnabledTools     []string `json:"enabledTools"`
+	ExpiredInSeconds int64    `json:"expiresInSeconds" binding:"omitempty,min=0,max=4294967295"`
+	Password         string   `json:"password" binding:"omitempty,min=6,max=128"`
 }
 
 // TokenRevokeRequest represents all parameters of token revoking request
@@ -74,6 +80,15 @@ type TokenInfoResponse struct {
 
 // TokenInfoResponseSlice represents the slice data structure of TokenInfoResponse
 type TokenInfoResponseSlice []*TokenInfoResponse
+
+// GetEnabledToolsMark returns the enabled tool mask
+func (c *MCPTokenContext) GetEnabledToolsMark() int64 {
+	if c == nil {
+		return core.MCPAllTools
+	}
+
+	return c.EnabledTools
+}
 
 // Len returns the count of items
 func (a TokenInfoResponseSlice) Len() int {

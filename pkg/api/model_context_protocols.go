@@ -172,12 +172,30 @@ func (a *ModelContextProtocolAPI) ListToolsHandler(c *core.WebContext, jsonRPCRe
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
+	enabledTools := core.MCPAllTools
+
+	if context := c.GetTokenContext(); context != "" {
+		var tokenContext models.MCPTokenContext
+		err = json.Unmarshal([]byte(context), &tokenContext)
+
+		if err != nil {
+			log.Errorf(c, "[model_context_protocols.ListToolsHandler] failed to parse token context \"%s\", because %s", context, err.Error())
+			return nil, errs.ErrInvalidToken
+		}
+
+		enabledTools = tokenContext.EnabledTools
+	}
+
 	mcpVersion := a.getMCPVersion(c)
 	toolsInfo := mcp.Container.GetMCPTools()
-	finalToolsInfos := make([]*mcp.MCPTool, len(toolsInfo))
+	finalToolsInfos := make([]*mcp.MCPTool, 0, len(toolsInfo))
 
 	for i := 0; i < len(toolsInfo); i++ {
-		finalToolsInfos[i] = &mcp.MCPTool{
+		if !toolsInfo[i].ToolType.IsEnabled(enabledTools) {
+			continue
+		}
+
+		toolInfo := &mcp.MCPTool{
 			Name:        toolsInfo[i].Name,
 			InputSchema: toolsInfo[i].InputSchema,
 			Title:       toolsInfo[i].Title,
@@ -185,8 +203,10 @@ func (a *ModelContextProtocolAPI) ListToolsHandler(c *core.WebContext, jsonRPCRe
 		}
 
 		if mcpVersion >= string(mcp.ToolResultStructuredContentMinVersion) {
-			finalToolsInfos[i].OutputSchema = toolsInfo[i].OutputSchema
+			toolInfo.OutputSchema = toolsInfo[i].OutputSchema
 		}
+
+		finalToolsInfos = append(finalToolsInfos, toolInfo)
 	}
 
 	listToolsResp := mcp.MCPListToolsResponse{

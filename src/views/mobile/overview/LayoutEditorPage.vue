@@ -121,7 +121,7 @@
 import OverviewWidget from './OverviewWidget.vue';
 import WidgetSettingsPopup from './WidgetSettingsPopup.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -159,8 +159,6 @@ import { generateRandomUUID } from '@/lib/misc.ts';
 import { useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import logger from '@/lib/logger.ts';
 
-type WidgetSettingsPopupType = InstanceType<typeof WidgetSettingsPopup>;
-
 const props = defineProps<{
     f7router: Router.Router
 }>();
@@ -182,8 +180,6 @@ const layoutJsonPlaceholder: string = `{
         }
     ]
 }`;
-
-const widgetSettingsPopup = useTemplateRef<WidgetSettingsPopupType>('widgetSettingsPopup');
 
 const loadingOverview = ref<boolean>(true);
 const showMoreActionSheet = ref<boolean>(false);

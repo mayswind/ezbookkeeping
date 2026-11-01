@@ -98,14 +98,12 @@
             </v-col>
         </v-row>
 
-        <confirm-dialog ref="confirmDialog"/>
         <snack-bar ref="snackbar" @update:show="onSnackbarShowStateChanged" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
-import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
@@ -123,7 +121,6 @@ import {
     mdiChevronLeft
 } from '@mdi/js';
 
-type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
@@ -140,7 +137,6 @@ const version = `${getClientDisplayVersion()}`;
 
 const passwordInput = useTemplateRef<VTextField>('passwordInput');
 const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');
-const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const email = ref<string>('');

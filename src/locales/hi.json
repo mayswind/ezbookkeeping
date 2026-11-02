@@ -10,6 +10,7 @@
         "English": "अंग्रेज़ी",
         "Spanish": "स्पेनिश",
         "French": "फ़्रेंच",
+        "Hindi": "हिन्दी",
         "Italian": "इतालवी",
         "Japanese": "जापानी",
         "Kannada": "कन्नड़",
@@ -26,35 +27,34 @@
         "Ukrainian": "यूक्रेनियाई",
         "Vietnamese": "वियतनामी",
         "Chinese (Simplified)": "चीनी (सरलीकृत)",
-        "Chinese (Traditional)": "चीनी (पारंपरिक)",
-        "Hindi": "हिन्दी"
+        "Chinese (Traditional)": "चीनी (पारंपरिक)"
     },
     "default": {
         "currency": "INR",
-        "firstDayOfWeek": "रविवार",
+        "firstDayOfWeek": "Sunday",
         "fiscalYearFormat": "EndYYYY",
-        "calendarDisplayType": "ग्रेगोरियन",
-        "dateDisplayType": "DayMonthYear",
+        "calendarDisplayType": "Gregorian",
+        "dateDisplayType": "Gregorian",
         "longDateFormat": "DayMonthYear",
         "shortDateFormat": "DayMonthYear",
         "longTimeFormat": "HourMinuteSecond",
         "shortTimeFormat": "HourMinute",
-        "numeralSystem": "पश्चिमी अरबी अंक",
-        "decimalSeparator": "बिंदु",
-        "digitGroupingSymbol": "कॉमा",
-        "digitGrouping": "हज़ार-विभाजक",
-        "currencyDisplayType": "प्रतीक राशि से पहले"
+        "numeralSystem": "WesternArabicNumerals",
+        "decimalSeparator": "Dot",
+        "digitGroupingSymbol": "Comma",
+        "digitGrouping": "IndianNumberGrouping",
+        "currencyDisplayType": "SymbolBeforeAmount"
     },
     "format": {
         "longDate": {
             "YearMonthDay": "YYYY MMMM DD",
-            "MonthDayYear": "MMMM D, YYYY",
-            "DayMonthYear": "D MMMM YYYY"
+            "MonthDayYear": "MMMM DD YYYY",
+            "DayMonthYear": "DD MMMM YYYY"
         },
         "shortDate": {
-            "YearMonthDay": "YYYY-M-D",
-            "MonthDayYear": "M/D/YYYY",
-            "DayMonthYear": "D/M/YYYY"
+            "YearMonthDay": "YYYY-MM-DD",
+            "MonthDayYear": "MM-DD-YYYY",
+            "DayMonthYear": "DD-MM-YYYY"
         },
         "longYear": {
             "YearMonthDay": "YYYY",
@@ -68,28 +68,28 @@
         },
         "longYearMonth": {
             "YearMonthDay": "YYYY MMMM",
-            "MonthDayYear": "MMMM, YYYY",
-            "DayMonthYear": "MMMM, YYYY"
+            "MonthDayYear": "MMMM YYYY",
+            "DayMonthYear": "MMMM YYYY"
         },
         "shortYearMonth": {
-            "YearMonthDay": "YYYY-M",
-            "MonthDayYear": "MMM, YYYY",
-            "DayMonthYear": "MMM, YYYY"
+            "YearMonthDay": "YYYY-MM",
+            "MonthDayYear": "MMM YYYY",
+            "DayMonthYear": "MMM YYYY"
         },
         "longMonthDay": {
             "YearMonthDay": "MMMM DD",
-            "MonthDayYear": "MMMM D",
-            "DayMonthYear": "D MMMM"
+            "MonthDayYear": "MMMM DD",
+            "DayMonthYear": "DD MMMM"
         },
         "shortMonthDay": {
-            "YearMonthDay": "M-D",
-            "MonthDayYear": "M/D",
-            "DayMonthYear": "D/M"
+            "YearMonthDay": "MM-DD",
+            "MonthDayYear": "MM-DD",
+            "DayMonthYear": "DD-MM"
         },
         "shortDay": {
-            "YearMonthDay": "D",
-            "MonthDayYear": "D",
-            "DayMonthYear": "D"
+            "YearMonthDay": "DD",
+            "MonthDayYear": "DD",
+            "DayMonthYear": "DD"
         },
         "longTime": {
             "HourMinuteSecond": "HH:mm:ss",
@@ -2898,12 +2898,12 @@
     "MCP Token": "MCP टोकन",
     "Enable All MCP Tools": "सभी MCP टूल सक्षम करें",
     "Enabled MCP Tools": "सक्षम MCP टूल",
-    "Query Transactions": "लेन-देन पूछें",
     "Query All Accounts": "सभी खाते पूछें",
     "Query All Account Balances": "सभी खाता शेष पूछें",
     "Query All Transaction Categories": "सभी लेन-देन श्रेणियाँ पूछें",
     "Query All Transaction Tags": "सभी लेन-देन टैग पूछें",
     "Query Latest Exchange Rates": "नवीनतम विनिमय दरें पूछें",
+    "Query Transactions": "लेन-देन पूछें",
     "Your token does not expire, please keep it secure.": "आपका टोकन कभी समाप्त नहीं होता, कृपया इसे सुरक्षित रखें।",
     "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "थर्ड-पार्टी ऐप से जोड़ते समय ध्यान रखें कि वे और उनके द्वारा उपयोग किए जाने वाले कोई भी बड़े भाषा मॉडल आपके निजी डेटा तक पहुँच सकते हैं।",
     "Unable to generate token": "टोकन जनरेट नहीं हो सका",

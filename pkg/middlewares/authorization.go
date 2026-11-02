@@ -25,8 +25,8 @@ func TokenAuthorizationByHeader(config *settings.Config) core.MiddlewareHandlerF
 }
 
 // TokenAuthorizationByQueryString verifies whether current request is valid by token in query string
-func TokenAuthorizationByQueryString(config *settings.Config) core.MiddlewareHandlerFunc {
-	return tokenAuthorization(config, TOKEN_SOURCE_TYPE_ARGUMENT, false)
+func TokenAuthorizationByQueryString(config *settings.Config, allowedNormalTokenScopes ...core.NormalTokenScope) core.MiddlewareHandlerFunc {
+	return tokenAuthorization(config, TOKEN_SOURCE_TYPE_ARGUMENT, false, allowedNormalTokenScopes...)
 }
 
 // TokenAuthorizationByCookie verifies whether current request is valid by token in cookie
@@ -144,9 +144,9 @@ func TokenOAuth2CallbackAuthorization(config *settings.Config) core.MiddlewareHa
 	}
 }
 
-func tokenAuthorization(config *settings.Config, source TokenSourceType, allowedAPIToken bool) core.MiddlewareHandlerFunc {
+func tokenAuthorization(config *settings.Config, source TokenSourceType, allowedAPIToken bool, allowedNormalTokenScopes ...core.NormalTokenScope) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenContext, err := getTokenClaims(c, source)
+		claims, tokenContext, err := getTokenClaims(c, source, allowedNormalTokenScopes...)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, err)
@@ -183,8 +183,8 @@ func tokenAuthorization(config *settings.Config, source TokenSourceType, allowed
 	}
 }
 
-func getTokenClaims(c *core.WebContext, source TokenSourceType) (*core.UserTokenClaims, string, *errs.Error) {
-	claims, tokenContext, err := parseToken(c, source)
+func getTokenClaims(c *core.WebContext, source TokenSourceType, allowedNormalTokenScopes ...core.NormalTokenScope) (*core.UserTokenClaims, string, *errs.Error) {
+	claims, tokenContext, err := parseToken(c, source, allowedNormalTokenScopes...)
 
 	if err != nil {
 		log.Warnf(c, "[authorization.getTokenClaims] failed to parse token, because %s", err.Error())
@@ -199,7 +199,7 @@ func getTokenClaims(c *core.WebContext, source TokenSourceType) (*core.UserToken
 	return claims, tokenContext, nil
 }
 
-func parseToken(c *core.WebContext, source TokenSourceType) (*core.UserTokenClaims, string, error) {
+func parseToken(c *core.WebContext, source TokenSourceType, allowedNormalTokenScopes ...core.NormalTokenScope) (*core.UserTokenClaims, string, error) {
 	tokenString := ""
 
 	if source == TOKEN_SOURCE_TYPE_ARGUMENT {
@@ -214,5 +214,5 @@ func parseToken(c *core.WebContext, source TokenSourceType) (*core.UserTokenClai
 		return nil, "", errs.ErrTokenIsEmpty
 	}
 
-	return services.Tokens.ParseToken(c, tokenString)
+	return services.Tokens.ParseToken(c, tokenString, allowedNormalTokenScopes...)
 }

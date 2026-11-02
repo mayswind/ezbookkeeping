@@ -33,6 +33,11 @@ func InitializeAvatarProvider(config *settings.Config) error {
 	return errs.ErrInvalidAvatarProvider
 }
 
+// NeedAvatarToken returns whether the current avatar provider requires a avatar token
+func (p *AvatarProviderContainer) NeedAvatarToken() bool {
+	return p.current != nil && p.current.NeedAvatarToken()
+}
+
 // GetAvatarUrl returns the avatar url by the current user avatar provider
 func (p *AvatarProviderContainer) GetAvatarUrl(user *models.User) string {
 	if p.current == nil {

@@ -20,6 +20,11 @@ func NewGravatarAvatarProvider() *GravatarAvatarProvider {
 	return &GravatarAvatarProvider{}
 }
 
+// NeedAvatarToken returns whether the current avatar provider requires a avatar token
+func (p *GravatarAvatarProvider) NeedAvatarToken() bool {
+	return false
+}
+
 // GetAvatarUrl returns the gravatar url
 func (p *GravatarAvatarProvider) GetAvatarUrl(user *models.User) string {
 	email := user.Email

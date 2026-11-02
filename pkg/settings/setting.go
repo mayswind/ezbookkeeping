@@ -193,15 +193,17 @@ const (
 	defaultInMemoryDuplicateCheckerCleanupInterval uint32 = 60  // 1 minutes
 	defaultDuplicateSubmissionsInterval            uint32 = 300 // 5 minutes
 
-	defaultSecretKey                     string = "ezbookkeeping"
-	defaultTrustedProxyIPs               string = "10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
-	defaultTokenExpiredTime              uint32 = 2592000 // 30 days
-	defaultTokenMinRefreshInterval       uint32 = 86400   // 1 day
-	defaultTemporaryTokenExpiredTime     uint32 = 300     // 5 minutes
-	defaultEmailVerifyTokenExpiredTime   uint32 = 3600    // 60 minutes
-	defaultPasswordResetTokenExpiredTime uint32 = 3600    // 60 minutes
-	defaultMaxFailuresPerIpPerMinute     uint32 = 5
-	defaultMaxFailuresPerUserPerMinute   uint32 = 5
+	defaultSecretKey                          string = "ezbookkeeping"
+	defaultTrustedProxyIPs                    string = "10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+	defaultTokenExpiredTime                   uint32 = 2592000 // 30 days
+	defaultTokenMinRefreshInterval            uint32 = 86400   // 1 day
+	defaultTemporaryTokenExpiredTime          uint32 = 300     // 5 minutes
+	defaultEmailVerifyTokenExpiredTime        uint32 = 3600    // 60 minutes
+	defaultUserAvatarTokenExpiredTime         uint32 = 3600    // 60 minutes
+	defaultTransactionPictureTokenExpiredTime uint32 = 3600    // 60 minutes
+	defaultPasswordResetTokenExpiredTime      uint32 = 3600    // 60 minutes
+	defaultMaxFailuresPerIpPerMinute          uint32 = 5
+	defaultMaxFailuresPerUserPerMinute        uint32 = 5
 
 	defaultOAuth2StateExpiredTime uint32 = 300   // 5 minutes
 	defaultOAuth2RequestTimeout   uint32 = 10000 // 10 seconds
@@ -409,23 +411,27 @@ type Config struct {
 	EnableCreateScheduledTransaction bool
 
 	// Secret
-	SecretKeyNoSet                        bool
-	SecretKey                             string
-	TrustedProxyIPs                       []*net.IPNet
-	TrustedProxyTextualIPs                []string
-	TokenExpiredTime                      uint32
-	TokenExpiredTimeDuration              time.Duration
-	TokenMinRefreshInterval               uint32
-	TemporaryTokenExpiredTime             uint32
-	TemporaryTokenExpiredTimeDuration     time.Duration
-	EmailVerifyTokenExpiredTime           uint32
-	EmailVerifyTokenExpiredTimeDuration   time.Duration
-	PasswordResetTokenExpiredTime         uint32
-	PasswordResetTokenExpiredTimeDuration time.Duration
-	EnableAPIToken                        bool
-	APITokenAllowedRemoteIPs              []*core.IPPattern
-	MaxFailuresPerIpPerMinute             uint32
-	MaxFailuresPerUserPerMinute           uint32
+	SecretKeyNoSet                             bool
+	SecretKey                                  string
+	TrustedProxyIPs                            []*net.IPNet
+	TrustedProxyTextualIPs                     []string
+	TokenExpiredTime                           uint32
+	TokenExpiredTimeDuration                   time.Duration
+	TokenMinRefreshInterval                    uint32
+	TemporaryTokenExpiredTime                  uint32
+	TemporaryTokenExpiredTimeDuration          time.Duration
+	EmailVerifyTokenExpiredTime                uint32
+	EmailVerifyTokenExpiredTimeDuration        time.Duration
+	PasswordResetTokenExpiredTime              uint32
+	PasswordResetTokenExpiredTimeDuration      time.Duration
+	UserAvatarTokenExpiredTime                 uint32
+	UserAvatarTokenExpiredTimeDuration         time.Duration
+	TransactionPictureTokenExpiredTime         uint32
+	TransactionPictureTokenExpiredTimeDuration time.Duration
+	EnableAPIToken                             bool
+	APITokenAllowedRemoteIPs                   []*core.IPPattern
+	MaxFailuresPerIpPerMinute                  uint32
+	MaxFailuresPerUserPerMinute                uint32
 
 	// Auth
 	EnableInternalAuth                bool
@@ -1125,6 +1131,22 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	}
 
 	config.PasswordResetTokenExpiredTimeDuration = time.Duration(config.PasswordResetTokenExpiredTime) * time.Second
+
+	config.UserAvatarTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "user_avatar_token_expired_time", defaultUserAvatarTokenExpiredTime)
+
+	if config.UserAvatarTokenExpiredTime < 60 {
+		return errs.ErrInvalidUserAvatarTokenExpiredTime
+	}
+
+	config.UserAvatarTokenExpiredTimeDuration = time.Duration(config.UserAvatarTokenExpiredTime) * time.Second
+
+	config.TransactionPictureTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "transaction_picture_token_expired_time", defaultTransactionPictureTokenExpiredTime)
+
+	if config.TransactionPictureTokenExpiredTime < 60 {
+		return errs.ErrInvalidTransactionPictureTokenExpiredTime
+	}
+
+	config.TransactionPictureTokenExpiredTimeDuration = time.Duration(config.TransactionPictureTokenExpiredTime) * time.Second
 
 	config.EnableAPIToken = getConfigItemBoolValue(configFile, sectionName, "enable_api_token", false)
 	config.APITokenAllowedRemoteIPs, err = getIPPatterns(configFile, sectionName, "api_token_allowed_remote_ips", "")

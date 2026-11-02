@@ -31,4 +31,6 @@ var (
 	ErrInvalidOAuth2Provider                          = NewSystemError(SystemSubcategorySetting, 24, http.StatusInternalServerError, "invalid oauth 2.0 provider")
 	ErrInvalidOAuth2StateExpiredTime                  = NewSystemError(SystemSubcategorySetting, 25, http.StatusInternalServerError, "invalid oauth 2.0 state expired time")
 	ErrInvalidLLMThinkingLevel                        = NewSystemError(SystemSubcategorySetting, 26, http.StatusInternalServerError, "invalid llm thinking level")
+	ErrInvalidUserAvatarTokenExpiredTime              = NewSystemError(SystemSubcategorySetting, 27, http.StatusInternalServerError, "invalid user avatar token expired time")
+	ErrInvalidTransactionPictureTokenExpiredTime      = NewSystemError(SystemSubcategorySetting, 28, http.StatusInternalServerError, "invalid transaction picture token expired time")
 )

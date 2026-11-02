@@ -13,6 +13,11 @@ func NewNullAvatarProvider() *NullAvatarProvider {
 	return &NullAvatarProvider{}
 }
 
+// NeedAvatarToken returns whether the current avatar provider requires a avatar token
+func (p *NullAvatarProvider) NeedAvatarToken() bool {
+	return false
+}
+
 // GetAvatarUrl returns an empty url
 func (p *NullAvatarProvider) GetAvatarUrl(user *models.User) string {
 	return ""

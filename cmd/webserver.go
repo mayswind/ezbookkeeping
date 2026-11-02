@@ -188,7 +188,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.AvatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
 		avatarRoute := router.Group("/avatar")
-		avatarRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
+		avatarRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config, core.NormalTokenScopeUserAvatar), config))
 		{
 			avatarRoute.GET("/:fileName", bindImage(api.Users.UserGetAvatarHandler, config))
 		}
@@ -196,7 +196,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.EnableTransactionPictures {
 		pictureRoute := router.Group("/pictures")
-		pictureRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
+		pictureRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config, core.NormalTokenScopeTransactionPicture), config))
 		{
 			pictureRoute.GET("/:fileName", bindImage(api.TransactionPictures.TransactionPictureGetHandler, config))
 		}

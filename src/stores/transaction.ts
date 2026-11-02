@@ -1833,7 +1833,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
             return undefined;
         }
 
-        return services.getTransactionPictureUrlWithToken(pictureInfo.originalUrl, disableBrowserCache);
+        return services.getTransactionPictureUrl(pictureInfo.originalUrl, disableBrowserCache);
     }
 
     function collapseMonthInTransactionList({ monthList, collapse }: { monthList: TransactionMonthList, collapse: boolean }): void {

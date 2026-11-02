@@ -69,7 +69,8 @@ type UserTokenClaims struct {
 
 // NormalTokenAdditionalData represents the additional data of a normal token
 type NormalTokenAdditionalData struct {
-	Scope NormalTokenScope
+	Scope                 NormalTokenScope
+	DerivedTokenExpiresAt int64
 }
 
 // NormalTokenScope represents the scope of a normal token
@@ -77,7 +78,13 @@ type NormalTokenScope byte
 
 // Normal token scopes
 const (
-	NormalTokenScopeAll NormalTokenScope = 1
+	NormalTokenScopeInvalid            NormalTokenScope = 0
+	NormalTokenScopeAll                NormalTokenScope = 1
+	NormalTokenScopeUserAvatar         NormalTokenScope = 2
+	NormalTokenScopeTransactionPicture NormalTokenScope = 3
+
+	NormalTokenScopeMinValue NormalTokenScope = NormalTokenScopeAll
+	NormalTokenScopeMaxValue NormalTokenScope = NormalTokenScopeTransactionPicture
 )
 
 // MarshalBinary returns the binary representation of the normal token additional data.
@@ -85,17 +92,34 @@ func (d *NormalTokenAdditionalData) MarshalBinary() ([]byte, error) {
 	buf := &bytes.Buffer{}
 	_ = binary.Write(buf, binary.BigEndian, d.Scope)
 
+	if d.Scope != NormalTokenScopeAll {
+		_ = binary.Write(buf, binary.BigEndian, d.DerivedTokenExpiresAt)
+	}
+
 	return buf.Bytes(), nil
 }
 
 // UnmarshalBinary decodes the binary normal token additional data.
 func (d *NormalTokenAdditionalData) UnmarshalBinary(data []byte) error {
-	if len(data) != 1 {
+	if len(data) < 1 {
 		return errs.ErrCurrentInvalidToken
 	}
 
+	if NormalTokenScope(data[0]) == NormalTokenScopeAll && len(data) != 1 {
+		return errs.ErrCurrentInvalidToken
+	} else if NormalTokenScope(data[0]) != NormalTokenScopeAll && len(data) != 9 {
+		return errs.ErrCurrentInvalidToken
+	}
+
+	d.Scope = NormalTokenScopeInvalid
+	d.DerivedTokenExpiresAt = 0
+
 	buf := bytes.NewBuffer(data)
 	_ = binary.Read(buf, binary.BigEndian, &d.Scope)
+
+	if d.Scope != NormalTokenScopeAll {
+		_ = binary.Read(buf, binary.BigEndian, &d.DerivedTokenExpiresAt)
+	}
 
 	return nil
 }

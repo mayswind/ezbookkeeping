@@ -1,5 +1,10 @@
 package models
 
+import (
+	"net/url"
+	"strings"
+)
+
 const TransactionPictureNewPictureTransactionId = int64(0)
 
 // TransactionPictureInfo represents transaction picture file info stored in database
@@ -27,7 +32,17 @@ type TransactionPictureInfoBasicResponse struct {
 }
 
 // ToTransactionPictureInfoBasicResponse returns a view-object according to database model
-func (p *TransactionPictureInfo) ToTransactionPictureInfoBasicResponse(originalUrl string) *TransactionPictureInfoBasicResponse {
+func (p *TransactionPictureInfo) ToTransactionPictureInfoBasicResponse(originalUrl string, pictureToken string) *TransactionPictureInfoBasicResponse {
+	if pictureToken != "" {
+		separator := "?"
+
+		if strings.Contains(originalUrl, "?") {
+			separator = "&"
+		}
+
+		originalUrl += separator + "token=" + url.QueryEscape(pictureToken)
+	}
+
 	return &TransactionPictureInfoBasicResponse{
 		PictureId:   p.PictureId,
 		OriginalUrl: originalUrl,

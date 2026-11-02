@@ -36,6 +36,7 @@ var (
 			},
 			ApiUsingAvatarProvider: ApiUsingAvatarProvider{
 				container: avatars.Container,
+				tokens:    services.Tokens,
 			},
 		},
 		tokens:               services.Tokens,
@@ -431,8 +432,15 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 			applicationCloudSettingSlice = &userApplicationCloudSettings.Settings
 		}
 
+		userBasicInfo, err := a.GetUserBasicInfo(c, user)
+
+		if err != nil {
+			log.Errorf(c, "[tokens.TokenRefreshHandler] failed to get user basic info for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
 		refreshResp := &models.TokenRefreshResponse{
-			User:                     a.GetUserBasicInfo(user),
+			User:                     userBasicInfo,
 			ApplicationCloudSettings: applicationCloudSettingSlice,
 			NotificationContent:      a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 		}
@@ -469,10 +477,17 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 
 	log.Infof(c, "[tokens.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
+	userBasicInfo, err := a.GetUserBasicInfo(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[tokens.TokenRefreshHandler] failed to get user basic info for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	refreshResp := &models.TokenRefreshResponse{
 		NewToken:                 token,
 		OldTokenId:               a.tokens.GenerateTokenId(oldTokenRecord),
-		User:                     a.GetUserBasicInfo(user),
+		User:                     userBasicInfo,
 		ApplicationCloudSettings: applicationCloudSettingSlice,
 		NotificationContent:      a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
 	}

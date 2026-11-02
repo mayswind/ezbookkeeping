@@ -46,6 +46,7 @@ var (
 			},
 			ApiUsingAvatarProvider: ApiUsingAvatarProvider{
 				container: avatars.Container,
+				tokens:    services.Tokens,
 			},
 		},
 		users:                   services.Users,
@@ -163,7 +164,13 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.WebContext) (any, *errs.Err
 
 	log.Infof(c, "[authorizations.AuthorizeHandler] user \"uid:%d\" has logged in, token type is %d, token will be expired at %d", user.Uid, claims.Type, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(c, token, twoFactorEnable, user, applicationCloudSettingSlice)
+	authResp, err := a.getAuthResponse(c, token, twoFactorEnable, user, applicationCloudSettingSlice)
+
+	if err != nil {
+		log.Errorf(c, "[authorizations.AuthorizeHandler] failed to get auth response for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	return authResp, nil
 }
 
@@ -268,7 +275,13 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 
 	log.Infof(c, "[authorizations.TwoFactorAuthorizeHandler] user \"uid:%d\" has authorized two-factor via passcode, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
+	authResp, err := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
+
+	if err != nil {
+		log.Errorf(c, "[authorizations.TwoFactorAuthorizeHandler] failed to get auth response for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	return authResp, nil
 }
 
@@ -367,7 +380,13 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 
 	log.Infof(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] user \"uid:%d\" has authorized two-factor via recovery code \"%s\", token will be expired at %d", user.Uid, credential.RecoveryCode, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
+	authResp, err := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
+
+	if err != nil {
+		log.Errorf(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to get auth response for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	return authResp, nil
 }
 
@@ -562,18 +581,36 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 
 	log.Infof(c, "[authorizations.OAuth2CallbackAuthorizeHandler] user \"uid:%d\" has logged in, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
-	authResp := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
+	authResp, err := a.getAuthResponse(c, token, false, user, applicationCloudSettingSlice)
+
+	if err != nil {
+		log.Errorf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] failed to get auth response for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	return authResp, nil
 }
 
-func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, need2FA bool, user *models.User, applicationCloudSettings *models.ApplicationCloudSettingSlice) *models.AuthResponse {
+func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, need2FA bool, user *models.User, applicationCloudSettings *models.ApplicationCloudSettingSlice) (*models.AuthResponse, error) {
+	var userBasicInfo *models.UserBasicInfo = nil
+	var err error
+
+	if !need2FA {
+		userBasicInfo, err = a.GetUserBasicInfo(c, user)
+
+		if err != nil {
+			log.Errorf(c, "[authorizations.getAuthResponse] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+	}
+
 	return &models.AuthResponse{
 		Token:                    token,
 		Need2FA:                  need2FA,
-		User:                     a.GetUserBasicInfo(user),
+		User:                     userBasicInfo,
 		ApplicationCloudSettings: applicationCloudSettings,
 		NotificationContent:      a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale()),
-	}
+	}, nil
 }
 
 func (a *AuthorizationsApi) update2FAPasscodeUsed(c *core.WebContext, uid int64, passcode string) bool {

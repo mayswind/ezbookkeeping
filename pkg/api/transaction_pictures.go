@@ -16,6 +16,7 @@ type TransactionPicturesApi struct {
 	ApiUsingConfig
 	ApiUsingDuplicateChecker
 	users    *services.UserService
+	tokens   *services.TokenService
 	pictures *services.TransactionPictureService
 }
 
@@ -32,6 +33,7 @@ var (
 			container: duplicatechecker.Container,
 		},
 		users:    services.Users,
+		tokens:   services.Tokens,
 		pictures: services.TransactionPictures,
 	}
 )
@@ -101,7 +103,19 @@ func (a *TransactionPicturesApi) TransactionPictureUploadHandler(c *core.WebCont
 					return nil, errs.Or(err, errs.ErrOperationFailed)
 				}
 
-				pictureInfoResp := a.GetTransactionPictureInfoResponse(pictureInfo)
+				pictureToken := ""
+				claims := c.GetTokenClaims()
+
+				if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
+					pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
+
+					if err != nil {
+						log.Errorf(c, "[transaction_pictures.TransactionPictureUploadHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+						return nil, errs.Or(err, errs.ErrTokenGenerating)
+					}
+				}
+
+				pictureInfoResp := a.GetTransactionPictureInfoResponse(pictureInfo, pictureToken)
 
 				return pictureInfoResp, nil
 			}
@@ -116,7 +130,20 @@ func (a *TransactionPicturesApi) TransactionPictureUploadHandler(c *core.WebCont
 	}
 
 	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_PICTURE, uid, clientSessionId, utils.Int64ToString(pictureInfo.PictureId))
-	pictureInfoResp := a.GetTransactionPictureInfoResponse(pictureInfo)
+
+	pictureToken := ""
+	claims := c.GetTokenClaims()
+
+	if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
+		pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
+
+		if err != nil {
+			log.Errorf(c, "[transaction_pictures.TransactionPictureUploadHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+			return nil, errs.Or(err, errs.ErrTokenGenerating)
+		}
+	}
+
+	pictureInfoResp := a.GetTransactionPictureInfoResponse(pictureInfo, pictureToken)
 
 	return pictureInfoResp, nil
 }

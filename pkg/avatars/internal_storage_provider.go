@@ -21,6 +21,11 @@ func NewInternalStorageAvatarProvider(config *settings.Config) *InternalStorageA
 	}
 }
 
+// NeedAvatarToken returns whether the current avatar provider requires a avatar token
+func (p *InternalStorageAvatarProvider) NeedAvatarToken() bool {
+	return true
+}
+
 // GetAvatarUrl returns the built-in avatar url
 func (p *InternalStorageAvatarProvider) GetAvatarUrl(user *models.User) string {
 	if user.CustomAvatarType == "" {

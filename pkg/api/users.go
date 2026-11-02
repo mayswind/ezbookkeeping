@@ -38,6 +38,7 @@ var (
 			},
 			ApiUsingAvatarProvider: ApiUsingAvatarProvider{
 				container: avatars.Container,
+				tokens:    services.Tokens,
 			},
 		},
 		users:    services.Users,
@@ -103,10 +104,17 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 		}
 	}
 
+	userBasicInfo, err := a.GetUserBasicInfo(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[users.UserRegisterHandler] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	authResp := &models.RegisterResponse{
 		AuthResponse: models.AuthResponse{
 			Need2FA:             false,
-			User:                a.GetUserBasicInfo(user),
+			User:                userBasicInfo,
 			NotificationContent: a.GetAfterRegisterNotificationContent(user.Language, c.GetClientLocale()),
 		},
 		NeedVerifyEmail:       a.CurrentConfig().EnableUserVerifyEmail && a.CurrentConfig().EnableUserForceVerifyEmail,
@@ -201,13 +209,20 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.WebContext) (any, *errs.Error)
 			return resp, nil
 		}
 
-		resp.NewToken = token
-		resp.User = a.GetUserBasicInfo(user)
-		resp.NotificationContent = a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale())
-
 		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)
 		c.SetTokenContext("")
+
+		userBasicInfo, err := a.GetUserBasicInfo(c, user)
+
+		if err != nil {
+			log.Errorf(c, "[users.UserEmailVerifyHandler] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		resp.NewToken = token
+		resp.User = userBasicInfo
+		resp.NotificationContent = a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale())
 
 		log.Infof(c, "[users.UserEmailVerifyHandler] user \"uid:%d\" token created, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 	}
@@ -222,13 +237,19 @@ func (a *UsersApi) UserProfileHandler(c *core.WebContext) (any, *errs.Error) {
 
 	if err != nil {
 		if !errs.IsCustomError(err) {
-			log.Errorf(c, "[users.UserRegisterHandler] failed to get user, because %s", err.Error())
+			log.Errorf(c, "[users.UserProfileHandler] failed to get user, because %s", err.Error())
 		}
 
 		return nil, errs.ErrUserNotFound
 	}
 
-	userResp := a.getUserProfileResponse(user)
+	userResp, err := a.getUserProfileResponse(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[users.UserProfileHandler] failed to get user profile response for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	return userResp, nil
 }
 
@@ -566,8 +587,15 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 
 	log.Infof(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" has updated successfully", user.Uid)
 
+	userBasicInfo, err := a.GetUserBasicInfo(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[users.UserUpdateProfileHandler] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	resp := &models.UserProfileUpdateResponse{
-		User: a.GetUserBasicInfo(user),
+		User: userBasicInfo,
 	}
 
 	if emailSetToUnverified && a.CurrentConfig().EnableUserVerifyEmail && a.CurrentConfig().EnableSMTP {
@@ -613,6 +641,15 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)
 		c.SetTokenContext("")
+
+		userBasicInfo, err := a.GetUserBasicInfo(c, user)
+
+		if err != nil {
+			log.Errorf(c, "[users.UserUpdateProfileHandler] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		resp.User = userBasicInfo
 
 		log.Infof(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
@@ -695,7 +732,13 @@ func (a *UsersApi) UserUpdateAvatarHandler(c *core.WebContext) (any, *errs.Error
 	}
 
 	user.CustomAvatarType = fileExtension
-	userResp := a.getUserProfileResponse(user)
+	userResp, err := a.getUserProfileResponse(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[users.UserUpdateAvatarHandler] failed to get user profile response for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	return userResp, nil
 }
 
@@ -738,7 +781,13 @@ func (a *UsersApi) UserRemoveAvatarHandler(c *core.WebContext) (any, *errs.Error
 	}
 
 	user.CustomAvatarType = ""
-	userResp := a.getUserProfileResponse(user)
+	userResp, err := a.getUserProfileResponse(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[users.UserRemoveAvatarHandler] failed to get user profile response for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	return userResp, nil
 }
 
@@ -873,6 +922,13 @@ func (a *UsersApi) UserGetAvatarHandler(c *core.WebContext) ([]byte, string, *er
 	return avatarData, contentType, nil
 }
 
-func (a *UsersApi) getUserProfileResponse(user *models.User) *models.UserProfileResponse {
-	return user.ToUserProfileResponse(a.GetUserBasicInfo(user))
+func (a *UsersApi) getUserProfileResponse(c *core.WebContext, user *models.User) (*models.UserProfileResponse, *errs.Error) {
+	userBasicInfo, err := a.GetUserBasicInfo(c, user)
+
+	if err != nil {
+		log.Errorf(c, "[users.getUserProfileResponse] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	return user.ToUserProfileResponse(userBasicInfo), nil
 }

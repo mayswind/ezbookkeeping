@@ -448,7 +448,7 @@ export const useUserStore = defineStore('user', () => {
             return null;
         }
 
-        return services.getInternalAvatarUrlWithToken(avatarUrl, disableBrowserCache);
+        return services.getInternalAvatarUrl(avatarUrl, disableBrowserCache);
     }
 
     return {

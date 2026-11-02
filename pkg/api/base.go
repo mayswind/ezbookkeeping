@@ -2,7 +2,9 @@ package api
 
 import (
 	"fmt"
+	"net/url"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/avatars"
@@ -11,6 +13,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
+	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
@@ -28,17 +31,17 @@ func (a *ApiUsingConfig) CurrentConfig() *settings.Config {
 }
 
 // GetTransactionPictureInfoResponse returns the view-object of transaction picture basic info according to the transaction picture model
-func (a *ApiUsingConfig) GetTransactionPictureInfoResponse(pictureInfo *models.TransactionPictureInfo) *models.TransactionPictureInfoBasicResponse {
+func (a *ApiUsingConfig) GetTransactionPictureInfoResponse(pictureInfo *models.TransactionPictureInfo, pictureToken string) *models.TransactionPictureInfoBasicResponse {
 	originalUrl := fmt.Sprintf(internalTransactionPictureUrlFormat, a.CurrentConfig().RootUrl, pictureInfo.PictureId, pictureInfo.PictureExtension)
-	return pictureInfo.ToTransactionPictureInfoBasicResponse(originalUrl)
+	return pictureInfo.ToTransactionPictureInfoBasicResponse(originalUrl, pictureToken)
 }
 
 // GetTransactionPictureInfoResponseList returns the view-object list of transaction picture basic info according to the transaction picture model
-func (a *ApiUsingConfig) GetTransactionPictureInfoResponseList(pictureInfos []*models.TransactionPictureInfo) models.TransactionPictureInfoBasicResponseSlice {
+func (a *ApiUsingConfig) GetTransactionPictureInfoResponseList(pictureInfos []*models.TransactionPictureInfo, pictureToken string) models.TransactionPictureInfoBasicResponseSlice {
 	pictureInfoResps := make(models.TransactionPictureInfoBasicResponseSlice, len(pictureInfos))
 
 	for i := 0; i < len(pictureInfos); i++ {
-		pictureInfoResps[i] = a.GetTransactionPictureInfoResponse(pictureInfos[i])
+		pictureInfoResps[i] = a.GetTransactionPictureInfoResponse(pictureInfos[i], pictureToken)
 	}
 
 	sort.Sort(pictureInfoResps)
@@ -207,11 +210,40 @@ func (a *ApiUsingDuplicateChecker) CheckAndIncreaseFailureCount(c *core.WebConte
 // ApiUsingAvatarProvider represents an api that need to use avatar provider
 type ApiUsingAvatarProvider struct {
 	container *avatars.AvatarProviderContainer
+	tokens    *services.TokenService
 }
 
 // GetAvatarUrl returns the avatar url by the current user avatar provider
-func (a *ApiUsingAvatarProvider) GetAvatarUrl(user *models.User) string {
-	return a.container.GetAvatarUrl(user)
+func (a *ApiUsingAvatarProvider) GetAvatarUrl(c *core.WebContext, user *models.User) (string, error) {
+	avatarUrl := a.container.GetAvatarUrl(user)
+
+	if avatarUrl == "" || !a.container.NeedAvatarToken() {
+		return avatarUrl, nil
+	}
+
+	claims := c.GetTokenClaims()
+
+	if claims == nil || claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		return avatarUrl, nil
+	}
+
+	avatarToken, err := a.tokens.DeriveUserAvatarToken(c, claims)
+
+	if err != nil {
+		return "", err
+	}
+
+	if avatarToken != "" {
+		separator := "?"
+
+		if strings.Contains(avatarUrl, "?") {
+			separator = "&"
+		}
+
+		avatarUrl += separator + "token=" + url.QueryEscape(avatarToken)
+	}
+
+	return avatarUrl, nil
 }
 
 // ApiWithUserInfo represents an api that can returns user info
@@ -221,6 +253,12 @@ type ApiWithUserInfo struct {
 }
 
 // GetUserBasicInfo returns the view-object of user basic info according to the user model
-func (a *ApiWithUserInfo) GetUserBasicInfo(user *models.User) *models.UserBasicInfo {
-	return user.ToUserBasicInfo(a.CurrentConfig().AvatarProvider, a.GetAvatarUrl(user))
+func (a *ApiWithUserInfo) GetUserBasicInfo(c *core.WebContext, user *models.User) (*models.UserBasicInfo, error) {
+	avatarUrl, err := a.GetAvatarUrl(c, user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user.ToUserBasicInfo(a.CurrentConfig().AvatarProvider, avatarUrl), nil
 }

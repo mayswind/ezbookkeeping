@@ -38,6 +38,7 @@ type TransactionsApi struct {
 	transactionTags       *services.TransactionTagService
 	transactionPictures   *services.TransactionPictureService
 	accounts              *services.AccountService
+	tokens                *services.TokenService
 	users                 *services.UserService
 }
 
@@ -58,6 +59,7 @@ var (
 		transactionTags:       services.TransactionTags,
 		transactionPictures:   services.TransactionPictures,
 		accounts:              services.Accounts,
+		tokens:                services.Tokens,
 		users:                 services.Users,
 	}
 )
@@ -1235,8 +1237,20 @@ func (a *TransactionsApi) TransactionGetHandler(c *core.WebContext) (any, *errs.
 		transactionResp.Tags = a.getTransactionTagInfoResponses(transactionTagIds, tagMap)
 	}
 
-	if transactionGetReq.WithPictures && a.CurrentConfig().EnableTransactionPictures {
-		transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos)
+	if transactionGetReq.WithPictures && a.CurrentConfig().EnableTransactionPictures && len(pictureInfos) > 0 {
+		pictureToken := ""
+		claims := c.GetTokenClaims()
+
+		if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
+			pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
+
+			if err != nil {
+				log.Errorf(c, "[transactions.TransactionGetHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+				return nil, errs.Or(err, errs.ErrTokenGenerating)
+			}
+		}
+
+		transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos, pictureToken)
 	}
 
 	return transactionResp, nil
@@ -1364,7 +1378,22 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 				}
 
 				transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
-				transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos)
+
+				if len(pictureInfos) > 0 {
+					pictureToken := ""
+					claims := c.GetTokenClaims()
+
+					if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
+						pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
+
+						if err != nil {
+							log.Errorf(c, "[transactions.TransactionCreateHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+							return nil, errs.Or(err, errs.ErrTokenGenerating)
+						}
+					}
+
+					transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos, pictureToken)
+				}
 
 				return transactionResp, nil
 			}
@@ -1382,7 +1411,22 @@ func (a *TransactionsApi) TransactionCreateHandler(c *core.WebContext) (any, *er
 
 	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_TRANSACTION, uid, transactionCreateReq.ClientSessionId, utils.Int64ToString(transaction.TransactionId))
 	transactionResp := transaction.ToTransactionInfoResponse(tagIds, transactionEditable)
-	transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos)
+
+	if len(pictureInfos) > 0 {
+		pictureToken := ""
+		claims := c.GetTokenClaims()
+
+		if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
+			pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
+
+			if err != nil {
+				log.Errorf(c, "[transactions.TransactionCreateHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+				return nil, errs.Or(err, errs.ErrTokenGenerating)
+			}
+		}
+
+		transactionResp.Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos, pictureToken)
+	}
 
 	return transactionResp, nil
 }
@@ -1604,7 +1648,22 @@ func (a *TransactionsApi) TransactionModifyHandler(c *core.WebContext) (any, *er
 	log.Infof(c, "[transactions.TransactionModifyHandler] user \"uid:%d\" has updated transaction \"id:%d\" successfully", uid, transactionModifyReq.Id)
 
 	newTransactionResp := newTransaction.ToTransactionInfoResponse(tagIds, transactionEditable)
-	newTransactionResp.Pictures = a.GetTransactionPictureInfoResponseList(newPictureInfos)
+
+	if len(newPictureInfos) > 0 {
+		pictureToken := ""
+		claims := c.GetTokenClaims()
+
+		if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
+			pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
+
+			if err != nil {
+				log.Errorf(c, "[transactions.TransactionModifyHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+				return nil, errs.Or(err, errs.ErrTokenGenerating)
+			}
+		}
+
+		newTransactionResp.Pictures = a.GetTransactionPictureInfoResponseList(newPictureInfos, pictureToken)
+	}
 
 	return newTransactionResp, nil
 }
@@ -3299,6 +3358,20 @@ func (a *TransactionsApi) getTransactionUsedAccounts(c *core.WebContext, uid int
 }
 
 func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, user *models.User, transactions []*models.Transaction, allAccounts map[int64]*models.Account, categoryMap map[int64]*models.TransactionCategory, tagMap map[int64]*models.TransactionTag, allTransactionTagIds map[int64][]int64, pictureInfoMap map[int64][]*models.TransactionPictureInfo, clientTimezone *time.Location, withPictures bool, trimAccount bool, trimCategory bool, trimTag bool) (models.TransactionInfoResponseSlice, error) {
+	var err error
+	pictureToken := ""
+
+	claims := c.GetTokenClaims()
+
+	if withPictures && a.CurrentConfig().EnableTransactionPictures && len(pictureInfoMap) > 0 && claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
+		pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
+
+		if err != nil {
+			log.Errorf(c, "[transactions.getTransactionResponseListResult] failed to derive transaction picture token for user \"uid:%d\", because %s", user.Uid, err.Error())
+			return nil, err
+		}
+	}
+
 	result := make(models.TransactionInfoResponseSlice, len(transactions))
 
 	for i := 0; i < len(transactions); i++ {
@@ -3336,7 +3409,7 @@ func (a *TransactionsApi) getTransactionResponseListResult(c *core.WebContext, u
 			pictureInfos, exists := pictureInfoMap[transaction.TransactionId]
 
 			if exists {
-				result[i].Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos)
+				result[i].Pictures = a.GetTransactionPictureInfoResponseList(pictureInfos, pictureToken)
 			}
 		}
 	}

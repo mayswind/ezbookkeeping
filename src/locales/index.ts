@@ -3,6 +3,7 @@ import el from './el.json';
 import en from './en.json';
 import es from './es.json';
 import fr from './fr.json';
+import hi from './hi.json';
 import it from './it.json';
 import ja from './ja.json';
 import kn from './kn.json';
@@ -74,6 +75,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: "fr-FR",
         textDirection: "ltr",
         content: fr,
+    },
+    'hi': {
+        name: 'Hindi',
+        displayName: 'हिन्दी',
+        alternativeLanguageTag: 'hi-IN',
+        textDirection: 'ltr',
+        content: hi
     },
     'it': {
         name: 'Italian',

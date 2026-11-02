@@ -1,7 +1,13 @@
-{
-    email 917562427@qq.com
-}
+# 域名从环境变量注入，和 docker-compose / .env 里的 EBK_SERVER_DOMAIN 保持一致，换域名只改 .env。
+# email 用于 Let's Encrypt 证书申请时注册账户（收续期失败提醒用），不影响 HTTPS 是否生效。
+#   - 不填：匿名签发，证书照常自动签发与续期，只是收不到提醒（默认即此）。
+#   - 想收提醒：取消下面 email 两行的注释，并填真实可用邮箱（写假的没意义，收不到就是白填）。
+# 注意：全局块里 email 若写空值会导致 Caddy 解析报错，所以用"整块注释"而非"空变量"来表示不填。
 
-bookkeeping.highfly-ai.com {
+# {
+#     email you@example.com
+# }
+
+{$EBK_SERVER_DOMAIN} {
     reverse_proxy ezbookkeeping:8080
 }

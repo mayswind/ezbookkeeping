@@ -1,9 +1,16 @@
 name: Build and Push Docker Image
 
 # 触发条件：push 到 main 分支时自动跑；也可在 Actions 页面手动点运行
+# paths-ignore：只改部署配置 / 文档时不触发构建（镜像 = 源码，这些文件变了镜像也不用重建）。
+# 注意：workflow_dispatch 不受 paths-ignore 影响，任何时候都能在 Actions 页面手动触发。
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'deploy/**'
+      - '**.md'
+      - '.gitignore'
+      - '.github/**'
   workflow_dispatch:
 
 jobs:

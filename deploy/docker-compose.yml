@@ -76,6 +76,9 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      # 供 Caddyfile 里的 {$EBK_SERVER_DOMAIN} 使用，和应用用同一个变量，换域名只改 .env
+      EBK_SERVER_DOMAIN: ${EBK_SERVER_DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

@@ -127,7 +127,19 @@ docker compose exec ezbookkeeping sh      # 进容器内手查
 `.env` 里 `EBK_IMAGE` 默认已是 `gaofei211/bookkeeping:latest`（自己 CI 的镜像）。
 想临时验证作者镜像改成 `mayswind/ezbookkeeping:latest` 即可。改完 `docker compose pull && up -d`。
 
-## 五、备份与改密码（提醒，别在日常更新里顺手做）
+## 五、邮件（SMTP）与忘记密码
+
+`EBK_MAIL_*` 配好后，登录页「忘记密码」才真正能发重置邮件（`enable_forget_password` 默认即 true）。
+用个人 QQ 邮箱发信：`mail.qq.com` 设置→账号 开启 IMAP/SMTP，发短信后拿到 16 位**授权码**（不是登录密码）。
+把 `.env` 里 `EBK_MAIL_SMTP_*` / `EBK_MAIL_FROM_ADDRESS` 填好（见 `.env.example`），`docker compose up -d`，然后测试：
+```bash
+docker compose exec ezbookkeeping /ezbookkeeping/ezbookkeeping utility send-test-mail --to 你的邮箱
+```
+- 端口用 `465`（云服务器一般封出站 25）。QQ 要求发件人地址 = 认证邮箱，`FROM_ADDRESS` 必须填同一个 QQ 邮箱。
+- 没配邮件又想临时重置某用户密码：
+  `docker compose exec ezbookkeeping /ezbookkeeping/ezbookkeeping user-data user-modify-password --username <用户名> --password <新密码>`
+
+## 六、备份与改密码（提醒，别在日常更新里顺手做）
 
 ```bash
 # 备份（导出当前库）

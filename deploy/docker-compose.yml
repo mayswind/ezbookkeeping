@@ -55,6 +55,12 @@ services:
       # ---- 对外地址（头像/图片/邮件链接/回调/二维码都靠它生成，必须 https:// 不带 :8080）----
       EBK_SERVER_DOMAIN: ${EBK_SERVER_DOMAIN}
       EBK_SERVER_ROOT_URL: ${EBK_SERVER_ROOT_URL}
+      # ---- 邮件（SMTP）：开启后「忘记密码」才真正能发信；密码放 .env ----
+      EBK_MAIL_ENABLE_SMTP: "true"
+      EBK_MAIL_SMTP_HOST: ${EBK_MAIL_SMTP_HOST}
+      EBK_MAIL_SMTP_USER: ${EBK_MAIL_SMTP_USER}
+      EBK_MAIL_SMTP_PASSWD: ${EBK_MAIL_SMTP_PASSWD}
+      EBK_MAIL_FROM_ADDRESS: ${EBK_MAIL_FROM_ADDRESS}
       # ---- 日志：开启文件日志轮转（已挂持久卷，防止无限增长）----
       EBK_LOG_LOG_FILE_ROTATE: "true"
       # ---- 时区：让日志时间显示为本地时间（不影响定时任务按模板时区计算）----

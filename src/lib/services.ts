@@ -166,7 +166,6 @@ import type {
 import type {
     UserLoginRequest,
     UserRegisterRequest,
-    UserVerifyEmailResponse,
     UserResendVerifyEmailRequest,
     UserProfileResponse,
     UserProfileUpdateRequest,
@@ -358,10 +357,8 @@ export default {
     register: (req: UserRegisterRequest): ApiResponsePromise<RegisterResponse> => {
         return axios.post<ApiResponse<RegisterResponse>>('register.json', req);
     },
-    verifyEmail: ({ token, requestNewToken }: { token: string, requestNewToken: boolean }): ApiResponsePromise<UserVerifyEmailResponse> => {
-        return axios.post<ApiResponse<UserVerifyEmailResponse>>('verify_email/by_token.json?token=' + token, {
-            requestNewToken: requestNewToken
-        }, {
+    verifyEmail: (token: string): ApiResponsePromise<boolean> => {
+        return axios.post<ApiResponse<boolean>>('verify_email/by_token.json?token=' + token, {}, {
             noAuth: true,
             ignoreError: true
         } as ApiRequestConfig);

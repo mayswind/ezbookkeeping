@@ -179,18 +179,6 @@ type UserRegisterRequest struct {
 	TransactionCategoryCreateBatchRequest
 }
 
-// UserVerifyEmailRequest represents all parameters of user verify email request
-type UserVerifyEmailRequest struct {
-	RequestNewToken bool `json:"requestNewToken" binding:"omitempty"`
-}
-
-// UserVerifyEmailResponse represents all response parameters after user have verified email
-type UserVerifyEmailResponse struct {
-	NewToken            string         `json:"newToken,omitempty"`
-	User                *UserBasicInfo `json:"user"`
-	NotificationContent string         `json:"notificationContent,omitempty"`
-}
-
 // UserResendVerifyEmailRequest represents all parameters of user resend verify email request
 type UserResendVerifyEmailRequest struct {
 	Email    string `json:"email" binding:"omitempty,max=100,validEmail"`

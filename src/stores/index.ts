@@ -20,7 +20,6 @@ import type {
     User,
     UserLoginRequest,
     UserResendVerifyEmailRequest,
-    UserVerifyEmailResponse,
     UserProfileUpdateRequest,
     UserProfileUpdateResponse
 } from '@/models/user.ts';
@@ -332,25 +331,14 @@ export const useRootStore = defineStore('root', () => {
         resetAllStates(true);
     }
 
-    function verifyEmail({ token, requestNewToken }: { token: string, requestNewToken: boolean }): Promise<UserVerifyEmailResponse> {
+    function verifyEmail(token: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            services.verifyEmail({
-                token,
-                requestNewToken
-            }).then(response => {
+            services.verifyEmail(token).then(response => {
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
                     reject({ message: 'Unable to verify email' });
                     return;
-                }
-
-                if (data.result.newToken && isString(data.result.newToken)) {
-                    updateCurrentToken(data.result.newToken);
-                }
-
-                if (data.result.user && isObject(data.result.user)) {
-                    userStore.storeUserBasicInfo(data.result.user);
                 }
 
                 resolve(data.result);

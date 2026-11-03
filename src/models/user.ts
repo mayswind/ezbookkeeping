@@ -205,12 +205,6 @@ export interface UserRegisterRequest {
     readonly incomeAmountColor?: number;
 }
 
-export interface UserVerifyEmailResponse {
-    readonly newToken?: string;
-    readonly user: UserBasicInfo;
-    readonly notificationContent?: string;
-}
-
 export interface UserResendVerifyEmailRequest {
     readonly email: string;
     readonly password: string;

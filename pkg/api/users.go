@@ -160,9 +160,6 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 
 // UserEmailVerifyHandler sets user email address verified
 func (a *UsersApi) UserEmailVerifyHandler(c *core.WebContext) (any, *errs.Error) {
-	var userVerifyEmailReq models.UserVerifyEmailRequest
-	err := c.ShouldBindJSON(&userVerifyEmailReq)
-
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 
@@ -199,35 +196,7 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.WebContext) (any, *errs.Error)
 		log.Warnf(c, "[users.UserEmailVerifyHandler] failed to revoke old email verify tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
 	}
 
-	resp := &models.UserVerifyEmailResponse{}
-
-	if userVerifyEmailReq.RequestNewToken {
-		token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
-
-		if err != nil {
-			log.Warnf(c, "[users.UserEmailVerifyHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
-			return resp, nil
-		}
-
-		c.SetTextualToken(token)
-		c.SetTokenClaims(claims)
-		c.SetTokenRecord(tokenRecord)
-
-		userBasicInfo, err := a.GetUserBasicInfo(c, user)
-
-		if err != nil {
-			log.Errorf(c, "[users.UserEmailVerifyHandler] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
-			return nil, errs.Or(err, errs.ErrOperationFailed)
-		}
-
-		resp.NewToken = token
-		resp.User = userBasicInfo
-		resp.NotificationContent = a.GetAfterLoginNotificationContent(user.Language, c.GetClientLocale())
-
-		log.Infof(c, "[users.UserEmailVerifyHandler] user \"uid:%d\" token created, new token will be expired at %d", user.Uid, claims.ExpiresAt)
-	}
-
-	return resp, nil
+	return true, nil
 }
 
 // UserProfileHandler returns user profile of current user

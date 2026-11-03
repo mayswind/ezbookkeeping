@@ -148,10 +148,13 @@ function unlockByWebAuthn(): void {
     ).then(({ id, userName, userSecret }) => {
         verifyingByWebAuthn.value = false;
 
-        unlockTokenByWebAuthn(id, userName, userSecret);
-        doAfterUnlocked();
-
-        router.replace('/');
+        if (unlockTokenByWebAuthn(id, userName, userSecret)) {
+            doAfterUnlocked();
+            router.replace('/');
+        } else {
+            logger.error('failed to unlock with webauthn');
+            snackbar.value?.showMessage('Failed to authenticate with WebAuthn');
+        }
     }).catch(error => {
         verifyingByWebAuthn.value = false;
         logger.error('failed to use webauthn to verify', error);
@@ -181,10 +184,13 @@ function unlockByPin(pinCode: string): void {
     }
 
     try {
-        unlockTokenByPinCode(user.username, pinCode);
-        doAfterUnlocked();
-
-        router.replace('/');
+        if (unlockTokenByPinCode(user.username, pinCode)) {
+            doAfterUnlocked();
+            router.replace('/');
+        } else {
+            logger.error('failed to unlock with pin code');
+            snackbar.value?.showMessage('Incorrect PIN code');
+        }
     } catch (ex) {
         logger.error('failed to unlock with pin code', ex);
         snackbar.value?.showMessage('Incorrect PIN code');

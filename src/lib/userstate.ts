@@ -73,7 +73,7 @@ export function getUserAppLockState(): ApplicationLockState | null {
     return appLockState as ApplicationLockState;
 }
 
-export function unlockTokenByWebAuthn(credentialId: string, userName: string, userSecret: string): void {
+export function unlockTokenByWebAuthn(credentialId: string, userName: string, userSecret: string): boolean {
     const webauthnConfigData = localStorage.getItem(webauthnConfigLocalStorageKey);
 
     if (!webauthnConfigData) {
@@ -98,12 +98,17 @@ export function unlockTokenByWebAuthn(credentialId: string, userName: string, us
     };
     const token = getDecryptedToken(encryptedToken, appLockState);
 
+    if (!token || token.length < 8) { // v2 prefix "ebk-tk-"
+        throw new Error('Failed to decrypt token');
+    }
+
     sessionStorage.setItem(appLockStateSessionStorageKey, JSON.stringify(appLockState));
     sessionStorage.setItem(encryptedTokenSessionStorageKey, encryptedToken);
     sessionStorage.setItem(tokenSessionStorageKey, token);
+    return true;
 }
 
-export function unlockTokenByPinCode(userName: string, pinCode: string): void {
+export function unlockTokenByPinCode(userName: string, pinCode: string): boolean {
     const encryptedToken = localStorage.getItem(tokenLocalStorageKey);
 
     if (!encryptedToken) {
@@ -116,9 +121,14 @@ export function unlockTokenByPinCode(userName: string, pinCode: string): void {
     };
     const token = getDecryptedToken(encryptedToken, appLockState);
 
+    if (!token || token.length < 8) { // v2 prefix "ebk-tk-"
+        throw new Error('Failed to decrypt token');
+    }
+
     sessionStorage.setItem(appLockStateSessionStorageKey, JSON.stringify(appLockState));
     sessionStorage.setItem(encryptedTokenSessionStorageKey, encryptedToken);
     sessionStorage.setItem(tokenSessionStorageKey, token);
+    return true;
 }
 
 export function encryptToken(userName: string, pinCode: string): void {

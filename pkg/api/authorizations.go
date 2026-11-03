@@ -592,16 +592,18 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 }
 
 func (a *AuthorizationsApi) getAuthResponse(c *core.WebContext, token string, need2FA bool, user *models.User, applicationCloudSettings *models.ApplicationCloudSettingSlice) (*models.AuthResponse, error) {
-	var userBasicInfo *models.UserBasicInfo = nil
-	var err error
+	if need2FA {
+		return &models.AuthResponse{
+			Token:   token,
+			Need2FA: need2FA,
+		}, nil
+	}
 
-	if !need2FA {
-		userBasicInfo, err = a.GetUserBasicInfo(c, user)
+	userBasicInfo, err := a.GetUserBasicInfo(c, user)
 
-		if err != nil {
-			log.Errorf(c, "[authorizations.getAuthResponse] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
-			return nil, errs.Or(err, errs.ErrOperationFailed)
-		}
+	if err != nil {
+		log.Errorf(c, "[authorizations.getAuthResponse] failed to get user basic info for user \"uid:%d\", because %s", user.Uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
 	return &models.AuthResponse{

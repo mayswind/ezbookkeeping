@@ -4,7 +4,7 @@ package models
 type AuthResponse struct {
 	Token                    string                        `json:"token"`
 	Need2FA                  bool                          `json:"need2FA"`
-	User                     *UserBasicInfo                `json:"user"`
+	User                     *UserBasicInfo                `json:"user,omitempty"`
 	ApplicationCloudSettings *ApplicationCloudSettingSlice `json:"applicationCloudSettings,omitempty"`
 	NotificationContent      string                        `json:"notificationContent,omitempty"`
 }

@@ -209,7 +209,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.WebCo
 		log.Warnf(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to revoke old tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
 	}
 
-	token, claims, err := a.tokens.CreateToken(c, user)
+	token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
 		log.Warnf(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -223,7 +223,7 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.WebCo
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
-	c.SetTokenContext("")
+	c.SetTokenRecord(tokenRecord)
 
 	log.Infof(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 

@@ -227,7 +227,7 @@ func (a *ApiUsingAvatarProvider) GetAvatarUrl(c *core.WebContext, user *models.U
 		return avatarUrl, nil
 	}
 
-	avatarToken, err := a.tokens.DeriveUserAvatarToken(c, claims)
+	avatarToken, err := a.tokens.DeriveUserAvatarToken(c, claims, c.GetTokenRecord())
 
 	if err != nil {
 		return "", err

@@ -103,16 +103,11 @@ func (a *TransactionPicturesApi) TransactionPictureUploadHandler(c *core.WebCont
 					return nil, errs.Or(err, errs.ErrOperationFailed)
 				}
 
-				pictureToken := ""
-				claims := c.GetTokenClaims()
+				pictureToken, err := a.GetTransactionPictureToken(c, uid)
 
-				if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
-					pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
-
-					if err != nil {
-						log.Errorf(c, "[transaction_pictures.TransactionPictureUploadHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
-						return nil, errs.Or(err, errs.ErrTokenGenerating)
-					}
+				if err != nil {
+					log.Errorf(c, "[transaction_pictures.TransactionPictureUploadHandler] failed to get transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+					return nil, errs.Or(err, errs.ErrTokenGenerating)
 				}
 
 				pictureInfoResp := a.GetTransactionPictureInfoResponse(pictureInfo, pictureToken)
@@ -131,16 +126,11 @@ func (a *TransactionPicturesApi) TransactionPictureUploadHandler(c *core.WebCont
 
 	a.SetSubmissionRemarkIfEnable(duplicatechecker.DUPLICATE_CHECKER_TYPE_NEW_PICTURE, uid, clientSessionId, utils.Int64ToString(pictureInfo.PictureId))
 
-	pictureToken := ""
-	claims := c.GetTokenClaims()
+	pictureToken, err := a.GetTransactionPictureToken(c, uid)
 
-	if claims != nil && claims.Type == core.USER_TOKEN_TYPE_NORMAL {
-		pictureToken, err = a.tokens.DeriveTransactionPictureToken(c, claims)
-
-		if err != nil {
-			log.Errorf(c, "[transaction_pictures.TransactionPictureUploadHandler] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
-			return nil, errs.Or(err, errs.ErrTokenGenerating)
-		}
+	if err != nil {
+		log.Errorf(c, "[transaction_pictures.TransactionPictureUploadHandler] failed to get transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrTokenGenerating)
 	}
 
 	pictureInfoResp := a.GetTransactionPictureInfoResponse(pictureInfo, pictureToken)
@@ -198,6 +188,28 @@ func (a *TransactionPicturesApi) TransactionPictureRemoveUnusedHandler(c *core.W
 	}
 
 	return true, nil
+}
+
+func (a *TransactionPicturesApi) GetTransactionPictureToken(c *core.WebContext, uid int64) (string, error) {
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[transaction_pictures.GetTransactionPictureToken] token is invalid, because claims is nil or token type is not normal")
+		return "", errs.ErrInvalidToken
+	}
+
+	if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		return "", nil
+	}
+
+	pictureToken, err := a.tokens.DeriveTransactionPictureToken(c, claims, c.GetTokenRecord())
+
+	if err != nil {
+		log.Errorf(c, "[transaction_pictures.GetTransactionPictureToken] failed to derive transaction picture token for user \"uid:%d\", because %s", uid, err.Error())
+		return "", errs.Or(err, errs.ErrTokenGenerating)
+	}
+
+	return pictureToken, nil
 }
 
 func (a *TransactionPicturesApi) createNewPictureInfoModel(uid int64, fileExtension string, clientIp string) *models.TransactionPictureInfo {

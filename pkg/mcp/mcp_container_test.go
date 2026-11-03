@@ -9,6 +9,7 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
+	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
@@ -51,13 +52,17 @@ func TestMCPContainerHandleTool_DisabledTool(t *testing.T) {
 			Name: tool.Name,
 		}
 
-		context.SetTokenContext(`{"enabledTools":"0"}`)
+		context.SetTokenRecord(&models.TokenRecord{
+			Context: `{"enabledTools":"0"}`,
+		})
 		actualValue, err := Container.HandleTool(context, request, nil, nil, nil)
 		assert.Nil(t, actualValue)
 		assert.Equal(t, errs.ErrMCPToolNotEnabled, err)
 
 		bit := int64(1) << (tool.ToolType - 1)
-		context.SetTokenContext(`{"enabledTools":"` + strconv.FormatInt(core.MCPAllTools & ^bit, 10) + `"}`)
+		context.SetTokenRecord(&models.TokenRecord{
+			Context: `{"enabledTools":"` + strconv.FormatInt(core.MCPAllTools & ^bit, 10) + `"}`,
+		})
 		actualValue, err = Container.HandleTool(context, request, nil, nil, nil)
 		assert.Nil(t, actualValue)
 		assert.Equal(t, errs.ErrMCPToolNotEnabled, err)
@@ -76,12 +81,16 @@ func TestMCPContainerHandleTool_InvalidContext(t *testing.T) {
 			Name: tool.Name,
 		}
 
-		context.SetTokenContext("invalid")
+		context.SetTokenRecord(&models.TokenRecord{
+			Context: "invalid",
+		})
 		actualValue, err := Container.HandleTool(context, request, nil, nil, nil)
 		assert.Nil(t, actualValue)
 		assert.Equal(t, errs.ErrInvalidToken, err)
 
-		context.SetTokenContext(`{"enabledTools":"-1"}`)
+		context.SetTokenRecord(&models.TokenRecord{
+			Context: `{"enabledTools":"-1"}`,
+		})
 		actualValue, err = Container.HandleTool(context, request, nil, nil, nil)
 		assert.Nil(t, actualValue)
 		assert.Equal(t, errs.ErrMCPToolNotEnabled, err)

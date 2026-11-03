@@ -134,11 +134,12 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.WebContext) (any, *errs.Err
 
 	var token string
 	var claims *core.UserTokenClaims
+	var tokenRecord core.TokenRecord
 
 	if twoFactorEnable {
-		token, claims, err = a.tokens.CreateRequire2FAToken(c, user)
+		token, claims, tokenRecord, err = a.tokens.CreateRequire2FAToken(c, user)
 	} else {
-		token, claims, err = a.tokens.CreateToken(c, user)
+		token, claims, tokenRecord, err = a.tokens.CreateToken(c, user)
 	}
 
 	if err != nil {
@@ -151,7 +152,7 @@ func (a *AuthorizationsApi) AuthorizeHandler(c *core.WebContext) (any, *errs.Err
 	}
 
 	c.SetTokenClaims(claims)
-	c.SetTokenContext("")
+	c.SetTokenRecord(tokenRecord)
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
@@ -253,7 +254,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 		log.Warnf(c, "[authorizations.TwoFactorAuthorizeHandler] failed to revoke temporary token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
 	}
 
-	token, claims, err := a.tokens.CreateToken(c, user)
+	token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
 		log.Errorf(c, "[authorizations.TwoFactorAuthorizeHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -262,7 +263,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeHandler(c *core.WebContext) (any, 
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
-	c.SetTokenContext("")
+	c.SetTokenRecord(tokenRecord)
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
@@ -358,7 +359,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 		log.Warnf(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to revoke temporary token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
 	}
 
-	token, claims, err := a.tokens.CreateToken(c, user)
+	token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
 		log.Errorf(c, "[authorizations.TwoFactorAuthorizeByRecoveryCodeHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -367,7 +368,7 @@ func (a *AuthorizationsApi) TwoFactorAuthorizeByRecoveryCodeHandler(c *core.WebC
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
-	c.SetTokenContext("")
+	c.SetTokenRecord(tokenRecord)
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
@@ -535,6 +536,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 
 	var token string
 	var claims *core.UserTokenClaims
+	var tokenRecord core.TokenRecord
 
 	if credential.Token != "" {
 		claims, _, err = a.tokens.ParseToken(c, credential.Token)
@@ -558,7 +560,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 	}
 
 	if token == "" {
-		token, claims, err = a.tokens.CreateToken(c, user)
+		token, claims, tokenRecord, err = a.tokens.CreateToken(c, user)
 
 		if err != nil {
 			log.Errorf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -568,7 +570,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
-	c.SetTokenContext("")
+	c.SetTokenRecord(tokenRecord)
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil

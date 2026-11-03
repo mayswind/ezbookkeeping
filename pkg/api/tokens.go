@@ -448,7 +448,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 		return refreshResp, nil
 	}
 
-	token, claims, err := a.tokens.CreateToken(c, user)
+	token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
 		log.Errorf(c, "[tokens.TokenRefreshHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -464,7 +464,7 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
-	c.SetTokenContext("")
+	c.SetTokenRecord(tokenRecord)
 
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil

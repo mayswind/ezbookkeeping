@@ -155,7 +155,7 @@ func TestGenerateEncryptedToken_Normal(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_NORMAL,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, []byte{byte(core.NormalTokenScopeAll)})
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, []byte{byte(core.NormalTokenScopeAll)})
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-tk-"))
 
@@ -189,7 +189,7 @@ func TestGenerateEncryptedToken_Require2FA(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_REQUIRE_2FA,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, nil)
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-2fa-"))
 
@@ -220,7 +220,7 @@ func TestGenerateEncryptedToken_EmailVerify(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_EMAIL_VERIFY,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, nil)
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-vfy-"))
 
@@ -251,7 +251,7 @@ func TestGenerateEncryptedToken_PasswordReset(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_PASSWORD_RESET,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, nil)
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-rst-"))
 
@@ -282,7 +282,7 @@ func TestGenerateEncryptedToken_MCP(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_MCP,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, nil)
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-mcp-"))
 
@@ -313,7 +313,7 @@ func TestGenerateEncryptedToken_OAuth2RequireVerify(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, nil)
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-olk-"))
 
@@ -344,7 +344,7 @@ func TestGenerateEncryptedToken_OAuth2Callback(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_OAUTH2_CALLBACK,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, nil)
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-oauth2-"))
 
@@ -375,7 +375,7 @@ func TestGenerateEncryptedToken_API(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_API,
 		Secret:          "0123456789",
 	}
-	actualValue, err := Tokens.generateEncryptedToken(record, nil)
+	actualValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, "ebk-ak-"))
 
@@ -401,7 +401,7 @@ func TestGenerateEncryptedToken_InvalidType(t *testing.T) {
 	initializeTokenServiceTest(t)
 	actualValue, err := Tokens.generateEncryptedToken(&models.TokenRecord{
 		TokenType: core.TokenType(255),
-	}, nil)
+	}, core.NONE_DERIVED_TOKEN, nil)
 
 	assert.Equal(t, "", actualValue)
 	assert.Equal(t, errs.ErrCurrentInvalidTokenType, err)
@@ -417,10 +417,10 @@ func TestGenerateEncryptedToken_RandomNonce(t *testing.T) {
 		Secret:          "0123456789",
 	}
 
-	firstValue, err := Tokens.generateEncryptedToken(record, []byte{byte(core.NormalTokenScopeAll)})
+	firstValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, []byte{byte(core.NormalTokenScopeAll)})
 	assert.Equal(t, nil, err)
 
-	secondValue, err := Tokens.generateEncryptedToken(record, []byte{byte(core.NormalTokenScopeAll)})
+	secondValue, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, []byte{byte(core.NormalTokenScopeAll)})
 	assert.Equal(t, nil, err)
 	assert.NotEqual(t, firstValue, secondValue)
 }
@@ -434,7 +434,7 @@ func TestGenerateEncryptedToken_BinaryLayout(t *testing.T) {
 		TokenType:       core.USER_TOKEN_TYPE_API,
 	}
 
-	token, err := Tokens.generateEncryptedToken(record, nil)
+	token, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, nil)
 	assert.Equal(t, nil, err)
 
 	plaintext, err := utils.DecryptSecretFromHex(strings.Split(token, "-")[2], Tokens.CurrentConfig().SecretKey)
@@ -474,6 +474,26 @@ func TestParseEncryptedTokenId_InvalidFormat(t *testing.T) {
 func TestParseEncryptedTokenId_UnknownType(t *testing.T) {
 	initializeTokenServiceTest(t)
 	actualValue, actualData, err := Tokens.parseEncryptedTokenId(core.NewNullContext(), []string{"ebk", "unknown", "00"})
+	assert.Nil(t, actualValue)
+	assert.Nil(t, actualData)
+	assert.Equal(t, errs.ErrCurrentInvalidTokenType, err)
+
+	actualValue, actualData, err = Tokens.parseEncryptedTokenId(core.NewNullContext(), []string{"ebk", "tk.", "00"})
+	assert.Nil(t, actualValue)
+	assert.Nil(t, actualData)
+	assert.Equal(t, errs.ErrCurrentInvalidTokenType, err)
+
+	actualValue, actualData, err = Tokens.parseEncryptedTokenId(core.NewNullContext(), []string{"ebk", "tk.unknown", "00"})
+	assert.Nil(t, actualValue)
+	assert.Nil(t, actualData)
+	assert.Equal(t, errs.ErrCurrentInvalidTokenType, err)
+
+	actualValue, actualData, err = Tokens.parseEncryptedTokenId(core.NewNullContext(), []string{"ebk", "tk.a.p", "00"})
+	assert.Nil(t, actualValue)
+	assert.Nil(t, actualData)
+	assert.Equal(t, errs.ErrCurrentInvalidTokenType, err)
+
+	actualValue, actualData, err = Tokens.parseEncryptedTokenId(core.NewNullContext(), []string{"ebk", "ak.a", "00"})
 	assert.Nil(t, actualValue)
 	assert.Nil(t, actualData)
 	assert.Equal(t, errs.ErrCurrentInvalidTokenType, err)
@@ -687,8 +707,9 @@ func TestGenerateEncryptedToken_UserAvatar(t *testing.T) {
 	additionalDataBytes, err := expectedValue.MarshalBinary()
 	assert.Equal(t, nil, err)
 
-	token, err := Tokens.generateEncryptedToken(record, additionalDataBytes)
+	token, err := Tokens.generateEncryptedToken(record, core.USER_AVATAR_DERIVED_NORMAL_TOKEN, additionalDataBytes)
 	assert.Equal(t, nil, err)
+	assert.True(t, strings.HasPrefix(token, "ebk-tk.a-"))
 
 	actualRecord, encryptedData, err := Tokens.parseEncryptedTokenId(core.NewNullContext(), strings.Split(token, "-"))
 	assert.Equal(t, nil, err)
@@ -758,8 +779,9 @@ func TestGenerateEncryptedToken_TransactionPicture(t *testing.T) {
 	additionalDataBytes, err := expectedValue.MarshalBinary()
 	assert.Equal(t, nil, err)
 
-	token, err := Tokens.generateEncryptedToken(record, additionalDataBytes)
+	token, err := Tokens.generateEncryptedToken(record, core.TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN, additionalDataBytes)
 	assert.Equal(t, nil, err)
+	assert.True(t, strings.HasPrefix(token, "ebk-tk.p-"))
 
 	actualRecord, encryptedData, err := Tokens.parseEncryptedTokenId(core.NewNullContext(), strings.Split(token, "-"))
 	assert.Equal(t, nil, err)
@@ -826,7 +848,7 @@ func TestGenerateEncryptedToken_ScopedAdditionalDataInvalidSecret(t *testing.T) 
 	}).MarshalBinary()
 	assert.Equal(t, nil, err)
 
-	token, err := Tokens.generateEncryptedToken(record, additionalDataBytes)
+	token, err := Tokens.generateEncryptedToken(record, core.USER_AVATAR_DERIVED_NORMAL_TOKEN, additionalDataBytes)
 	assert.Equal(t, nil, err)
 
 	_, encryptedData, err := Tokens.parseEncryptedTokenId(core.NewNullContext(), strings.Split(token, "-"))
@@ -873,15 +895,17 @@ func TestParseNormalTokenAdditionalData_InvalidScope(t *testing.T) {
 }
 
 func TestDeriveUserAvatarToken_CurrentSession(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
+	c, claims, record := initializeScopedTokenServiceTest(t)
 	expectedValue := time.Now().Add(time.Hour).Unix()
-	token, err := Tokens.DeriveUserAvatarToken(c, claims)
+	token, err := Tokens.DeriveUserAvatarToken(c, claims, record)
 	assert.Equal(t, nil, err)
+	assert.True(t, strings.HasPrefix(token, "ebk-tk.a-"))
 
-	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeUserAvatar)
+	actualValue, actualRecord, err := Tokens.ParseToken(c, token, core.NormalTokenScopeUserAvatar)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, claims.UserTokenId, actualValue.UserTokenId)
 	assert.Equal(t, claims.Uid, actualValue.Uid)
+	assert.Equal(t, record, actualRecord)
 	assert.InDelta(t, expectedValue, actualValue.ExpiresAt, 2)
 
 	_, _, err = Tokens.ParseToken(c, token)
@@ -889,13 +913,28 @@ func TestDeriveUserAvatarToken_CurrentSession(t *testing.T) {
 
 	_, _, err = Tokens.ParseToken(c, token, core.NormalTokenScopeTransactionPicture)
 	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
+
+	mismatchedToken := strings.Replace(token, "ebk-tk.a-", "ebk-tk.p-", 1)
+	_, _, err = Tokens.ParseToken(c, mismatchedToken, core.NormalTokenScopeUserAvatar, core.NormalTokenScopeTransactionPicture)
+	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
+
+	missingDerivedTokenType := strings.Replace(token, "ebk-tk.a-", "ebk-tk-", 1)
+	actualValue, _, err = Tokens.ParseToken(c, missingDerivedTokenType, core.NormalTokenScopeUserAvatar)
+	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
+	assert.Nil(t, actualValue)
+
+	normalToken, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, []byte{byte(core.NormalTokenScopeAll)})
+	assert.Equal(t, nil, err)
+	mismatchedToken = strings.Replace(normalToken, "ebk-tk-", "ebk-tk.a-", 1)
+	_, _, err = Tokens.ParseToken(c, mismatchedToken)
+	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
 }
 
 func TestDeriveUserAvatarToken_SessionExpiration(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
+	c, claims, record := initializeScopedTokenServiceTest(t)
 	claims.ExpiresAt = time.Now().Unix() + 60
 	expectedValue := claims.ExpiresAt
-	token, err := Tokens.DeriveUserAvatarToken(c, claims)
+	token, err := Tokens.DeriveUserAvatarToken(c, claims, record)
 	assert.Equal(t, nil, err)
 
 	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeUserAvatar)
@@ -911,7 +950,7 @@ func TestParseToken_UserAvatarExpired(t *testing.T) {
 	}).MarshalBinary()
 	assert.Equal(t, nil, err)
 
-	token, err := Tokens.generateEncryptedToken(record, additionalDataBytes)
+	token, err := Tokens.generateEncryptedToken(record, core.USER_AVATAR_DERIVED_NORMAL_TOKEN, additionalDataBytes)
 	assert.Equal(t, nil, err)
 
 	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeUserAvatar)
@@ -920,8 +959,8 @@ func TestParseToken_UserAvatarExpired(t *testing.T) {
 }
 
 func TestDeriveUserAvatarToken_RevokedSession(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
-	token, err := Tokens.DeriveUserAvatarToken(c, claims)
+	c, claims, record := initializeScopedTokenServiceTest(t)
+	token, err := Tokens.DeriveUserAvatarToken(c, claims, record)
 	assert.Equal(t, nil, err)
 
 	err = Tokens.DeleteTokenByClaims(c, claims)
@@ -933,15 +972,17 @@ func TestDeriveUserAvatarToken_RevokedSession(t *testing.T) {
 }
 
 func TestDeriveTransactionPictureToken_CurrentSession(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
+	c, claims, record := initializeScopedTokenServiceTest(t)
 	expectedValue := time.Now().Add(30 * time.Minute).Unix()
-	token, err := Tokens.DeriveTransactionPictureToken(c, claims)
+	token, err := Tokens.DeriveTransactionPictureToken(c, claims, record)
 	assert.Equal(t, nil, err)
+	assert.True(t, strings.HasPrefix(token, "ebk-tk.p-"))
 
-	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeTransactionPicture)
+	actualValue, actualRecord, err := Tokens.ParseToken(c, token, core.NormalTokenScopeTransactionPicture)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, claims.UserTokenId, actualValue.UserTokenId)
 	assert.Equal(t, claims.Uid, actualValue.Uid)
+	assert.Equal(t, record, actualRecord)
 	assert.InDelta(t, expectedValue, actualValue.ExpiresAt, 2)
 
 	_, _, err = Tokens.ParseToken(c, token)
@@ -949,13 +990,28 @@ func TestDeriveTransactionPictureToken_CurrentSession(t *testing.T) {
 
 	_, _, err = Tokens.ParseToken(c, token, core.NormalTokenScopeUserAvatar)
 	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
+
+	mismatchedToken := strings.Replace(token, "ebk-tk.p-", "ebk-tk.a-", 1)
+	_, _, err = Tokens.ParseToken(c, mismatchedToken, core.NormalTokenScopeUserAvatar, core.NormalTokenScopeTransactionPicture)
+	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
+
+	missingDerivedTokenType := strings.Replace(token, "ebk-tk.p-", "ebk-tk-", 1)
+	actualValue, _, err = Tokens.ParseToken(c, missingDerivedTokenType, core.NormalTokenScopeTransactionPicture)
+	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
+	assert.Nil(t, actualValue)
+
+	normalToken, err := Tokens.generateEncryptedToken(record, core.NONE_DERIVED_TOKEN, []byte{byte(core.NormalTokenScopeAll)})
+	assert.Equal(t, nil, err)
+	mismatchedToken = strings.Replace(normalToken, "ebk-tk-", "ebk-tk.p-", 1)
+	_, _, err = Tokens.ParseToken(c, mismatchedToken)
+	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
 }
 
 func TestDeriveTransactionPictureToken_SessionExpiration(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
+	c, claims, record := initializeScopedTokenServiceTest(t)
 	claims.ExpiresAt = time.Now().Unix() + 60
 	expectedValue := claims.ExpiresAt
-	token, err := Tokens.DeriveTransactionPictureToken(c, claims)
+	token, err := Tokens.DeriveTransactionPictureToken(c, claims, record)
 	assert.Equal(t, nil, err)
 
 	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeTransactionPicture)
@@ -971,7 +1027,7 @@ func TestParseToken_TransactionPictureExpired(t *testing.T) {
 	}).MarshalBinary()
 	assert.Equal(t, nil, err)
 
-	token, err := Tokens.generateEncryptedToken(record, additionalDataBytes)
+	token, err := Tokens.generateEncryptedToken(record, core.TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN, additionalDataBytes)
 	assert.Equal(t, nil, err)
 
 	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeTransactionPicture)
@@ -980,8 +1036,8 @@ func TestParseToken_TransactionPictureExpired(t *testing.T) {
 }
 
 func TestDeriveTransactionPictureToken_RevokedSession(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
-	token, err := Tokens.DeriveTransactionPictureToken(c, claims)
+	c, claims, record := initializeScopedTokenServiceTest(t)
+	token, err := Tokens.DeriveTransactionPictureToken(c, claims, record)
 	assert.Equal(t, nil, err)
 
 	err = Tokens.DeleteTokenByClaims(c, claims)
@@ -995,29 +1051,29 @@ func TestDeriveTransactionPictureToken_RevokedSession(t *testing.T) {
 func TestDeriveUserAvatarToken_InvalidClaims(t *testing.T) {
 	initializeTokenServiceTest(t)
 	expectedValue := ""
-	actualValue, err := Tokens.DeriveUserAvatarToken(core.NewNullContext(), nil)
+	actualValue, err := Tokens.DeriveUserAvatarToken(core.NewNullContext(), nil, nil)
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
 
 	actualValue, err = Tokens.DeriveUserAvatarToken(core.NewNullContext(), &core.UserTokenClaims{
 		Type: core.USER_TOKEN_TYPE_API,
-	})
+	}, nil)
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
 
 	actualValue, err = Tokens.DeriveUserAvatarToken(core.NewNullContext(), &core.UserTokenClaims{
 		Type:        core.USER_TOKEN_TYPE_NORMAL,
 		UserTokenId: "invalid",
-	})
+	}, nil)
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
 }
 
 func TestDeriveUserAvatarToken_ExpiredSession(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
+	c, claims, record := initializeScopedTokenServiceTest(t)
 	claims.ExpiresAt = time.Now().Unix() - 1
 	expectedValue := ""
-	actualValue, err := Tokens.DeriveUserAvatarToken(c, claims)
+	actualValue, err := Tokens.DeriveUserAvatarToken(c, claims, record)
 
 	assert.Equal(t, errs.ErrTokenExpired, err)
 	assert.Equal(t, expectedValue, actualValue)
@@ -1025,14 +1081,14 @@ func TestDeriveUserAvatarToken_ExpiredSession(t *testing.T) {
 
 func TestDeriveUserAvatarToken_InvalidRecordType(t *testing.T) {
 	c, _, _ := initializeScopedTokenServiceTest(t)
-	_, claims, _, err := Tokens.createToken(c, &models.User{
+	_, claims, record, err := Tokens.createToken(c, &models.User{
 		Uid: 123,
 	}, core.USER_TOKEN_TYPE_API, "", "", time.Hour)
 	assert.Equal(t, nil, err)
 
 	claims.Type = core.USER_TOKEN_TYPE_NORMAL
 	expectedValue := ""
-	actualValue, err := Tokens.DeriveUserAvatarToken(c, claims)
+	actualValue, err := Tokens.DeriveUserAvatarToken(c, claims, record)
 
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
@@ -1041,29 +1097,29 @@ func TestDeriveUserAvatarToken_InvalidRecordType(t *testing.T) {
 func TestDeriveTransactionPictureToken_InvalidClaims(t *testing.T) {
 	initializeTokenServiceTest(t)
 	expectedValue := ""
-	actualValue, err := Tokens.DeriveTransactionPictureToken(core.NewNullContext(), nil)
+	actualValue, err := Tokens.DeriveTransactionPictureToken(core.NewNullContext(), nil, nil)
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
 
 	actualValue, err = Tokens.DeriveTransactionPictureToken(core.NewNullContext(), &core.UserTokenClaims{
 		Type: core.USER_TOKEN_TYPE_API,
-	})
+	}, nil)
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
 
 	actualValue, err = Tokens.DeriveTransactionPictureToken(core.NewNullContext(), &core.UserTokenClaims{
 		Type:        core.USER_TOKEN_TYPE_NORMAL,
 		UserTokenId: "invalid",
-	})
+	}, nil)
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
 }
 
 func TestDeriveTransactionPictureToken_ExpiredSession(t *testing.T) {
-	c, claims, _ := initializeScopedTokenServiceTest(t)
+	c, claims, record := initializeScopedTokenServiceTest(t)
 	claims.ExpiresAt = time.Now().Unix() - 1
 	expectedValue := ""
-	actualValue, err := Tokens.DeriveTransactionPictureToken(c, claims)
+	actualValue, err := Tokens.DeriveTransactionPictureToken(c, claims, record)
 
 	assert.Equal(t, errs.ErrTokenExpired, err)
 	assert.Equal(t, expectedValue, actualValue)
@@ -1071,14 +1127,14 @@ func TestDeriveTransactionPictureToken_ExpiredSession(t *testing.T) {
 
 func TestDeriveTransactionPictureToken_InvalidRecordType(t *testing.T) {
 	c, _, _ := initializeScopedTokenServiceTest(t)
-	_, claims, _, err := Tokens.createToken(c, &models.User{
+	_, claims, record, err := Tokens.createToken(c, &models.User{
 		Uid: 123,
 	}, core.USER_TOKEN_TYPE_API, "", "", time.Hour)
 	assert.Equal(t, nil, err)
 
 	claims.Type = core.USER_TOKEN_TYPE_NORMAL
 	expectedValue := ""
-	actualValue, err := Tokens.DeriveTransactionPictureToken(c, claims)
+	actualValue, err := Tokens.DeriveTransactionPictureToken(c, claims, record)
 
 	assert.Equal(t, errs.ErrInvalidToken, err)
 	assert.Equal(t, expectedValue, actualValue)
@@ -1092,4 +1148,132 @@ func TestParseNormalTokenAdditionalData_InvalidData(t *testing.T) {
 	actualValue, err = Tokens.parseNormalTokenAdditionalData(core.NewNullContext(), []byte{1, 0}, 2000, nil)
 	assert.Equal(t, errs.ErrCurrentInvalidToken, err)
 	assert.Nil(t, actualValue)
+}
+
+func TestDeriveUserAvatarToken_InvalidRecord(t *testing.T) {
+	initializeTokenServiceTest(t)
+	c := core.NewNullContext()
+	claims := &core.UserTokenClaims{
+		Uid:         123,
+		UserTokenId: "456",
+		Type:        core.USER_TOKEN_TYPE_NORMAL,
+		IssuedAt:    789,
+		ExpiresAt:   time.Now().Add(time.Hour).Unix(),
+	}
+	record := &models.TokenRecord{
+		Uid:             claims.Uid,
+		UserTokenId:     456,
+		TokenType:       claims.Type,
+		CreatedUnixTime: claims.IssuedAt,
+		ExpiredUnixTime: claims.ExpiresAt,
+	}
+	expectedValue := ""
+	actualValue, err := Tokens.DeriveUserAvatarToken(c, claims, nil)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	record.Uid++
+	actualValue, err = Tokens.DeriveUserAvatarToken(c, claims, record)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	record.Uid = claims.Uid
+	record.UserTokenId++
+	actualValue, err = Tokens.DeriveUserAvatarToken(c, claims, record)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	record.UserTokenId = 456
+	record.CreatedUnixTime++
+	actualValue, err = Tokens.DeriveUserAvatarToken(c, claims, record)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestDeriveUserAvatarToken_RecordExpiration(t *testing.T) {
+	c, claims, record := initializeScopedTokenServiceTest(t)
+	record.ExpiredUnixTime = time.Now().Unix() + 60
+	expectedValue := record.ExpiredUnixTime
+	token, err := Tokens.DeriveUserAvatarToken(c, claims, record)
+	assert.Equal(t, nil, err)
+
+	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeUserAvatar)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue.ExpiresAt)
+
+	record.ExpiredUnixTime = time.Now().Unix() - 1
+	token, err = Tokens.DeriveUserAvatarToken(c, claims, record)
+	assert.Equal(t, errs.ErrTokenExpired, err)
+	assert.Equal(t, "", token)
+}
+
+func TestDeriveTransactionPictureToken_InvalidRecord(t *testing.T) {
+	initializeTokenServiceTest(t)
+	c := core.NewNullContext()
+	claims := &core.UserTokenClaims{
+		Uid:         123,
+		UserTokenId: "456",
+		Type:        core.USER_TOKEN_TYPE_NORMAL,
+		IssuedAt:    789,
+		ExpiresAt:   time.Now().Add(time.Hour).Unix(),
+	}
+	record := &models.TokenRecord{
+		Uid:             claims.Uid,
+		UserTokenId:     456,
+		TokenType:       claims.Type,
+		CreatedUnixTime: claims.IssuedAt,
+		ExpiredUnixTime: claims.ExpiresAt,
+	}
+	expectedValue := ""
+	actualValue, err := Tokens.DeriveTransactionPictureToken(c, claims, nil)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	record.Uid++
+	actualValue, err = Tokens.DeriveTransactionPictureToken(c, claims, record)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	record.Uid = claims.Uid
+	record.UserTokenId++
+	actualValue, err = Tokens.DeriveTransactionPictureToken(c, claims, record)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+
+	record.UserTokenId = 456
+	record.CreatedUnixTime++
+	actualValue, err = Tokens.DeriveTransactionPictureToken(c, claims, record)
+	assert.Equal(t, errs.ErrInvalidToken, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestDeriveTransactionPictureToken_RecordExpiration(t *testing.T) {
+	c, claims, record := initializeScopedTokenServiceTest(t)
+	record.ExpiredUnixTime = time.Now().Unix() + 60
+	expectedValue := record.ExpiredUnixTime
+	token, err := Tokens.DeriveTransactionPictureToken(c, claims, record)
+	assert.Equal(t, nil, err)
+
+	actualValue, _, err := Tokens.ParseToken(c, token, core.NormalTokenScopeTransactionPicture)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue.ExpiresAt)
+
+	record.ExpiredUnixTime = time.Now().Unix() - 1
+	token, err = Tokens.DeriveTransactionPictureToken(c, claims, record)
+	assert.Equal(t, errs.ErrTokenExpired, err)
+	assert.Equal(t, "", token)
+}
+
+func TestParseToken_ReturnsTokenRecord(t *testing.T) {
+	c, _, _ := initializeScopedTokenServiceTest(t)
+	token, claims, expectedValue, err := Tokens.createToken(c, &models.User{
+		Uid: 123,
+	}, core.USER_TOKEN_TYPE_NORMAL, "test-agent", "test-context", time.Hour)
+	assert.Equal(t, nil, err)
+
+	actualClaims, actualValue, err := Tokens.ParseToken(c, token)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, claims.UserTokenId, actualClaims.UserTokenId)
+	assert.Equal(t, expectedValue, actualValue)
+	assert.Equal(t, "test-context", actualValue.GetContext())
 }

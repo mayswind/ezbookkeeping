@@ -37,7 +37,7 @@ func TokenAuthorizationByCookie(config *settings.Config) core.MiddlewareHandlerF
 // TokenTwoFactorAuthorization verifies whether current request is valid by 2fa passcode
 func TokenTwoFactorAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, err)
@@ -51,7 +51,7 @@ func TokenTwoFactorAuthorization(config *settings.Config) core.MiddlewareHandler
 		}
 
 		c.SetTokenClaims(claims)
-		c.SetTokenContext(tokenContext)
+		c.SetTokenRecord(tokenRecord)
 		c.Next()
 	}
 }
@@ -59,7 +59,7 @@ func TokenTwoFactorAuthorization(config *settings.Config) core.MiddlewareHandler
 // TokenEmailVerifyAuthorization verifies whether current request is email verification
 func TokenEmailVerifyAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, errs.ErrEmailVerifyTokenIsInvalidOrExpired)
@@ -73,7 +73,7 @@ func TokenEmailVerifyAuthorization(config *settings.Config) core.MiddlewareHandl
 		}
 
 		c.SetTokenClaims(claims)
-		c.SetTokenContext(tokenContext)
+		c.SetTokenRecord(tokenRecord)
 		c.Next()
 	}
 }
@@ -81,7 +81,7 @@ func TokenEmailVerifyAuthorization(config *settings.Config) core.MiddlewareHandl
 // TokenResetPasswordAuthorization verifies whether current request is password reset
 func TokenResetPasswordAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, errs.ErrPasswordResetTokenIsInvalidOrExpired)
@@ -95,7 +95,7 @@ func TokenResetPasswordAuthorization(config *settings.Config) core.MiddlewareHan
 		}
 
 		c.SetTokenClaims(claims)
-		c.SetTokenContext(tokenContext)
+		c.SetTokenRecord(tokenRecord)
 		c.Next()
 	}
 }
@@ -103,7 +103,7 @@ func TokenResetPasswordAuthorization(config *settings.Config) core.MiddlewareHan
 // TokenMCPAuthorization verifies whether current request is valid by mcp token in header
 func TokenMCPAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, err)
@@ -117,7 +117,7 @@ func TokenMCPAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 		}
 
 		c.SetTokenClaims(claims)
-		c.SetTokenContext(tokenContext)
+		c.SetTokenRecord(tokenRecord)
 		c.Next()
 	}
 }
@@ -125,7 +125,7 @@ func TokenMCPAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 // TokenOAuth2CallbackAuthorization verifies whether current request is OAuth 2.0 callback
 func TokenOAuth2CallbackAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenContext, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
+		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, errs.ErrTokenExpired)
@@ -139,14 +139,14 @@ func TokenOAuth2CallbackAuthorization(config *settings.Config) core.MiddlewareHa
 		}
 
 		c.SetTokenClaims(claims)
-		c.SetTokenContext(tokenContext)
+		c.SetTokenRecord(tokenRecord)
 		c.Next()
 	}
 }
 
 func tokenAuthorization(config *settings.Config, source TokenSourceType, allowedAPIToken bool, allowedNormalTokenScopes ...core.NormalTokenScope) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenContext, err := getTokenClaims(c, source, allowedNormalTokenScopes...)
+		claims, tokenRecord, err := getTokenClaims(c, source, allowedNormalTokenScopes...)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, err)
@@ -178,28 +178,28 @@ func tokenAuthorization(config *settings.Config, source TokenSourceType, allowed
 		}
 
 		c.SetTokenClaims(claims)
-		c.SetTokenContext(tokenContext)
+		c.SetTokenRecord(tokenRecord)
 		c.Next()
 	}
 }
 
-func getTokenClaims(c *core.WebContext, source TokenSourceType, allowedNormalTokenScopes ...core.NormalTokenScope) (*core.UserTokenClaims, string, *errs.Error) {
-	claims, tokenContext, err := parseToken(c, source, allowedNormalTokenScopes...)
+func getTokenClaims(c *core.WebContext, source TokenSourceType, allowedNormalTokenScopes ...core.NormalTokenScope) (*core.UserTokenClaims, core.TokenRecord, *errs.Error) {
+	claims, tokenRecord, err := parseToken(c, source, allowedNormalTokenScopes...)
 
 	if err != nil {
 		log.Warnf(c, "[authorization.getTokenClaims] failed to parse token, because %s", err.Error())
-		return nil, "", errs.Or(err, errs.ErrUnauthorizedAccess)
+		return nil, nil, errs.Or(err, errs.ErrUnauthorizedAccess)
 	}
 
 	if claims.Uid <= 0 {
 		log.Warnf(c, "[authorization.getTokenClaims] user id in token is invalid")
-		return nil, "", errs.ErrCurrentInvalidToken
+		return nil, nil, errs.ErrCurrentInvalidToken
 	}
 
-	return claims, tokenContext, nil
+	return claims, tokenRecord, nil
 }
 
-func parseToken(c *core.WebContext, source TokenSourceType, allowedNormalTokenScopes ...core.NormalTokenScope) (*core.UserTokenClaims, string, error) {
+func parseToken(c *core.WebContext, source TokenSourceType, allowedNormalTokenScopes ...core.NormalTokenScope) (*core.UserTokenClaims, core.TokenRecord, error) {
 	tokenString := ""
 
 	if source == TOKEN_SOURCE_TYPE_ARGUMENT {
@@ -211,7 +211,7 @@ func parseToken(c *core.WebContext, source TokenSourceType, allowedNormalTokenSc
 	}
 
 	if tokenString == "" {
-		return nil, "", errs.ErrTokenIsEmpty
+		return nil, nil, errs.ErrTokenIsEmpty
 	}
 
 	return services.Tokens.ParseToken(c, tokenString, allowedNormalTokenScopes...)

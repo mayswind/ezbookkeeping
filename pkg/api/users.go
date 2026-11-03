@@ -141,7 +141,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 		return authResp, nil
 	}
 
-	token, claims, err := a.tokens.CreateToken(c, user)
+	token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 	if err != nil {
 		log.Warnf(c, "[users.UserRegisterHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -151,7 +151,7 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 	authResp.Token = token
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
-	c.SetTokenContext("")
+	c.SetTokenRecord(tokenRecord)
 
 	log.Infof(c, "[users.UserRegisterHandler] user \"uid:%d\" has logged in, token will be expired at %d", user.Uid, claims.ExpiresAt)
 
@@ -202,7 +202,7 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.WebContext) (any, *errs.Error)
 	resp := &models.UserVerifyEmailResponse{}
 
 	if userVerifyEmailReq.RequestNewToken {
-		token, claims, err := a.tokens.CreateToken(c, user)
+		token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 		if err != nil {
 			log.Warnf(c, "[users.UserEmailVerifyHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -211,7 +211,7 @@ func (a *UsersApi) UserEmailVerifyHandler(c *core.WebContext) (any, *errs.Error)
 
 		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)
-		c.SetTokenContext("")
+		c.SetTokenRecord(tokenRecord)
 
 		userBasicInfo, err := a.GetUserBasicInfo(c, user)
 
@@ -630,7 +630,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 			log.Warnf(c, "[users.UserUpdateProfileHandler] failed to revoke old tokens for user \"uid:%d\", because %s", user.Uid, err.Error())
 		}
 
-		token, claims, err := a.tokens.CreateToken(c, user)
+		token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 		if err != nil {
 			log.Warnf(c, "[users.UserUpdateProfileHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
@@ -640,7 +640,7 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		resp.NewToken = token
 		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)
-		c.SetTokenContext("")
+		c.SetTokenRecord(tokenRecord)
 
 		userBasicInfo, err := a.GetUserBasicInfo(c, user)
 

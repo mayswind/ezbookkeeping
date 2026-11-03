@@ -7,6 +7,7 @@ const TokenMaxUserAgentLength = 255
 
 // TokenRecord represents token data stored in database
 type TokenRecord struct {
+	core.TokenRecord
 	Uid              int64          `xorm:"PK INDEX(IDX_token_record_uid_type_expired_time) INDEX(IDX_token_record_expired_time)"`
 	UserTokenId      int64          `xorm:"PK"`
 	TokenType        core.TokenType `xorm:"INDEX(IDX_token_record_uid_type_expired_time) TINYINT NOT NULL"`
@@ -76,6 +77,41 @@ type TokenInfoResponse struct {
 	UserAgent string         `json:"userAgent"`
 	LastSeen  int64          `json:"lastSeen"`
 	IsCurrent bool           `json:"isCurrent"`
+}
+
+// GetUid returns the uid of the token record
+func (r *TokenRecord) GetUid() int64 {
+	return r.Uid
+}
+
+// GetUserTokenId returns the user token id of the token record
+func (r *TokenRecord) GetUserTokenId() int64 {
+	return r.UserTokenId
+}
+
+// GetTokenType returns the token type of the token record
+func (r *TokenRecord) GetTokenType() core.TokenType {
+	return r.TokenType
+}
+
+// GetSecret returns the secret of the token record
+func (r *TokenRecord) GetSecret() string {
+	return r.Secret
+}
+
+// GetContext returns the context of the token record
+func (r *TokenRecord) GetContext() string {
+	return r.Context
+}
+
+// GetCreatedUnixTime returns the created unix time of the token record
+func (r *TokenRecord) GetCreatedUnixTime() int64 {
+	return r.CreatedUnixTime
+}
+
+// GetExpiredUnixTime returns the expired unix time of the token record
+func (r *TokenRecord) GetExpiredUnixTime() int64 {
+	return r.ExpiredUnixTime
 }
 
 // TokenInfoResponseSlice represents the slice data structure of TokenInfoResponse

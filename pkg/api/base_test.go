@@ -83,13 +83,14 @@ func initializeInternalAvatarApiTest(t *testing.T, rootUrl string) (*ApiWithUser
 		CustomAvatarType: "png",
 	}
 
-	_, claims, err := services.Tokens.CreateToken(c, user)
+	_, claims, tokenRecord, err := services.Tokens.CreateToken(c, user)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	c.SetTokenClaims(claims)
+	c.SetTokenRecord(tokenRecord)
 	service.ApiUsingAvatarProvider.tokens = services.Tokens
 
 	return service, c, user

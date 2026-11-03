@@ -57,6 +57,22 @@ var TextualTokenTypesReverse = func() map[string]TokenType {
 	return reverseMap
 }()
 
+// TextualDerivedTokenType represents the textual type of a derived token
+type TextualDerivedTokenType string
+
+// Textual derived token types
+const (
+	NONE_DERIVED_TOKEN                       TextualDerivedTokenType = ""
+	USER_AVATAR_DERIVED_NORMAL_TOKEN         TextualDerivedTokenType = "a"
+	TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN TextualDerivedTokenType = "p"
+)
+
+// ValidTextualDerivedTokenTypes contains all supported textual derived token types
+var ValidTextualDerivedTokenTypes = map[TextualDerivedTokenType]bool{
+	USER_AVATAR_DERIVED_NORMAL_TOKEN:         true,
+	TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN: true,
+}
+
 // UserTokenClaims represents user token
 type UserTokenClaims struct {
 	UserTokenId string    `json:"userTokenId"`
@@ -86,6 +102,12 @@ const (
 	NormalTokenScopeMinValue NormalTokenScope = NormalTokenScopeAll
 	NormalTokenScopeMaxValue NormalTokenScope = NormalTokenScopeTransactionPicture
 )
+
+// NormalTokenScopeDerivedTokenTypeMap maps normal token scopes to their corresponding derived token types
+var NormalTokenScopeDerivedTokenTypeMap = map[NormalTokenScope]TextualDerivedTokenType{
+	NormalTokenScopeUserAvatar:         USER_AVATAR_DERIVED_NORMAL_TOKEN,
+	NormalTokenScopeTransactionPicture: TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN,
+}
 
 // MarshalBinary returns the binary representation of the normal token additional data.
 func (d *NormalTokenAdditionalData) MarshalBinary() ([]byte, error) {

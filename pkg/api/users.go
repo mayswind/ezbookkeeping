@@ -922,7 +922,7 @@ func (a *UsersApi) UserGetAvatarHandler(c *core.WebContext) ([]byte, string, *er
 	return avatarData, contentType, nil
 }
 
-func (a *UsersApi) getUserProfileResponse(c *core.WebContext, user *models.User) (*models.UserProfileResponse, *errs.Error) {
+func (a *UsersApi) getUserProfileResponse(c *core.WebContext, user *models.User) (*models.UserProfileResponse, error) {
 	userBasicInfo, err := a.GetUserBasicInfo(c, user)
 
 	if err != nil {

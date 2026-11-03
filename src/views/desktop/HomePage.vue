@@ -1,6 +1,18 @@
 <template>
     <main-page-layout no-navbar>
         <template #content>
+            <div class="d-flex align-center flex-wrap ga-2 mb-4" v-if="showQuickSwitch">
+                <v-chip :key="currency" v-for="currency in quickSwitchCurrencies"
+                        :color="currency === defaultCurrency ? 'primary' : 'default'"
+                        :variant="currency === defaultCurrency ? 'flat' : 'outlined'"
+                        :disabled="!!switchingCurrency || loadingOverview"
+                        :title="getCurrencyName(currency)"
+                        @click="onSwitchCurrency(currency)">
+                    {{ currency }}
+                    <v-progress-circular class="ms-2" indeterminate size="14" width="2"
+                                         v-if="switchingCurrency === currency" />
+                </v-chip>
+            </div>
             <overview-dashboard :layout="layout" :loading="loadingOverview" @refresh="reload" />
         </template>
     </main-page-layout>
@@ -13,6 +25,9 @@ import SnackBar from '@/components/desktop/SnackBar.vue';
 import OverviewDashboard from './overview/OverviewDashboard.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
+
+import { useI18n } from '@/locales/helpers.ts';
+import { useCurrencyQuickSwitchBase } from '@/views/base/overview/CurrencyQuickSwitchBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
@@ -38,6 +53,9 @@ import {
 import logger from '@/lib/logger.ts';
 
 type SnackBarType = InstanceType<typeof SnackBar>;
+
+const { getCurrencyName } = useI18n();
+const { switchingCurrency, quickSwitchCurrencies, defaultCurrency, showQuickSwitch, switchCurrency } = useCurrencyQuickSwitchBase();
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
@@ -133,6 +151,16 @@ function reload(force: boolean): void {
     }).catch(error => {
         loadingOverview.value = false;
 
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function onSwitchCurrency(currency: string): void {
+    switchCurrency(currency).then(() => {
+        reload(false);
+    }).catch(error => {
         if (!error.processed) {
             snackbar.value?.showError(error);
         }

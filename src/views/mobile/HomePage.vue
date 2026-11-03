@@ -4,6 +4,15 @@
             <f7-nav-title :title="tt('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
+        <f7-block class="currency-quick-switch margin-vertical-half" v-if="showQuickSwitch">
+            <f7-chip :key="currency" v-for="currency in quickSwitchCurrencies"
+                     :class="{ 'disabled': !!switchingCurrency }"
+                     :color="currency === defaultCurrency ? 'primary' : undefined"
+                     :outline="currency !== defaultCurrency"
+                     :text="currency"
+                     @click="onSwitchCurrency(currency)" />
+        </f7-block>
+
         <overview-dashboard :layout="layout" :loading="loading" @navigate="onNavigate" />
 
         <f7-toolbar tabbar icons bottom class="main-tabbar">
@@ -77,6 +86,8 @@ import type { Router } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, isiOS } from '@/lib/ui/mobile.ts';
 
+import { useCurrencyQuickSwitchBase } from '@/views/base/overview/CurrencyQuickSwitchBase.ts';
+
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
@@ -121,6 +132,7 @@ const props = defineProps<{
 
 const { tt } = useI18n();
 const { showToast } = useI18nUIComponents();
+const { switchingCurrency, quickSwitchCurrencies, defaultCurrency, showQuickSwitch, switchCurrency } = useCurrencyQuickSwitchBase();
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
@@ -203,6 +215,16 @@ function reload(done?: () => void): void {
     }).catch(error => {
         done?.();
 
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    });
+}
+
+function onSwitchCurrency(currency: string): void {
+    switchCurrency(currency).then(() => {
+        reload();
+    }).catch(error => {
         if (!error.processed) {
             showToast(error.message || error);
         }
@@ -362,6 +384,12 @@ init();
 </script>
 
 <style>
+.currency-quick-switch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
 .home-summary-card {
     background-color: var(--f7-color-yellow);
 }

@@ -29,6 +29,7 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	"overviewAccountFilterInHomePage":             USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
 	"overviewTransactionCategoryFilterInHomePage": USER_APPLICATION_CLOUD_SETTING_TYPE_STRING_BOOLEAN_MAP,
 	"overviewTransactionTagFilterInHomePage":      USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
+	"quickSwitchCurrenciesInHomePage":             USER_APPLICATION_CLOUD_SETTING_TYPE_STRING,
 	// Transaction List Page
 	"itemsCountInTransactionListPage":              USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"showTotalAmountInTransactionListPage":         USER_APPLICATION_CLOUD_SETTING_TYPE_BOOLEAN,

@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"math"
@@ -146,7 +147,7 @@ func (s *TokenService) CreateAPITokenViaCli(c *core.CliContext, user *models.Use
 }
 
 // CreateMCPToken generates a new MCP token and saves to database
-func (s *TokenService) CreateMCPToken(c *core.WebContext, user *models.User, expiresInSeconds int64) (string, *core.UserTokenClaims, error) {
+func (s *TokenService) CreateMCPToken(c *core.WebContext, user *models.User, expiresInSeconds int64, enabledTools *int64) (string, *core.UserTokenClaims, error) {
 	var tokenExpiredTimeDuration time.Duration
 
 	if expiresInSeconds > 0 {
@@ -155,7 +156,21 @@ func (s *TokenService) CreateMCPToken(c *core.WebContext, user *models.User, exp
 		tokenExpiredTimeDuration = time.Unix(tokenMaxExpiredAtUnixTime, 0).Sub(time.Now())
 	}
 
-	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, s.getUserAgent(c), "", tokenExpiredTimeDuration)
+	context := ""
+
+	if enabledTools != nil {
+		tokenContext, err := json.Marshal(&models.MCPTokenContext{
+			EnabledTools: *enabledTools,
+		})
+
+		if err != nil {
+			return "", nil, err
+		}
+
+		context = string(tokenContext)
+	}
+
+	token, claims, _, err := s.createToken(c, user, core.USER_TOKEN_TYPE_MCP, s.getUserAgent(c), context, tokenExpiredTimeDuration)
 	return token, claims, err
 }
 

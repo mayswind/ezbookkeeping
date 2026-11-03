@@ -11,14 +11,14 @@
         "copyright": "Copyright (c) 2016 Gin-Gonic",
         "url": "https://github.com/gin-contrib/cache",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.4.6/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/cache/blob/v1.4.7/LICENSE"
     },
     {
         "name": "GZIP gin's middleware",
         "copyright": "Copyright (c) 2017 Gin-Gonic",
         "url": "https://github.com/gin-contrib/gzip",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.8/LICENSE"
+        "licenseUrl": "https://github.com/gin-contrib/gzip/blob/v1.2.9/LICENSE"
     },
     {
         "name": "xorm",
@@ -46,7 +46,7 @@
         "copyright": "Copyright (c) 2023 urfave/cli maintainers",
         "url": "https://github.com/urfave/cli",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/urfave/cli/blob/v3.13.0/LICENSE"
+        "licenseUrl": "https://github.com/urfave/cli/blob/v3.14.0/LICENSE"
     },
     {
         "name": "INI",
@@ -100,21 +100,21 @@
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/crypto",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.57.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/crypto/+/refs/tags/v0.58.0:LICENSE"
     },
     {
         "name": "Go Networking",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/net",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.59.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/net/+/refs/tags/v0.62.0:LICENSE"
     },
     {
         "name": "Go Text",
         "copyright": "Copyright (c) 2009 The Go Authors. All rights reserved.",
         "url": "https://golang.org/x/text",
         "license": "BSD 3-Clause \"New\" or \"Revised\" License",
-        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.42.0:LICENSE"
+        "licenseUrl": "https://cs.opensource.google/go/x/text/+/refs/tags/v0.43.0:LICENSE"
     },
     {
         "name": "Go OAuth2",
@@ -142,28 +142,28 @@
         "copyright": "Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved. Copyright 2014-2015 Stripe, Inc.",
         "url": "https://github.com/aws/aws-sdk-go-v2",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/aws/aws-sdk-go-v2/blob/v1.47.1/LICENSE.txt"
+        "licenseUrl": "https://github.com/aws/aws-sdk-go-v2/blob/v1.47.5/LICENSE.txt"
     },
     {
         "name": "Smithy Go",
         "copyright": "Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.",
         "url": "https://github.com/aws/smithy-go",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/aws/smithy-go/blob/v1.28.2/LICENSE"
+        "licenseUrl": "https://github.com/aws/smithy-go/blob/v1.28.7/LICENSE"
     },
     {
         "name": "MinIO Go Client SDK",
         "copyright": "MinIO Cloud Storage, (C) 2014-2020 MinIO, Inc.",
         "url": "https://github.com/minio/minio-go",
         "license": "Apache License 2.0",
-        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.3.0/LICENSE"
+        "licenseUrl": "https://github.com/minio/minio-go/blob/v7.4.1/LICENSE"
     },
     {
         "name": "gocron",
         "copyright": "Copyright (c) 2014, 辣椒面",
         "url": "https://github.com/go-co-op/gocron",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.22.0/LICENSE"
+        "licenseUrl": "https://github.com/go-co-op/gocron/blob/v2.23.0/LICENSE"
     },
     {
         "name": "barcode",
@@ -217,35 +217,35 @@
         "copyright": "Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors",
         "url": "https://github.com/vuejs/core",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.43/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/core/blob/v3.5.44/LICENSE"
     },
     {
         "name": "Pinia",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/pinia",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/pinia/blob/v4.0.3/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/pinia/blob/v4.1.0/LICENSE"
     },
     {
         "name": "vue-router",
         "copyright": "Copyright (c) 2019-present Eduardo San Martin Morote",
         "url": "https://github.com/vuejs/router",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuejs/router/blob/v5.3.1/LICENSE"
+        "licenseUrl": "https://github.com/vuejs/router/blob/v5.4.0/LICENSE"
     },
     {
         "name": "vue-i18n",
         "copyright": "Copyright (c) 2016 kazuya kawaguchi",
         "url": "https://github.com/intlify/vue-i18n-next",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.4.12/LICENSE"
+        "licenseUrl": "https://github.com/intlify/vue-i18n-next/blob/v11.4.17/LICENSE"
     },
     {
         "name": "vuetify",
         "copyright": "Copyright (c) 2016-now Vuetify, LLC",
         "url": "https://vuetifyjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v4.2.3/packages/vuetify/LICENSE.md"
+        "licenseUrl": "https://github.com/vuetifyjs/vuetify/blob/v4.3.1/packages/vuetify/LICENSE.md"
     },
     {
         "name": "register-service-worker",
@@ -259,14 +259,14 @@
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.2.0/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.3.0/LICENSE"
     },
     {
         "name": "Framework7-vue",
         "copyright": "Copyright (c) 2014 Vladimir Kharlampidi",
         "url": "https://framework7.io/vue/",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.2.0/LICENSE"
+        "licenseUrl": "https://github.com/framework7io/framework7/blob/v9.3.0/LICENSE"
     },
     {
         "name": "Framework7-icons",
@@ -308,7 +308,7 @@
         "copyright": "Copyright (c) 2016-present GU Yiling & ECOMFE",
         "url": "https://github.com/ecomfe/vue-echarts",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.3.1/LICENSE"
+        "licenseUrl": "https://github.com/ecomfe/vue-echarts/blob/v8.3.2/LICENSE"
     },
     {
         "name": "Monaco Editor",
@@ -329,7 +329,7 @@
         "copyright": "Copyright (c) 2014-present Matt Zabriskie & Collaborators",
         "url": "https://axios-http.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/axios/axios/blob/v1.20.0/LICENSE"
+        "licenseUrl": "https://github.com/axios/axios/blob/v1.21.0/LICENSE"
     },
     {
         "name": "decimal.js",
@@ -350,7 +350,7 @@
         "copyright": "Copyright (c) JS Foundation and other contributors",
         "url": "https://momentjs.com",
         "license": "MIT License",
-        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.6.4/LICENSE"
+        "licenseUrl": "https://github.com/moment/moment-timezone/blob/0.6.6/LICENSE"
     },
     {
         "name": "Leaflet",

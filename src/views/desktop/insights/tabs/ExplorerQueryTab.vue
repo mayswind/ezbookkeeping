@@ -97,7 +97,7 @@
                                 </div>
 
                                 <div v-else-if="element.conditions && element.conditions.length > 0 && !showExpression[element.id]">
-                                    <div :key="conditionIndex" v-for="(conditionWithRelation, conditionIndex) in element.conditions">
+                                    <div :key="conditionIndex" v-for="(conditionWithRelation, conditionIndex) in (element.conditions as TransactionExplorerConditionWithRelation[])">
                                         <div class="d-flex overflow-x-auto align-center gap-2 mb-3"
                                              :style="getConditionStyle(element, conditionIndex)"
                                              v-if="conditionWithRelation.relation !== TransactionExplorerConditionRelation.SubEnd">
@@ -161,7 +161,7 @@
                                                     :disabled="loading || disabled || !!editingQuery"
                                                     :placeholder="tt('None')"
                                                     :items="allAvailableDayOfWeekOptions"
-                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-model="conditionWithRelation.condition.value as number[]"
                                                     v-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeDayOfWeek.value"
                                                 >
                                                     <template #item="{ props, internalItem }">
@@ -183,7 +183,7 @@
                                                     :disabled="loading || disabled || !!editingQuery"
                                                     :placeholder="tt('None')"
                                                     :items="allAvailableDayOfMonthOptions"
-                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-model="conditionWithRelation.condition.value as number[]"
                                                     v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeDayOfMonth.value"
                                                 >
                                                     <template #item="{ props, internalItem }">
@@ -205,7 +205,7 @@
                                                     :disabled="loading || disabled || !!editingQuery"
                                                     :placeholder="tt('None')"
                                                     :items="allAvailableMonthOfYearOptions"
-                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-model="conditionWithRelation.condition.value as number[]"
                                                     v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeMonthOfYear.value"
                                                 >
                                                     <template #item="{ props, internalItem }">
@@ -227,7 +227,7 @@
                                                     :disabled="loading || disabled || !!editingQuery"
                                                     :placeholder="tt('None')"
                                                     :items="allAvailableHourOfDayOptions"
-                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-model="conditionWithRelation.condition.value as number[]"
                                                     v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionTimeHourOfDay.value"
                                                 >
                                                     <template #item="{ props, internalItem }">
@@ -278,7 +278,7 @@
                                                         { type: TransactionType.Income, displayName: tt('Income') },
                                                         { type: TransactionType.Transfer, displayName: tt('Transfer') }
                                                     ]"
-                                                    v-model="conditionWithRelation.condition.value"
+                                                    v-model="conditionWithRelation.condition.value as number[]"
                                                     v-else-if="conditionWithRelation.condition.field === TransactionExplorerConditionField.TransactionType.value"
                                                 >
                                                     <template #item="{ props, internalItem }">
@@ -534,6 +534,7 @@ import {
 } from '@/consts/timezone.ts';
 
 import {
+    type TransactionExplorerConditionWithRelation,
     type TransactionExplorerCondition,
     TransactionExplorerQuery,
     TransactionExplorerGeoLocationCondition

@@ -22,4 +22,5 @@ var (
 	ErrEmailVerifyTokenIsInvalidOrExpired   = NewNormalError(NormalSubcategoryToken, 13, http.StatusBadRequest, "email verify token is invalid or expired")
 	ErrPasswordResetTokenIsInvalidOrExpired = NewNormalError(NormalSubcategoryToken, 14, http.StatusBadRequest, "password reset token is invalid or expired")
 	ErrAPITokenNotEnabled                   = NewNormalError(NormalSubcategoryToken, 15, http.StatusForbidden, "api token is not enabled")
+	ErrMCPToolsEmpty                        = NewNormalError(NormalSubcategoryToken, 16, http.StatusBadRequest, "at least one mcp tool must be enabled")
 )

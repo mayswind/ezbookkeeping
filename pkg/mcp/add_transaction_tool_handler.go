@@ -45,6 +45,11 @@ type mcpAddTransactionToolHandler struct{}
 
 var MCPAddTransactionToolHandler = &mcpAddTransactionToolHandler{}
 
+// ToolType returns the MCP tool type
+func (h *mcpAddTransactionToolHandler) ToolType() core.MCPToolType {
+	return core.MCP_TOOL_TYPE_ADD_TRANSACTION
+}
+
 // Name returns the name of the MCP tool
 func (h *mcpAddTransactionToolHandler) Name() string {
 	return "add_transaction"

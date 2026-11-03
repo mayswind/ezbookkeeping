@@ -56,6 +56,11 @@ type mcpQueryTransactionsToolHandler struct{}
 
 var MCPQueryTransactionsToolHandler = &mcpQueryTransactionsToolHandler{}
 
+// ToolType returns the MCP tool type
+func (h *mcpQueryTransactionsToolHandler) ToolType() core.MCPToolType {
+	return core.MCP_TOOL_TYPE_QUERY_TRANSACTIONS
+}
+
 // Name returns the name of the MCP tool
 func (h *mcpQueryTransactionsToolHandler) Name() string {
 	return "query_transactions"

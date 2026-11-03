@@ -106,6 +106,11 @@ export interface TypeAndDisplayName {
     readonly displayName: string;
 }
 
+export interface NameAndDisplayName {
+    readonly name: string;
+    readonly displayName: string;
+}
+
 export interface LocalizedSwitchOption {
     readonly value: boolean;
     readonly displayName: string;

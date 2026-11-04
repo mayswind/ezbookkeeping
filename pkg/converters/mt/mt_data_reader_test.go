@@ -205,6 +205,24 @@ func TestMT940DataReaderParse_InformationToAccountOwnerMoreThanSixLine(t *testin
 	assert.Equal(t, "Additional Info Line 6", actualData.Statements[0].InformationToAccountOwner[5])
 }
 
+func TestMT940DataReaderParse_InformationToAccountOwnerAfterClosingBalance(t *testing.T) {
+	reader := &mt940DataReader{
+		allLines: []string{
+			":61:250601D123,45NTRFTEST",
+			":86:First Transaction",
+			":62F:C250601CNY1111,11",
+			":86:Statement Information",
+		},
+	}
+	context := core.NewNullContext()
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Statements))
+	assert.Equal(t, []string{"First Transaction"}, actualData.Statements[0].InformationToAccountOwner)
+}
+
 func TestMT940DataReaderParse_DuplicateBlockHeader(t *testing.T) {
 	reader := &mt940DataReader{
 		allLines: []string{

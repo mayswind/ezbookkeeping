@@ -61,6 +61,14 @@ services:
       EBK_MAIL_SMTP_USER: ${EBK_MAIL_SMTP_USER}
       EBK_MAIL_SMTP_PASSWD: ${EBK_MAIL_SMTP_PASSWD}
       EBK_MAIL_FROM_ADDRESS: ${EBK_MAIL_FROM_ADDRESS}
+      # ---- AI 文本识别（DeepSeek 走 OpenAI 兼容接口；DeepSeek 无视觉模型，图片识别不启用）----
+      EBK_AI_TRANSACTION_FROM_AI_TEXT_RECOGNITION: "true"
+      EBK_LLM_TEXT_RECOGNITION_LLM_PROVIDER: openai_compatible
+      EBK_LLM_TEXT_RECOGNITION_OPENAI_COMPATIBLE_BASE_URL: https://api.deepseek.com/v1/
+      EBK_LLM_TEXT_RECOGNITION_OPENAI_COMPATIBLE_API_KEY: ${DEEPSEEK_API_KEY}
+      EBK_LLM_TEXT_RECOGNITION_OPENAI_COMPATIBLE_MODEL_ID: deepseek-chat
+      # ---- MCP 服务（供 AI/LLM 通过 http 访问；allowed_remote_ips 留空=允许所有来源）----
+      EBK_MCP_ENABLE_MCP: "true"
       # ---- 日志：开启文件日志轮转（已挂持久卷，防止无限增长）----
       EBK_LOG_LOG_FILE_ROTATE: "true"
       # ---- 时区：让日志时间显示为本地时间（不影响定时任务按模板时区计算）----

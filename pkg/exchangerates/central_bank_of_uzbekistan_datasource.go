@@ -122,7 +122,7 @@ func (e *CentralBankOfUzbekistanExchangeRate) ToLatestExchangeRate(c core.Contex
 		return nil
 	}
 
-	finalRate := 1000 * unit / rate
+	finalRate := unit / rate
 
 	if math.IsInf(finalRate, 0) {
 		return nil

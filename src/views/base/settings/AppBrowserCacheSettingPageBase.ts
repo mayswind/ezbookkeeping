@@ -6,19 +6,20 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { type NameNumeralValue } from '@/core/base.ts';
-import { type BrowserCacheStatistics } from '@/core/cache.ts';
+import { type BrowserCacheStatistics, FileCacheType } from '@/core/cache.ts';
 
 import {
     loadBrowserCacheStatistics,
     updateMapCacheExpiration,
-    clearApplicationCodeCache,
-    clearMapDataCache,
-    clearCustomIconCache,
-    clearAllBrowserCaches
+    clearFileCaches
 } from '@/lib/cache.ts';
 
 export function useAppBrowserCacheSettingPageBase() {
-    const { tt, formatNumberToLocalizedNumerals } = useI18n();
+    const {
+        tt,
+        formatNumberToLocalizedNumerals,
+        formatVolumeToLocalizedNumerals
+    } = useI18n();
 
     const isSupportedFileCache: boolean = 'serviceWorker' in navigator && !!navigator.serviceWorker.controller;
 
@@ -26,8 +27,11 @@ export function useAppBrowserCacheSettingPageBase() {
     const exchangeRatesStore = useExchangeRatesStore();
 
     const loading = ref<boolean>(true);
+    const clearingCache = ref<boolean>(false);
     const fileCacheStatistics = ref<BrowserCacheStatistics | undefined>(undefined);
     const exchangeRatesCacheSize = ref<number | undefined>(undefined);
+    const selectedFileCacheTypes = ref<FileCacheType[]>([]);
+    const showClearFileCache = ref<boolean>(false);
 
     const allMapCacheExpirationOptions = computed<NameNumeralValue[]>(() => {
         return [
@@ -78,9 +82,19 @@ export function useAppBrowserCacheSettingPageBase() {
                 loading.value = true;
             }
 
+            exchangeRatesCacheSize.value = exchangeRatesStore.getExchangeRatesCacheSize();
+
+            if (!isSupportedFileCache) {
+                if (updateLoadingState) {
+                    loading.value = false;
+                }
+
+                resolve();
+                return;
+            }
+
             loadBrowserCacheStatistics().then(statistics => {
                 fileCacheStatistics.value = statistics;
-                exchangeRatesCacheSize.value = exchangeRatesStore.getExchangeRatesCacheSize();
 
                 if (updateLoadingState) {
                     loading.value = false;
@@ -97,6 +111,65 @@ export function useAppBrowserCacheSettingPageBase() {
         });
     }
 
+    function getDisplayFileCacheSize(cacheType: FileCacheType): string {
+        const statistics = fileCacheStatistics.value;
+
+        if (!statistics) {
+            return formatVolumeToLocalizedNumerals(0, 2);
+        }
+
+        switch (cacheType.key) {
+            case FileCacheType.ApplicationCode.key:
+                return formatVolumeToLocalizedNumerals(statistics.codeCacheSize, 2);
+            case FileCacheType.ResourceFiles.key:
+                return formatVolumeToLocalizedNumerals(statistics.assetsCacheSize, 2);
+            case FileCacheType.MapData.key:
+                return formatVolumeToLocalizedNumerals(statistics.mapCacheSize, 2);
+            case FileCacheType.UserAvatars.key:
+                return formatVolumeToLocalizedNumerals(statistics.userAvatarCacheSize, 2);
+            case FileCacheType.TransactionPictures.key:
+                return formatVolumeToLocalizedNumerals(statistics.transactionPictureCacheSize, 2);
+            case FileCacheType.CustomIcons.key:
+                return formatVolumeToLocalizedNumerals(statistics.customIconCacheSize, 2);
+            default:
+                return formatVolumeToLocalizedNumerals(0, 2);
+        }
+    }
+
+    function openClearFileCache(): void {
+        if (!isSupportedFileCache || loading.value || clearingCache.value || !fileCacheStatistics.value) {
+            return;
+        }
+
+        selectedFileCacheTypes.value = [];
+        showClearFileCache.value = true;
+    }
+
+    function setFileCacheSelected(cacheType: FileCacheType, selected: boolean): void {
+        if (selected) {
+            if (!selectedFileCacheTypes.value.some(item => item.key === cacheType.key)) {
+                selectedFileCacheTypes.value.push(cacheType);
+            }
+        } else {
+            selectedFileCacheTypes.value = selectedFileCacheTypes.value.filter(item => item.key !== cacheType.key);
+        }
+    }
+
+    function clearSelectedFileCaches(): Promise<void> {
+        if (!isSupportedFileCache || loading.value || clearingCache.value || !selectedFileCacheTypes.value.length) {
+            return Promise.resolve();
+        }
+
+        clearingCache.value = true;
+
+        return clearFileCaches(...selectedFileCacheTypes.value).then(() => {
+            showClearFileCache.value = false;
+            return loadCacheStatistics(true);
+        }).finally(() => {
+            clearingCache.value = false;
+        });
+    }
+
     function clearExchangeRatesDataCache(): void {
         exchangeRatesStore.resetLatestExchangeRates();
         exchangeRatesCacheSize.value = exchangeRatesStore.getExchangeRatesCacheSize();
@@ -107,8 +180,11 @@ export function useAppBrowserCacheSettingPageBase() {
         isSupportedFileCache,
         // states
         loading,
+        clearingCache,
         fileCacheStatistics,
         exchangeRatesCacheSize,
+        selectedFileCacheTypes,
+        showClearFileCache,
         // computed states
         allMapCacheExpirationOptions,
         allExchangeRatesDataCacheExpirationOptions,
@@ -116,10 +192,10 @@ export function useAppBrowserCacheSettingPageBase() {
         exchangeRatesDataCacheExpiration,
         // functions
         loadCacheStatistics,
-        clearApplicationCodeCache,
-        clearMapDataCache,
-        clearCustomIconCache,
-        clearAllBrowserCaches,
+        getDisplayFileCacheSize,
+        openClearFileCache,
+        setFileCacheSelected,
+        clearSelectedFileCaches,
         clearExchangeRatesDataCache
     };
 }

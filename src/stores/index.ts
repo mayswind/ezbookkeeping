@@ -30,7 +30,7 @@ import {
     isObject,
     isString
 } from '@/lib/common.ts';
-import { clearCustomIconCache } from '@/lib/cache.ts';
+import { clearTransactionPictureCache, clearAllUserCaches } from '@/lib/cache.ts';
 import {
     hasUserAppLockState,
     getUserAppLockState,
@@ -536,6 +536,10 @@ export const useRootStore = defineStore('root', () => {
                     statisticsStore.updateTransactionStatisticsInvalidState(true);
                 }
 
+                clearTransactionPictureCache().catch(error => {
+                    logger.warn('failed to clear transaction picture cache', error);
+                });
+
                 resolve(data.result);
             }).catch(error => {
                 logger.error('failed to clear user data', error);
@@ -574,6 +578,10 @@ export const useRootStore = defineStore('root', () => {
                 if (!statisticsStore.transactionStatisticsStateInvalid) {
                     statisticsStore.updateTransactionStatisticsInvalidState(true);
                 }
+
+                clearTransactionPictureCache().catch(error => {
+                    logger.warn('failed to clear transaction picture cache', error);
+                });
 
                 resolve(data.result);
             }).catch(error => {
@@ -623,8 +631,11 @@ export const useRootStore = defineStore('root', () => {
                 }
 
                 userCustomIconsStore.resetCustomIcons();
-                clearCustomIconCache();
                 importPresetsStore.resetImportPresets();
+
+                clearAllUserCaches().catch(error => {
+                    logger.warn('failed to clear user caches', error);
+                });
 
                 resolve(data.result);
             }).catch(error => {

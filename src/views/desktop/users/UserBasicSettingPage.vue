@@ -514,7 +514,6 @@ import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 import type { UserProfileResponse } from '@/models/user.ts';
 import { Account } from '@/models/account.ts';
 
-import { generateRandomUUID } from '@/lib/misc.ts';
 import { isUserVerifyEmailEnabled } from '@/lib/server_settings.ts';
 
 import {
@@ -578,9 +577,8 @@ const avatarInput = useTemplateRef<HTMLInputElement>('avatarInput');
 
 const avatarUrl = ref<string>('');
 const avatarProvider = ref<string | undefined>('');
-const avatarNoCacheId = ref<string>('');
 
-const currentUserAvatar = computed<string | null>(() => userStore.getUserAvatarUrl(avatarUrl.value, avatarNoCacheId.value));
+const currentUserAvatar = computed<string | null>(() => userStore.getUserAvatarUrl(avatarUrl.value));
 
 function init(): void {
     loading.value = true;
@@ -656,7 +654,6 @@ function updateAvatar(event: Event): void {
         if (response) {
             avatarUrl.value = response.avatar;
             avatarProvider.value = response.avatarProvider;
-            avatarNoCacheId.value = generateRandomUUID();
             setCurrentUserProfile(response);
         }
 

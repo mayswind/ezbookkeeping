@@ -206,7 +206,6 @@ import {
 
 import {
     isDefined,
-    isBoolean,
     objectFieldWithValueToArrayItem
 } from './common.ts';
 import {
@@ -223,7 +222,6 @@ import {
     getBrowserTimezoneName,
     getCurrentUnixTime
 } from './datetime.ts';
-import { generateRandomUUID } from './misc.ts';
 import { getBasePath } from './web.ts';
 import logger from './logger.ts';
 
@@ -1028,57 +1026,7 @@ export default {
     generateAmapApiInternalProxyUrl: (): string => {
         return `${window.location.origin}${getBasePath()}${BASE_AMAP_API_PROXY_URL_PATH}`;
     },
-    getInternalAvatarUrl(avatarUrl: string, disableBrowserCache?: boolean | string): string {
-        if (!avatarUrl) {
-            return avatarUrl;
-        }
-
-        const params: string[] = [];
-
-        if (disableBrowserCache) {
-            if (isBoolean(disableBrowserCache)) {
-                params.push('_nocache=' + generateRandomUUID());
-            } else {
-                params.push('_nocache=' + disableBrowserCache);
-            }
-        }
-
-        if (!params.length) {
-            return avatarUrl;
-        }
-
-        if (avatarUrl.indexOf('?') >= 0) {
-            return avatarUrl + '&' + params.join('&');
-        } else {
-            return avatarUrl + '?' + params.join('&');
-        }
-    },
     getUserCustomIconUrlWithToken(iconId: string | number): string {
         return `${getBasePath()}/icons/${iconId}.png?token=${getCurrentToken()}`;
-    },
-    getTransactionPictureUrl(pictureUrl: string, disableBrowserCache?: boolean | string): string {
-        if (!pictureUrl) {
-            return pictureUrl;
-        }
-
-        const params: string[] = [];
-
-        if (disableBrowserCache) {
-            if (isBoolean(disableBrowserCache)) {
-                params.push('_nocache=' + generateRandomUUID());
-            } else {
-                params.push('_nocache=' + disableBrowserCache);
-            }
-        }
-
-        if (!params.length) {
-            return pictureUrl;
-        }
-
-        if (pictureUrl.indexOf('?') >= 0) {
-            return pictureUrl + '&' + params.join('&');
-        } else {
-            return pictureUrl + '?' + params.join('&');
-        }
     }
 };

@@ -172,8 +172,8 @@ interface MapCacheConfig {
     expirationPlugin: DynamicExpirationPlugin;
 }
 
-interface CustomIconCacheConfig {
-    customIconRequestStripTokenPlugin: AuthenticatedImageRequestStripTokenPlugin;
+interface AuthenticatedImageCacheConfig {
+    imageRequestStripTokenPlugin: AuthenticatedImageRequestStripTokenPlugin;
 }
 
 declare const self: ServiceWorkerGlobalScope;
@@ -181,6 +181,8 @@ declare const self: ServiceWorkerGlobalScope;
 const SW_ASSETS_CACHE_NAME: string = 'ezbookkeeping-assets-cache';
 const SW_CODE_CACHE_NAME: string = 'ezbookkeeping-code-cache';
 const SW_MAP_CACHE_NAME: string = 'ezbookkeeping-map-cache';
+const SW_USER_AVATAR_CACHE_NAME: string = 'ezbookkeeping-user-avatar-cache';
+const SW_TRANSACTION_PICTURE_CACHE_NAME: string = 'ezbookkeeping-transaction-picture-cache';
 const SW_CUSTOM_ICON_CACHE_NAME: string = 'ezbookkeeping-custom-icon-cache';
 const SW_SHARE_CACHE_NAME: string = 'ezbookkeeping-share-cache';
 const SW_SHARE_IMAGE_URL_PATHNAME: string = '__share__image__';
@@ -199,8 +201,16 @@ const mapCacheConfig: MapCacheConfig = {
     expirationPlugin: new DynamicExpirationPlugin(DEFAULT_MAP_CACHE_MAX_ENTRIES, DEFAULT_MAP_CACHE_MAX_AGE_MILLISECONDS)
 };
 
-const customIconCacheConfig: CustomIconCacheConfig = {
-    customIconRequestStripTokenPlugin: new AuthenticatedImageRequestStripTokenPlugin()
+const userAvatarCacheConfig: AuthenticatedImageCacheConfig = {
+    imageRequestStripTokenPlugin: new AuthenticatedImageRequestStripTokenPlugin()
+};
+
+const transactionPictureCacheConfig: AuthenticatedImageCacheConfig = {
+    imageRequestStripTokenPlugin: new AuthenticatedImageRequestStripTokenPlugin()
+};
+
+const customIconCacheConfig: AuthenticatedImageCacheConfig = {
+    imageRequestStripTokenPlugin: new AuthenticatedImageRequestStripTokenPlugin()
 };
 
 self.skipWaiting();
@@ -288,11 +298,31 @@ registerRoute(
 );
 
 registerRoute(
+    /.*\/avatar\/\d+\.[a-zA-Z0-9]+/,
+    new StaleWhileRevalidate({
+        cacheName: SW_USER_AVATAR_CACHE_NAME,
+        plugins: [
+            userAvatarCacheConfig.imageRequestStripTokenPlugin
+        ]
+    })
+);
+
+registerRoute(
+    /.*\/pictures\/\d+\.[a-zA-Z0-9]+/,
+    new CacheFirst({
+        cacheName: SW_TRANSACTION_PICTURE_CACHE_NAME,
+        plugins: [
+            transactionPictureCacheConfig.imageRequestStripTokenPlugin
+        ]
+    })
+);
+
+registerRoute(
     /.*\/icons\/\d+\.png/,
     new CacheFirst({
         cacheName: SW_CUSTOM_ICON_CACHE_NAME,
         plugins: [
-            customIconCacheConfig.customIconRequestStripTokenPlugin
+            customIconCacheConfig.imageRequestStripTokenPlugin
         ]
     })
 );

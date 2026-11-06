@@ -44,10 +44,22 @@
                                 color: 'warning'
                             },
                             {
+                                title: 'User Avatars',
+                                count: fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.userAvatarCacheSize, 2) : '-',
+                                icon: mdiAccountCircleOutline,
+                                color: 'primary'
+                            },
+                            {
+                                title: 'Transaction Pictures',
+                                count: fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.transactionPictureCacheSize, 2) : '-',
+                                icon: mdiImage,
+                                color: 'error-darken-1'
+                            },
+                            {
                                 title: 'Custom Icons',
                                 count: fileCacheStatistics ? formatVolumeToLocalizedNumerals(fileCacheStatistics.customIconCacheSize, 2) : '-',
                                 icon: mdiShapePlusOutline,
-                                color: 'error-darken-1'
+                                color: 'purple'
                             }
                         ]">
                             <div class="d-flex align-center">
@@ -69,20 +81,8 @@
 
                 <v-card-text>
                     <v-btn color="secondary" variant="tonal"
-                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearApplicationCodeFileCache()">
-                        {{ tt('Clear Application Code Cache') }}
-                    </v-btn>
-                    <v-btn class="ms-2" color="secondary" variant="tonal"
-                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearMapCache()">
-                        {{ tt('Clear Map Data Cache') }}
-                    </v-btn>
-                    <v-btn class="ms-2" color="secondary" variant="tonal"
-                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearCustomIconsCache()">
-                        {{ tt('Clear Custom Icon Cache') }}
-                    </v-btn>
-                    <v-btn class="ms-2" color="secondary" variant="tonal"
-                           :disabled="loading || !isSupportedFileCache || !fileCacheStatistics" @click="clearAllFileCache()">
-                        {{ tt('Clear All File Cache') }}
+                           :disabled="!isSupportedFileCache || loading || clearingCache || !fileCacheStatistics" @click="openClearFileCache">
+                        {{ tt('Clear File Cache') }}
                     </v-btn>
                 </v-card-text>
             </v-card>
@@ -147,11 +147,47 @@
         </v-col>
     </v-row>
 
+    <v-dialog width="600" :persistent="clearingCache" v-model="showClearFileCache">
+        <one-column-dialog-layout content-class="pa-0"
+                                  :title="tt('Clear File Cache')" :cancel-button-title="tt('Cancel')"
+                                  :disabled="clearingCache" @cancel="showClearFileCache = false">
+            <template #toolbar>
+                <v-btn class="mx-2" density="comfortable" variant="outlined"
+                       :disabled="loading || clearingCache || !selectedFileCacheTypes.length" @click="clearFileCache">
+                    {{ tt('Clear') }}
+                    <v-progress-circular indeterminate size="22" class="ms-2" v-if="clearingCache"></v-progress-circular>
+                </v-btn>
+            </template>
+
+            <template #content>
+                <v-list class="mx-3 d-flex flex-column gap-1" density="comfortable" select-strategy="classic"
+                        :disabled="loading || clearingCache" v-model:selected="selectedFileCacheTypes">
+                    <v-list-item class="py-0" density="compact"
+                                 :key="item.key" :value="item" :title="tt(item.name)"
+                                 v-for="item in FileCacheType.values()">
+                        <template #prepend="{ isActive }">
+                            <v-list-item-action start>
+                                <v-checkbox-btn :model-value="isActive"
+                                                @update:model-value="setFileCacheSelected(item, !!$event)"></v-checkbox-btn>
+                            </v-list-item-action>
+                        </template>
+
+                        <template #append>
+                            <span class="text-body-medium">{{ getDisplayFileCacheSize(item) }}</span>
+                        </template>
+                    </v-list-item>
+                </v-list>
+            </template>
+        </one-column-dialog-layout>
+    </v-dialog>
+
     <confirm-dialog ref="confirmDialog"/>
+    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
+import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { useTemplateRef } from 'vue';
 
@@ -159,18 +195,24 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useAppBrowserCacheSettingPageBase } from '@/views/base/settings/AppBrowserCacheSettingPageBase.ts';
 
+import { FileCacheType } from '@/core/cache.ts';
+
 import { isMapProviderUseExternalSDK } from '@/lib/map/index.ts';
 import { getMapProvider, isMapDataFetchProxyEnabled } from '@/lib/server_settings.ts';
+import logger from '@/lib/logger.ts';
 
 import {
     mdiRefresh,
     mdiFileCodeOutline,
     mdiFileImageOutline,
     mdiFileImageMarkerOutline,
+    mdiAccountCircleOutline,
+    mdiImage,
     mdiShapePlusOutline
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
+type SnackBarType = InstanceType<typeof SnackBar>;
 
 const {
     tt,
@@ -180,51 +222,32 @@ const {
 const {
     isSupportedFileCache,
     loading,
+    clearingCache,
     fileCacheStatistics,
     exchangeRatesCacheSize,
+    selectedFileCacheTypes,
+    showClearFileCache,
     allMapCacheExpirationOptions,
     allExchangeRatesDataCacheExpirationOptions,
     mapCacheExpiration,
     exchangeRatesDataCacheExpiration,
     loadCacheStatistics,
-    clearApplicationCodeCache,
-    clearMapDataCache,
-    clearCustomIconCache,
-    clearAllBrowserCaches,
+    getDisplayFileCacheSize,
+    openClearFileCache,
+    setFileCacheSelected,
+    clearSelectedFileCaches,
     clearExchangeRatesDataCache
 } = useAppBrowserCacheSettingPageBase();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
+const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
-function clearApplicationCodeFileCache(): void {
-    confirmDialog.value?.open('Are you sure you want to clear application code cache?').then(() => {
-        clearApplicationCodeCache().then(() => {
-            loadCacheStatistics(true);
-        });
-    });
-}
-
-function clearMapCache(): void {
-    confirmDialog.value?.open('Are you sure you want to clear map data cache?').then(() => {
-        clearMapDataCache().then(() => {
-            loadCacheStatistics(true);
-        });
-    });
-}
-
-function clearCustomIconsCache(): void {
-    confirmDialog.value?.open('Are you sure you want to clear custom icon cache?').then(() => {
-        clearCustomIconCache().then(() => {
-            loadCacheStatistics(true);
-        });
-    });
-}
-
-function clearAllFileCache(): void {
-    confirmDialog.value?.open('Are you sure you want to clear all file cache?').then(() => {
-        clearAllBrowserCaches().then(() => {
-            location.reload();
-        });
+function clearFileCache(): void {
+    clearSelectedFileCaches().then(() => {
+        snackbar.value?.showMessage('Cache has been cleared');
+    }).catch(error => {
+        logger.error('failed to clear browser cache', error);
+        snackbar.value?.showMessage('Unable to clear cache');
     });
 }
 

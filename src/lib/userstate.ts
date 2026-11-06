@@ -8,6 +8,7 @@ import type { TransactionDraft } from '@/models/transaction.ts';
 
 import { isString, isObject } from './common.ts';
 import { isEnableApplicationLock } from './settings.ts';
+import { clearAllUserCaches } from './cache.ts';
 import logger from './logger.ts';
 
 const appLockSecretBaseStringPrefix: string = 'EBK_LOCK_SECRET_';
@@ -262,7 +263,19 @@ export function getCurrentUserInfo(): UserBasicInfo | null {
 
 export function updateCurrentUserInfo(user: UserBasicInfo): void {
     if (isObject(user)) {
-        localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(user));
+        // trim token in the user avatar url
+        const storedUser = { ...user };
+
+        if (storedUser.avatar && isString(storedUser.avatar)) {
+            const avatarUrl = new URL(storedUser.avatar);
+
+            if (avatarUrl.searchParams.has('token')) {
+                avatarUrl.searchParams.delete('token');
+                storedUser.avatar = avatarUrl.toString();
+            }
+        }
+
+        localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(storedUser));
     }
 }
 
@@ -321,6 +334,10 @@ export function clearCurrentSessionToken(): void {
 }
 
 export function clearCurrentTokenAndUserInfo(clearAppLockState: boolean): void {
+    clearAllUserCaches().catch(error => {
+        logger.warn('failed to clear user caches', error);
+    });
+
     if (clearAppLockState) {
         sessionStorage.removeItem(appLockStateSessionStorageKey);
     }

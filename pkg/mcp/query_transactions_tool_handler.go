@@ -27,7 +27,7 @@ type MCPQueryTransactionsRequest struct {
 	MatchMode             string `json:"match_mode,omitempty" jsonschema:"enum=default,enum=ignore_case" jsonschema_description:"Match mode for keyword search (optional, leave empty for database default setting, ignore_case for case-insensitive search)"`
 	Count                 int32  `json:"count,omitempty" jsonschema:"default=100" jsonschema_description:"Maximum number of results to return (default: 100)"`
 	Page                  int32  `json:"page,omitempty" jsonschema:"default=1" jsonschema_description:"Page number for pagination (default: 1)"`
-	ResponseFields        string `json:"response_fields,omitempty" jsonschema_description:"Comma-separated list of optional fields to include in the response (optional, leave empty for all fields, available fields: time, currency, category_name, account_name, comment)"`
+	ResponseFields        string `json:"response_fields,omitempty" jsonschema_description:"Comma-separated list of optional fields to include in the response (optional, leave empty for all fields except id, available fields: id, time, currency, category_name, account_name, comment)"`
 }
 
 // MCPQueryTransactionsResponse represents the response structure for querying transactions
@@ -40,6 +40,7 @@ type MCPQueryTransactionsResponse struct {
 
 // MCPTransactionInfo defines the structure of transaction information
 type MCPTransactionInfo struct {
+	Id                     string `json:"id,omitempty" jsonschema_description:"Transaction ID"`
 	Time                   string `json:"time,omitempty" jsonschema_description:"Time of the transaction in RFC 3339 format (e.g. 2023-01-01T12:00:00Z)"`
 	Type                   string `json:"type" jsonschema:"enum=income,enum=expense,enum=transfer,enum=balance_modification" jsonschema_description:"Transaction type (income, expense, transfer, balance_modification)"`
 	Amount                 string `json:"amount" jsonschema_description:"Amount of the transaction in the specified currency"`
@@ -208,6 +209,10 @@ func (h *mcpQueryTransactionsToolHandler) createNewMCPQueryTransactionsResponse(
 		transaction := transactions[i]
 		transactionInfo := MCPTransactionInfo{
 			Amount: utils.FormatAmount(transaction.Amount),
+		}
+
+		if _, exists := filteredFields["id"]; exists {
+			transactionInfo.Id = utils.Int64ToString(transaction.TransactionId)
 		}
 
 		if transaction.Type == models.TRANSACTION_DB_TYPE_EXPENSE {

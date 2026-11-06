@@ -2904,6 +2904,7 @@
     "Query All Transaction Tags": "सभी लेन-देन टैग पूछें",
     "Query Latest Exchange Rates": "नवीनतम विनिमय दरें पूछें",
     "Query Transactions": "लेन-देन पूछें",
+    "Delete Transaction": "Delete Transaction",
     "Your token does not expire, please keep it secure.": "आपका टोकन कभी समाप्त नहीं होता, कृपया इसे सुरक्षित रखें।",
     "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "थर्ड-पार्टी ऐप से जोड़ते समय ध्यान रखें कि वे और उनके द्वारा उपयोग किए जाने वाले कोई भी बड़े भाषा मॉडल आपके निजी डेटा तक पहुँच सकते हैं।",
     "Unable to generate token": "टोकन जनरेट नहीं हो सका",

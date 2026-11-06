@@ -28,6 +28,10 @@ export const ALL_MCP_TOOLS: NameAndDisplayName[] = [
     {
         name: 'add_transaction',
         displayName:'Add Transaction'
+    },
+    {
+        name: 'delete_transaction',
+        displayName:'Delete Transaction'
     }
 ];
 

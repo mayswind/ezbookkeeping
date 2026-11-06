@@ -2904,6 +2904,7 @@
     "Query All Transaction Tags": "Query All Transaction Tags",
     "Query Latest Exchange Rates": "Query Latest Exchange Rates",
     "Query Transactions": "Query Transactions",
+    "Delete Transaction": "Delete Transaction",
     "Your token does not expire, please keep it secure.": "Το token σας δεν λήγει, φυλάξτε το με ασφάλεια.",
     "When connecting to third-party apps, be aware that they and any large language models they use can access your private data.": "Όταν συνδέεστε με εφαρμογές τρίτων, έχετε υπόψη ότι αυτές και τα μεγάλα γλωσσικά μοντέλα που ενδεχομένως χρησιμοποιούν αποκτούν πρόσβαση στα προσωπικά σας δεδομένα.",
     "Unable to generate token": "Δεν είναι δυνατή η δημιουργία token",

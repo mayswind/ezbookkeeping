@@ -50,11 +50,11 @@ func TestCentralBankOfUzbekistanDataSource_StandardDataExtractExchangeRates(t *t
 	assert.Equal(t, nil, err)
 	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "USD",
-		Rate:     "0.07812420655102723",
+		Rate:     "0.00007812420655102722",
 	})
 	assert.Contains(t, actualLatestExchangeRateResponse.ExchangeRates, &models.LatestExchangeRate{
 		Currency: "VND",
-		Rate:     "1984.126984126984",
+		Rate:     "1.9841269841269842",
 	})
 }
 

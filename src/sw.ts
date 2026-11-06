@@ -158,7 +158,8 @@ class AuthenticatedImageRequestStripTokenPlugin implements WorkboxPlugin {
 
         if (url.searchParams.has('token')) {
             url.searchParams.delete('token');
-            return new Request(url.href, param.request);
+            const request: Request = param.request.mode === 'navigate' ? new Request(param.request, { mode: 'same-origin' }) : param.request;
+            return new Request(url.href, request);
         }
 
         return param.request;

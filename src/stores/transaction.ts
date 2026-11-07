@@ -1832,6 +1832,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
             }).catch(error => {
                 logger.error('failed to remove transaction picture', error);
 
+                deleteTransactionPictureCacheEntries(pictureInfo.originalUrl).catch(error => {
+                    logger.warn('failed to delete transaction picture cache entry', error);
+                });
+
                 if (error.response && error.response.data && error.response.data.errorMessage) {
                     reject({ error: error.response.data });
                 } else if (!error.processed) {

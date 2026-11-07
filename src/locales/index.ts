@@ -13,6 +13,7 @@ import pl from './pl.json';
 import ptBR from './pt_BR.json';
 import ro from './ro.json';
 import ru from './ru.json';
+import sk from './sk.json';
 import sl from './sl.json';
 import ta from './ta.json';
 import th from './th.json';
@@ -145,6 +146,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'ru-RU',
         textDirection: 'ltr',
         content: ru
+    },
+    'sk': {
+        name: 'Slovak',
+        displayName: 'Slovenčina',
+        alternativeLanguageTag: 'sk-SK',
+        textDirection: 'ltr',
+        content: sk
     },
     'sl': {
         name: 'Slovenian',

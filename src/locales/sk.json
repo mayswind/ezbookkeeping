@@ -53,9 +53,9 @@
             "DayMonthYear": "D. MMMM YYYY"
         },
         "shortDate": {
-            "YearMonthDay": "YYYY-MM-DD",
-            "MonthDayYear": "MM/DD/YYYY",
-            "DayMonthYear": "DD.MM.YYYY"
+            "YearMonthDay": "YYYY-M-D",
+            "MonthDayYear": "M/D/YYYY",
+            "DayMonthYear": "D.M.YYYY"
         },
         "longYear": {
             "YearMonthDay": "YYYY",

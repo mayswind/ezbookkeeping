@@ -362,6 +362,7 @@ func startWebServer(c *core.CliContext) error {
 			if config.EnableOAuth2Login {
 				apiV1Route.GET("/users/external_auth/list.json", bindApi(api.UserExternalAuths.ExternalAuthListHandler, config))
 				apiV1Route.POST("/users/external_auth/unlink.json", bindApi(api.UserExternalAuths.UnlinkExternalAuthHandler, config))
+				apiV1Route.POST("/users/external_auth/oauth2/link.json", bindApi(api.OAuth2Authentications.LinkHandler, config))
 			}
 
 			// Application Cloud Settings

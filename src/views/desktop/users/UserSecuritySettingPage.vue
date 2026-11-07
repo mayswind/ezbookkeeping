@@ -111,8 +111,7 @@
                         <td class=" text-right">
                             <v-btn density="comfortable" variant="tonal"
                                    :disabled="loggingInByOAuth2"
-                                   :href="oauth2LinkUrl"
-                                   @click="loggingInByOAuth2 = true"
+                                   @click="linkExternalAuth"
                                    v-if="!thirdPartyLogin.linked && isOAuth2Enabled() && getOAuth2Provider() === thirdPartyLogin.externalAuthType">
                                 {{ tt('Link') }}
                                 <v-progress-circular indeterminate size="22" class="ms-2" v-if="loggingInByOAuth2"></v-progress-circular>
@@ -339,8 +338,6 @@ const loadingSession = ref<boolean>(true);
 const loggingInByOAuth2 = ref<boolean>(false);
 const oauth2ClientSessionId = ref<string>(generateRandomUUID());
 
-const oauth2LinkUrl = computed<string>(() => rootStore.generateOAuth2LinkUrl('desktop', oauth2ClientSessionId.value));
-
 const thirdPartyLoginList = computed<DesktopPageLinkedThirdPartyLogin[]>(() => {
     const ret: DesktopPageLinkedThirdPartyLogin[] = [];
 
@@ -451,6 +448,30 @@ function reloadExternalAuth(silent?: boolean): void {
             externalAuths.value = [];
         } else if (!error.processed) {
             externalAuths.value = [];
+            snackbar.value?.showError(error);
+        }
+    });
+}
+
+function linkExternalAuth(): void {
+    if (!isOAuth2Enabled() || loggingInByOAuth2.value) {
+        return;
+    }
+
+    loggingInByOAuth2.value = true;
+
+    userExternalAuthStore.linkExternalOAuth2({
+        platform: 'desktop',
+        clientSessionId: oauth2ClientSessionId.value
+    }).then(url => {
+        window.location.href = url;
+        oauth2ClientSessionId.value = generateRandomUUID();
+        loggingInByOAuth2.value = false;
+    }).catch(error => {
+        oauth2ClientSessionId.value = generateRandomUUID();
+        loggingInByOAuth2.value = false;
+
+        if (!error.processed) {
             snackbar.value?.showError(error);
         }
     });

@@ -173,7 +173,8 @@ import type {
 } from '@/models/user.ts';
 import type {
     UserExternalAuthUnlinkRequest,
-    UserExternalAuthInfoResponse
+    UserExternalAuthInfoResponse,
+    OAuth2LinkRequest
 } from '@/models/user_external_auth.ts';
 import type {
     OAuth2CallbackLoginRequest
@@ -403,6 +404,9 @@ export default {
     },
     unlinkExternalAuth: (req: UserExternalAuthUnlinkRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/users/external_auth/unlink.json', req);
+    },
+    linkExternalOAuth2: (req: OAuth2LinkRequest): ApiResponsePromise<string> => {
+        return axios.post<ApiResponse<string>>('v1/users/external_auth/oauth2/link.json', req);
     },
     getTokens: (): ApiResponsePromise<TokenInfoResponse[]> => {
         return axios.get<ApiResponse<TokenInfoResponse[]>>('v1/tokens/list.json');
@@ -975,9 +979,6 @@ export default {
     },
     generateOAuth2LoginUrl: (platform: 'mobile' | 'desktop', clientSessionId: string): string => {
         return `${getBasePath()}/oauth2/login?platform=${platform}&client_session_id=${clientSessionId}`;
-    },
-    generateOAuth2LinkUrl: (platform: 'mobile' | 'desktop', clientSessionId: string): string => {
-        return `${getBasePath()}/oauth2/login?platform=${platform}&client_session_id=${clientSessionId}&token=${getCurrentToken()}`;
     },
     generateQrCodeUrl: (qrCodeName: string): string => {
         return `${getBasePath()}${BASE_QRCODE_PATH}/${qrCodeName}.png`;

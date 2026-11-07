@@ -64,8 +64,8 @@ func (a *UserExternalAuthsApi) ExternalAuthListHandler(c *core.WebContext) (any,
 
 // UnlinkExternalAuthHandler unlinks external authentication for current user
 func (a *UserExternalAuthsApi) UnlinkExternalAuthHandler(c *core.WebContext) (any, *errs.Error) {
-	var externalAuthLinkReq models.UserExternalAuthUnlinkRequest
-	err := c.ShouldBindJSON(&externalAuthLinkReq)
+	var externalAuthUnlinkReq models.UserExternalAuthUnlinkRequest
+	err := c.ShouldBindJSON(&externalAuthUnlinkReq)
 
 	if err != nil {
 		log.Warnf(c, "[user_external_auths.UnlinkExternalAuthHandler] parse request failed, because %s", err.Error())
@@ -93,7 +93,7 @@ func (a *UserExternalAuthsApi) UnlinkExternalAuthHandler(c *core.WebContext) (an
 		return nil, errs.ErrUserNotFound
 	}
 
-	if !a.users.IsPasswordEqualsUserPassword(externalAuthLinkReq.Password, user) {
+	if !a.users.IsPasswordEqualsUserPassword(externalAuthUnlinkReq.Password, user) {
 		return nil, errs.ErrUserPasswordWrong
 	}
 
@@ -101,7 +101,7 @@ func (a *UserExternalAuthsApi) UnlinkExternalAuthHandler(c *core.WebContext) (an
 		return nil, errs.ErrNotPermittedToPerformThisAction
 	}
 
-	externalAuthType := core.UserExternalAuthType(externalAuthLinkReq.ExternalAuthType)
+	externalAuthType := core.UserExternalAuthType(externalAuthUnlinkReq.ExternalAuthType)
 
 	if !externalAuthType.IsValid() {
 		return nil, errs.ErrUserExternalAuthNotFound
@@ -110,7 +110,7 @@ func (a *UserExternalAuthsApi) UnlinkExternalAuthHandler(c *core.WebContext) (an
 	err = a.userExternalAuths.DeleteUserExternalAuth(c, uid, externalAuthType)
 
 	if err != nil {
-		log.Errorf(c, "[user_external_auths.UnlinkExternalAuthHandler] failed to unlink external authentication \"%s\" for user \"uid:%d\", because %s", externalAuthLinkReq.ExternalAuthType, uid, err.Error())
+		log.Errorf(c, "[user_external_auths.UnlinkExternalAuthHandler] failed to unlink external authentication \"%s\" for user \"uid:%d\", because %s", externalAuthUnlinkReq.ExternalAuthType, uid, err.Error())
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 

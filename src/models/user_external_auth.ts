@@ -10,3 +10,8 @@ export interface UserExternalAuthInfoResponse {
     readonly externalUsername?: string;
     readonly createdAt?: number;
 }
+
+export interface OAuth2LinkRequest {
+    readonly platform: string;
+    readonly clientSessionId: string;
+}

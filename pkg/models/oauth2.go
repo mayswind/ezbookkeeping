@@ -4,7 +4,12 @@ package models
 type OAuth2LoginRequest struct {
 	Platform        string `form:"platform" binding:"required"`
 	ClientSessionId string `form:"client_session_id" binding:"required"`
-	Token           string `form:"token"`
+}
+
+// OAuth2LinkRequest represents all parameters of OAuth 2.0 link request
+type OAuth2LinkRequest struct {
+	Platform        string `json:"platform" binding:"required"`
+	ClientSessionId string `json:"clientSessionId" binding:"required"`
 }
 
 // OAuth2CallbackRequest represents all parameters of OAuth 2.0 callback request

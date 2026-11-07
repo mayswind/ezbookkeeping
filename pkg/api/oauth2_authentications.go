@@ -62,65 +62,57 @@ func (a *OAuth2AuthenticationApi) LoginHandler(c *core.WebContext) (string, *err
 		return a.redirectToFailedCallbackPage(c, errs.NewIncompleteOrIncorrectSubmissionError(err))
 	}
 
-	if oauth2LoginReq.Platform != "mobile" && oauth2LoginReq.Platform != "desktop" {
-		return a.redirectToFailedCallbackPage(c, errs.ErrInvalidOAuth2LoginRequest)
-	}
-
-	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId)
-
-	if found {
-		log.Errorf(c, "[oauth2_authentications.LoginHandler] another oauth 2.0 state \"%s\" has been processing for client session id \"%s\"", remark, oauth2LoginReq.ClientSessionId)
-		return a.redirectToFailedCallbackPage(c, errs.ErrRepeatedRequest)
-	}
-
-	uid := int64(0)
-
-	if oauth2LoginReq.Token != "" {
-		claims, _, err := a.tokens.ParseToken(c, oauth2LoginReq.Token)
-
-		if err != nil {
-			log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to parse token, because %s", err.Error())
-			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidToken)
-		}
-
-		if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
-			log.Errorf(c, "[oauth2_authentications.LoginHandler] token type \"%d\" is not allowed to login via oauth 2.0", claims.Type)
-			return a.redirectToFailedCallbackPage(c, errs.ErrInvalidToken)
-		}
-
-		uid = claims.Uid
-		user, err := a.users.GetUserById(c, uid)
-
-		if err != nil && !errors.Is(err, errs.ErrUserNotFound) {
-			log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to get user by id %d, because %s", uid, err.Error())
-			return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
-		}
-
-		if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_OAUTH2_LOGIN) {
-			return a.redirectToFailedCallbackPage(c, errs.ErrNotPermittedToPerformThisAction)
-		}
-	}
-
-	verifier, err := utils.GetRandomNumberOrLowercaseLetter(64)
+	redirectUrl, err := a.generateExternalAuthUrl(c, oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, 0)
 
 	if err != nil {
-		log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to generate random string for oauth 2.0 state, because %s", err.Error())
-		return a.redirectToFailedCallbackPage(c, errs.ErrSystemError)
+		return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrOperationFailed))
 	}
-
-	remark = fmt.Sprintf("%s|%s|%d|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, uid, verifier)
-	state := fmt.Sprintf("%s|%s|%s", oauth2LoginReq.Platform, oauth2LoginReq.ClientSessionId, utils.MD5EncodeToString([]byte(remark)))
-
-	redirectUrl, err := oauth2.GetOAuth2AuthUrl(c, state, verifier)
-
-	if err != nil {
-		log.Errorf(c, "[oauth2_authentications.LoginHandler] failed to get oauth 2.0 auth url, because %s", err.Error())
-		return a.redirectToFailedCallbackPage(c, errs.Or(err, errs.ErrSystemError))
-	}
-
-	a.SetSubmissionRemarkWithCustomExpiration(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, oauth2LoginReq.ClientSessionId, remark, a.CurrentConfig().OAuth2StateExpiredTimeDuration)
 
 	return redirectUrl, nil
+}
+
+// LinkHandler links external oauth 2.0 authentication for current user
+func (a *OAuth2AuthenticationApi) LinkHandler(c *core.WebContext) (any, *errs.Error) {
+	var oauth2LinkReq models.OAuth2LinkRequest
+	err := c.ShouldBindJSON(&oauth2LinkReq)
+
+	if err != nil {
+		log.Warnf(c, "[oauth2_authentications.LinkHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	claims := c.GetTokenClaims()
+
+	if claims == nil {
+		log.Warnf(c, "[oauth2_authentications.LinkHandler] current token is null")
+		return nil, errs.ErrInvalidToken
+	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		log.Warnf(c, "[oauth2_authentications.LinkHandler] token type \"%d\" is not allowed to link external authentication", claims.Type)
+		return nil, errs.ErrInvalidToken
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Warnf(c, "[oauth2_authentications.LinkHandler] failed to get user for user \"uid:%d\", because %s", uid, err.Error())
+		}
+
+		return nil, errs.Or(err, errs.ErrUserNotFound)
+	}
+
+	if user.FeatureRestriction.Contains(core.USER_FEATURE_RESTRICTION_TYPE_OAUTH2_LOGIN) {
+		return nil, errs.ErrNotPermittedToPerformThisAction
+	}
+
+	externalAuthUrl, err := a.generateExternalAuthUrl(c, oauth2LinkReq.Platform, oauth2LinkReq.ClientSessionId, uid)
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	return externalAuthUrl, nil
 }
 
 // CallbackHandler handles OAuth 2.0 callback request
@@ -409,6 +401,40 @@ func (a *OAuth2AuthenticationApi) CallbackHandler(c *core.WebContext) (string, *
 
 		return a.redirectToSuccessCallbackPage(c, platform, userExternalAuthType, token)
 	}
+}
+
+func (a *OAuth2AuthenticationApi) generateExternalAuthUrl(c *core.WebContext, platform string, clientSessionId string, uid int64) (string, error) {
+	if platform != "mobile" && platform != "desktop" {
+		return "", errs.ErrInvalidOAuth2LoginRequest
+	}
+
+	found, remark := a.GetSubmissionRemark(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, clientSessionId)
+
+	if found {
+		log.Errorf(c, "[oauth2_authentications.generateExternalAuthUrl] another oauth 2.0 state \"%s\" has been processing for client session id \"%s\"", remark, clientSessionId)
+		return "", errs.ErrRepeatedRequest
+	}
+
+	verifier, err := utils.GetRandomNumberOrLowercaseLetter(64)
+
+	if err != nil {
+		log.Errorf(c, "[oauth2_authentications.generateExternalAuthUrl] failed to generate random string for oauth 2.0 state, because %s", err.Error())
+		return "", errs.ErrSystemError
+	}
+
+	remark = fmt.Sprintf("%s|%s|%d|%s", platform, clientSessionId, uid, verifier)
+	state := fmt.Sprintf("%s|%s|%s", platform, clientSessionId, utils.MD5EncodeToString([]byte(remark)))
+
+	externalAuthUrl, err := oauth2.GetOAuth2AuthUrl(c, state, verifier)
+
+	if err != nil {
+		log.Errorf(c, "[oauth2_authentications.generateExternalAuthUrl] failed to get oauth 2.0 auth url, because %s", err.Error())
+		return "", errs.Or(err, errs.ErrSystemError)
+	}
+
+	a.SetSubmissionRemarkWithCustomExpiration(duplicatechecker.DUPLICATE_CHECKER_TYPE_OAUTH2_REDIRECT, 0, clientSessionId, remark, a.CurrentConfig().OAuth2StateExpiredTimeDuration)
+
+	return externalAuthUrl, nil
 }
 
 func (a *OAuth2AuthenticationApi) redirectToSuccessCallbackPage(c *core.WebContext, platform string, externalAuthType core.UserExternalAuthType, token string) (string, *errs.Error) {

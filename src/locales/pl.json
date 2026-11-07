@@ -2969,6 +2969,7 @@
     "Others": "Pozostałe",
     "Cache Expiration Time": "Czas ważności pamięci podręcznej",
     "Cache Expiration for Map Data": "Czas ważności danych map",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "Czas ważności danych kursów walut",
     "Disable Cache": "Wyłącz pamięć podręczną",
     "Clear File Cache": "Clear File Cache",

@@ -11,6 +11,7 @@ import { type BrowserCacheStatistics, FileCacheType } from '@/core/cache.ts';
 import {
     loadBrowserCacheStatistics,
     updateMapCacheExpiration,
+    updateTransactionPictureCacheExpiration,
     clearFileCaches
 } from '@/lib/cache.ts';
 
@@ -46,6 +47,8 @@ export function useAppBrowserCacheSettingPageBase() {
         ];
     });
 
+    const allTransactionPictureCacheExpirationOptions = allMapCacheExpirationOptions;
+
     const allExchangeRatesDataCacheExpirationOptions = computed<NameNumeralValue[]>(() => {
         return [
             { name: tt('Disable Cache'), value: -1 },
@@ -63,6 +66,17 @@ export function useAppBrowserCacheSettingPageBase() {
 
             if (isSupportedFileCache) {
                 updateMapCacheExpiration(value);
+            }
+        }
+    });
+
+    const transactionPictureCacheExpiration = computed<number>({
+        get: () => isSupportedFileCache ? settingsStore.appSettings.transactionPictureCacheExpiration : -1,
+        set: (value) => {
+            settingsStore.setTransactionPictureCacheExpiration(value);
+
+            if (isSupportedFileCache) {
+                updateTransactionPictureCacheExpiration(value);
             }
         }
     });
@@ -187,8 +201,10 @@ export function useAppBrowserCacheSettingPageBase() {
         showClearFileCache,
         // computed states
         allMapCacheExpirationOptions,
+        allTransactionPictureCacheExpirationOptions,
         allExchangeRatesDataCacheExpirationOptions,
         mapCacheExpiration,
+        transactionPictureCacheExpiration,
         exchangeRatesDataCacheExpiration,
         // functions
         loadCacheStatistics,

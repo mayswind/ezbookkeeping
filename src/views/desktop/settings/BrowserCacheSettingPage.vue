@@ -133,6 +133,18 @@
                                     item-title="name"
                                     item-value="value"
                                     persistent-placeholder
+                                    :disabled="loading || !isSupportedFileCache || !fileCacheStatistics"
+                                    :label="tt('Cache Expiration for Transaction Pictures')"
+                                    :placeholder="tt('Cache Expiration for Transaction Pictures')"
+                                    :items="allTransactionPictureCacheExpirationOptions"
+                                    v-model="transactionPictureCacheExpiration"
+                                />
+                            </v-col>
+                            <v-col cols="12" sm="6">
+                                <v-select
+                                    item-title="name"
+                                    item-value="value"
+                                    persistent-placeholder
                                     :disabled="loading"
                                     :label="tt('Cache Expiration for Exchange Rates Data')"
                                     :placeholder="tt('Cache Expiration for Exchange Rates Data')"
@@ -228,8 +240,10 @@ const {
     selectedFileCacheTypes,
     showClearFileCache,
     allMapCacheExpirationOptions,
+    allTransactionPictureCacheExpirationOptions,
     allExchangeRatesDataCacheExpirationOptions,
     mapCacheExpiration,
+    transactionPictureCacheExpiration,
     exchangeRatesDataCacheExpiration,
     loadCacheStatistics,
     getDisplayFileCacheSize,

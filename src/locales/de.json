@@ -2969,6 +2969,7 @@
     "Others": "Sonstiges",
     "Cache Expiration Time": "Cache-Ablaufzeit",
     "Cache Expiration for Map Data": "Cache-Ablaufzeit für Kartendaten",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "Cache-Ablaufzeit für Wechselkursdaten",
     "Disable Cache": "Cache deaktivieren",
     "Clear File Cache": "Clear File Cache",

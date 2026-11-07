@@ -18,6 +18,12 @@ export interface SWMapCacheConfig {
     maxAgeMilliseconds: number;
 }
 
+export interface SWTransactionPictureCacheConfig {
+    enabled: boolean;
+    maxEntries: number;
+    maxAgeMilliseconds: number;
+}
+
 export class FileCacheType implements KeyAndName {
     private static readonly allInstances: FileCacheType[] = [];
     private static readonly allInstancesByKey: Record<string, FileCacheType> = {};

@@ -2969,6 +2969,7 @@
     "Others": "अन्य",
     "Cache Expiration Time": "कैश समाप्ति समय",
     "Cache Expiration for Map Data": "मैप डेटा की कैश समाप्ति",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "विनिमय दर डेटा की कैश समाप्ति",
     "Disable Cache": "कैश अक्षम करें",
     "Clear File Cache": "Clear File Cache",

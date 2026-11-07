@@ -2969,6 +2969,7 @@
     "Others": "其他",
     "Cache Expiration Time": "缓存过期时间",
     "Cache Expiration for Map Data": "地图数据缓存过期时间",
+    "Cache Expiration for Transaction Pictures": "交易图片缓存过期时间",
     "Cache Expiration for Exchange Rates Data": "汇率数据缓存过期时间",
     "Disable Cache": "禁用缓存",
     "Clear File Cache": "清除文件缓存",

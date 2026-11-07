@@ -2969,6 +2969,7 @@
     "Others": "其他",
     "Cache Expiration Time": "快取過期時間",
     "Cache Expiration for Map Data": "地圖資料快取過期時間",
+    "Cache Expiration for Transaction Pictures": "交易圖片快取過期時間",
     "Cache Expiration for Exchange Rates Data": "匯率資料快取過期時間",
     "Disable Cache": "停用快取",
     "Clear File Cache": "清除檔案快取",

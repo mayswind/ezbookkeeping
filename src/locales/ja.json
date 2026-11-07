@@ -2969,6 +2969,7 @@
     "Others": "その他",
     "Cache Expiration Time": "キャッシュの有効期限",
     "Cache Expiration for Map Data": "地図データのキャッシュ有効期限",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "為替レートデータのキャッシュ有効期限",
     "Disable Cache": "キャッシュを無効化",
     "Clear File Cache": "Clear File Cache",

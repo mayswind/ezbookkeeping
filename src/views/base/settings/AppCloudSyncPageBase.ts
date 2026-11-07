@@ -115,6 +115,7 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         categoryName: 'Browser Cache Management',
         items: [
             { settingKey: 'mapCacheExpiration', settingName: 'Cache Expiration for Map Data', mobile: true, desktop: true },
+            { settingKey: 'transactionPictureCacheExpiration', settingName: 'Cache Expiration for Transaction Pictures', mobile: true, desktop: true },
             { settingKey: 'exchangeRatesDataCacheExpiration', settingName: 'Cache Expiration for Exchange Rates Data', mobile: true, desktop: true }
         ]
     },

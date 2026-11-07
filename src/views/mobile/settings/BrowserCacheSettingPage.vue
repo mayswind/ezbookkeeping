@@ -33,6 +33,7 @@
                 <small>{{ tt('Cache Expiration Time') }}</small>
             </f7-list-item>
             <f7-list-item title="Map Data" after="Disable Cache" v-if="getMapProvider()"></f7-list-item>
+            <f7-list-item title="Transaction Pictures" after="30 Days"></f7-list-item>
             <f7-list-item title="Exchange Rates Data" after="Disable Cache"></f7-list-item>
         </f7-list>
 
@@ -78,6 +79,25 @@
                                            :items="allMapCacheExpirationOptions"
                                            v-model:show="showMapDataCacheExpirationPopup"
                                            v-model="mapCacheExpiration">
+                </list-item-selection-popup>
+            </f7-list-item>
+            <f7-list-item
+                link="#"
+                :class="{ 'disabled': loading || !isSupportedFileCache || !fileCacheStatistics }"
+                :title="tt('Transaction Pictures')"
+                :after="findNameByValue(allTransactionPictureCacheExpirationOptions, transactionPictureCacheExpiration)"
+                @click="showTransactionPictureCacheExpirationPopup = true"
+            >
+                <list-item-selection-popup value-type="item"
+                                           key-field="value" value-field="value"
+                                           title-field="name"
+                                           :title="tt('Cache Expiration for Transaction Pictures')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Expiration Time')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allTransactionPictureCacheExpirationOptions"
+                                           v-model:show="showTransactionPictureCacheExpirationPopup"
+                                           v-model="transactionPictureCacheExpiration">
                 </list-item-selection-popup>
             </f7-list-item>
             <f7-list-item
@@ -177,8 +197,10 @@ const {
     selectedFileCacheTypes,
     showClearFileCache,
     allMapCacheExpirationOptions,
+    allTransactionPictureCacheExpirationOptions,
     allExchangeRatesDataCacheExpirationOptions,
     mapCacheExpiration,
+    transactionPictureCacheExpiration,
     exchangeRatesDataCacheExpiration,
     loadCacheStatistics,
     getDisplayFileCacheSize,
@@ -189,6 +211,7 @@ const {
 } = useAppBrowserCacheSettingPageBase();
 
 const showMapDataCacheExpirationPopup = ref<boolean>(false);
+const showTransactionPictureCacheExpirationPopup = ref<boolean>(false);
 const showExchangeRatesDataCacheExpirationPopup = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 

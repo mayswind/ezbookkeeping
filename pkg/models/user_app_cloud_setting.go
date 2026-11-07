@@ -63,8 +63,9 @@ var ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES = map[string]UserApplicationClo
 	// Exchange Rates Data Page
 	"currencySortByInExchangeRatesPage": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// Browser Cache Management
-	"mapCacheExpiration":               USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
-	"exchangeRatesDataCacheExpiration": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
+	"mapCacheExpiration":                USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
+	"transactionPictureCacheExpiration": USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
+	"exchangeRatesDataCacheExpiration":  USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	// Statistics Settings
 	"statistics.defaultChartDataType":                 USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,
 	"statistics.defaultTimezoneType":                  USER_APPLICATION_CLOUD_SETTING_TYPE_NUMBER,

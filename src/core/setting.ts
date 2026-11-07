@@ -94,6 +94,7 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     currencySortByInExchangeRatesPage: number;
     // Browser Cache Management
     mapCacheExpiration: number,
+    transactionPictureCacheExpiration: number,
     exchangeRatesDataCacheExpiration: number,
     // Statistics Settings
     statistics: {
@@ -191,6 +192,7 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'currencySortByInExchangeRatesPage': UserApplicationCloudSettingType.Number,
     // Browser Cache Management
     'mapCacheExpiration': UserApplicationCloudSettingType.Number,
+    'transactionPictureCacheExpiration': UserApplicationCloudSettingType.Number,
     'exchangeRatesDataCacheExpiration': UserApplicationCloudSettingType.Number,
     // Statistics Settings
     'statistics.defaultChartDataType': UserApplicationCloudSettingType.Number,
@@ -268,6 +270,7 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     currencySortByInExchangeRatesPage: CurrencySortingType.Default.type,
     // Browser Cache Management
     mapCacheExpiration: -1,
+    transactionPictureCacheExpiration: 2592000,
     exchangeRatesDataCacheExpiration: 0,
     // Statistics Settings
     statistics: {

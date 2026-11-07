@@ -2969,6 +2969,7 @@
     "Others": "Altele",
     "Cache Expiration Time": "Timp de expirare cache",
     "Cache Expiration for Map Data": "Expirare cache pentru datele hărții",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "Expirare cache pentru cursurile de schimb",
     "Disable Cache": "Dezactivează cache-ul",
     "Clear File Cache": "Clear File Cache",

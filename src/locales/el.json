@@ -2969,6 +2969,7 @@
     "Others": "Λοιπά",
     "Cache Expiration Time": "Χρόνος λήξης cache",
     "Cache Expiration for Map Data": "Λήξη cache για δεδομένα χαρτών",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "Λήξη cache για δεδομένα ισοτιμιών",
     "Disable Cache": "Απενεργοποίηση cache",
     "Clear File Cache": "Clear File Cache",

@@ -1,6 +1,7 @@
 import {
     type BrowserCacheStatistics,
     type SWMapCacheConfig,
+    type SWTransactionPictureCacheConfig,
     FileCacheType
 } from '@/core/cache.ts';
 
@@ -8,6 +9,9 @@ import {
     SW_SHARE_CACHE_NAME,
     SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG,
     SW_MESSAGE_TYPE_UPDATE_MAP_CACHE_CONFIG_RESPONSE,
+    SW_MESSAGE_TYPE_UPDATE_TRANSACTION_PICTURE_CACHE_CONFIG,
+    SW_MESSAGE_TYPE_UPDATE_TRANSACTION_PICTURE_CACHE_CONFIG_RESPONSE,
+    TRANSACTION_PICTURE_CACHE_MAX_ENTRIES,
     MAP_CACHE_MAX_ENTRIES
 } from '@/consts/cache.ts';
 
@@ -16,6 +20,7 @@ import services from './services.ts';
 import logger from './logger.ts';
 
 let controllerchangeListenerAdded: boolean = false;
+let transactionPictureControllerchangeListenerAdded: boolean = false;
 
 function findFirstCacheName(prefix: string): Promise<string> {
     if (!prefix) {
@@ -73,6 +78,45 @@ function doUpdateMapCacheExpiration(expireSeconds: number): Promise<void> {
             }, [messageChannel.port2]);
         }).catch(error => {
             logger.error('failed to update map cache config', error);
+            reject(error);
+        });
+    });
+}
+
+function doUpdateTransactionPictureCacheExpiration(expireSeconds: number): Promise<void> {
+    const config: SWTransactionPictureCacheConfig = {
+        enabled: expireSeconds >= 0,
+        maxEntries: TRANSACTION_PICTURE_CACHE_MAX_ENTRIES,
+        maxAgeMilliseconds: expireSeconds * 1000
+    };
+
+    return new Promise((resolve, reject) => {
+        if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+            reject(new Error('Service worker is not supported or not active'));
+            return;
+        }
+
+        const controller = navigator.serviceWorker.controller;
+
+        navigator.serviceWorker.ready.then(() => {
+            const messageChannel = new MessageChannel();
+
+            messageChannel.port1.onmessage = (event) => {
+                if (event.data && event.data.type === SW_MESSAGE_TYPE_UPDATE_TRANSACTION_PICTURE_CACHE_CONFIG_RESPONSE) {
+                    logger.info('Transaction picture cache config updated successfully in service worker: ' + JSON.stringify(event.data.payload));
+                    resolve();
+                } else {
+                    logger.error('cannot update transaction picture cache config, invalid response from service worker', event);
+                    reject(new Error('Invalid response from service worker'));
+                }
+            };
+
+            controller.postMessage({
+                type: SW_MESSAGE_TYPE_UPDATE_TRANSACTION_PICTURE_CACHE_CONFIG,
+                payload: config
+            }, [messageChannel.port2]);
+        }).catch(error => {
+            logger.error('failed to update transaction picture cache config', error);
             reject(error);
         });
     });
@@ -264,6 +308,21 @@ export function updateMapCacheExpiration(expireSeconds: number): void {
 
         if (navigator.serviceWorker.controller) {
             doUpdateMapCacheExpiration(expireSeconds);
+        }
+    }
+}
+
+export function updateTransactionPictureCacheExpiration(expireSeconds: number): void {
+    if ('serviceWorker' in navigator) {
+        if (!transactionPictureControllerchangeListenerAdded) {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                doUpdateTransactionPictureCacheExpiration(expireSeconds);
+            });
+            transactionPictureControllerchangeListenerAdded = true;
+        }
+
+        if (navigator.serviceWorker.controller) {
+            doUpdateTransactionPictureCacheExpiration(expireSeconds);
         }
     }
 }

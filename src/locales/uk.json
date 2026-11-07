@@ -2969,6 +2969,7 @@
     "Others": "Інше",
     "Cache Expiration Time": "Строк дії кешу",
     "Cache Expiration for Map Data": "Строк дії кешу даних карти",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "Строк дії кешу курсів валют",
     "Disable Cache": "Вимкнути кеш",
     "Clear File Cache": "Clear File Cache",

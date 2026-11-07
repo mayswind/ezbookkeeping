@@ -2969,6 +2969,7 @@
     "Others": "Diğerleri",
     "Cache Expiration Time": "Önbellek Geçerlilik Süresi",
     "Cache Expiration for Map Data": "Harita Verileri Önbellek Geçerlilik Süresi",
+    "Cache Expiration for Transaction Pictures": "Cache Expiration for Transaction Pictures",
     "Cache Expiration for Exchange Rates Data": "Döviz Kurları Önbellek Geçerlilik Süresi",
     "Disable Cache": "Önbelleği Devre Dışı Bırak",
     "Clear File Cache": "Clear File Cache",

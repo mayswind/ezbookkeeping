@@ -11,7 +11,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import { isWebAuthnSupported } from '@/lib/webauthn.ts';
 import { hasWebAuthnConfig } from '@/lib/userstate.ts';
-import { updateMapCacheExpiration } from '@/lib/cache.ts';
+import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
@@ -50,6 +50,7 @@ export function useUnlockPageBase() {
             }
 
             updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+            updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
             exchangeRatesStore.removeExpiredExchangeRates(true);
             exchangeRatesStore.autoUpdateExchangeRatesData();
 

@@ -8,7 +8,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { AuthResponse } from '@/models/auth_response.ts';
 
-import { updateMapCacheExpiration } from '@/lib/cache.ts';
+import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { getOAuth2Provider, getOIDCCustomDisplayNames, getLoginPageTips } from '@/lib/server_settings.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
@@ -56,6 +56,7 @@ export function useLoginPageBase(platform: 'mobile' | 'desktop') {
         }
 
         updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+        updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
         exchangeRatesStore.removeExpiredExchangeRates(true);
         exchangeRatesStore.autoUpdateExchangeRatesData();
 

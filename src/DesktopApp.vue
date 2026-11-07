@@ -34,7 +34,7 @@ import { ThemeType } from '@/core/theme.ts';
 import { isProduction } from '@/lib/version.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
-import { updateMapCacheExpiration } from '@/lib/cache.ts';
+import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
@@ -123,6 +123,7 @@ if (isUserLogined() && initialRoutePath !== '/verify_email' && initialRoutePath 
             }
 
             updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+            updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
             exchangeRatesStore.removeExpiredExchangeRates(true);
             exchangeRatesStore.autoUpdateExchangeRatesData();
         });

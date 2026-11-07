@@ -12,7 +12,7 @@ import { CategoryType } from '@/core/category.ts';
 import type { RegisterResponse } from '@/models/auth_response.ts';
 import type { User } from '@/models/user.ts';
 
-import { updateMapCacheExpiration } from '@/lib/cache.ts';
+import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 
 export function useSignupPageBase() {
@@ -131,6 +131,7 @@ export function useSignupPageBase() {
         }
 
         updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+        updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
         exchangeRatesStore.removeExpiredExchangeRates(true);
         exchangeRatesStore.autoUpdateExchangeRatesData();
 

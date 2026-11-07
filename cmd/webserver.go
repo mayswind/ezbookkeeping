@@ -339,19 +339,19 @@ func startWebServer(c *core.CliContext) error {
 		{
 			// Tokens
 			apiV1Route.GET("/tokens/list.json", bindApi(api.Tokens.TokenListHandler, config))
-			apiV1Route.POST("/tokens/generate/api.json", bindApi(api.Tokens.TokenGenerateAPIHandler, config))
-			apiV1Route.POST("/tokens/generate/mcp.json", bindApi(api.Tokens.TokenGenerateMCPHandler, config))
+			apiV1Route.POST("/tokens/generate/api.json", bindApi(api.Tokens.TokenGenerateAPIHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+			apiV1Route.POST("/tokens/generate/mcp.json", bindApi(api.Tokens.TokenGenerateMCPHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 			apiV1Route.POST("/tokens/revoke.json", bindApi(api.Tokens.TokenRevokeHandler, config))
-			apiV1Route.POST("/tokens/revoke_all.json", bindApi(api.Tokens.TokenRevokeAllHandler, config))
-			apiV1Route.POST("/tokens/refresh.json", bindApiWithTokenUpdate(api.Tokens.TokenRefreshHandler, config))
+			apiV1Route.POST("/tokens/revoke_all.json", bindApi(api.Tokens.TokenRevokeAllHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+			apiV1Route.POST("/tokens/refresh.json", bindApiWithTokenUpdate(api.Tokens.TokenRefreshHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 
 			// Users
 			apiV1Route.GET("/users/profile/get.json", bindApi(api.Users.UserProfileHandler, config))
-			apiV1Route.POST("/users/profile/update.json", bindApiWithTokenUpdate(api.Users.UserUpdateProfileHandler, config))
+			apiV1Route.POST("/users/profile/update.json", bindApiWithTokenUpdate(api.Users.UserUpdateProfileHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 
 			if config.AvatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
-				apiV1Route.POST("/users/avatar/update.json", bindApi(api.Users.UserUpdateAvatarHandler, config))
-				apiV1Route.POST("/users/avatar/remove.json", bindApi(api.Users.UserRemoveAvatarHandler, config))
+				apiV1Route.POST("/users/avatar/update.json", bindApi(api.Users.UserUpdateAvatarHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+				apiV1Route.POST("/users/avatar/remove.json", bindApi(api.Users.UserRemoveAvatarHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 			}
 
 			if config.EnableUserVerifyEmail {
@@ -361,29 +361,29 @@ func startWebServer(c *core.CliContext) error {
 			// External Authentications
 			if config.EnableOAuth2Login {
 				apiV1Route.GET("/users/external_auth/list.json", bindApi(api.UserExternalAuths.ExternalAuthListHandler, config))
-				apiV1Route.POST("/users/external_auth/unlink.json", bindApi(api.UserExternalAuths.UnlinkExternalAuthHandler, config))
-				apiV1Route.POST("/users/external_auth/oauth2/link.json", bindApi(api.OAuth2Authentications.LinkHandler, config))
+				apiV1Route.POST("/users/external_auth/unlink.json", bindApi(api.UserExternalAuths.UnlinkExternalAuthHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+				apiV1Route.POST("/users/external_auth/oauth2/link.json", bindApi(api.OAuth2Authentications.LinkHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 			}
 
 			// Application Cloud Settings
-			apiV1Route.GET("/users/settings/cloud/get.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsGetHandler, config))
-			apiV1Route.POST("/users/settings/cloud/update.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsUpdateHandler, config))
-			apiV1Route.POST("/users/settings/cloud/disable.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsDisableHandler, config))
+			apiV1Route.GET("/users/settings/cloud/get.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsGetHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+			apiV1Route.POST("/users/settings/cloud/update.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsUpdateHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+			apiV1Route.POST("/users/settings/cloud/disable.json", bindApi(api.UserApplicationCloudSettings.ApplicationSettingsDisableHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 
 			// Two-Factor Authorization
 			if config.EnableTwoFactor {
 				apiV1Route.GET("/users/2fa/status.json", bindApi(api.TwoFactorAuthorizations.TwoFactorStatusHandler, config))
-				apiV1Route.POST("/users/2fa/enable/request.json", bindApi(api.TwoFactorAuthorizations.TwoFactorEnableRequestHandler, config))
-				apiV1Route.POST("/users/2fa/enable/confirm.json", bindApiWithTokenUpdate(api.TwoFactorAuthorizations.TwoFactorEnableConfirmHandler, config))
-				apiV1Route.POST("/users/2fa/disable.json", bindApi(api.TwoFactorAuthorizations.TwoFactorDisableHandler, config))
-				apiV1Route.POST("/users/2fa/recovery/regenerate.json", bindApi(api.TwoFactorAuthorizations.TwoFactorRecoveryCodeRegenerateHandler, config))
+				apiV1Route.POST("/users/2fa/enable/request.json", bindApi(api.TwoFactorAuthorizations.TwoFactorEnableRequestHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+				apiV1Route.POST("/users/2fa/enable/confirm.json", bindApiWithTokenUpdate(api.TwoFactorAuthorizations.TwoFactorEnableConfirmHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+				apiV1Route.POST("/users/2fa/disable.json", bindApi(api.TwoFactorAuthorizations.TwoFactorDisableHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+				apiV1Route.POST("/users/2fa/recovery/regenerate.json", bindApi(api.TwoFactorAuthorizations.TwoFactorRecoveryCodeRegenerateHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 			}
 
 			// Data
 			apiV1Route.GET("/data/statistics.json", bindApi(api.DataManagements.DataStatisticsHandler, config))
-			apiV1Route.POST("/data/clear/all.json", bindApi(api.DataManagements.ClearAllDataHandler, config))
-			apiV1Route.POST("/data/clear/transactions.json", bindApi(api.DataManagements.ClearAllTransactionsHandler, config))
-			apiV1Route.POST("/data/clear/transactions/by_account.json", bindApi(api.DataManagements.ClearAllTransactionsByAccountHandler, config))
+			apiV1Route.POST("/data/clear/all.json", bindApi(api.DataManagements.ClearAllDataHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+			apiV1Route.POST("/data/clear/transactions.json", bindApi(api.DataManagements.ClearAllTransactionsHandler, config, core.USER_TOKEN_TYPE_NORMAL))
+			apiV1Route.POST("/data/clear/transactions/by_account.json", bindApi(api.DataManagements.ClearAllTransactionsByAccountHandler, config, core.USER_TOKEN_TYPE_NORMAL))
 
 			if config.EnableDataExport {
 				apiV1Route.GET("/data/export.csv", bindCsv(api.DataManagements.ExportDataToEzbookkeepingCSVHandler, config))
@@ -578,9 +578,14 @@ func bindRedirect(fn core.RedirectHandlerFunc, config *settings.Config) gin.Hand
 	}
 }
 
-func bindApi(fn core.ApiHandlerFunc, config *settings.Config) gin.HandlerFunc {
+func bindApi(fn core.ApiHandlerFunc, config *settings.Config, onlyAllowedTokenTypes ...core.TokenType) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		c := core.WrapWebContext(ginCtx, config.TrustedProxyIPs)
+
+		if !middlewares.CheckCurrentTokenType(c, onlyAllowedTokenTypes...) {
+			return
+		}
+
 		result, err := fn(c)
 
 		if err != nil {
@@ -591,9 +596,14 @@ func bindApi(fn core.ApiHandlerFunc, config *settings.Config) gin.HandlerFunc {
 	}
 }
 
-func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config) gin.HandlerFunc {
+func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config, onlyAllowedTokenTypes ...core.TokenType) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		c := core.WrapWebContext(ginCtx, config.TrustedProxyIPs)
+
+		if !middlewares.CheckCurrentTokenType(c, onlyAllowedTokenTypes...) {
+			return
+		}
+
 		result, err := fn(c)
 
 		if err == nil && config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod {

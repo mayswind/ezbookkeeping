@@ -81,16 +81,6 @@ func (a *OAuth2AuthenticationApi) LinkHandler(c *core.WebContext) (any, *errs.Er
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
-	claims := c.GetTokenClaims()
-
-	if claims == nil {
-		log.Warnf(c, "[oauth2_authentications.LinkHandler] current token is null")
-		return nil, errs.ErrInvalidToken
-	} else if claims.Type != core.USER_TOKEN_TYPE_NORMAL {
-		log.Warnf(c, "[oauth2_authentications.LinkHandler] token type \"%d\" is not allowed to link external authentication", claims.Type)
-		return nil, errs.ErrInvalidToken
-	}
-
 	uid := c.GetCurrentUid()
 	user, err := a.users.GetUserById(c, uid)
 

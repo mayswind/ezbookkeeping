@@ -3,6 +3,7 @@ package core
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -107,6 +108,30 @@ const (
 var NormalTokenScopeDerivedTokenTypeMap = map[NormalTokenScope]TextualDerivedTokenType{
 	NormalTokenScopeUserAvatar:         USER_AVATAR_DERIVED_NORMAL_TOKEN,
 	NormalTokenScopeTransactionPicture: TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN,
+}
+
+// String returns a textual representation of the token type enum
+func (t TokenType) String() string {
+	switch t {
+	case USER_TOKEN_TYPE_NORMAL:
+		return "Normal Token"
+	case USER_TOKEN_TYPE_REQUIRE_2FA:
+		return "Require 2FA Token"
+	case USER_TOKEN_TYPE_EMAIL_VERIFY:
+		return "Email Verify Token"
+	case USER_TOKEN_TYPE_PASSWORD_RESET:
+		return "Password Reset Token"
+	case USER_TOKEN_TYPE_MCP:
+		return "MCP Token"
+	case USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY:
+		return "OAuth2 Callback Require Verify Token"
+	case USER_TOKEN_TYPE_OAUTH2_CALLBACK:
+		return "OAuth2 Callback Token"
+	case USER_TOKEN_TYPE_API:
+		return "API Token"
+	default:
+		return fmt.Sprintf("Invalid(%d)", int(t))
+	}
 }
 
 // MarshalBinary returns the binary representation of the normal token additional data.

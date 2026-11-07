@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math"
 	"math/big"
 	"strconv"
 	"strings"
@@ -141,6 +142,12 @@ func ParseAmount(amount string) (int64, error) {
 	integer := int64(0)
 	decimals := int64(0)
 
+	// The sign was taken above, so both parts must be plain digits ("-+1" and
+	// "1.+5" are not amounts even though strconv accepts a sign in each part)
+	if !IsStringOnlyContainsDigits(items[0]) || (len(items) == 2 && !IsStringOnlyContainsDigits(items[1])) {
+		return 0, errs.ErrNumberInvalid
+	}
+
 	if len(items[0]) > 0 {
 		integer, err = StringToInt64(items[0])
 
@@ -171,6 +178,12 @@ func ParseAmount(amount string) (int64, error) {
 		if len(items[1]) == 1 {
 			decimals = decimals * 10
 		}
+	}
+
+	// integer*100+decimals must fit in int64; otherwise it would wrap around
+	// to a different (possibly negative) amount instead of failing
+	if integer > (math.MaxInt64-decimals)/100 {
+		return 0, errs.ErrNumberInvalid
 	}
 
 	return sign*integer*100 + sign*decimals, nil

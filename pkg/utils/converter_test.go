@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math"
 	"math/big"
 	"testing"
 
@@ -328,4 +329,34 @@ func TestParseAmount_InvalidAmount(t *testing.T) {
 
 	_, err = ParseAmount("1.234")
 	assert.NotNil(t, err)
+
+	// A second sign after the leading one is not part of the number
+	_, err = ParseAmount("-+1")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("++1")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("1.+5")
+	assert.NotNil(t, err)
+
+	// Amounts beyond the int64 range must fail instead of wrapping around
+	_, err = ParseAmount("92233720368547758.08")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("-92233720368547758.08")
+	assert.NotNil(t, err)
+
+	_, err = ParseAmount("100000000000000000")
+	assert.NotNil(t, err)
+}
+
+func TestParseAmount_Int64Bounds(t *testing.T) {
+	actualValue, err := ParseAmount("92233720368547758.07")
+	assert.Nil(t, err)
+	assert.Equal(t, int64(math.MaxInt64), actualValue)
+
+	actualValue, err = ParseAmount("-92233720368547758.07")
+	assert.Nil(t, err)
+	assert.Equal(t, int64(-math.MaxInt64), actualValue)
 }

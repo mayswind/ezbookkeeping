@@ -3,8 +3,6 @@ package services
 import (
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -111,7 +109,7 @@ func (s *InsightsExplorerService) CreateExploration(c core.Context, exploration 
 	exploration.CreatedUnixTime = time.Now().Unix()
 	exploration.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(exploration.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(exploration.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(exploration)
 		return err
 	})
@@ -125,7 +123,7 @@ func (s *InsightsExplorerService) ModifyExploration(c core.Context, exploration 
 
 	exploration.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(exploration.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(exploration.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.ID(exploration.ExplorerId).Cols("name", "data", "updated_unix_time").Where("uid=? AND deleted=?", exploration.Uid, false).Update(exploration)
 
 		if err != nil {
@@ -151,7 +149,7 @@ func (s *InsightsExplorerService) HideExploration(c core.Context, uid int64, ids
 		UpdatedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("explorer_id", ids).Update(updateModel)
 
 		if err != nil {
@@ -174,7 +172,7 @@ func (s *InsightsExplorerService) ModifyExplorationDisplayOrders(c core.Context,
 		explorations[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		for i := 0; i < len(explorations); i++ {
 			exploration := explorations[i]
 			updatedRows, err := sess.ID(exploration.ExplorerId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(exploration)
@@ -203,7 +201,7 @@ func (s *InsightsExplorerService) DeleteExploration(c core.Context, uid int64, e
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		deletedRows, err := sess.ID(explorerId).Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {
@@ -229,7 +227,7 @@ func (s *InsightsExplorerService) DeleteAllExplorations(c core.Context, uid int6
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {

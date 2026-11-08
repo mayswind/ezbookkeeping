@@ -8,8 +8,6 @@ import (
 	"net/url"
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -226,7 +224,7 @@ func (s *UserService) CreateUser(c core.Context, user *models.User, noPassword b
 	user.UpdatedUnixTime = time.Now().Unix()
 	user.LastLoginUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(user)
 		return err
 	})
@@ -363,7 +361,7 @@ func (s *UserService) UpdateUser(c core.Context, user *models.User, modifyUserLa
 	user.UpdatedUnixTime = now
 	updateCols = append(updateCols, "updated_unix_time")
 
-	err = s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	err = s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.ID(user.Uid).Cols(updateCols...).Where("deleted=?", false).Update(user)
 
 		if err != nil {
@@ -395,7 +393,7 @@ func (s *UserService) UpdateUserPassword(c core.Context, user *models.User) erro
 	user.Password = utils.EncodePassword(user.Password, user.Salt)
 	user.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.ID(user.Uid).Cols("password", "updated_unix_time").Where("deleted=?", false).Update(user)
 
 		if err != nil {
@@ -429,7 +427,7 @@ func (s *UserService) UpdateUserAvatar(c core.Context, uid int64, avatarFile mul
 		UpdatedUnixTime:  now,
 	}
 
-	err = s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	err = s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.ID(uid).Cols("custom_avatar_type", "updated_unix_time").Where("deleted=?", false).Update(updateModel)
 		return err
 	})
@@ -468,7 +466,7 @@ func (s *UserService) RemoveUserAvatar(c core.Context, uid int64, fileExtension 
 		UpdatedUnixTime:  now,
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.ID(uid).Cols("custom_avatar_type", "updated_unix_time").Where("deleted=?", false).Update(updateModel)
 		return err
 	})
@@ -480,7 +478,7 @@ func (s *UserService) UpdateUserLastLoginTime(c core.Context, uid int64) error {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.ID(uid).Cols("last_login_unix_time").Where("deleted=?", false).Update(&models.User{LastLoginUnixTime: time.Now().Unix()})
 		return err
 	})

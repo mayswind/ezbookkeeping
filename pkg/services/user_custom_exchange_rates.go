@@ -2,7 +2,6 @@ package services
 
 import (
 	"time"
-	"xorm.io/xorm"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
@@ -46,7 +45,7 @@ func (s *UserCustomExchangeRatesService) UpdateCustomExchangeRate(c core.Context
 	newCustomExchangeRate := &models.UserCustomExchangeRate{}
 	defaultCurrencyExchangeRate := &models.UserCustomExchangeRate{}
 
-	err := s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	err := s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		oldCustomExchangeRate := &models.UserCustomExchangeRate{}
 		has, err := sess.Where("uid=? AND deleted_unix_time=? AND currency=?", uid, 0, currency).Get(oldCustomExchangeRate)
 
@@ -116,7 +115,7 @@ func (s *UserCustomExchangeRatesService) DeleteCustomExchangeRate(c core.Context
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		deletedRows, err := sess.Cols("deleted_unix_time").Where("uid=? AND deleted_unix_time=? AND currency=?", uid, 0, currency).Update(updateModel)
 
 		if err != nil {
@@ -141,7 +140,7 @@ func (s *UserCustomExchangeRatesService) DeleteAllCustomExchangeRates(c core.Con
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Cols("deleted_unix_time").Where("uid=? AND deleted_unix_time=?", uid, 0).Update(updateModel)
 
 		if err != nil {

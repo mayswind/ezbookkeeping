@@ -3,8 +3,6 @@ package services
 import (
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -111,7 +109,7 @@ func (s *ImportPresetsService) CreatePreset(c core.Context, preset *models.Impor
 	preset.CreatedUnixTime = time.Now().Unix()
 	preset.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(preset.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(preset.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(preset)
 		return err
 	})
@@ -125,7 +123,7 @@ func (s *ImportPresetsService) ModifyPreset(c core.Context, preset *models.Impor
 
 	preset.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(preset.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(preset.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.ID(preset.PresetId).Cols("name", "data", "updated_unix_time").Where("uid=? AND deleted=?", preset.Uid, false).Update(preset)
 
 		if err != nil {
@@ -148,7 +146,7 @@ func (s *ImportPresetsService) ModifyPresetDisplayOrders(c core.Context, uid int
 		presets[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		for i := 0; i < len(presets); i++ {
 			preset := presets[i]
 			updatedRows, err := sess.ID(preset.PresetId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(preset)
@@ -177,7 +175,7 @@ func (s *ImportPresetsService) DeletePreset(c core.Context, uid int64, presetId 
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		deletedRows, err := sess.ID(presetId).Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {
@@ -203,7 +201,7 @@ func (s *ImportPresetsService) DeleteAllPresets(c core.Context, uid int64) error
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=?", uid, false).Update(updateModel)
 
 		if err != nil {

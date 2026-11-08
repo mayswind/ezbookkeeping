@@ -4,8 +4,6 @@ import (
 	"sort"
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -59,7 +57,7 @@ func (s *UserApplicationCloudSettingsService) UpdateUserApplicationCloudSettings
 		UpdatedUnixTime: time.Now().Unix(),
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		exists, err := sess.Cols("uid").Where("uid=?", uid).Exist(&models.UserApplicationCloudSetting{})
 
 		if err != nil {
@@ -93,7 +91,7 @@ func (s *UserApplicationCloudSettingsService) ClearUserApplicationCloudSettings(
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.UserApplicationCloudSetting{})
 		return err
 	})

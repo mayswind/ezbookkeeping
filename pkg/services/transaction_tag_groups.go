@@ -3,8 +3,6 @@ package services
 import (
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -100,7 +98,7 @@ func (s *TransactionTagGroupService) CreateTagGroup(c core.Context, tagGroup *mo
 	tagGroup.CreatedUnixTime = time.Now().Unix()
 	tagGroup.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(tagGroup.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(tagGroup.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(tagGroup)
 		return err
 	})
@@ -114,7 +112,7 @@ func (s *TransactionTagGroupService) ModifyTagGroup(c core.Context, tagGroup *mo
 
 	tagGroup.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(tagGroup.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(tagGroup.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.ID(tagGroup.TagGroupId).Cols("name", "updated_unix_time").Where("uid=? AND deleted=?", tagGroup.Uid, false).Update(tagGroup)
 
 		if err != nil {
@@ -137,7 +135,7 @@ func (s *TransactionTagGroupService) ModifyTagGroupDisplayOrders(c core.Context,
 		tagGroups[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		for i := 0; i < len(tagGroups); i++ {
 			tagGroup := tagGroups[i]
 			updatedRows, err := sess.ID(tagGroup.TagGroupId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tagGroup)
@@ -166,7 +164,7 @@ func (s *TransactionTagGroupService) DeleteTagGroup(c core.Context, uid int64, t
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		exists, err := sess.Cols("uid", "deleted").Where("uid=? AND deleted=? AND tag_group_id=?", uid, false, tagGroupId).Limit(1).Exist(&models.TransactionTag{})
 
 		if err != nil {
@@ -200,7 +198,7 @@ func (s *TransactionTagGroupService) DeleteAllTagGroups(c core.Context, uid int6
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		exists, err := sess.Cols("uid", "deleted").Where("uid=? AND deleted=? AND tag_group_id>?", uid, false, 0).Limit(1).Exist(&models.TransactionTag{})
 
 		if err != nil {

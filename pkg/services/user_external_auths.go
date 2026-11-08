@@ -3,8 +3,6 @@ package services
 import (
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -91,7 +89,7 @@ func (s *UserExternalAuthService) CreateUserExternalAuth(c core.Context, userExt
 
 	userExternalAuth.CreatedUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		exists, err := sess.Where("uid=? AND external_auth_type=?", userExternalAuth.Uid, userExternalAuth.ExternalAuthType).Limit(1).Exist(&models.UserExternalAuth{})
 
 		if err != nil {
@@ -111,7 +109,7 @@ func (s *UserExternalAuthService) DeleteUserExternalAuth(c core.Context, uid int
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		deletedRows, err := sess.Where("uid=? AND external_auth_type=?", uid, externalAuthType).Delete(&models.UserExternalAuth{})
 
 		if err != nil {

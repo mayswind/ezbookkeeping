@@ -5,7 +5,6 @@ import (
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
-	"xorm.io/xorm"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
@@ -129,7 +128,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorSetting(c core.Context, t
 
 	twoFactor.CreatedUnixTime = time.Now().Unix()
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(twoFactor)
 		return err
 	})
@@ -141,7 +140,7 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorSetting(c core.Context, u
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		deletedRows, err := sess.Where("uid=?", uid).Delete(&models.TwoFactor{})
 
 		if err != nil {
@@ -171,7 +170,7 @@ func (s *TwoFactorAuthorizationService) UseUserTwoFactorRecoveryCode(c core.Cont
 
 	recoveryCode = utils.EncodePassword(recoveryCode, salt)
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.Cols("used", "used_unix_time").Where("uid=? AND recovery_code=? AND used=?", uid, recoveryCode, false).Update(&models.TwoFactorRecoveryCode{Used: true, UsedUnixTime: time.Now().Unix()})
 
 		if err != nil {
@@ -214,7 +213,7 @@ func (s *TwoFactorAuthorizationService) CreateTwoFactorRecoveryCodes(c core.Cont
 		}
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.TwoFactorRecoveryCode{})
 
 		if err != nil {
@@ -240,7 +239,7 @@ func (s *TwoFactorAuthorizationService) DeleteTwoFactorRecoveryCodes(c core.Cont
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.TwoFactorRecoveryCode{})
 		return err
 	})

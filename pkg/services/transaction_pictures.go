@@ -5,8 +5,6 @@ import (
 	"mime/multipart"
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -221,7 +219,7 @@ func (s *TransactionPictureService) UploadPicture(c core.Context, pictureInfo *m
 		return err
 	}
 
-	return s.UserDataDB(pictureInfo.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(pictureInfo.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(pictureInfo)
 		return err
 	})
@@ -244,7 +242,7 @@ func (s *TransactionPictureService) RemoveUnusedTransactionPicture(c core.Contex
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDB().DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDB().DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		deletedRows, err := sess.ID(pictureId).Cols("deleted", "deleted_unix_time").Where("uid=? AND deleted=? AND transaction_id=?", uid, false, models.TransactionPictureNewPictureTransactionId).Update(updateModel)
 
 		if err != nil {

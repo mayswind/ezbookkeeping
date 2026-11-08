@@ -4,8 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"xorm.io/xorm"
-
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -217,7 +215,7 @@ func (s *TransactionTagService) CreateTag(c core.Context, tag *models.Transactio
 	tag.CreatedUnixTime = time.Now().Unix()
 	tag.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(tag.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(tag.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(tag)
 		return err
 	})
@@ -279,7 +277,7 @@ func (s *TransactionTagService) CreateTags(c core.Context, uid int64, tags []*mo
 		tag.UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		for i := 0; i < len(newTags); i++ {
 			tag := newTags[i]
 			_, err := sess.Insert(tag)
@@ -311,7 +309,7 @@ func (s *TransactionTagService) ModifyTag(c core.Context, tag *models.Transactio
 
 	tag.UpdatedUnixTime = time.Now().Unix()
 
-	return s.UserDataDB(tag.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(tag.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.ID(tag.TagId).Cols("name", "tag_group_id", "display_order", "updated_unix_time").Where("uid=? AND deleted=?", tag.Uid, false).Update(tag)
 
 		if err != nil {
@@ -337,7 +335,7 @@ func (s *TransactionTagService) HideTag(c core.Context, uid int64, ids []int64, 
 		UpdatedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.Cols("hidden", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).In("tag_id", ids).Update(updateModel)
 
 		if err != nil {
@@ -360,7 +358,7 @@ func (s *TransactionTagService) ModifyTagDisplayOrders(c core.Context, uid int64
 		tags[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		for i := 0; i < len(tags); i++ {
 			tag := tags[i]
 			updatedRows, err := sess.ID(tag.TagId).Cols("display_order", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tag)
@@ -389,7 +387,7 @@ func (s *TransactionTagService) DeleteTag(c core.Context, uid int64, tagId int64
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		exists, err := sess.Cols("uid", "tag_id").Where("uid=? AND deleted=? AND tag_id=?", uid, false, tagId).Limit(1).Exist(&models.TransactionTagIndex{})
 
 		if err != nil {
@@ -445,7 +443,7 @@ func (s *TransactionTagService) DeleteAllTags(c core.Context, uid int64) error {
 		DeletedUnixTime: now,
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		exists, err := sess.Cols("uid", "deleted").Where("uid=? AND deleted=?", uid, false).Limit(1).Exist(&models.TransactionTagIndex{})
 
 		if err != nil {
@@ -483,7 +481,7 @@ func (s *TransactionTagService) ModifyTagIndexTransactionTime(c core.Context, ui
 		tagIndexes[i].UpdatedUnixTime = time.Now().Unix()
 	}
 
-	return s.UserDataDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.UserDataDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		for i := 0; i < len(tagIndexes); i++ {
 			tagIndex := tagIndexes[i]
 			updatedRows, err := sess.ID(tagIndex.TagIndexId).Cols("transaction_time", "updated_unix_time").Where("uid=? AND deleted=?", uid, false).Update(tagIndex)

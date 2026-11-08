@@ -12,7 +12,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/golang-jwt/jwt/v5/request"
-	"xorm.io/xorm"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/datastore"
@@ -222,7 +221,7 @@ func (s *TokenService) UpdateTokenLastSeen(c core.Context, tokenRecord *models.T
 
 	tokenRecord.LastSeenUnixTime = time.Now().Unix()
 
-	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		updatedRows, err := sess.Cols("last_seen_unix_time").Where("uid=? AND user_token_id=? AND created_unix_time=?", tokenRecord.Uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Update(tokenRecord)
 
 		if err != nil {
@@ -245,7 +244,7 @@ func (s *TokenService) DeleteToken(c core.Context, tokenRecord *models.TokenReco
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		deletedRows, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", tokenRecord.Uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
 
 		if err != nil {
@@ -264,7 +263,7 @@ func (s *TokenService) DeleteTokens(c core.Context, uid int64, tokenRecords []*m
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.TokenDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		for i := 0; i < len(tokenRecords); i++ {
 			tokenRecord := tokenRecords[i]
 			deletedRows, err := sess.Where("uid=? AND user_token_id=? AND created_unix_time=?", uid, tokenRecord.UserTokenId, tokenRecord.CreatedUnixTime).Delete(&models.TokenRecord{})
@@ -301,7 +300,7 @@ func (s *TokenService) DeleteTokensBeforeTime(c core.Context, uid int64, createT
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.TokenDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Where("uid=? AND created_unix_time<?", uid, createTime).Delete(&models.TokenRecord{})
 		return err
 	})
@@ -313,7 +312,7 @@ func (s *TokenService) DeleteTokensByType(c core.Context, uid int64, tokenType c
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.TokenDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Where("uid=? AND token_type=?", uid, tokenType).Delete(&models.TokenRecord{})
 		return err
 	})
@@ -325,7 +324,7 @@ func (s *TokenService) DeleteAllTokens(c core.Context, uid int64) error {
 		return errs.ErrUserIdInvalid
 	}
 
-	return s.TokenDB(uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.TokenDB(uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Where("uid=?", uid).Delete(&models.TokenRecord{})
 		return err
 	})
@@ -337,7 +336,7 @@ func (s *TokenService) DeleteAllExpiredTokens(c core.Context) error {
 	totalCount := int64(0)
 
 	for i := 0; i < s.TokenDBCount(); i++ {
-		err := s.TokenDBByIndex(i).DoTransaction(c, func(sess *xorm.Session) error {
+		err := s.TokenDBByIndex(i).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 			count, err := sess.Where("expired_unix_time<=?", time.Now().Unix()).Delete(&models.TokenRecord{})
 			totalCount += count
 			return err
@@ -865,7 +864,7 @@ func (s *TokenService) createTokenRecord(c core.Context, tokenRecord *models.Tok
 		return errs.ErrInvalidUserTokenId
 	}
 
-	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess *xorm.Session) error {
+	return s.TokenDB(tokenRecord.Uid).DoTransaction(c, func(sess datastore.DatabaseSession) error {
 		_, err := sess.Insert(tokenRecord)
 		return err
 	})

@@ -14,6 +14,7 @@ import { hasWebAuthnConfig } from '@/lib/userstate.ts';
 import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+import logger from '@/lib/logger.ts';
 
 export function useUnlockPageBase() {
     const { setLanguage, initLocale } = useI18n();
@@ -57,6 +58,8 @@ export function useUnlockPageBase() {
             if (response.notificationContent) {
                 rootStore.setNotificationContent(response.notificationContent);
             }
+        }).catch(error => {
+            logger.error('failed to refresh token after unlocking', error);
         });
     }
 

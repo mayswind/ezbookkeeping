@@ -48,7 +48,7 @@ export const useTokensStore = defineStore('tokens', () => {
     }
 
     function refreshTokenAndRevokeOldToken(): Promise<TokenRefreshResponse> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             services.refreshToken().then(response => {
                 const data = response.data;
 
@@ -71,12 +71,14 @@ export const useTokensStore = defineStore('tokens', () => {
                         revokeToken({
                             tokenId: data.result.oldTokenId,
                             ignoreError: true
+                        }).catch(error => {
+                            logger.warn('failed to revoke old token after refreshing', error);
                         });
                     }
                 }
 
                 resolve(data.result);
-            });
+            }).catch(reject);
         });
     }
 

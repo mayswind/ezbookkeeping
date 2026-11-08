@@ -36,6 +36,7 @@ import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
+import logger from '@/lib/logger.ts';
 
 const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
 
@@ -126,6 +127,8 @@ if (isUserLogined() && initialRoutePath !== '/verify_email' && initialRoutePath 
             updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
             exchangeRatesStore.removeExpiredExchangeRates(true);
             exchangeRatesStore.autoUpdateExchangeRatesData();
+        }).catch(error => {
+            logger.error('failed to refresh token', error);
         });
     }
 }

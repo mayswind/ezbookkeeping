@@ -82,7 +82,7 @@ func (c *WebContext) SetContextId(requestId string) {
 func (c *WebContext) GetContextId() string {
 	requestId, exists := c.Get(webContextRequestIdFieldKey)
 
-	if !exists {
+	if !exists || requestId == nil {
 		return ""
 	}
 
@@ -98,7 +98,7 @@ func (c *WebContext) SetTextualToken(token string) {
 func (c *WebContext) GetTextualToken() string {
 	token, exists := c.Get(webContextTextualTokenFieldKey)
 
-	if !exists {
+	if !exists || token == nil {
 		return ""
 	}
 
@@ -114,7 +114,7 @@ func (c *WebContext) SetTokenClaims(claims *UserTokenClaims) {
 func (c *WebContext) GetTokenClaims() *UserTokenClaims {
 	claims, exists := c.Get(webContextTokenClaimsFieldKey)
 
-	if !exists {
+	if !exists || claims == nil {
 		return nil
 	}
 
@@ -130,7 +130,7 @@ func (c *WebContext) SetTokenRecord(record TokenRecord) {
 func (c *WebContext) GetTokenRecord() TokenRecord {
 	record, exists := c.Get(webContextTokenContextFieldKey)
 
-	if !exists {
+	if !exists || record == nil {
 		return nil
 	}
 
@@ -230,7 +230,7 @@ func (c *WebContext) SetResponseError(error *errs.Error) {
 func (c *WebContext) GetResponseError() *errs.Error {
 	err, exists := c.Get(webContextResponseErrorFieldKey)
 
-	if !exists {
+	if !exists || err == nil {
 		return nil
 	}
 

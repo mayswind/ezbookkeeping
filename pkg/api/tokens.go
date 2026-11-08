@@ -314,7 +314,7 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.WebContext) (any, *errs.Error)
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
-	currentTokenIndex := 0
+	currentTokenIndex := -1
 
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
@@ -325,7 +325,9 @@ func (a *TokensApi) TokenRevokeAllHandler(c *core.WebContext) (any, *errs.Error)
 		}
 	}
 
-	tokens = append(tokens[:currentTokenIndex], tokens[currentTokenIndex+1:]...)
+	if currentTokenIndex >= 0 {
+		tokens = append(tokens[:currentTokenIndex], tokens[currentTokenIndex+1:]...)
+	}
 
 	if len(tokens) < 1 {
 		return nil, errs.ErrTokenRecordNotFound

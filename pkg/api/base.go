@@ -109,40 +109,40 @@ func (a *ApiUsingConfig) GetAfterOpenNotificationContent(userLanguage string, cl
 // ApiUsingDuplicateChecker represents an api that need to use duplicate checker
 type ApiUsingDuplicateChecker struct {
 	ApiUsingConfig
-	container *duplicatechecker.DuplicateCheckerContainer
+	duplicateChecker duplicatechecker.DuplicateChecker
 }
 
 // GetSubmissionRemark returns whether the same submission has been processed and related remark by the current duplicate checker
 func (a *ApiUsingDuplicateChecker) GetSubmissionRemark(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string) (bool, string) {
-	return a.container.GetSubmissionRemark(checkerType, uid, identification)
+	return a.duplicateChecker.GetSubmissionRemark(checkerType, uid, identification)
 }
 
 // SetSubmissionRemarkWithCustomExpiration saves the identification and remark by the current duplicate checker with custom expiration time
 func (a *ApiUsingDuplicateChecker) SetSubmissionRemarkWithCustomExpiration(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string, expiration time.Duration) {
-	a.container.SetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
+	a.duplicateChecker.SetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
 }
 
 // GetOrSetSubmissionRemarkWithCustomExpiration returns the remark when the same submission has been processed or saves the identification and remark by the current duplicate checker with custom expiration time
 func (a *ApiUsingDuplicateChecker) GetOrSetSubmissionRemarkWithCustomExpiration(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string, expiration time.Duration) (bool, string) {
-	return a.container.GetOrSetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
+	return a.duplicateChecker.GetOrSetSubmissionRemarkWithCustomExpiration(checkerType, uid, identification, remark, expiration)
 }
 
 // SetSubmissionRemarkIfEnable saves the identification and remark by the current duplicate checker if the duplicate submission check is enabled
 func (a *ApiUsingDuplicateChecker) SetSubmissionRemarkIfEnable(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string, remark string) {
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {
-		a.container.SetSubmissionRemark(checkerType, uid, identification, remark)
+		a.duplicateChecker.SetSubmissionRemark(checkerType, uid, identification, remark)
 	}
 }
 
 // RemoveSubmissionRemark removes the identification and remark by the current duplicate checker
 func (a *ApiUsingDuplicateChecker) RemoveSubmissionRemark(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string) {
-	a.container.RemoveSubmissionRemark(checkerType, uid, identification)
+	a.duplicateChecker.RemoveSubmissionRemark(checkerType, uid, identification)
 }
 
 // RemoveSubmissionRemarkIfEnable removes the identification and remark by the current duplicate checker if the duplicate submission check is enabled
 func (a *ApiUsingDuplicateChecker) RemoveSubmissionRemarkIfEnable(checkerType duplicatechecker.DuplicateCheckerType, uid int64, identification string) {
 	if a.CurrentConfig().EnableDuplicateSubmissionsCheck {
-		a.container.RemoveSubmissionRemark(checkerType, uid, identification)
+		a.duplicateChecker.RemoveSubmissionRemark(checkerType, uid, identification)
 	}
 }
 
@@ -150,7 +150,7 @@ func (a *ApiUsingDuplicateChecker) RemoveSubmissionRemarkIfEnable(checkerType du
 func (a *ApiUsingDuplicateChecker) CheckFailureCount(c *core.WebContext, uid int64) error {
 	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 {
 		clientIp := c.ClientIP()
-		ipFailureCount := a.container.GetFailureCount(clientIp)
+		ipFailureCount := a.duplicateChecker.GetFailureCount(clientIp)
 
 		if ipFailureCount >= a.CurrentConfig().MaxFailuresPerIpPerMinute {
 			log.Warnf(c, "[base.CheckFailureCount] operation failure via IP \"%s\", current failure count: %d reached the limit", clientIp, ipFailureCount)
@@ -159,7 +159,7 @@ func (a *ApiUsingDuplicateChecker) CheckFailureCount(c *core.WebContext, uid int
 	}
 
 	if a.CurrentConfig().MaxFailuresPerUserPerMinute > 0 && uid > 0 {
-		uidFailureCount := a.container.GetFailureCount(utils.Int64ToString(uid))
+		uidFailureCount := a.duplicateChecker.GetFailureCount(utils.Int64ToString(uid))
 
 		if uidFailureCount >= a.CurrentConfig().MaxFailuresPerUserPerMinute {
 			log.Warnf(c, "[base.CheckFailureCount] operation failure via uid \"%d\", current failure count: %d reached the limit", uid, uidFailureCount)
@@ -177,21 +177,21 @@ func (a *ApiUsingDuplicateChecker) CheckAndIncreaseFailureCount(c *core.WebConte
 	uidFailureCount := uint32(0)
 
 	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 {
-		ipFailureCount = a.container.GetFailureCount(clientIp)
+		ipFailureCount = a.duplicateChecker.GetFailureCount(clientIp)
 	}
 
 	if a.CurrentConfig().MaxFailuresPerUserPerMinute > 0 && uid > 0 {
-		uidFailureCount = a.container.GetFailureCount(utils.Int64ToString(uid))
+		uidFailureCount = a.duplicateChecker.GetFailureCount(utils.Int64ToString(uid))
 	}
 
 	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 && ipFailureCount < a.CurrentConfig().MaxFailuresPerIpPerMinute {
 		log.Warnf(c, "[base.CheckAndIncreaseFailureCount] operation failure via IP \"%s\", previous failure count: %d", clientIp, ipFailureCount)
-		a.container.IncreaseFailureCount(clientIp)
+		a.duplicateChecker.IncreaseFailureCount(clientIp)
 	}
 
 	if a.CurrentConfig().MaxFailuresPerUserPerMinute > 0 && uid > 0 && uidFailureCount < a.CurrentConfig().MaxFailuresPerUserPerMinute {
 		log.Warnf(c, "[base.CheckAndIncreaseFailureCount] operation failure via uid \"%d\", previous failure count: %d", uid, uidFailureCount)
-		a.container.IncreaseFailureCount(utils.Int64ToString(uid))
+		a.duplicateChecker.IncreaseFailureCount(utils.Int64ToString(uid))
 	}
 
 	if a.CurrentConfig().MaxFailuresPerIpPerMinute > 0 && ipFailureCount >= a.CurrentConfig().MaxFailuresPerIpPerMinute {
@@ -209,15 +209,15 @@ func (a *ApiUsingDuplicateChecker) CheckAndIncreaseFailureCount(c *core.WebConte
 
 // ApiUsingAvatarProvider represents an api that need to use avatar provider
 type ApiUsingAvatarProvider struct {
-	container *avatars.AvatarProviderContainer
-	tokens    *services.TokenService
+	avatarProvider avatars.AvatarProvider
+	tokens         *services.TokenService
 }
 
 // GetAvatarUrl returns the avatar url by the current user avatar provider
 func (a *ApiUsingAvatarProvider) GetAvatarUrl(c *core.WebContext, user *models.User) (string, error) {
-	avatarUrl := a.container.GetAvatarUrl(user)
+	avatarUrl := a.avatarProvider.GetAvatarUrl(user)
 
-	if avatarUrl == "" || !a.container.NeedAvatarToken() {
+	if avatarUrl == "" || !a.avatarProvider.NeedAvatarToken() {
 		return avatarUrl, nil
 	}
 

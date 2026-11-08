@@ -37,8 +37,8 @@ var (
 				container: settings.Container,
 			},
 			ApiUsingAvatarProvider: ApiUsingAvatarProvider{
-				container: avatars.Container,
-				tokens:    services.Tokens,
+				avatarProvider: avatars.Container,
+				tokens:         services.Tokens,
 			},
 		},
 		users:    services.Users,

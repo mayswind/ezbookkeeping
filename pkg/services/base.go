@@ -19,6 +19,13 @@ type ServiceUsingDB struct {
 	container *datastore.DataStoreContainer
 }
 
+// NewServiceUsingDB returns a new service using the given data storage container
+func NewServiceUsingDB(container *datastore.DataStoreContainer) ServiceUsingDB {
+	return ServiceUsingDB{
+		container: container,
+	}
+}
+
 // UserDB returns the datastore which contains user
 func (s *ServiceUsingDB) UserDB() datastore.Database {
 	return s.container.UserStore.Choose(0)
@@ -57,6 +64,13 @@ func (s *ServiceUsingDB) UserDataDBCount() int {
 // ServiceUsingConfig represents a service that need to use config
 type ServiceUsingConfig struct {
 	container *settings.ConfigContainer
+}
+
+// NewServiceUsingConfig returns a new service using the given config container
+func NewServiceUsingConfig(container *settings.ConfigContainer) ServiceUsingConfig {
+	return ServiceUsingConfig{
+		container: container,
+	}
 }
 
 // CurrentConfig returns the current config

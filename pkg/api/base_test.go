@@ -21,24 +21,30 @@ import (
 
 func initializeAvatarProviderApiTest(t *testing.T, config *settings.Config) *ApiWithUserInfo {
 	t.Helper()
-	previousContainer := avatars.Container
-	previousConfig := settings.Container.GetCurrentConfig()
-	t.Cleanup(func() {
-		avatars.Container = previousContainer
-		settings.SetCurrentConfig(previousConfig)
-	})
+	var provider avatars.AvatarProvider
 
-	avatars.Container = &avatars.AvatarProviderContainer{}
-	settings.SetCurrentConfig(config)
-
-	err := avatars.InitializeAvatarProvider(config)
-	if err != nil {
-		t.Fatal(err)
+	if config.AvatarProvider == core.USER_AVATAR_PROVIDER_INTERNAL {
+		provider = avatars.NewInternalStorageAvatarProvider(config)
+	} else if config.AvatarProvider == core.USER_AVATAR_PROVIDER_GRAVATAR {
+		provider = avatars.NewGravatarAvatarProvider()
+	} else if config.AvatarProvider == "" {
+		provider = avatars.NewNullAvatarProvider()
+	} else {
+		t.Fatal(errs.ErrInvalidAvatarProvider)
 	}
 
+	configContainer := settings.NewConfigContainer(config)
+
 	return &ApiWithUserInfo{
-		ApiUsingConfig:         ApiUsingConfig{container: settings.Container},
-		ApiUsingAvatarProvider: ApiUsingAvatarProvider{container: avatars.Container},
+		ApiUsingConfig: ApiUsingConfig{
+			container: configContainer,
+		},
+		ApiUsingAvatarProvider: ApiUsingAvatarProvider{
+			avatarProvider: provider,
+			tokens: &services.TokenService{
+				ServiceUsingConfig: services.NewServiceUsingConfig(configContainer),
+			},
+		},
 	}
 }
 

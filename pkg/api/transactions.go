@@ -52,7 +52,7 @@ var (
 			ApiUsingConfig: ApiUsingConfig{
 				container: settings.Container,
 			},
-			container: duplicatechecker.Container,
+			duplicateChecker: duplicatechecker.Container,
 		},
 		transactions:          services.Transactions,
 		transactionCategories: services.TransactionCategories,

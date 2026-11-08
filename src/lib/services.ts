@@ -264,7 +264,7 @@ axios.interceptors.request.use((config: ApiRequestConfig) => {
     if (refreshingTokenPromise && !config.ignoreBlocked) {
         return new Promise(resolve => {
             blockedRequests.push(newToken => {
-                if (newToken) {
+                if (newToken && !config.noAuth) {
                     config.headers.Authorization = `Bearer ${newToken}`;
                 }
 

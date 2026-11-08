@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 
 import { useSettingsStore } from './setting.ts';
 import { useUserStore } from './user.ts';
+import { useUserCustomIconsStore } from './userCustomIcon.ts';
 
 import type {
     TokenGenerateAPIResponse,
@@ -19,6 +20,7 @@ import services from '@/lib/services.ts';
 export const useTokensStore = defineStore('tokens', () => {
     const settingsStore = useSettingsStore();
     const userStore = useUserStore();
+    const userCustomIconsStore = useUserCustomIconsStore();
 
     function getAllTokens(): Promise<TokenInfoResponse[]> {
         return new Promise((resolve, reject) => {
@@ -60,6 +62,10 @@ export const useTokensStore = defineStore('tokens', () => {
 
                 if (data && data.success && data.result && data.result.newToken) {
                     updateCurrentToken(data.result.newToken);
+
+                    if (!userCustomIconsStore.customIconListStateInvalid) {
+                        userCustomIconsStore.updateCustomIconListInvalidState(true);
+                    }
 
                     if (data.result.oldTokenId) {
                         revokeToken({

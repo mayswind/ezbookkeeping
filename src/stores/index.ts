@@ -445,6 +445,10 @@ export const useRootStore = defineStore('root', () => {
 
                 if (data.result.newToken && isString(data.result.newToken)) {
                     updateCurrentToken(data.result.newToken);
+
+                    if (!userCustomIconsStore.customIconListStateInvalid) {
+                        userCustomIconsStore.updateCustomIconListInvalidState(true);
+                    }
                 }
 
                 if (data.result.user && isObject(data.result.user)) {

@@ -1,4 +1,6 @@
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
+
+import { useUserCustomIconsStore } from '@/stores/userCustomIcon.ts';
 
 import type { CommonIconItemType } from '@/core/icon.ts';
 import type { ColorStyleValue, ColorValue } from '@/core/color.ts';
@@ -6,7 +8,6 @@ import { ALL_ACCOUNT_ICONS, DEFAULT_ACCOUNT_ICON, ALL_CATEGORY_ICONS, DEFAULT_CA
 import { DEFAULT_ICON_COLOR, DEFAULT_ACCOUNT_COLOR, DEFAULT_CATEGORY_COLOR, DEFAULT_COLOR_STYLE_VARIABLE } from '@/consts/color.ts';
 
 import { isNumber } from '@/lib/common.ts';
-import services from '@/lib/services.ts';
 
 type IconItemStyleName = string;
 type IconItemStyleValue = ColorValue | string | number | undefined;
@@ -22,12 +23,14 @@ export interface CommonIconProps {
 }
 
 export function useItemIconBase(props: CommonIconProps) {
+    const customIconsStore = useUserCustomIconsStore();
+
     const customIconUrl = computed<string | undefined>(() => {
         if (props.iconType !== 'user-custom') {
             return undefined;
         }
 
-        return services.getUserCustomIconUrlWithToken(props.iconId);
+        return customIconsStore.getUserCustomIconUrl(props.iconId);
     });
 
     const style = computed<Record<IconItemStyleName, IconItemStyleValue>>(() => {
@@ -139,6 +142,12 @@ export function useItemIconBase(props: CommonIconProps) {
 
         return ret;
     }
+
+    watch(() => props.iconType, iconType => {
+        if (iconType === 'user-custom') {
+            customIconsStore.loadAllCustomIcons({ force: false });
+        }
+    }, { immediate: true });
 
     return {
         style,

@@ -1,5 +1,10 @@
 package models
 
+import (
+	"net/url"
+	"strings"
+)
+
 const UserCustomIconFileExtension = "png"
 
 // UserCustomIcon represents a user uploaded icon stored in object storage.
@@ -31,15 +36,33 @@ type UserCustomIconDeleteRequest struct {
 
 // UserCustomIconInfoResponse represents the response data of a user custom icon
 type UserCustomIconInfoResponse struct {
-	Id           int64 `json:"id,string"`
-	DisplayOrder int32 `json:"displayOrder"`
+	Id           int64  `json:"id,string"`
+	DisplayOrder int32  `json:"displayOrder"`
+	OriginalUrl  string `json:"originalUrl"`
+}
+
+// UserCustomIconListResponse represents the response data of user custom icons
+type UserCustomIconListResponse struct {
+	Items     UserCustomIconInfoResponseSlice `json:"items"`
+	ExpiresAt int64                           `json:"expiresAt"`
 }
 
 // ToUserCustomIconInfoResponse returns a view-object according to database model
-func (i *UserCustomIcon) ToUserCustomIconInfoResponse() *UserCustomIconInfoResponse {
+func (i *UserCustomIcon) ToUserCustomIconInfoResponse(originalUrl string, iconToken string) *UserCustomIconInfoResponse {
+	if iconToken != "" {
+		separator := "?"
+
+		if strings.Contains(originalUrl, "?") {
+			separator = "&"
+		}
+
+		originalUrl += separator + "token=" + url.QueryEscape(iconToken)
+	}
+
 	return &UserCustomIconInfoResponse{
 		Id:           i.IconId,
 		DisplayOrder: i.DisplayOrder,
+		OriginalUrl:  originalUrl,
 	}
 }
 

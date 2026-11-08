@@ -18,6 +18,7 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const internalUserCustomIconUrlFormat = "%sicons/%d.%s"
 const internalTransactionPictureUrlFormat = "%spictures/%d.%s"
 
 // ApiUsingConfig represents an api that need to use config
@@ -28,6 +29,12 @@ type ApiUsingConfig struct {
 // CurrentConfig returns the current config
 func (a *ApiUsingConfig) CurrentConfig() *settings.Config {
 	return a.container.GetCurrentConfig()
+}
+
+// GetUserCustomIconInfoResponse returns the view-object of a user custom icon according to the icon model
+func (a *ApiUsingConfig) GetUserCustomIconInfoResponse(iconInfo *models.UserCustomIcon, iconToken string) *models.UserCustomIconInfoResponse {
+	originalUrl := fmt.Sprintf(internalUserCustomIconUrlFormat, a.CurrentConfig().RootUrl, iconInfo.IconId, models.UserCustomIconFileExtension)
+	return iconInfo.ToUserCustomIconInfoResponse(originalUrl, iconToken)
 }
 
 // GetTransactionPictureInfoResponse returns the view-object of transaction picture basic info according to the transaction picture model

@@ -189,6 +189,7 @@ import type {
 } from '@/models/large_language_model.ts';
 import type {
     UserCustomIconInfoResponse,
+    UserCustomIconListResponse,
     UserCustomIconMoveRequest,
     UserCustomIconDeleteRequest
 } from '@/models/user_custom_icon.ts';
@@ -924,8 +925,8 @@ export default {
             cancelableUuid: cancelableUuid
         } as ApiRequestConfig);
     },
-    getAllUserCustomIcons: (): ApiResponsePromise<UserCustomIconInfoResponse[]> => {
-        return axios.get<ApiResponse<UserCustomIconInfoResponse[]>>('v1/custom_icons/list.json');
+    getAllUserCustomIcons: (): ApiResponsePromise<UserCustomIconListResponse> => {
+        return axios.get<ApiResponse<UserCustomIconListResponse>>('v1/custom_icons/list.json');
     },
     uploadUserCustomIcon: ({ iconFile, clientSessionId }: { iconFile: File, clientSessionId?: string }): ApiResponsePromise<UserCustomIconInfoResponse> => {
         return axios.postForm<ApiResponse<UserCustomIconInfoResponse>>('v1/custom_icons/upload.json', {
@@ -1026,8 +1027,5 @@ export default {
     },
     generateAmapApiInternalProxyUrl: (): string => {
         return `${window.location.origin}${getBasePath()}${BASE_AMAP_API_PROXY_URL_PATH}`;
-    },
-    getUserCustomIconUrlWithToken(iconId: string | number): string {
-        return `${getBasePath()}/icons/${iconId}.png?token=${getCurrentToken()}`;
     }
 };

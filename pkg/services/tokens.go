@@ -201,12 +201,19 @@ func (s *TokenService) CreateOAuth2CallbackToken(c *core.WebContext, user *model
 
 // DeriveUserAvatarToken derives an avatar-only token from the current session
 func (s *TokenService) DeriveUserAvatarToken(c core.Context, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, error) {
-	return s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeUserAvatar, s.CurrentConfig().UserAvatarTokenExpiredTimeDuration)
+	token, _, err := s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeUserAvatar, s.CurrentConfig().UserAvatarTokenExpiredTimeDuration)
+	return token, err
+}
+
+// DeriveUserCustomIconToken derives an icon-only token from the current session
+func (s *TokenService) DeriveUserCustomIconToken(c core.Context, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, int64, error) {
+	return s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeUserCustomIcon, s.CurrentConfig().UserCustomIconTokenExpiredTimeDuration)
 }
 
 // DeriveTransactionPictureToken derives a picture-only token from the current session
 func (s *TokenService) DeriveTransactionPictureToken(c core.Context, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, error) {
-	return s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeTransactionPicture, s.CurrentConfig().TransactionPictureTokenExpiredTimeDuration)
+	token, _, err := s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeTransactionPicture, s.CurrentConfig().TransactionPictureTokenExpiredTimeDuration)
+	return token, err
 }
 
 // UpdateTokenLastSeen updates the last seen time of specified token
@@ -733,10 +740,10 @@ func (s *TokenService) createToken(c core.Context, user *models.User, tokenType 
 	return tokenString, claims, tokenRecord, err
 }
 
-func (s *TokenService) deriveScopedNormalToken(c core.Context, claims *core.UserTokenClaims, record core.TokenRecord, scope core.NormalTokenScope, expiry time.Duration) (string, error) {
+func (s *TokenService) deriveScopedNormalToken(c core.Context, claims *core.UserTokenClaims, record core.TokenRecord, scope core.NormalTokenScope, expiry time.Duration) (string, int64, error) {
 	if claims == nil || claims.Type != core.USER_TOKEN_TYPE_NORMAL {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] token is invalid, because claims is nil or token type is not normal")
-		return "", errs.ErrInvalidToken
+		return "", 0, errs.ErrInvalidToken
 	}
 
 	now := time.Now().Unix()
@@ -744,24 +751,24 @@ func (s *TokenService) deriveScopedNormalToken(c core.Context, claims *core.User
 
 	if err != nil {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] token \"utid:%s\" in token of user \"uid:%d\" is invalid, because %s", claims.UserTokenId, claims.Uid, err.Error())
-		return "", errs.ErrInvalidToken
+		return "", 0, errs.ErrInvalidToken
 	}
 
 	if record == nil || record.GetUid() != claims.Uid || record.GetUserTokenId() != userTokenId || record.GetCreatedUnixTime() != claims.IssuedAt {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] token \"utid:%s\" of user \"uid:%d\" record is invalid, because record is nil or not match claims", claims.UserTokenId, claims.Uid)
-		return "", errs.ErrInvalidToken
+		return "", 0, errs.ErrInvalidToken
 	}
 
 	expiredAt := min(time.Now().Add(expiry).Unix(), claims.ExpiresAt, record.GetExpiredUnixTime())
 
 	if expiredAt < now {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] token \"utid:%s\" of user \"uid:%d\" record is expired", claims.UserTokenId, claims.Uid)
-		return "", errs.ErrTokenExpired
+		return "", 0, errs.ErrTokenExpired
 	}
 
 	if record.GetTokenType() != core.USER_TOKEN_TYPE_NORMAL {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] token \"utid:%s\" of user \"uid:%d\" record is not normal token", claims.UserTokenId, claims.Uid)
-		return "", errs.ErrInvalidToken
+		return "", 0, errs.ErrInvalidToken
 	}
 
 	additionalData := &core.NormalTokenAdditionalData{
@@ -773,17 +780,18 @@ func (s *TokenService) deriveScopedNormalToken(c core.Context, claims *core.User
 
 	if err != nil {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] cannot marshal additional data of token \"utid:%s\" of user \"uid:%d\", because %s", claims.UserTokenId, claims.Uid, err.Error())
-		return "", err
+		return "", 0, err
 	}
 
 	derivedTokenType, exists := core.NormalTokenScopeDerivedTokenTypeMap[scope]
 
 	if !exists {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] cannot get derived token type of token \"utid:%s\" of user \"uid:%d\", because scope \"%d\" is not supported", claims.UserTokenId, claims.Uid, scope)
-		return "", errs.ErrInvalidToken
+		return "", 0, errs.ErrInvalidToken
 	}
 
-	return s.generateEncryptedToken(record, derivedTokenType, additionalDataBytes)
+	token, err := s.generateEncryptedToken(record, derivedTokenType, additionalDataBytes)
+	return token, expiredAt, err
 }
 
 func (s *TokenService) generateEncryptedToken(record core.TokenRecord, derivedTokenType core.TextualDerivedTokenType, additionalData []byte) (string, error) {

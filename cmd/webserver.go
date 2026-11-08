@@ -204,7 +204,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.EnableUserCustomIcon {
 		customIconRoute := router.Group("/icons")
-		customIconRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
+		customIconRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config, core.NormalTokenScopeUserCustomIcon), config))
 		{
 			customIconRoute.GET("/:fileName", bindImage(api.UserCustomIcons.CustomIconGetHandler, config))
 		}

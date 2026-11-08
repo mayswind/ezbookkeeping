@@ -132,8 +132,8 @@ const deletingCustomIconId = ref<string>('');
 
 const allCustomIcons = computed<UserCustomIconInfoResponse[]>(() => customIconsStore.allCustomIcons);
 
-function getCustomIconUrl(customIcon: UserCustomIconInfoResponse): string {
-    return customIconsStore.getUserCustomIconUrlWithToken(customIcon);
+function getCustomIconUrl(customIcon: UserCustomIconInfoResponse): string | undefined {
+    return customIconsStore.getUserCustomIconUrl(customIcon);
 }
 
 function init(): void {

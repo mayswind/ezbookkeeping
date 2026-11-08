@@ -1,8 +1,8 @@
 package api
 
 import (
+	"fmt"
 	"net/url"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -18,6 +18,120 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
+
+type apiTestDatabase struct {
+	datastore.Database
+	handler apiTestModelHandler
+}
+
+type apiTestSession struct {
+	datastore.DatabaseSession
+	database *apiTestDatabase
+	query    any
+	args     []any
+}
+
+type apiTestModelHandler interface {
+	Find(s *apiTestSession, rowsSlicePtr any, condiBean ...any) error
+	Get(s *apiTestSession, beans ...any) (bool, error)
+	Insert(s *apiTestSession, beans ...any) (int64, error)
+	Delete(s *apiTestSession, beans ...any) (int64, error)
+}
+
+type apiTestModelOperations struct {
+}
+
+func (db *apiTestDatabase) NewSession(c core.Context) datastore.DatabaseSession {
+	return &apiTestSession{
+		database: db,
+	}
+}
+
+func (db *apiTestDatabase) DoTransaction(c core.Context, fn func(datastore.DatabaseSession) error) error {
+	return fn(db.NewSession(c))
+}
+
+func (s *apiTestSession) Where(query any, args ...any) datastore.DatabaseSession {
+	s.query = query
+	s.args = args
+	return s
+}
+
+func (s *apiTestSession) Find(rowsSlicePtr any, condiBean ...any) error {
+	handler := s.database.handler
+
+	if handler == nil {
+		return s.unsupportedOperation("Find", rowsSlicePtr)
+	}
+
+	return handler.Find(s, rowsSlicePtr, condiBean...)
+}
+
+func (s *apiTestSession) Limit(limit int, start ...int) datastore.DatabaseSession {
+	return s
+}
+
+func (s *apiTestSession) Get(beans ...any) (bool, error) {
+	if len(beans) != 1 {
+		return false, s.unsupportedOperation("Get", beans)
+	}
+
+	handler := s.database.handler
+
+	if handler == nil {
+		return false, s.unsupportedOperation("Get", beans[0])
+	}
+
+	return handler.Get(s, beans...)
+}
+
+func (s *apiTestSession) Insert(beans ...any) (int64, error) {
+	if len(beans) != 1 {
+		return 0, s.unsupportedOperation("Insert", beans)
+	}
+
+	handler := s.database.handler
+
+	if handler == nil {
+		return 0, s.unsupportedOperation("Insert", beans[0])
+	}
+
+	return handler.Insert(s, beans...)
+}
+
+func (s *apiTestSession) Delete(beans ...any) (int64, error) {
+	if len(beans) != 1 {
+		return 0, s.unsupportedOperation("Delete", beans)
+	}
+
+	handler := s.database.handler
+
+	if handler == nil {
+		return 0, s.unsupportedOperation("Delete", beans[0])
+	}
+
+	return handler.Delete(s, beans...)
+}
+
+func (s *apiTestSession) unsupportedOperation(operation string, bean any) error {
+	return fmt.Errorf("unsupported mock %s for %T (query: %v, args: %v)", operation, bean, s.query, s.args)
+}
+
+func (o *apiTestModelOperations) Find(s *apiTestSession, rowsSlicePtr any, condiBean ...any) error {
+	return s.unsupportedOperation("Find", rowsSlicePtr)
+}
+
+func (o *apiTestModelOperations) Get(s *apiTestSession, beans ...any) (bool, error) {
+	return false, s.unsupportedOperation("Get", beans)
+}
+
+func (o *apiTestModelOperations) Insert(s *apiTestSession, beans ...any) (int64, error) {
+	return 0, s.unsupportedOperation("Insert", beans)
+}
+
+func (o *apiTestModelOperations) Delete(s *apiTestSession, beans ...any) (int64, error) {
+	return 0, s.unsupportedOperation("Delete", beans)
+}
 
 func initializeAvatarProviderApiTest(t *testing.T, config *settings.Config) *ApiWithUserInfo {
 	t.Helper()
@@ -58,28 +172,17 @@ func initializeInternalAvatarApiTest(t *testing.T, rootUrl string) (*ApiWithUser
 		UserAvatarTokenExpiredTimeDuration: time.Hour,
 	})
 
-	previousStores := *datastore.Container
-
-	t.Cleanup(func() {
-		*datastore.Container = previousStores
-	})
-
-	err := datastore.InitializeDataStore(&settings.Config{
-		DatabaseConfig: &settings.DatabaseConfig{
-			DatabaseType: settings.Sqlite3DbType,
-			DatabasePath: filepath.Join(t.TempDir(), "tokens.db"),
-		},
+	tokenStore, err := datastore.NewDataStore(&apiTestDatabase{
+		handler: &tokenApiTestData{},
 	})
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = datastore.Container.TokenStore.SyncStructs(new(models.TokenRecord))
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	api.tokens.ServiceUsingDB = services.NewServiceUsingDB(&datastore.DataStoreContainer{
+		TokenStore: tokenStore,
+	})
 
 	c := core.WrapWebContext(&gin.Context{}, nil)
 
@@ -89,7 +192,7 @@ func initializeInternalAvatarApiTest(t *testing.T, rootUrl string) (*ApiWithUser
 		CustomAvatarType: "png",
 	}
 
-	_, claims, tokenRecord, err := services.Tokens.CreateToken(c, user)
+	_, claims, tokenRecord, err := api.tokens.CreateToken(c, user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -97,7 +200,6 @@ func initializeInternalAvatarApiTest(t *testing.T, rootUrl string) (*ApiWithUser
 
 	c.SetTokenClaims(claims)
 	c.SetTokenRecord(tokenRecord)
-	api.ApiUsingAvatarProvider.tokens = services.Tokens
 
 	return api, c, user
 }
@@ -150,7 +252,7 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_Internal(t *testing.T) {
 	avatarUrl, err := url.Parse(actualValue)
 	assert.Equal(t, nil, err)
 
-	claims, _, err := services.Tokens.ParseToken(c, avatarUrl.Query().Get("token"), core.NormalTokenScopeUserAvatar)
+	claims, _, err := api.tokens.ParseToken(c, avatarUrl.Query().Get("token"), core.NormalTokenScopeUserAvatar)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, user.Uid, claims.Uid)
 	assert.Equal(t, c.GetTokenClaims().UserTokenId, claims.UserTokenId)
@@ -168,7 +270,7 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_InternalWithQueryString(t *testing.
 	assert.Equal(t, nil, err)
 	assert.Equal(t, "/avatar/123.png", avatarUrl.Query().Get("path"))
 
-	claims, _, err := services.Tokens.ParseToken(c, avatarUrl.Query().Get("token"), core.NormalTokenScopeUserAvatar)
+	claims, _, err := api.tokens.ParseToken(c, avatarUrl.Query().Get("token"), core.NormalTokenScopeUserAvatar)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, user.Uid, claims.Uid)
 }
@@ -177,7 +279,6 @@ func TestApiWithUserInfo_GetUserBasicInfo_AvatarTokenError(t *testing.T) {
 	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider: core.USER_AVATAR_PROVIDER_INTERNAL,
 	})
-	api.ApiUsingAvatarProvider.tokens = services.Tokens
 
 	c := core.WrapWebContext(&gin.Context{}, nil)
 	c.SetTokenClaims(&core.UserTokenClaims{

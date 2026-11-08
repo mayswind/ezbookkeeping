@@ -11,18 +11,17 @@ import (
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
-	"github.com/mayswind/ezbookkeeping/pkg/services"
 	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 func TestTransactionsApiGetTransactionResponseListResult_NormalToken(t *testing.T) {
 	baseAPI, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/")
-	config := settings.Container.GetCurrentConfig()
+	config := baseAPI.CurrentConfig()
 	config.EnableTransactionPictures = true
 	config.TransactionPictureTokenExpiredTimeDuration = time.Hour
 	api := &TransactionsApi{
 		ApiUsingConfig: baseAPI.ApiUsingConfig,
-		tokens:         services.Tokens,
+		tokens:         baseAPI.tokens,
 	}
 
 	transactions := []*models.Transaction{{
@@ -46,7 +45,7 @@ func TestTransactionsApiGetTransactionResponseListResult_NormalToken(t *testing.
 	pictureUrl, err := url.Parse(actualValue[0].Pictures[0].OriginalUrl)
 	assert.Equal(t, nil, err)
 
-	claims, _, err := services.Tokens.ParseToken(c, pictureUrl.Query().Get("token"), core.NormalTokenScopeTransactionPicture)
+	claims, _, err := api.tokens.ParseToken(c, pictureUrl.Query().Get("token"), core.NormalTokenScopeTransactionPicture)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, user.Uid, claims.Uid)
 	assert.Equal(t, c.GetTokenClaims().UserTokenId, claims.UserTokenId)

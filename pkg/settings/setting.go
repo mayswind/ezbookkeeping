@@ -200,6 +200,7 @@ const (
 	defaultTemporaryTokenExpiredTime          uint32 = 300     // 5 minutes
 	defaultEmailVerifyTokenExpiredTime        uint32 = 3600    // 60 minutes
 	defaultUserAvatarTokenExpiredTime         uint32 = 3600    // 60 minutes
+	defaultUserCustomIconTokenExpiredTime     uint32 = 3600    // 60 minutes
 	defaultTransactionPictureTokenExpiredTime uint32 = 3600    // 60 minutes
 	defaultPasswordResetTokenExpiredTime      uint32 = 3600    // 60 minutes
 	defaultMaxFailuresPerIpPerMinute          uint32 = 5
@@ -426,6 +427,8 @@ type Config struct {
 	PasswordResetTokenExpiredTimeDuration      time.Duration
 	UserAvatarTokenExpiredTime                 uint32
 	UserAvatarTokenExpiredTimeDuration         time.Duration
+	UserCustomIconTokenExpiredTime             uint32
+	UserCustomIconTokenExpiredTimeDuration     time.Duration
 	TransactionPictureTokenExpiredTime         uint32
 	TransactionPictureTokenExpiredTimeDuration time.Duration
 	EnableAPIToken                             bool
@@ -1139,6 +1142,14 @@ func loadSecurityConfiguration(config *Config, configFile *ini.File, sectionName
 	}
 
 	config.UserAvatarTokenExpiredTimeDuration = time.Duration(config.UserAvatarTokenExpiredTime) * time.Second
+
+	config.UserCustomIconTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "user_custom_icon_token_expired_time", defaultUserCustomIconTokenExpiredTime)
+
+	if config.UserCustomIconTokenExpiredTime < 60 {
+		return errs.ErrInvalidUserCustomIconTokenExpiredTime
+	}
+
+	config.UserCustomIconTokenExpiredTimeDuration = time.Duration(config.UserCustomIconTokenExpiredTime) * time.Second
 
 	config.TransactionPictureTokenExpiredTime = getConfigItemUint32Value(configFile, sectionName, "transaction_picture_token_expired_time", defaultTransactionPictureTokenExpiredTime)
 

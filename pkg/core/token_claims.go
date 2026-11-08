@@ -65,12 +65,14 @@ type TextualDerivedTokenType string
 const (
 	NONE_DERIVED_TOKEN                       TextualDerivedTokenType = ""
 	USER_AVATAR_DERIVED_NORMAL_TOKEN         TextualDerivedTokenType = "a"
+	USER_CUSTOM_ICON_DERIVED_NORMAL_TOKEN    TextualDerivedTokenType = "i"
 	TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN TextualDerivedTokenType = "p"
 )
 
 // ValidTextualDerivedTokenTypes contains all supported textual derived token types
 var ValidTextualDerivedTokenTypes = map[TextualDerivedTokenType]bool{
 	USER_AVATAR_DERIVED_NORMAL_TOKEN:         true,
+	USER_CUSTOM_ICON_DERIVED_NORMAL_TOKEN:    true,
 	TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN: true,
 }
 
@@ -98,7 +100,8 @@ const (
 	NormalTokenScopeInvalid            NormalTokenScope = 0
 	NormalTokenScopeAll                NormalTokenScope = 1
 	NormalTokenScopeUserAvatar         NormalTokenScope = 2
-	NormalTokenScopeTransactionPicture NormalTokenScope = 3
+	NormalTokenScopeUserCustomIcon     NormalTokenScope = 3
+	NormalTokenScopeTransactionPicture NormalTokenScope = 4
 
 	NormalTokenScopeMinValue NormalTokenScope = NormalTokenScopeAll
 	NormalTokenScopeMaxValue NormalTokenScope = NormalTokenScopeTransactionPicture
@@ -107,6 +110,7 @@ const (
 // NormalTokenScopeDerivedTokenTypeMap maps normal token scopes to their corresponding derived token types
 var NormalTokenScopeDerivedTokenTypeMap = map[NormalTokenScope]TextualDerivedTokenType{
 	NormalTokenScopeUserAvatar:         USER_AVATAR_DERIVED_NORMAL_TOKEN,
+	NormalTokenScopeUserCustomIcon:     USER_CUSTOM_ICON_DERIVED_NORMAL_TOKEN,
 	NormalTokenScopeTransactionPicture: TRANSACTION_PICTURE_DERIVED_NORMAL_TOKEN,
 }
 

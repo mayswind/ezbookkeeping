@@ -238,8 +238,8 @@ interface ApiRequestConfig extends AxiosRequestConfig {
 
 export type ApiResponsePromise<T> = Promise<AxiosResponse<ApiResponse<T>>>;
 
-let needBlockRequest = false;
-const blockedRequests: ((token: string | undefined) => void)[] = [];
+let refreshingTokenPromise: ApiResponsePromise<TokenRefreshResponse> | null = null;
+const blockedRequests: ((token: string | null) => void)[] = [];
 const cancelableRequests: Record<string, boolean> = {};
 
 axios.defaults.baseURL = getBasePath() + BASE_API_URL_PATH;
@@ -261,7 +261,7 @@ axios.interceptors.request.use((config: ApiRequestConfig) => {
 
     config.headers['X-Timezone-Name'] = timezoneName;
 
-    if (needBlockRequest && !config.ignoreBlocked) {
+    if (refreshingTokenPromise && !config.ignoreBlocked) {
         return new Promise(resolve => {
             blockedRequests.push(newToken => {
                 if (newToken) {
@@ -382,23 +382,36 @@ export default {
         return axios.get<ApiResponse<boolean>>('logout.json');
     },
     refreshToken: (): ApiResponsePromise<TokenRefreshResponse> => {
-        return new Promise((resolve) => {
-            needBlockRequest = true;
+        if (refreshingTokenPromise) {
+            return refreshingTokenPromise;
+        }
 
+        let newToken: string | null;
+
+        refreshingTokenPromise = new Promise((resolve, reject) => {
             axios.post<ApiResponse<TokenRefreshResponse>>('v1/tokens/refresh.json', {}, {
                 ignoreBlocked: true
             } as ApiRequestConfig).then(response => {
                 const data = response.data;
 
-                resolve(response);
-                needBlockRequest = false;
+                if (data && data.success && data.result && data.result.newToken) {
+                    newToken = data.result.newToken;
+                } else {
+                    newToken = getCurrentToken();
+                }
 
-                return data.result.newToken;
-            }).then(newToken => {
-                blockedRequests.forEach(func => func(newToken));
-                blockedRequests.length = 0;
+                resolve(response);
+            }).catch(error => {
+                return reject(error);
+            }).finally(() => {
+                refreshingTokenPromise = null;
+
+                const requests = blockedRequests.splice(0);
+                requests.forEach(func => func(newToken));
             });
         });
+
+        return refreshingTokenPromise;
     },
     getExternalAuths: (): ApiResponsePromise<UserExternalAuthInfoResponse[]> => {
         return axios.get<ApiResponse<UserExternalAuthInfoResponse[]>>('v1/users/external_auth/list.json');

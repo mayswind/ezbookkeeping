@@ -27,10 +27,10 @@ func initializeTokensApiTest(t *testing.T) {
 
 func TestTokensApiGetMCPToolsMask(t *testing.T) {
 	initializeTokensApiTest(t)
-	service := &TokensApi{}
+	api := &TokensApi{}
 
 	expectedValue := int64(80)
-	actualValue, err := service.getMCPToolsMask(core.NewNullContext(), []string{"add_transaction", "query_latest_exchange_rates"})
+	actualValue, err := api.getMCPToolsMask(core.NewNullContext(), []string{"add_transaction", "query_latest_exchange_rates"})
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
@@ -38,10 +38,10 @@ func TestTokensApiGetMCPToolsMask(t *testing.T) {
 
 func TestTokensApiGetMCPToolsMask_EmptyNames(t *testing.T) {
 	initializeTokensApiTest(t)
-	service := &TokensApi{}
+	api := &TokensApi{}
 
 	expectedValue := int64(0)
-	actualValue, err := service.getMCPToolsMask(core.NewNullContext(), []string{})
+	actualValue, err := api.getMCPToolsMask(core.NewNullContext(), []string{})
 
 	assert.Equal(t, errs.ErrMCPToolsEmpty, err)
 	assert.Equal(t, expectedValue, actualValue)
@@ -49,10 +49,10 @@ func TestTokensApiGetMCPToolsMask_EmptyNames(t *testing.T) {
 
 func TestTokensApiGetMCPToolsMask_DuplicateNames(t *testing.T) {
 	initializeTokensApiTest(t)
-	service := &TokensApi{}
+	api := &TokensApi{}
 
 	expectedValue := int64(32)
-	actualValue, err := service.getMCPToolsMask(core.NewNullContext(), []string{"query_transactions", "query_transactions"})
+	actualValue, err := api.getMCPToolsMask(core.NewNullContext(), []string{"query_transactions", "query_transactions"})
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
@@ -60,14 +60,14 @@ func TestTokensApiGetMCPToolsMask_DuplicateNames(t *testing.T) {
 
 func TestTokensApiGetMCPToolsMask_InvalidNames(t *testing.T) {
 	initializeTokensApiTest(t)
-	service := &TokensApi{}
+	api := &TokensApi{}
 
-	actualValue, err := service.getMCPToolsMask(core.NewNullContext(), []string{"unknown_tool"})
+	actualValue, err := api.getMCPToolsMask(core.NewNullContext(), []string{"unknown_tool"})
 
 	assert.Equal(t, int64(0), actualValue)
 	assert.Equal(t, errs.ErrIncompleteOrIncorrectSubmission, err)
 
-	actualValue, err = service.getMCPToolsMask(core.NewNullContext(), []string{"add_transaction", ""})
+	actualValue, err = api.getMCPToolsMask(core.NewNullContext(), []string{"add_transaction", ""})
 
 	assert.Equal(t, int64(0), actualValue)
 	assert.Equal(t, errs.ErrIncompleteOrIncorrectSubmission, err)

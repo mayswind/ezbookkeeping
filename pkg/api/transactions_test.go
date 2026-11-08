@@ -16,12 +16,12 @@ import (
 )
 
 func TestTransactionsApiGetTransactionResponseListResult_NormalToken(t *testing.T) {
-	service, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/")
+	baseAPI, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/")
 	config := settings.Container.GetCurrentConfig()
 	config.EnableTransactionPictures = true
 	config.TransactionPictureTokenExpiredTimeDuration = time.Hour
 	api := &TransactionsApi{
-		ApiUsingConfig: service.ApiUsingConfig,
+		ApiUsingConfig: baseAPI.ApiUsingConfig,
 		tokens:         services.Tokens,
 	}
 
@@ -53,11 +53,11 @@ func TestTransactionsApiGetTransactionResponseListResult_NormalToken(t *testing.
 }
 
 func TestTransactionsApiGetTransactionResponseListResult_APIToken(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	baseAPI := initializeAvatarProviderApiTest(t, &settings.Config{
 		RootUrl:                   "https://foo.bar/",
 		EnableTransactionPictures: true,
 	})
-	api := &TransactionsApi{ApiUsingConfig: service.ApiUsingConfig}
+	api := &TransactionsApi{ApiUsingConfig: baseAPI.ApiUsingConfig}
 	c := core.WrapWebContext(&gin.Context{}, nil)
 	c.SetTokenClaims(&core.UserTokenClaims{Type: core.USER_TOKEN_TYPE_API, Uid: 123})
 

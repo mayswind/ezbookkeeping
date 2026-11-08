@@ -44,7 +44,7 @@ func initializeAvatarProviderApiTest(t *testing.T, config *settings.Config) *Api
 
 func initializeInternalAvatarApiTest(t *testing.T, rootUrl string) (*ApiWithUserInfo, *core.WebContext, *models.User) {
 	t.Helper()
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider:                     core.USER_AVATAR_PROVIDER_INTERNAL,
 		RootUrl:                            rootUrl,
 		SecretKey:                          "avatar-api-test-key",
@@ -91,18 +91,18 @@ func initializeInternalAvatarApiTest(t *testing.T, rootUrl string) (*ApiWithUser
 
 	c.SetTokenClaims(claims)
 	c.SetTokenRecord(tokenRecord)
-	service.ApiUsingAvatarProvider.tokens = services.Tokens
+	api.ApiUsingAvatarProvider.tokens = services.Tokens
 
-	return service, c, user
+	return api, c, user
 }
 
 func TestApiUsingAvatarProvider_GetAvatarUrl_Gravatar(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider: core.USER_AVATAR_PROVIDER_GRAVATAR,
 	})
 
 	expectedValue := "https://www.gravatar.com/avatar/0bc83cb571cd1c50ba6f3e8a78ef1346"
-	actualValue, err := service.GetAvatarUrl(nil, &models.User{
+	actualValue, err := api.GetAvatarUrl(nil, &models.User{
 		Email: "MyEmailAddress@example.com",
 	})
 	assert.Equal(t, nil, err)
@@ -110,12 +110,12 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_Gravatar(t *testing.T) {
 }
 
 func TestApiUsingAvatarProvider_GetAvatarUrl_EmptyCustomAvatarType(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider: core.USER_AVATAR_PROVIDER_INTERNAL,
 	})
 
 	expectedValue := ""
-	actualValue, err := service.GetAvatarUrl(nil, &models.User{
+	actualValue, err := api.GetAvatarUrl(nil, &models.User{
 		Uid: 123,
 	})
 	assert.Equal(t, nil, err)
@@ -123,10 +123,10 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_EmptyCustomAvatarType(t *testing.T)
 }
 
 func TestApiUsingAvatarProvider_GetAvatarUrl_NoProvider(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{})
+	api := initializeAvatarProviderApiTest(t, &settings.Config{})
 	expectedValue := ""
 
-	actualValue, err := service.GetAvatarUrl(nil, &models.User{
+	actualValue, err := api.GetAvatarUrl(nil, &models.User{
 		Uid: 123,
 	})
 	assert.Equal(t, nil, err)
@@ -134,10 +134,10 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_NoProvider(t *testing.T) {
 }
 
 func TestApiUsingAvatarProvider_GetAvatarUrl_Internal(t *testing.T) {
-	service, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/")
+	api, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/")
 
 	expectedValue := "https://foo.bar/avatar/123.png?token="
-	actualValue, err := service.GetAvatarUrl(c, user)
+	actualValue, err := api.GetAvatarUrl(c, user)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, expectedValue))
 
@@ -151,10 +151,10 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_Internal(t *testing.T) {
 }
 
 func TestApiUsingAvatarProvider_GetAvatarUrl_InternalWithQueryString(t *testing.T) {
-	service, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/?path=/")
+	api, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/?path=/")
 
 	expectedValue := "https://foo.bar/?path=/avatar/123.png&token="
-	actualValue, err := service.GetAvatarUrl(c, user)
+	actualValue, err := api.GetAvatarUrl(c, user)
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(actualValue, expectedValue))
 
@@ -168,10 +168,10 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_InternalWithQueryString(t *testing.
 }
 
 func TestApiWithUserInfo_GetUserBasicInfo_AvatarTokenError(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider: core.USER_AVATAR_PROVIDER_INTERNAL,
 	})
-	service.ApiUsingAvatarProvider.tokens = services.Tokens
+	api.ApiUsingAvatarProvider.tokens = services.Tokens
 
 	c := core.WrapWebContext(&gin.Context{}, nil)
 	c.SetTokenClaims(&core.UserTokenClaims{
@@ -179,7 +179,7 @@ func TestApiWithUserInfo_GetUserBasicInfo_AvatarTokenError(t *testing.T) {
 		UserTokenId: "invalid",
 	})
 
-	actualValue, err := service.GetUserBasicInfo(c, &models.User{
+	actualValue, err := api.GetUserBasicInfo(c, &models.User{
 		Uid:              123,
 		CustomAvatarType: "png",
 	})
@@ -188,8 +188,8 @@ func TestApiWithUserInfo_GetUserBasicInfo_AvatarTokenError(t *testing.T) {
 }
 
 func TestApiWithUserInfo_GetUserBasicInfo_InternalAvatar(t *testing.T) {
-	service, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/")
-	actualValue, err := service.GetUserBasicInfo(c, user)
+	api, c, user := initializeInternalAvatarApiTest(t, "https://foo.bar/")
+	actualValue, err := api.GetUserBasicInfo(c, user)
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, user.Username, actualValue.Username)
@@ -198,7 +198,7 @@ func TestApiWithUserInfo_GetUserBasicInfo_InternalAvatar(t *testing.T) {
 }
 
 func TestApiUsingAvatarProvider_GetAvatarUrl_APIToken(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider: core.USER_AVATAR_PROVIDER_INTERNAL,
 		RootUrl:        "https://foo.bar/",
 	})
@@ -206,13 +206,13 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_APIToken(t *testing.T) {
 	c.SetTokenClaims(&core.UserTokenClaims{Type: core.USER_TOKEN_TYPE_API})
 
 	expectedValue := "https://foo.bar/avatar/123.png"
-	actualValue, err := service.GetAvatarUrl(c, &models.User{Uid: 123, CustomAvatarType: "png"})
+	actualValue, err := api.GetAvatarUrl(c, &models.User{Uid: 123, CustomAvatarType: "png"})
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
 }
 
 func TestApiUsingAvatarProvider_GetAvatarUrl_Require2FAToken(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider: core.USER_AVATAR_PROVIDER_INTERNAL,
 		RootUrl:        "https://foo.bar/",
 	})
@@ -220,13 +220,13 @@ func TestApiUsingAvatarProvider_GetAvatarUrl_Require2FAToken(t *testing.T) {
 	c.SetTokenClaims(&core.UserTokenClaims{Type: core.USER_TOKEN_TYPE_REQUIRE_2FA})
 
 	expectedValue := "https://foo.bar/avatar/123.png"
-	actualValue, err := service.GetAvatarUrl(c, &models.User{Uid: 123, CustomAvatarType: "png"})
+	actualValue, err := api.GetAvatarUrl(c, &models.User{Uid: 123, CustomAvatarType: "png"})
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
 }
 
 func TestApiWithUserInfo_GetUserBasicInfo_APIToken(t *testing.T) {
-	service := initializeAvatarProviderApiTest(t, &settings.Config{
+	api := initializeAvatarProviderApiTest(t, &settings.Config{
 		AvatarProvider: core.USER_AVATAR_PROVIDER_INTERNAL,
 		RootUrl:        "https://foo.bar/",
 	})
@@ -240,7 +240,7 @@ func TestApiWithUserInfo_GetUserBasicInfo_APIToken(t *testing.T) {
 	}
 
 	expectedValue := user.ToUserBasicInfo(core.USER_AVATAR_PROVIDER_INTERNAL, "https://foo.bar/avatar/123.png")
-	actualValue, err := service.GetUserBasicInfo(c, user)
+	actualValue, err := api.GetUserBasicInfo(c, user)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedValue, actualValue)
 }

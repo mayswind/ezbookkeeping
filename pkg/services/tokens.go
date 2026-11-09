@@ -665,16 +665,21 @@ func (s *TokenService) parseNormalTokenAdditionalData(c core.Context, data []byt
 		return nil, err
 	}
 
-	if additionalData.Scope == core.NormalTokenScopeAll {
-		return &additionalData, nil
-	}
-
 	if additionalData.Scope < core.NormalTokenScopeMinValue || additionalData.Scope > core.NormalTokenScopeMaxValue {
 		log.Warnf(c, "[tokens.parseNormalTokenAdditionalData] token is invalid, because scope value \"%d\" is not supported", additionalData.Scope)
 		return nil, errs.ErrCurrentInvalidToken
 	}
 
+	if additionalData.Scope != core.NormalTokenScopeAll && additionalData.DerivedTokenExpiresAt < now {
+		log.Warnf(c, "[tokens.parseNormalTokenAdditionalData] token is invalid, because derived token expires at \"%d\" is earlier than now", additionalData.DerivedTokenExpiresAt)
+		return nil, errs.ErrCurrentTokenExpired
+	}
+
 	allowed := false
+
+	if additionalData.Scope == core.NormalTokenScopeAll && len(allowedScopes) < 1 {
+		allowed = true
+	}
 
 	for i := 0; i < len(allowedScopes); i++ {
 		if allowedScopes[i] == additionalData.Scope {
@@ -686,11 +691,6 @@ func (s *TokenService) parseNormalTokenAdditionalData(c core.Context, data []byt
 	if !allowed {
 		log.Warnf(c, "[tokens.parseNormalTokenAdditionalData] token is invalid, because scope value \"%d\" is not allowed", additionalData.Scope)
 		return nil, errs.ErrCurrentInvalidToken
-	}
-
-	if additionalData.DerivedTokenExpiresAt < now {
-		log.Warnf(c, "[tokens.parseNormalTokenAdditionalData] token is invalid, because derived token expires at \"%d\" is earlier than now", additionalData.DerivedTokenExpiresAt)
-		return nil, errs.ErrCurrentTokenExpired
 	}
 
 	return &additionalData, nil

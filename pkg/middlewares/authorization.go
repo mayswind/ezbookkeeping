@@ -25,13 +25,13 @@ func TokenAuthorizationByHeader(config *settings.Config) core.MiddlewareHandlerF
 }
 
 // TokenAuthorizationByQueryString verifies whether current request is valid by token in query string
-func TokenAuthorizationByQueryString(config *settings.Config, allowedNormalTokenScopes ...core.NormalTokenScope) core.MiddlewareHandlerFunc {
-	return tokenAuthorization(config, TOKEN_SOURCE_TYPE_ARGUMENT, false, allowedNormalTokenScopes...)
+func TokenAuthorizationByQueryString(config *settings.Config, allowedNormalTokenScopes core.NormalTokenScope) core.MiddlewareHandlerFunc {
+	return tokenAuthorization(config, TOKEN_SOURCE_TYPE_ARGUMENT, false, allowedNormalTokenScopes)
 }
 
 // TokenAuthorizationByCookie verifies whether current request is valid by token in cookie
-func TokenAuthorizationByCookie(config *settings.Config, allowedNormalTokenScopes ...core.NormalTokenScope) core.MiddlewareHandlerFunc {
-	return tokenAuthorization(config, TOKEN_SOURCE_TYPE_COOKIE, false, allowedNormalTokenScopes...)
+func TokenAuthorizationByCookie(config *settings.Config, allowedNormalTokenScopes core.NormalTokenScope) core.MiddlewareHandlerFunc {
+	return tokenAuthorization(config, TOKEN_SOURCE_TYPE_COOKIE, false, allowedNormalTokenScopes)
 }
 
 // TokenTwoFactorAuthorization verifies whether current request is valid by 2fa passcode

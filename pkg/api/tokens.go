@@ -415,7 +415,14 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
+		mapProxyToken, err := a.generateMapProxyToken(c, user.Uid, c.GetTokenClaims(), c.GetTokenRecord())
+
+		if err != nil {
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
 		refreshResp := &models.TokenRefreshResponse{
+			NewMapProxyToken:         mapProxyToken,
 			User:                     userBasicInfo,
 			ApplicationCloudSettings: applicationCloudSettingSlice,
 			NotificationContent:      a.GetAfterOpenNotificationContent(user.Language, c.GetClientLocale()),
@@ -442,6 +449,8 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 	c.SetTokenClaims(claims)
 	c.SetTokenRecord(tokenRecord)
 
+	log.Infof(c, "[tokens.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
+
 	userApplicationCloudSettings, err := a.userAppCloudSettings.GetUserApplicationCloudSettingsByUid(c, user.Uid)
 	var applicationCloudSettingSlice *models.ApplicationCloudSettingSlice = nil
 
@@ -451,8 +460,6 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 		applicationCloudSettingSlice = &userApplicationCloudSettings.Settings
 	}
 
-	log.Infof(c, "[tokens.TokenRefreshHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
-
 	userBasicInfo, err := a.GetUserBasicInfo(c, user)
 
 	if err != nil {
@@ -460,8 +467,15 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 		return nil, errs.Or(err, errs.ErrOperationFailed)
 	}
 
+	mapProxyToken, err := a.generateMapProxyToken(c, user.Uid, claims, tokenRecord)
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	refreshResp := &models.TokenRefreshResponse{
 		NewToken:                 token,
+		NewMapProxyToken:         mapProxyToken,
 		OldTokenId:               a.tokens.GenerateTokenId(oldTokenRecord),
 		User:                     userBasicInfo,
 		ApplicationCloudSettings: applicationCloudSettingSlice,
@@ -469,6 +483,29 @@ func (a *TokensApi) TokenRefreshHandler(c *core.WebContext) (any, *errs.Error) {
 	}
 
 	return refreshResp, nil
+}
+
+func (a *TokensApi) generateMapProxyToken(c *core.WebContext, uid int64, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, error) {
+	if claims == nil || claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		return "", nil
+	}
+
+	mapProxyEnabled := a.CurrentConfig().EnableMapDataFetchProxy && a.CurrentConfig().SupportMapDataFetchProxy
+	amapInternalProxyEnabled := a.CurrentConfig().MapProvider == settings.AmapProvider && a.CurrentConfig().AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod
+
+	if !mapProxyEnabled && !amapInternalProxyEnabled {
+		return "", nil
+	}
+
+	token, _, err := a.tokens.DeriveMapProxyToken(c, claims, tokenRecord)
+
+	if err != nil {
+		log.Errorf(c, "[tokens.generateMapProxyToken] failed to derive map proxy token for user \"uid:%d\", because %s", uid, err.Error())
+		return "", errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	c.SetTextualMapProxyToken(token)
+	return token, nil
 }
 
 // getMCPToolsMask converts registered tool names to their permanent permission bits.

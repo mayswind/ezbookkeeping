@@ -124,13 +124,14 @@ export class LeafletMapInstance implements MapInstance {
         }
 
         if (isMapDataFetchProxyEnabled()) {
-            tileUrlFormat = services.generateMapProxyTileImageUrl(this.mapProvider, options.language);
+            tileUrlFormat = services.generateMapProxyTileImageUrl(this.mapProvider, options.language, '{token}');
             tileUrlSubDomains = '';
         } else if (this.presetMapTileSource && this.presetMapTileSource.tileUrlExtraParams) {
             tileUrlFormat = this.getFinalUrlFormat(this.presetMapTileSource.tileUrlFormat as string, this.presetMapTileSource.tileUrlExtraParams, options);
         }
 
         const tileLayer = leaflet.tileLayer(tileUrlFormat, {
+            token: () => options.getCurrentToken?.() || '',
             subdomains: tileUrlSubDomains,
             maxZoom: maxZoom,
             minZoom: minZoom
@@ -139,13 +140,14 @@ export class LeafletMapInstance implements MapInstance {
 
         if (annotationUrlFormat || (this.mapProvider === 'custom' && isCustomMapAnnotationLayerDataFetchProxyEnabled())) {
             if (isMapDataFetchProxyEnabled()) {
-                annotationUrlFormat = services.generateMapProxyAnnotationImageUrl(this.mapProvider, options.language);
+                annotationUrlFormat = services.generateMapProxyAnnotationImageUrl(this.mapProvider, options.language, '{token}');
                 annotationUrlSubDomains = '';
             } else if (this.presetMapTileSource && this.presetMapTileSource.annotationUrlExtraParams) {
                 annotationUrlFormat = this.getFinalUrlFormat(this.presetMapTileSource.annotationUrlFormat as string, this.presetMapTileSource.annotationUrlExtraParams, options);
             }
 
             const annotationLayer = leaflet.tileLayer(annotationUrlFormat, {
+                token: () => options.getCurrentToken?.() || '',
                 subdomains: annotationUrlSubDomains,
                 maxZoom: maxZoom,
                 minZoom: minZoom

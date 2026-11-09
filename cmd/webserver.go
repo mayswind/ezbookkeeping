@@ -213,20 +213,10 @@ func startWebServer(c *core.CliContext) error {
 	router.GET("/healthz.json", bindApi(api.Healths.HealthStatusHandler, config))
 
 	proxyRoute := router.Group("/proxy")
-	proxyRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config), config))
+	proxyRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByQueryString(config, core.NormalTokenScopeMapProxy), config))
 	{
-		if config.EnableMapDataFetchProxy {
-			if config.MapProvider == settings.OpenStreetMapProvider ||
-				config.MapProvider == settings.OpenStreetMapHumanitarianStyleProvider ||
-				config.MapProvider == settings.OpenTopoMapProvider ||
-				config.MapProvider == settings.OPNVKarteMapProvider ||
-				config.MapProvider == settings.CyclOSMMapProvider ||
-				config.MapProvider == settings.CartoDBMapProvider ||
-				config.MapProvider == settings.TomTomMapProvider ||
-				config.MapProvider == settings.TianDiTuProvider ||
-				config.MapProvider == settings.CustomProvider {
-				proxyRoute.GET("/map/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapTileImageProxyHandler, config))
-			}
+		if config.EnableMapDataFetchProxy && config.SupportMapDataFetchProxy {
+			proxyRoute.GET("/map/tile/:zoomLevel/:coordinateX/:fileName", bindProxy(api.MapImages.MapTileImageProxyHandler, config))
 
 			if config.MapProvider == settings.TianDiTuProvider ||
 				(config.MapProvider == settings.CustomProvider && config.CustomMapTileServerAnnotationLayerUrl != "") {
@@ -237,7 +227,7 @@ func startWebServer(c *core.CliContext) error {
 
 	if config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod {
 		amapApiProxyRoute := router.Group("/_AMapService")
-		amapApiProxyRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByCookie(config), config))
+		amapApiProxyRoute.Use(bindMiddleware(middlewares.TokenAuthorizationByCookie(config, core.NormalTokenScopeMapProxy), config))
 		{
 			amapApiProxyRoute.GET("/*action", bindProxy(api.AmapApis.AmapApiProxyHandler, config))
 		}
@@ -605,9 +595,14 @@ func bindApiWithTokenUpdate(fn core.ApiHandlerFunc, config *settings.Config, onl
 		}
 
 		result, err := fn(c)
+		claims := c.GetTokenClaims()
 
 		if err == nil && config.MapProvider == settings.AmapProvider && config.AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod {
-			middlewares.AmapApiProxyAuthCookie(c, config)
+			if claims != nil {
+				middlewares.AmapApiProxyAuthCookie(c, c.GetTextualMapProxyToken(), claims.ExpiresAt)
+			} else {
+				middlewares.AmapApiProxyAuthCookie(c, "", -1)
+			}
 		}
 
 		if err != nil {

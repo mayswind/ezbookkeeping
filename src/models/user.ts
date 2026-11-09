@@ -242,6 +242,7 @@ export interface UserProfileUpdateRequest {
 export interface UserProfileUpdateResponse {
     readonly user: UserBasicInfo;
     readonly newToken?: string;
+    readonly newMapProxyToken?: string;
 }
 
 export interface UserProfileResponse extends UserBasicInfo {

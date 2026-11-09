@@ -1003,8 +1003,7 @@ export default {
             `.*${BASE_PROXY_URL_PATH}/map/annotation/[^/]+/[^/]+/[^/]+\\.png\\?provider=[^&]+.*$`
         ];
     },
-    generateMapProxyTileImageUrl: (mapProvider: string, language: string): string => {
-        const token = getCurrentToken();
+    generateMapProxyTileImageUrl: (mapProvider: string, language: string, token: string): string => {
         let url = `${getBasePath()}${BASE_PROXY_URL_PATH}/map/tile/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {
@@ -1013,8 +1012,7 @@ export default {
 
         return url;
     },
-    generateMapProxyAnnotationImageUrl: (mapProvider: string, language: string): string => {
-        const token = getCurrentToken();
+    generateMapProxyAnnotationImageUrl: (mapProvider: string, language: string, token: string): string => {
         let url = `${getBasePath()}${BASE_PROXY_URL_PATH}/map/annotation/{z}/{x}/{y}.png?provider=${mapProvider}&token=${token}`;
 
         if (language) {

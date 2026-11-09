@@ -488,6 +488,7 @@ type Config struct {
 	// Map
 	MapProvider                           string
 	EnableMapDataFetchProxy               bool
+	SupportMapDataFetchProxy              bool
 	MapProxy                              string
 	TomTomMapAPIKey                       string
 	TianDiTuAPIKey                        string
@@ -1313,6 +1314,21 @@ func loadMapConfiguration(config *Config, configFile *ini.File, sectionName stri
 	}
 
 	config.EnableMapDataFetchProxy = getConfigItemBoolValue(configFile, sectionName, "map_data_fetch_proxy", false)
+
+	if config.MapProvider == OpenStreetMapProvider ||
+		config.MapProvider == OpenStreetMapHumanitarianStyleProvider ||
+		config.MapProvider == OpenTopoMapProvider ||
+		config.MapProvider == OPNVKarteMapProvider ||
+		config.MapProvider == CyclOSMMapProvider ||
+		config.MapProvider == CartoDBMapProvider ||
+		config.MapProvider == TomTomMapProvider ||
+		config.MapProvider == TianDiTuProvider ||
+		config.MapProvider == CustomProvider {
+		config.SupportMapDataFetchProxy = true
+	} else {
+		config.SupportMapDataFetchProxy = false
+	}
+
 	config.MapProxy = getConfigItemStringValue(configFile, sectionName, "proxy", "system")
 	config.TomTomMapAPIKey = getConfigItemStringValue(configFile, sectionName, "tomtom_map_api_key")
 	config.TianDiTuAPIKey = getConfigItemStringValue(configFile, sectionName, "tianditu_map_app_key")

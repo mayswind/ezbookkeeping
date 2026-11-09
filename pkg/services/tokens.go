@@ -201,19 +201,32 @@ func (s *TokenService) CreateOAuth2CallbackToken(c *core.WebContext, user *model
 
 // DeriveUserAvatarToken derives an avatar-only token from the current session
 func (s *TokenService) DeriveUserAvatarToken(c core.Context, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, error) {
-	token, _, err := s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeUserAvatar, s.CurrentConfig().UserAvatarTokenExpiredTimeDuration)
+	expiresAt := time.Now().Add(s.CurrentConfig().UserAvatarTokenExpiredTimeDuration).Unix()
+	token, _, err := s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeUserAvatar, expiresAt)
 	return token, err
 }
 
 // DeriveUserCustomIconToken derives an icon-only token from the current session
 func (s *TokenService) DeriveUserCustomIconToken(c core.Context, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, int64, error) {
-	return s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeUserCustomIcon, s.CurrentConfig().UserCustomIconTokenExpiredTimeDuration)
+	expiresAt := time.Now().Add(s.CurrentConfig().UserCustomIconTokenExpiredTimeDuration).Unix()
+	return s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeUserCustomIcon, expiresAt)
 }
 
 // DeriveTransactionPictureToken derives a picture-only token from the current session
 func (s *TokenService) DeriveTransactionPictureToken(c core.Context, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, error) {
-	token, _, err := s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeTransactionPicture, s.CurrentConfig().TransactionPictureTokenExpiredTimeDuration)
+	expiresAt := time.Now().Add(s.CurrentConfig().TransactionPictureTokenExpiredTimeDuration).Unix()
+	token, _, err := s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeTransactionPicture, expiresAt)
 	return token, err
+}
+
+// DeriveMapProxyToken derives a map-only token from the current session
+func (s *TokenService) DeriveMapProxyToken(c core.Context, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, int64, error) {
+	if claims == nil || tokenRecord == nil {
+		return "", 0, errs.ErrInvalidToken
+	}
+
+	expiresAt := min(claims.ExpiresAt, tokenRecord.GetExpiredUnixTime())
+	return s.deriveScopedNormalToken(c, claims, tokenRecord, core.NormalTokenScopeMapProxy, expiresAt)
 }
 
 // UpdateTokenLastSeen updates the last seen time of specified token
@@ -740,7 +753,7 @@ func (s *TokenService) createToken(c core.Context, user *models.User, tokenType 
 	return tokenString, claims, tokenRecord, err
 }
 
-func (s *TokenService) deriveScopedNormalToken(c core.Context, claims *core.UserTokenClaims, record core.TokenRecord, scope core.NormalTokenScope, expiry time.Duration) (string, int64, error) {
+func (s *TokenService) deriveScopedNormalToken(c core.Context, claims *core.UserTokenClaims, record core.TokenRecord, scope core.NormalTokenScope, expiresAt int64) (string, int64, error) {
 	if claims == nil || claims.Type != core.USER_TOKEN_TYPE_NORMAL {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] token is invalid, because claims is nil or token type is not normal")
 		return "", 0, errs.ErrInvalidToken
@@ -759,7 +772,7 @@ func (s *TokenService) deriveScopedNormalToken(c core.Context, claims *core.User
 		return "", 0, errs.ErrInvalidToken
 	}
 
-	expiredAt := min(time.Now().Add(expiry).Unix(), claims.ExpiresAt, record.GetExpiredUnixTime())
+	expiredAt := min(expiresAt, claims.ExpiresAt, record.GetExpiredUnixTime())
 
 	if expiredAt < now {
 		log.Warnf(c, "[tokens.deriveScopedNormalToken] token \"utid:%s\" of user \"uid:%d\" record is expired", claims.UserTokenId, claims.Uid)

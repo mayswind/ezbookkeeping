@@ -148,12 +148,20 @@ func (a *UsersApi) UserRegisterHandler(c *core.WebContext) (any, *errs.Error) {
 		return authResp, nil
 	}
 
-	authResp.Token = token
 	c.SetTextualToken(token)
 	c.SetTokenClaims(claims)
 	c.SetTokenRecord(tokenRecord)
 
 	log.Infof(c, "[users.UserRegisterHandler] user \"uid:%d\" has logged in, token will be expired at %d", user.Uid, claims.ExpiresAt)
+
+	mapProxyToken, err := a.generateMapProxyToken(c, user.Uid, claims, tokenRecord)
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	authResp.Token = token
+	authResp.MapProxyToken = mapProxyToken
 
 	return authResp, nil
 }
@@ -596,10 +604,11 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 			return resp, nil
 		}
 
-		resp.NewToken = token
 		c.SetTextualToken(token)
 		c.SetTokenClaims(claims)
 		c.SetTokenRecord(tokenRecord)
+
+		log.Infof(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
 		userBasicInfo, err := a.GetUserBasicInfo(c, user)
 
@@ -608,9 +617,15 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 			return nil, errs.Or(err, errs.ErrOperationFailed)
 		}
 
-		resp.User = userBasicInfo
+		mapProxyToken, err := a.generateMapProxyToken(c, user.Uid, claims, tokenRecord)
 
-		log.Infof(c, "[users.UserUpdateProfileHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
+		if err != nil {
+			return nil, errs.Or(err, errs.ErrOperationFailed)
+		}
+
+		resp.NewToken = token
+		resp.NewMapProxyToken = mapProxyToken
+		resp.User = userBasicInfo
 
 		return resp, nil
 	}
@@ -859,6 +874,29 @@ func (a *UsersApi) UserGetAvatarHandler(c *core.WebContext) ([]byte, string, *er
 	}
 
 	return avatarData, contentType, nil
+}
+
+func (a *UsersApi) generateMapProxyToken(c *core.WebContext, uid int64, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, error) {
+	if claims == nil || claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		return "", nil
+	}
+
+	mapProxyEnabled := a.CurrentConfig().EnableMapDataFetchProxy && a.CurrentConfig().SupportMapDataFetchProxy
+	amapInternalProxyEnabled := a.CurrentConfig().MapProvider == settings.AmapProvider && a.CurrentConfig().AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod
+
+	if !mapProxyEnabled && !amapInternalProxyEnabled {
+		return "", nil
+	}
+
+	token, _, err := a.tokens.DeriveMapProxyToken(c, claims, tokenRecord)
+
+	if err != nil {
+		log.Errorf(c, "[users.generateMapProxyToken] failed to derive map proxy token for user \"uid:%d\", because %s", uid, err.Error())
+		return "", errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	c.SetTextualMapProxyToken(token)
+	return token, nil
 }
 
 func (a *UsersApi) getUserProfileResponse(c *core.WebContext, user *models.User) (*models.UserProfileResponse, error) {

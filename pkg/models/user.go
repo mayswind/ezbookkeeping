@@ -217,8 +217,9 @@ type UserProfileUpdateRequest struct {
 
 // UserProfileUpdateResponse represents the data returns to frontend after updating profile
 type UserProfileUpdateResponse struct {
-	User     *UserBasicInfo `json:"user"`
-	NewToken string         `json:"newToken,omitempty"`
+	User             *UserBasicInfo `json:"user"`
+	NewToken         string         `json:"newToken,omitempty"`
+	NewMapProxyToken string         `json:"newMapProxyToken,omitempty"`
 }
 
 // UserProfileResponse represents a view-object of user profile

@@ -11,6 +11,8 @@
 <script setup lang="ts">
 import { ref, computed, useTemplateRef } from 'vue';
 
+import { useTokensStore } from '@/stores/token.ts';
+
 import { useI18n } from '@/locales/helpers.ts';
 
 import type { Coordinate } from '@/core/coordinate.ts';
@@ -32,6 +34,8 @@ const emit = defineEmits<{
 
 const { tt, getCurrentLanguageInfo } = useI18n();
 
+const tokensStore = useTokensStore();
+
 const mapContainer = useTemplateRef<HTMLElement>('mapContainer');
 const mapInstance = ref<MapInstance | null>(createMapInstance({
     enableZoomControl: props.enableZoomControl
@@ -44,6 +48,7 @@ const zoomLevel = ref<number>(1);
 
 const mapSupported = computed<boolean>(() => !!mapInstance.value);
 const mapDependencyLoaded = computed<boolean>(() => mapInstance.value?.dependencyLoaded || false);
+const mapProxyToken = computed<string | null>(() => tokensStore.getMapProxyToken());
 
 const finalMapStyle = computed<Record<string, string>>(() => {
     const styles: Record<string, string> = Object.assign({}, props.mapStyle);
@@ -90,6 +95,7 @@ function initMapView(): void {
 
         mapInstance.value.initMapInstance(mapContainer.value as HTMLElement, {
             language: languageInfo?.alternativeLanguageTag,
+            getCurrentToken: () => mapProxyToken.value,
             initCenter: initCenter.value,
             zoomLevel: zoomLevel.value,
             text: {

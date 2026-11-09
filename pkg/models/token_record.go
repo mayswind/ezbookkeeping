@@ -64,6 +64,7 @@ type TokenGenerateMCPResponse struct {
 // TokenRefreshResponse represents all response parameters of token refreshing
 type TokenRefreshResponse struct {
 	NewToken                 string                        `json:"newToken,omitempty"`
+	NewMapProxyToken         string                        `json:"newMapProxyToken,omitempty"`
 	OldTokenId               string                        `json:"oldTokenId,omitempty"`
 	User                     *UserBasicInfo                `json:"user"`
 	ApplicationCloudSettings *ApplicationCloudSettingSlice `json:"applicationCloudSettings,omitempty"`

@@ -11,10 +11,12 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/log"
 	"github.com/mayswind/ezbookkeeping/pkg/models"
 	"github.com/mayswind/ezbookkeeping/pkg/services"
+	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // TwoFactorAuthorizationsApi represents 2fa api
 type TwoFactorAuthorizationsApi struct {
+	ApiUsingConfig
 	twoFactorAuthorizations *services.TwoFactorAuthorizationService
 	users                   *services.UserService
 	tokens                  *services.TokenService
@@ -23,6 +25,9 @@ type TwoFactorAuthorizationsApi struct {
 // Initialize a 2fa api singleton instance
 var (
 	TwoFactorAuthorizations = &TwoFactorAuthorizationsApi{
+		ApiUsingConfig: ApiUsingConfig{
+			container: settings.Container,
+		},
 		twoFactorAuthorizations: services.TwoFactorAuthorizations,
 		users:                   services.Users,
 		tokens:                  services.Tokens,
@@ -207,8 +212,15 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorEnableConfirmHandler(c *core.WebCo
 
 	log.Infof(c, "[twofactor_authorizations.TwoFactorEnableConfirmHandler] user \"uid:%d\" token refreshed, new token will be expired at %d", user.Uid, claims.ExpiresAt)
 
+	mapProxyToken, err := a.generateMapProxyToken(c, user.Uid, claims, tokenRecord)
+
+	if err != nil {
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
 	confirmResp := &models.TwoFactorEnableConfirmResponse{
 		Token:         token,
+		MapProxyToken: mapProxyToken,
 		RecoveryCodes: recoveryCodes,
 	}
 
@@ -331,4 +343,27 @@ func (a *TwoFactorAuthorizationsApi) TwoFactorRecoveryCodeRegenerateHandler(c *c
 	log.Infof(c, "[twofactor_authorizations.TwoFactorRecoveryCodeRegenerateHandler] user \"uid:%d\" has regenerated two-factor recovery codes", uid)
 
 	return recoveryCodesResp, nil
+}
+
+func (a *TwoFactorAuthorizationsApi) generateMapProxyToken(c *core.WebContext, uid int64, claims *core.UserTokenClaims, tokenRecord core.TokenRecord) (string, error) {
+	if claims == nil || claims.Type != core.USER_TOKEN_TYPE_NORMAL {
+		return "", nil
+	}
+
+	mapProxyEnabled := a.CurrentConfig().EnableMapDataFetchProxy && a.CurrentConfig().SupportMapDataFetchProxy
+	amapInternalProxyEnabled := a.CurrentConfig().MapProvider == settings.AmapProvider && a.CurrentConfig().AmapSecurityVerificationMethod == settings.AmapSecurityVerificationInternalProxyMethod
+
+	if !mapProxyEnabled && !amapInternalProxyEnabled {
+		return "", nil
+	}
+
+	token, _, err := a.tokens.DeriveMapProxyToken(c, claims, tokenRecord)
+
+	if err != nil {
+		log.Errorf(c, "[twofactor_authorizations.generateMapProxyToken] failed to derive map proxy token for user \"uid:%d\", because %s", uid, err.Error())
+		return "", errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	c.SetTextualMapProxyToken(token)
+	return token, nil
 }

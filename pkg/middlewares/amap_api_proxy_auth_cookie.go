@@ -1,12 +1,18 @@
 package middlewares
 
 import (
+	"time"
+
 	"github.com/mayswind/ezbookkeeping/pkg/core"
-	"github.com/mayswind/ezbookkeeping/pkg/settings"
 )
 
 // AmapApiProxyAuthCookie adds amap api proxy auth cookie to cookies in response
-func AmapApiProxyAuthCookie(c *core.WebContext, config *settings.Config) {
-	token := c.GetTextualToken()
-	c.SetTokenStringToCookie(token, int(config.TokenExpiredTime), "/_AMapService")
+func AmapApiProxyAuthCookie(c *core.WebContext, token string, expiresAt int64) {
+	maxAge := int(expiresAt - time.Now().Unix())
+
+	if maxAge <= 0 {
+		token = ""
+	}
+
+	c.SetTokenStringToCookie(token, maxAge, "/_AMapService")
 }

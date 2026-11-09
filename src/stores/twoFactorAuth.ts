@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { useTokensStore } from './token.ts';
 import { useUserCustomIconsStore } from './userCustomIcon.ts';
 
 import type {
@@ -18,6 +19,7 @@ import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
 
 export const useTwoFactorAuthStore = defineStore('twoFactorAuth', () => {
+    const tokensStore = useTokensStore();
     const userCustomIconsStore = useUserCustomIconsStore();
 
     function get2FAStatus(): Promise<TwoFactorStatusResponse> {
@@ -82,6 +84,7 @@ export const useTwoFactorAuthStore = defineStore('twoFactorAuth', () => {
 
                 if (data.result.token) {
                     updateCurrentToken(data.result.token);
+                    tokensStore.updateMapProxyToken(data.result.mapProxyToken);
 
                     if (!userCustomIconsStore.customIconListStateInvalid) {
                         userCustomIconsStore.updateCustomIconListInvalidState(true);

@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"math/big"
 	"strings"
 	"unicode"
 
@@ -23,6 +24,9 @@ const (
 	availableCharactersLength                = len(availableCharacters)
 	availableNumberAndLettersLength          = len(availableNumberAndLetters)
 	availableNumberAndLowercaseLettersLength = len(availableNumberAndLowercaseLetters)
+	base62Characters                         = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	base62ChunkSize                          = 10
+	base62ChunkBase                          = 839299365868340224 // 62^10
 )
 
 // SubString returns part of the source string according to start index and length
@@ -237,7 +241,7 @@ func EncodePassword(password string, salt string) string {
 	return strings.TrimRight(base64.StdEncoding.EncodeToString(encodedPassword), "=")
 }
 
-// EncryptSecretToBase64 returns an encrypted secret encoded as Base64.
+// EncryptSecretToBase64 returns an encrypted secret encoded as Base64
 func EncryptSecretToBase64(secret string, key string) (string, error) {
 	encryptedSecret, err := AESGCMEncrypt(MD5Encode([]byte(key)), []byte(secret)) // md5encode make the aes key's length to 16
 
@@ -248,7 +252,18 @@ func EncryptSecretToBase64(secret string, key string) (string, error) {
 	return base64.StdEncoding.EncodeToString(encryptedSecret), nil
 }
 
-// EncryptSecretToHex returns an encrypted secret encoded as hexadecimal.
+// EncryptSecretToBase62 returns an encrypted secret encoded as Base62
+func EncryptSecretToBase62(secret string, key string) (string, error) {
+	encryptedSecret, err := AESGCMEncrypt(MD5Encode([]byte(key)), []byte(secret)) // md5encode make the aes key's length to 16
+
+	if err != nil {
+		return "", err
+	}
+
+	return encodeBase62(encryptedSecret), nil
+}
+
+// EncryptSecretToHex returns an encrypted secret encoded as hexadecimal
 func EncryptSecretToHex(secret string, key string) (string, error) {
 	encryptedSecret, err := AESGCMEncrypt(MD5Encode([]byte(key)), []byte(secret)) // md5encode make the aes key's length to 16
 
@@ -259,7 +274,7 @@ func EncryptSecretToHex(secret string, key string) (string, error) {
 	return hex.EncodeToString(encryptedSecret), nil
 }
 
-// DecryptSecretFromBase64 returns the decrypted secret from Base64 ciphertext.
+// DecryptSecretFromBase64 returns the decrypted secret from Base64 ciphertext
 func DecryptSecretFromBase64(encyptedSecret string, key string) (string, error) {
 	encyptedData, err := base64.StdEncoding.DecodeString(encyptedSecret)
 
@@ -276,7 +291,24 @@ func DecryptSecretFromBase64(encyptedSecret string, key string) (string, error) 
 	return string(secret), nil
 }
 
-// DecryptSecretFromHex returns the decrypted secret from hexadecimal ciphertext.
+// DecryptSecretFromBase62 returns the decrypted secret from Base62 ciphertext
+func DecryptSecretFromBase62(encryptedSecret string, key string) (string, error) {
+	encryptedData, err := decodeBase62(encryptedSecret)
+
+	if err != nil {
+		return "", err
+	}
+
+	secret, err := AESGCMDecrypt(MD5Encode([]byte(key)), encryptedData)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(secret), nil
+}
+
+// DecryptSecretFromHex returns the decrypted secret from hexadecimal ciphertext
 func DecryptSecretFromHex(encryptedSecret string, key string) (string, error) {
 	encryptedData, err := hex.DecodeString(encryptedSecret)
 
@@ -291,4 +323,89 @@ func DecryptSecretFromHex(encryptedSecret string, key string) (string, error) {
 	}
 
 	return string(secret), nil
+}
+
+func encodeBase62(data []byte) string {
+	leadingZeros := 0
+
+	for leadingZeros < len(data) && data[leadingZeros] == 0 {
+		leadingZeros++
+	}
+
+	if leadingZeros == len(data) {
+		return strings.Repeat("0", leadingZeros)
+	}
+
+	var value, base, remainder big.Int
+	value.SetBytes(data)
+	base.SetUint64(base62ChunkBase)
+	result := make([]byte, len(data)*8/5+1)
+	index := len(result)
+
+	for value.Sign() > 0 {
+		value.QuoRem(&value, &base, &remainder)
+		chunk := remainder.Uint64()
+
+		for i := 0; i < base62ChunkSize; i++ {
+			index--
+			result[index] = base62Characters[chunk%62]
+			chunk /= 62
+
+			if value.Sign() == 0 && chunk == 0 {
+				break
+			}
+		}
+	}
+
+	for i := 0; i < leadingZeros; i++ {
+		index--
+		result[index] = '0'
+	}
+
+	return string(result[index:])
+}
+
+func decodeBase62(str string) ([]byte, error) {
+	if len(str) < 1 {
+		return nil, errs.ErrCiphertextInvalid
+	}
+
+	var value, base, chunkValue big.Int
+
+	for i := 0; i < len(str); {
+		var chunk uint64
+		power := uint64(1)
+		end := min(i+base62ChunkSize, len(str))
+
+		for ; i < end; i++ {
+			var digit uint64
+
+			switch {
+			case str[i] >= '0' && str[i] <= '9':
+				digit = uint64(str[i] - '0')
+			case str[i] >= 'A' && str[i] <= 'Z':
+				digit = uint64(str[i]-'A') + 10
+			case str[i] >= 'a' && str[i] <= 'z':
+				digit = uint64(str[i]-'a') + 36
+			default:
+				return nil, errs.ErrCiphertextInvalid
+			}
+
+			chunk = chunk*62 + digit
+			power *= 62
+		}
+
+		base.SetUint64(power)
+		chunkValue.SetUint64(chunk)
+		value.Mul(&value, &base)
+		value.Add(&value, &chunkValue)
+	}
+
+	leadingZeros := 0
+
+	for leadingZeros < len(str) && str[leadingZeros] == '0' {
+		leadingZeros++
+	}
+
+	return append(make([]byte, leadingZeros), value.Bytes()...), nil
 }

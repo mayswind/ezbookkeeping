@@ -181,6 +181,217 @@ func TestEncryptSecretToBase64AndDecryptSecretFromBase64(t *testing.T) {
 	assert.Equal(t, expectedValue, actualValue)
 }
 
+func TestEncryptSecretToBase62AndDecryptSecretFromBase62(t *testing.T) {
+	str := "foo"
+	key := "bar"
+	expectedValue := str
+
+	encryptedStr, err := EncryptSecretToBase62(str, key)
+	assert.Equal(t, nil, err)
+	actualValue, err := DecryptSecretFromBase62(encryptedStr, key)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestEncryptSecretToBase62AndDecryptSecretFromBase62_EmptyString(t *testing.T) {
+	str := ""
+	key := "bar"
+	expectedValue := str
+
+	encryptedStr, err := EncryptSecretToBase62(str, key)
+	assert.Equal(t, nil, err)
+	actualValue, err := DecryptSecretFromBase62(encryptedStr, key)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestEncryptSecretToBase62AndDecryptSecretFromBase62_Unicode(t *testing.T) {
+	str := "图片:token/context?"
+	key := "bar"
+	expectedValue := str
+
+	encryptedStr, err := EncryptSecretToBase62(str, key)
+	assert.Equal(t, nil, err)
+	actualValue, err := DecryptSecretFromBase62(encryptedStr, key)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedValue, actualValue)
+}
+
+func TestBase62_LeadingZeros(t *testing.T) {
+	assert.Equal(t, "0010", encodeBase62([]byte{0, 0, 62}))
+	actualValue, err := decodeBase62("0010")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, []byte{0, 0, 62}, actualValue)
+
+	assert.Equal(t, "00", encodeBase62([]byte{0, 0}))
+	actualValue, err = decodeBase62("00")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, []byte{0, 0}, actualValue)
+
+	assert.Equal(t, "z", encodeBase62([]byte{61}))
+	actualValue, err = decodeBase62("z")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, []byte{61}, actualValue)
+}
+
+func TestBase62_Alphabet(t *testing.T) {
+	expectedValue := "9"
+	actualValue := encodeBase62([]byte{9})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData := []byte{9}
+	actualData, err := decodeBase62("9")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "A"
+	actualValue = encodeBase62([]byte{10})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{10}
+	actualData, err = decodeBase62("A")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "Z"
+	actualValue = encodeBase62([]byte{35})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{35}
+	actualData, err = decodeBase62("Z")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "a"
+	actualValue = encodeBase62([]byte{36})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{36}
+	actualData, err = decodeBase62("a")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "z"
+	actualValue = encodeBase62([]byte{61})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{61}
+	actualData, err = decodeBase62("z")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "10"
+	actualValue = encodeBase62([]byte{62})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{62}
+	actualData, err = decodeBase62("10")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "11"
+	actualValue = encodeBase62([]byte{63})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{63}
+	actualData, err = decodeBase62("11")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "zz"
+	actualValue = encodeBase62([]byte{15, 3})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{15, 3}
+	actualData, err = decodeBase62("zz")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "100"
+	actualValue = encodeBase62([]byte{15, 4})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{15, 4}
+	actualData, err = decodeBase62("100")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "zzzzzzzzzz"
+	actualValue = encodeBase62([]byte{11, 165, 202, 83, 146, 203, 3, 255})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{11, 165, 202, 83, 146, 203, 3, 255}
+	actualData, err = decodeBase62("zzzzzzzzzz")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "10000000000"
+	actualValue = encodeBase62([]byte{11, 165, 202, 83, 146, 203, 4, 0})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{11, 165, 202, 83, 146, 203, 4, 0}
+	actualData, err = decodeBase62("10000000000")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "10000000001"
+	actualValue = encodeBase62([]byte{11, 165, 202, 83, 146, 203, 4, 1})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{11, 165, 202, 83, 146, 203, 4, 1}
+	actualData, err = decodeBase62("10000000001")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "100000000000000000001"
+	actualValue = encodeBase62([]byte{135, 170, 193, 158, 64, 170, 252, 14, 32, 201, 143, 88, 16, 0, 1})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{135, 170, 193, 158, 64, 170, 252, 14, 32, 201, 143, 88, 16, 0, 1}
+	actualData, err = decodeBase62("100000000000000000001")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+
+	expectedValue = "0010000000001"
+	actualValue = encodeBase62([]byte{0, 0, 11, 165, 202, 83, 146, 203, 4, 1})
+	assert.Equal(t, expectedValue, actualValue)
+	expectedData = []byte{0, 0, 11, 165, 202, 83, 146, 203, 4, 1}
+	actualData, err = decodeBase62("0010000000001")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedData, actualData)
+}
+
+func TestDecryptSecretFromBase62_WrongKey(t *testing.T) {
+	encryptedStr, err := EncryptSecretToBase62("foo", "bar")
+	assert.Equal(t, nil, err)
+
+	_, err = DecryptSecretFromBase62(encryptedStr, "wrong-key")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromBase62_TamperedCiphertext(t *testing.T) {
+	encryptedStr, err := EncryptSecretToBase62("foo", "bar")
+	assert.Equal(t, nil, err)
+	data, err := decodeBase62(encryptedStr)
+	assert.Equal(t, nil, err)
+
+	data[len(data)-1] ^= 1
+	_, err = DecryptSecretFromBase62(encodeBase62(data), "bar")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromBase62_InvalidBase62(t *testing.T) {
+	_, err := DecryptSecretFromBase62("", "bar")
+	assert.NotNil(t, err)
+
+	_, err = DecryptSecretFromBase62("-1", "bar")
+	assert.NotNil(t, err)
+
+	_, err = DecryptSecretFromBase62("+1", "bar")
+	assert.NotNil(t, err)
+
+	_, err = DecryptSecretFromBase62("a_b", "bar")
+	assert.NotNil(t, err)
+
+	_, err = DecryptSecretFromBase62("a b", "bar")
+	assert.NotNil(t, err)
+
+	_, err = DecryptSecretFromBase62("图片", "bar")
+	assert.NotNil(t, err)
+}
+
+func TestDecryptSecretFromBase62_ShortCiphertext(t *testing.T) {
+	_, err := DecryptSecretFromBase62("00", "bar")
+	assert.NotNil(t, err)
+}
+
 func TestEncryptSecretToHexAndDecryptSecretFromHex(t *testing.T) {
 	str := "foo"
 	key := "bar"

@@ -2,6 +2,8 @@ package services
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
 	"encoding/binary"
 	"encoding/json/v2"
 	"errors"
@@ -23,7 +25,8 @@ import (
 )
 
 const tokenPrefix = "ebk"
-const tokenIdentityMinimumSize = 8 + 8 + 8 + 1
+const tokenSignatureSize = 12
+const tokenIdentityMinimumSize = 8 + 8 + 8 + tokenSignatureSize + 1
 const tokenMaxExpiredAtUnixTime = int64(253402300799) // 9999-12-31 23:59:59 UTC
 
 // TokenService represents user token service
@@ -428,7 +431,7 @@ func (s *TokenService) GenerateTokenId(tokenRecord *models.TokenRecord) string {
 }
 
 func (s *TokenService) parseEncryptedToken(c core.Context, parts []string, allowedScopes ...core.NormalTokenScope) (*core.UserTokenClaims, core.TokenRecord, error) {
-	identity, encryptedAdditionalData, err := s.parseEncryptedTokenId(c, parts)
+	identity, signature, encryptedAdditionalData, err := s.parseEncryptedTokenId(c, parts)
 
 	if err != nil {
 		return nil, nil, err
@@ -443,6 +446,11 @@ func (s *TokenService) parseEncryptedToken(c core.Context, parts []string, allow
 
 	if record.TokenType != identity.TokenType {
 		log.Warnf(c, "[tokens.parseEncryptedToken] token \"utid:%d\" of user \"uid:%d\" record type is not match, because token type is %d but record type is %d", record.UserTokenId, record.Uid, identity.TokenType, record.TokenType)
+		return nil, nil, errs.ErrCurrentInvalidToken
+	}
+
+	if !hmac.Equal(signature, s.generateTokenSignature(record)) {
+		log.Warnf(c, "[tokens.parseEncryptedToken] token \"utid:%d\" of user \"uid:%d\" is invalid, because signature is invalid", record.UserTokenId, record.Uid)
 		return nil, nil, errs.ErrCurrentInvalidToken
 	}
 
@@ -520,24 +528,24 @@ func (s *TokenService) parseEncryptedToken(c core.Context, parts []string, allow
 	}, record, nil
 }
 
-func (s *TokenService) parseEncryptedTokenId(c core.Context, parts []string) (*models.TokenRecord, []byte, error) {
+func (s *TokenService) parseEncryptedTokenId(c core.Context, parts []string) (*models.TokenRecord, []byte, []byte, error) {
 	if len(parts) != 3 || parts[0] != tokenPrefix {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token format is invalid")
-		return nil, nil, errs.ErrCurrentInvalidToken
+		return nil, nil, nil, errs.ErrCurrentInvalidToken
 	}
 
 	typeParts := strings.Split(parts[1], ".")
 
 	if len(typeParts) > 2 {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token type \"%s\" is invalid", parts[1])
-		return nil, nil, errs.ErrCurrentInvalidTokenType
+		return nil, nil, nil, errs.ErrCurrentInvalidTokenType
 	}
 
 	tokenType, exists := core.TextualTokenTypesReverse[typeParts[0]]
 
 	if !exists {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token type \"%s\" is not supported", parts[1])
-		return nil, nil, errs.ErrCurrentInvalidTokenType
+		return nil, nil, nil, errs.ErrCurrentInvalidTokenType
 	}
 
 	if len(typeParts) == 2 {
@@ -545,22 +553,22 @@ func (s *TokenService) parseEncryptedTokenId(c core.Context, parts []string) (*m
 
 		if tokenType != core.USER_TOKEN_TYPE_NORMAL || !core.ValidTextualDerivedTokenTypes[derivedTokenType] {
 			log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because derived token type \"%s\" is not supported", typeParts[1])
-			return nil, nil, errs.ErrCurrentInvalidTokenType
+			return nil, nil, nil, errs.ErrCurrentInvalidTokenType
 		}
 	}
 
-	decryptedFullTokenId, err := utils.DecryptSecretFromHex(parts[2], s.CurrentConfig().SecretKey)
+	decryptedFullTokenId, err := utils.DecryptSecretFromBase62(parts[2], s.CurrentConfig().SecretKey)
 
 	if err != nil {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because decrypting token id failed, %s", err.Error())
-		return nil, nil, errs.ErrCurrentInvalidToken
+		return nil, nil, nil, errs.ErrCurrentInvalidToken
 	}
 
 	fullTokenId := []byte(decryptedFullTokenId)
 
 	if len(fullTokenId) < tokenIdentityMinimumSize {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token id is too short")
-		return nil, nil, errs.ErrCurrentInvalidToken
+		return nil, nil, nil, errs.ErrCurrentInvalidToken
 	}
 
 	buf := bytes.NewBuffer(fullTokenId)
@@ -577,14 +585,15 @@ func (s *TokenService) parseEncryptedTokenId(c core.Context, parts []string) (*m
 
 	if uid <= 0 || userTokenId <= 0 || createdUnixTime <= 0 {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because uid, user token id or creation time is invalid")
-		return nil, nil, errs.ErrCurrentInvalidToken
+		return nil, nil, nil, errs.ErrCurrentInvalidToken
 	}
 
 	if actualTokenType != tokenType {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token type is not match, expected %d but got %d", tokenType, actualTokenType)
-		return nil, nil, errs.ErrCurrentInvalidToken
+		return nil, nil, nil, errs.ErrCurrentInvalidToken
 	}
 
+	signature := buf.Next(tokenSignatureSize)
 	encryptedAdditionalData := buf.Bytes()
 
 	return &models.TokenRecord{
@@ -592,7 +601,7 @@ func (s *TokenService) parseEncryptedTokenId(c core.Context, parts []string) (*m
 		UserTokenId:     userTokenId,
 		CreatedUnixTime: createdUnixTime,
 		TokenType:       tokenType,
-	}, encryptedAdditionalData, nil
+	}, signature, encryptedAdditionalData, nil
 }
 
 func (s *TokenService) parseLegacyJWTToken(c core.Context, tokenString string) (*core.UserTokenClaims, core.TokenRecord, error) {
@@ -839,12 +848,13 @@ func (s *TokenService) generateEncryptedToken(record core.TokenRecord, derivedTo
 	_ = binary.Write(buf, binary.BigEndian, record.GetUserTokenId())
 	_ = binary.Write(buf, binary.BigEndian, record.GetCreatedUnixTime())
 	_ = binary.Write(buf, binary.BigEndian, record.GetTokenType())
+	_, _ = buf.Write(s.generateTokenSignature(record))
 
 	if len(encryptedAdditionalData) > 0 {
 		_, _ = buf.Write(encryptedAdditionalData)
 	}
 
-	encryptedFullTokenId, err := utils.EncryptSecretToHex(buf.String(), s.CurrentConfig().SecretKey)
+	encryptedFullTokenId, err := utils.EncryptSecretToBase62(buf.String(), s.CurrentConfig().SecretKey)
 
 	if err != nil {
 		return "", err
@@ -889,6 +899,15 @@ func (s *TokenService) createTokenRecord(c core.Context, tokenRecord *models.Tok
 		_, err := sess.Insert(tokenRecord)
 		return err
 	})
+}
+
+func (s *TokenService) generateTokenSignature(record core.TokenRecord) []byte {
+	signature := hmac.New(sha1.New, []byte(record.GetSecret()))
+	_ = binary.Write(signature, binary.BigEndian, record.GetUid())
+	_ = binary.Write(signature, binary.BigEndian, record.GetUserTokenId())
+	_ = binary.Write(signature, binary.BigEndian, record.GetCreatedUnixTime())
+	_ = binary.Write(signature, binary.BigEndian, record.GetTokenType())
+	return signature.Sum(nil)[:tokenSignatureSize]
 }
 
 func (s *TokenService) getUserTokenId() int64 {

@@ -600,6 +600,9 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		token, claims, tokenRecord, err := a.tokens.CreateToken(c, user)
 
 		if err != nil {
+			// generate a new map proxy token and set to the web context
+			a.generateMapProxyToken(c, user.Uid, c.GetTokenClaims(), c.GetTokenRecord())
+
 			log.Warnf(c, "[users.UserUpdateProfileHandler] failed to create token for user \"uid:%d\", because %s", user.Uid, err.Error())
 			return resp, nil
 		}
@@ -628,6 +631,9 @@ func (a *UsersApi) UserUpdateProfileHandler(c *core.WebContext) (any, *errs.Erro
 		resp.User = userBasicInfo
 
 		return resp, nil
+	} else {
+		// generate a new map proxy token and set to the web context
+		a.generateMapProxyToken(c, user.Uid, c.GetTokenClaims(), c.GetTokenRecord())
 	}
 
 	return resp, nil

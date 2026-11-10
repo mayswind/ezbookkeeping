@@ -36,6 +36,7 @@
                                         v-if="!modelValue || modelValue !== colorInfo.color" />
                                 <v-badge class="right-bottom-icon" color="primary"
                                          offset-x="8" offset-y="8"
+                                         :aria-label="tt('Selected')"
                                          :location="`bottom ${textDirection === TextDirection.LTR ? 'right' : 'left'}`"
                                          :icon="mdiCheck"
                                          v-if="modelValue && modelValue === colorInfo.color">

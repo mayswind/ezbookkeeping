@@ -529,7 +529,16 @@ const vuetify = createVuetify({
 // key is in the original i18n text of vuetify (in vuetify/lib/locale/en.js), value is the text in the ezBookkeeping i18n files
 const vuetifyI18nTextKeyMap: Record<string, string> = {
     'open': 'Open',
-    'close': 'Close'
+    'close': 'Close',
+    'loading': 'Loading...',
+    'noDataText': 'No data',
+    'input.clear': 'Clear',
+    'pagination.ariaLabel.root': 'Pagination Navigation',
+    'pagination.ariaLabel.next': 'Next Page',
+    'pagination.ariaLabel.previous': 'Previous Page',
+    'colorPicker.ariaLabel.eyedropper': 'Select color with eyedropper',
+    'colorPicker.ariaLabel.hueSlider': 'Hue',
+    'colorPicker.ariaLabel.hexInput': 'HEX value'
 }
 
 echarts.use([

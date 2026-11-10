@@ -127,12 +127,24 @@
                                 <div class="transaction-keyword-filter ms-2">
                                     <v-text-field autocomplete="off" density="compact" :disabled="loading"
                                                   :prepend-inner-icon="mdiMagnify"
-                                                  :append-inner-icon="searchKeyword !== query.keyword ? mdiCheck : undefined"
                                                   :placeholder="tt('Search transaction description')"
                                                   v-model="searchKeyword"
-                                                  @click:append-inner="changeKeywordFilter(searchKeyword)"
                                                   @keyup.enter="changeKeywordFilter(searchKeyword)"
-                                    />
+                                    >
+                                        <template #append-inner>
+                                            <v-tooltip :text="tt('Search')" v-if="searchKeyword !== query.keyword">
+                                                <template v-slot:activator="{ props }">
+                                                    <v-icon :icon="mdiCheck"
+                                                            :aria-label="tt('Search')"
+                                                            :disabled="loading"
+                                                            @click="changeKeywordFilter(searchKeyword)"
+                                                            @keydown.enter.stop.prevent="changeKeywordFilter(searchKeyword)"
+                                                            @keydown.space.stop.prevent="changeKeywordFilter(searchKeyword)"
+                                                            v-bind="props" />
+                                                </template>
+                                            </v-tooltip>
+                                        </template>
+                                    </v-text-field>
                                 </div>
                             </div>
                         </template>

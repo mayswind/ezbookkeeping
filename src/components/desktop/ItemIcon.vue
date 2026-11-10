@@ -4,6 +4,7 @@
     </div>
     <i class="item-icon" :class="classes" :style="style" v-else-if="!hiddenStatus && !customIconUrl"></i>
     <v-badge class="right-bottom-icon" color="secondary" offset-y="4"
+             :aria-label="tt('Hidden')"
              :location="`bottom ${textDirection === TextDirection.LTR ? 'right' : 'left'}`"
              :icon="mdiEyeOffOutline" v-if="hiddenStatus">
         <div class="item-img-icon-container" :class="classes" :style="style" v-if="customIconUrl">
@@ -32,7 +33,7 @@ interface DesktopItemIconProps extends CommonIconProps {
 
 const props = defineProps<DesktopItemIconProps>();
 
-const { getCurrentLanguageTextDirection } = useI18n();
+const { tt, getCurrentLanguageTextDirection } = useI18n();
 const { style, customIconUrl, getAccountIcon, getCategoryIcon } = useItemIconBase(props);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());

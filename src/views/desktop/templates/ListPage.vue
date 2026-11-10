@@ -80,7 +80,8 @@
                                     <div class="d-flex align-center">
                                         <div class="d-flex align-center">
                                             <v-badge class="right-bottom-icon" color="secondary"
-                                                     location="bottom right" offset-x="8" :icon="mdiEyeOffOutline"
+                                                     location="bottom right" offset-x="8"
+                                                     :aria-label="tt('Hidden')" :icon="mdiEyeOffOutline"
                                                      v-if="element.hidden">
                                                 <v-icon size="20" start :icon="templateType === TemplateType.Schedule.type ? mdiClockTimeNineOutline : mdiTextBoxOutline"/>
                                             </v-badge>

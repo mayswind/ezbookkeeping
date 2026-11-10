@@ -358,9 +358,12 @@ export default {
         return axios.post<ApiResponse<RegisterResponse>>('register.json', req);
     },
     verifyEmail: (token: string): ApiResponsePromise<boolean> => {
-        return axios.post<ApiResponse<boolean>>('verify_email/by_token.json?token=' + token, {}, {
+        return axios.post<ApiResponse<boolean>>('verify_email/by_token.json', {}, {
             noAuth: true,
-            ignoreError: true
+            ignoreError: true,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         } as ApiRequestConfig);
     },
     resendVerifyEmailByUnloginUser: (req: UserResendVerifyEmailRequest): ApiResponsePromise<boolean> => {
@@ -370,12 +373,15 @@ export default {
         return axios.post<ApiResponse<boolean>>('forget_password/request.json', req);
     },
     resetPassword: ({ email, token, password }: { email: string, token: string, password: string }): ApiResponsePromise<boolean> => {
-        return axios.post<ApiResponse<boolean>>('forget_password/reset/by_token.json?token=' + token, {
+        return axios.post<ApiResponse<boolean>>('forget_password/reset/by_token.json', {
             email: email,
             password: password
         }, {
             noAuth: true,
-            ignoreError: true
+            ignoreError: true,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         } as ApiRequestConfig);
     },
     logout: (): ApiResponsePromise<boolean> => {

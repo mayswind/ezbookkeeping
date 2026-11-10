@@ -59,7 +59,7 @@ func TokenTwoFactorAuthorization(config *settings.Config) core.MiddlewareHandler
 // TokenEmailVerifyAuthorization verifies whether current request is email verification
 func TokenEmailVerifyAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, errs.ErrEmailVerifyTokenIsInvalidOrExpired)
@@ -81,7 +81,7 @@ func TokenEmailVerifyAuthorization(config *settings.Config) core.MiddlewareHandl
 // TokenResetPasswordAuthorization verifies whether current request is password reset
 func TokenResetPasswordAuthorization(config *settings.Config) core.MiddlewareHandlerFunc {
 	return func(c *core.WebContext) {
-		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_ARGUMENT)
+		claims, tokenRecord, err := getTokenClaims(c, TOKEN_SOURCE_TYPE_HEADER)
 
 		if err != nil {
 			utils.PrintJsonErrorResult(c, errs.ErrPasswordResetTokenIsInvalidOrExpired)

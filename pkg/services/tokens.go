@@ -24,7 +24,9 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
-const tokenPrefix = "ebk"
+const textualTokenMinLength = 8 // ebk-tk-
+const textualTokenMaxLength = 512
+const textualTokenPrefix = "ebk"
 const tokenSignatureSize = 12
 const tokenIdentityMinimumSize = 8 + 8 + 8 + tokenSignatureSize + 1
 const tokenMaxExpiredAtUnixTime = int64(253402300799) // 9999-12-31 23:59:59 UTC
@@ -75,9 +77,19 @@ func (s *TokenService) GetAllUnexpiredNormalAndMCPTokensByUid(c core.Context, ui
 
 // ParseToken returns the token model according to token content
 func (s *TokenService) ParseToken(c core.Context, token string, allowedScopes ...core.NormalTokenScope) (*core.UserTokenClaims, core.TokenRecord, error) {
+	if len(token) < textualTokenMinLength {
+		log.Errorf(c, "[tokens.ParseToken] token is too short, length is %d", len(token))
+		return nil, nil, errs.ErrInvalidToken
+	}
+
+	if len(token) > textualTokenMaxLength {
+		log.Errorf(c, "[tokens.ParseToken] token is too long, length is %d", len(token))
+		return nil, nil, errs.ErrInvalidToken
+	}
+
 	parts := strings.Split(token, "-")
 
-	if len(parts) == 3 && parts[0] == tokenPrefix {
+	if len(parts) == 3 && parts[0] == textualTokenPrefix {
 		return s.parseEncryptedToken(c, parts, allowedScopes...)
 	}
 
@@ -529,7 +541,7 @@ func (s *TokenService) parseEncryptedToken(c core.Context, parts []string, allow
 }
 
 func (s *TokenService) parseEncryptedTokenId(c core.Context, parts []string) (*models.TokenRecord, []byte, []byte, error) {
-	if len(parts) != 3 || parts[0] != tokenPrefix {
+	if len(parts) != 3 || parts[0] != textualTokenPrefix {
 		log.Warnf(c, "[tokens.parseEncryptedTokenId] token is invalid, because token format is invalid")
 		return nil, nil, nil, errs.ErrCurrentInvalidToken
 	}
@@ -860,7 +872,7 @@ func (s *TokenService) generateEncryptedToken(record core.TokenRecord, derivedTo
 		return "", err
 	}
 
-	return tokenPrefix + "-" + typeName + "-" + encryptedFullTokenId, nil
+	return textualTokenPrefix + "-" + typeName + "-" + encryptedFullTokenId, nil
 }
 
 func (s *TokenService) getTokenRecord(c core.Context, uid int64, userTokenId int64, createUnixTime int64) (*models.TokenRecord, error) {

@@ -769,7 +769,7 @@ func loadMCPServerConfiguration(config *Config, configFile *ini.File, sectionNam
 func loadDatabaseConfiguration(config *Config, configFile *ini.File, sectionName string) error {
 	dbConfig := &DatabaseConfig{}
 
-	dbConfig.DatabaseType = getConfigItemStringValue(configFile, sectionName, "type", MySqlDbType)
+	dbConfig.DatabaseType = getConfigItemStringValue(configFile, sectionName, "type")
 
 	if dbConfig.DatabaseType != MySqlDbType &&
 		dbConfig.DatabaseType != PostgresDbType &&
@@ -1178,7 +1178,7 @@ func loadAuthConfiguration(config *Config, configFile *ini.File, sectionName str
 	config.EnableOAuth2Login = getConfigItemBoolValue(configFile, sectionName, "enable_oauth2_auth", false)
 	config.EnableTwoFactor = getConfigItemBoolValue(configFile, sectionName, "enable_two_factor", true)
 	config.EnableUserForgetPassword = getConfigItemBoolValue(configFile, sectionName, "enable_forget_password", false)
-	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", false)
+	config.ForgetPasswordRequireVerifyEmail = getConfigItemBoolValue(configFile, sectionName, "forget_password_require_email_verify", true)
 	config.OAuth2ClientID = getConfigItemStringValue(configFile, sectionName, "oauth2_client_id")
 	config.OAuth2ClientSecret = getConfigItemStringValue(configFile, sectionName, "oauth2_client_secret")
 	config.OAuth2UsePKCE = getConfigItemBoolValue(configFile, sectionName, "oauth2_use_pkce", false)

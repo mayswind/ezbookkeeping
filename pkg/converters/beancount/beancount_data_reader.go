@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/big"
 	"strings"
 
 	"golang.org/x/text/encoding/unicode"
@@ -75,8 +76,12 @@ func (r *beancountDataReader) read(ctx core.Context) (*beancountData, error) {
 		}
 
 		if r.getNotEmptyItemsCount(items) < 2 {
-			log.Warnf(ctx, "[beancount_data_reader.read] cannot parse %s \"%s\", because not enough items in line", recordId, strings.Join(items, " "))
-			continue
+			actualFirstItem := r.getNotEmptyItemByIndex(items, 0)
+
+			if len(items[0]) > 0 || currentTransactionEntry == nil || len(actualFirstItem) == 0 || actualFirstItem[0] < 'A' || actualFirstItem[0] > 'Z' {
+				log.Warnf(ctx, "[beancount_data_reader.read] cannot parse %s \"%s\", because not enough items in line", recordId, strings.Join(items, " "))
+				continue
+			}
 		}
 
 		firstItem := items[0]
@@ -189,6 +194,15 @@ func (r *beancountDataReader) read(ctx core.Context) (*beancountData, error) {
 		currentTransactionEntry = nil
 	}
 
+	for i := 0; i < len(data.Transactions); i++ {
+		recordId := fmt.Sprintf("record:%d", i+1)
+		err := r.completeTransactionPostingAmounts(ctx, recordId, data.Transactions[i])
+
+		if err != nil {
+			return nil, errs.NewImportError(errs.Or(err, errs.ErrInvalidBeancountFile), recordId)
+		}
+	}
+
 	return data, nil
 }
 
@@ -276,6 +290,105 @@ func (r *beancountDataReader) setAccountTypeNameMap(accountType beancountAccount
 	delete(r.accountTypeNameMap, r.accountTypeNameReversedMap[accountType])
 	r.accountTypeNameMap[accountTypeName] = accountType
 	r.accountTypeNameReversedMap[accountType] = accountTypeName
+}
+
+func (r *beancountDataReader) completeTransactionPostingAmounts(ctx core.Context, recordId string, transactionEntry *beancountTransactionEntry) error {
+	var missingPosting *beancountPosting
+
+	for i := 0; i < len(transactionEntry.Postings); i++ {
+		posting := transactionEntry.Postings[i]
+
+		if posting.Amount == "" {
+			if missingPosting != nil {
+				log.Errorf(ctx, "[beancount_data_reader.completeTransactionPostingAmounts] cannot complete transaction %s, because more than one posting missing amount", recordId)
+				return errs.ErrInvalidBeancountFile
+			}
+
+			missingPosting = posting
+		}
+	}
+
+	if missingPosting == nil {
+		return nil
+	}
+
+	if len(transactionEntry.Postings) < 2 {
+		log.Errorf(ctx, "[beancount_data_reader.completeTransactionPostingAmounts] cannot complete transaction %s, because no posting has an amount", recordId)
+		return errs.ErrInvalidBeancountFile
+	}
+
+	amountsByCommodity := make(map[string]*big.Rat)
+
+	for i := 0; i < len(transactionEntry.Postings); i++ {
+		posting := transactionEntry.Postings[i]
+
+		if posting == missingPosting {
+			continue
+		}
+
+		if posting.Commodity == "" {
+			log.Errorf(ctx, "[beancount_data_reader.completeTransactionPostingAmounts] cannot complete transaction %s, because posting account \"%s\" has an amount but no commodity", recordId, posting.Account)
+			return errs.ErrInvalidBeancountFile
+		}
+
+		amount, valid := new(big.Rat).SetString(posting.Amount)
+
+		if !valid {
+			log.Errorf(ctx, "[beancount_data_reader.completeTransactionPostingAmounts] cannot parse amount in transaction %s, because amount \"%s\" is invalid", recordId, posting.Amount)
+			return errs.ErrInvalidBeancountFile
+		}
+
+		if total, exists := amountsByCommodity[posting.Commodity]; exists {
+			total.Add(total, amount)
+		} else {
+			amountsByCommodity[posting.Commodity] = amount
+		}
+	}
+
+	commodity := missingPosting.Commodity
+
+	for currentCommodity, amount := range amountsByCommodity {
+		if amount.Sign() == 0 { // posting is balanced
+			continue
+		}
+
+		if commodity != "" && commodity != currentCommodity {
+			log.Errorf(ctx, "[beancount_data_reader.completeTransactionPostingAmounts] cannot complete transaction %s, because there are more than one unbalanced commodity in postings, \"%s\" and \"%s\"", recordId, commodity, currentCommodity)
+			return errs.ErrInvalidBeancountFile
+		}
+
+		if commodity == "" {
+			commodity = currentCommodity
+		}
+	}
+
+	if commodity == "" && len(amountsByCommodity) == 1 {
+		for currentCommodity := range amountsByCommodity {
+			commodity = currentCommodity
+		}
+	}
+
+	if commodity == "" {
+		log.Errorf(ctx, "[beancount_data_reader.completeTransactionPostingAmounts] cannot complete transaction %s, because missing posting commodity cannot be determined", recordId)
+		return errs.ErrInvalidBeancountFile
+	}
+
+	totalAmount := new(big.Rat)
+
+	if total, exists := amountsByCommodity[commodity]; exists {
+		totalAmount.Neg(total)
+	}
+
+	finalAmount, err := numberToTextualAmount(totalAmount)
+
+	if err != nil {
+		log.Errorf(ctx, "[beancount_data_reader.completeTransactionPostingAmounts] cannot complete transaction %s, because cannot convert amount to string, %s", recordId, err.Error())
+		return err
+	}
+
+	missingPosting.Amount = finalAmount
+	missingPosting.Commodity = commodity
+	return nil
 }
 
 func (r *beancountDataReader) readAccountLine(ctx core.Context, recordId string, items []string, date string, directive beancountDirective, data *beancountData) (*beancountAccount, error) {
@@ -427,8 +540,20 @@ func (r *beancountDataReader) readTransactionPostingLine(ctx core.Context, recor
 	transactionPositing.OriginalAmount, amountActualLastIndex = r.getOriginalAmountAndLastIndexFromIndex(items, accountNameActualIndex+1)
 
 	if transactionPositing.OriginalAmount == "" || amountActualLastIndex < 0 {
-		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot parse transaction posting %s \"%s\", because missing amount", recordId, strings.Join(items, " "))
-		return nil, errs.NewImportError(errs.ErrAmountInvalid, recordId, transactionPositing.OriginalAmount)
+		nextItem, nextItemIndex := r.getNotEmptyItemAndIndexFromIndex(items, accountNameActualIndex+1)
+
+		if nextItem == "" || nextItem[0] == beancountCommentPrefix {
+			amountActualLastIndex = len(items) - 1
+		} else {
+			remainingItem, _ := r.getNotEmptyItemAndIndexFromIndex(items, nextItemIndex+1)
+
+			if nextItem[0] < 'A' || nextItem[0] > 'Z' || strings.ToUpper(nextItem) != nextItem || (remainingItem != "" && remainingItem[0] != beancountCommentPrefix) {
+				log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot parse transaction posting %s \"%s\", because missing amount", recordId, strings.Join(items, " "))
+				return nil, errs.NewImportError(errs.ErrAmountInvalid, recordId, transactionPositing.OriginalAmount)
+			}
+
+			amountActualLastIndex = accountNameActualIndex
+		}
 	}
 
 	finalAmount, err := evaluateBeancountAmountExpression(ctx, transactionPositing.OriginalAmount)
@@ -446,7 +571,7 @@ func (r *beancountDataReader) readTransactionPostingLine(ctx core.Context, recor
 	commodityActualIndex := -1
 	transactionPositing.Commodity, commodityActualIndex = r.getNotEmptyItemAndIndexFromIndex(items, amountActualLastIndex+1)
 
-	if transactionPositing.Commodity == "" || commodityActualIndex < 0 {
+	if transactionPositing.Amount != "" && (transactionPositing.Commodity == "" || commodityActualIndex < 0) {
 		log.Warnf(ctx, "[beancount_data_reader.readTransactionPostingLine] cannot parse transaction posting %s \"%s\", because missing commodity", recordId, strings.Join(items, " "))
 		return nil, errs.NewImportError(errs.ErrInvalidBeancountFile, recordId, transactionPositing.Commodity)
 	}

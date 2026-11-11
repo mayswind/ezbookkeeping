@@ -171,6 +171,136 @@ func TestBeancountTransactionDataFileParseImportedData_MinimumValidData2(t *test
 	assert.Equal(t, "", allNewSubTransferCategories[0].Name)
 }
 
+func TestBeancountTransactionDataFileParseImportedData_IncomeWithOmittedAmount(t *testing.T) {
+	importer := &beancountTransactionDataImporter{}
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, _, allNewSubIncomeCategories, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 *\n"+
+			"  Income:Salary -123.45 USD\n"+
+			"  Assets:Checking\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 1, len(allNewAccounts))
+	assert.Equal(t, 1, len(allNewSubIncomeCategories))
+
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_INCOME, allNewTransactions[0].Type)
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+
+	assert.Equal(t, "Assets:Checking", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "USD", allNewTransactions[0].OriginalSourceAccountCurrency)
+
+	assert.Equal(t, "Income:Salary", allNewTransactions[0].OriginalCategoryName)
+
+	assert.Equal(t, "Assets:Checking", allNewAccounts[0].Name)
+	assert.Equal(t, "USD", allNewAccounts[0].Currency)
+
+	assert.Equal(t, "Income:Salary", allNewSubIncomeCategories[0].Name)
+}
+
+func TestBeancountTransactionDataFileParseImportedData_ExpenseWithOmittedAmount(t *testing.T) {
+	importer := &beancountTransactionDataImporter{}
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, allNewSubExpenseCategories, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 *\n"+
+			"  Liabilities:CreditCard\n"+
+			"  Expenses:Food 12.34 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 1, len(allNewAccounts))
+	assert.Equal(t, 1, len(allNewSubExpenseCategories))
+
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_EXPENSE, allNewTransactions[0].Type)
+	assert.Equal(t, int64(1234), allNewTransactions[0].Amount)
+
+	assert.Equal(t, "Liabilities:CreditCard", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "CNY", allNewTransactions[0].OriginalSourceAccountCurrency)
+
+	assert.Equal(t, "Expenses:Food", allNewTransactions[0].OriginalCategoryName)
+
+	assert.Equal(t, "Liabilities:CreditCard", allNewAccounts[0].Name)
+	assert.Equal(t, "CNY", allNewAccounts[0].Currency)
+
+	assert.Equal(t, "Expenses:Food", allNewSubExpenseCategories[0].Name)
+}
+
+func TestBeancountTransactionDataFileParseImportedData_TransferWithOmittedAmount(t *testing.T) {
+	importer := &beancountTransactionDataImporter{}
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 *\n"+
+			"  Assets:Savings 23.45 EUR\n"+
+			"  Assets:Checking\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 2, len(allNewAccounts))
+
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[0].Type)
+	assert.Equal(t, int64(2345), allNewTransactions[0].Amount)
+	assert.Equal(t, int64(2345), allNewTransactions[0].RelatedAccountAmount)
+
+	assert.Equal(t, "Assets:Checking", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "EUR", allNewTransactions[0].OriginalSourceAccountCurrency)
+
+	assert.Equal(t, "Assets:Savings", allNewTransactions[0].OriginalDestinationAccountName)
+	assert.Equal(t, "EUR", allNewTransactions[0].OriginalDestinationAccountCurrency)
+
+	assert.Equal(t, "Assets:Checking", allNewAccounts[0].Name)
+	assert.Equal(t, "EUR", allNewAccounts[0].Currency)
+
+	assert.Equal(t, "Assets:Savings", allNewAccounts[1].Name)
+	assert.Equal(t, "EUR", allNewAccounts[1].Currency)
+}
+
+func TestBeancountTransactionDataFileParseImportedData_OpeningBalanceWithOmittedAmount(t *testing.T) {
+	importer := &beancountTransactionDataImporter{}
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, allNewAccounts, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"2024-09-01 *\n"+
+			"  Assets:Checking\n"+
+			"  Equity:Opening-Balances -123.45 CNY\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, 1, len(allNewAccounts))
+
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_MODIFY_BALANCE, allNewTransactions[0].Type)
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+
+	assert.Equal(t, "Assets:Checking", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "CNY", allNewTransactions[0].OriginalSourceAccountCurrency)
+	assert.Equal(t, "", allNewTransactions[0].OriginalCategoryName)
+
+	assert.Equal(t, "Assets:Checking", allNewAccounts[0].Name)
+	assert.Equal(t, "CNY", allNewAccounts[0].Currency)
+}
+
 func TestBeancountTransactionDataFileParseImportedData_ParseInvalidTime(t *testing.T) {
 	importer := BeancountTransactionDataImporter
 	context := core.NewNullContext()

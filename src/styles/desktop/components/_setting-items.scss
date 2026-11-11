@@ -8,6 +8,16 @@
         border-radius: var(--ebk-radius-lg);
         transition: background-color 0.15s ease-in-out;
 
+        > .v-select,
+        > .v-autocomplete {
+            flex: 0 1 auto;
+            width: max-content;
+        }
+
+        > .v-autocomplete .v-autocomplete__selection {
+            max-width: calc(100% - 2px);
+        }
+
         &:hover,
         &:focus-within {
             background-color: rgba(var(--v-theme-on-surface), 0.03);

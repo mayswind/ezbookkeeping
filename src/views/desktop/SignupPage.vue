@@ -95,7 +95,8 @@
 
                                 <v-row>
                                     <v-col cols="12" md="6">
-                                        <currency-select :disabled="submitting || navigateToHomePage"
+                                        <currency-select :menu-props="{ contentClass: 'select-menu-large' }"
+                                                         :disabled="submitting || navigateToHomePage"
                                                          :label="tt('Default Currency')"
                                                          :placeholder="tt('Default Currency')"
                                                          v-model="user.defaultCurrency" />

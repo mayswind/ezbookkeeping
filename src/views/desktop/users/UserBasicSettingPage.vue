@@ -61,7 +61,7 @@
                                 type="text"
                                 autocomplete="nickname"
                                 persistent-placeholder
-                                max-width="400px"
+                                max-width="320px"
                                 :disabled="loading || saving"
                                 :placeholder="tt('Your nickname')"
                                 v-model="newProfile.nickname"
@@ -77,7 +77,7 @@
                                 type="email"
                                 autocomplete="email"
                                 persistent-placeholder
-                                max-width="400px"
+                                max-width="320px"
                                 :disabled="loading || saving"
                                 :placeholder="tt('Your email address')"
                                 v-model="newProfile.email"
@@ -96,6 +96,7 @@
                                                secondary-key-field="id" secondary-value-field="id"
                                                secondary-title-field="name"
                                                secondary-icon-field="icon" secondary-icon-type-field="iconType" secondary-icon-type="account" secondary-color-field="color"
+                                               :menu-props="{ contentClass: 'two-column-select-menu select-menu-x-large' }"
                                                :disabled="loading || saving || !allVisibleAccounts.length"
                                                :enable-filter="true" :filter-placeholder="tt('Find account')" :filter-no-items-text="tt('No available account')"
                                                :placeholder="tt('Default Account')"
@@ -155,6 +156,7 @@
                             <span>{{ languageTitle }}</span>
                             <v-spacer/>
                             <language-select class="ms-4" density="compact" max-width="400px"
+                                             :menu-props="{ contentClass: 'select-menu-large' }"
                                              :disabled="loading || saving"
                                              :placeholder="languageTitle"
                                              :include-system-default="true"
@@ -165,6 +167,7 @@
                             <span>{{ tt('Default Currency') }}</span>
                             <v-spacer/>
                             <currency-select class="ms-4" density="compact" max-width="400px"
+                                             :menu-props="{ contentClass: 'select-menu-large' }"
                                              :disabled="loading || saving"
                                              :placeholder="tt('Default Currency')"
                                              v-model="newProfile.defaultCurrency" />

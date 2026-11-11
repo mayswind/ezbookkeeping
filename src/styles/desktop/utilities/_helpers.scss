@@ -89,6 +89,26 @@
     gap: var(--ebk-space-6);
 }
 
+.select-menu-small {
+    width: max-content;
+    min-width: min(200px, calc(100% - 24px)) !important;
+}
+
+.select-menu-medium {
+    width: max-content;
+    min-width: min(320px, calc(100% - 24px)) !important;
+}
+
+.select-menu-large {
+    width: max-content;
+    min-width: min(480px, calc(100% - 24px)) !important;
+}
+
+.select-menu-x-large {
+    width: max-content;
+    min-width: min(640px, calc(100% - 24px)) !important;
+}
+
 .drag-handle {
     cursor: grab;
 }

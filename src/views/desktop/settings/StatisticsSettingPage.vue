@@ -14,6 +14,7 @@
                                 item-value="type"
                                 persistent-placeholder
                                 max-width="400px"
+                                :menu-props="{ contentClass: 'select-menu-large' }"
                                 :placeholder="tt('Default Chart Data Type')"
                                 :items="allChartDataTypes"
                                 v-model="defaultChartDataType"
@@ -128,6 +129,7 @@
                                 item-value="type"
                                 persistent-placeholder
                                 max-width="400px"
+                                :menu-props="{ contentClass: 'select-menu-medium' }"
                                 :placeholder="tt('Default Date Range')"
                                 :items="allCategoricalChartDateRanges"
                                 v-model="defaultCategoricalChartDateRange"
@@ -168,6 +170,7 @@
                                 item-value="type"
                                 persistent-placeholder
                                 max-width="400px"
+                                :menu-props="{ contentClass: 'select-menu-medium' }"
                                 :placeholder="tt('Default Date Range')"
                                 :items="allTrendChartDateRanges"
                                 v-model="defaultTrendChartDateRange"
@@ -208,6 +211,7 @@
                                 item-value="type"
                                 persistent-placeholder
                                 max-width="400px"
+                                :menu-props="{ contentClass: 'select-menu-medium' }"
                                 :placeholder="tt('Default Date Range')"
                                 :items="allAssetTrendsChartDateRanges"
                                 v-model="defaultAssetTrendsChartDateRange"

@@ -31,6 +31,7 @@
                                 auto-select-first
                                 persistent-placeholder
                                 max-width="600px"
+                                :menu-props="{ contentClass: 'select-menu-x-large' }"
                                 :placeholder="tt('Timezone')"
                                 :items="allTimezones"
                                 :no-data-text="tt('No results')"
@@ -343,6 +344,7 @@
                                 item-value="type"
                                 persistent-placeholder
                                 max-width="400px"
+                                :menu-props="{ contentClass: 'select-menu-medium' }"
                                 :placeholder="tt('Default Date Range')"
                                 :items="allInsightsExplorerDefaultDateRanges"
                                 v-model="insightsExplorerDefaultDateRangeType"
@@ -392,6 +394,7 @@
                                 item-value="type"
                                 persistent-placeholder
                                 max-width="400px"
+                                :menu-props="{ contentClass: 'select-menu-medium' }"
                                 :placeholder="tt('Default Date Range for Reconciliation Statement Button')"
                                 :items="allReconciliationStatementDateRanges"
                                 v-model="reconciliationStatementButtonDefaultDateRangeTypeInDesktop"

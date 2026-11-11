@@ -808,3 +808,306 @@ func TestBeancountDataReaderReadTransactionMetadataLine(t *testing.T) {
 	assert.Equal(t, "value 7", actualData.Transactions[1].Postings[0].Metadata["key7"])
 	assert.Equal(t, 0, len(actualData.Transactions[1].Postings[1].Metadata))
 }
+
+func TestBeancountDataReaderRead_CommentWithQuotes(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		";;; You can provide mappings from the account numbers (\"account\n"+
+		"2024-01-01 * \"Test\"\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "Test", actualData.Transactions[0].Narration)
+}
+
+func TestBeancountDataReaderRead_IndentedCommentWithQuotes(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Test\"\n"+
+		"  Assets:Cash -10 CNY\n"+
+		"  ; An indented comment with an unmatched \"quote\n"+
+		"  Expenses:Food 10 CNY\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+	assert.Equal(t, "Assets:Cash", actualData.Transactions[0].Postings[0].Account)
+	assert.Equal(t, "Expenses:Food", actualData.Transactions[0].Postings[1].Account)
+}
+
+func TestBeancountDataReaderRead_InlineCommentsWithQuotes(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"option \"name_assets\" \"AssetsAccount\" ; unmatched \"quote\n"+
+		"2024-01-01 open AssetsAccount:Cash CNY; bare\"quote\n"+
+		"pushtag #tag1 ; unmatched \"quote\n"+
+		"2024-01-01 * \"Test\"; bare\"quote\n"+
+		"  key: \"Value\" ; unmatched \"quote\n"+
+		"  Expenses:Food 10 CNY; bare\"quote\n"+
+		"  AssetsAccount:Cash ; unmatched \"quote\n"+
+		"poptag #tag1 ; unmatched \"quote\n"+
+		"2024-01-02 * \"Other\" ; unmatched \"quote\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, beancountAssetsAccountType, actualData.Accounts["AssetsAccount:Cash"].AccountType)
+	assert.Equal(t, 2, len(actualData.Transactions))
+	assert.Equal(t, "", actualData.Transactions[0].Payee)
+	assert.Equal(t, "Test", actualData.Transactions[0].Narration)
+	assert.Equal(t, "Value", actualData.Transactions[0].Metadata["key"])
+	assert.Equal(t, []string{"tag1"}, actualData.Transactions[0].Tags)
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+	assert.Equal(t, "-10.00", actualData.Transactions[0].Postings[1].Amount)
+	assert.Equal(t, "CNY", actualData.Transactions[0].Postings[1].Commodity)
+	assert.Equal(t, "", actualData.Transactions[1].Payee)
+	assert.Equal(t, "Other", actualData.Transactions[1].Narration)
+	assert.Equal(t, 0, len(actualData.Transactions[1].Tags))
+}
+
+func TestBeancountDataReaderRead_QuotedSemicolons(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \";Payee; Name\" \";Narration; Text\" #tag1\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, ";Payee; Name", actualData.Transactions[0].Payee)
+	assert.Equal(t, ";Narration; Text", actualData.Transactions[0].Narration)
+	assert.Equal(t, []string{"tag1"}, actualData.Transactions[0].Tags)
+}
+
+func TestBeancountDataReaderRead_MultilineQuotedSemicolons(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Line 1\n;Line 2 \\\"quoted\\\"; text\" ; unmatched \"quote\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "", actualData.Transactions[0].Payee)
+	assert.Equal(t, "Line 1\n;Line 2 \"quoted\"; text", actualData.Transactions[0].Narration)
+}
+
+func TestBeancountDataReaderRead_EscapedQuotes(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Test \\\"quoted; text\\\" end\" ; unmatched \"quote\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "Test \"quoted; text\" end", actualData.Transactions[0].Narration)
+}
+
+func TestBeancountDataReaderRead_EscapedBackslashes(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"C:\\\\Test\\\\\" ; unmatched \"quote\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "C:\\Test\\", actualData.Transactions[0].Narration)
+}
+
+func TestBeancountDataReaderRead_EscapeSequences(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Line\\nTab\\tReturn\\rForm\\fBack\\bUnknown\\x\"\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "Line\nTab\tReturn\rForm\fBack\bUnknownx", actualData.Transactions[0].Narration)
+}
+
+func TestBeancountDataReaderRead_TabSeparators(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01\t*\t\"Test\"\t#tag1\n"+
+		"\tAssets:Cash\t-10\tCNY\n"+
+		"\tExpenses:Food\t10\tCNY\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "Test", actualData.Transactions[0].Narration)
+	assert.Equal(t, []string{"tag1"}, actualData.Transactions[0].Tags)
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+	assert.Equal(t, "Assets:Cash", actualData.Transactions[0].Postings[0].Account)
+	assert.Equal(t, "-10.00", actualData.Transactions[0].Postings[0].Amount)
+	assert.Equal(t, "Expenses:Food", actualData.Transactions[0].Postings[1].Account)
+	assert.Equal(t, "10.00", actualData.Transactions[0].Postings[1].Amount)
+}
+
+func TestBeancountDataReaderRead_MultipleSpaceSeparators(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01   *   \"Payee\"   \"Narration\"   #tag1  \n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "Payee", actualData.Transactions[0].Payee)
+	assert.Equal(t, "Narration", actualData.Transactions[0].Narration)
+	assert.Equal(t, []string{"tag1"}, actualData.Transactions[0].Tags)
+}
+
+func TestBeancountDataReaderRead_EmptyPayee(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"\" \"Narration\"\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "", actualData.Transactions[0].Payee)
+	assert.Equal(t, "Narration", actualData.Transactions[0].Narration)
+}
+
+func TestBeancountDataReaderRead_EmptyNarration(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Payee\" \"\" #tag1\n"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "Payee", actualData.Transactions[0].Payee)
+	assert.Equal(t, "", actualData.Transactions[0].Narration)
+	assert.Equal(t, []string{"tag1"}, actualData.Transactions[0].Tags)
+}
+
+func TestBeancountDataReaderRead_EmptyPayeeAndNarration(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"\" \"\"\n"))
+	assert.Nil(t, err)
+
+	assert.Equal(t, []string{"2024-01-01", "*", "", ""}, reader.allData[0].items)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "", actualData.Transactions[0].Payee)
+	assert.Equal(t, "", actualData.Transactions[0].Narration)
+}
+
+func TestBeancountDataReaderRead_MultilineCRLF(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"; Comment\r\n"+
+		"2024-01-01 * \"Line 1\r\n;Line 2\"\r\n"+
+		"  Assets:Cash -10 CNY\r\n"+
+		"  Expenses:Food 10 CNY\r\n"))
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, reader.allData[1].lineNumber)
+	assert.Equal(t, 5, reader.allData[len(reader.allData)-1].lineNumber)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(actualData.Transactions))
+	assert.Equal(t, "Line 1\n;Line 2", actualData.Transactions[0].Narration)
+	assert.Equal(t, 2, len(actualData.Transactions[0].Postings))
+}
+
+func TestBeancountDataReaderRead_InputNotModified(t *testing.T) {
+	context := core.NewNullContext()
+	data := []byte("" +
+		"; Comment with an unmatched \"quote\n" +
+		"2024-01-01 * \"Test\" ; Comment\n")
+	expectedData := append([]byte(nil), data...)
+
+	_, err := createNewBeancountDataReader(context, data)
+	assert.Nil(t, err)
+
+	assert.Equal(t, expectedData, data)
+}
+
+func TestBeancountDataReaderRead_CommentLineNumbers(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"; unmatched \"quote\r\n"+
+		"\r\n"+
+		"  ; another comment\r\n"+
+		"2024-01-01 * \"Test\"\r\n"+
+		"  Assets:Cash -10 CNY\r\n"+
+		"; bare\"quote\r\n"+
+		"  Expenses:Food 10 CNY"))
+	assert.Nil(t, err)
+
+	assert.Equal(t, 7, reader.allData[len(reader.allData)-1].lineNumber)
+	assert.Equal(t, "Expenses:Food", reader.getNotEmptyItemByIndex(reader.allData[len(reader.allData)-1].items, 0))
+}
+
+func TestBeancountDataReaderRead_OnlyComments(t *testing.T) {
+	context := core.NewNullContext()
+	reader, err := createNewBeancountDataReader(context, []byte(""+
+		"; unmatched \"quote\n"+
+		"  ; bare\"quote"))
+	assert.Nil(t, err)
+
+	actualData, err := reader.read(context)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 0, len(actualData.Accounts))
+	assert.Equal(t, 0, len(actualData.Transactions))
+}
+
+func TestBeancountDataReaderRead_InvalidBareQuote(t *testing.T) {
+	context := core.NewNullContext()
+	_, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * bare\"quote ; comment\n"))
+	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
+}
+
+func TestBeancountDataReaderRead_UnterminatedQuotedString(t *testing.T) {
+	context := core.NewNullContext()
+	_, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Unterminated; string\n"))
+	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
+}
+
+func TestBeancountDataReaderRead_UnterminatedEscapeSequence(t *testing.T) {
+	context := core.NewNullContext()
+	_, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Unterminated\\"))
+	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
+}
+
+func TestBeancountDataReaderRead_TextAfterClosingQuote(t *testing.T) {
+	context := core.NewNullContext()
+	_, err := createNewBeancountDataReader(context, []byte(""+
+		"2024-01-01 * \"Test\"text\n"))
+	assert.EqualError(t, err, errs.ErrInvalidBeancountFile.Message)
+}

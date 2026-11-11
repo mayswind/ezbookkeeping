@@ -1,8 +1,8 @@
 package beancount
 
 import (
+	"bufio"
 	"bytes"
-	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
@@ -473,14 +473,6 @@ func (r *beancountDataReader) readTransactionLine(ctx core.Context, recordId str
 			continue
 		}
 
-		if item[0] == beancountCommentPrefix { // ; comment
-			if i-1 < payeeNarrationLastIndex {
-				payeeNarrationLastIndex = i - 1
-			}
-
-			break
-		}
-
 		if item[0] == beancountTagPrefix { // [#tag]
 			tagName := item[1:]
 
@@ -751,29 +743,10 @@ func (r *beancountDataReader) getOriginalAmountAndLastIndexFromIndex(items []str
 func createNewBeancountDataReader(ctx core.Context, data []byte) (*beancountDataReader, error) {
 	fallback := unicode.UTF8.NewDecoder()
 	reader := transform.NewReader(bytes.NewReader(data), unicode.BOMOverride(fallback))
-	csvReader := csv.NewReader(reader)
-	csvReader.Comma = ' '
-	csvReader.FieldsPerRecord = -1
+	allData, err := readBeancountLines(ctx, reader)
 
-	allData := make([]beancountLineData, 0)
-
-	for {
-		items, err := csvReader.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			log.Errorf(ctx, "[beancount_data_reader.createNewBeancountDataReader] cannot parse data, because %s", err.Error())
-			return nil, errs.ErrInvalidBeancountFile
-		}
-
-		lineNumber, _ := csvReader.FieldPos(0)
-		allData = append(allData, beancountLineData{
-			lineNumber: lineNumber,
-			items:      items,
-		})
+	if err != nil {
+		return nil, errs.ErrInvalidBeancountFile
 	}
 
 	return &beancountDataReader{
@@ -793,4 +766,122 @@ func createNewBeancountDataReader(ctx core.Context, data []byte) (*beancountData
 		},
 		allData: allData,
 	}, nil
+}
+
+func readBeancountLines(ctx core.Context, reader io.Reader) ([]beancountLineData, error) {
+	bufferedReader := bufio.NewReader(reader)
+	allData := make([]beancountLineData, 0)
+	var items []string
+	itemBuilder := strings.Builder{}
+	lineNumber := 0
+	recordLineNumber := 0
+	inString := false
+	quotedItem := false
+
+	for {
+		line, err := bufferedReader.ReadString('\n')
+
+		if err != nil && err != io.EOF {
+			return nil, err
+		}
+
+		if len(line) == 0 {
+			break
+		}
+
+		lineNumber++
+		line = strings.TrimSuffix(strings.TrimSuffix(line, "\n"), "\r")
+
+		if !inString {
+			recordLineNumber = lineNumber
+		}
+
+		if len(line) == 0 && !inString {
+			continue
+		}
+
+		for i := 0; i < len(line); i++ {
+			char := line[i]
+
+			if inString {
+				if char == '\\' {
+					i++
+
+					if i >= len(line) {
+						log.Errorf(ctx, "[beancount_data_reader.readBeancountLines] invalid string escape on line#%d \"%s\"", lineNumber, line)
+						return nil, errs.ErrInvalidBeancountFile
+					}
+
+					char = line[i]
+
+					switch char {
+					case 'n':
+						char = '\n'
+					case 't':
+						char = '\t'
+					case 'r':
+						char = '\r'
+					case 'f':
+						char = '\f'
+					case 'b':
+						char = '\b'
+					}
+				} else if char == '"' {
+					inString = false
+					continue
+				}
+
+				itemBuilder.WriteByte(char)
+			} else if char == beancountCommentPrefix {
+				break
+			} else if char == ' ' || char == '\t' || char == '\r' {
+				if itemBuilder.Len() > 0 || quotedItem {
+					items = append(items, itemBuilder.String())
+					itemBuilder.Reset()
+					quotedItem = false
+				} else if len(items) == 0 {
+					items = append(items, "") // preserve the indentation marker
+				}
+			} else if char == '"' {
+				if itemBuilder.Len() > 0 || quotedItem {
+					log.Errorf(ctx, "[beancount_data_reader.readBeancountLines] unexpected quote on line#%d \"%s\"", lineNumber, line)
+					return nil, errs.ErrInvalidBeancountFile
+				}
+
+				inString = true
+				quotedItem = true
+			} else {
+				if quotedItem {
+					log.Errorf(ctx, "[beancount_data_reader.readBeancountLines] unexpected character after string on line#%d \"%s\"", lineNumber, line)
+					return nil, errs.ErrInvalidBeancountFile
+				}
+
+				itemBuilder.WriteByte(char)
+			}
+		}
+
+		if inString {
+			itemBuilder.WriteByte('\n')
+			continue
+		}
+
+		if itemBuilder.Len() > 0 || quotedItem {
+			items = append(items, itemBuilder.String())
+			itemBuilder.Reset()
+			quotedItem = false
+		}
+
+		allData = append(allData, beancountLineData{
+			lineNumber: recordLineNumber,
+			items:      items,
+		})
+		items = nil
+	}
+
+	if inString {
+		log.Errorf(ctx, "[beancount_data_reader.readBeancountLines] unterminated string on line#%d", recordLineNumber)
+		return nil, errs.ErrInvalidBeancountFile
+	}
+
+	return allData, nil
 }

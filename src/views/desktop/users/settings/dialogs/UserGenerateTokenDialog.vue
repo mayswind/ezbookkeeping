@@ -173,11 +173,11 @@ const generatedToken = ref<string>('');
 
 const codeContainerStyle = computed<string>(() => {
     if (tokenType.value === 'api' && showAPIExample.value && serverUrl.value) {
-        return 'height: 160px';
+        return 'height: 140px';
     } else if (tokenType.value === 'mcp' && showMCPConfiguration.value && serverUrl.value) {
-        return 'height: 390px';
+        return 'height: 360px';
     } else {
-        return 'height: 160px';
+        return 'height: 140px';
     }
 });
 

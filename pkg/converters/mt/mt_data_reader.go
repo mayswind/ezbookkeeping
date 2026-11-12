@@ -57,7 +57,8 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 	var lastTag string
 
 	for i := 0; i < len(r.allLines); i++ {
-		line := strings.TrimSpace(r.allLines[i])
+		rawLine := r.allLines[i]
+		line := strings.TrimSpace(rawLine)
 		recordId := fmt.Sprintf("line:%d", i+1)
 
 		if len(line) < 1 {
@@ -132,13 +133,13 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 			lastTag = mtTagStatementLine
 		} else if strings.HasPrefix(line, mtTagInformationToAccountOwner) && currentStatement != nil {
 			currentStatement.InformationToAccountOwner = make([]string, 1)
-			currentStatement.InformationToAccountOwner[0] = line[len(mtTagInformationToAccountOwner):]
+			currentStatement.InformationToAccountOwner[0] = rawLine[strings.Index(rawLine, mtTagInformationToAccountOwner)+len(mtTagInformationToAccountOwner):]
 			lastTag = mtTagInformationToAccountOwner
 		} else if line[0] != mtTagPrefix && lastTag == mtTagStatementLine && currentStatement != nil {
 			currentStatement.ReferenceForAccountOwner += line
 			lastTag = ""
 		} else if line[0] != mtTagPrefix && lastTag == mtTagInformationToAccountOwner && currentStatement != nil && len(currentStatement.InformationToAccountOwner) < mtInformationToAccountOwnerMaxLines {
-			currentStatement.InformationToAccountOwner = append(currentStatement.InformationToAccountOwner, line)
+			currentStatement.InformationToAccountOwner = append(currentStatement.InformationToAccountOwner, rawLine)
 			lastTag = mtTagInformationToAccountOwner
 		} else {
 			log.Warnf(ctx, "[mt_data_reader.read] unsupported line \"%s\" and skip this line", line)

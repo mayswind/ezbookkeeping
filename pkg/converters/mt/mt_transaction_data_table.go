@@ -164,14 +164,22 @@ func (t *mt940TransactionDataRowIterator) parseTransaction(ctx core.Context, use
 	}
 
 	informationToAccountOwnerMap := statement.GetInformationToAccountOwnerMap()
+	description := informationToAccountOwnerMap[MT_INFORMATION_TO_ACCOUNT_OWNER_TAG_REMITTANCE]
 
-	if len(informationToAccountOwnerMap) > 0 {
-		if value, exists := informationToAccountOwnerMap[MT_INFORMATION_TO_ACCOUNT_OWNER_TAG_REMITTANCE]; exists {
-			data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = value
+	if strings.HasPrefix(description, MT_REMITTANCE_CODE_UNSTRUCTURED+"/") || strings.HasPrefix(description, MT_REMITTANCE_CODE_STRUCTURED+"/") {
+		subFields := strings.SplitN(description, "/", 3)
+		description = ""
+
+		if len(subFields) == 3 {
+			description = strings.TrimSpace(subFields[2])
 		}
-	} else {
-		data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = strings.Join(statement.InformationToAccountOwner, "\n")
 	}
+
+	if len(description) < 1 {
+		description = strings.Join(statement.InformationToAccountOwner, "\n")
+	}
+
+	data[datatable.TRANSACTION_DATA_TABLE_DESCRIPTION] = description
 
 	return data, nil
 }

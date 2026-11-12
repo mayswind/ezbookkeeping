@@ -89,3 +89,151 @@ func TestMtStatementGetInformationToAccountOwnerMap_EmptyKeyValue(t *testing.T) 
 	actualMap := statement.GetInformationToAccountOwnerMap()
 	assert.Equal(t, expectedMap, actualMap)
 }
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGStructuredInformation(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/EREF/TEST-REFERENCE-001//CNTP/TESTACCOUNT001/TESTDEFF/Example Supplier/Berlin/REMI/USTD//Service invoice 0042/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"EREF": "TEST-REFERENCE-001",
+		"CNTP": "TESTACCOUNT001/TESTDEFF/Example Supplier/Berlin",
+		"REMI": "USTD//Service invoice 0042",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGCounterpartyEmptySubFields(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/IREF/846299123//CNTP/RO64RZBR0000075214917550//BUPA SORTREP ICONIC///REMI/USTD//2025 February ",
+			"Payment/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"IREF": "846299123",
+		"CNTP": "RO64RZBR0000075214917550//BUPA SORTREP ICONIC/",
+		"REMI": "USTD//2025 February Payment",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGRemittanceTagSplitAcrossLines(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/IREF/846299138//CNTP/RO41INGB0000000008626480//HERTOGH B.V.///R",
+			"EMI/USTD//2025 February Payment/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"IREF": "846299138",
+		"CNTP": "RO41INGB0000000008626480//HERTOGH B.V./",
+		"REMI": "USTD//2025 February Payment",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGRemittanceWithSlashes(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/IREF/846299125//CNTP/RO34BTRLRONCRT0000052301//FEEL FREE DOT COM///REMI/USTD//INVOICE nr. 15833/ ",
+			"01.02.2025/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"IREF": "846299125",
+		"CNTP": "RO34BTRLRONCRT0000052301//FEEL FREE DOT COM/",
+		"REMI": "USTD//INVOICE nr. 15833/ 01.02.2025",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGUltimateCreditorAndDebtor(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/ULTC/Jansen/10454//ULTD/Johnson/18888/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"ULTC": "Jansen/10454",
+		"ULTD": "Johnson/18888",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGDutchStructuredRemittance(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/REMI/STRD/CUR/1234567890123456/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"REMI": "STRD/CUR/1234567890123456",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGISOStructuredRemittance(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/REMI/STRD/ISO/RF18539007547034/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"REMI": "STRD/ISO/RF18539007547034",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGRemittanceWithPurposeTagInText(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/REMI/USTD//Invoice /PURP/reference//PURP/PENS/",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"REMI": "USTD//Invoice /PURP/reference",
+		"PURP": "PENS",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestMtStatementGetInformationToAccountOwnerMap_INGRemittanceWithTrailingSlash(t *testing.T) {
+	statement := &mtStatement{
+		InformationToAccountOwner: []string{
+			"/REMI/USTD//Invoice 2026/01//",
+		},
+	}
+
+	expectedMap := map[string]string{
+		"REMI": "USTD//Invoice 2026/01/",
+	}
+
+	actualMap := statement.GetInformationToAccountOwnerMap()
+	assert.Equal(t, expectedMap, actualMap)
+}

@@ -101,6 +101,11 @@ func (r *mt940DataReader) read(ctx core.Context) (*mt940Data, error) {
 				return nil, err
 			}
 
+			if currentStatement != nil {
+				data.Statements = append(data.Statements, currentStatement)
+				currentStatement = nil
+			}
+
 			data.ClosingBalance = balance
 			lastTag = line[:len(mtTagClosingBalanceF)]
 		} else if strings.HasPrefix(line, mtTagClosingAvailableBalance) {

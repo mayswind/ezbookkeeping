@@ -161,6 +161,14 @@
     background: rgb(var(--ebk-code-background));
 }
 
+.code-textarea.v-textarea {
+    &.v-input--readonly {
+        .v-field__overlay {
+            background: rgb(var(--ebk-code-background));
+        }
+    }
+}
+
 [dir='rtl'] .code-container {
     direction: ltr;
 }

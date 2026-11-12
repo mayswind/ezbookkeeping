@@ -467,10 +467,8 @@
                                     </div>
                                 </div>
                                 <div v-else-if="element.conditions && element.conditions.length > 0 && showExpression[element.id]">
-                                    <div class="w-100 code-container">
-                                        <v-textarea class="w-100 always-cursor-text mb-4" :readonly="true"
-                                                    :value="getExpression(element, index)"></v-textarea>
-                                    </div>
+                                    <v-textarea class="w-100 code-textarea always-cursor-text mb-4" :readonly="true"
+                                                :value="getExpression(element, index)"></v-textarea>
                                 </div>
 
                                 <v-btn class="px-2" density="comfortable" color="primary" variant="text"

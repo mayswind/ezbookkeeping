@@ -207,6 +207,9 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 func (t *qifTransactionDataRowIterator) parseTransactionTime(ctx core.Context, date string) (string, error) {
 	var year, month, day string
 
+	// Quicken pads a one-digit day or year with a space ("1/ 5' 8")
+	date = strings.ReplaceAll(strings.TrimSpace(date), " ", "0")
+
 	if (t.dataTable.dateFormatType == qifYearMonthDayDateFormat && utils.IsValidYearMonthDayLongOrShortDateFormat(date)) ||
 		(t.dataTable.dateFormatType == qifMonthDayYearDateFormat && utils.IsValidMonthDayYearLongOrShortDateFormat(date)) ||
 		(t.dataTable.dateFormatType == qifDayMonthYearDateFormat && utils.IsValidDayMonthYearLongOrShortDateFormat(date)) {

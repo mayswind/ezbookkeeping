@@ -190,6 +190,32 @@ func TestQIFTransactionDataFileParseImportedData_ParseMonthDayYearDateFormatTime
 	assert.Equal(t, int64(1725494400), utils.GetUnixTimeFromTransactionTime(allNewTransactions[4].TransactionTime))
 }
 
+func TestQIFTransactionDataFileParseImportedData_ParseSpacePaddedMonthDayYearDateFormatTime(t *testing.T) {
+	importer := QifMonthDayYearTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"!Type:Bank\n"+
+			"D9/ 1'24\n"+
+			"T-123.45\n"+
+			"^\n"+
+			"D9/ 2/24\n"+
+			"T-123.45\n"+
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+
+	assert.Equal(t, 2, len(allNewTransactions))
+
+	assert.Equal(t, int64(1725148800), utils.GetUnixTimeFromTransactionTime(allNewTransactions[0].TransactionTime))
+	assert.Equal(t, int64(1725235200), utils.GetUnixTimeFromTransactionTime(allNewTransactions[1].TransactionTime))
+}
+
 func TestQIFTransactionDataFileParseImportedData_ParseDayYearMonthDateFormatTime(t *testing.T) {
 	importer := QifDayMonthYearTransactionDataImporter
 	context := core.NewNullContext()

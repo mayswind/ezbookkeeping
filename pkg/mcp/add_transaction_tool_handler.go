@@ -60,6 +60,21 @@ func (h *mcpAddTransactionToolHandler) Description() string {
 	return "Add a new transaction in ezBookkeeping."
 }
 
+// DataOperationType returns how the MCP tool operates on business records
+func (h *mcpAddTransactionToolHandler) DataOperationType() MCPToolDataOperationType {
+	return MCP_TOOL_DATA_OPERATION_ADD
+}
+
+// IsIdempotent returns whether repeated calls with the same arguments have no additional effects
+func (h *mcpAddTransactionToolHandler) IsIdempotent() bool {
+	return false
+}
+
+// DependsOnExternalData returns whether the MCP tool may depend on third-party data
+func (h *mcpAddTransactionToolHandler) DependsOnExternalData() bool {
+	return false
+}
+
 // InputType returns the input type for the MCP tool request
 func (h *mcpAddTransactionToolHandler) InputType() reflect.Type {
 	return reflect.TypeOf(&MCPAddTransactionRequest{})

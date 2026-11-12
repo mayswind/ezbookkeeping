@@ -72,6 +72,21 @@ func (h *mcpQueryTransactionsToolHandler) Description() string {
 	return "Query transactions based on various filters."
 }
 
+// DataOperationType returns how the MCP tool operates on business records
+func (h *mcpQueryTransactionsToolHandler) DataOperationType() MCPToolDataOperationType {
+	return MCP_TOOL_DATA_OPERATION_READ_ONLY
+}
+
+// IsIdempotent returns whether repeated calls with the same arguments have no additional effects
+func (h *mcpQueryTransactionsToolHandler) IsIdempotent() bool {
+	return true
+}
+
+// DependsOnExternalData returns whether the MCP tool may depend on third-party data
+func (h *mcpQueryTransactionsToolHandler) DependsOnExternalData() bool {
+	return false
+}
+
 // InputType returns the input type for the MCP tool request
 func (h *mcpQueryTransactionsToolHandler) InputType() reflect.Type {
 	return reflect.TypeOf(&MCPQueryTransactionsRequest{})

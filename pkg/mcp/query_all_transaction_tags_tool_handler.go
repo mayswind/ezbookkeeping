@@ -34,6 +34,21 @@ func (h *mcpQueryAllTransactionTagsToolHandler) Description() string {
 	return "Query transaction tags for the current user in ezBookkeeping."
 }
 
+// DataOperationType returns how the MCP tool operates on business records
+func (h *mcpQueryAllTransactionTagsToolHandler) DataOperationType() MCPToolDataOperationType {
+	return MCP_TOOL_DATA_OPERATION_READ_ONLY
+}
+
+// IsIdempotent returns whether repeated calls with the same arguments have no additional effects
+func (h *mcpQueryAllTransactionTagsToolHandler) IsIdempotent() bool {
+	return true
+}
+
+// DependsOnExternalData returns whether the MCP tool may depend on third-party data
+func (h *mcpQueryAllTransactionTagsToolHandler) DependsOnExternalData() bool {
+	return false
+}
+
 // InputType returns the input type for the MCP tool request
 func (h *mcpQueryAllTransactionTagsToolHandler) InputType() reflect.Type {
 	return nil

@@ -42,6 +42,21 @@ func (h *mcpDeleteTransactionToolHandler) Description() string {
 	return "Delete an existing transaction in ezBookkeeping."
 }
 
+// DataOperationType returns how the MCP tool operates on business records
+func (h *mcpDeleteTransactionToolHandler) DataOperationType() MCPToolDataOperationType {
+	return MCP_TOOL_DATA_OPERATION_MODIFY
+}
+
+// IsIdempotent returns whether repeated calls with the same arguments have no additional effects
+func (h *mcpDeleteTransactionToolHandler) IsIdempotent() bool {
+	return true
+}
+
+// DependsOnExternalData returns whether the MCP tool may depend on third-party data
+func (h *mcpDeleteTransactionToolHandler) DependsOnExternalData() bool {
+	return false
+}
+
 // InputType returns the input type for the MCP tool request
 func (h *mcpDeleteTransactionToolHandler) InputType() reflect.Type {
 	return reflect.TypeOf(&MCPDeleteTransactionRequest{})

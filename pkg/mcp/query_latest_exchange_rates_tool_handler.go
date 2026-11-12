@@ -51,6 +51,21 @@ func (h *mcpQueryLatestExchangeRatesToolHandler) Description() string {
 	return "Query latest exchange rates with specified currencies."
 }
 
+// DataOperationType returns how the MCP tool operates on business records
+func (h *mcpQueryLatestExchangeRatesToolHandler) DataOperationType() MCPToolDataOperationType {
+	return MCP_TOOL_DATA_OPERATION_READ_ONLY
+}
+
+// IsIdempotent returns whether repeated calls with the same arguments have no additional effects
+func (h *mcpQueryLatestExchangeRatesToolHandler) IsIdempotent() bool {
+	return true
+}
+
+// DependsOnExternalData returns whether the MCP tool may depend on third-party data
+func (h *mcpQueryLatestExchangeRatesToolHandler) DependsOnExternalData() bool {
+	return true
+}
+
 // InputType returns the input type for the MCP tool request
 func (h *mcpQueryLatestExchangeRatesToolHandler) InputType() reflect.Type {
 	return reflect.TypeOf(&MCPQueryExchangeRatesRequest{})

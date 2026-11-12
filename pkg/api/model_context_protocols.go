@@ -200,6 +200,7 @@ func (a *ModelContextProtocolAPI) ListToolsHandler(c *core.WebContext, jsonRPCRe
 			InputSchema: toolsInfo[i].InputSchema,
 			Title:       toolsInfo[i].Title,
 			Description: toolsInfo[i].Description,
+			Annotations: toolsInfo[i].Annotations,
 		}
 
 		if mcpVersion >= string(mcp.ToolResultStructuredContentMinVersion) {

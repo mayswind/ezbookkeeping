@@ -1,6 +1,8 @@
 package sgml
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/xml"
 	"io"
 	"reflect"
@@ -41,6 +43,84 @@ type Decoder struct {
 	xmlDecoder *xml.Decoder
 }
 
+// bareAmpersandReader escapes every "&" that does not start an entity or character reference,
+// because SGML files (e.g. OFX 1.x) often contain a bare "&" as text (e.g. "AT&T"), which xml decoder rejects
+type bareAmpersandReader struct {
+	reader  *bufio.Reader
+	pending []byte
+}
+
+var predefinedEntityNames = [][]byte{[]byte("amp;"), []byte("lt;"), []byte("gt;"), []byte("apos;"), []byte("quot;")}
+
+func (r *bareAmpersandReader) Read(p []byte) (int, error) {
+	n := 0
+
+	for n < len(p) {
+		if len(r.pending) > 0 {
+			copied := copy(p[n:], r.pending)
+			r.pending = r.pending[copied:]
+			n += copied
+			continue
+		}
+
+		if n > 0 && r.reader.Buffered() == 0 {
+			break
+		}
+
+		b, err := r.reader.ReadByte()
+
+		if err != nil {
+			if n > 0 {
+				break
+			}
+
+			return 0, err
+		}
+
+		p[n] = b
+		n++
+
+		if b == '&' && !r.isReference() {
+			r.pending = []byte("amp;")
+		}
+	}
+
+	return n, nil
+}
+
+func (r *bareAmpersandReader) isReference() bool {
+	next, _ := r.reader.Peek(16)
+
+	for _, entityName := range predefinedEntityNames {
+		if bytes.HasPrefix(next, entityName) {
+			return true
+		}
+	}
+
+	if len(next) < 1 || next[0] != '#' {
+		return false
+	}
+
+	isHex := len(next) > 1 && next[1] == 'x'
+	digitStart := 1
+
+	if isHex {
+		digitStart = 2
+	}
+
+	for i := digitStart; i < len(next); i++ {
+		c := next[i]
+
+		if c == ';' {
+			return i > digitStart
+		} else if !('0' <= c && c <= '9') && !(isHex && ('a' <= c && c <= 'f' || 'A' <= c && c <= 'F')) {
+			return false
+		}
+	}
+
+	return false
+}
+
 var sgmlTypeInfoMap sync.Map // map[reflect.Type]*typeInfo
 
 // Decode unmarshal the specified struct instance and returns whether error occurs
@@ -75,6 +155,8 @@ func (d *Decoder) Decode(v any) error {
 
 		if err == io.EOF {
 			break
+		} else if err != nil {
+			return err
 		}
 
 		switch token := token.(type) {
@@ -110,6 +192,8 @@ func (d *Decoder) unmarshal(element reflect.Value, elementName string) error {
 
 		if err == io.EOF {
 			break
+		} else if err != nil {
+			return err
 		}
 
 		switch token := token.(type) {
@@ -310,7 +394,7 @@ func (d *Decoder) getActualFieldValue(fieldName string, fieldValue string, textu
 
 // NewDecoder creates a new SGML parser reading from specified io reader
 func NewDecoder(reader io.Reader) *Decoder {
-	xmlDecoder := xml.NewDecoder(reader)
+	xmlDecoder := xml.NewDecoder(&bareAmpersandReader{reader: bufio.NewReader(reader)})
 	xmlDecoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
 		return input, nil
 	}

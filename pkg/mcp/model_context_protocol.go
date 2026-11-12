@@ -126,7 +126,7 @@ type MCPListToolsResponse struct {
 
 // MCPTool defines the structure of a tool in the MCP
 type MCPTool struct {
-	ToolType     core.MCPToolType
+	ToolType     core.MCPToolType    `json:"-"`
 	Name         string              `json:"name"`
 	InputSchema  *jsonschema.Schema  `json:"inputSchema"`
 	OutputSchema *jsonschema.Schema  `json:"outputSchema,omitempty"`

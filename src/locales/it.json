@@ -151,7 +151,7 @@
             "everyMultiDaysOfYear": "Ogni {days} dell'anno",
             "everyNDays": "Ogni {n} giorni",
             "youHaveAccounts": "Hai registrato {count} profili",
-            "addNewTag": "Aggiungi nuovo giorno \"{tag}\"",
+            "addNewTag": "Aggiungi nuovo tag \"{tag}\"",
             "clickToSelectedFile": "Carica un file ({extensions})",
             "previewCount": "Preview Count: {count}",
             "selectedCount": "{count} selezionati su {totalCount}",

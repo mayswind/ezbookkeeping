@@ -357,3 +357,57 @@ func TestDecoderDecode_WithEmbeddedNotSupportedField(t *testing.T) {
 
 	assert.EqualError(t, err, errs.ErrInvalidSGMLFile.Message)
 }
+
+func TestDecoderDecode_WithBareAmpersand(t *testing.T) {
+	sgmlDecoder := NewDecoder(strings.NewReader(
+		"<Root>\n" +
+			"<Text1>AT&T\n" +
+			"<Text2>B & H\n" +
+			"</Root>\n"))
+
+	testStruct := &TestSimpleStruct{}
+	err := sgmlDecoder.Decode(&testStruct)
+
+	assert.NotNil(t, err)
+}
+
+func TestDecoderDecode_WithEscapedAmpersand(t *testing.T) {
+	sgmlDecoder := NewDecoder(strings.NewReader(
+		"<Root>\n" +
+			"<Text1>AT&amp;T\n" +
+			"<Text2>B &amp; H\n" +
+			"</Root>\n"))
+
+	testStruct := &TestSimpleStruct{}
+	err := sgmlDecoder.Decode(&testStruct)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "AT&T", testStruct.Text1)
+	assert.Equal(t, "B & H", testStruct.Text2)
+}
+
+func TestDecoderDecode_WithSyntaxError(t *testing.T) {
+	sgmlDecoder := NewDecoder(strings.NewReader(
+		"<Root>\n" +
+			"<Text1>Foo\n" +
+			"<!x\n" +
+			"</Root>\n"))
+
+	testStruct := &TestSimpleStruct{}
+	err := sgmlDecoder.Decode(&testStruct)
+
+	assert.NotNil(t, err)
+}
+
+func TestDecoderDecode_WithSyntaxErrorBeforeRootElement(t *testing.T) {
+	sgmlDecoder := NewDecoder(strings.NewReader(
+		"<1>\n" +
+			"<Root>\n" +
+			"<Text1>Foo\n" +
+			"</Root>\n"))
+
+	testStruct := &TestSimpleStruct{}
+	err := sgmlDecoder.Decode(&testStruct)
+
+	assert.NotNil(t, err)
+}

@@ -77,6 +77,10 @@ func (d *Decoder) Decode(v any) error {
 			break
 		}
 
+		if err != nil {
+			return err
+		}
+
 		switch token := token.(type) {
 		case xml.StartElement:
 			if token.Name.Local == rootElementName {
@@ -110,6 +114,10 @@ func (d *Decoder) unmarshal(element reflect.Value, elementName string) error {
 
 		if err == io.EOF {
 			break
+		}
+
+		if err != nil {
+			return err
 		}
 
 		switch token := token.(type) {

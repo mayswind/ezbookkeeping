@@ -14,6 +14,22 @@
             </div>
         </f7-toolbar>
         <f7-page-content class="margin-top">
+            <f7-list strong inset dividers class="no-margin-top">
+                <f7-list-input
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    clear-button
+                    :placeholder="typedFormatHint"
+                    v-model:value="typedText"
+                    @keydown.enter.prevent="confirm"
+                    @paste="onPaste"
+                >
+                </f7-list-input>
+            </f7-list>
             <div class="block no-margin no-padding">
                 <date-time-picker ref="datetimepicker"
                                   datetime-picker-class="justify-content-center"
@@ -109,11 +125,16 @@ import { type TimePickerValue, useDateTimeSelectionBase } from '@/components/bas
 import { useEnvironmentsStore } from '@/stores/environment.ts';
 
 import { NumeralSystem } from '@/core/numeral.ts';
+import { type DateTime } from '@/core/datetime.ts';
 
 import { isDefined } from '@/lib/common.ts';
 import {
     getHourIn12HourFormat,
     getCurrentUnixTime,
+    getUnixTimeFromLocalDatetime,
+    getLocalDatetimeFromUnixTime,
+    getSameDateTimeWithBrowserTimezone,
+    parseDateTimeFromUnixTimeWithBrowserTimezone,
     getAMOrPM,
     getCombinedDateAndTimeValues
 } from '@/lib/datetime.ts';
@@ -136,7 +157,8 @@ const emit = defineEmits<{
 
 const {
     tt,
-    getCurrentNumeralSystemType
+    getCurrentNumeralSystemType,
+    formatDateTimeToLongDateTime
 } = useI18n();
 const { showToast } = useI18nUIComponents();
 
@@ -147,11 +169,13 @@ const {
     isSecondTwoDigits,
     isMeridiemIndicatorFirst,
     meridiemItems,
+    typedFormatHint,
     getLocalDatetimeFromSameDateTimeOfUnixTime,
     getUnixTimeFromSameDateTimeOfLocalDatetime,
     getDisplayTimeValue,
     generateAllHours,
-    generateAllMinutesOrSeconds
+    generateAllMinutesOrSeconds,
+    parseTypedDateTime
 } = useDateTimeSelectionBase();
 
 const environmentsStore = useEnvironmentsStore();
@@ -171,6 +195,14 @@ const timePickerItemHeight = ref<number | undefined>(undefined);
 
 const isDarkMode = computed<boolean>(() => environmentsStore.framework7DarkMode || false);
 const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
+
+const displayTime = computed<string>(() => formatDateTimeToLongDateTime(parseDateTimeFromUnixTimeWithBrowserTimezone(getUnixTimeFromLocalDatetime(dateTime.value))));
+
+const typedText = ref<string>(displayTime.value);
+
+watch(displayTime, (newValue) => {
+    typedText.value = newValue;
+});
 
 const hourItems = computed<TimePickerValue[]>(() => generateAllHours(3, isHourTwoDigits.value));
 const minuteItems = computed<TimePickerValue[]>(() => generateAllMinutesOrSeconds(3, isMinuteTwoDigits.value));
@@ -230,7 +262,68 @@ function clear(): void {
     emit('update:show', false);
 }
 
+function applyParsedDateTime(dt: DateTime): void {
+    dateTime.value = getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(dt).getUnixTime());
+
+    if (mode.value === 'time') {
+        nextTick(() => {
+            initTimePickerStyle();
+            scrollAllTimeSelectedItems();
+        });
+    }
+}
+
+function commitTypedText(): boolean {
+    const text = typedText.value;
+
+    if (text === displayTime.value) {
+        return true;
+    }
+
+    if (!text.trim()) {
+        typedText.value = displayTime.value;
+        return true;
+    }
+
+    const dt = parseTypedDateTime(text);
+
+    if (!dt) {
+        typedText.value = displayTime.value;
+        return false;
+    }
+
+    applyParsedDateTime(dt);
+    return true;
+}
+
+function onPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+
+    if (!event.clipboardData) {
+        return;
+    }
+
+    const text = event.clipboardData.getData('Text');
+
+    if (!text) {
+        return;
+    }
+
+    const dt = parseTypedDateTime(text);
+
+    if (!dt) {
+        return;
+    }
+
+    applyParsedDateTime(dt);
+}
+
 function confirm(): void {
+    if (!commitTypedText()) {
+        showToast(tt('Invalid date/time format'));
+        return;
+    }
+
     if (!dateTime.value) {
         return;
     }

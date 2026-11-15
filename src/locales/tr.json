@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "İşlem alınamadı",
     "Unable to add transaction": "İşlem eklenemedi",
     "Unable to save transaction": "İşlem kaydedilemedi",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Yeni bir işlem eklediniz",
     "You have saved this transaction": "Bu işlemi kaydettiniz",
     "Do you want to save this transaction draft?": "Bu işlem taslağını kaydetmek istiyor musunuz?",

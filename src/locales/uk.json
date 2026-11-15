@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Не вдалося отримати транзакцію",
     "Unable to add transaction": "Не вдалося додати транзакцію",
     "Unable to save transaction": "Не вдалося зберегти транзакцію",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Додано нову транзакцію",
     "You have saved this transaction": "Транзакцію збережено",
     "Do you want to save this transaction draft?": "Бажаєте зберегти чернетку транзакції?",

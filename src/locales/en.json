@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Unable to retrieve transaction",
     "Unable to add transaction": "Unable to add transaction",
     "Unable to save transaction": "Unable to save transaction",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "You have added a new transaction",
     "You have saved this transaction": "You have saved this transaction",
     "Do you want to save this transaction draft?": "Do you want to save this transaction draft?",

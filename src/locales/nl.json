@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Kan transactie niet ophalen",
     "Unable to add transaction": "Kan transactie niet toevoegen",
     "Unable to save transaction": "Kan transactie niet opslaan",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Je hebt een nieuwe transactie toegevoegd",
     "You have saved this transaction": "Je hebt deze transactie opgeslagen",
     "Do you want to save this transaction draft?": "Wil je dit transactieconcept opslaan?",

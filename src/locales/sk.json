@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Nepodarilo sa načítať transakciu",
     "Unable to add transaction": "Nepodarilo sa pridať transakciu",
     "Unable to save transaction": "Nepodarilo sa uložiť transakciu",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Pridali ste novú transakciu",
     "You have saved this transaction": "Transakcia bola uložená",
     "Do you want to save this transaction draft?": "Chcete uložiť koncept tejto transakcie?",

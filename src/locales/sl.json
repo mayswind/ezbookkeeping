@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Transakcije ni mogoče pridobiti",
     "Unable to add transaction": "Transakcije ni mogoče dodati",
     "Unable to save transaction": "Transakcije ni mogoče shraniti",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Dodali ste novo transakcijo",
     "You have saved this transaction": "Transakcijo ste shranili",
     "Do you want to save this transaction draft?": "Ali želite shraniti osnutek transakcije?",

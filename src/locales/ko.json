@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "거래를 검색할 수 없습니다",
     "Unable to add transaction": "거래를 추가할 수 없습니다",
     "Unable to save transaction": "거래를 저장할 수 없습니다",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "새 거래를 추가했습니다",
     "You have saved this transaction": "이 거래를 저장했습니다",
     "Do you want to save this transaction draft?": "이 거래 초안을 저장하시겠습니까?",

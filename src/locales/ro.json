@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Nu s-a putut prelua tranzacția",
     "Unable to add transaction": "Nu s-a putut adăuga tranzacția",
     "Unable to save transaction": "Nu s-a putut salva tranzacția",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Ai adăugat o tranzacție nouă",
     "You have saved this transaction": "Ai salvat această tranzacție",
     "Do you want to save this transaction draft?": "Dorești să salvezi această schiță de tranzacție?",

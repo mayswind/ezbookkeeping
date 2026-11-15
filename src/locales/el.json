@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Δεν είναι δυνατή η ανάκτηση της συναλλαγής",
     "Unable to add transaction": "Δεν είναι δυνατή η προσθήκη συναλλαγής",
     "Unable to save transaction": "Δεν είναι δυνατή η αποθήκευση της συναλλαγής",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Προσθέσατε νέα συναλλαγή",
     "You have saved this transaction": "Αποθηκεύσατε αυτήν τη συναλλαγή",
     "Do you want to save this transaction draft?": "Θέλετε να αποθηκεύσετε αυτό το πρόχειρο συναλλαγής;",

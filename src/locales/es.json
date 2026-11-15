@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "No se puede recuperar la transacción",
     "Unable to add transaction": "No se puede agregar la transacción",
     "Unable to save transaction": "No se puede guardar la transacción",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Se ha añadido una nueva transacción",
     "You have saved this transaction": "Se ha guardado esta transacción",
     "Do you want to save this transaction draft?": "¿Quieres guardar este borrador de transacción?",

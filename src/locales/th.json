@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "ไม่สามารถดึงข้อมูลรายการได้",
     "Unable to add transaction": "ไม่สามารถเพิ่มรายการได้",
     "Unable to save transaction": "ไม่สามารถบันทึกรายการได้",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "คุณได้เพิ่มรายการใหม่แล้ว",
     "You have saved this transaction": "คุณได้บันทึกรายการนี้แล้ว",
     "Do you want to save this transaction draft?": "คุณต้องการบันทึกร่างรายการนี้ไหม?",

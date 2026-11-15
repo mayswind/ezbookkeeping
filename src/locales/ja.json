@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "取引を取得できません",
     "Unable to add transaction": "取引を追加できません",
     "Unable to save transaction": "取引を保存できません",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "新しい取引を追加しました",
     "You have saved this transaction": "この取引を保存しました",
     "Do you want to save this transaction draft?": "この取引の下書きを保存しますか？",

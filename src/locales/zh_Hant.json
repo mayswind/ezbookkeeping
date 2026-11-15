@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "無法取得交易",
     "Unable to add transaction": "無法新增交易",
     "Unable to save transaction": "無法儲存交易",
+    "Unable to add transactions": "無法新增交易",
     "You have added a new transaction": "您已經新增交易",
     "You have saved this transaction": "您已經儲存此交易",
     "Do you want to save this transaction draft?": "您是否要儲存這筆交易草稿？",

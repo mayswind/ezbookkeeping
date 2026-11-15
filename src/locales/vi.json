@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Không thể lấy giao dịch",
     "Unable to add transaction": "Không thể thêm giao dịch",
     "Unable to save transaction": "Không thể lưu giao dịch",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Bạn đã thêm một giao dịch mới",
     "You have saved this transaction": "Bạn đã lưu giao dịch này",
     "Do you want to save this transaction draft?": "Bạn có muốn lưu bản nháp giao dịch này không?",

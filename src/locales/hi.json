@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "लेन-देन प्राप्त नहीं हो सका",
     "Unable to add transaction": "लेन-देन जोड़ा नहीं जा सका",
     "Unable to save transaction": "लेन-देन सहेजा नहीं जा सका",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "आपने एक नया लेन-देन जोड़ा है",
     "You have saved this transaction": "आपने यह लेन-देन सहेज लिया है",
     "Do you want to save this transaction draft?": "क्या आप यह लेन-देन ड्राफ़्ट सहेजना चाहते हैं?",

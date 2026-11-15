@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Не удалось получить транзакцию",
     "Unable to add transaction": "Не удалось добавить транзакцию",
     "Unable to save transaction": "Не удалось сохранить транзакцию",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Вы добавили новую транзакцию",
     "You have saved this transaction": "Вы сохранили эту транзакцию",
     "Do you want to save this transaction draft?": "Хотите сохранить этот черновик транзакции?",

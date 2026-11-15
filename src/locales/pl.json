@@ -2437,6 +2437,7 @@
     "Unable to retrieve transaction": "Nie można pobrać transakcji",
     "Unable to add transaction": "Nie można dodać transakcji",
     "Unable to save transaction": "Nie można zapisać transakcji",
+    "Unable to add transactions": "Unable to add transactions",
     "You have added a new transaction": "Dodano nową transakcję",
     "You have saved this transaction": "Zapisano transakcję",
     "Do you want to save this transaction draft?": "Czy chcesz zapisać szkic tej transakcji?",

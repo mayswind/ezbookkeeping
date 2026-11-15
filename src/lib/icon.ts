@@ -79,3 +79,33 @@ export function getUserCustomIconsInRows(userCustomIconInfos: UserCustomIconInfo
 
     return ret;
 }
+
+export function isUserCustomIconEquals(customIcon1: UserCustomIconInfoResponse, customIcon2: UserCustomIconInfoResponse): boolean {
+    if (customIcon1.id !== customIcon2.id || customIcon1.displayOrder !== customIcon2.displayOrder) {
+        return false;
+    }
+
+    try {
+        const originalUrl1 = new URL(customIcon1.originalUrl, window.location.href);
+        const originalUrl2 = new URL(customIcon2.originalUrl, window.location.href);
+        originalUrl1.searchParams.delete('token');
+        originalUrl2.searchParams.delete('token');
+        return originalUrl1.href === originalUrl2.href;
+    } catch {
+        return customIcon1.originalUrl === customIcon2.originalUrl;
+    }
+}
+
+export function isUserCustomIconsEquals(customIcons1: UserCustomIconInfoResponse[], customIcons2: UserCustomIconInfoResponse[]): boolean {
+    if (customIcons1.length !== customIcons2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < customIcons1.length; i++) {
+        if (!isUserCustomIconEquals(customIcons1[i]!, customIcons2[i]!)) {
+            return false;
+        }
+    }
+
+    return true;
+}

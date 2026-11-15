@@ -20,7 +20,7 @@ import {
     Account
 } from '@/models/account.ts';
 
-import { isDefined, isArray, isEquals, arrayItemToObjectField } from '@/lib/common.ts';
+import { isDefined, isArray, arrayItemToObjectField } from '@/lib/common.ts';
 import { BIG_DECIMAL_ZERO, isBigDecimal, parseBigDecimal } from '@/lib/numeral.ts';
 import { getCategorizedAccountsMap, getAllFilteredAccountsBalance } from '@/lib/account.ts';
 import services from '@/lib/services.ts';
@@ -929,7 +929,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
                 const accounts = Account.sortAccounts(Account.ofMulti(data.result), settingsStore.accountCategoryDisplayOrders);
 
-                if (force && data.result && isEquals(allAccounts.value, accounts)) {
+                if (force && data.result && Account.equalsMulti(allAccounts.value, accounts)) {
                     loadingPromise = null;
                     reject({ message: 'Account list is up to date', isUpToDate: true });
                     return;

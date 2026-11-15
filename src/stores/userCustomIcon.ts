@@ -4,9 +4,10 @@ import { defineStore } from 'pinia';
 import { itemAndIndex } from '@/core/base.ts';
 import type { UserCustomIconInfoResponse, UserCustomIconNewDisplayOrderRequest } from '@/models/user_custom_icon.ts';
 
-import { isObject, isString, isNumber, isEquals } from '@/lib/common.ts';
+import { isObject, isString, isNumber } from '@/lib/common.ts';
 import { getCurrentUnixTime } from '@/lib/datetime.ts';
 import { deleteCustomIconCacheEntry } from '@/lib/cache.ts';
+import { isUserCustomIconsEquals } from '@/lib/icon.ts';
 
 import services from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
@@ -81,7 +82,7 @@ export const useUserCustomIconsStore = defineStore('userCustomIcons', () => {
                     updateCustomIconListInvalidState(false);
                 }
 
-                if (force && data.result && isEquals(allCustomIcons.value, data.result.items)) {
+                if (force && data.result && isUserCustomIconsEquals(allCustomIcons.value, data.result.items)) {
                     loadingPromise = null;
                     reject({ message: 'Custom icon list is up to date', isUpToDate: true });
                     return;

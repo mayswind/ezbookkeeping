@@ -622,6 +622,20 @@ export class Account implements AccountInfoResponse {
         return accounts;
     }
 
+    public static equalsMulti(accounts1: Account[], accounts2: Account[]): boolean {
+        if (accounts1.length !== accounts2.length) {
+            return false;
+        }
+
+        for (let i = 0; i < accounts1.length; i++) {
+            if (!(accounts1[i]!).equals(accounts2[i]!)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static findAccountNameById(accounts: Account[], accountId: string, defaultName?: string): string | undefined {
         for (const account of accounts) {
             if (account.id === accountId) {

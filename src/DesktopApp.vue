@@ -50,6 +50,7 @@ import logger from '@/lib/logger.ts';
 
 interface SnackbarMessage {
     text: string;
+    style: string;
     onDismiss: (reason: string) => void;
 }
 
@@ -95,6 +96,7 @@ const toastQueue = computed<SnackbarMessage[]>({
         for (const toast of desktopPageStore.pendingToastQueue) {
             const snackbarMessage: SnackbarMessage = {
                 text: '',
+                style: 'z-index: 10000',
                 onDismiss: () => {
                     desktopPageStore.removeShowingToast(toast.id);
                 }

@@ -5,11 +5,13 @@
         persistent-placeholder
         :density="density"
         :variant="variant"
-        :disabled="disabled"
+        :disabled="disabled || loading || settingLanguage"
         :label="label"
         :placeholder="placeholder"
+        :loading="loading || settingLanguage"
         :items="allLanguages"
-        v-model="currentLocaleValue"
+        :model-value="currentLocaleValue"
+        @update:model-value="changeLanguage"
     >
         <template #item="{ props, internalItem }">
             <v-list-item :value="internalItem.value" v-bind="props">
@@ -53,21 +55,23 @@ const emit = defineEmits<LanguageSelectBaseEmits>();
 const { getCurrentLanguageTag } = useI18n();
 
 const {
+    settingLanguage,
     allLanguages,
     updateLanguage,
     isLanguageSelected
 } = useLanguageSelectButtonBase(props, emit);
 
-const currentLocaleValue = computed<string>({
-    get: () => {
-        if (props.useModelValue) {
-            return props.modelValue ?? '';
-        } else {
-            return getCurrentLanguageTag()
-        }
-    },
-    set: (value: string) => {
-        updateLanguage(value);
+const currentLocaleValue = computed<string>(() => {
+    if (props.useModelValue) {
+        return props.modelValue ?? '';
+    } else {
+        return getCurrentLanguageTag()
     }
 });
+
+function changeLanguage(languageTag: string): void {
+    updateLanguage(languageTag).catch(error => {
+        emit('error', error.message || error);
+    });
+}
 </script>

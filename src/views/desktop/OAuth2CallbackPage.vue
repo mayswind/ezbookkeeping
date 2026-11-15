@@ -75,7 +75,7 @@
                     <v-card variant="flat" class="w-100 px-4 pb-3" max-width="500">
                         <v-card-text class="pt-0">
                             <div class="text-center">
-                                <language-select-button :disabled="loggingInByOAuth2" />
+                                <language-select-button :disabled="loggingInByOAuth2" @error="desktopPageStore.addErrorToast" />
                             </div>
 
                             <v-divider class="mt-2 mb-3" />
@@ -89,14 +89,11 @@
                 </div>
             </v-col>
         </v-row>
-
-        <snack-bar ref="snackbar" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
@@ -105,6 +102,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useLoginPageBase } from '@/views/base/LoginPageBase.ts';
 
 import { useRootStore } from '@/stores/index.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type ErrorResponse, buildErrorResponse } from '@/core/api.ts';
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
@@ -119,8 +117,6 @@ import {
 import {
     mdiChevronLeft
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     token?: string;
@@ -141,6 +137,7 @@ const {
 } = useI18n();
 
 const rootStore = useRootStore();
+const desktopPageStore = useDesktopPageStore();
 
 const {
     version,
@@ -150,7 +147,6 @@ const {
 } = useLoginPageBase('desktop');
 
 const passcodeInput = useTemplateRef<VTextField>('passcodeInput');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const passcode = ref<string>('');
 const show2faInput = ref<boolean>(false);
@@ -188,7 +184,7 @@ function verifyAndLogin(): void  {
     const problemMessage = inputProblemMessage.value;
 
     if (problemMessage) {
-        snackbar.value?.showMessage(problemMessage);
+        desktopPageStore.addToast(problemMessage);
         return;
     }
 
@@ -199,9 +195,12 @@ function verifyAndLogin(): void  {
         passcode: passcode.value,
         callbackToken: props.token || ''
     }).then(authResponse => {
-        loggingInByOAuth2.value = false;
-        doAfterLogin(authResponse);
-        navigateToHome();
+        doAfterLogin(authResponse).then(loginHint => {
+            desktopPageStore.addToast(loginHint);
+            navigateToHome();
+        }).finally(() => {
+            loggingInByOAuth2.value = false;
+        });
     }).catch(error => {
         loggingInByOAuth2.value = false;
 
@@ -222,7 +221,7 @@ function verifyAndLogin(): void  {
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -233,9 +232,12 @@ if (!error.value && props.platform && props.token && !props.userName) {
     rootStore.authorizeOAuth2({
         callbackToken: props.token
     }).then(authResponse => {
-        loggingInByOAuth2.value = false;
-        doAfterLogin(authResponse);
-        navigateToHome();
+        doAfterLogin(authResponse).then(loginHint => {
+            desktopPageStore.addToast(loginHint);
+            navigateToHome();
+        }).finally(() => {
+            loggingInByOAuth2.value = false;
+        });
     }).catch(error => {
         loggingInByOAuth2.value = false;
 
@@ -245,7 +247,7 @@ if (!error.value && props.platform && props.token && !props.userName) {
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

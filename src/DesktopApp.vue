@@ -2,6 +2,7 @@
     <v-app>
         <router-view />
     </v-app>
+
     <v-snackbar class="cursor-pointer" color="notification-background" location="top"
                 :multi-line="true" :timeout="-1" :close-on-content-click="true" v-model="showNotification">
         <v-tooltip activator="parent">{{ tt('Click to close') }}</v-tooltip>
@@ -13,6 +14,12 @@
             {{ currentNotificationContent }}
         </div>
     </v-snackbar>
+
+    <v-snackbar-queue :total-visible="3" display-strategy="hold" :close-text="tt('Close')" v-model="toastQueue">
+        <template #actions="{ props }">
+            <v-btn variant="text" color="primary" v-bind="props">{{ tt('Close') }}</v-btn>
+        </template>
+    </v-snackbar-queue>
 </template>
 
 <script setup lang="ts">
@@ -28,9 +35,12 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useTokensStore } from '@/stores/token.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { ThemeType } from '@/core/theme.ts';
+
+import { isObject, isString } from '@/lib/common.ts';
 import { isProduction } from '@/lib/version.ts';
 import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
@@ -38,11 +48,17 @@ import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } fro
 import { getSystemTheme, setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
-const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
+interface SnackbarMessage {
+    text: string;
+    onDismiss: (reason: string) => void;
+}
+
+const { tt, te, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
 
 const theme = useTheme();
 
 const rootStore = useRootStore();
+const desktopPageStore = useDesktopPageStore();
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const tokensStore = useTokensStore();
@@ -71,6 +87,53 @@ const initialRoutePath: string = (() => {
 })();
 
 const showNotification = ref<boolean>(false);
+
+const toastQueue = computed<SnackbarMessage[]>({
+    get: () => {
+        const localizedToasts: SnackbarMessage[] = [];
+
+        for (const toast of desktopPageStore.pendingToastQueue) {
+            const snackbarMessage: SnackbarMessage = {
+                text: '',
+                onDismiss: () => {
+                    desktopPageStore.removeShowingToast(toast.id);
+                }
+            };
+
+            if (toast.type === 'message') {
+                if (toast.options) {
+                    snackbarMessage.text = tt(toast.message, toast.options);
+                } else {
+                    snackbarMessage.text = tt(toast.message);
+                }
+            } else if (toast.type === 'error') {
+                if (isObject(toast.error) && 'message' in toast.error && toast.error.message) {
+                    snackbarMessage.text = te(toast.error.message);
+                } else if (isObject(toast.error) && 'error' in toast.error) {
+                    snackbarMessage.text = te(toast.error);
+                } else if (isString(toast.error)) {
+                    snackbarMessage.text = te(toast.error);
+                } else {
+                    snackbarMessage.text = tt('An error occurred');
+                }
+            } else {
+                snackbarMessage.text = tt('An error occurred');
+            }
+
+            localizedToasts.push(snackbarMessage);
+        }
+
+        return localizedToasts;
+    },
+    set: (newValue: SnackbarMessage[]) => {
+        const oldCount = desktopPageStore.pendingToastQueue.length;
+        const newCount = newValue.length;
+
+        if (newCount < oldCount) {
+            desktopPageStore.removePendingToast(oldCount - newCount);
+        }
+    }
+});
 
 const currentNotificationContent = computed<string | null>(() => rootStore.currentNotification);
 
@@ -103,8 +166,15 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fun
     }
 });
 
-let localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
-settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone).then(localeDefaultSettings => {
+    settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+}).catch(error => {
+    logger.error('failed to initialize locale', error);
+
+    if (!error.processed) {
+        desktopPageStore.addErrorToast(error);
+    }
+});
 
 setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
 
@@ -112,21 +182,31 @@ if (isUserLogined() && initialRoutePath !== '/verify_email' && initialRoutePath 
     if (!settingsStore.appSettings.applicationLock || isUserUnlocked()) {
         // refresh token if user is logined
         tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-            if (response.user) {
-                localeDefaultSettings = setLanguage(response.user.language);
-                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-
-                if (response.notificationContent) {
-                    rootStore.setNotificationContent(response.notificationContent);
+            const user = response.user;
+            const languageSettings = user ? setLanguage(user.language).catch(error => {
+                if (!error.processed) {
+                    desktopPageStore.addErrorToast(error);
                 }
-            }
 
-            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
-            updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
-            exchangeRatesStore.removeExpiredExchangeRates(true);
-            exchangeRatesStore.autoUpdateExchangeRatesData();
+                return Promise.reject(error);
+            }) : Promise.reject();
+
+            languageSettings.then(localeDefaultSettings => {
+                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+            }).finally(() => {
+                if (user) {
+                    setExpenseAndIncomeAmountColor(user.expenseAmountColor, user.incomeAmountColor);
+
+                    if (response.notificationContent) {
+                        rootStore.setNotificationContent(response.notificationContent);
+                    }
+                }
+
+                updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+                updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
+                exchangeRatesStore.removeExpiredExchangeRates(true);
+                exchangeRatesStore.autoUpdateExchangeRatesData();
+            });
         }).catch(error => {
             logger.error('failed to refresh token', error);
         });

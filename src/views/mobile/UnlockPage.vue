@@ -13,12 +13,12 @@
             </f7-list-item>
 
             <f7-list-item class="list-item-pincode-input margin-horizontal margin-bottom">
-                <pin-code-input :secure="true" :length="6" :auto-confirm="true" v-model="pinCode" @pincode:confirm="unlockByPin" />
+                <pin-code-input :disabled="unlocking" :secure="true" :length="6" :auto-confirm="true" v-model="pinCode" @pincode:confirm="unlockByPin" />
             </f7-list-item>
 
-            <f7-list-button class="login-page-primary-action margin-horizontal" :class="{ 'disabled': !isPinCodeValid(pinCode) }"
+            <f7-list-button class="login-page-primary-action margin-horizontal" :class="{ 'disabled': unlocking || !isPinCodeValid(pinCode) }"
                             :text="tt('Unlock with PIN Code')" @click="unlockByPin"></f7-list-button>
-            <f7-list-button class="login-page-secondary-action margin-top margin-horizontal" v-if="isWebAuthnAvailable"
+            <f7-list-button class="login-page-secondary-action margin-top margin-horizontal" :class="{ 'disabled': unlocking }" v-if="isWebAuthnAvailable"
                             :text="tt('Unlock with WebAuthn')" @click="unlockByWebAuthn"></f7-list-button>
 
             <f7-list-item class="block-footer margin-bottom-half">
@@ -33,7 +33,7 @@
 
         <f7-list class="login-page-bottom">
             <f7-block-footer>
-                <language-select-button />
+                <language-select-button :disabled="unlocking" @error="showToast" />
 
                 <div class="login-page-powered-by margin-top-half">
                     <span>Powered by</span>
@@ -44,7 +44,7 @@
         </f7-list>
 
         <f7-toolbar class="login-page-fixed-bottom" tabbar bottom :outline="false">
-            <language-select-button />
+            <language-select-button :disabled="unlocking" @error="showToast" />
 
             <div class="login-page-powered-by margin-top-half">
                 <span>Powered by</span>
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import type { Router } from 'framework7/types';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
@@ -90,7 +91,13 @@ const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, doAfterUnlocked, 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 
+const unlocking = ref<boolean>(false);
+
 function unlockByWebAuthn(): void {
+    if (unlocking.value) {
+        return;
+    }
+
     const router = props.f7router;
     const webAuthnCredentialId = getWebAuthnCredentialId();
 
@@ -115,12 +122,27 @@ function unlockByWebAuthn(): void {
         userStore.currentUserBasicInfo,
         webAuthnCredentialId
     ).then(({ id, userName, userSecret }) => {
-        hideLoading();
-
         if (unlockTokenByWebAuthn(id, userName, userSecret)) {
-            doAfterUnlocked();
-            router.refreshPage();
+            unlocking.value = true;
+
+            doAfterUnlocked().then(unlockHint => {
+                if (unlockHint) {
+                    showToast(unlockHint);
+                }
+
+                router.refreshPage();
+            }).catch(error => {
+                logger.error('failed to set language after unlocking', error);
+
+                if (!error.processed) {
+                    showToast(error.message || error);
+                }
+            }).finally(() => {
+                unlocking.value = false;
+                hideLoading();
+            });
         } else {
+            hideLoading();
             logger.error('failed to unlock with webauthn');
             showToast('Failed to authenticate with WebAuthn');
         }
@@ -141,7 +163,7 @@ function unlockByWebAuthn(): void {
 }
 
 function unlockByPin(pinCode: string): void {
-    if (!isPinCodeValid(pinCode)) {
+    if (unlocking.value || !isPinCodeValid(pinCode)) {
         return;
     }
 
@@ -159,8 +181,25 @@ function unlockByPin(pinCode: string): void {
 
     try {
         if (unlockTokenByPinCode(user.username, pinCode)) {
-            doAfterUnlocked();
-            router.refreshPage();
+            unlocking.value = true;
+            showLoading(() => unlocking.value);
+
+            doAfterUnlocked().then(unlockHint => {
+                if (unlockHint) {
+                    showToast(unlockHint);
+                }
+
+                router.refreshPage();
+            }).catch(error => {
+                logger.error('failed to set language after unlocking', error);
+
+                if (!error.processed) {
+                    showToast(error.message || error);
+                }
+            }).finally(() => {
+                unlocking.value = false;
+                hideLoading();
+            });
         } else {
             logger.error('failed to unlock with pin code');
             showToast('Incorrect PIN code');
@@ -175,10 +214,14 @@ function relogin(): void {
     const router = props.f7router;
 
     showConfirm('Are you sure you want to re-login?', () => {
-        doRelogin();
-
-        router.navigate('/login', {
-            clearPreviousHistory: true
+        doRelogin().then(() => {
+            router.navigate('/login', {
+                clearPreviousHistory: true
+            });
+        }).catch(error => {
+            if (!error.processed) {
+                showToast(error.message || error);
+            }
         });
     });
 }

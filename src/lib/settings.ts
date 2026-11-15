@@ -22,6 +22,7 @@ import {
 
 const settingsLocalStorageKey: string = 'ebk_app_settings';
 const currentLanguageSessionStorageKey: string = 'ebk_current_language';
+const languageMessagesLocalStorageKeyPrefix: string = 'ebk_language_messages_';
 const languagePreviewSessionStorageKeyPrefix: string = 'ebk_language_preview_';
 
 export interface SessionLanguagePreview {
@@ -119,6 +120,43 @@ export function isEnableAnimate(): boolean {
 
 export function clearSettings(): void {
     localStorage.removeItem(settingsLocalStorageKey);
+}
+
+export function getLanguageMessagesCache(languageKey: string): string | null {
+    try {
+        return localStorage.getItem(languageMessagesLocalStorageKeyPrefix + languageKey);
+    } catch (ex) {
+        console.warn('failed to read language messages from local storage', ex);
+        return null;
+    }
+}
+
+export function setLanguageMessagesCache(languageKey: string, messages: string): void {
+    try {
+        localStorage.setItem(languageMessagesLocalStorageKeyPrefix + languageKey, messages);
+    } catch (ex) {
+        console.warn('failed to write language messages to local storage', ex);
+    }
+}
+
+export function clearLanguageMessagesCache(): void {
+    try {
+        const storageKeys: string[] = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+
+            if (key && key.startsWith(languageMessagesLocalStorageKeyPrefix)) {
+                storageKeys.push(key);
+            }
+        }
+
+        for (const key of storageKeys) {
+            localStorage.removeItem(key);
+        }
+    } catch (ex) {
+        console.warn('failed to clear language messages from local storage', ex);
+    }
 }
 
 export function getSessionCurrentLanguageKey(): string {

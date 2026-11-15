@@ -173,7 +173,7 @@
                     <v-card variant="flat" class="w-100 px-4 pb-3" max-width="500">
                         <v-card-text class="pt-0">
                             <div class="text-center">
-                                <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2 || verifying" />
+                                <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2 || verifying" @error="desktopPageStore.addErrorToast" />
                             </div>
 
                             <v-divider class="mt-2 mb-3" />
@@ -189,13 +189,11 @@
         </v-row>
 
         <switch-to-mobile-dialog v-model:show="showMobileQrCode" />
-        <snack-bar ref="snackbar" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, useTemplateRef, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
@@ -204,6 +202,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useLoginPageBase } from '@/views/base/LoginPageBase.ts';
 
 import { useRootStore } from '@/stores/index.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
@@ -222,13 +221,12 @@ import {
     mdiHelpCircleOutline
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const router = useRouter();
 
 const { tt } = useI18n();
 
 const rootStore = useRootStore();
+const desktopPageStore = useDesktopPageStore();
 
 const {
     version,
@@ -252,19 +250,18 @@ const {
 
 const passwordInput = useTemplateRef<VTextField>('passwordInput');
 const passcodeInput = useTemplateRef<VTextField>('passcodeInput');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const show2faInput = ref<boolean>(false);
 const showMobileQrCode = ref<boolean>(false);
 
 function login(): void {
     if (!username.value) {
-        snackbar.value?.showMessage('Username cannot be blank');
+        desktopPageStore.addToast('Username cannot be blank');
         return;
     }
 
     if (!password.value) {
-        snackbar.value?.showMessage('Password cannot be blank');
+        desktopPageStore.addToast('Password cannot be blank');
         return;
     }
 
@@ -283,9 +280,8 @@ function login(): void {
         loginName: username.value,
         password: password.value
     }).then(authResponse => {
-        loggingInByPassword.value = false;
-
         if (authResponse.need2FA) {
+            loggingInByPassword.value = false;
             tempToken.value = authResponse.token;
             show2faInput.value = true;
 
@@ -299,8 +295,12 @@ function login(): void {
             return;
         }
 
-        doAfterLogin(authResponse);
-        router.replace('/');
+        doAfterLogin(authResponse).then(loginHint => {
+            desktopPageStore.addToast(loginHint);
+            router.replace('/');
+        }).finally(() => {
+            loggingInByOAuth2.value = false;
+        });
     }).catch(error => {
         loggingInByPassword.value = false;
 
@@ -310,7 +310,7 @@ function login(): void {
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -321,10 +321,10 @@ function verify(): void {
     }
 
     if (twoFAVerifyType.value === 'passcode' && !passcode.value) {
-        snackbar.value?.showMessage('Passcode cannot be blank');
+        desktopPageStore.addToast('Passcode cannot be blank');
         return;
     } else if (twoFAVerifyType.value === 'backupcode' && !backupCode.value) {
-        snackbar.value?.showMessage('Backup code cannot be blank');
+        desktopPageStore.addToast('Backup code cannot be blank');
         return;
     }
 
@@ -335,15 +335,17 @@ function verify(): void {
         passcode: twoFAVerifyType.value === 'passcode' ? passcode.value : null,
         recoveryCode: twoFAVerifyType.value === 'backupcode' ? backupCode.value : null
     }).then(authResponse => {
-        verifying.value = false;
-
-        doAfterLogin(authResponse);
-        router.replace('/');
+        doAfterLogin(authResponse).then(loginHint => {
+            desktopPageStore.addToast(loginHint);
+            router.replace('/');
+        }).finally(() => {
+            verifying.value = false;
+        });
     }).catch(error => {
         verifying.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

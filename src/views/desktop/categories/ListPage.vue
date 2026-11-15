@@ -187,7 +187,7 @@
 
     <edit-dialog ref="editDialog" />
     <preset-dialog :category-type="activeCategoryType" v-model:show="showPresetDialog"
-                            @category:saved="onPresetCategorySaved" />
+                   @category:saved="onPresetCategorySaved" />
 
     <confirm-dialog ref="confirmDialog"/>
     <snack-bar ref="snackbar" />

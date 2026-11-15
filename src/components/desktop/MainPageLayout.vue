@@ -174,16 +174,13 @@
 
         <switch-to-mobile-dialog v-model:show="showMobileQrCode" />
         <about-dialog v-model:show="showAboutDialog" />
-
-        <snack-bar ref="snackbar" />
     </div>
 </template>
 
 <script setup lang="ts">
 import AboutDialog from '@/views/desktop/common/dialogs/AboutDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useDisplay, useTheme } from 'vuetify';
 import { useRoute, useRouter } from 'vue-router';
@@ -229,8 +226,6 @@ defineProps<{
     noNavbar?: boolean;
 }>();
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const { lgAndDown } = useDisplay();
 const theme = useTheme();
 const route = useRoute();
@@ -242,8 +237,6 @@ const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 const desktopPageStore = useDesktopPageStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const logouting = ref<boolean>(false);
 const showVerticalOverlayMenu = ref<boolean>(false);
@@ -291,23 +284,23 @@ function logout(): void {
     showLoading.value = true;
 
     rootStore.logout().then(() => {
-        logouting.value = false;
-        showLoading.value = false;
-
         settingsStore.clearAppSettings();
 
-        const localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
-        settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+        initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone).then(localeDefaultSettings => {
+            settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+        }).finally(() => {
+            logouting.value = false;
+            showLoading.value = false;
 
-        setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
-
-        router.replace('/login');
+            setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
+            router.replace('/login');
+        });
     }).catch(error => {
         logouting.value = false;
         showLoading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

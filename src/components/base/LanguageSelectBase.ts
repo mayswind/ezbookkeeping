@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
@@ -7,6 +7,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 
 export interface LanguageSelectBaseProps {
     disabled?: boolean;
+    loading?: boolean;
     includeSystemDefault?: boolean;
     useModelValue?: boolean;
     modelValue?: string;
@@ -14,6 +15,7 @@ export interface LanguageSelectBaseProps {
 
 export interface LanguageSelectBaseEmits {
     (e: 'update:modelValue', value: string): void;
+    (e: 'error', message: string): void;
 }
 
 export function useLanguageSelectButtonBase(props: LanguageSelectBaseProps, emit: LanguageSelectBaseEmits) {
@@ -21,15 +23,11 @@ export function useLanguageSelectButtonBase(props: LanguageSelectBaseProps, emit
 
     const settingsStore = useSettingsStore();
 
+    const settingLanguage = ref<boolean>(false);
+
     const allLanguages = computed<LanguageOption[]>(() => getAllLanguageOptions(!!props.includeSystemDefault));
 
-    const currentLocale = computed<string>({
-        get: () => getCurrentLanguageTag(),
-        set: (value: string) => {
-            const localeDefaultSettings = setLanguage(value);
-            settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
-    });
+    const currentLocale = computed<string>(() => getCurrentLanguageTag());
 
     const currentLanguageName = computed<string>(() => {
         if (props.useModelValue && props.modelValue) {
@@ -45,12 +43,23 @@ export function useLanguageSelectButtonBase(props: LanguageSelectBaseProps, emit
         }
     });
 
-    function updateLanguage(languageTag: string): void {
+    function updateLanguage(languageTag: string): Promise<void> {
+        if (props.disabled || props.loading || settingLanguage.value) {
+            return Promise.resolve();
+        }
+
         if (props.useModelValue) {
             emit('update:modelValue', languageTag);
-        } else {
-            currentLocale.value = languageTag;
+            return Promise.resolve();
         }
+
+        settingLanguage.value = true;
+
+        return setLanguage(languageTag).then(localeDefaultSettings => {
+            settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+        }).finally(() => {
+            settingLanguage.value = false;
+        });
     }
 
     function isLanguageSelected(languageTag: string): boolean {
@@ -62,6 +71,8 @@ export function useLanguageSelectButtonBase(props: LanguageSelectBaseProps, emit
     }
 
     return {
+        // states,
+        settingLanguage,
         // computed states
         allLanguages,
         currentLocale,

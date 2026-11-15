@@ -1,5 +1,5 @@
 <template>
-    <v-dialog width="800" :persistent="submitting" v-model="showState">
+    <v-dialog width="800" :persistent="submitting || loadingLanguage" v-model="showState">
         <one-column-dialog-layout content-class="pt-0"
                                   :disabled="submitting"
                                   :title="tt('Default Categories')" :cancel-button-title="tt('Cancel')"
@@ -9,11 +9,13 @@
                     <div class="d-flex align-center text-body-large my-1">
                         <span class="font-weight-bold ms-1">{{ getCategoryTypeName(parseInt(categoryType)) }}</span>
                         <v-spacer/>
-                        <language-select-button :disabled="submitting"
-                                                :use-model-value="true" v-model="currentLocale" />
+                        <language-select-button :disabled="submitting || loadingLanguage" :loading="loadingLanguage"
+                                                :use-model-value="true" :model-value="currentLocale"
+                                                @update:model-value="changeLanguage" />
                     </div>
 
-                    <v-expansion-panels class="compacted-expansion-panels" variant="accordion" multiple :disabled="submitting"
+                    <v-expansion-panels class="compacted-expansion-panels" variant="accordion" multiple
+                                        :disabled="submitting || loadingLanguage"
                                         @click="focusParentWhenClicked($event, 'v-list', '.v-card-text')">
                         <v-expansion-panel :key="idx" v-for="(category, idx) in categories">
                             <v-expansion-panel-title class="py-0 px-4">
@@ -41,7 +43,7 @@
 
             <template #footer>
                 <v-spacer/>
-                <v-btn :disabled="submitting" @click="save">
+                <v-btn :disabled="submitting || loadingLanguage" @click="save">
                     {{ tt('Save') }}
                     <v-progress-circular indeterminate size="22" class="ms-2" v-if="submitting"></v-progress-circular>
                 </v-btn>
@@ -55,7 +57,7 @@
 <script setup lang="ts">
 import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -80,13 +82,14 @@ const emit = defineEmits<{
     (e: 'category:saved', event: { message: string }): void;
 }>();
 
-const { tt, getCurrentLanguageTag, getAllTransactionDefaultCategories } = useI18n();
+const { tt, getCurrentLanguageTag, getAllTransactionDefaultCategories, loadLanguageResources } = useI18n();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const currentLocale = ref<string>(getCurrentLanguageTag());
+const loadingLanguage = ref<boolean>(false);
 const submitting = ref<boolean>(false);
 
 const allPresetCategories = computed<Record<string, LocalizedPresetCategory[]>>(() => getAllTransactionDefaultCategories(props.categoryType, currentLocale.value));
@@ -109,7 +112,29 @@ function getCategoryTypeName(categoryType: number): string {
     }
 }
 
+function changeLanguage(languageTag: string): void {
+    if (submitting.value || loadingLanguage.value) {
+        return;
+    }
+
+    loadingLanguage.value = true;
+
+    loadLanguageResources(languageTag).then(() => {
+        currentLocale.value = languageTag;
+    }).catch(error => {
+        if (!error.processed) {
+            snackbar.value?.showError(error);
+        }
+    }).finally(() => {
+        loadingLanguage.value = false;
+    });
+}
+
 function save(): void {
+    if (loadingLanguage.value) {
+        return;
+    }
+
     submitting.value = true;
 
     const presetCategoriesArray = categorizedArrayToPlainArray(allPresetCategories.value);
@@ -132,4 +157,10 @@ function save(): void {
         }
     });
 }
+
+watch(() => props.show, (newValue) => {
+    if (newValue) {
+        currentLocale.value = getCurrentLanguageTag();
+    }
+});
 </script>

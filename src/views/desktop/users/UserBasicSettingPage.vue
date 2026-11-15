@@ -621,10 +621,13 @@ function save(): void {
     saving.value = true;
 
     rootStore.updateUserProfile(newProfile.value.toProfileUpdateRequest()).then(response => {
-        saving.value = false;
-
-        doAfterProfileUpdate(response.user);
-        snackbar.value?.showMessage('Your profile has been successfully updated');
+        doAfterProfileUpdate(response.user).then(() => {
+            snackbar.value?.showMessage('Your profile has been successfully updated');
+        }).catch(() => {
+            snackbar.value?.showMessage('Your profile has been successfully updated, but the language resources could not be loaded.');
+        }).finally(() => {
+            saving.value = false;
+        });
     }).catch(error => {
         saving.value = false;
 

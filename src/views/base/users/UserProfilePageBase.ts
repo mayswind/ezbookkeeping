@@ -189,7 +189,7 @@ export function useUserProfilePageBase() {
         newProfile.value.fillFrom(oldProfile.value);
     }
 
-    function doAfterProfileUpdate(user: UserBasicInfo): void {
+    function doAfterProfileUpdate(user: UserBasicInfo): Promise<void> {
         if (user) {
             if (user.firstDayOfWeek !== oldProfile.value.firstDayOfWeek) {
                 overviewStore.resetTransactionOverview();
@@ -197,11 +197,14 @@ export function useUserProfilePageBase() {
 
             setCurrentUserProfile(user);
 
-            const localeDefaultSettings = setLanguage(user.language);
-            settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-            setExpenseAndIncomeAmountColor(user.expenseAmountColor, user.incomeAmountColor);
+            return setLanguage(user.language).then(localeDefaultSettings => {
+                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+            }).finally(() => {
+                setExpenseAndIncomeAmountColor(user.expenseAmountColor, user.incomeAmountColor);
+            });
         }
+
+        return Promise.resolve();
     }
 
     return {

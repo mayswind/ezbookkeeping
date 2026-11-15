@@ -400,19 +400,27 @@ function updatePassword(): void {
         password: newPassword.value,
         oldPassword: currentPassword.value
     }).then(response => {
-        updatingPassword.value = false;
         currentPassword.value = '';
         newPassword.value = '';
         confirmPassword.value = '';
 
-        if (response.user) {
-            const localeDefaultSettings = setLanguage(response.user.language);
+        const languagePromise = response.user ? setLanguage(response.user.language) : Promise.reject();
+
+        languagePromise.then(localeDefaultSettings => {
             settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-        }
 
-        reloadSessions(true);
+            if (response.user) {
+                snackbar.value?.showMessage('Your profile has been successfully updated');
+            }
+        }).catch(() => {
+            if (response.user) {
+                snackbar.value?.showMessage('Your profile has been successfully updated, but the language resources could not be loaded.');
+            }
+        }).finally(() => {
+            updatingPassword.value = false;
+            reloadSessions(true);
+        });
 
-        snackbar.value?.showMessage('Your profile has been successfully updated');
     }).catch(error => {
         updatingPassword.value = false;
         currentPassword.value = '';

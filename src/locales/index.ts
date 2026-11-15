@@ -1,27 +1,8 @@
-import de from './de.json';
-import el from './el.json';
 import en from './en.json';
-import es from './es.json';
-import fr from './fr.json';
-import hi from './hi.json';
-import it from './it.json';
-import ja from './ja.json';
-import kn from './kn.json';
-import ko from './ko.json';
-import nl from './nl.json';
-import pl from './pl.json';
-import ptBR from './pt_BR.json';
-import ro from './ro.json';
-import ru from './ru.json';
-import sk from './sk.json';
-import sl from './sl.json';
-import ta from './ta.json';
-import th from './th.json';
-import tr from './tr.json';
-import uk from './uk.json';
-import vi from './vi.json';
-import zhHans from './zh_Hans.json';
-import zhHant from './zh_Hant.json';
+
+export interface LanguageMessages {
+    [key: string]: string | LanguageMessages;
+}
 
 export interface LanguageInfo {
     readonly name: string;
@@ -29,7 +10,7 @@ export interface LanguageInfo {
     readonly alternativeLanguageTag: string;
     readonly aliases?: string[];
     readonly textDirection: 'ltr' | 'rtl';
-    readonly content: object;
+    readonly loadContent: () => Promise<LanguageMessages>;
 }
 
 export interface LanguageOption {
@@ -39,6 +20,7 @@ export interface LanguageOption {
 }
 
 export const DEFAULT_LANGUAGE: string = 'en';
+export const DEFAULT_LANGUAGE_CONTENT: LanguageMessages = en;
 
 // To add new languages, please refer to https://ezbookkeeping.mayswind.net/translating
 export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
@@ -47,154 +29,154 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         displayName: 'Deutsch',
         alternativeLanguageTag: 'de-DE',
         textDirection: 'ltr',
-        content: de
+        loadContent: () => import('./de.json').then(module => module.default)
     },
     'el': {
         name: 'Greek',
         displayName: 'Ελληνικά',
         alternativeLanguageTag: 'el-GR',
         textDirection: 'ltr',
-        content: el
+        loadContent: () => import('./el.json').then(module => module.default)
     },
     'en': {
         name: 'English',
         displayName: 'English',
         alternativeLanguageTag: 'en-US',
         textDirection: 'ltr',
-        content: en
+        loadContent: () => Promise.resolve(DEFAULT_LANGUAGE_CONTENT)
     },
     'es': {
         name: 'Spanish',
         displayName: 'Español',
         alternativeLanguageTag: 'es-ES',
         textDirection: 'ltr',
-        content: es
+        loadContent: () => import('./es.json').then(module => module.default)
     },
     'fr': {
         name: "French",
         displayName: "Français",
         alternativeLanguageTag: "fr-FR",
         textDirection: "ltr",
-        content: fr,
+        loadContent: () => import('./fr.json').then(module => module.default),
     },
     'hi': {
         name: 'Hindi',
         displayName: 'हिन्दी',
         alternativeLanguageTag: 'hi-IN',
         textDirection: 'ltr',
-        content: hi
+        loadContent: () => import('./hi.json').then(module => module.default)
     },
     'it': {
         name: 'Italian',
         displayName: 'Italiano',
         alternativeLanguageTag: 'it-IT',
         textDirection: 'ltr',
-        content: it
+        loadContent: () => import('./it.json').then(module => module.default)
     },
     'ja': {
         name: 'Japanese',
         displayName: '日本語',
         alternativeLanguageTag: 'ja-JP',
         textDirection: 'ltr',
-        content: ja
+        loadContent: () => import('./ja.json').then(module => module.default)
     },
     'kn': {
         name: 'Kannada',
         displayName: 'ಕನ್ನಡ',
         alternativeLanguageTag: 'kn-IN',
         textDirection: 'ltr',
-        content: kn
+        loadContent: () => import('./kn.json').then(module => module.default)
     },
     'ko': {
         name: 'Korean',
         displayName: '한국어',
         alternativeLanguageTag: 'ko-KR',
         textDirection: 'ltr',
-        content: ko
+        loadContent: () => import('./ko.json').then(module => module.default)
     },
     'nl': {
         name: 'Dutch',
         displayName: 'Nederlands',
         alternativeLanguageTag: 'nl-NL',
         textDirection: 'ltr',
-        content: nl
+        loadContent: () => import('./nl.json').then(module => module.default)
     },
     'pl': {
         name: 'Polish',
         displayName: 'Polski',
         alternativeLanguageTag: 'pl-PL',
         textDirection: 'ltr',
-        content: pl
+        loadContent: () => import('./pl.json').then(module => module.default)
     },
     'pt-BR': {
         name: 'Portuguese (Brazil)',
         displayName: 'Português (Brasil)',
         alternativeLanguageTag: 'pt-BR',
         textDirection: 'ltr',
-        content: ptBR
+        loadContent: () => import('./pt_BR.json').then(module => module.default)
     },
     'ro': {
         name: 'Romanian',
         displayName: 'Română',
         alternativeLanguageTag: 'ro-RO',
         textDirection: 'ltr',
-        content: ro
+        loadContent: () => import('./ro.json').then(module => module.default)
     },
     'ru': {
         name: 'Russian',
         displayName: 'Русский',
         alternativeLanguageTag: 'ru-RU',
         textDirection: 'ltr',
-        content: ru
+        loadContent: () => import('./ru.json').then(module => module.default)
     },
     'sk': {
         name: 'Slovak',
         displayName: 'Slovenčina',
         alternativeLanguageTag: 'sk-SK',
         textDirection: 'ltr',
-        content: sk
+        loadContent: () => import('./sk.json').then(module => module.default)
     },
     'sl': {
         name: 'Slovenian',
         displayName: 'Slovenščina',
         alternativeLanguageTag: 'sl-SI',
         textDirection: 'ltr',
-        content: sl
+        loadContent: () => import('./sl.json').then(module => module.default)
     },
     'ta': {
         name: 'Tamil',
         displayName: 'தமிழ்',
         alternativeLanguageTag: 'ta-IN',
         textDirection: 'ltr',
-        content: ta
+        loadContent: () => import('./ta.json').then(module => module.default)
     },
     'th': {
         name: 'Thai',
         displayName: 'ภาษาไทย',
         alternativeLanguageTag: 'th-TH',
         textDirection: 'ltr',
-        content: th
+        loadContent: () => import('./th.json').then(module => module.default)
     },
     'tr': {
         name: 'Turkish',
         displayName: 'Türkçe',
         alternativeLanguageTag: 'tr-TR',
         textDirection: 'ltr',
-        content: tr
+        loadContent: () => import('./tr.json').then(module => module.default)
     },
     'uk': {
         name: 'Ukrainian',
         displayName: 'Українська',
         alternativeLanguageTag: 'uk-UA',
         textDirection: 'ltr',
-        content: uk
+        loadContent: () => import('./uk.json').then(module => module.default)
     },
     'vi': {
         name: 'Vietnamese',
         displayName: 'Tiếng Việt',
         alternativeLanguageTag: 'vi-VN',
         textDirection: 'ltr',
-        content: vi
+        loadContent: () => import('./vi.json').then(module => module.default)
     },
     'zh-Hans': {
         name: 'Chinese (Simplified)',
@@ -202,7 +184,7 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'zh-CN',
         aliases: ['zh-CHS', 'zh-CN', 'zh-SG'],
         textDirection: 'ltr',
-        content: zhHans
+        loadContent: () => import('./zh_Hans.json').then(module => module.default)
     },
     'zh-Hant': {
         name: 'Chinese (Traditional)',
@@ -210,6 +192,6 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         alternativeLanguageTag: 'zh-TW',
         aliases: ['zh-CHT', 'zh-TW', 'zh-HK', 'zh-MO'],
         textDirection: 'ltr',
-        content: zhHant
+        loadContent: () => import('./zh_Hant.json').then(module => module.default)
     },
 };

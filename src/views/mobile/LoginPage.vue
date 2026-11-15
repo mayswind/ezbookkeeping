@@ -92,7 +92,7 @@
 
         <f7-list class="login-page-bottom">
             <f7-block-footer>
-                <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2" />
+                <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2" @error="showToast" />
 
                 <div class="login-page-powered-by margin-top-half">
                     <span>Powered by</span>
@@ -103,7 +103,7 @@
         </f7-list>
 
         <f7-toolbar class="login-page-fixed-bottom" tabbar bottom :outline="false">
-            <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2" />
+            <language-select-button :disabled="loggingInByPassword || loggingInByOAuth2" @error="showToast" />
 
             <div class="login-page-powered-by margin-top-half">
                 <span>Powered by</span>
@@ -300,17 +300,25 @@ function login(): void {
         loginName: username.value,
         password: password.value
     }).then(authResponse => {
-        loggingInByPassword.value = false;
-        hideLoading();
-
         if (authResponse.need2FA) {
+            loggingInByPassword.value = false;
+            hideLoading();
+
             tempToken.value = authResponse.token;
             show2faSheet.value = true;
             return;
         }
 
-        doAfterLogin(authResponse);
-        router.refreshPage();
+        doAfterLogin(authResponse).then(loginHint => {
+            if (loginHint) {
+                showToast(loginHint);
+            }
+
+            router.refreshPage();
+        }).finally(() => {
+            loggingInByPassword.value = false;
+            hideLoading();
+        });
     }).catch(error => {
         loggingInByPassword.value = false;
         hideLoading();
@@ -365,12 +373,17 @@ function verify(): void {
         passcode: twoFAVerifyType.value === 'passcode' ? passcode.value : null,
         recoveryCode: twoFAVerifyType.value === 'backupcode' ? backupCode.value : null
     }).then(authResponse => {
-        verifying.value = false;
-        hideLoading();
+        doAfterLogin(authResponse).then(loginHint => {
+            if (loginHint) {
+                showToast(loginHint);
+            }
 
-        doAfterLogin(authResponse);
-        show2faSheet.value = false;
-        router.refreshPage();
+            router.refreshPage();
+        }).finally(() => {
+            verifying.value = false;
+            hideLoading();
+            show2faSheet.value = false;
+        });
     }).catch(error => {
         verifying.value = false;
         hideLoading();

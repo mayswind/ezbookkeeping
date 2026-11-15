@@ -201,17 +201,17 @@ function logout(): void {
         showLoading(() => logouting.value);
 
         rootStore.logout().then(() => {
-            logouting.value = false;
-            hideLoading();
-
             settingsStore.clearAppSettings();
 
-            const localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
-            settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+            initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone).then(localeDefaultSettings => {
+                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+            }).finally(() => {
+                logouting.value = false;
+                hideLoading();
 
-            setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
-
-            props.f7router.navigate('/');
+                setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
+                props.f7router.navigate('/');
+            });
         }).catch(error => {
             logouting.value = false;
             hideLoading();

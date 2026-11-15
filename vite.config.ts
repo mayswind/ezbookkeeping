@@ -332,16 +332,12 @@ export default defineConfig(() => {
                                         return true;
                                     } else if (/[\\/]src[\\/]views[\\/]base[\\/]/i.test(id)) {
                                         return true;
-                                    } else if (/[\\/]src[\\/]locales[\\/]helpers\.(js|ts)/i.test(id)) {
+                                    } else if (/[\\/]src[\\/]locales[\\/](helpers|index)\.(js|ts)/i.test(id)) {
                                         return true;
                                     } else {
                                         return false;
                                     }
                                 }
-                            },
-                            {
-                                name:  'locales',
-                                test: /[\\/]src[\\/]locales[\\/]/i
                             }
                         ]
                     }

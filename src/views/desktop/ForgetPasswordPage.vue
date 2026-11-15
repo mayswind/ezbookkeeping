@@ -58,7 +58,7 @@
                     <v-card variant="flat" class="w-100 px-4 pb-3" max-width="500">
                         <v-card-text class="pt-0">
                             <div class="text-center">
-                                <language-select-button :disabled="requesting" />
+                                <language-select-button :disabled="requesting" @error="desktopPageStore.addErrorToast" />
                             </div>
 
                             <v-divider class="mt-2 mb-3" />
@@ -72,19 +72,16 @@
                 </div>
             </v-col>
         </v-row>
-
-        <snack-bar ref="snackbar" />
     </div>
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useRootStore } from '@/stores/index.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 
@@ -94,23 +91,19 @@ import {
     mdiChevronLeft
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
-
 const { tt } = useI18n();
 
 const rootStore = useRootStore();
+const desktopPageStore = useDesktopPageStore();
 
 const version = `${getClientDisplayVersion()}`;
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const email = ref<string>('');
 const requesting = ref<boolean>(false);
 
 function requestResetPassword(): void {
     if (!email.value) {
-        snackbar.value?.showMessage('Email address cannot be blank');
+        desktopPageStore.addToast('Email address cannot be blank');
         return;
     }
 
@@ -120,12 +113,12 @@ function requestResetPassword(): void {
         email: email.value
     }).then(() => {
         requesting.value = false;
-        snackbar.value?.showMessage('Password reset email has been sent');
+        desktopPageStore.addToast('Password reset email has been sent');
     }).catch(error => {
         requesting.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

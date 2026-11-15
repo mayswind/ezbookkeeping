@@ -63,7 +63,7 @@
                     <v-card variant="flat" class="w-100 px-4 pb-3" max-width="500">
                         <v-card-text class="pt-0">
                             <div class="text-center">
-                                <language-select-button :disabled="resending" />
+                                <language-select-button :disabled="resending" @error="desktopPageStore.addErrorToast" />
                             </div>
 
                             <v-divider class="mt-2 mb-3" />
@@ -91,6 +91,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useRootStore } from '@/stores/index.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 
@@ -115,6 +116,7 @@ const router = useRouter();
 const { tt, te } = useI18n();
 
 const rootStore = useRootStore();
+const desktopPageStore = useDesktopPageStore();
 
 const version = `${getClientDisplayVersion()}`;
 
@@ -145,7 +147,7 @@ function init(): void {
 
         if (!error.processed) {
             errorMessage.value = te(error.message || error);
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -158,12 +160,12 @@ function resendEmail(): void {
         password: password.value
     }).then(() => {
         resending.value = false;
-        snackbar.value?.showMessage('Validation email has been sent');
+        desktopPageStore.addToast('Validation email has been sent');
     }).catch(error => {
         resending.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

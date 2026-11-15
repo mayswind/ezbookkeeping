@@ -16,6 +16,7 @@ import {
 } from '@/consts/cache.ts';
 
 import { isFunction, isObject, isNumber } from './common.ts';
+import { clearLanguageMessagesCache } from './settings.ts';
 import services from './services.ts';
 import logger from './logger.ts';
 
@@ -396,6 +397,10 @@ export function clearFileCaches(...cacheTypes: FileCacheType[]): Promise<void> {
     const cacheNamePrefixes: string[] = [];
 
     for (const cacheType of cacheTypes) {
+        if (cacheType === FileCacheType.ApplicationCode) {
+            clearLanguageMessagesCache();
+        }
+
         cacheNames.push(cacheType.key);
         cacheNamePrefixes.push(...cacheType.cacheNamePrefixes);
     }
@@ -416,6 +421,8 @@ export function clearAllUserCaches(): Promise<void> {
 }
 
 export function clearAllBrowserCaches(): Promise<void> {
+    clearLanguageMessagesCache();
+
     if (!window.caches) {
         logger.error('caches API is not supported in this browser');
         return Promise.reject();

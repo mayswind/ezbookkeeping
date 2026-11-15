@@ -23,20 +23,20 @@
                             <v-form>
                                 <v-row>
                                     <v-col cols="12">
-                                        <pin-code-input :disabled="verifyingByWebAuthn" :autofocus="true"
+                                        <pin-code-input :disabled="unlocking || verifyingByWebAuthn" :autofocus="true"
                                                         :secure="true" :length="6" :auto-confirm="true"
                                                         v-model="pinCode" @pincode:confirm="unlockByPin" />
                                     </v-col>
 
                                     <v-col cols="12">
-                                        <v-btn block :disabled="!isPinCodeValid(pinCode) || verifyingByWebAuthn"
+                                        <v-btn block :disabled="unlocking || verifyingByWebAuthn || !isPinCodeValid(pinCode)"
                                                @click="unlockByPin(pinCode)">
                                             {{ tt('Unlock with PIN Code') }}
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="12" v-if="isWebAuthnAvailable">
-                                        <v-btn block variant="tonal" :disabled="verifyingByWebAuthn"
+                                        <v-btn block variant="tonal" :disabled="unlocking || verifyingByWebAuthn"
                                                @click="unlockByWebAuthn">
                                             {{ tt('Unlock with WebAuthn') }}
                                             <v-progress-circular indeterminate size="22" class="ms-2" v-if="verifyingByWebAuthn"></v-progress-circular>
@@ -59,7 +59,7 @@
                     <v-card variant="flat" class="w-100 px-4 pb-3" max-width="500">
                         <v-card-text class="pt-0">
                             <div class="text-center">
-                                <language-select-button :disabled="verifyingByWebAuthn" />
+                                <language-select-button :disabled="unlocking || verifyingByWebAuthn" @error="desktopPageStore.addErrorToast" />
                             </div>
 
                             <v-divider class="mt-2 mb-3" />
@@ -75,13 +75,11 @@
         </v-row>
 
         <confirm-dialog ref="confirmDialog"/>
-        <snack-bar ref="snackbar" />
     </div>
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
@@ -91,6 +89,7 @@ import { useUnlockPageBase } from '@/views/base/UnlockPageBase.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { APPLICATION_LOGO_PATH } from '@/consts/asset.ts';
 
@@ -107,7 +106,6 @@ import {
 import logger from '@/lib/logger.ts';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const router = useRouter();
 
@@ -116,27 +114,32 @@ const { version, pinCode, isWebAuthnAvailable, isPinCodeValid, doAfterUnlocked, 
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
+const desktopPageStore = useDesktopPageStore();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
+const unlocking = ref<boolean>(false);
 const verifyingByWebAuthn = ref<boolean>(false);
 
 function unlockByWebAuthn(): void {
+    if (unlocking.value) {
+        return;
+    }
+
     const webAuthnCredentialId = getWebAuthnCredentialId();
 
     if (!userStore.currentUserBasicInfo || !webAuthnCredentialId) {
-        snackbar.value?.showMessage('An error occurred');
+        desktopPageStore.addToast('An error occurred');
         return;
     }
 
     if (!settingsStore.appSettings.applicationLockWebAuthn || !hasWebAuthnConfig()) {
-        snackbar.value?.showMessage('WebAuthn is not enabled');
+        desktopPageStore.addToast('WebAuthn is not enabled');
         return;
     }
 
     if (!isWebAuthnSupported()) {
-        snackbar.value?.showMessage('WebAuth is not supported on this device');
+        desktopPageStore.addToast('WebAuth is not supported on this device');
         return;
     }
 
@@ -149,59 +152,87 @@ function unlockByWebAuthn(): void {
         verifyingByWebAuthn.value = false;
 
         if (unlockTokenByWebAuthn(id, userName, userSecret)) {
-            doAfterUnlocked();
-            router.replace('/');
+            unlocking.value = true;
+
+            doAfterUnlocked().then(unlockHint => {
+                desktopPageStore.addToast(unlockHint);
+                router.replace('/');
+            }).catch(error => {
+                logger.error('failed to set language after unlocking', error);
+
+                if (!error.processed) {
+                    desktopPageStore.addErrorToast(error);
+                }
+            }).finally(() => {
+                unlocking.value = false;
+            });
         } else {
             logger.error('failed to unlock with webauthn');
-            snackbar.value?.showMessage('Failed to authenticate with WebAuthn');
+            desktopPageStore.addToast('Failed to authenticate with WebAuthn');
         }
     }).catch(error => {
         verifyingByWebAuthn.value = false;
         logger.error('failed to use webauthn to verify', error);
 
         if (error.notSupported) {
-            snackbar.value?.showMessage('WebAuth is not supported on this device');
+            desktopPageStore.addToast('WebAuth is not supported on this device');
         } else if (error.name === 'NotAllowedError') {
-            snackbar.value?.showMessage('User has canceled authentication');
+            desktopPageStore.addToast('User has canceled authentication');
         } else if (error.invalid) {
-            snackbar.value?.showMessage('Failed to authenticate with WebAuthn');
+            desktopPageStore.addToast('Failed to authenticate with WebAuthn');
         } else {
-            snackbar.value?.showMessage('User has canceled or this device does not support WebAuthn');
+            desktopPageStore.addToast('User has canceled or this device does not support WebAuthn');
         }
     });
 }
 
 function unlockByPin(pinCode: string): void {
-    if (!isPinCodeValid(pinCode)) {
+    if (unlocking.value || !isPinCodeValid(pinCode)) {
         return;
     }
 
     const user = userStore.currentUserBasicInfo;
 
     if (!user || !user.username) {
-        snackbar.value?.showMessage('An error occurred');
+        desktopPageStore.addToast('An error occurred');
         return;
     }
 
     try {
         if (unlockTokenByPinCode(user.username, pinCode)) {
-            doAfterUnlocked();
-            router.replace('/');
+            unlocking.value = true;
+
+            doAfterUnlocked().then(unlockHint => {
+                desktopPageStore.addToast(unlockHint);
+                router.replace('/');
+            }).catch(error => {
+                logger.error('failed to set language after unlocking', error);
+
+                if (!error.processed) {
+                    desktopPageStore.addErrorToast(error);
+                }
+            }).finally(() => {
+                unlocking.value = false;
+            });
         } else {
             logger.error('failed to unlock with pin code');
-            snackbar.value?.showMessage('Incorrect PIN code');
+            desktopPageStore.addToast('Incorrect PIN code');
         }
     } catch (ex) {
         logger.error('failed to unlock with pin code', ex);
-        snackbar.value?.showMessage('Incorrect PIN code');
+        desktopPageStore.addToast('Incorrect PIN code');
     }
 }
 
 function relogin(): void {
     confirmDialog.value?.open('Are you sure you want to re-login?').then(() => {
-        doRelogin();
-
-        router.replace('/login');
+        doRelogin().then(() => {
+            router.replace('/login');
+        }).catch(error => {
+            if (!error.processed) {
+                desktopPageStore.addErrorToast(error);
+            }
+        });
     });
 }
 </script>

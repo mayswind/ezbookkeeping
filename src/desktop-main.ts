@@ -38,6 +38,7 @@ import { VSelect } from 'vuetify/components/VSelect';
 import { VSkeletonLoader } from 'vuetify/components/VSkeletonLoader';
 import { VSlideGroup, VSlideGroupItem } from 'vuetify/components/VSlideGroup';
 import { VSnackbar } from 'vuetify/components/VSnackbar';
+import { VSnackbarQueue } from 'vuetify/components/VSnackbarQueue';
 import { VSwitch } from 'vuetify/components/VSwitch';
 import { VTabs, VTab } from 'vuetify/components/VTabs';
 import { VTable } from 'vuetify/components/VTable';
@@ -208,6 +209,7 @@ const vuetify = createVuetify({
         VSlideGroup,
         VSlideGroupItem,
         VSnackbar,
+        VSnackbarQueue,
         VSwitch,
         VTabs,
         VTab,
@@ -293,6 +295,10 @@ const vuetify = createVuetify({
             size: 40
         },
         VSnackbar: {
+            timeout: 3000,
+            zIndex: 9000
+        },
+        VSnackbarQueue: {
             timeout: 3000,
             zIndex: 9000
         },

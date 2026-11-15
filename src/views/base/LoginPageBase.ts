@@ -8,6 +8,7 @@ import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
 import type { AuthResponse } from '@/models/auth_response.ts';
 
+import { isObject, isString } from '@/lib/common.ts';
 import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { getOAuth2Provider, getOIDCCustomDisplayNames, getLoginPageTips } from '@/lib/server_settings.ts';
 import { getClientDisplayVersion } from '@/lib/version.ts';
@@ -47,22 +48,36 @@ export function useLoginPageBase(platform: 'mobile' | 'desktop') {
     const oauth2LoginDisplayName = computed<string>(() => getLocalizedOAuth2LoginText(getOAuth2Provider(), getOIDCCustomDisplayNames()));
     const tips = computed<string>(() => getServerMultiLanguageConfigContent(getLoginPageTips()));
 
-    function doAfterLogin(authResponse: AuthResponse): void {
-        if (authResponse.user) {
-            const localeDefaultSettings = setLanguage(authResponse.user.language);
-            settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+    function doAfterLogin(authResponse: AuthResponse): Promise<string> {
+        return new Promise<string>(resolve => {
+            const languagePromise = authResponse.user ? setLanguage(authResponse.user.language) : Promise.reject();
+            let loginHint: string = '';
 
-            setExpenseAndIncomeAmountColor(authResponse.user.expenseAmountColor, authResponse.user.incomeAmountColor);
-        }
+            languagePromise.then(localeDefaultSettings => {
+                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+            }).catch(error => {
+                if (isObject(error) && 'message' in error && isString(error.message)) {
+                    loginHint = error.message;
+                } else if (isString(error)) {
+                    loginHint = error;
+                }
+            }).finally(() => {
+                if (authResponse.user) {
+                    setExpenseAndIncomeAmountColor(authResponse.user.expenseAmountColor, authResponse.user.incomeAmountColor);
+                }
 
-        updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
-        updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
-        exchangeRatesStore.removeExpiredExchangeRates(true);
-        exchangeRatesStore.autoUpdateExchangeRatesData();
+                updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+                updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
+                exchangeRatesStore.removeExpiredExchangeRates(true);
+                exchangeRatesStore.autoUpdateExchangeRatesData();
 
-        if (authResponse.notificationContent) {
-            rootStore.setNotificationContent(authResponse.notificationContent);
-        }
+                if (authResponse.notificationContent) {
+                    rootStore.setNotificationContent(authResponse.notificationContent);
+                }
+
+                resolve(loginHint);
+            });
+        });
     }
 
     return {

@@ -614,6 +614,17 @@ export const useSettingsStore = defineStore('settings', () => {
         }
     }
 
+    function getLocaleDefaultSettingsSnapshot(): LocaleDefaultSettings {
+        const snapshot: LocaleDefaultSettings = {
+            currency: localeDefaultSettings.value.currency,
+            firstDayOfWeek: localeDefaultSettings.value.firstDayOfWeek,
+            preferredExpenseAmountColor: localeDefaultSettings.value.preferredExpenseAmountColor,
+            preferredIncomeAmountColor: localeDefaultSettings.value.preferredIncomeAmountColor
+        };
+
+        return snapshot;
+    }
+
     function updateLocalizedDefaultSettings(newLocaleDefaultSettings: LocaleDefaultSettings | null) {
         if (!newLocaleDefaultSettings) {
             return;
@@ -712,6 +723,7 @@ export const useSettingsStore = defineStore('settings', () => {
         createApplicationCloudSettings,
         setApplicationSettingsFromCloudSettings,
         updateApplicationSyncSettingKeys,
+        getLocaleDefaultSettingsSnapshot,
         updateLocalizedDefaultSettings
     };
 });

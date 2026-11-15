@@ -154,15 +154,14 @@ function applyPreview(): void {
 }
 
 function restorePreview(): void {
-    try {
-        restoreLanguagePreview();
+    restoreLanguagePreview().then(() => {
         currentLanguageConfigJson.value = getCurrentLanguageMessagesJson();
         currentLanguageTextDirection.value = getCurrentLanguageTextDirection();
         snackbar.value?.showMessage('Built-in language configuration restored');
-    } catch (ex) {
+    }).catch(ex => {
         logger.error('failed to restore language configuration', ex);
         snackbar.value?.showError( 'Unable to restore the language configuration');
-    }
+    });
 }
 
 watch(currentLanguage, () => {

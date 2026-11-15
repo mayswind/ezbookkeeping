@@ -6,7 +6,7 @@ import { useSettingsStore } from './setting.ts';
 import { type WeekDayValue, WeekDay } from '@/core/datetime.ts';
 import { FiscalYearStart } from '@/core/fiscalyear.ts';
 import { KnownFileType } from '@/core/file.ts';
-import type { ApplicationCloudSetting } from '@/core/setting.ts';
+import type { ApplicationCloudSetting, LocaleDefaultSettings } from '@/core/setting.ts';
 
 import {
     type UserBasicInfo,
@@ -158,12 +158,12 @@ export const useUserStore = defineStore('user', () => {
         return userInfo.incomeAmountColor;
     });
 
-    function generateNewUserModel(language: string): User {
+    function generateNewUserModel(language: string, defaultLocaleSettings: LocaleDefaultSettings): User {
         return User.createNewUser(language,
-            settingsStore.localeDefaultSettings.currency,
-            settingsStore.localeDefaultSettings.firstDayOfWeek,
-            settingsStore.localeDefaultSettings.preferredExpenseAmountColor?.type,
-            settingsStore.localeDefaultSettings.preferredIncomeAmountColor?.type
+            defaultLocaleSettings.currency,
+            defaultLocaleSettings.firstDayOfWeek,
+            defaultLocaleSettings.preferredExpenseAmountColor?.type,
+            defaultLocaleSettings.preferredIncomeAmountColor?.type
         );
     }
 

@@ -4,12 +4,13 @@
             <f7-nav-left :back-link="tt('Back')"></f7-nav-left>
             <f7-nav-title :title="tt('Default Categories')"></f7-nav-title>
             <f7-nav-right class="navbar-compact-icons" v-if="isPresetHasCategories">
-                <f7-link icon-f7="ellipsis" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': submitting }" :aria-label="tt('Save')" @click="save"></f7-link>
+                <f7-link icon-f7="ellipsis" :class="{ 'disabled': submitting || loadingLanguage }" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
+                <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': submitting || loadingLanguage }" :aria-label="tt('Save')" @click="save"></f7-link>
             </f7-nav-right>
         </f7-navbar>
 
-        <f7-block class="no-padding no-margin" :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
+        <f7-block class="no-padding no-margin" :class="{ 'disabled': submitting || loadingLanguage }"
+                  :key="categoryType" v-for="(categories, categoryType) in allPresetCategories">
             <f7-block-title class="margin-top margin-horizontal">{{ getCategoryTypeName(parseInt(categoryType)) }}</f7-block-title>
 
             <f7-list strong inset dividers class="margin-top">
@@ -38,7 +39,7 @@
 
         <f7-actions close-by-outside-click close-on-escape :opened="showMoreActionSheet" @actions:closed="showMoreActionSheet = false">
             <f7-actions-group>
-                <f7-actions-button @click="showChangeLocaleSheet = true">{{ tt('Change Language') }}</f7-actions-button>
+                <f7-actions-button :class="{ 'disabled': submitting || loadingLanguage }" @click="showChangeLocaleSheet = true">{{ tt('Change Language') }}</f7-actions-button>
             </f7-actions-group>
             <f7-actions-group>
                 <f7-actions-button bold close>{{ tt('Cancel') }}</f7-actions-button>
@@ -50,7 +51,8 @@
                                    title-field="nativeDisplayName" after-field="displayName"
                                    :items="allLanguages"
                                    v-model:show="showChangeLocaleSheet"
-                                   v-model="currentLocale">
+                                   :model-value="currentLocale"
+                                   @update:model-value="changeLanguage">
         </list-item-selection-sheet>
     </f7-page>
 </template>
@@ -75,7 +77,7 @@ const props = defineProps<{
     f7router: Router.Router;
 }>();
 
-const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories } = useI18n();
+const { tt, getCurrentLanguageTag, getAllLanguageOptions, getAllTransactionDefaultCategories, loadLanguageResources } = useI18n();
 const { showToast, routeBackOnError } = useI18nUIComponents();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
@@ -83,6 +85,7 @@ const transactionCategoriesStore = useTransactionCategoriesStore();
 const loadingError = ref<unknown | null>(null);
 const currentLocale = ref<string>(getCurrentLanguageTag());
 const categoryType = ref<number>(0);
+const loadingLanguage = ref<boolean>(false);
 const submitting = ref<boolean>(false);
 const showMoreActionSheet = ref<boolean>(false);
 const showChangeLocaleSheet = ref<boolean>(false);
@@ -104,7 +107,31 @@ function getCategoryTypeName(categoryType: number): string {
     }
 }
 
+function changeLanguage(languageTag: string): void {
+    if (submitting.value || loadingLanguage.value) {
+        return;
+    }
+
+    loadingLanguage.value = true;
+    showLoading(() => loadingLanguage.value);
+
+    loadLanguageResources(languageTag).then(() => {
+        currentLocale.value = languageTag;
+    }).catch(error => {
+        if (!error.processed) {
+            showToast(error.message || error);
+        }
+    }).finally(() => {
+        loadingLanguage.value = false;
+        hideLoading();
+    });
+}
+
 function save(): void {
+    if (loadingLanguage.value) {
+        return;
+    }
+
     const router = props.f7router;
 
     submitting.value = true;

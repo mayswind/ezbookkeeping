@@ -30,10 +30,11 @@ import { initMapProvider } from '@/lib/map/index.ts';
 import { isUserLogined, isUserUnlocked } from '@/lib/userstate.ts';
 import { updateMapCacheExpiration, updateTransactionPictureCacheExpiration } from '@/lib/cache.ts';
 import { setExpenseAndIncomeAmountColor } from '@/lib/ui/common.ts';
-import { isiOSHomeScreenMode, isModalShowing, setAppFontSize } from '@/lib/ui/mobile.ts';
+import { isiOSHomeScreenMode, isModalShowing, setAppFontSize, useI18nUIComponents } from '@/lib/ui/mobile.ts';
 import logger from '@/lib/logger.ts';
 
 const { tt, getCurrentLanguageInfo, setLanguage, initLocale } = useI18n();
+const { showToast } = useI18nUIComponents();
 
 const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
@@ -218,8 +219,15 @@ watch(currentNotificationContent, (newValue) => {
     }
 });
 
-let localeDefaultSettings = initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone);
-settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+initLocale(userStore.currentUserLanguage, settingsStore.appSettings.timeZone).then(localeDefaultSettings => {
+    settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+}).catch(error => {
+    logger.error('failed to initialize locale', error);
+
+    if (!error.processed) {
+        showToast(error.message || error);
+    }
+});
 
 setExpenseAndIncomeAmountColor(userStore.currentUserExpenseAmountColor, userStore.currentUserIncomeAmountColor);
 
@@ -227,21 +235,31 @@ if (isUserLogined()) {
     if (!settingsStore.appSettings.applicationLock || isUserUnlocked()) {
         // refresh token if user is logined
         tokensStore.refreshTokenAndRevokeOldToken().then(response => {
-            if (response.user) {
-                localeDefaultSettings = setLanguage(response.user.language);
-                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
-
-                setExpenseAndIncomeAmountColor(response.user.expenseAmountColor, response.user.incomeAmountColor);
-
-                if (response.notificationContent) {
-                    rootStore.setNotificationContent(response.notificationContent);
+            const user = response.user;
+            const languageSettings = user ? setLanguage(user.language).catch(error => {
+                if (!error.processed) {
+                    showToast(error.message || error);
                 }
-            }
 
-            updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
-            updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
-            exchangeRatesStore.removeExpiredExchangeRates(true);
-            exchangeRatesStore.autoUpdateExchangeRatesData();
+                return Promise.reject(error);
+            }) : Promise.reject();
+
+            languageSettings.then(localeDefaultSettings => {
+                settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
+            }).finally(() => {
+                if (user) {
+                    setExpenseAndIncomeAmountColor(user.expenseAmountColor, user.incomeAmountColor);
+
+                    if (response.notificationContent) {
+                        rootStore.setNotificationContent(response.notificationContent);
+                    }
+                }
+
+                updateMapCacheExpiration(settingsStore.appSettings.mapCacheExpiration);
+                updateTransactionPictureCacheExpiration(settingsStore.appSettings.transactionPictureCacheExpiration);
+                exchangeRatesStore.removeExpiredExchangeRates(true);
+                exchangeRatesStore.autoUpdateExchangeRatesData();
+            });
         }).catch(error => {
             logger.error('failed to refresh token', error);
         });

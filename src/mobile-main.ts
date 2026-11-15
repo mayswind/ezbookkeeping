@@ -141,6 +141,7 @@ Framework7.use([
 const app = createApp(App);
 const pinia = createPinia();
 const i18n = createI18n(getI18nOptions());
+
 registerComponents(app);
 app.use(pinia);
 app.use(i18n);

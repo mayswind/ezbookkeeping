@@ -12,7 +12,7 @@
                                v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
                         <v-btn density="compact" color="default" variant="text" class="ms-2"
                                :aria-label="tt('Refresh')" :icon="true" :disabled="loading || updating"
-                               :loading="loading" @click="reload">
+                               :loading="loading" @click="reload(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -134,26 +134,18 @@ function getCustomIconUrl(customIcon: UserCustomIconInfoResponse): string | unde
     return customIconsStore.getUserCustomIconUrl(customIcon);
 }
 
-function init(): void {
+function reload(force: boolean): void {
     loading.value = true;
 
-    customIconsStore.loadAllCustomIcons({ force: false }).then(() => {
-        loading.value = false;
-    }).catch(error => {
-        loading.value = false;
-
-        if (!error.processed) {
-            desktopPageStore.addErrorToast(error);
-        }
-    });
-}
-
-function reload(): void {
-    loading.value = true;
-
-    customIconsStore.loadAllCustomIcons({ force: true }).then(() => {
+    customIconsStore.loadAllCustomIcons({
+        force: force
+    }).then(() => {
         loading.value = false;
         displayOrderModified.value = false;
+
+        if (force) {
+            desktopPageStore.addToast('Custom icon list has been updated');
+        }
     }).catch(error => {
         loading.value = false;
 
@@ -238,7 +230,7 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     });
 }
 
-init();
+reload(false);
 </script>
 
 <style>

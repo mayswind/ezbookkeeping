@@ -51,24 +51,19 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useMoveAllTransactionsPageBase } from '@/views/base/accounts/MoveAllTransactionsPageBase.ts'
 
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { Account } from '@/models/account.ts';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const { tt } = useI18n();
 
@@ -86,11 +81,10 @@ const {
 
 const accountsStore = useAccountsStore();
 const transactionsStore = useTransactionsStore();
+const desktopPageStore = useDesktopPageStore();
 
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(false);
@@ -104,7 +98,7 @@ function init(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -141,7 +135,7 @@ function confirm(): void {
         moving.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

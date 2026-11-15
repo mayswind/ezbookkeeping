@@ -4,20 +4,18 @@
             <overview-dashboard :layout="layout" :loading="loadingOverview" @refresh="reload" />
         </template>
     </main-page-layout>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import OverviewDashboard from './overview/OverviewDashboard.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { PartialRecord } from '@/core/base.ts';
 import { type DesktopOverviewLayout, OverviewWidgetDataRequirement } from '@/core/overview_layout.ts';
@@ -37,14 +35,11 @@ import {
 } from '@/lib/overview_layout.ts';
 import logger from '@/lib/logger.ts';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const loadingOverview = ref<boolean>(true);
 
@@ -128,13 +123,13 @@ function reload(force: boolean): void {
         loadingOverview.value = false;
 
         if (force) {
-            snackbar.value?.showMessage('Data has been updated');
+            desktopPageStore.addToast('Data has been updated');
         }
     }).catch(error => {
         loadingOverview.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

@@ -155,12 +155,10 @@
     <update-dialog ref="updateDialog" />
 
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import UpdateDialog from './list/dialogs/UpdateDialog.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
@@ -170,6 +168,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useExchangeRatesPageBase } from '@/views/base/ExchangeRatesPageBase.ts';
 
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type BigDecimal, NumeralSystem } from '@/core/numeral.ts';
 import { AMOUNT_FACTOR } from '@/consts/numeral.ts';
@@ -186,7 +185,6 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 type UpdateDialogType = InstanceType<typeof UpdateDialog>;
 
 const { lgAndUp } = useDisplay();
@@ -205,9 +203,9 @@ const {
 } = useExchangeRatesPageBase();
 
 const exchangeRatesStore = useExchangeRatesStore();
+const desktopPageStore = useDesktopPageStore();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const updateDialog = useTemplateRef<UpdateDialogType>('updateDialog');
 
 const activeTab = ref<string>('exchangeRatesPage');
@@ -241,16 +239,16 @@ function reload(force: boolean): void {
             }
 
             if (force) {
-                snackbar.value?.showMessage('Exchange rates data has been updated');
+                desktopPageStore.addToast('Exchange rates data has been updated');
             } else if (!foundDefaultCurrency) {
-                snackbar.value?.showMessage('There is no exchange rates data for your default currency');
+                desktopPageStore.addToast('There is no exchange rates data for your default currency');
             }
         }
     }).catch(error => {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -258,11 +256,11 @@ function reload(force: boolean): void {
 function update(): void {
     updateDialog.value?.open().then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -286,7 +284,7 @@ function remove(currency: string): void {
             customExchangeRateRemoving.value[currency] = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });

@@ -30,20 +30,15 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionsStore } from '@/stores/transaction.ts';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 const {
     tt,
@@ -51,8 +46,7 @@ const {
 } = useI18n();
 
 const transactionsStore = useTransactionsStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const showState = ref<boolean>(false);
 const deleting = ref<boolean>(false);
@@ -91,7 +85,7 @@ function confirm(): void {
         deleting.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

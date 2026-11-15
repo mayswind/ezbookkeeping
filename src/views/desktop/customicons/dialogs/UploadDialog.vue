@@ -47,13 +47,10 @@
 
         <input ref="imageInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="openImage($event)" />
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import OneColumnDialogLayout from '@/components/desktop/OneColumnDialogLayout.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 import { useTheme } from 'vuetify';
@@ -61,14 +58,13 @@ import { useTheme } from 'vuetify';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserCustomIconsStore } from '@/stores/userCustomIcon.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { KnownFileType } from '@/core/file.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { SUPPORTED_IMAGE_EXTENSIONS } from '@/consts/file.ts';
 
 import { generateRandomUUID } from '@/lib/misc.ts';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 interface CustomIconUploadResponse {
     message: string;
@@ -79,6 +75,7 @@ const theme = useTheme();
 const { tt } = useI18n();
 
 const customIconsStore = useUserCustomIconsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const CROP_STAGE_SIZE: number = 320;
 const MIN_ZOOM: number = 1;
@@ -87,7 +84,6 @@ const MAX_ZOOM: number = 5;
 const imageInput = useTemplateRef<HTMLInputElement>('imageInput');
 const previewImage = useTemplateRef<HTMLImageElement>('previewImage');
 const cropStage = useTemplateRef<HTMLElement>('cropStage');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 let resolveFunc: ((response?: CustomIconUploadResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -203,7 +199,7 @@ function upload(): void {
     canvas.toBlob((blob) => {
         if (!blob) {
             uploading.value = false;
-            snackbar.value?.showError('Unable to crop image');
+            desktopPageStore.addErrorToast('Unable to crop image');
             return;
         }
 
@@ -218,7 +214,7 @@ function upload(): void {
             uploading.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     }, KnownFileType.PNG.contentType);

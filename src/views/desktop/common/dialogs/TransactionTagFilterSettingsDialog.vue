@@ -123,14 +123,11 @@
             </template>
         </one-column-dialog-layout>
 
-        <snack-bar ref="snackbar" />
     </v-dialog>
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import {
@@ -139,6 +136,7 @@ import {
 } from '@/views/base/settings/TransactionTagFilterSettingPageBase.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { values } from '@/core/base.ts';
 import { TransactionTagFilterType } from '@/core/transaction.ts';
@@ -157,8 +155,6 @@ import {
     mdiDotsVertical,
     mdiPound
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     type: string;
@@ -193,8 +189,7 @@ const {
 } = useTransactionTagFilterSettingPageBase(props.type);
 
 const transactionTagsStore = useTransactionTagsStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const expandTagGroups = ref<string[]>(allVisibleTagGroupIds.value);
 
@@ -211,13 +206,13 @@ function init(): void {
         expandTagGroups.value = allVisibleTagGroupIds.value;
 
         if (!loadFilterTagIds(props.tagFilter)) {
-            snackbar.value?.showError('Parameter Invalid');
+            desktopPageStore.addErrorToast('Parameter Invalid');
         }
     }).catch(error => {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

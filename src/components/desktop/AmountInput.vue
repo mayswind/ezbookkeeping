@@ -65,14 +65,10 @@
             <div class="text-no-wrap">{{ appendText }}</div>
         </template>
     </v-text-field>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import {
@@ -80,6 +76,8 @@ import {
     type CommonNumberInputEmits,
     useCommonNumberInputBase
 } from '@/components/base/CommonNumberInputBase.ts';
+
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { NumeralSystem, DecimalSeparator } from '@/core/numeral.ts';
 import type { CurrencyPrependAndAppendText } from '@/core/currency.ts';
@@ -97,8 +95,6 @@ import {
     mdiCheck,
     mdiClose
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 interface DesktopAmountInputProps extends CommonNumberInputProps {
     class?: string;
@@ -133,7 +129,7 @@ const {
     onPaste
 } = useCommonNumberInputBase(props, emit, DEFAULT_DECIMAL_NUMBER_COUNT, getInitedFormattedValue(props.modelValue, props.flipNegative), parseAmountFromLocalizedNumerals, getFormattedValue, getValidFormattedValue);
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const rules = [
     (v: string) => {
@@ -218,7 +214,7 @@ function calculateFormula(): void {
     let finalFormula = currentFormula.value;
 
     if (systemDecimalSeparator !== decimalSeparator && finalFormula.indexOf(systemDecimalSeparator) >= 0) {
-        snackbar.value?.showMessage('Formula is invalid');
+        desktopPageStore.addToast('Formula is invalid');
         return;
     } else if (systemDecimalSeparator !== decimalSeparator) {
         finalFormula = replaceAll(currentFormula.value, decimalSeparator, systemDecimalSeparator);
@@ -235,13 +231,13 @@ function calculateFormula(): void {
             currentValue.value = getValidFormattedValue(calculatedAmount, textualValue, hasDecimalSeparator);
             formulaMode.value = false;
         } else {
-            snackbar.value?.showMessage('Formula is invalid');
+            desktopPageStore.addToast('Formula is invalid');
         }
     } catch (ex) {
         logger.error('cannot evaluate formula in amount input, original formula is ' + finalFormula, ex);
 
         if (ex instanceof Error) {
-            snackbar.value?.showMessage(ex.message);
+            desktopPageStore.addToast(ex.message);
         }
     }
 }

@@ -195,13 +195,11 @@
     <unlink-third-party-login-dialog ref="unlinkThirdPartyLoginDialog" />
     <user-generate-token-dialog ref="generateTokenDialog" />
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import UnlinkThirdPartyLoginDialog from './settings/dialogs/UnlinkThirdPartyLoginDialog.vue';
 import UserGenerateTokenDialog from './settings/dialogs/UserGenerateTokenDialog.vue';
 
@@ -213,6 +211,7 @@ import { useRootStore } from '@/stores/index.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserExternalAuthStore } from '@/stores/userExternalAuth.ts';
 import { useTokensStore } from '@/stores/token.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { itemAndIndex, reversedItemAndIndex } from '@/core/base.ts';
 import { KnownErrorCode } from '@/consts/api.ts';
@@ -306,7 +305,6 @@ class DesktopPageSessionInfo extends SessionInfo {
 type UnlinkThirdPartyLoginDialogType = InstanceType<typeof UnlinkThirdPartyLoginDialog>;
 type UserGenerateTokenDialogType = InstanceType<typeof UserGenerateTokenDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const {
     tt,
@@ -319,13 +317,13 @@ const rootStore = useRootStore();
 const settingsStore = useSettingsStore();
 const userExternalAuthStore = useUserExternalAuthStore();
 const tokensStore = useTokensStore();
+const desktopPageStore = useDesktopPageStore();
 
 const newPasswordInput = useTemplateRef<VTextField>('newPasswordInput');
 const confirmPasswordInput = useTemplateRef<VTextField>('confirmPasswordInput');
 const unlinkThirdPartyLoginDialog = useTemplateRef<UnlinkThirdPartyLoginDialogType>('unlinkThirdPartyLoginDialog');
 const generateTokenDialog = useTemplateRef<UserGenerateTokenDialogType>('generateTokenDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const externalAuths = ref<UserExternalAuthInfoResponse[]>([]);
 const tokens = ref<TokenInfoResponse[]>([]);
@@ -390,7 +388,7 @@ function updatePassword(): void {
     const problemMessage = inputProblemMessage.value;
 
     if (problemMessage) {
-        snackbar.value?.showMessage(problemMessage);
+        desktopPageStore.addToast(problemMessage);
         return;
     }
 
@@ -410,11 +408,11 @@ function updatePassword(): void {
             settingsStore.updateLocalizedDefaultSettings(localeDefaultSettings);
 
             if (response.user) {
-                snackbar.value?.showMessage('Your profile has been successfully updated');
+                desktopPageStore.addToast('Your profile has been successfully updated');
             }
         }).catch(() => {
             if (response.user) {
-                snackbar.value?.showMessage('Your profile has been successfully updated, but the language resources could not be loaded.');
+                desktopPageStore.addToast('Your profile has been successfully updated, but the language resources could not be loaded.');
             }
         }).finally(() => {
             updatingPassword.value = false;
@@ -426,7 +424,7 @@ function updatePassword(): void {
         currentPassword.value = '';
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -441,9 +439,9 @@ function reloadExternalAuth(silent?: boolean): void {
     userExternalAuthStore.getExternalAuths().then(response => {
         if (!silent) {
             if (isEquals(externalAuths.value, response)) {
-                snackbar.value?.showMessage('Third-party login list is up to date');
+                desktopPageStore.addToast('Third-party login list is up to date');
             } else {
-                snackbar.value?.showMessage('Third-party login list has been updated');
+                desktopPageStore.addToast('Third-party login list has been updated');
             }
         }
 
@@ -456,7 +454,7 @@ function reloadExternalAuth(silent?: boolean): void {
             externalAuths.value = [];
         } else if (!error.processed) {
             externalAuths.value = [];
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -480,7 +478,7 @@ function linkExternalAuth(): void {
         loggingInByOAuth2.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -507,9 +505,9 @@ function reloadSessions(silent?: boolean): void {
     tokensStore.getAllTokens().then(response => {
         if (!silent) {
             if (isEquals(tokens.value, response)) {
-                snackbar.value?.showMessage('Session list is up to date');
+                desktopPageStore.addToast('Session list is up to date');
             } else {
-                snackbar.value?.showMessage('Session list has been updated');
+                desktopPageStore.addToast('Session list has been updated');
             }
         }
 
@@ -519,7 +517,7 @@ function reloadSessions(silent?: boolean): void {
         loadingSession.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -542,7 +540,7 @@ function revokeSession(session: SessionInfo): void {
             loadingSession.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -565,12 +563,12 @@ function revokeAllSessions(): void {
                 }
             }
 
-            snackbar.value?.showMessage('You have logged out all other sessions');
+            desktopPageStore.addToast('You have logged out all other sessions');
         }).catch(error => {
             loadingSession.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });

@@ -421,12 +421,10 @@
     <batch-replace-dialog ref="batchReplaceDialog" />
     <batch-apply-rules-dialog ref="batchApplyRulesDialog" />
     <batch-create-dialog ref="batchCreateDialog" />
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import BatchReplaceDialog, { type BatchReplaceDialogDataType } from '../dialogs/BatchReplaceDialog.vue';
 import BatchApplyRulesDialog from '../dialogs/BatchApplyRulesDialog.vue';
 import BatchCreateDialog, { type BatchCreateDialogDataType } from '../dialogs/BatchCreateDialog.vue';
@@ -442,6 +440,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type NameValue, type NameNumeralValue, itemAndIndex, reversed, keys } from '@/core/base.ts';
 import { DecimalSeparator, AmountFilterType } from '@/core/numeral.ts';
@@ -502,7 +501,6 @@ import {
     mdiKeyboardTab
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchReplaceDialogType = InstanceType<typeof BatchReplaceDialog>;
 type BatchApplyRulesDialogType = InstanceType<typeof BatchApplyRulesDialog>;
 type BatchCreateDialogType = InstanceType<typeof BatchCreateDialog>;
@@ -561,8 +559,8 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const exchangeRatesStore = useExchangeRatesStore();
+const desktopPageStore = useDesktopPageStore();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const batchReplaceDialog = useTemplateRef<BatchReplaceDialogType>('batchReplaceDialog');
 const batchApplyRulesDialog = useTemplateRef<BatchApplyRulesDialogType>('batchApplyRulesDialog');
 const batchCreateDialog = useTemplateRef<BatchCreateDialogType>('batchCreateDialog');
@@ -1834,7 +1832,7 @@ function showBatchReplaceDialog(type: BatchReplaceDialogDataType, allSourceTagIt
         }
 
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
@@ -1897,7 +1895,7 @@ function showBatchAddDialog(type: BatchReplaceDialogDataType): void {
         }
 
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
@@ -1997,7 +1995,7 @@ function showReplaceInvalidItemDialog(type: BatchReplaceDialogDataType, invalidI
         }
 
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
@@ -2033,7 +2031,7 @@ function showBatchApplyRulesDialog(initialRules: ImportTransactionReplaceRule[])
         });
 
         if (applyResult.updatedTransactionCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(applyResult.updatedTransactionCount)
             });
         }
@@ -2103,7 +2101,7 @@ function showBatchCreateInvalidItemDialog(type: BatchCreateDialogDataType, inval
         }
 
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
@@ -2232,7 +2230,7 @@ function focusTableScrollContainerWhenNonEditing(event: MouseEvent): void {
 }
 
 function onShowDateRangeError(message: string): void {
-    snackbar.value?.showError(message);
+    desktopPageStore.addErrorToast(message);
 }
 
 function reset(): void {

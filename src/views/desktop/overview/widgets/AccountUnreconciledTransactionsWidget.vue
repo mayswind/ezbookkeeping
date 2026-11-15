@@ -31,18 +31,18 @@
         <reconciliation-statement-dialog ref="reconciliationStatementDialog"
                                          @update:last-reconciled-time="onUpdateLastReconciledTime"
                                          @error="onShowReconciliationStatementError" />
-        <snack-bar ref="snackbar" />
     </v-card>
 </template>
 
 <script setup lang="ts">
 import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import ReconciliationStatementDialog from '@/views/desktop/accounts/list/dialogs/ReconciliationStatementDialog.vue';
 
 import { useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import {
     type CommonAccountUnreconciledTransactionsWidgetProps,
@@ -55,7 +55,6 @@ import {
     mdiCreditCardOutline
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
 type ReconciliationStatementDialogType = InstanceType<typeof ReconciliationStatementDialog>;
 
 const emit = defineEmits<{
@@ -72,7 +71,8 @@ const { tt, formatNumberToLocalizedNumerals } = useI18n();
 
 const { noDataText, displayAccounts, getTransactionListDateRange } = useAccountUnreconciledTransactionsWidgetBase(props);
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
+
 const reconciliationStatementDialog = useTemplateRef<ReconciliationStatementDialogType>('reconciliationStatementDialog');
 
 function showReconciliationStatementDialog(accountId: string): void {
@@ -94,6 +94,6 @@ function onUpdateLastReconciledTime(): void {
 }
 
 function onShowReconciliationStatementError(message: string): void {
-    snackbar.value?.showError(message);
+    desktopPageStore.addErrorToast(message);
 }
 </script>

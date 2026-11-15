@@ -35,11 +35,9 @@
     </v-row>
 
     <iframe id="sandbox" ref="sandbox" sandbox="allow-scripts" style="display: none;"></iframe>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import ImportTransactionScriptEditor from '@/components/desktop/ImportTransactionScriptEditor.vue';
 
 import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vue';
@@ -47,6 +45,7 @@ import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vu
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { NameNumeralValue } from '@/core/base.ts';
 import { KnownDateTimeFormat } from '@/core/datetime.ts';
@@ -76,8 +75,6 @@ import {
     mdiFolderOpenOutline,
     mdiContentSaveOutline
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 type SandboxRequest = {
     source: string;
@@ -111,6 +108,7 @@ const {
 } = useI18n();
 
 const settingsStore = useSettingsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const sandboxMessageSignature: string = '#ezBookkeeping-sandbox-message#';
 const sandboxBuildinScripts: string = `
@@ -178,7 +176,6 @@ window.addEventListener('message', function (event) {
 `;
 
 const sandbox = useTemplateRef<HTMLIFrameElement>('sandbox');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const sandboxLoaded = ref<boolean>(false);
 const customScript = ref<string>('');
@@ -281,7 +278,7 @@ function tryAutoExecuteCustomScript(): void {
 
 function generateResult(): string | undefined {
     if (!previewResult.value) {
-        snackbar.value?.showError('Please execute the custom script first');
+        desktopPageStore.addErrorToast('Please execute the custom script first');
         return undefined;
     }
 
@@ -318,7 +315,7 @@ function loadScriptFile(): void {
         customScript.value = content;
     }).catch(error => {
         logger.error('Failed to load script file', error);
-        snackbar.value?.showError('Cannot load script file');
+        desktopPageStore.addErrorToast('Cannot load script file');
     });
 }
 
@@ -337,12 +334,12 @@ function onMessage(event: MessageEvent<SandboxResponse>): void {
     const data = event.data;
 
     if (data.knownError) {
-        snackbar.value?.showError(data.knownError);
+        desktopPageStore.addErrorToast(data.knownError);
         previewResult.value = undefined;
         executionError.value = `// ${tt(data.knownError)}`;
     } else if (data.error) {
         logger.error('Failed to execute custom script: ' + data.error);
-        snackbar.value?.showError('Failed to execute custom script');
+        desktopPageStore.addErrorToast('Failed to execute custom script');
         previewResult.value = undefined;
         executionError.value = `// ${data.error}`;
     } else if (data.result) {
@@ -373,7 +370,7 @@ function onMessage(event: MessageEvent<SandboxResponse>): void {
 
                 if (!isDefined(unixTime)) {
                     logger.error('Failed to parse time "' + originalDateTime + '" with custom format "' + format + '"');
-                    snackbar.value?.showError('Failed to parse time');
+                    desktopPageStore.addErrorToast('Failed to parse time');
                     previewResult.value = undefined;
                     executionError.value = `// ${tt('Failed to parse time')} "${originalDateTime}"`;
                     return;
@@ -382,7 +379,7 @@ function onMessage(event: MessageEvent<SandboxResponse>): void {
 
             if (!isDefined(unixTime)) {
                 logger.error('Failed to parse time "' + item['time'] + '"');
-                snackbar.value?.showError('Failed to parse time');
+                desktopPageStore.addErrorToast('Failed to parse time');
                 previewResult.value = undefined;
                 executionError.value = `// ${tt('Failed to parse time')} "${item['time']}"`;
                 return;

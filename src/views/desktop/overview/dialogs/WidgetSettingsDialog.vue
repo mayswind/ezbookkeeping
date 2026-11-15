@@ -105,8 +105,6 @@
             </template>
         </one-column-dialog-layout>
 
-        <snack-bar ref="snackbar" />
-
         <account-filter-settings-dialog type="custom"
                                         :selected-account-ids="(currentSettingItem?.settingType === 'accountSelect' && currentSettingItem?.settingName && isArray(getSettingValue(currentSettingItem.settingName))) ? getSettingValue(currentSettingItem.settingName) as string[] : []"
                                         :disable-hidden-account="(currentSettingItem?.settingType === 'accountSelect') ? (currentSettingItem?.disableHiddenAccounts ?? false) : false"
@@ -129,9 +127,8 @@
 import AccountFilterSettingsDialog from '@/views/desktop/common/dialogs/AccountFilterSettingsDialog.vue';
 import CategoryFilterSettingsDialog from '@/views/desktop/common/dialogs/CategoryFilterSettingsDialog.vue';
 import TransactionTagFilterSettingsDialog from '@/views/desktop/common/dialogs/TransactionTagFilterSettingsDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
@@ -139,6 +136,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type NameNumeralValue, values } from '@/core/base.ts';
 import { AccountType } from '@/core/account.ts';
@@ -156,8 +154,6 @@ import { DESKTOP_OVERVIEW_WIDGET_DEFINITIONS } from '@/consts/overview_layout.ts
 import { isDefined, isArray, isString, isObjectEmpty, arrayItemToObjectField } from '@/lib/common.ts';
 import { cloneWidget, getOverviewWidgetSettingContext } from '@/lib/overview_layout.ts';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const {
     tt,
     joinMultiText,
@@ -169,8 +165,7 @@ const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 let resolveFunc: ((widget: DesktopOverviewWidgetLayout) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -384,7 +379,7 @@ function open(value: DesktopOverviewWidgetLayout): Promise<DesktopOverviewWidget
             loading.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     }

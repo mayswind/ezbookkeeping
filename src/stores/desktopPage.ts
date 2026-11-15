@@ -48,27 +48,29 @@ export const useDesktopPageStore = defineStore('desktopPages', () => {
         return false;
     }
 
-    function addToastToPendingQueue(toast: DesktopToast): void {
-        if (showingToastQueue.value && showingToastQueue.value.length > 0) {
-            for (const showingToast of showingToastQueue.value) {
-                if (isToastEquals(showingToast, toast)) {
-                    return;
+    function addToastToPendingQueue(toast: DesktopToast, allowRepeat?: boolean): void {
+        if (!allowRepeat) {
+            if (showingToastQueue.value && showingToastQueue.value.length > 0) {
+                for (const showingToast of showingToastQueue.value) {
+                    if (isToastEquals(showingToast, toast)) {
+                        return;
+                    }
                 }
             }
-        }
 
-        if (pendingToastQueue.value.length > 1) {
-            const lastPendingToast = pendingToastQueue.value[pendingToastQueue.value.length - 1];
-
-            if (lastPendingToast && isToastEquals(lastPendingToast, toast)) {
-                return;
+            if (pendingToastQueue.value && pendingToastQueue.value.length > 0) {
+                for (const pendingToast of pendingToastQueue.value) {
+                    if (isToastEquals(pendingToast, toast)) {
+                        return;
+                    }
+                }
             }
         }
 
         pendingToastQueue.value.push(toast);
     }
 
-    function addToast(message: string, options?: Record<string, unknown>): void {
+    function addToast(message: string, options?: Record<string, unknown>, allowRepeat?: boolean): void {
         if (!message || message.trim() === '') {
             return;
         }
@@ -80,7 +82,7 @@ export const useDesktopPageStore = defineStore('desktopPages', () => {
             options: options
         };
 
-        addToastToPendingQueue(newToast);
+        addToastToPendingQueue(newToast, allowRepeat);
     }
 
     function addErrorToast(error: string | { message: string } | { error: ErrorResponse }): void {

@@ -121,11 +121,9 @@
     </v-dialog>
 
     <batch-apply-rules-dialog ref="replaceRulesDialog" />
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import ImportTransactionOptions from '@/components/desktop/ImportTransactionOptions.vue';
 import ImportTransactionScriptEditor from '@/components/desktop/ImportTransactionScriptEditor.vue';
 import BatchApplyRulesDialog from '@/views/desktop/transactions/import/dialogs/BatchApplyRulesDialog.vue';
@@ -136,6 +134,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useImportPresetsStore } from '@/stores/importPreset.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { KnownFileType } from '@/core/file.ts';
 import {
@@ -164,7 +163,6 @@ interface ImportPresetEditResponse {
     message: string;
 }
 
-type SnackBarType = InstanceType<typeof SnackBar>;
 type ReplaceRulesDialogType = InstanceType<typeof BatchApplyRulesDialog>;
 
 const {
@@ -176,8 +174,8 @@ const {
 
 const settingsStore = useSettingsStore();
 const importPresetsStore = useImportPresetsStore();
+const desktopPageStore = useDesktopPageStore();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const replaceRulesDialog = useTemplateRef<ReplaceRulesDialogType>('replaceRulesDialog');
 
 let resolveFunc: ((value: ImportPresetEditResponse) => void) | null = null;
@@ -303,7 +301,7 @@ function save(): void {
     const problemMessage = inputEmptyProblemMessage.value;
 
     if (problemMessage) {
-        snackbar.value?.showMessage(problemMessage);
+        desktopPageStore.addToast(problemMessage);
         return;
     }
 
@@ -327,7 +325,7 @@ function save(): void {
         submitting.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -339,14 +337,14 @@ function loadDataMappingFile(): void {
         const mapping = ImportTransactionDataMapping.parseFromJson(content);
 
         if (!mapping) {
-            snackbar.value?.showError('Data mapping file is invalid');
+            desktopPageStore.addErrorToast('Data mapping file is invalid');
             return;
         }
 
         preset.value.dataMapping = mapping.toJson();
     }).catch(error => {
         logger.error('failed to load data mapping file', error);
-        snackbar.value?.showError('Data mapping file is invalid');
+        desktopPageStore.addErrorToast('Data mapping file is invalid');
     });
 }
 
@@ -357,7 +355,7 @@ function loadScriptFile(): void {
         preset.value.customScript = content;
     }).catch(error => {
         logger.error('failed to load script file', error);
-        snackbar.value?.showError('Cannot load script file');
+        desktopPageStore.addErrorToast('Cannot load script file');
     });
 }
 

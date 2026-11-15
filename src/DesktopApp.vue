@@ -15,7 +15,7 @@
         </div>
     </v-snackbar>
 
-    <v-snackbar-queue :total-visible="3" display-strategy="hold" :close-text="tt('Close')" v-model="toastQueue">
+    <v-snackbar-queue :total-visible="3" display-strategy="overflow" :close-text="tt('Close')" v-model="toastQueue">
         <template #actions="{ props }">
             <v-btn variant="text" color="primary" v-bind="props">{{ tt('Close') }}</v-btn>
         </template>

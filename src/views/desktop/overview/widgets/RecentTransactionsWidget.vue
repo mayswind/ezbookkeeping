@@ -37,15 +37,12 @@
         </v-card-text>
 
         <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
-
-        <snack-bar ref="snackbar" />
     </v-card>
 </template>
 
 <script setup lang="ts">
 import OverviewWidgetHeader from './OverviewWidgetHeader.vue';
 
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 
 import { computed, useTemplateRef } from 'vue';
@@ -57,6 +54,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { TransactionType } from '@/core/transaction.ts';
 import { DISPLAY_HIDDEN_AMOUNT } from '@/consts/numeral.ts';
@@ -75,7 +73,6 @@ import {
     mdiPencilBoxOutline
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
 const props = defineProps<{
@@ -100,8 +97,8 @@ const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
+const desktopPageStore = useDesktopPageStore();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const showAmountInHomePage = computed<boolean>(() => settingsStore.appSettings.showAmountInHomePage);
@@ -173,13 +170,13 @@ function showTransaction(transaction: TransactionInfoResponse): void {
         currentTransaction: Transaction.of(transaction)
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         emit('refresh');
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

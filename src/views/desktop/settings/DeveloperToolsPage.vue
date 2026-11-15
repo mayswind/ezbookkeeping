@@ -36,7 +36,6 @@
                             v-model="currentLanguageTextDirection" />
                     </div>
 
-
                     <div class="mt-2">
                         <div class="d-flex align-center">
                             <span>{{ tt('Language Configuration') }}</span>
@@ -77,16 +76,14 @@
             </v-card>
         </v-col>
     </v-row>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { NameValue } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
@@ -101,8 +98,6 @@ import {
     mdiContentSaveOutline
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const {
     tt,
     getCurrentLanguageTag,
@@ -114,7 +109,7 @@ const {
     restoreLanguagePreview
 } = useI18n();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const currentLanguageConfigJson = ref<string>('');
 const currentLanguageTextDirection = ref<TextDirection>(TextDirection.LTR);
@@ -135,7 +130,7 @@ function loadLanguageConfigurationFile(): void {
         currentLanguageConfigJson.value = content;
     }).catch(error => {
         logger.error('Failed to load language configuration file', error);
-        snackbar.value?.showError('Unable to load language configuration file');
+        desktopPageStore.addErrorToast('Unable to load language configuration file');
     });
 }
 
@@ -146,10 +141,10 @@ function saveLanguageConfigurationFile(): void {
 function applyPreview(): void {
     try {
         previewLanguage(currentLanguageConfigJson.value, currentLanguageTextDirection.value);
-        snackbar.value?.showMessage('Language preview applied. You can navigate to other pages to check the result.');
+        desktopPageStore.addToast('Language preview applied. You can navigate to other pages to check the result.', undefined, true);
     } catch (ex) {
         logger.error('failed to apply language preview', ex);
-        snackbar.value?.showError( 'Unable to apply language preview');
+        desktopPageStore.addErrorToast('Unable to apply language preview');
     }
 }
 
@@ -157,10 +152,10 @@ function restorePreview(): void {
     restoreLanguagePreview().then(() => {
         currentLanguageConfigJson.value = getCurrentLanguageMessagesJson();
         currentLanguageTextDirection.value = getCurrentLanguageTextDirection();
-        snackbar.value?.showMessage('Built-in language configuration restored');
+        desktopPageStore.addToast('Built-in language configuration restored', undefined, true);
     }).catch(ex => {
         logger.error('failed to restore language configuration', ex);
-        snackbar.value?.showError( 'Unable to restore the language configuration');
+        desktopPageStore.addErrorToast('Unable to restore the language configuration');
     });
 }
 

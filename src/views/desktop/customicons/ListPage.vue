@@ -90,12 +90,10 @@
     <upload-dialog ref="uploadDialog" />
 
     <confirm-dialog ref="confirmDialog" />
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import UploadDialog from '@/views/desktop/customicons/dialogs/UploadDialog.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
@@ -103,6 +101,7 @@ import { ref, computed, useTemplateRef } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserCustomIconsStore } from '@/stores/userCustomIcon.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { UserCustomIconInfoResponse } from '@/models/user_custom_icon.ts';
 
@@ -113,15 +112,14 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 type UploadDialogType = InstanceType<typeof UploadDialog>;
 
 const { tt } = useI18n();
 
 const customIconsStore = useUserCustomIconsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const uploadDialog = useTemplateRef<UploadDialogType>('uploadDialog');
 
 const loading = ref<boolean>(true);
@@ -145,7 +143,7 @@ function init(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -160,7 +158,7 @@ function reload(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -168,11 +166,11 @@ function reload(): void {
 function add(): void {
     uploadDialog.value?.open().then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -192,7 +190,7 @@ function deleteCustomIcon(customIcon: UserCustomIconInfoResponse): void {
             deletingCustomIconId.value = '';
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -212,7 +210,7 @@ function saveSortResult(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -225,7 +223,7 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     const moveEvent = event.moved;
 
     if (!moveEvent.element || !moveEvent.element.id) {
-        snackbar.value?.showMessage('Unable to move custom icon');
+        desktopPageStore.addToast('Unable to move custom icon');
         return;
     }
 
@@ -236,7 +234,7 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     }).then(() => {
         displayOrderModified.value = true;
     }).catch(error => {
-        snackbar.value?.showError(error);
+        desktopPageStore.addErrorToast(error);
     });
 }
 

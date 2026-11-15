@@ -59,14 +59,10 @@
             </v-card>
         </v-col>
     </v-row>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useAppLockPageBase } from '@/views/base/settings/AppLockPageBase.ts';
@@ -74,6 +70,7 @@ import { useAppLockPageBase } from '@/views/base/settings/AppLockPageBase.ts';
 import { useSettingsStore } from '@/stores/setting.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { registerWebAuthnCredential } from '@/lib/webauthn.ts';
 import {
@@ -86,19 +83,16 @@ import {
 } from '@/lib/userstate.ts';
 import logger from '@/lib/logger.ts';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const { tt } = useI18n();
 const { isSupportedWebAuthn, isEnableApplicationLock, isEnableApplicationLockWebAuthn } = useAppLockPageBase();
 
 const settingsStore = useSettingsStore();
 const userStore = useUserStore();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
-
 const pinCode = ref<string>('');
 const enablingWebAuthn = ref<boolean>(false);
 const transactionsStore = useTransactionsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const pinCodeValid = computed<boolean>(() => pinCode.value?.length === 6 || false);
 
@@ -112,13 +106,13 @@ function confirm(): void {
 
 function enable(): void {
     if (settingsStore.appSettings.applicationLock) {
-        snackbar.value?.showMessage('Application lock has been enabled');
+        desktopPageStore.addToast('Application lock has been enabled');
         return;
     }
 
     if (!pinCode.value || pinCode.value.length !== 6) {
         pinCode.value = '';
-        snackbar.value?.showMessage('Invalid PIN code');
+        desktopPageStore.addToast('Invalid PIN code');
         return;
     }
 
@@ -126,7 +120,7 @@ function enable(): void {
 
     if (!user || !user.username) {
         pinCode.value = '';
-        snackbar.value?.showMessage('An error occurred');
+        desktopPageStore.addToast('An error occurred');
         return;
     }
 
@@ -142,13 +136,13 @@ function enable(): void {
 
 function disable(): void {
     if (!settingsStore.appSettings.applicationLock) {
-        snackbar.value?.showMessage('Application lock is not enabled');
+        desktopPageStore.addToast('Application lock is not enabled');
         return;
     }
 
     if (!isCorrectPinCode(pinCode.value)) {
         pinCode.value = '';
-        snackbar.value?.showMessage('Incorrect PIN code');
+        desktopPageStore.addToast('Incorrect PIN code');
         return;
     }
 
@@ -176,20 +170,20 @@ watch(isEnableApplicationLockWebAuthn, (newValue) => {
 
             saveWebAuthnConfig(id);
             settingsStore.setEnableApplicationLockWebAuthn(true);
-            snackbar.value?.showMessage('You have enabled WebAuthn successfully');
+            desktopPageStore.addToast('You have enabled WebAuthn successfully');
         }).catch(error => {
             logger.error('failed to enable WebAuthn', error);
 
             enablingWebAuthn.value = false;
 
             if (error.notSupported) {
-                snackbar.value?.showMessage('WebAuth is not supported on this device');
+                desktopPageStore.addToast('WebAuth is not supported on this device');
             } else if (error.name === 'NotAllowedError') {
-                snackbar.value?.showMessage('User has canceled authentication');
+                desktopPageStore.addToast('User has canceled authentication');
             } else if (error.invalid) {
-                snackbar.value?.showMessage('Failed to enable WebAuthn');
+                desktopPageStore.addToast('Failed to enable WebAuthn');
             } else {
-                snackbar.value?.showMessage('User has canceled or this device does not support WebAuthn');
+                desktopPageStore.addToast('User has canceled or this device does not support WebAuthn');
             }
 
             isEnableApplicationLockWebAuthn.value = false;

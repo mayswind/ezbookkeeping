@@ -50,18 +50,15 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
 
@@ -69,8 +66,6 @@ import { categorizedArrayToPlainArray } from '@/lib/common.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';
 import { focusParentWhenClicked } from '@/lib/ui/desktop.ts';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     categoryType: CategoryType;
@@ -85,8 +80,7 @@ const emit = defineEmits<{
 const { tt, getCurrentLanguageTag, getAllTransactionDefaultCategories, loadLanguageResources } = useI18n();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const currentLocale = ref<string>(getCurrentLanguageTag());
 const loadingLanguage = ref<boolean>(false);
@@ -123,7 +117,7 @@ function changeLanguage(languageTag: string): void {
         currentLocale.value = languageTag;
     }).catch(error => {
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     }).finally(() => {
         loadingLanguage.value = false;
@@ -153,7 +147,7 @@ function save(): void {
         submitting.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

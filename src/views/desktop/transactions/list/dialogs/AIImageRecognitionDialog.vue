@@ -43,19 +43,17 @@
         </one-column-dialog-layout>
     </v-dialog>
 
-    <snack-bar ref="snackbar" />
     <input ref="imageInput" type="file" style="display: none" :accept="SUPPORTED_IMAGE_EXTENSIONS" @change="openImage($event)" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
 import { ref, computed, useTemplateRef } from 'vue';
 import { useTheme } from 'vuetify';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionsStore } from '@/stores/transaction.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { ImageUploadQualityType } from '@/core/image.ts';
 import { KnownFileType } from '@/core/file.ts';
@@ -73,15 +71,13 @@ import { generateRandomUUID } from '@/lib/misc.ts';
 import { compressJpgImageByQuality } from '@/lib/ui/common.ts';
 import logger from '@/lib/logger.ts';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const theme = useTheme();
 
 const { tt } = useI18n();
 
 const transactionsStore = useTransactionsStore();
+const desktopPageStore = useDesktopPageStore();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const imageInput = useTemplateRef<HTMLInputElement>('imageInput');
 
 let resolveFunc: ((result: AIImageRecognitionResult) => void) | null = null;
@@ -111,7 +107,7 @@ function loadImage(file: File): void {
         imageSrc.value = undefined;
         loading.value = false;
         logger.error('failed to compress image', error);
-        snackbar.value?.showError('Unable to load image');
+        desktopPageStore.addErrorToast('Unable to load image');
     });
 }
 
@@ -181,7 +177,7 @@ function recognize(): void {
         cancelRecognizingUuid.value = undefined;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -195,7 +191,7 @@ function cancelRecognize(): void {
     recognizing.value = false;
     cancelRecognizingUuid.value = undefined;
 
-    snackbar.value?.showMessage('User Canceled');
+    desktopPageStore.addToast('User Canceled');
 }
 
 function cancel(): void {

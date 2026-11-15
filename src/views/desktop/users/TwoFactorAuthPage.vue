@@ -99,18 +99,15 @@
             </v-card>
         </v-col>
     </v-row>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTwoFactorAuthStore } from '@/stores/twoFactorAuth.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { KnownErrorCode } from '@/consts/api.ts';
 import { copyTextToClipboard } from '@/lib/ui/common.ts';
@@ -119,13 +116,10 @@ import {
     mdiContentCopy
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const { tt } = useI18n();
 
 const twoFactorAuthStore = useTwoFactorAuthStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const status = ref<boolean | null>(null);
 const loading = ref<boolean>(true);
@@ -152,7 +146,7 @@ function init(): void {
             status.value = null;
         } else if (!error.processed) {
             status.value = null;
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -173,14 +167,14 @@ function enable(): void {
         enabling.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
 
 function enableConfirm(): void {
     if (!currentPasscode.value) {
-        snackbar.value?.showMessage('Passcode cannot be blank');
+        desktopPageStore.addToast('Passcode cannot be blank');
         return;
     }
 
@@ -213,14 +207,14 @@ function enableConfirm(): void {
         enableConfirming.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
 
 function disable(): void {
     if (!currentPassword.value) {
-        snackbar.value?.showMessage('Current password cannot be blank');
+        desktopPageStore.addToast('Current password cannot be blank');
         return;
     }
 
@@ -241,19 +235,19 @@ function disable(): void {
         disabling.value = false;
 
         status.value = false;
-        snackbar.value?.showMessage('Two-factor authentication has been disabled');
+        desktopPageStore.addToast('Two-factor authentication has been disabled');
     }).catch(error => {
         disabling.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
 
 function regenerateBackupCode(): void {
     if (!currentPassword.value) {
-        snackbar.value?.showMessage('Current password cannot be blank');
+        desktopPageStore.addToast('Current password cannot be blank');
         return;
     }
 
@@ -278,7 +272,7 @@ function regenerateBackupCode(): void {
         regenerating.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -297,7 +291,7 @@ function reset(): void {
 
 function copyBackupCodes(): void {
     copyTextToClipboard(currentBackupCode.value);
-    snackbar.value?.showMessage('Backup codes copied');
+    desktopPageStore.addToast('Backup codes copied');
 }
 
 defineExpose({

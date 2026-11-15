@@ -123,7 +123,7 @@
                                               :timezone-utc-offset="row.transaction.utcOffset"
                                               :model-value="row.transaction.time"
                                               @update:model-value="updateTime(row.transaction, $event)"
-                                              @error="snackbar?.showError($event)" />
+                                              @error="desktopPageStore.addErrorToast" />
                         </td>
                         <td>
                             <v-select density="compact" variant="plain"
@@ -247,12 +247,10 @@
     </v-dialog>
 
     <confirm-dialog ref="confirmDialog" />
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
 
@@ -264,6 +262,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { TransactionType } from '@/core/transaction.ts';
@@ -295,7 +294,6 @@ interface BatchAddTransactionRow {
 }
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const {
     tt,
@@ -309,12 +307,12 @@ const accountsStore = useAccountsStore();
 const transactionsStore = useTransactionsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
+const desktopPageStore = useDesktopPageStore();
 
 let resolveFunc: ((changed: boolean) => void) | null = null;
 let rejectFunc: ((reason?: string) => void) | null = null;
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(false);
@@ -600,7 +598,7 @@ function submit(): void {
             submitting.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });

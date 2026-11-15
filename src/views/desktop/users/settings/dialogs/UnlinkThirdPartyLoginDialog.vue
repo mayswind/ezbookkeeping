@@ -28,29 +28,23 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserExternalAuthStore } from '@/stores/userExternalAuth.ts';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 const { tt } = useI18n();
 
 const userExternalAuthStore = useUserExternalAuthStore();
+const desktopPageStore = useDesktopPageStore();
 
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 const unlinking = ref<boolean>(false);
@@ -88,7 +82,7 @@ function confirm(): void {
         unlinking.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

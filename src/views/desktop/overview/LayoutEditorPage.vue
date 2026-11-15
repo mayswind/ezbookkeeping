@@ -44,7 +44,6 @@
     <json-export-dialog ref="layoutExportDialog" :title="tt('Export Layout')" :file-name="tt('dataExport.defaultOverviewLayoutFileName')" />
 
     <confirm-dialog ref="confirmDialog" />
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
@@ -54,7 +53,6 @@ import WidgetSettingsDialog from './dialogs/WidgetSettingsDialog.vue';
 import JsonImportDialog from '@/components/desktop/JsonImportDialog.vue';
 import JsonExportDialog from '@/components/desktop/JsonExportDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter, onBeforeRouteLeave } from 'vue-router';
@@ -65,6 +63,7 @@ import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useOverviewStore } from '@/stores/overview.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
 import {
@@ -112,7 +111,6 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 type AddWidgetDialogType = InstanceType<typeof AddWidgetDialog>;
 type WidgetSettingsDialogType = InstanceType<typeof WidgetSettingsDialog>;
 type JsonImportDialogType = InstanceType<typeof JsonImportDialog>;
@@ -126,6 +124,7 @@ const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
+const desktopPageStore = useDesktopPageStore();
 
 const layoutJsonPlaceholder: string = `{
     "widgets": [
@@ -142,7 +141,6 @@ const layoutJsonPlaceholder: string = `{
 }`;
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const addWidgetDialog = useTemplateRef<AddWidgetDialogType>('addWidgetDialog');
 const widgetSettingsDialog = useTemplateRef<WidgetSettingsDialogType>('widgetSettingsDialog');
 const layoutImportDialog = useTemplateRef<JsonImportDialogType>('layoutImportDialog');
@@ -232,13 +230,13 @@ function reload(force: boolean): void {
         loadingOverview.value = false;
 
         if (force) {
-            snackbar.value?.showMessage('Data has been updated');
+            desktopPageStore.addToast('Data has been updated');
         }
     }).catch(error => {
         loadingOverview.value = false;
 
         if (!error.processed && !error.isUpToDate) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -357,7 +355,7 @@ function onImportLayout(data: string): boolean {
         return true;
     } catch (error) {
         logger.error('Failed to import overview layout', error);
-        snackbar.value?.showError('Layout import failed. Please make sure the layout is valid and try again.');
+        desktopPageStore.addErrorToast('Layout import failed. Please make sure the layout is valid and try again.');
         return false;
     }
 }

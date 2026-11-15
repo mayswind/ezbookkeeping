@@ -176,12 +176,10 @@
     </v-row>
 
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, useTemplateRef } from 'vue';
 
@@ -190,6 +188,7 @@ import { useDataManagementPageBase } from '@/views/base/users/DataManagementPage
 
 import { useRootStore } from '@/stores/index.ts';
 import { useUserStore } from '@/stores/user.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { isEquals } from '@/lib/common.ts';
 import { isDataExportingEnabled } from '@/lib/server_settings.ts';
@@ -211,16 +210,15 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const { tt } = useI18n();
 const { dataStatistics, displayDataStatistics, getExportFileName } = useDataManagementPageBase();
 
 const rootStore = useRootStore();
 const userStore = useUserStore();
+const desktopPageStore = useDesktopPageStore();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const loadingDataStatistics = ref<boolean>(true);
 const exportingData = ref<boolean>(false);
@@ -233,9 +231,9 @@ function reloadUserDataStatistics(force: boolean): void {
     userStore.getUserDataStatistics().then(dataStatisticsResponse => {
         if (force) {
             if (isEquals(dataStatistics.value, dataStatisticsResponse)) {
-                snackbar.value?.showMessage('Data is up to date');
+                desktopPageStore.addToast('Data is up to date');
             } else {
-                snackbar.value?.showMessage('Data has been updated');
+                desktopPageStore.addToast('Data has been updated');
             }
         }
 
@@ -245,7 +243,7 @@ function reloadUserDataStatistics(force: boolean): void {
         loadingDataStatistics.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -264,14 +262,14 @@ function exportData(fileType: string): void {
         exportingData.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
 
 function clearAllTransactions(): void {
     if (!currentPasswordForClearData.value) {
-        snackbar.value?.showMessage('Current password cannot be blank');
+        desktopPageStore.addToast('Current password cannot be blank');
         return;
     }
 
@@ -288,13 +286,13 @@ function clearAllTransactions(): void {
             clearingData.value = false;
             currentPasswordForClearData.value = '';
 
-            snackbar.value?.showMessage('All transactions has been cleared');
+            desktopPageStore.addToast('All transactions has been cleared');
             reloadUserDataStatistics(false);
         }).catch(error => {
             clearingData.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -302,7 +300,7 @@ function clearAllTransactions(): void {
 
 function clearAllData(): void {
     if (!currentPasswordForClearData.value) {
-        snackbar.value?.showMessage('Current password cannot be blank');
+        desktopPageStore.addToast('Current password cannot be blank');
         return;
     }
 
@@ -319,13 +317,13 @@ function clearAllData(): void {
             clearingData.value = false;
             currentPasswordForClearData.value = '';
 
-            snackbar.value?.showMessage('All user data has been cleared');
+            desktopPageStore.addToast('All user data has been cleared');
             reloadUserDataStatistics(false);
         }).catch(error => {
             clearingData.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });

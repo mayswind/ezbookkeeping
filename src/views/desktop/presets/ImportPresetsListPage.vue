@@ -102,12 +102,10 @@
 
     <import-preset-edit-dialog ref="editDialog" />
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import ImportPresetEditDialog from './dialogs/ImportPresetEditDialog.vue';
 
 import { ref, computed, useTemplateRef } from 'vue';
@@ -115,6 +113,7 @@ import { ref, computed, useTemplateRef } from 'vue';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useImportPresetsStore } from '@/stores/importPreset.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type ImportPresetBasicInfo } from '@/models/import_preset.ts';
 
@@ -127,15 +126,14 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof ImportPresetEditDialog>;
 
 const { tt } = useI18n();
 
 const importPresetsStore = useImportPresetsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const loading = ref<boolean>(true);
@@ -157,7 +155,7 @@ function init(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -171,7 +169,7 @@ function reload(): void {
         loading.value = false;
         displayOrderModified.value = false;
 
-        snackbar.value?.showMessage('Import preset list has been updated');
+        desktopPageStore.addToast('Import preset list has been updated');
     }).catch(error => {
         loading.value = false;
 
@@ -180,7 +178,7 @@ function reload(): void {
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -188,11 +186,11 @@ function reload(): void {
 function add(): void {
     editDialog.value?.open({}).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -202,11 +200,11 @@ function edit(preset: ImportPresetBasicInfo): void {
         id: preset.id
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -226,7 +224,7 @@ function remove(preset: ImportPresetBasicInfo): void {
             presetRemoving.value[preset.id] = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -246,7 +244,7 @@ function saveSortResult(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -259,7 +257,7 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     const moveEvent = event.moved;
 
     if (!moveEvent.element || !moveEvent.element.id) {
-        snackbar.value?.showMessage('Unable to move import preset');
+        desktopPageStore.addToast('Unable to move import preset');
         return;
     }
 
@@ -270,7 +268,7 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     }).then(() => {
         displayOrderModified.value = true;
     }).catch(error => {
-        snackbar.value?.showError(error);
+        desktopPageStore.addErrorToast(error);
     });
 }
 

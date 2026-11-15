@@ -50,19 +50,16 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type NameValue, values } from '@/core/base.ts';
 import { IconType } from '@/core/icon.ts';
@@ -85,8 +82,6 @@ import {
 
 export type BatchCreateDialogDataType = 'expenseCategory' | 'incomeCategory' | 'transferCategory' | 'tag';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 interface BatchCreateDialogResponse {
     sourceTargetMap: Record<string, string>;
 }
@@ -95,8 +90,7 @@ const { tt } = useI18n();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 let resolveFunc: ((response: BatchCreateDialogResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -275,14 +269,14 @@ function confirm(): void {
                 submitting.value = false;
 
                 if (!error.processed) {
-                    snackbar.value?.showError(error);
+                    desktopPageStore.addErrorToast(error);
                 }
             });
         }).catch(error => {
             submitting.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     } else if (type.value === 'tag') {
@@ -309,14 +303,14 @@ function confirm(): void {
                 submitting.value = false;
 
                 if (!error.processed) {
-                    snackbar.value?.showError(error);
+                    desktopPageStore.addErrorToast(error);
                 }
             });
         }).catch(error => {
             submitting.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     }

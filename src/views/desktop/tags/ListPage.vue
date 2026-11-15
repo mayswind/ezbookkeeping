@@ -334,14 +334,12 @@
                    :default-title="tt('Rename Tag Group')"
                    :label="tt('Tag Group Name')" :placeholder="tt('Tag Group Name')" />
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import TagGroupChangeDisplayOrderDialog from './dialog/TagGroupChangeDisplayOrderDialog.vue';
 import RenameDialog from '@/components/desktop/RenameDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -350,6 +348,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useTagListPageBase } from '@/views/base/tags/TagListPageBase.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { DEFAULT_TAG_GROUP_ID } from '@/consts/tag.ts';
 
@@ -382,7 +381,6 @@ import {
 type TagGroupChangeDisplayOrderDialogType = InstanceType<typeof TagGroupChangeDisplayOrderDialog>;
 type RenameDialogType = InstanceType<typeof RenameDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const { lgAndUp } = useDisplay();
 
@@ -406,12 +404,12 @@ const {
 } = useTagListPageBase();
 
 const transactionTagsStore = useTransactionTagsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const newTagRow = useTemplateRef<HTMLElement>('newTagRow');
 const tagGroupChangeDisplayOrderDialog = useTemplateRef<TagGroupChangeDisplayOrderDialogType>('tagGroupChangeDisplayOrderDialog');
 const renameDialog = useTemplateRef<RenameDialogType>('renameDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const updating = ref<boolean>(false);
 const activeTab = ref<string>('tagListPage');
@@ -443,7 +441,7 @@ function reload(): void {
         loading.value = false;
         displayOrderModified.value = false;
 
-        snackbar.value?.showMessage('Tag list has been updated');
+        desktopPageStore.addToast('Tag list has been updated');
     }).catch(error => {
         loading.value = false;
 
@@ -452,7 +450,7 @@ function reload(): void {
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -478,7 +476,7 @@ function addTagGroup(): void {
             updating.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -488,7 +486,7 @@ function renameTagGroup(): void {
     const tagGroup = transactionTagsStore.allTransactionTagGroupsMap[activeTagGroupId.value];
 
     if (!tagGroup) {
-        snackbar.value?.showMessage('Unable to rename this tag group');
+        desktopPageStore.addToast('Unable to rename this tag group');
         return;
     }
 
@@ -506,7 +504,7 @@ function renameTagGroup(): void {
             updating.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -532,7 +530,7 @@ function removeTagGroup(): void {
     const tagGroup = transactionTagsStore.allTransactionTagGroupsMap[activeTagGroupId.value];
 
     if (!tagGroup) {
-        snackbar.value?.showMessage('Unable to delete this tag group');
+        desktopPageStore.addToast('Unable to delete this tag group');
         return;
     }
 
@@ -559,7 +557,7 @@ function removeTagGroup(): void {
             updating.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -573,7 +571,7 @@ function showMoveTagDialog(tag: TransactionTag): void {
 
 function moveTagToGroup(tag: TransactionTag | null, targetTagGroupId: string): void {
     if (!tag) {
-        snackbar.value?.showMessage('Unable to move tag');
+        desktopPageStore.addToast('Unable to move tag');
         return;
     }
 
@@ -593,7 +591,7 @@ function moveTagToGroup(tag: TransactionTag | null, targetTagGroupId: string): v
         tagMoving.value[tag.id] = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 
@@ -621,7 +619,7 @@ function save(tag: TransactionTag): void {
         tagUpdating.value[tag.id || ''] = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -657,7 +655,7 @@ function saveSortResult(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -677,7 +675,7 @@ function hide(tag: TransactionTag, hidden: boolean): void {
         tagHiding.value[tag.id] = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -697,7 +695,7 @@ function remove(tag: TransactionTag): void {
             tagRemoving.value[tag.id] = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -711,7 +709,7 @@ function onMove(event: { moved: { element: { id: string }; oldIndex: number; new
     const moveEvent = event.moved;
 
     if (!moveEvent.element || !moveEvent.element.id) {
-        snackbar.value?.showMessage('Unable to move tag');
+        desktopPageStore.addToast('Unable to move tag');
         return;
     }
 
@@ -722,7 +720,7 @@ function onMove(event: { moved: { element: { id: string }; oldIndex: number; new
     }).then(() => {
         displayOrderModified.value = true;
     }).catch(error => {
-        snackbar.value?.showError(error);
+        desktopPageStore.addErrorToast(error);
     });
 }
 
@@ -734,7 +732,7 @@ transactionTagsStore.loadAllTags({
     loading.value = false;
 
     if (!error.processed) {
-        snackbar.value?.showError(error);
+        desktopPageStore.addErrorToast(error);
     }
 });
 

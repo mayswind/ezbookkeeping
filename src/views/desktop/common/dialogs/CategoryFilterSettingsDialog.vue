@@ -115,14 +115,11 @@
             </template>
         </one-column-dialog-layout>
 
-        <snack-bar ref="snackbar" />
     </v-dialog>
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import {
@@ -131,6 +128,7 @@ import {
 } from '@/views/base/settings/CategoryFilterSettingPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -155,8 +153,6 @@ import {
     mdiEyeOffOutline,
     mdiDotsVertical
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     type: CategoryFilterType;
@@ -191,8 +187,7 @@ const {
 } = useCategoryFilterSettingPageBase(props.type, props.categoryTypes);
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const expandCategoryTypes = ref<CategoryType[]>([
     CategoryType.Income,
@@ -212,13 +207,13 @@ function init(): void {
         loading.value = false;
 
         if (!loadFilterCategoryIds(props.selectedCategoryIds)) {
-            snackbar.value?.showError('Parameter Invalid');
+            desktopPageStore.addErrorToast('Parameter Invalid');
         }
     }).catch(error => {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

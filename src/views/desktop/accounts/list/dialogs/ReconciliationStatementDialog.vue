@@ -313,14 +313,11 @@
 
     <amount-input-dialog ref="amountInputDialog" />
     <edit-dialog ref="editDialog" :type="TransactionEditPageType.Transaction" />
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import OneColumnDialogLayout from '@/components/desktop/OneColumnDialogLayout.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import AmountInputDialog from '@/components/desktop/AmountInputDialog.vue';
 import EditDialog from '@/views/desktop/transactions/list/dialogs/EditDialog.vue';
 import { TransactionEditPageType } from '@/views/base/transactions/TransactionEditPageBase.ts';
@@ -333,6 +330,7 @@ import { useReconciliationStatementPageBase } from '@/views/base/accounts/Reconc
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { NameNumeralValue } from '@/core/base.ts';
 import { type BigDecimal, DecimalSeparator } from '@/core/numeral.ts';
@@ -378,7 +376,6 @@ import {
 } from '@mdi/js';
 
 type OneColumnDialogLayoutType = InstanceType<typeof OneColumnDialogLayout>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 type AmountInputDialogType = InstanceType<typeof AmountInputDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
@@ -443,6 +440,7 @@ const {
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionsStore = useTransactionsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const chartTypeIconMap = {
     [AccountBalanceTrendChartType.Column.type]: mdiChartBar,
@@ -470,7 +468,6 @@ let rejectFunc: ((reason?: unknown) => void) | null = null;
 
 const dialogLayout = useTemplateRef<OneColumnDialogLayoutType>('dialogLayout');
 const amountInputDialog = useTemplateRef<AmountInputDialogType>('amountInputDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const showState = ref<boolean>(false);
@@ -575,9 +572,9 @@ function reload(force: boolean): void {
     }).then(result => {
         if (force) {
             if (isReconciliationStatementsResponseEquals(result)) {
-                snackbar.value?.showMessage('Data is up to date');
+                desktopPageStore.addToast('Data is up to date');
             } else {
-                snackbar.value?.showMessage('Data has been updated');
+                desktopPageStore.addToast('Data has been updated');
             }
         }
 
@@ -587,7 +584,7 @@ function reload(force: boolean): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     })
 }
@@ -597,13 +594,13 @@ function addTransaction(): void {
         accountId: accountId.value
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         reload(false);
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -616,7 +613,7 @@ function updateClosingBalance(): void {
     }
 
     if (!currentClosingBalance.between(TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT)) {
-        snackbar.value?.showError('Numeric Overflow');
+        desktopPageStore.addErrorToast('Numeric Overflow');
         return;
     }
 
@@ -650,7 +647,7 @@ function updateClosingBalance(): void {
         }
 
         if (!newTransactionAmount.between(TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT)) {
-            snackbar.value?.showError('Numeric Overflow');
+            desktopPageStore.addErrorToast('Numeric Overflow');
             return;
         }
 
@@ -662,13 +659,13 @@ function updateClosingBalance(): void {
             noTransactionDraft: true
         }).then(result => {
             if (result && result.message) {
-                snackbar.value?.showMessage(result.message);
+                desktopPageStore.addToast(result.message);
             }
 
             reload(false);
         }).catch(error => {
             if (error) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -693,13 +690,13 @@ function showTransaction(transaction: TransactionReconciliationStatementResponse
         currentTransaction: Transaction.of(transaction)
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         reload(false);
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -714,13 +711,13 @@ function updateLastReconciledTime(): void {
 
     accountsStore.updateAccountLastReconciledTime(accountId.value, reconciledTime).then(() => {
         updatingLastReconciledTime.value = false;
-        snackbar.value?.showMessage('Last reconciled time have been updated');
+        desktopPageStore.addToast('Last reconciled time have been updated');
         emit('update:last-reconciled-time', reconciledTime);
     }).catch(error => {
         updatingLastReconciledTime.value = false;
 
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

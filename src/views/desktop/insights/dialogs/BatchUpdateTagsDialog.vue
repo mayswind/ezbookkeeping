@@ -38,27 +38,22 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import {computed, ref, useTemplateRef} from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import {
     mdiRefresh
 } from '@mdi/js'
 
 export type BatchUpdateTagsOperationType = 'add' | 'remove' | 'clear';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const {
     tt,
@@ -67,8 +62,7 @@ const {
 
 const transactionTagsStore = useTransactionTagsStore();
 const transactionsStore = useTransactionsStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(false);
@@ -114,7 +108,7 @@ function reload(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -134,7 +128,7 @@ function confirm(): void {
             submitting.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     } else if (type.value === 'remove') {
@@ -151,7 +145,7 @@ function confirm(): void {
             submitting.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     } else if (type.value === 'clear') {
@@ -167,7 +161,7 @@ function confirm(): void {
             submitting.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     }

@@ -58,13 +58,10 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import NumberInput from '@/components/desktop/NumberInput.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, useTemplateRef } from 'vue';
 
@@ -72,6 +69,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
 import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import {
     USER_CUSTOM_EXCHANGE_RATE_MAX_VALUE,
@@ -87,7 +85,6 @@ interface UserCustomExchangeRateUpdateResponse {
 }
 
 type NumberInputType = InstanceType<typeof NumberInput>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 defineProps<{
     show?: boolean;
@@ -97,6 +94,7 @@ const { tt } = useI18n();
 
 const userStore = useUserStore();
 const exchangeRatesStore = useExchangeRatesStore();
+const desktopPageStore = useDesktopPageStore();
 
 const showState = ref<boolean>(false);
 const submitting = ref<boolean>(false);
@@ -106,7 +104,6 @@ const currency = ref<string>(userStore.currentUserDefaultCurrency);
 const targetCurrencyAmount = ref<number>(1);
 
 const targetAmountInput = useTemplateRef<NumberInputType>('targetAmountInput');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 let resolveFunc: ((response: UserCustomExchangeRateUpdateResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -141,7 +138,7 @@ function confirm(): void {
         submitting.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

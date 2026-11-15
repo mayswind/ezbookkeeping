@@ -124,18 +124,15 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
 import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTokensStore } from '@/stores/token.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { NameAndDisplayName } from '@/core/base.ts';
 import { ALL_MCP_TOOL_NAMES, DEFAULT_ENABLED_MCP_TOOL_NAMES } from '@/consts/mcp.ts';
@@ -144,14 +141,12 @@ import { type TokenGenerateAPIResponse, type TokenGenerateMCPResponse } from '@/
 import { isAPITokenEnabled, isMCPServerEnabled } from '@/lib/server_settings.ts';
 import { copyTextToClipboard } from '@/lib/ui/common.ts';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const { tt, getAllMCPTools, formatNumberToLocalizedNumerals } = useI18n();
 
 const tokensStore = useTokensStore();
+const desktopPageStore = useDesktopPageStore();
 
 const buttonContainer = useTemplateRef<HTMLElement>('buttonContainer');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 let resolveFunc: (() => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -250,7 +245,7 @@ function generateToken(): void {
         generating.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -264,7 +259,7 @@ function copy(): void {
         copyTextToClipboard(generatedToken.value, buttonContainer.value);
     }
 
-    snackbar.value?.showMessage('Data copied');
+    desktopPageStore.addToast('Data copied');
 }
 
 function cancel(): void {

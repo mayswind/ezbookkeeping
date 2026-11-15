@@ -215,13 +215,11 @@
                    :default-title="tt('Rename Exploration')"
                    :label="tt('Exploration Name')" :placeholder="tt('Exploration Name')" />
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import RenameDialog from '@/components/desktop/RenameDialog.vue';
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import DataExportDialog from '@/components/desktop/DataExportDialog.vue';
 import JsonImportDialog from '@/components/desktop/JsonImportDialog.vue';
 import JsonExportDialog from '@/components/desktop/JsonExportDialog.vue';
@@ -243,6 +241,7 @@ import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
 import { type TransactionExplorerPartialFilter, type TransactionExplorerFilter, useExplorersStore } from '@/stores/explorer.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { type WeekDayValue, type LocalizedDateRange, DateRangeScene, DateRange } from '@/core/datetime.ts';
@@ -300,7 +299,6 @@ type ExplorerPageTabType = 'query' | 'table' | 'chart';
 
 type RenameDialogType = InstanceType<typeof RenameDialog>;
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 type DataExportDialogType = InstanceType<typeof DataExportDialog>;
 type JsonImportDialogType = InstanceType<typeof JsonImportDialog>;
 type JsonExportDialogType = InstanceType<typeof JsonExportDialog>;
@@ -323,6 +321,7 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
 const explorersStore = useExplorersStore();
+const desktopPageStore = useDesktopPageStore();
 
 const timezoneTypeIconMap = {
     [TimezoneTypeForStatistics.ApplicationTimezone.type]: mdiHomeClockOutline,
@@ -331,7 +330,6 @@ const timezoneTypeIconMap = {
 
 const renameDialog = useTemplateRef<RenameDialogType>('renameDialog');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const dataExportDialog = useTemplateRef<DataExportDialogType>('dataExportDialog');
 const queryImportDialog = useTemplateRef<JsonImportDialogType>('queryImportDialog');
 const queryExportDialog = useTemplateRef<JsonExportDialogType>('queryExportDialog');
@@ -518,7 +516,7 @@ function init(initProps: InsightsExplorerProps): void {
         initing.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -532,13 +530,13 @@ function reload(force: boolean): Promise<unknown> | null {
         loading.value = false;
 
         if (force) {
-            snackbar.value?.showMessage('Data has been updated');
+            desktopPageStore.addToast('Data has been updated');
         }
     }).catch(error => {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -579,7 +577,7 @@ function loadExploration(explorationId: string, force?: boolean, init?: boolean)
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -643,7 +641,7 @@ function doSaveExploration(saveAs?: boolean): Promise<unknown> {
         updating.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
 
             if (error.error && error.error.errorCode === KnownErrorCode.NothingWillBeUpdated) {
                 initExploration.value = InsightsExplorer.of(currentExploration.value);
@@ -686,7 +684,7 @@ function hideExploration(hidden: boolean): void {
         updating.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -708,7 +706,7 @@ function removeExploration(): void {
             updating.value = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -818,12 +816,12 @@ function onImportQueries(data: string): boolean {
         const queryItems = JSON.parse(data);
 
         if (!isArray(queryItems)) {
-            snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
+            desktopPageStore.addErrorToast('Queries import failed. Please make sure the queries are valid and try again.');
             return false;
         }
 
         if (!queryItems || queryItems.length < 1) {
-            snackbar.value?.showError('No valid queries found in the input. Please make sure the queries are valid and try again.');
+            desktopPageStore.addErrorToast('No valid queries found in the input. Please make sure the queries are valid and try again.');
             return false;
         }
 
@@ -832,7 +830,7 @@ function onImportQueries(data: string): boolean {
 
         for (const queryItem of queryItems) {
             if (!isObject(queryItem)) {
-                snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
+                desktopPageStore.addErrorToast('Queries import failed. Please make sure the queries are valid and try again.');
                 return false;
             }
 
@@ -844,7 +842,7 @@ function onImportQueries(data: string): boolean {
                 const queryId = queryItem['id'];
 
                 if (!isTextualUUID(queryId)) {
-                    snackbar.value?.showMessage('format.misc.queryIdInvalidTip', { id: queryId });
+                    desktopPageStore.addToast('format.misc.queryIdInvalidTip', { id: queryId });
                     return false;
                 }
 
@@ -854,12 +852,12 @@ function onImportQueries(data: string): boolean {
             const query = TransactionExplorerQuery.parse(queryItem);
 
             if (!query) {
-                snackbar.value?.showMessage('format.misc.queryInvalidTip', { id: originalId });
+                desktopPageStore.addToast('format.misc.queryInvalidTip', { id: originalId });
                 return false;
             }
 
             if (queryIds[query.id]) {
-                snackbar.value?.showMessage('format.misc.queryIdDuplicatedTip', { id: query.id });
+                desktopPageStore.addToast('format.misc.queryIdDuplicatedTip', { id: query.id });
                 return false;
             }
 
@@ -868,7 +866,7 @@ function onImportQueries(data: string): boolean {
         }
 
         if (!queries || queries.length < 1) {
-            snackbar.value?.showError('No valid queries found in the input. Please make sure the queries are valid and try again.');
+            desktopPageStore.addErrorToast('No valid queries found in the input. Please make sure the queries are valid and try again.');
             return false;
         }
 
@@ -878,7 +876,7 @@ function onImportQueries(data: string): boolean {
         return true;
     } catch (error) {
         logger.error('Failed to import queries', error);
-        snackbar.value?.showError('Queries import failed. Please make sure the queries are valid and try again.');
+        desktopPageStore.addErrorToast('Queries import failed. Please make sure the queries are valid and try again.');
         return false;
     }
 }
@@ -889,13 +887,13 @@ function onShowTransaction(transaction: TransactionInsightDataItem): void {
         currentTransaction: Transaction.of(transaction)
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         reload(false);
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -905,7 +903,7 @@ function onUpdateTransactions(): void {
 }
 
 function onShowDateRangeError(message: string): void {
-    snackbar.value?.showError(message);
+    desktopPageStore.addErrorToast(message);
 }
 
 onBeforeRouteUpdate((to) => {

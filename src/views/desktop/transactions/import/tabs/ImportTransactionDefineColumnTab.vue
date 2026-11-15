@@ -224,17 +224,16 @@
             </div>
         </div>
     </div>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type NameValue, type NameNumeralValue, type TypeAndDisplayName, itemAndIndex, keys, entries } from '@/core/base.ts';
 import { KnownAmountFormat } from '@/core/numeral.ts';
@@ -266,8 +265,6 @@ import {
     mdiFolderOpenOutline,
     mdiContentSaveOutline
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 interface ImportTransactionDefineColumnResult {
     includeHeader: boolean;
@@ -305,7 +302,7 @@ const {
     getTablePageOptions
 } = useI18n();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const currentPage = ref<number>(1);
 const countPerPage = ref<number>(10);
@@ -575,12 +572,12 @@ function generateResult(): ImportTransactionDefineColumnResult | undefined {
         || !isNumber(columnMapping[ImportTransactionColumnType.TransactionTime.type])
         || !isNumber(columnMapping[ImportTransactionColumnType.TransactionType.type])
         || !isNumber(columnMapping[ImportTransactionColumnType.Amount.type])) {
-        snackbar.value?.showError('Missing transaction time, transaction type, or amount column mapping');
+        desktopPageStore.addErrorToast('Missing transaction time, transaction type, or amount column mapping');
         return undefined;
     }
 
     if (!transactionTypeMapping || isObjectEmpty(transactionTypeMapping)) {
-        snackbar.value?.showError('Transaction type mapping is not set');
+        desktopPageStore.addErrorToast('Transaction type mapping is not set');
         return undefined;
     }
 
@@ -606,12 +603,12 @@ function generateResult(): ImportTransactionDefineColumnResult | undefined {
     }
 
     if (!timeFormat) {
-        snackbar.value?.showError('Transaction time format is not set');
+        desktopPageStore.addErrorToast('Transaction time format is not set');
         return undefined;
     }
 
     if (!amountDecimalSeparator) {
-        snackbar.value?.showError('Transaction amount format is not set');
+        desktopPageStore.addErrorToast('Transaction amount format is not set');
         return undefined;
     }
 
@@ -654,11 +651,11 @@ function loadColumnMappingFile(): void {
         const result = loadColumnMapping(content);
 
         if (!result) {
-            snackbar.value?.showError('Data mapping file is invalid');
+            desktopPageStore.addErrorToast('Data mapping file is invalid');
         }
     }).catch(error => {
         logger.error('Failed to open data mapping file', error);
-        snackbar.value?.showError('Data mapping file is invalid');
+        desktopPageStore.addErrorToast('Data mapping file is invalid');
     });
 }
 

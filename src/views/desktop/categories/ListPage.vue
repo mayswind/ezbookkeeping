@@ -190,14 +190,12 @@
                    @category:saved="onPresetCategorySaved" />
 
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import { VNavigationDrawer } from 'vuetify/components/VNavigationDrawer';
 
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 import PresetDialog from './list/dialogs/PresetDialog.vue';
 
@@ -208,6 +206,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPageBase.ts';
 
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
@@ -231,7 +230,6 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
 const { lgAndUp } = useDisplay();
@@ -239,10 +237,10 @@ const { tt } = useI18n();
 const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
+const desktopPageStore = useDesktopPageStore();
 
 const navbar = useTemplateRef<VNavigationDrawer>('navbar');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const activeCategoryType = ref<CategoryType>(CategoryType.Expense);
@@ -334,7 +332,7 @@ function reload(force: boolean): void {
         displayOrderModified.value = false;
 
         if (force) {
-            snackbar.value?.showMessage('Category list has been updated');
+            desktopPageStore.addToast('Category list has been updated');
         }
 
         updateCardMinHeight();
@@ -346,7 +344,7 @@ function reload(force: boolean): void {
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -359,13 +357,13 @@ function add(): void {
         icon: currentPrimaryCategory.value?.icon
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         updateCardMinHeight();
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -376,7 +374,7 @@ function edit(category: TransactionCategory): void {
         currentCategory: category
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         if (transactionCategoriesStore.transactionCategoryListStateInvalid) {
@@ -386,7 +384,7 @@ function edit(category: TransactionCategory): void {
         updateCardMinHeight();
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -408,7 +406,7 @@ function hide(category: TransactionCategory, hidden: boolean): void {
         categoryHiding.value[category.id] = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -430,7 +428,7 @@ function remove(category: TransactionCategory): void {
             categoryRemoving.value[category.id] = false;
 
             if (!error.processed) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -453,7 +451,7 @@ function saveSortResult(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -466,7 +464,7 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     const moveEvent = event.moved;
 
     if (!moveEvent.element || !moveEvent.element.id) {
-        snackbar.value?.showMessage('Unable to move category');
+        desktopPageStore.addToast('Unable to move category');
         return;
     }
 
@@ -477,13 +475,13 @@ function onMove(event: { moved: { element: { id: string }, oldIndex: number, new
     }).then(() => {
         displayOrderModified.value = true;
     }).catch(error => {
-        snackbar.value?.showError(error);
+        desktopPageStore.addErrorToast(error);
     });
 }
 
 function onPresetCategorySaved(e: { message: string }): void {
     if (e && e.message) {
-        snackbar.value?.showMessage(e.message);
+        desktopPageStore.addToast(e.message);
         reload(false);
     }
 }

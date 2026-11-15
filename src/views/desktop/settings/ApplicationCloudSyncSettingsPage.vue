@@ -123,19 +123,16 @@
             </v-card>
         </v-col>
     </v-row>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useAppCloudSyncBase } from '@/views/base/settings/AppCloudSyncPageBase.ts';
 
 import { useUserStore } from '@/stores/user.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import {
     mdiDotsVertical,
@@ -145,8 +142,6 @@ import {
     mdiCellphone,
     mdiMonitor,
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const { tt } = useI18n();
 const {
@@ -169,8 +164,7 @@ const {
 } = useAppCloudSyncBase();
 
 const userStore = useUserStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const openedPanel = ref<string[]>(['synchronizedSettings']);
 
@@ -184,7 +178,7 @@ function init(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -196,15 +190,15 @@ function enable(update: boolean): void {
         enabling.value = false;
 
         if (!update) {
-            snackbar.value?.showMessage('Settings sync has been enabled');
+            desktopPageStore.addToast('Settings sync has been enabled');
         } else {
-            snackbar.value?.showMessage('Synchronized settings have been updated');
+            desktopPageStore.addToast('Synchronized settings have been updated');
         }
     }).catch(error => {
         enabling.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -215,12 +209,12 @@ function disable(): void {
     userStore.disableUserApplicationCloudSettings().then(() => {
         enabledApplicationCloudSettings.value = {};
         disabling.value = false;
-        snackbar.value?.showMessage('Settings sync has been disabled');
+        desktopPageStore.addToast('Settings sync has been disabled');
     }).catch(error => {
         disabling.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

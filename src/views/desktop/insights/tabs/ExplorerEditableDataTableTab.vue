@@ -213,11 +213,9 @@
     <batch-update-account-dialog ref="batchUpdateAccountDialog" />
     <batch-update-tags-dialog ref="batchUpdateTagsDialog" />
     <batch-delete-dialog ref="batchDeleteDialog" />
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
 import BatchUpdateCategoryDialog from '@/views/desktop/insights/dialogs/BatchUpdateCategoryDialog.vue';
 import BatchUpdateAccountDialog from '@/views/desktop/insights/dialogs/BatchUpdateAccountDialog.vue';
@@ -227,6 +225,8 @@ import BatchDeleteDialog from '@/views/desktop/insights/dialogs/BatchDeleteDialo
 import { ref, computed, useTemplateRef, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 import { useExplorerDataTablePageBase } from '@/views/base/explorer/ExplorerDataTablePageBase.ts';
 
 import { keys } from '@/core/base.ts';
@@ -249,7 +249,6 @@ import {
     mdiDeleteOutline
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
 type BatchUpdateCategoryDialogType = InstanceType<typeof BatchUpdateCategoryDialog>;
 type BatchUpdateAccountDialogType = InstanceType<typeof BatchUpdateAccountDialog>;
 type BatchUpdateTagsDialogType = InstanceType<typeof BatchUpdateTagsDialog>;
@@ -267,7 +266,7 @@ const emit = defineEmits<{
     (e: 'update:transactions'): void;
 }>();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 const batchUpdateCategoryDialog = useTemplateRef<BatchUpdateCategoryDialogType>('batchUpdateCategoryDialog');
 const batchUpdateAccountDialog = useTemplateRef<BatchUpdateAccountDialogType>('batchUpdateAccountDialog');
 const batchUpdateTagsDialog = useTemplateRef<BatchUpdateTagsDialogType>('batchUpdateTagsDialog');
@@ -360,7 +359,7 @@ function batchUpdateTransactionCategories(type: CategoryType): void {
         updateIds: getAllSelectedTransactionIds()
     }).then(updatedCount => {
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
@@ -368,7 +367,7 @@ function batchUpdateTransactionCategories(type: CategoryType): void {
         emit('update:transactions');
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -379,7 +378,7 @@ function batchUpdateTransactionAccounts(isDestinationAccount: boolean): void {
         updateIds: getAllSelectedTransactionIds()
     }).then(updatedCount => {
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
@@ -387,7 +386,7 @@ function batchUpdateTransactionAccounts(isDestinationAccount: boolean): void {
         emit('update:transactions');
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -398,7 +397,7 @@ function batchUpdateTransactionTags(type: BatchUpdateTagsOperationType): void {
         updateIds: getAllSelectedTransactionIds()
     }).then(updatedCount => {
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveUpdatedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveUpdatedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }
@@ -406,7 +405,7 @@ function batchUpdateTransactionTags(type: BatchUpdateTagsOperationType): void {
         emit('update:transactions');
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -416,7 +415,7 @@ function batchDeleteTransactions(): void {
         updateIds: getAllSelectedTransactionIds()
     }).then(updatedCount => {
         if (updatedCount > 0) {
-            snackbar.value?.showMessage('format.misc.youHaveDeletedTransactions', {
+            desktopPageStore.addToast('format.misc.youHaveDeletedTransactions', {
                 count: formatNumberToLocalizedNumerals(updatedCount)
             });
         }

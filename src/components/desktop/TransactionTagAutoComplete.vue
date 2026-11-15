@@ -72,16 +72,13 @@
             </v-list>
         </template>
     </component>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import { VAutocomplete } from 'vuetify/components/VAutocomplete';
 import { VSelect } from 'vuetify/components/VSelect';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import {
@@ -91,6 +88,7 @@ import {
 } from '@/components/base/TransactionTagSelectionBase.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { NormalizedText } from '@/core/text.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
@@ -100,8 +98,6 @@ import type { ComponentDensity, InputVariant } from '@/lib/ui/desktop.ts';
 import {
     mdiPound
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 interface DesktopTransactionTagSelectionProps extends CommonTransactionTagSelectionProps {
     density?: ComponentDensity;
@@ -128,8 +124,7 @@ const {
 } = useTransactionTagSelectionBase(props, false);
 
 const transactionTagsStore = useTransactionTagsStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const menuOpenState = ref<boolean>(false);
 const componentType = computed<typeof VAutocomplete | typeof VSelect>(() => props.selectOnly ? VSelect : VAutocomplete);
@@ -151,7 +146,7 @@ function saveNewTag(tagName: string): void {
         emit('tag:saving', false, tagName);
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

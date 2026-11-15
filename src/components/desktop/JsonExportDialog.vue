@@ -25,16 +25,15 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
 import { ref, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
+
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
+
 import { KnownFileType } from '@/core/file.ts';
 
 import { copyTextToClipboard, startDownloadFile } from '@/lib/ui/common.ts';
@@ -48,8 +47,6 @@ export interface JsonExportDialogOptions {
     json: string;
 }
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const props = defineProps<{
     title: string;
     fileName: string;
@@ -57,8 +54,9 @@ const props = defineProps<{
 
 const { tt } = useI18n();
 
+const desktopPageStore = useDesktopPageStore();
+
 const buttonContainer = useTemplateRef<HTMLElement>('buttonContainer');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 const json = ref<string>('');
@@ -70,7 +68,7 @@ function open(options: JsonExportDialogOptions): void {
 
 function copy(): void {
     copyTextToClipboard(json.value, buttonContainer.value);
-    snackbar.value?.showMessage('Data copied');
+    desktopPageStore.addToast('Data copied');
 }
 
 function save(): void {

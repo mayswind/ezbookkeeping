@@ -92,18 +92,15 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
 import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useUserStore } from '@/stores/user.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type PartialRecord, itemAndIndex } from '@/core/base.ts';
 import { type BigDecimal, DecimalSeparator } from '@/core/numeral.ts';
@@ -130,14 +127,12 @@ import {
     mdiContentSaveOutline
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const { tt, getCurrentDecimalSeparator } = useI18n();
 
 const userStore = useUserStore();
+const desktopPageStore = useDesktopPageStore();
 
 const buttonContainer = useTemplateRef<HTMLElement>('buttonContainer');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 const headers = ref<string[]>([]);
@@ -303,7 +298,7 @@ function open(options: { headers: string[], data: string[][], supportedMermaidCh
 
 function copy(): void {
     copyTextToClipboard(exportedData.value, buttonContainer.value);
-    snackbar.value?.showMessage('Data copied');
+    desktopPageStore.addToast('Data copied');
 }
 
 function save(): void {

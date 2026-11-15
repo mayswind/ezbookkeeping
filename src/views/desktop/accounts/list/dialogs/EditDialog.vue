@@ -212,12 +212,10 @@
     </v-dialog>
 
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { ref, computed, useTemplateRef, watch } from 'vue';
 
@@ -226,6 +224,7 @@ import { useAccountEditPageBase } from '@/views/base/accounts/AccountEditPageBas
 
 import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { itemAndIndex } from '@/core/base.ts';
 import { AccountType, AccountCategory } from '@/core/account.ts';
@@ -249,7 +248,6 @@ interface AccountEditResponse {
 }
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const { tt } = useI18n();
 const {
@@ -280,9 +278,9 @@ const {
 
 const userStore = useUserStore();
 const accountsStore = useAccountsStore();
+const desktopPageStore = useDesktopPageStore();
 
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 let resolveFunc: ((value: AccountEditResponse) => void) | null = null;
 let rejectFunc: ((reason?: unknown) => void) | null = null;
@@ -380,7 +378,7 @@ function save(): void {
     const problemMessage = inputEmptyProblemMessage.value;
 
     if (problemMessage) {
-        snackbar.value?.showMessage(problemMessage);
+        desktopPageStore.addToast(problemMessage);
         return;
     }
 
@@ -406,7 +404,7 @@ function save(): void {
         submitting.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -431,7 +429,7 @@ function cancel(): void {
 }
 
 function onShowDateTimeError(error: string): void {
-    snackbar.value?.showError(error);
+    desktopPageStore.addErrorToast(error);
 }
 
 watch(() => account.value.type, (newValue) => {

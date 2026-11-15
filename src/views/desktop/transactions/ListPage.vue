@@ -717,14 +717,11 @@
     <transaction-tag-filter-settings-dialog type="transactionListCurrent"
                                             v-model:show="showFilterTagDialog"
                                             @settings:change="changeMultipleTagsFilter" />
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import { VMenu } from 'vuetify/components/VMenu';
 import PaginationButtons from '@/components/desktop/PaginationButtons.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 import BatchAddDialog from './list/dialogs/BatchAddDialog.vue';
 import AIImageRecognitionDialog from './list/dialogs/AIImageRecognitionDialog.vue';
@@ -852,7 +849,6 @@ interface TransactionListProps {
 
 const props = defineProps<TransactionListProps>();
 
-type SnackBarType = InstanceType<typeof SnackBar>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 type BatchAddDialogType = InstanceType<typeof BatchAddDialog>;
 type AIImageRecognitionDialogType = InstanceType<typeof AIImageRecognitionDialog>;
@@ -943,7 +939,6 @@ const amountFilterMenu = useTemplateRef<VMenu>('amountFilterMenu');
 const accountFilterMenu = useTemplateRef<VMenu>('accountFilterMenu');
 const tagFilterMenu = useTemplateRef<VMenu>('tagFilterMenu');
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 const batchAddDialog = useTemplateRef<BatchAddDialogType>('batchAddDialog');
 const aiImageRecognitionDialog = useTemplateRef<AIImageRecognitionDialogType>('aiImageRecognitionDialog');
@@ -1306,7 +1301,7 @@ function reload(force: boolean, init: boolean): void {
         }
 
         if (force) {
-            snackbar.value?.showMessage('Data has been updated');
+            desktopPageStore.addToast('Data has been updated');
         }
     }).catch(error => {
         loading.value = false;
@@ -1314,7 +1309,7 @@ function reload(force: boolean, init: boolean): void {
         totalCount.value = 1;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -1610,7 +1605,7 @@ function changeAmountFilter(filterType: string): void {
             amountFilter += ':' + currentAmountFilterValue1.value;
         } else if (amountCount === 2) {
             if (currentAmountFilterValue2.value < currentAmountFilterValue1.value) {
-                snackbar.value?.showMessage('Incorrect amount range');
+                desktopPageStore.addToast('Incorrect amount range');
                 return;
             }
 
@@ -1654,13 +1649,13 @@ function add(template?: TransactionTemplate, autoRecognizeClipboardText?: string
         autoRecognizeClipboardText: autoRecognizeClipboardText
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         reload(false, false);
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -1689,7 +1684,7 @@ function addMultiple(): void {
         }
     }).catch(error => {
         if (error && !error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -1727,13 +1722,13 @@ function addByRecognizingImage(): void {
             noTransactionDraft: true
         }).then(result => {
             if (result && result.message) {
-                snackbar.value?.showMessage(result.message);
+                desktopPageStore.addToast(result.message);
             }
 
             reload(false, false);
         }).catch(error => {
             if (error) {
-                snackbar.value?.showError(error);
+                desktopPageStore.addErrorToast(error);
             }
         });
     });
@@ -1744,7 +1739,7 @@ function importTransaction(): void {
         reload(false, false);
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -1776,7 +1771,7 @@ function exportTransactions(fileExtension: string): void {
         exportingData.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -1787,13 +1782,13 @@ function show(transaction: Transaction): void {
         currentTransaction: transaction
     }).then(result => {
         if (result && result.message) {
-            snackbar.value?.showMessage(result.message);
+            desktopPageStore.addToast(result.message);
         }
 
         reload(false, false);
     }).catch(error => {
         if (error) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -1858,7 +1853,7 @@ function scrollMenuToSelectedItem(menu: VMenu | null): void {
 }
 
 function onShowDateRangeError(message: string): void {
-    snackbar.value?.showError(message);
+    desktopPageStore.addErrorToast(message);
 }
 
 onBeforeRouteUpdate((to) => {

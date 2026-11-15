@@ -113,14 +113,11 @@
             </template>
         </one-column-dialog-layout>
 
-        <snack-bar ref="snackbar" />
     </v-dialog>
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import {
@@ -129,6 +126,7 @@ import {
 } from '@/views/base/settings/AccountFilterSettingPageBase.ts';
 
 import { useAccountsStore } from '@/stores/account.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { AccountType, AccountCategory } from '@/core/account.ts';
 import type { Account } from '@/models/account.ts';
@@ -153,8 +151,6 @@ import {
     mdiEyeOffOutline,
     mdiDotsVertical
 } from '@mdi/js';
-
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const props = defineProps<{
     type: AccountFilterType;
@@ -190,8 +186,7 @@ const {
 } = useAccountFilterSettingPageBase(props.type, computed(() => props.disableHiddenAccount));
 
 const accountsStore = useAccountsStore();
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
+const desktopPageStore = useDesktopPageStore();
 
 const expandAccountCategories = ref<number[]>(AccountCategory.values(customAccountCategoryOrder.value).map(category => category.type));
 
@@ -207,13 +202,13 @@ function init(): void {
         loading.value = false;
 
         if (!loadFilterAccountIds(props.selectedAccountIds)) {
-            snackbar.value?.showError('Parameter Invalid');
+            desktopPageStore.addErrorToast('Parameter Invalid');
         }
     }).catch(error => {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }

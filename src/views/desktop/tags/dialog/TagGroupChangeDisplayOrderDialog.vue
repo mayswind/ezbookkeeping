@@ -66,18 +66,15 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { type TransactionTagGroup } from '@/models/transaction_tag_group.ts';
 
@@ -87,15 +84,12 @@ import {
     mdiDrag
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 const { tt } = useI18n();
 
 const transactionTagsStore = useTransactionTagsStore();
+const desktopPageStore = useDesktopPageStore();
 
 let resolveFunc: (() => void) | null = null;
-
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 const showState = ref<boolean>(false);
 const loading = ref<boolean>(true);
@@ -117,7 +111,7 @@ function open(): Promise<void> {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 
@@ -135,7 +129,7 @@ function reload(): void {
         loading.value = false;
         displayOrderModified.value = false;
 
-        snackbar.value?.showMessage('Tag group list has been updated');
+        desktopPageStore.addToast('Tag group list has been updated');
     }).catch(error => {
         loading.value = false;
 
@@ -144,7 +138,7 @@ function reload(): void {
         }
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -163,7 +157,7 @@ function saveDisplayOrder(): void {
         loading.value = false;
 
         if (!error.processed) {
-            snackbar.value?.showError(error);
+            desktopPageStore.addErrorToast(error);
         }
     });
 }
@@ -185,7 +179,7 @@ function onMove(event: { moved: { element: { id: string }; oldIndex: number; new
     const moveEvent = event.moved;
 
     if (!moveEvent.element || !moveEvent.element.id) {
-        snackbar.value?.showMessage('Unable to move tag group');
+        desktopPageStore.addToast('Unable to move tag group');
         return;
     }
 
@@ -196,7 +190,7 @@ function onMove(event: { moved: { element: { id: string }; oldIndex: number; new
     }).then(() => {
         displayOrderModified.value = true;
     }).catch(error => {
-        snackbar.value?.showError(error);
+        desktopPageStore.addErrorToast(error);
     });
 }
 

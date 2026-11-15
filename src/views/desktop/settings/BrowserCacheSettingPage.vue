@@ -194,18 +194,18 @@
     </v-dialog>
 
     <confirm-dialog ref="confirmDialog"/>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
-import SnackBar from '@/components/desktop/SnackBar.vue';
 
 import { useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useAppBrowserCacheSettingPageBase } from '@/views/base/settings/AppBrowserCacheSettingPageBase.ts';
+
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import { FileCacheType } from '@/core/cache.ts';
 
@@ -224,7 +224,6 @@ import {
 } from '@mdi/js';
 
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
-type SnackBarType = InstanceType<typeof SnackBar>;
 
 const {
     tt,
@@ -253,15 +252,16 @@ const {
     clearExchangeRatesDataCache
 } = useAppBrowserCacheSettingPageBase();
 
+const desktopPageStore = useDesktopPageStore();
+
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 
 function clearFileCache(): void {
     clearSelectedFileCaches().then(() => {
-        snackbar.value?.showMessage('Cache has been cleared');
+        desktopPageStore.addToast('Cache has been cleared');
     }).catch(error => {
         logger.error('failed to clear browser cache', error);
-        snackbar.value?.showMessage('Unable to clear cache');
+        desktopPageStore.addToast('Unable to clear cache');
     });
 }
 

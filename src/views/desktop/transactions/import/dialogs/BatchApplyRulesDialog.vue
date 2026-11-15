@@ -257,12 +257,9 @@
             </template>
         </one-column-dialog-layout>
     </v-dialog>
-    <snack-bar ref="snackbar" />
 </template>
 
 <script setup lang="ts">
-import SnackBar from '@/components/desktop/SnackBar.vue';
-
 import { ref, computed, useTemplateRef, nextTick } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
@@ -274,6 +271,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
+import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
 import type { GenericNameValue, NameValue, NameNumeralValue, TypeAndDisplayName } from '@/core/base.ts';
 import type { LocalizedTimezoneInfo } from '@/core/timezone.ts';
@@ -315,8 +313,6 @@ import {
     mdiMenuDown
 } from '@mdi/js';
 
-type SnackBarType = InstanceType<typeof SnackBar>;
-
 interface BatchApplyRulesDialogResponse {
     rules: ImportTransactionReplaceRule[];
     scope: ImportTransactionReplaceRuleApplyScope;
@@ -339,8 +335,8 @@ const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
+const desktopPageStore = useDesktopPageStore();
 
-const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const rulesContainer = useTemplateRef<HTMLDivElement>('rulesContainer');
 
 let resolveFunc: ((response: BatchApplyRulesDialogResponse) => void) | null = null;
@@ -605,14 +601,14 @@ function reload(force: boolean): void {
 
         // show info if all up to date
         if (force && isAllUpToDate) {
-            snackbar.value?.showMessage('Data is up to date');
+            desktopPageStore.addToast('Data is up to date');
             return;
         }
 
         // show error if any
         for (const result of results) {
             if (result.status === 'rejected' && !result.reason?.isUpToDate) {
-                snackbar.value?.showError(result.reason);
+                desktopPageStore.addErrorToast(result.reason);
                 return;
             }
         }
@@ -620,7 +616,7 @@ function reload(force: boolean): void {
         // show info if one of them updated
         for (const result of results) {
             if (force && result.status === 'fulfilled') {
-                snackbar.value?.showMessage('Data has been updated');
+                desktopPageStore.addToast('Data has been updated');
                 return;
             }
         }
@@ -736,11 +732,11 @@ function loadReplaceRuleFile(): void {
             rules.value = result.getRules();
         } else {
             logger.error('Failed to parse replace rule file');
-            snackbar.value?.showError('Replace rule file is invalid');
+            desktopPageStore.addErrorToast('Replace rule file is invalid');
         }
     }).catch(error => {
         logger.error('Failed to open replace rule file', error);
-        snackbar.value?.showError('Replace rule file is invalid');
+        desktopPageStore.addErrorToast('Replace rule file is invalid');
     });
 }
 

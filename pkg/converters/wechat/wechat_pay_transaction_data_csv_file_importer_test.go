@@ -302,6 +302,53 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "零钱", allNewTransactions[0].OriginalSourceAccountName)
 	assert.Equal(t, "", allNewTransactions[0].OriginalDestinationAccountName)
+
+	data6 := "微信支付账单明细,,,,\n" +
+		"微信昵称：[xxx],,,,\n" +
+		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
+		",,,,\n" +
+		"----------------------微信支付账单明细列表--------------------,,,,\n" +
+		"交易时间,交易类型,收/支,金额(元),支付方式,当前状态\n" +
+		"2024-09-04 23:59:59,零钱通转出-到招商银行(1234),/,￥0.02,零钱通,资金已到账\n"
+
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data6), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, "零钱通", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "招商银行(1234)", allNewTransactions[0].OriginalDestinationAccountName)
+	assert.Equal(t, "零钱通转出-到招商银行(1234)", allNewTransactions[0].OriginalCategoryName)
+
+	data7 := "微信支付账单明细,,,,\n" +
+		"微信昵称：[xxx],,,,\n" +
+		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
+		",,,,\n" +
+		"----------------------微信支付账单明细列表--------------------,,,,\n" +
+		"交易时间,交易类型,收/支,金额(元),支付方式,当前状态\n" +
+		"2024-09-05 23:59:59,转入零钱通-来自零钱,/,￥0.04,零钱,支付成功\n"
+
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data7), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, "零钱", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "零钱通", allNewTransactions[0].OriginalDestinationAccountName)
+	assert.Equal(t, "转入零钱通-来自零钱", allNewTransactions[0].OriginalCategoryName)
+
+	data8 := "微信支付账单明细,,,,\n" +
+		"微信昵称：[xxx],,,,\n" +
+		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
+		",,,,\n" +
+		"----------------------微信支付账单明细列表--------------------,,,,\n" +
+		"交易时间,交易类型,收/支,金额(元),支付方式,当前状态\n" +
+		"2024-09-06 23:59:59,转入零钱通-来自招商银行(1234),/,￥0.06,招商银行储蓄卡(1234),支付成功\n"
+
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(data8), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, "招商银行储蓄卡(1234)", allNewTransactions[0].OriginalSourceAccountName)
+	assert.Equal(t, "零钱通", allNewTransactions[0].OriginalDestinationAccountName)
 }
 
 func TestWeChatPayCsvFileImporterParseImportedData_ParseDescription(t *testing.T) {

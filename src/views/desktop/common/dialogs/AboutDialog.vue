@@ -199,9 +199,10 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 
-import type { LanguageOption } from '@/locales';
 import { useI18n } from '@/locales/helpers.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
+
+import type { LanguageOption } from '@/core/language.ts';
 
 import {
     mdiWebRefresh

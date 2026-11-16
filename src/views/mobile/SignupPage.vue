@@ -250,7 +250,6 @@
 import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
@@ -258,6 +257,7 @@ import { useSignupPageBase } from '@/views/base/SignupPageBase.ts';
 import { useRootStore } from '@/stores/index.ts';
 
 import type { TypeAndDisplayName } from '@/core/base.ts';
+import type { LanguageOption } from '@/core/language.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { type LocalizedPresetCategory } from '@/core/category.ts';
 

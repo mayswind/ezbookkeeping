@@ -159,11 +159,11 @@
 <script setup lang="ts">
 import { ref, computed, useTemplateRef, onMounted } from 'vue';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, isiOSHomeScreenMode, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useAboutPageBase } from '@/views/base/AboutPageBase.ts';
 
+import type { LanguageOption } from '@/core/language.ts';
 import { isWebAuthnCompletelySupported } from '@/lib/webauthn.ts';
 import { getStringifiedServerSetting } from '@/lib/server_settings.ts';
 

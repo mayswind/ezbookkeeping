@@ -584,7 +584,6 @@
 import { ref, computed } from 'vue';
 import type { Router } from 'framework7/types';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 import { useUserProfilePageBase } from '@/views/base/users/UserProfilePageBase.ts';
@@ -594,6 +593,7 @@ import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 
 import { TextDirection } from '@/core/text.ts';
+import type { LanguageOption } from '@/core/language.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
 import type { LocalizedCurrencyInfo } from '@/core/currency.ts';
 import { TransactionEditScopeType } from '@/core/transaction.ts';

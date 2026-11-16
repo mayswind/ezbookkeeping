@@ -13,9 +13,13 @@ import {
 } from '@/core/base.ts';
 
 import {
-    type LanguageMessages,
     type LanguageInfo,
-    type LanguageOption,
+    type LanguageMessages,
+    type LanguageMessagesCacheEntry,
+    type LanguageOption
+} from '@/core/language.ts';
+
+import {
     DEFAULT_LANGUAGE,
     DEFAULT_LANGUAGE_CONTENT,
     ALL_LANGUAGES
@@ -288,7 +292,8 @@ import {
 } from '@/lib/account.ts';
 
 import {
-    getLanguageMessagesCache,
+    getAllLanguageMessagesCache,
+    getLanguageMessagesFromCacheEntries,
     setLanguageMessagesCache,
     getSessionCurrentLanguageKey,
     setSessionCurrentLanguageKey,
@@ -323,16 +328,17 @@ export interface LocalizedError {
 
 const availableLanguageMessages: Record<string, LanguageMessages> = (function (): Record<string, LanguageMessages> {
     const ret: Record<string, LanguageMessages> = {};
+    const cachedLanguageMessages: LanguageMessagesCacheEntry[] = getAllLanguageMessagesCache();
 
     for (const languageKey of keys(ALL_LANGUAGES)) {
         if (languageKey === DEFAULT_LANGUAGE) {
             ret[DEFAULT_LANGUAGE] = DEFAULT_LANGUAGE_CONTENT;
         } else {
             try {
-                const languageMessages = getLanguageMessagesCache(languageKey);
+                const languageMessages: LanguageMessages | undefined = getLanguageMessagesFromCacheEntries(languageKey, cachedLanguageMessages);
 
                 if (languageMessages) {
-                    ret[languageKey] = JSON.parse(languageMessages);
+                    ret[languageKey] = languageMessages;
                 }
             } catch (ex) {
                 logger.warn(`failed to load cached language messages for ${languageKey}`, ex);
@@ -349,7 +355,7 @@ const loadedLanguages: Record<string, boolean> = {
 const allLanguageActualRtlSetting = reactive<Record<string, boolean>>({});
 const previewedLanguages = reactive<Record<string, boolean>>({});
 
-function parseLanguageMessages(json: string): LanguageMessages {
+function parsePreviewLanguageMessages(json: string): LanguageMessages {
     const value: unknown = JSON.parse(json.replace(/^\uFEFF/, ''));
 
     function validate(value: unknown, path: string): asserts value is LanguageMessages {
@@ -396,7 +402,7 @@ export function getI18nOptions(): I18nOptions {
 
                 if (preview && preview.data && preview.textDirection) {
                     try {
-                        messages[languageKey] = parseLanguageMessages(preview.data);
+                        messages[languageKey] = parsePreviewLanguageMessages(preview.data);
                         allLanguageActualRtlSetting[languageKey] = preview.textDirection === TextDirection.RTL;
                         previewedLanguages[languageKey] = true;
                     } catch (ex) {
@@ -413,7 +419,7 @@ export function getI18nOptions(): I18nOptions {
 export function getRtlLocales(): Record<string, boolean> {
     for (const [languageKey, languageInfo] of entries(ALL_LANGUAGES)) {
         if (!isDefined(allLanguageActualRtlSetting[languageKey])) {
-            allLanguageActualRtlSetting[languageKey] = languageInfo.textDirection === 'rtl';
+            allLanguageActualRtlSetting[languageKey] = languageInfo.textDirection === TextDirection.RTL;
         }
     }
 
@@ -1185,12 +1191,7 @@ export function useI18n() {
 
     function getCurrentLanguageTextDirection(): TextDirection {
         const currentLanguageInfo = getCurrentLanguageInfo();
-
-        if (currentLanguageInfo.textDirection === 'rtl') {
-            return TextDirection.RTL;
-        } else {
-            return TextDirection.LTR;
-        }
+        return currentLanguageInfo.textDirection;
     }
 
     function getCurrentLanguageMessagesJson(): string {
@@ -1895,7 +1896,7 @@ export function useI18n() {
         const languageInfo = ALL_LANGUAGES[languageKey];
 
         if (languageInfo && previewedLanguages[languageKey]) {
-            return { ...languageInfo, textDirection: allLanguageActualRtlSetting[languageKey] ? 'rtl' : 'ltr' };
+            return { ...languageInfo, textDirection: allLanguageActualRtlSetting[languageKey] ? TextDirection.RTL : TextDirection.LTR };
         }
 
         return languageInfo;
@@ -2799,20 +2800,13 @@ function parse(row, index) {
     }
 
     function loadLanguageMessages(languageKey: string, languageInfo: LanguageInfo): Promise<LanguageMessages> {
+        const cachedLanguageMessages: LanguageMessagesCacheEntry[] = getAllLanguageMessagesCache();
         const isLoaded = loadedLanguages[languageKey];
         const needReload = !isLoaded;
         let messages = availableLanguageMessages[languageKey];
 
         if (!messages) {
-            const cachedMessages = getLanguageMessagesCache(languageKey);
-
-            if (cachedMessages) {
-                try {
-                    messages = parseLanguageMessages(cachedMessages);
-                } catch (ex) {
-                    logger.warn(`failed to parse cached language messages for ${languageKey}`, ex);
-                }
-            }
+            messages = getLanguageMessagesFromCacheEntries(languageKey, cachedLanguageMessages);
         }
 
         if (messages) {
@@ -2828,7 +2822,7 @@ function parse(row, index) {
                     }
 
                     availableLanguageMessages[languageKey] = messages;
-                    setLanguageMessagesCache(languageKey, JSON.stringify(messages));
+                    setLanguageMessagesCache(languageKey, messages);
                     loadedLanguages[languageKey] = true;
                 }).catch(ex => {
                     logger.warn(`failed to load language resources for ${languageKey}`, ex);
@@ -2854,7 +2848,7 @@ function parse(row, index) {
                 }
 
                 availableLanguageMessages[languageKey] = messages;
-                setLanguageMessagesCache(languageKey, JSON.stringify(messages));
+                setLanguageMessagesCache(languageKey, messages);
                 loadedLanguages[languageKey] = true;
                 resolve(messages);
             }).catch(ex => {
@@ -2917,16 +2911,16 @@ function parse(row, index) {
         return localeDefaultSettings;
     }
 
-    function applyTextDirection(textDirection: 'ltr' | 'rtl'): void {
+    function applyTextDirection(textDirection: TextDirection): void {
         if (document.querySelector('html')?.getAttribute('data-dir-mode') === 'static') {
-            if (textDirection === 'ltr') {
+            if (textDirection === TextDirection.LTR) {
                 if (location.search.includes('rtl')) {
                     const url = new URL(window.location.href);
                     url.search = '';
                     url.hash = '#/';
                     window.location.replace(url.toString());
                 }
-            } else if (textDirection === 'rtl') {
+            } else if (textDirection === TextDirection.RTL) {
                 if (!location.search.includes('rtl')) {
                     const url = new URL(window.location.href);
                     url.searchParams.set('rtl', '');
@@ -2935,9 +2929,9 @@ function parse(row, index) {
                 }
             }
         } else {
-            if (textDirection === 'ltr') {
+            if (textDirection === TextDirection.LTR) {
                 document.querySelector('html')?.removeAttribute('dir');
-            } else if (textDirection === 'rtl') {
+            } else if (textDirection === TextDirection.RTL) {
                 document.querySelector('html')?.setAttribute('dir', 'rtl');
             }
         }
@@ -2949,7 +2943,7 @@ function parse(row, index) {
 
     function previewLanguage(json: string, textDirection: TextDirection): void {
         const languageKey = locale.value;
-        const messages: LanguageMessages = parseLanguageMessages(json);
+        const messages: LanguageMessages = parsePreviewLanguageMessages(json);
         setSessionLanguagePreview(languageKey, {
             data: json,
             textDirection: textDirection
@@ -2975,7 +2969,7 @@ function parse(row, index) {
             loadLanguageMessages(languageKey, languageInfo).then(messages => {
                 setSessionLanguagePreview(languageKey, null);
                 setLocaleMessage(languageKey, messages);
-                allLanguageActualRtlSetting[languageKey] = languageInfo.textDirection === 'rtl';
+                allLanguageActualRtlSetting[languageKey] = languageInfo.textDirection === TextDirection.RTL;
                 delete previewedLanguages[languageKey];
 
                 settingsStore.updateLocalizedDefaultSettings(applyLanguage(languageKey, true));

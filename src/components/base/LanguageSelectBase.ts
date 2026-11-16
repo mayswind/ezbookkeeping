@@ -1,9 +1,10 @@
 import { ref, computed } from 'vue';
 
-import type { LanguageOption } from '@/locales/index.ts';
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+
+import type { LanguageOption } from '@/core/language.ts';
 
 export interface LanguageSelectBaseProps {
     disabled?: boolean;

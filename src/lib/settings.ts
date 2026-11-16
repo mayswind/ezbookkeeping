@@ -1,5 +1,6 @@
 import { keys } from '@/core/base.ts';
 import { TextDirection } from '@/core/text.ts';
+import type { LanguageMessages, LanguageMessagesCacheEntry } from '@/core/language.ts';
 
 import type {
     ApplicationSettingKey,
@@ -17,13 +18,17 @@ import {
 
 import {
     isObject,
-    isString
+    isArray,
+    isString,
+    isNumber
 } from '@/lib/common.ts';
 
 const settingsLocalStorageKey: string = 'ebk_app_settings';
 const currentLanguageSessionStorageKey: string = 'ebk_current_language';
-const languageMessagesLocalStorageKeyPrefix: string = 'ebk_language_messages_';
+const languageMessagesLocalStorageKey: string = 'ebk_language_messages';
 const languagePreviewSessionStorageKeyPrefix: string = 'ebk_language_preview_';
+
+const MAXIMUM_LANGUAGE_MESSAGES_CACHE_ENTRIES: number = 3;
 
 export interface SessionLanguagePreview {
     readonly data: string;
@@ -122,18 +127,70 @@ export function clearSettings(): void {
     localStorage.removeItem(settingsLocalStorageKey);
 }
 
-export function getLanguageMessagesCache(languageKey: string): string | null {
+export function getAllLanguageMessagesCache(): LanguageMessagesCacheEntry[] {
     try {
-        return localStorage.getItem(languageMessagesLocalStorageKeyPrefix + languageKey);
+        const entries = JSON.parse(localStorage.getItem(languageMessagesLocalStorageKey) || '[]');
+
+        if (!entries || !isArray(entries)) {
+            console.warn('language messages cache entries in local storage is invalid', entries);
+            return [];
+        }
+
+        for (const entry of entries) {
+            if (!isObject(entry) || !('languageKey' in entry) || !('updatedAt' in entry) || !('data' in entry)) {
+                console.warn('language messages cache entry is invalid', entry);
+                return [];
+            }
+
+            const languageKey = entry['languageKey'];
+            const updatedAt = entry['updatedAt'];
+            const data = entry['data'];
+
+            if (!isString(languageKey) || !isNumber(updatedAt) || !isObject(data)) {
+                console.warn('fields in language messages cache entry are invalid', entry);
+                return [];
+            }
+        }
+
+        return entries as LanguageMessagesCacheEntry[];
     } catch (ex) {
-        console.warn('failed to read language messages from local storage', ex);
-        return null;
+        console.warn('failed to read language cache entries from local storage', ex);
+        return [];
     }
 }
 
-export function setLanguageMessagesCache(languageKey: string, messages: string): void {
+export function getLanguageMessagesFromCacheEntries(languageKey: string, entries: LanguageMessagesCacheEntry[]): LanguageMessages | undefined {
+    for (const entry of entries) {
+        if (entry.languageKey === languageKey) {
+            return entry.data;
+        }
+    }
+
+    return undefined;
+}
+
+export function setLanguageMessagesCache(languageKey: string, messages: LanguageMessages): void {
     try {
-        localStorage.setItem(languageMessagesLocalStorageKeyPrefix + languageKey, messages);
+        const entries: LanguageMessagesCacheEntry[] = [];
+        const oldEntries: LanguageMessagesCacheEntry[] = getAllLanguageMessagesCache();
+
+        entries.push({
+            languageKey: languageKey,
+            updatedAt: new Date().getTime(),
+            data: messages
+        });
+
+        for (const entry of oldEntries) {
+            if (entry.languageKey !== languageKey) {
+                entries.push(entry);
+            }
+
+            if (entries.length >= MAXIMUM_LANGUAGE_MESSAGES_CACHE_ENTRIES) {
+                break;
+            }
+        }
+
+        localStorage.setItem(languageMessagesLocalStorageKey, JSON.stringify(entries));
     } catch (ex) {
         console.warn('failed to write language messages to local storage', ex);
     }
@@ -141,19 +198,7 @@ export function setLanguageMessagesCache(languageKey: string, messages: string):
 
 export function clearLanguageMessagesCache(): void {
     try {
-        const storageKeys: string[] = [];
-
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-
-            if (key && key.startsWith(languageMessagesLocalStorageKeyPrefix)) {
-                storageKeys.push(key);
-            }
-        }
-
-        for (const key of storageKeys) {
-            localStorage.removeItem(key);
-        }
+        localStorage.removeItem(languageMessagesLocalStorageKey);
     } catch (ex) {
         console.warn('failed to clear language messages from local storage', ex);
     }

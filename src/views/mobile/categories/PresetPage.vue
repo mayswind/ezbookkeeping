@@ -66,8 +66,9 @@ import type { Router } from 'framework7/types';
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading } from '@/lib/ui/mobile.ts';
 
-import type { LanguageOption } from '@/locales/index.ts';
+import type { LanguageOption } from '@/core/language.ts';
 import { type LocalizedPresetCategory, CategoryType } from '@/core/category.ts';
+
 import { getObjectOwnFieldCount, categorizedArrayToPlainArray } from '@/lib/common.ts';
 import { getCategoryIconType } from '@/lib/icon.ts';
 import { localizedPresetCategoriesToTransactionCategoryCreateWithSubCategories } from '@/lib/category.ts';

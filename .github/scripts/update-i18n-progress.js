@@ -17,23 +17,17 @@ function discoverFrontendLanguages() {
     const indexPath = path.join(FRONTEND_LOCALES_DIR, 'index.ts');
     const content = fs.readFileSync(indexPath, 'utf-8');
 
-    const importMap = {};
-    const importRegex = /import\s+(\w+)\s+from\s+['"]\.\/([\w_]+\.json)['"]/g;
-    let match;
-
-    while ((match = importRegex.exec(content)) !== null) {
-        importMap[match[1]] = match[2];
-    }
-
     const result = {};
-    const langRegex = /['"]([^'"]+)['"]\s*:\s*\{[^}]*content\s*:\s*(\w+)/g;
+    const langRegex = /['"]([^'"]+)['"]\s*:\s*\{[^}]*loadContent\s*:\s*\(\)\s*=>\s*(?:import\(['"]\.\/([\w_]+\.json)['"]\)|Promise\.resolve\(DEFAULT_LANGUAGE_CONTENT\))/g;
+    let match;
 
     while ((match = langRegex.exec(content)) !== null) {
         const tag = match[1];
-        const varName = match[2];
 
-        if (importMap[varName]) {
-            result[tag] = importMap[varName];
+        if (match[2]) {
+            result[tag] = match[2];
+        } else if (tag === DEFAULT_LANGUAGE_TAG) {
+            result[tag] = `${DEFAULT_LANGUAGE_TAG}.json`;
         }
     }
 

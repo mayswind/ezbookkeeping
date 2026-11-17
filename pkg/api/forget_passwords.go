@@ -144,19 +144,19 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.WebContext) (any, 
 		return nil, errs.ErrEmailIsNotVerified
 	}
 
+	oldTokenClaims := c.GetTokenClaims()
+	err = a.tokens.DeleteTokenByClaims(c, oldTokenClaims)
+
+	if err != nil {
+		log.Warnf(c, "[forget_passwords.UserResetPasswordHandler] failed to revoke password reset token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
+	}
+
 	if user.Email != request.Email {
 		log.Warnf(c, "[forget_passwords.UserResetPasswordHandler] request email not equals the user email")
 		return nil, errs.ErrEmailIsInvalid
 	}
 
 	if a.users.IsPasswordEqualsUserPassword(request.Password, user) {
-		oldTokenClaims := c.GetTokenClaims()
-		err = a.tokens.DeleteTokenByClaims(c, oldTokenClaims)
-
-		if err != nil {
-			log.Warnf(c, "[forget_passwords.UserResetPasswordHandler] failed to revoke password reset token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
-		}
-
 		return nil, errs.ErrNewPasswordEqualsOldInvalid
 	}
 

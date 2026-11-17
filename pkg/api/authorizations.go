@@ -444,8 +444,15 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 	}
 
 	oldTokenClaims := c.GetTokenClaims()
+	oldTokenType := oldTokenClaims.Type
 
-	if oldTokenClaims.Type == core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY {
+	err = a.tokens.DeleteTokenByClaims(c, oldTokenClaims)
+
+	if err != nil {
+		log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] failed to revoke temporary token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
+	}
+
+	if oldTokenType == core.USER_TOKEN_TYPE_OAUTH2_CALLBACK_REQUIRE_VERIFY {
 		if credential.Password == "" {
 			return nil, errs.ErrPasswordIsEmpty
 		}
@@ -517,7 +524,7 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 		}
 
 		log.Infof(c, "[authorizations.OAuth2CallbackAuthorizeHandler] user external auth has been created for user \"uid:%d\"", user.Uid)
-	} else if oldTokenClaims.Type == core.USER_TOKEN_TYPE_OAUTH2_CALLBACK {
+	} else if oldTokenType == core.USER_TOKEN_TYPE_OAUTH2_CALLBACK {
 		_, err = a.userExternalAuths.GetUserExternalAuthByUid(c, uid, tokenContext.ExternalAuthType)
 
 		if err != nil {
@@ -526,12 +533,6 @@ func (a *AuthorizationsApi) OAuth2CallbackAuthorizeHandler(c *core.WebContext) (
 		}
 	} else {
 		return nil, errs.ErrSystemError
-	}
-
-	err = a.tokens.DeleteTokenByClaims(c, oldTokenClaims)
-
-	if err != nil {
-		log.Warnf(c, "[authorizations.OAuth2CallbackAuthorizeHandler] failed to revoke temporary token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
 	}
 
 	var token string

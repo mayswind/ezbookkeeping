@@ -4,7 +4,7 @@ import { Account } from '@/models/account.ts';
 import { TransactionCategory } from '@/models/transaction_category.ts';
 import { TransactionTag } from '@/models/transaction_tag.ts';
 import { TransactionPicture, type TransactionPictureInfoBasicResponse } from '@/models/transaction_picture_info.ts';
-import { Transaction } from '@/models/transaction.ts';
+import { type TransactionInfoResponse, Transaction } from '@/models/transaction.ts';
 
 import {
     isDefined,
@@ -215,4 +215,109 @@ export function setTransactionModelByTransaction(transaction: Transaction, trans
             transaction.setGeoLocation(transaction2.geoLocation);
         }
     }
+}
+
+export function isTransactionEquals(transaction1: TransactionInfoResponse, transaction2: TransactionInfoResponse): boolean {
+    if (transaction1.id !== transaction2.id ||
+        transaction1.timeSequenceId !== transaction2.timeSequenceId ||
+        transaction1.type !== transaction2.type ||
+        transaction1.categoryId !== transaction2.categoryId ||
+        transaction1.time !== transaction2.time ||
+        transaction1.utcOffset !== transaction2.utcOffset ||
+        transaction1.sourceAccountId !== transaction2.sourceAccountId ||
+        transaction1.destinationAccountId !== transaction2.destinationAccountId ||
+        transaction1.sourceAmount !== transaction2.sourceAmount ||
+        transaction1.destinationAmount !== transaction2.destinationAmount ||
+        transaction1.hideAmount !== transaction2.hideAmount ||
+        transaction1.comment !== transaction2.comment ||
+        transaction1.editable !== transaction2.editable) {
+        return false;
+    }
+
+    if (transaction1.tagIds.length !== transaction2.tagIds.length) {
+        return false;
+    }
+
+    for (let i = 0; i < transaction1.tagIds.length; i++) {
+        if (transaction1.tagIds[i] !== transaction2.tagIds[i]) {
+            return false;
+        }
+    }
+
+    if (transaction1.category && transaction2.category) {
+        if (transaction1.category.id !== transaction2.category.id) {
+            return false;
+        }
+    } else if (transaction1.category || transaction2.category) {
+        return false;
+    }
+
+    const accounts1 = [transaction1.sourceAccount, transaction1.destinationAccount];
+    const accounts2 = [transaction2.sourceAccount, transaction2.destinationAccount];
+
+    for (let i = 0; i < accounts1.length; i++) {
+        if (accounts1[i] && accounts2[i]) {
+            if (accounts1[i]!.id !== accounts2[i]!.id) {
+                return false;
+            }
+        } else if (accounts1[i] || accounts2[i]) {
+            return false;
+        }
+    }
+
+    const tags1 = transaction1.tags || [];
+    const tags2 = transaction2.tags || [];
+
+    if (tags1.length !== tags2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < tags1.length; i++) {
+        const tag1 = tags1[i]!;
+        const tag2 = tags2[i]!;
+
+        if (tag1.id !== tag2.id) {
+            return false;
+        }
+    }
+
+    const pictures1 = transaction1.pictures || [];
+    const pictures2 = transaction2.pictures || [];
+
+    if (pictures1.length !== pictures2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < pictures1.length; i++) {
+        const picture1 = pictures1[i]!;
+        const picture2 = pictures2[i]!;
+
+        if (picture1.pictureId !== picture2.pictureId) {
+            return false;
+        }
+    }
+
+    if (transaction1.geoLocation && transaction2.geoLocation) {
+        if (transaction1.geoLocation.latitude !== transaction2.geoLocation.latitude || transaction1.geoLocation.longitude !== transaction2.geoLocation.longitude) {
+            return false;
+        }
+    } else if (transaction1.geoLocation || transaction2.geoLocation) {
+        return false;
+    }
+
+    return true;
+}
+
+export function isTransactionsEquals(transactions1: TransactionInfoResponse[], transactions2: TransactionInfoResponse[]): boolean {
+    if (transactions1.length !== transactions2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < transactions1.length; i++) {
+        if (!isTransactionEquals(transactions1[i]!, transactions2[i]!)) {
+            return false;
+        }
+    }
+
+    return true;
 }

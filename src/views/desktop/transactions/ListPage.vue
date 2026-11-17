@@ -1273,6 +1273,7 @@ function reload(force: boolean, init: boolean): void {
             const currentMonth = currentMonthMinDate.getGregorianCalendarMonth();
 
             return transactionsStore.loadMonthlyAllTransactions({
+                force: force,
                 year: currentYear,
                 month: currentMonth,
                 mustHavePictures: isGalleryMode,
@@ -1282,6 +1283,7 @@ function reload(force: boolean, init: boolean): void {
             });
         } else {
             return transactionsStore.loadTransactions({
+                force: force,
                 reload: true,
                 count: countPerPage.value,
                 page: page,
@@ -1294,14 +1296,14 @@ function reload(force: boolean, init: boolean): void {
         }
     }).then(data => {
         loading.value = false;
-        currentPageTransactions.value = data && data.items && data.items.length ? data.items : [];
+        currentPageTransactions.value = data && data.result && data.result.items && data.result.items.length ? data.result.items : [];
 
         if (page <= 1) {
-            totalCount.value = data && data.totalCount ? data.totalCount : 1;
+            totalCount.value = data && data.result && data.result.totalCount ? data.result.totalCount : 1;
         }
 
         if (force) {
-            desktopPageStore.addToast('Data has been updated');
+            desktopPageStore.addToast(data.isUpToDate ? 'Data is up to date' : 'Data has been updated');
         }
     }).catch(error => {
         loading.value = false;

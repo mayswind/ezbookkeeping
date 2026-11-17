@@ -65,6 +65,7 @@ import { BIG_DECIMAL_ZERO, parseBigDecimal, getAmountWithDecimalNumberCount } fr
 import { getCurrencyFraction } from '@/lib/currency.ts';
 import { getFirstVisibleCategoryId } from '@/lib/category.ts';
 import { clearTransactionPictureCache, deleteTransactionPictureCacheEntries } from '@/lib/cache.ts';
+import { isTransactionsEquals } from '@/lib/transaction.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 import logger from '@/lib/logger.ts';
 
@@ -117,6 +118,11 @@ export interface TransactionMonthList {
     readonly inflowOutflowDailyTotalAmounts: Record<string, TransactionTotalAmount>;
     readonly incomeExpenseTotalAmount: TransactionTotalAmount;
     readonly incomeExpenseDailyTotalAmounts: Record<string, TransactionTotalAmount>;
+}
+
+export interface TransactionListResult {
+    readonly isUpToDate: boolean;
+    readonly result: TransactionPageWrapper;
 }
 
 export const useTransactionsStore = defineStore('transactions', () => {
@@ -193,6 +199,20 @@ export const useTransactionsStore = defineStore('transactions', () => {
     const hasMoreTransaction = computed<boolean>(() => {
         return transactionsNextTimeId.value > 0;
     });
+
+    function getTransactionListForComparison(): Transaction[] {
+        return transactions.value.flatMap(transactionMonth => transactionMonth.items).sort((transaction1, transaction2) => {
+            if (transaction1.time !== transaction2.time) {
+                return transaction2.time - transaction1.time;
+            }
+
+            if (transaction1.id.length !== transaction2.id.length) {
+                return transaction2.id.length - transaction1.id.length;
+            }
+
+            return transaction1.id === transaction2.id ? 0 : transaction1.id < transaction2.id ? 1 : -1;
+        });
+    }
 
     function loadTransactionList({ transactionPageWrapper, reload, autoExpand, defaultCurrency, nextTimeSequenceId }: { transactionPageWrapper: TransactionPageWrapper, reload: boolean, autoExpand: boolean, defaultCurrency: string, nextTimeSequenceId?: number }): void {
         if (reload) {
@@ -969,7 +989,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         };
     }
 
-    function loadTransactions({ reload, count, page, mustHavePictures, withCount, withPictures, autoExpand, defaultCurrency }: { reload?: boolean, count?: number, page?: number, mustHavePictures?: boolean, withCount?: boolean, withPictures?: boolean, autoExpand: boolean, defaultCurrency: string }): Promise<TransactionPageWrapper> {
+    function loadTransactions({ reload, force, count, page, mustHavePictures, withCount, withPictures, autoExpand, defaultCurrency }: { reload?: boolean, force?: boolean, count?: number, page?: number, mustHavePictures?: boolean, withCount?: boolean, withPictures?: boolean, autoExpand: boolean, defaultCurrency: string }): Promise<TransactionListResult> {
         let actualMaxTime = transactionsNextTimeId.value;
 
         if (reload && transactionsFilter.value.maxTime > 0) {
@@ -1020,6 +1040,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     totalCount: data.result.totalCount
                 };
 
+                const previousTransactions = force ? getTransactionListForComparison() : [];
+
                 loadTransactionList({
                     transactionPageWrapper: transactionPageWrapper,
                     reload: !!reload,
@@ -1028,13 +1050,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     nextTimeSequenceId: data.result.nextTimeSequenceId
                 });
 
+                const isUpToDate = !!force && isTransactionsEquals(previousTransactions, getTransactionListForComparison());
+
                 if (reload) {
                     if (transactionListStateInvalid.value) {
                         updateTransactionListInvalidState(false);
                     }
                 }
 
-                resolve(transactionPageWrapper);
+                resolve({
+                    isUpToDate: isUpToDate,
+                    result: transactionPageWrapper
+                });
             }).catch(error => {
                 logger.error('failed to load transaction list', error);
 
@@ -1062,7 +1089,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         });
     }
 
-    function loadMonthlyAllTransactions({ year, month, mustHavePictures, withPictures, autoExpand, defaultCurrency }: { year: number, month: number, mustHavePictures?: boolean, withPictures?: boolean, autoExpand: boolean, defaultCurrency: string }): Promise<TransactionPageWrapper> {
+    function loadMonthlyAllTransactions({ year, month, force, mustHavePictures, withPictures, autoExpand, defaultCurrency }: { year: number, month: number, force?: boolean, mustHavePictures?: boolean, withPictures?: boolean, autoExpand: boolean, defaultCurrency: string }): Promise<TransactionListResult> {
         return new Promise((resolve, reject) => {
             services.getAllTransactionsByMonth({
                 year: year,
@@ -1100,6 +1127,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     totalCount: data.result.totalCount
                 };
 
+                const previousTransactions = force ? getTransactionListForComparison() : [];
+
                 loadTransactionList({
                     transactionPageWrapper: transactionPageWrapper,
                     reload: true,
@@ -1107,11 +1136,16 @@ export const useTransactionsStore = defineStore('transactions', () => {
                     defaultCurrency: defaultCurrency
                 });
 
+                const isUpToDate = !!force && isTransactionsEquals(previousTransactions, getTransactionListForComparison());
+
                 if (transactionListStateInvalid.value) {
                     updateTransactionListInvalidState(false);
                 }
 
-                resolve(transactionPageWrapper);
+                resolve({
+                    isUpToDate: isUpToDate,
+                    result: transactionPageWrapper
+                });
             }).catch(error => {
                 logger.error('failed to load monthly all transaction list', error);
 

@@ -1047,6 +1047,7 @@ function reload(done?: () => void): void {
             const currentMonth = currentMonthMinDate.getGregorianCalendarMonth();
 
             return transactionsStore.loadMonthlyAllTransactions({
+                force: force,
                 year: currentYear,
                 month: currentMonth,
                 mustHavePictures: isGalleryMode,
@@ -1056,6 +1057,7 @@ function reload(done?: () => void): void {
             });
         } else {
             return transactionsStore.loadTransactions({
+                force: force,
                 reload: true,
                 mustHavePictures: isGalleryMode,
                 withPictures: isGalleryMode || showPictureIndicatorInTransactionListPage.value,
@@ -1063,11 +1065,11 @@ function reload(done?: () => void): void {
                 defaultCurrency: selectedAccountDefaultCurrency.value
             });
         }
-    }).then(() => {
+    }).then(data => {
         done?.();
 
         if (force) {
-            showToast('Data has been updated');
+            showToast(data.isUpToDate ? 'Data is up to date' : 'Data has been updated');
         }
 
         loading.value = false;

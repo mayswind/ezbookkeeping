@@ -149,6 +149,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.WebContext) (any, 
 
 	if err != nil {
 		log.Warnf(c, "[forget_passwords.UserResetPasswordHandler] failed to revoke password reset token \"utid:%s\" for user \"uid:%d\", because %s", oldTokenClaims.UserTokenId, user.Uid, err.Error())
+		return nil, errs.ErrSystemError
 	}
 
 	if user.Email != request.Email {

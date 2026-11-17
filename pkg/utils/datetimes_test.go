@@ -529,14 +529,14 @@ func TestParseFromLongDateLastTimeInTimezone_AmbiguousMidnight(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	// The previous date ends before the first occurrence of repeated midnight.
-	expectedValue := "2026-10-31T23:59:59.999999999-04:00"
-	actualTime, err := ParseFromLongDateLastTimeInTimezone("2026-10-31", havanaLocation)
+	expectedValue := "2025-11-01T23:59:59.999999999-04:00"
+	actualTime, err := ParseFromLongDateLastTimeInTimezone("2025-11-01", havanaLocation)
 	assert.Equal(t, nil, err)
 	actualValue := actualTime.Format(time.RFC3339Nano)
 	assert.Equal(t, expectedValue, actualValue)
 
-	expectedValue = "2026-11-01T23:59:59.999999999-05:00"
-	actualTime, err = ParseFromLongDateLastTimeInTimezone("2026-11-01", havanaLocation)
+	expectedValue = "2025-11-02T23:59:59.999999999-05:00"
+	actualTime, err = ParseFromLongDateLastTimeInTimezone("2025-11-02", havanaLocation)
 	assert.Equal(t, nil, err)
 	actualValue = actualTime.Format(time.RFC3339Nano)
 	assert.Equal(t, expectedValue, actualValue)

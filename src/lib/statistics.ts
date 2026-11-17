@@ -16,8 +16,16 @@ import {
 
 import type {
     YearMonthItems,
-    SortableTransactionStatisticDataItem
+    SortableTransactionStatisticDataItem,
+    TransactionStatisticResponse,
+    TransactionStatisticResponseItem,
+    TransactionStatisticTrendsResponseItem,
+    TransactionStatisticAssetTrendsResponseItem
 } from '@/models/transaction.ts';
+
+import {
+    isArrayEquals
+} from '@/lib/common.ts';
 
 import {
     getAllMonthsStartAndEndUnixTimes,
@@ -25,6 +33,16 @@ import {
     getAllYearsStartAndEndUnixTimes,
     getAllFiscalYearsStartAndEndUnixTimes
 } from '@/lib/datetime.ts';
+
+function isTransactionStatisticItemsEquals(items1: TransactionStatisticResponseItem[], items2: TransactionStatisticResponseItem[]): boolean {
+    return isArrayEquals(items1, items2,
+        item => `${item.categoryId}_${item.accountId}_${item.relatedAccountId}_${item.relatedAccountType}`,
+        (item1, item2) => item1.categoryId === item2.categoryId &&
+            item1.accountId === item2.accountId &&
+            item1.relatedAccountId === item2.relatedAccountId &&
+            item1.relatedAccountType === item2.relatedAccountType &&
+            item1.amount === item2.amount);
+}
 
 export function sortStatisticsItems<T extends SortableTransactionStatisticDataItem>(items: T[], sortingType: number): void {
     if (sortingType === ChartSortingType.DisplayOrder.type) {
@@ -67,6 +85,60 @@ export function sortStatisticsItems<T extends SortableTransactionStatisticDataIt
             });
         });
     }
+}
+
+export function isTransactionStatisticsEquals(statistics1: TransactionStatisticResponse | null, statistics2: TransactionStatisticResponse | null): boolean {
+    if (statistics1 === statistics2) {
+        return true;
+    }
+
+    if (!statistics1 || !statistics2 || statistics1.startTime !== statistics2.startTime || statistics1.endTime !== statistics2.endTime) {
+        return false;
+    }
+
+    return isTransactionStatisticItemsEquals(statistics1.items, statistics2.items);
+}
+
+export function isTransactionStatisticsTrendsEquals(statistics1: TransactionStatisticTrendsResponseItem[], statistics2: TransactionStatisticTrendsResponseItem[]): boolean {
+    if (statistics1.length !== statistics2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < statistics1.length; i++) {
+        const item1 = statistics1[i]!;
+        const item2 = statistics2[i]!;
+
+        if (item1.year !== item2.year || item1.month !== item2.month || !isTransactionStatisticItemsEquals(item1.items, item2.items)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function isTransactionStatisticsAssetTrendsEquals(statistics1: TransactionStatisticAssetTrendsResponseItem[], statistics2: TransactionStatisticAssetTrendsResponseItem[]): boolean {
+    if (statistics1.length !== statistics2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < statistics1.length; i++) {
+        const item1 = statistics1[i]!;
+        const item2 = statistics2[i]!;
+
+        if (item1.year !== item2.year || item1.month !== item2.month || item1.day !== item2.day) {
+            return false;
+        }
+
+        if (!isArrayEquals(item1.items, item2.items,
+            item => item.accountId,
+            (dataItem1, dataItem2) => dataItem1.accountId === dataItem2.accountId &&
+                dataItem1.accountOpeningBalance === dataItem2.accountOpeningBalance &&
+                dataItem1.accountClosingBalance === dataItem2.accountClosingBalance)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 export function getAllDateRangesFromItems<T extends Year1BasedMonth>(items: YearMonthItems<T>[], startYearMonth: Year1BasedMonth | TextualYearMonth | '', endYearMonth: Year1BasedMonth | TextualYearMonth | '', fiscalYearStart: number, dateAggregationType: number): YearUnixTime[] | FiscalYearUnixTime[] | YearQuarterUnixTime[] | YearMonthUnixTime[] {

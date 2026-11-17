@@ -83,7 +83,12 @@ import {
 } from '@/lib/datetime.ts';
 import { getFinalAccountIdsByFilteredAccountIds } from '@/lib/account.ts';
 import { getFinalCategoryIdsByFilteredCategoryIds } from '@/lib/category.ts';
-import { sortStatisticsItems } from '@/lib/statistics.ts';
+import {
+    sortStatisticsItems,
+    isTransactionStatisticsEquals,
+    isTransactionStatisticsTrendsEquals,
+    isTransactionStatisticsAssetTrendsEquals
+} from '@/lib/statistics.ts';
 import logger from '@/lib/logger.ts';
 import services from '@/lib/services.ts';
 
@@ -1994,7 +1999,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     updateTransactionStatisticsInvalidState(false);
                 }
 
-                if (force && data.result && isEquals(transactionCategoryStatisticsData.value, data.result)) {
+                if (force && data.result && isTransactionStatisticsEquals(transactionCategoryStatisticsData.value, data.result)) {
                     reject({ message: 'Data is up to date', isUpToDate: true });
                     return;
                 }
@@ -2037,7 +2042,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     updateTransactionStatisticsInvalidState(false);
                 }
 
-                if (force && data.result && isEquals(transactionCategoryTrendsData.value, data.result)) {
+                if (force && data.result && isTransactionStatisticsTrendsEquals(transactionCategoryTrendsData.value, data.result)) {
                     reject({ message: 'Data is up to date', isUpToDate: true });
                     return;
                 }
@@ -2076,7 +2081,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
                     updateTransactionStatisticsInvalidState(false);
                 }
 
-                if (force && data.result && isEquals(transactionAssetTrendsData.value, data.result)) {
+                if (force && data.result && isTransactionStatisticsAssetTrendsEquals(transactionAssetTrendsData.value, data.result)) {
                     reject({ message: 'Data is up to date', isUpToDate: true });
                     return;
                 }

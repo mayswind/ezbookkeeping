@@ -151,6 +151,50 @@ export function isEquals<T>(obj1: T, obj2: T): boolean {
     }
 }
 
+export function isArrayEquals<T>(array1: T[], array2: T[], getItemKey: (item: T) => string, isItemEquals: (item1: T, item2: T) => boolean): boolean {
+    if (array1.length !== array2.length) {
+        return false;
+    }
+
+    const items2Map: Record<string, T[]> = {};
+
+    for (const item of array2) {
+        const itemKey = getItemKey(item);
+        const items = items2Map[itemKey];
+
+        if (items) {
+            items.push(item);
+        } else {
+            items2Map[itemKey] = [item];
+        }
+    }
+
+    for (const item1 of array1) {
+        const items2 = items2Map[getItemKey(item1)];
+
+        if (!items2 || !items2.length) {
+            return false;
+        }
+
+        let matchedIndex = -1;
+
+        for (let i = 0; i < items2.length; i++) {
+            if (isItemEquals(item1, items2[i]!)) {
+                matchedIndex = i;
+                break;
+            }
+        }
+
+        if (matchedIndex < 0) {
+            return false;
+        }
+
+        items2.splice(matchedIndex, 1);
+    }
+
+    return true;
+}
+
 export function isYearMonthEquals(val1: string, val2: string): boolean {
     const items1 = val1.split('-');
     const items2 = val2.split('-');

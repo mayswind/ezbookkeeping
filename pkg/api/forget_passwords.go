@@ -1,6 +1,7 @@
 package api
 
 import (
+	"strings"
 	"time"
 
 	"github.com/mayswind/ezbookkeeping/pkg/core"
@@ -152,7 +153,7 @@ func (a *ForgetPasswordsApi) UserResetPasswordHandler(c *core.WebContext) (any, 
 		return nil, errs.ErrSystemError
 	}
 
-	if user.Email != request.Email {
+	if strings.ToLower(user.Email) != strings.ToLower(request.Email) {
 		log.Warnf(c, "[forget_passwords.UserResetPasswordHandler] request email not equals the user email")
 		return nil, errs.ErrEmailIsInvalid
 	}

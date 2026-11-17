@@ -303,6 +303,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 	assert.Equal(t, "零钱", allNewTransactions[0].OriginalSourceAccountName)
 	assert.Equal(t, "", allNewTransactions[0].OriginalDestinationAccountName)
 
+	// transfer from wechat fund
 	data6 := "微信支付账单明细,,,,\n" +
 		"微信昵称：[xxx],,,,\n" +
 		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
@@ -319,6 +320,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 	assert.Equal(t, "招商银行(1234)", allNewTransactions[0].OriginalDestinationAccountName)
 	assert.Equal(t, "零钱通转出-到招商银行(1234)", allNewTransactions[0].OriginalCategoryName)
 
+	// transfer to wechat fund
 	data7 := "微信支付账单明细,,,,\n" +
 		"微信昵称：[xxx],,,,\n" +
 		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +
@@ -335,6 +337,7 @@ func TestWeChatPayCsvFileImporterParseImportedData_ParseAccountName(t *testing.T
 	assert.Equal(t, "零钱通", allNewTransactions[0].OriginalDestinationAccountName)
 	assert.Equal(t, "转入零钱通-来自零钱", allNewTransactions[0].OriginalCategoryName)
 
+	// transfer to wechat fund
 	data8 := "微信支付账单明细,,,,\n" +
 		"微信昵称：[xxx],,,,\n" +
 		"起始时间：[2024-01-01 00:00:00] 终止时间：[2024-09-01 23:59:59],,,,\n" +

@@ -292,12 +292,12 @@ func TestGetDateFirstTimeInTimezone_AmbiguousMidnight(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	// Select the first occurrence of midnight when it occurs twice.
-	expectedValue := "2026-11-01T00:00:00-04:00"
-	actualValue := GetDateFirstTimeInTimezone(time.Date(2026, 11, 1, 12, 0, 0, 0, time.UTC), havanaLocation).Format(time.RFC3339Nano)
+	expectedValue := "2025-11-02T00:00:00-04:00"
+	actualValue := GetDateFirstTimeInTimezone(time.Date(2025, 11, 2, 12, 0, 0, 0, time.UTC), havanaLocation).Format(time.RFC3339Nano)
 	assert.Equal(t, expectedValue, actualValue)
 
-	expectedValue = "2026-11-02T00:00:00-05:00"
-	actualValue = GetDateFirstTimeInTimezone(time.Date(2026, 11, 2, 12, 0, 0, 0, time.UTC), havanaLocation).Format(time.RFC3339Nano)
+	expectedValue = "2025-11-03T00:00:00-05:00"
+	actualValue = GetDateFirstTimeInTimezone(time.Date(2025, 11, 3, 12, 0, 0, 0, time.UTC), havanaLocation).Format(time.RFC3339Nano)
 	assert.Equal(t, expectedValue, actualValue)
 }
 

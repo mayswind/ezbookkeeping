@@ -12,6 +12,9 @@ import {
     TransactionType
 } from '@/core/transaction.ts';
 import type {
+    ScheduledTransactionStatus
+} from '@/core/template.ts';
+import type {
     ImportFileTypeSupportedAdditionalOptions
 } from '@/core/import_transaction.ts';
 
@@ -136,7 +139,8 @@ import type {
     TransactionTemplateHideRequest,
     TransactionTemplateMoveRequest,
     TransactionTemplateDeleteRequest,
-    TransactionTemplateInfoResponse
+    TransactionTemplateInfoResponse,
+    ScheduledTransactionOccurrenceResponse
 } from '@/models/transaction_template.ts';
 import type {
     InsightsExplorerCreateRequest,
@@ -881,8 +885,11 @@ export default {
     deleteTransactionTag: (req: TransactionTagDeleteRequest): ApiResponsePromise<boolean> => {
         return axios.post<ApiResponse<boolean>>('v1/transaction/tags/delete.json', req);
     },
-    getAllTransactionTemplates: ({ templateType }: { templateType: number }): ApiResponsePromise<TransactionTemplateInfoResponse[]> => {
-        return axios.get<ApiResponse<TransactionTemplateInfoResponse[]>>('v1/transaction/templates/list.json?templateType=' + templateType);
+    getAllTransactionTemplates: ({ templateType, scheduledStatus }: { templateType: number, scheduledStatus?: ScheduledTransactionStatus }): ApiResponsePromise<TransactionTemplateInfoResponse[]> => {
+        return axios.get<ApiResponse<TransactionTemplateInfoResponse[]>>('v1/transaction/templates/list.json?template_type=' + templateType + (scheduledStatus ? '&scheduled_status=' + scheduledStatus : ''));
+    },
+    getScheduledTransactionsInMonth: ({ year, month }: { year: number, month: number }): ApiResponsePromise<ScheduledTransactionOccurrenceResponse[]> => {
+        return axios.get<ApiResponse<ScheduledTransactionOccurrenceResponse[]>>(`v1/transaction/templates/schedules/by_month.json?year=${year}&month=${month}`);
     },
     getTransactionTemplate: ({ id }: { id: string }): ApiResponsePromise<TransactionTemplateInfoResponse> => {
         return axios.get<ApiResponse<TransactionTemplateInfoResponse>>('v1/transaction/templates/get.json?id=' + id);

@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Каждое {days} число месяца",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "У вас добавлено {count} счетов",
             "addNewTag": "Добавить новый тег \"{tag}\"",
             "clickToSelectedFile": "Нажмите, чтобы выбрать файл для импорта ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "ОК",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Скрыть скрытые теги транзакций",
     "Transaction Templates": "Шаблоны транзакций",
     "Scheduled Transactions": "Запланированные транзакции",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Название шаблона",
     "No available template": "Нет доступных шаблонов",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "После добавления шаблонов вы можете долго нажимать кнопку «Добавить» на главной странице, чтобы быстро добавить новую транзакцию",

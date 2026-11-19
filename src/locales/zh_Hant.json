@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "每月{days}",
             "everyMultiDaysOfYear": "每年{days}",
             "everyNDays": "每 {n} 天",
+            "nextExecutionTime": "下次執行：{time}",
             "youHaveAccounts": "您已經記錄了 {count} 個帳戶",
             "addNewTag": "新增標籤 \"{tag}\"",
             "clickToSelectedFile": "點擊選擇匯入檔案 ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "未清餘額",
             "availableBalance": "可用額度"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "已停用"
         }
     },
     "OK": "確定",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "不顯示隱藏的交易標籤",
     "Transaction Templates": "交易範本",
     "Scheduled Transactions": "定期交易",
+    "List View": "清單檢視",
+    "Calendar View": "日曆檢視",
+    "Active": "活躍",
+    "Expired": "已過期",
+    "Show Hidden Scheduled Transactions": "顯示隱藏的定期交易",
+    "Hide Hidden Scheduled Transactions": "不顯示隱藏的定期交易",
+    "Unable to retrieve scheduled transaction calendar": "無法取得定期交易日曆",
     "Template Name": "範本名稱",
     "No available template": "沒有可用的範本",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "當新增範本後，您可以在首頁長按新增按鈕快速新增交易",

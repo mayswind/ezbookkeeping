@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "每月{days}",
             "everyMultiDaysOfYear": "每年{days}",
             "everyNDays": "每 {n} 天",
+            "nextExecutionTime": "下次执行：{time}",
             "youHaveAccounts": "您已经记录了 {count} 个账户",
             "addNewTag": "添加新标签 \"{tag}\"",
             "clickToSelectedFile": "点击选择导入文件 ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "未清余额",
             "availableBalance": "可用额度"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "已禁用"
         }
     },
     "OK": "确定",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "不显示隐藏的交易标签",
     "Transaction Templates": "交易模板",
     "Scheduled Transactions": "定时交易",
+    "List View": "列表视图",
+    "Calendar View": "日历视图",
+    "Active": "活跃",
+    "Expired": "已过期",
+    "Show Hidden Scheduled Transactions": "显示隐藏的定时交易",
+    "Hide Hidden Scheduled Transactions": "不显示隐藏的定时交易",
+    "Unable to retrieve scheduled transaction calendar": "无法获取定时交易日历",
     "Template Name": "模板名称",
     "No available template": "没有可用的模板",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "当添加模板后，您可以在主界面长按添加按钮快速添加新的交易",

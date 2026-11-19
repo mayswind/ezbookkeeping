@@ -1,6 +1,6 @@
 import { type TextualYearMonthDay } from '@/core/datetime.ts';
 import { TransactionType } from '@/core/transaction.ts';
-import { TemplateType } from '@/core/template.ts';
+import { type ScheduledTransactionStatus, TemplateType } from '@/core/template.ts';
 
 import { Transaction, type TransactionInfoResponse } from './transaction.ts';
 
@@ -12,10 +12,12 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
     public scheduledStartDate?: TextualYearMonthDay;
     public scheduledEndDate?: TextualYearMonthDay;
     public scheduledAt?: number;
+    public scheduledStatus?: ScheduledTransactionStatus;
+    public nextScheduledTime?: number;
     public displayOrder: number;
     public hidden: boolean;
 
-    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: TextualYearMonthDay | undefined, scheduledEndDate: TextualYearMonthDay | undefined, scheduledAt: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
+    private constructor(id: string, templateType: number, name: string, type: number, categoryId: string, timeZone: string | undefined, utcOffset: number, sourceAccountId: string, destinationAccountId: string, sourceAmount: number, destinationAmount: number, hideAmount: boolean, scheduledFrequencyType: number | undefined, scheduledFrequency: string | undefined, scheduledStartDate: TextualYearMonthDay | undefined, scheduledEndDate: TextualYearMonthDay | undefined, scheduledAt: number | undefined, scheduledStatus: ScheduledTransactionStatus | undefined, nextScheduledTime: number | undefined, tagIds: string[], comment: string, editable: boolean, displayOrder: number, hidden: boolean) {
         super(id, '', type, categoryId, 0, timeZone, utcOffset, sourceAccountId, destinationAccountId, sourceAmount, destinationAmount, hideAmount, tagIds, comment, editable);
         this.templateType = templateType;
         this.name = name;
@@ -24,6 +26,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
         this.scheduledStartDate = scheduledStartDate;
         this.scheduledEndDate = scheduledEndDate;
         this.scheduledAt = scheduledAt;
+        this.scheduledStatus = scheduledStatus;
+        this.nextScheduledTime = nextScheduledTime;
         this.displayOrder = displayOrder;
         this.hidden = hidden;
     }
@@ -106,6 +110,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             undefined, // scheduledStartDate
             undefined, // scheduledEndDate
             undefined, // scheduledAt
+            undefined, // scheduledStatus
+            undefined, // nextScheduledTime
             transaction.tagIds,
             transaction.comment,
             true,
@@ -133,6 +139,8 @@ export class TransactionTemplate extends Transaction implements TransactionTempl
             templateResponse.scheduledStartDate ?? undefined,
             templateResponse.scheduledEndDate ?? undefined,
             templateResponse.scheduledAt,
+            undefined, // scheduledStatus
+            templateResponse.nextScheduledTime,
             templateResponse.tagIds,
             templateResponse.comment,
             true, // editable
@@ -219,7 +227,14 @@ export interface TransactionTemplateInfoResponse extends TransactionInfoResponse
     readonly scheduledStartDate?: TextualYearMonthDay;
     readonly scheduledEndDate?: TextualYearMonthDay;
     readonly scheduledAt?: number;
+    readonly scheduledStatus?: ScheduledTransactionStatus;
+    readonly nextScheduledTime?: number;
     readonly timeZone?: string;
     readonly displayOrder: number;
     readonly hidden: boolean;
+}
+
+export interface ScheduledTransactionOccurrenceResponse {
+    readonly templateId: string;
+    readonly scheduledTime: number;
 }

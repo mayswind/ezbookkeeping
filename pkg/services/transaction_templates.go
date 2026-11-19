@@ -62,6 +62,29 @@ func (s *TransactionTemplateService) GetAllTemplatesByUid(c core.Context, uid in
 	return templates, err
 }
 
+// GetAllScheduledTemplatesByUid returns all scheduled transaction template models of user
+func (s *TransactionTemplateService) GetAllScheduledTemplatesByUid(c core.Context, uid int64, status models.ScheduledTransactionStatus, now int64) ([]*models.TransactionTemplate, error) {
+	if uid <= 0 {
+		return nil, errs.ErrUserIdInvalid
+	}
+
+	sess := s.UserDataDB(uid).NewSession(c).Where("uid=? AND deleted=? AND template_type=?", uid, false, models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE)
+
+	switch status {
+	case models.SCHEDULED_TRANSACTION_STATUS_ACTIVE:
+		sess = sess.And("scheduled_frequency_type<>? AND (scheduled_end_time IS NULL OR scheduled_end_time>=?)", models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED, now)
+	case models.SCHEDULED_TRANSACTION_STATUS_DISABLED:
+		sess = sess.And("scheduled_frequency_type=?", models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED)
+	case models.SCHEDULED_TRANSACTION_STATUS_EXPIRED:
+		sess = sess.And("scheduled_frequency_type<>? AND scheduled_end_time<?", models.TRANSACTION_SCHEDULE_FREQUENCY_TYPE_DISABLED, now)
+	}
+
+	var templates []*models.TransactionTemplate
+	err := sess.Find(&templates)
+
+	return templates, err
+}
+
 // GetTemplateByTemplateId returns a transaction template model according to transaction template id
 func (s *TransactionTemplateService) GetTemplateByTemplateId(c core.Context, uid int64, templateId int64) (*models.TransactionTemplate, error) {
 	if uid <= 0 {

@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Every {days} of month",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "You have recorded {count} accounts",
             "addNewTag": "Add new tag \"{tag}\"",
             "clickToSelectedFile": "Click to select import file ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "बकाया",
             "availableBalance": "उपलब्ध"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "ठीक है",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "छिपे लेन-देन टैग छिपाएँ",
     "Transaction Templates": "लेन-देन टेम्पलेट",
     "Scheduled Transactions": "अनुसूचित लेन-देन",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "टेम्पलेट नाम",
     "No available template": "कोई टेम्पलेट उपलब्ध नहीं",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "टेम्पलेट जोड़ने के बाद, आप होम पेज पर जोड़ें बटन को देर तक दबाकर जल्दी से नया लेन-देन जोड़ सकते हैं",

@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Κάθε {days} του μήνα",
             "everyMultiDaysOfYear": "Κάθε {days} του έτους",
             "everyNDays": "Κάθε {n} ημέρες",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Έχετε καταχωρίσει {count} λογαριασμούς",
             "addNewTag": "Προσθήκη νέας ετικέτας \"{tag}\"",
             "clickToSelectedFile": "Κάντε κλικ για επιλογή αρχείου εισαγωγής ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Απόκρυψη κρυφών ετικετών συναλλαγών",
     "Transaction Templates": "Πρότυπα συναλλαγών",
     "Scheduled Transactions": "Προγραμματισμένες συναλλαγές",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Όνομα προτύπου",
     "No available template": "Δεν υπάρχει διαθέσιμο πρότυπο",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Μόλις προσθέσετε πρότυπα, μπορείτε να πατήσετε παρατεταμένα το κουμπί προσθήκης στην αρχική σελίδα για γρήγορη προσθήκη νέας συναλλαγής",

@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "毎月{days}日",
             "everyMultiDaysOfYear": "毎年{days}",
             "everyNDays": "{n}日ごと",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "{count}件の口座を記録しました",
             "addNewTag": "新しいタグ「{tag}」を追加",
             "clickToSelectedFile": "クリックしてインポートファイルを選択します（{extensions}）",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "非表示取引タグを非表示にします",
     "Transaction Templates": "取引テンプレート",
     "Scheduled Transactions": "スケジュールされた取引",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "テンプレート名",
     "No available template": "利用可能なテンプレートはありません",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "テンプレートを追加したらホームページの[追加]ボタンを長押しして新しい取引をすばやく追加できます。",

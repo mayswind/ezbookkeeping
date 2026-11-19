@@ -41,7 +41,7 @@
             </f7-list-item>
             <f7-list-item popover-close link="#" :key="template.id" :title="template.name"
                           @click="emit('navigate', MobileOverviewWidgetNavigationType.Url, '/transaction/add?templateId=' + template.id)"
-                          v-for="template in allTransactionTemplates">
+                          v-for="template in allNormalTransactionTemplates">
                 <template #media>
                     <f7-icon f7="doc_plaintext"></f7-icon>
                 </template>
@@ -59,7 +59,6 @@ import { useEnvironmentsStore } from '@/stores/environment.ts';
 import { useTransactionTemplatesStore } from '@/stores/transactionTemplate.ts';
 
 import type { ColorValue } from '@/core/color.ts';
-import { TemplateType } from '@/core/template.ts';
 import { MobileOverviewWidgetNavigationType, AddTransactionButtonDefaultAction } from '@/core/overview_layout.ts';
 
 import { DEFAULT_MOBILE_ADD_TRANSACTION_BUTTON_BACKGROUND_COLOR } from '@/consts/color.ts';
@@ -87,6 +86,8 @@ const { tt } = useI18n();
 
 const environmentsStore = useEnvironmentsStore();
 const transactionTemplatesStore = useTransactionTemplatesStore();
+
+const allNormalTransactionTemplates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allVisibleNormalTemplates);
 
 const finalDefaultAction = computed<AddTransactionButtonDefaultAction>(() => {
     if (props.defaultAction === AddTransactionButtonDefaultAction.AIClipboardTextRecognition && isTransactionFromAITextRecognitionEnabled()) {
@@ -137,12 +138,7 @@ const buttonStyle = computed<Record<string, string>>((): Record<string, string> 
     };
 });
 
-const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
-    const allTemplates = transactionTemplatesStore.allVisibleTemplates;
-    return allTemplates[TemplateType.Normal.type] || [];
-});
-
-const hasTransactionAddMenuItems = computed<boolean>(() => isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates.value && allTransactionTemplates.value.length > 0));
+const hasTransactionAddMenuItems = computed<boolean>(() => isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allNormalTransactionTemplates.value && allNormalTransactionTemplates.value.length > 0));
 </script>
 
 <style>

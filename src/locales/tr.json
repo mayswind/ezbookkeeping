@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Ayın her {days} günü",
             "everyMultiDaysOfYear": "Yılın her {days} günü",
             "everyNDays": "Her {n} günde bir",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "{count} adet hesap kaydettiniz",
             "addNewTag": "Yeni etiket ekle: \"{tag}\"",
             "clickToSelectedFile": "İçe aktarılacak dosyayı seçmek için tıklayın ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Ödenmemiş",
             "availableBalance": "Kullanılabilir"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "Tamam",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Gizli İşlem Etiketlerini Gizle",
     "Transaction Templates": "İşlem Şablonları",
     "Scheduled Transactions": "Planlanmış İşlemler",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Şablon Adı",
     "No available template": "Mevcut şablon yok",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Şablon ekledikten sonra, hızlıca yeni bir işlem eklemek için ana sayfadaki Ekle butonuna uzun basabilirsiniz",

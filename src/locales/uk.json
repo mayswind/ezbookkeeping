@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Кожного {days} числа місяця",
             "everyMultiDaysOfYear": "Кожні {days} року",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Зареєстровано рахунків: {count}",
             "addNewTag": "Додати новий тег \"{tag}\"",
             "clickToSelectedFile": "Натисніть, щоб вибрати файл для імпорту ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "ОК",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Не показувати приховані теги транзакцій",
     "Transaction Templates": "Шаблони транзакцій",
     "Scheduled Transactions": "Заплановані транзакції",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Назва шаблону",
     "No available template": "Немає доступних шаблонів",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Після додавання шаблонів ви можете довго натискати кнопку «Додати» на головній сторінці, щоб швидко додати транзакцію",

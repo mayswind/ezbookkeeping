@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Mỗi ngày {days} trong tháng",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Bạn đã ghi nhận {count} tài khoản",
             "addNewTag": "Add new tag \"{tag}\"",
             "clickToSelectedFile": "Nhấp để chọn tệp nhập khẩu ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Ẩn thẻ giao dịch ẩn",
     "Transaction Templates": "Mẫu giao dịch",
     "Scheduled Transactions": "Giao dịch theo lịch trình",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Tên mẫu",
     "No available template": "Không có mẫu nào khả dụng",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Sau khi bạn thêm mẫu, bạn có thể nhấn giữ nút Thêm trên trang chủ để nhanh chóng thêm giao dịch mới",

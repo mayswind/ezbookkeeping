@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "În fiecare {days} din lună",
             "everyMultiDaysOfYear": "În fiecare {days} din an",
             "everyNDays": "La fiecare {n} zile",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Ai înregistrat {count} conturi",
             "addNewTag": "Adaugă eticheta nouă „{tag}”",
             "clickToSelectedFile": "Fă clic pentru a selecta fișierul de import ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Ascunde etichetele de tranzacții ascunse",
     "Transaction Templates": "Șabloane de tranzacții",
     "Scheduled Transactions": "Tranzacții programate",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Nume șablon",
     "No available template": "Niciun șablon disponibil",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "După ce adaugi șabloane, poți apăsa lung butonul „Adaugă” de pe pagina principală pentru a introduce rapid o tranzacție nouă",

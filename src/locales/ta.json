@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "மாதத்தில் ஒவ்வொரு {days}",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "நீங்கள் {count} கணக்குகளை பதிவு செய்துள்ளீர்கள்",
             "addNewTag": "புதிய குறிச்சொல் சேர்க்க \"{tag}\"",
             "clickToSelectedFile": "இறக்குமதி கோப்பைத் தேர்ந்தெடுக்க கிளிக் செய்யவும் ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "சரி",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "மறைந்த பரிவர்த்தனை குறிச்சொற்களை மறை",
     "Transaction Templates": "பரிவர்த்தனை வார்ப்புரு‌கள்",
     "Scheduled Transactions": "திட்டமிட்ட பரிவர்த்தனைகள்",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "வார்ப்புரு பெயர்",
     "No available template": "எந்த வார்ப்புரு கிடைக்கவில்லை",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "நீங்கள் வார்ப்புரு‌களை சேர்த்த பின்பு, முகப்புப் பக்கத்தில் Add பட்டன் ஐ நீண்ட நேரம் அழுத்தி புதிய பரிவர்த்தனையை விரைவாக சேர்க்கலாம்",

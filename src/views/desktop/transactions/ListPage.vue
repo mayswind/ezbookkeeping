@@ -73,11 +73,11 @@
                                                          :prepend-icon="mdiMagicStaff"
                                                          v-if="isTransactionFromAIImageRecognitionEnabled()"
                                                          @click="addByRecognizingImage"></v-list-item>
-                                            <v-divider class="my-1" v-if="allTransactionTemplates && allTransactionTemplates.length > 0" />
+                                            <v-divider class="my-1" v-if="allNormalTransactionTemplates && allNormalTransactionTemplates.length > 0" />
                                             <v-list-item :key="template.id"
                                                          :title="template.name"
                                                          :prepend-icon="mdiTextBoxOutline"
-                                                         v-for="template in allTransactionTemplates"
+                                                         v-for="template in allNormalTransactionTemplates"
                                                          @click="add(template)"></v-list-item>
                                         </v-list>
                                     </v-menu>
@@ -762,7 +762,6 @@ import {
 import { AmountFilterType } from '@/core/numeral.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { TransactionType, TransactionAmountType } from '@/core/transaction.ts';
-import { TemplateType }  from '@/core/template.ts';
 
 import { DEFAULT_PAGE_COUNTS } from '@/consts/page.ts';
 
@@ -963,13 +962,9 @@ const showFilterCategoryDialog = ref<boolean>(false);
 const showFilterTagDialog = ref<boolean>(false);
 
 const isDarkMode = computed<boolean>(() => theme.global.name.value === ThemeType.Dark);
+const allNormalTransactionTemplates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allVisibleNormalTemplates);
 const allPageCounts = computed<NameNumeralValue[]>(() => getTablePageOptions(DEFAULT_PAGE_COUNTS, undefined, false, true));
 const recentMonthDateRanges = computed<LocalizedRecentMonthDateRange[]>(() => getAllRecentMonthDateRanges(pageType.value === TransactionListPageType.List.type || pageType.value === TransactionListPageType.Gallery.type, true));
-
-const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
-    const allTemplates = transactionTemplatesStore.allVisibleTemplates;
-    return allTemplates[TemplateType.Normal.type] || [];
-});
 
 const allowCategoryTypes = computed<string>(() => {
     if (TransactionType.Income <= query.value.type && query.value.type <= TransactionType.Transfer) {
@@ -1243,8 +1238,7 @@ function init(initProps: TransactionListProps): void {
     currentPage.value = 1;
     reload(false, true);
 
-    transactionTemplatesStore.loadAllTemplates({
-        templateType: TemplateType.Normal.type,
+    transactionTemplatesStore.loadAllNormalTemplates({
         force: false
     });
 }

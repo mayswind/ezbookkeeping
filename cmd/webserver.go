@@ -459,6 +459,7 @@ func startWebServer(c *core.CliContext) error {
 
 			// Transaction Templates
 			apiV1Route.GET("/transaction/templates/list.json", bindApi(api.TransactionTemplates.TemplateListHandler, config))
+			apiV1Route.GET("/transaction/templates/schedules/by_month.json", bindApi(api.TransactionTemplates.ScheduledTransactionMonthListHandler, config))
 			apiV1Route.GET("/transaction/templates/get.json", bindApi(api.TransactionTemplates.TemplateGetHandler, config))
 			apiV1Route.POST("/transaction/templates/add.json", bindApi(api.TransactionTemplates.TemplateCreateHandler, config))
 			apiV1Route.POST("/transaction/templates/modify.json", bindApi(api.TransactionTemplates.TemplateModifyHandler, config))

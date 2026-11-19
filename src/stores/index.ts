@@ -76,7 +76,7 @@ export const useRootStore = defineStore('root', () => {
         transactionsStore.resetTransactions();
         transactionTagsStore.resetTransactionTags();
         transactionCategoriesStore.resetTransactionCategories();
-        transactionTemplatesStore.resetTransactionTemplates();
+        transactionTemplatesStore.resetNormalTransactionTemplates();
         accountsStore.resetAccounts();
         tokensStore.resetMapProxyToken();
 

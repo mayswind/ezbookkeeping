@@ -60,7 +60,14 @@ func (a *TransactionTemplatesApi) TemplateListHandler(c *core.WebContext) (any, 
 	}
 
 	uid := c.GetCurrentUid()
-	templates, err := a.templates.GetAllTemplatesByUid(c, uid, templateListReq.TemplateType)
+
+	var templates []*models.TransactionTemplate
+
+	if templateListReq.TemplateType == models.TRANSACTION_TEMPLATE_TYPE_SCHEDULE {
+		templates, err = a.templates.GetAllScheduledTemplatesByUid(c, uid, templateListReq.ScheduledStatus, time.Now().Unix())
+	} else {
+		templates, err = a.templates.GetAllTemplatesByUid(c, uid, templateListReq.TemplateType)
+	}
 
 	if err != nil {
 		log.Errorf(c, "[transaction_templates.TemplateListHandler] failed to get templates for user \"uid:%d\", because %s", uid, err.Error())
@@ -77,6 +84,60 @@ func (a *TransactionTemplatesApi) TemplateListHandler(c *core.WebContext) (any, 
 	sort.Sort(templateResps)
 
 	return templateResps, nil
+}
+
+// ScheduledTransactionMonthListHandler returns future scheduled occurrences in a month
+func (a *TransactionTemplatesApi) ScheduledTransactionMonthListHandler(c *core.WebContext) (any, *errs.Error) {
+	var scheduledTemplateMonthListReq models.ScheduledTransactionMonthRequest
+	err := c.ShouldBindQuery(&scheduledTemplateMonthListReq)
+
+	if err != nil {
+		log.Warnf(c, "[transaction_templates.ScheduledTransactionMonthListHandler] parse request failed, because %s", err.Error())
+		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
+	}
+
+	if !a.CurrentConfig().EnableScheduledTransaction {
+		return nil, errs.ErrScheduledTransactionNotEnabled
+	}
+
+	clientTimezone, err := c.GetClientTimezone()
+
+	if err != nil {
+		log.Warnf(c, "[transaction_templates.ScheduledTransactionMonthListHandler] cannot get client timezone, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	uid := c.GetCurrentUid()
+	now := time.Now().Unix()
+	templates, err := a.templates.GetAllScheduledTemplatesByUid(c, uid, models.SCHEDULED_TRANSACTION_STATUS_ACTIVE, now)
+
+	if err != nil {
+		log.Errorf(c, "[transaction_templates.ScheduledTransactionMonthListHandler] failed to get scheduled transactions in month \"%d-%d\" for user \"uid:%d\", because %s", scheduledTemplateMonthListReq.Year, scheduledTemplateMonthListReq.Month, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	startTime := time.Date(scheduledTemplateMonthListReq.Year, time.Month(scheduledTemplateMonthListReq.Month), 1, 0, 0, 0, 0, clientTimezone)
+	endUnixTime := startTime.AddDate(0, 1, 0).Unix()
+	startUnixTime := startTime.Unix()
+
+	if now > startUnixTime {
+		startUnixTime = now
+	}
+
+	occurrenceResps := make(models.ScheduledTransactionOccurrenceResponseSlice, 0)
+
+	for _, template := range templates {
+		for _, scheduledTime := range template.GetScheduledTimes(startUnixTime, endUnixTime, false) {
+			occurrenceResps = append(occurrenceResps, &models.ScheduledTransactionOccurrenceResponse{
+				TemplateId:    template.TemplateId,
+				ScheduledTime: scheduledTime,
+			})
+		}
+	}
+
+	sort.Sort(occurrenceResps)
+
+	return occurrenceResps, nil
 }
 
 // TemplateGetHandler returns one specific transaction template of current user

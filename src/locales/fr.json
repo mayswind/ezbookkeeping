@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Tous les {days} du mois",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Vous avez enregistré {count} comptes",
             "addNewTag": "Ajouter une nouvelle étiquette \"{tag}\"",
             "clickToSelectedFile": "Cliquez pour sélectionner le fichier d'importation ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Masquer les étiquettes de transaction masquées",
     "Transaction Templates": "Modèles de transaction",
     "Scheduled Transactions": "Transactions programmées",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Nom du modèle",
     "No available template": "Aucun modèle disponible",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Une fois que vous ajoutez des modèles, vous pouvez maintenir appuyé le bouton Ajouter sur la page d'accueil pour ajouter rapidement une nouvelle transaction",

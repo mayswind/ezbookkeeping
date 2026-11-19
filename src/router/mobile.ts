@@ -50,6 +50,7 @@ import TagListPage from '@/views/mobile/tags/ListPage.vue';
 import TagGroupListPage from '@/views/mobile/tags/GroupListPage.vue';
 
 import TemplateListPage from '@/views/mobile/templates/ListPage.vue';
+import ScheduledTransactionListPage from '@/views/mobile/schedules/ListPage.vue';
 
 function asyncResolve(component: unknown): (ctx: Router.RouteCallbackCtx) => void {
     return function({ resolve }: { resolve: ({ component }: { component: unknown }) => void }): void {
@@ -355,7 +356,7 @@ const routes: Router.RouteParameters[] = [
     },
     {
         path: '/schedule/list',
-        async: asyncResolve(TemplateListPage),
+        async: asyncResolve(ScheduledTransactionListPage),
         beforeEnter: [checkLogin]
     },
     {

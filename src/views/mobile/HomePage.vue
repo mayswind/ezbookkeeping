@@ -53,7 +53,7 @@
                 </f7-list-item>
                 <f7-list-item popover-close :key="template.id" :title="template.name"
                               :link="'/transaction/add?templateId=' + template.id"
-                              v-for="template in allTransactionTemplates">
+                              v-for="template in allNormalTransactionTemplates">
                     <template #media>
                         <f7-icon f7="doc_plaintext"></f7-icon>
                     </template>
@@ -89,7 +89,6 @@ import {
     OverviewWidgetDataRequirement,
     MobileOverviewWidgetNavigationType
 } from '@/core/overview_layout.ts';
-import { TemplateType } from '@/core/template.ts';
 import { MOBILE_OVERVIEW_WIDGET_DEFINITIONS, DEFAULT_MOBILE_OVERVIEW_LAYOUT } from '@/consts/overview_layout.ts';
 
 import { TransactionTemplate } from '@/models/transaction_template.ts';
@@ -134,6 +133,8 @@ const loading = ref<boolean>(true);
 const showTransactionTemplatePopover = ref<boolean>(false);
 const showAIReceiptImageRecognitionSheet = ref<boolean>(false);
 
+const allNormalTransactionTemplates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allVisibleNormalTemplates);
+
 const layout = computed<MobileOverviewLayout>(() => {
     try {
         return parseMobileOverviewLayout(settingsStore.appSettings.mobileOverviewPageLayout);
@@ -143,12 +144,7 @@ const layout = computed<MobileOverviewLayout>(() => {
     }
 });
 
-const allTransactionTemplates = computed<TransactionTemplate[]>(() => {
-    const allTemplates = transactionTemplatesStore.allVisibleTemplates;
-    return allTemplates[TemplateType.Normal.type] || [];
-});
-
-const hasTransactionAddMenuItems = computed<boolean>(() => isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allTransactionTemplates.value && allTransactionTemplates.value.length > 0));
+const hasTransactionAddMenuItems = computed<boolean>(() => isTransactionFromAITextRecognitionEnabled() || isTransactionFromAIImageRecognitionEnabled() || (allNormalTransactionTemplates.value && allNormalTransactionTemplates.value.length > 0));
 
 function openTransactionTemplatePopover(): void {
     if (hasTransactionAddMenuItems.value) {
@@ -164,7 +160,7 @@ function init(): void {
             getShareCacheImageBlob(),
             accountsStore.loadAllAccounts({ force: false }),
             transactionCategoriesStore.loadAllCategories({ force: false }),
-            transactionTemplatesStore.loadAllTemplates({ templateType: TemplateType.Normal.type,  force: false }),
+            transactionTemplatesStore.loadAllNormalTemplates({ force: false }),
             ...reloadOverviewData(false)
         ];
 

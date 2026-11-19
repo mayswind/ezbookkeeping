@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Every {days} of month",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "You have recorded {count} accounts",
             "addNewTag": "Add new tag \"{tag}\"",
             "clickToSelectedFile": "Click to select import file ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Hide Hidden Transaction Tags",
     "Transaction Templates": "Transaction Templates",
     "Scheduled Transactions": "Scheduled Transactions",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Template Name",
     "No available template": "No available template",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction",

@@ -1,5 +1,11 @@
 import type { TypeAndName } from './base.ts';
 
+export enum ScheduledTransactionStatus {
+    Active = 1,
+    Disabled = 2,
+    Expired = 3
+}
+
 export class TemplateType implements TypeAndName {
     private static readonly allInstances: TemplateType[] = [];
     private static readonly allInstancesByType: Record<number, TemplateType> = {};

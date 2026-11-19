@@ -293,6 +293,10 @@ html[dir="rtl"] .v-btn.button-icon-with-direction > .v-btn__append > .v-icon > .
 
     &.v-btn-group--density-comfortable {
         height: 2.375rem;
+
+        &.v-btn-group--divided {
+            height: 36px;
+        }
     }
 
     > .v-btn--variant-outlined {

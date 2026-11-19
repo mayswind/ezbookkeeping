@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "ಪ್ರತಿ {days} ತಿಂಗಳಲ್ಲಿ",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "ನೀವು {count} ಖಾತೆಗಳನ್ನು ದಾಖಲಿಸಿದ್ದೀರಿ",
             "addNewTag": "ಹೊಸ ಟ್ಯಾಗ್ ಸೇರಿಸಿ \"{tag}\"",
             "clickToSelectedFile": "ಆಮದು ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "ಸರಿ",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "ಮರೆಮಾಡಿದ ವಹಿವಾಟು ಟ್ಯಾಗ್‌ಗಳನ್ನು ಮರೆಮಾಡಿ",
     "Transaction Templates": "ವಹಿವಾಟು ಟೆಂಪ್ಲೇಟ್‌ಗಳು",
     "Scheduled Transactions": "ಷೆಡ್ಯೂಲ್ ಮಾಡಿದ ವಹಿವಾಟುಗಳು",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "ಟೆಂಪ್ಲೇಟ್ ಹೆಸರು",
     "No available template": "ಯಾವುದೇ ಟೆಂಪ್ಲೇಟ್ ಲಭ್ಯವಿಲ್ಲ",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "ನೀವು ಟೆಂಪ್ಲೇಟ್‌ಗಳನ್ನು ಸೇರಿಸಿದ ನಂತರ, ಹೋಮ್ ಪುಟದಲ್ಲಿನ Add ಬಟನ್ ಅನ್ನು ದೀರ್ಘವಾಗಿ ಒತ್ತುವುದರಿಂದ ಹೊಸ ವಹಿವಾಟನ್ನು ಶೀಘ್ರವಾಗಿ ಸೇರಿಸಬಹುದು",

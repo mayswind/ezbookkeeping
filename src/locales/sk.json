@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Každý {days} v mesiaci",
             "everyMultiDaysOfYear": "Každý {days} v roku",
             "everyNDays": "Každých {n} dní",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Máte zaznamenaných {count} účtov",
             "addNewTag": "Pridať nový štítok „{tag}“",
             "clickToSelectedFile": "Kliknite pre výber súboru na import ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Dlžná suma",
             "availableBalance": "Dostupné"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Skryť skryté štítky",
     "Transaction Templates": "Šablóny transakcií",
     "Scheduled Transactions": "Plánované transakcie",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Názov šablóny",
     "No available template": "Žiadna dostupná šablóna",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Po pridaní šablón môžete dlhým podržaním tlačidla Pridať na úvodnej stránke rýchlo pridať transakciu",

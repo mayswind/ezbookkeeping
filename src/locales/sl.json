@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Vsak {days} v mesecu",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Zabeležili ste {count} računov",
             "addNewTag": "Dodaj novo oznako \"{tag}\"",
             "clickToSelectedFile": "Kliknite za izbiro datoteke za uvoz ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "V redu",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Skrij skrite oznake transakcij",
     "Transaction Templates": "Predloge transakcij",
     "Scheduled Transactions": "Načrtovane transakcije",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Ime predloge",
     "No available template": "Ni razpoložljivih predlog",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Ko dodate predloge, lahko na začetni strani z dolgim pritiskom na gumb 'Dodaj' hitro dodate novo transakcijo",

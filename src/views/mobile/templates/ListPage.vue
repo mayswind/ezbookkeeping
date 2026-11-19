@@ -5,10 +5,10 @@
             <f7-nav-left v-else-if="sortable">
                 <f7-link icon-f7="xmark" :class="{ 'disabled': displayOrderSaving }" :aria-label="tt('Cancel')" @click="cancelSort"></f7-link>
             </f7-nav-left>
-            <f7-nav-title :title="templateType === TemplateType.Schedule.type ? tt('Scheduled Transactions') : tt('Transaction Templates')"></f7-nav-title>
+            <f7-nav-title :title="tt('Transaction Templates')"></f7-nav-title>
             <f7-nav-right :class="{ 'navbar-compact-icons': true, 'disabled': loading }">
                 <f7-link icon-f7="ellipsis" :class="{ 'disabled': !templates.length || sortable }" :aria-label="tt('More')" @click="showMoreActionSheet = true"></f7-link>
-                <f7-link icon-f7="plus" :aria-label="tt('Add')" :href="'/template/add?templateType=' + templateType" v-if="!sortable"></f7-link>
+                <f7-link icon-f7="plus" :aria-label="tt('Add')" :href="'/template/add?templateType=' + TemplateType.Normal.type" v-if="!sortable"></f7-link>
                 <f7-link icon-f7="checkmark_alt" :class="{ 'disabled': displayOrderSaving || !displayOrderModified }" :aria-label="tt('Save')" @click="saveSortResult" v-else-if="sortable"></f7-link>
             </f7-nav-right>
         </f7-navbar>
@@ -24,10 +24,7 @@
 
         <f7-list strong inset dividers class="margin-top-half" v-if="!loading && noAvailableTemplate">
             <f7-list-item :title="tt('No available template')"
-                          :footer="tt('Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction')"
-                          v-if="templateType === TemplateType.Normal.type"></f7-list-item>
-            <f7-list-item :title="tt('No available scheduled transactions')" v-else-if="templateType === TemplateType.Schedule.type"></f7-list-item>
-            <f7-list-item :title="tt('No available template')" v-else></f7-list-item>
+                          :footer="tt('Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction')"></f7-list-item>
         </f7-list>
 
         <f7-list strong inset dividers sortable class="margin-top-half template-list"
@@ -43,7 +40,7 @@
                           v-show="showHidden || !template.hidden"
                           @taphold="setSortable()">
                 <template #media>
-                    <f7-icon :f7="templateType === TemplateType.Schedule.type ? 'clock' : 'doc_plaintext'">
+                    <f7-icon f7="doc_plaintext">
                         <f7-badge color="gray" class="right-bottom-icon" v-if="template.hidden">
                             <f7-icon f7="eye_slash_fill"></f7-icon>
                         </f7-badge>
@@ -123,7 +120,6 @@ const { showAlert, showToast, routeBackOnError } = useI18nUIComponents();
 
 const transactionTemplatesStore = useTransactionTemplatesStore();
 
-const templateType = ref<number>(TemplateType.Normal.type);
 const loading = ref<boolean>(true);
 const loadingError = ref<unknown | null>(null);
 const showHidden = ref<boolean>(false);
@@ -135,7 +131,7 @@ const displayOrderModified = ref<boolean>(false);
 const displayOrderSaving = ref<boolean>(false);
 
 const textDirection = computed<TextDirection>(() => getCurrentLanguageTextDirection());
-const templates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allTransactionTemplates[templateType.value] || []);
+const templates = computed<TransactionTemplate[]>(() => transactionTemplatesStore.allNormalTransactionTemplates);
 const firstShowingId = computed<string | null>(() => getFirstShowingId(templates.value, showHidden.value));
 const lastShowingId = computed<string | null>(() => getLastShowingId(templates.value, showHidden.value));
 const noAvailableTemplate = computed<boolean>(() => isNoAvailableTemplate(templates.value, showHidden.value));
@@ -153,16 +149,9 @@ function parseTemplateIdFromDomId(domId: string): string | null {
 }
 
 function init(): void {
-    if (props.f7route.path === '/template/list') {
-        templateType.value = TemplateType.Normal.type;
-    } else if (props.f7route.path === '/schedule/list') {
-        templateType.value = TemplateType.Schedule.type;
-    }
-
     loading.value = true;
 
-    transactionTemplatesStore.loadAllTemplates({
-        templateType: templateType.value,
+    transactionTemplatesStore.loadAllNormalTemplates({
         force: false
     }).then(() => {
         loading.value = false;
@@ -184,8 +173,7 @@ function reload(done?: () => void): void {
 
     const force = !!done;
 
-    transactionTemplatesStore.loadAllTemplates({
-        templateType: templateType.value,
+    transactionTemplatesStore.loadAllNormalTemplates({
         force: force
     }).then(() => {
         done?.();
@@ -275,9 +263,7 @@ function saveSortResult(): void {
     displayOrderSaving.value = true;
     showLoading();
 
-    transactionTemplatesStore.updateTemplateDisplayOrders({
-        templateType: templateType.value
-    }).then(() => {
+    transactionTemplatesStore.updateNormalTemplateDisplayOrders().then(() => {
         displayOrderSaving.value = false;
         hideLoading();
 
@@ -304,8 +290,7 @@ function cancelSort(): void {
     displayOrderSaving.value = true;
     showLoading();
 
-    transactionTemplatesStore.loadAllTemplates({
-        templateType: templateType.value,
+    transactionTemplatesStore.loadAllNormalTemplates({
         force: false
     }).then(() => {
         displayOrderSaving.value = false;
@@ -337,8 +322,7 @@ function onSort(event: { el: { id: string }; from: number; to: number }): void {
         return;
     }
 
-    transactionTemplatesStore.changeTemplateDisplayOrder({
-        templateType: templateType.value,
+    transactionTemplatesStore.changeNormalTemplateDisplayOrder({
         templateId: id,
         from: event.from,
         to: event.to
@@ -350,7 +334,7 @@ function onSort(event: { el: { id: string }; from: number; to: number }): void {
 }
 
 function onPageAfterIn(): void {
-    if ((!isDefined(transactionTemplatesStore.transactionTemplateListStatesInvalid[templateType.value]) || transactionTemplatesStore.transactionTemplateListStatesInvalid[templateType.value]) && !loading.value) {
+    if ((!isDefined(transactionTemplatesStore.normalTransactionTemplateListStateInvalid) || transactionTemplatesStore.normalTransactionTemplateListStateInvalid) && !loading.value) {
         reload();
     }
 

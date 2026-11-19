@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "ทุกๆ {days} ของเดือน",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "คุณได้บันทึกบัญชี {count} บัญชี",
             "addNewTag": "เพิ่มแท็กใหม่ \"{tag}\"",
             "clickToSelectedFile": "คลิกเพื่อเลือกไฟล์นำเข้า ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "ตกลง",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "ซ่อนแท็กรายการที่ซ่อนอยู่",
     "Transaction Templates": "แม่แบบรายการ",
     "Scheduled Transactions": "รายการตามกำหนด",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "ชื่อแม่แบบ",
     "No available template": "ไม่มีแม่แบบที่ใช้ได้",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "เมื่อคุณเพิ่มแม่แบบแล้ว คุณสามารถกดปุ่มเพิ่มค้างไว้บนหน้าหลักเพื่อเพิ่มรายการใหม่อย่างรวดเร็ว",

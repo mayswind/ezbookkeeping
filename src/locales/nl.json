@@ -150,6 +150,7 @@
             "everyMultiDaysOfMonth": "Elke {days} van de maand",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
+            "nextExecutionTime": "Next execution: {time}",
             "youHaveAccounts": "Je hebt {count} rekeningen geregistreerd",
             "addNewTag": "Nieuwe tag toevoegen \"{tag}\"",
             "clickToSelectedFile": "Klik om importbestand te selecteren ({extensions})",
@@ -1574,6 +1575,9 @@
         "accountListPage": {
             "outstandingBalance": "Outstanding",
             "availableBalance": "Available"
+        },
+        "scheduledTransactionListPage": {
+            "disabled": "Disabled"
         }
     },
     "OK": "OK",
@@ -2840,6 +2844,13 @@
     "Hide Hidden Transaction Tags": "Verborgen transactietags verbergen",
     "Transaction Templates": "Transactiesjablonen",
     "Scheduled Transactions": "Geplande transacties",
+    "List View": "List View",
+    "Calendar View": "Calendar View",
+    "Active": "Active",
+    "Expired": "Expired",
+    "Show Hidden Scheduled Transactions": "Show Hidden Scheduled Transactions",
+    "Hide Hidden Scheduled Transactions": "Hide Hidden Scheduled Transactions",
+    "Unable to retrieve scheduled transaction calendar": "Unable to retrieve scheduled transaction calendar",
     "Template Name": "Sjabloonnaam",
     "No available template": "Geen sjablonen beschikbaar",
     "Once you add templates, you can long-press the Add button on the home page to quickly add a new transaction": "Zodra je sjablonen hebt, kun je op de startpagina de knop ‘Toevoegen’ lang indrukken om snel een nieuwe transactie toe te voegen",

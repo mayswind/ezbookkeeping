@@ -1,183 +1,142 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
-import { type BeforeResolveFunction, itemAndIndex, entries } from '@/core/base.ts';
-
+import { type BeforeResolveFunction, itemAndIndex } from '@/core/base.ts';
+import { TemplateType, type ScheduledTransactionStatus } from '@/core/template.ts';
 import { TransactionType } from '@/core/transaction.ts';
 
 import {
     type TransactionTemplateInfoResponse,
     type TransactionTemplateNewDisplayOrderRequest,
+    type ScheduledTransactionOccurrenceResponse,
     TransactionTemplate
 } from '@/models/transaction_template.ts';
 
-import { isDefined, isObject, isArray, isEquals } from '@/lib/common.ts';
+import { isDefined, isEquals } from '@/lib/common.ts';
 
 import logger from '@/lib/logger.ts';
 import services, { type ApiResponsePromise } from '@/lib/services.ts';
 
 export const useTransactionTemplatesStore = defineStore('transactionTemplates', () =>{
-    const allTransactionTemplates = ref<Record<number, TransactionTemplate[]>>({});
-    const allTransactionTemplatesMap = ref<Record<number, Record<string, TransactionTemplate>>>({});
-    const transactionTemplateListStatesInvalid = ref<Record<number, boolean>>({});
+    let loadingPromise: Promise<TransactionTemplate[]> | null = null;
 
-    const allVisibleTemplates = computed<Record<number, TransactionTemplate[]>>(() => {
-        const allVisibleTemplates: Record<number, TransactionTemplate[]> = {};
+    const allNormalTransactionTemplates = ref<TransactionTemplate[]>([]);
+    const allNormalTransactionTemplatesMap = ref<Record<string, TransactionTemplate>>({});
+    const normalTransactionTemplateListStateInvalid = ref<boolean>(true);
 
-        for (const [templateType, allTemplates] of entries(allTransactionTemplates.value)) {
-            const visibleTemplates: TransactionTemplate[] = [];
+    const allVisibleNormalTemplates = computed<TransactionTemplate[]>(() => allNormalTransactionTemplates.value.filter(template => !template.hidden));
+    const allAvailableNormalTemplatesCount = computed<number>(() => allNormalTransactionTemplates.value.length);
+    const allVisibleNormalTemplatesCount = computed<number>(() => allVisibleNormalTemplates.value.length);
 
-            for (const template of allTemplates) {
-                if (!template.hidden) {
-                    visibleTemplates.push(template);
-                }
-            }
-
-            allVisibleTemplates[parseInt(templateType)] = visibleTemplates;
-        }
-
-        return allVisibleTemplates;
-    });
-
-    const allAvailableTemplatesCount = computed<Record<number, number>>(() => {
-        const allAvailableTemplateCounts: Record<number, number> = {};
-
-        for (const [templateType, allTemplates] of entries(allTransactionTemplates.value)) {
-            allAvailableTemplateCounts[parseInt(templateType)] = allTemplates.length;
-        }
-
-        return allAvailableTemplateCounts;
-    });
-
-    const allVisibleTemplatesCount = computed<Record<number, number>>(() => {
-        const allVisibleTemplateCounts: Record<number, number> = {};
-
-        for (const [templateType, allTemplates] of entries(allVisibleTemplates.value)) {
-            allVisibleTemplateCounts[parseInt(templateType)] = allTemplates.length;
-        }
-
-        return allVisibleTemplateCounts;
-    });
-
-    function loadTransactionTemplateList(templateType: number, templates: TransactionTemplate[]): void {
-        allTransactionTemplates.value[templateType] = templates;
-        allTransactionTemplatesMap.value[templateType] = {};
+    function loadNormalTransactionTemplateList(templates: TransactionTemplate[]): void {
+        allNormalTransactionTemplates.value = templates;
+        allNormalTransactionTemplatesMap.value = {};
 
         for (const template of templates) {
-            allTransactionTemplatesMap.value[templateType][template.id] = template;
+            allNormalTransactionTemplatesMap.value[template.id] = template;
         }
     }
 
-    function addTemplateToTransactionTemplateList(templateType: number, template: TransactionTemplate): void {
-        const templates = allTransactionTemplates.value[templateType];
-        const templateMap = allTransactionTemplatesMap.value[templateType];
-
-        if (isArray(templates)) {
-            templates.push(template);
-        }
-
-        if (isObject(templateMap)) {
-            templateMap[template.id] = template;
-        }
+    function addTemplateToNormalTransactionTemplateList(template: TransactionTemplate): void {
+        allNormalTransactionTemplates.value.push(template);
+        allNormalTransactionTemplatesMap.value[template.id] = template;
     }
 
-    function updateTemplateInTransactionTemplateList(templateType: number, currentTemplate: TransactionTemplate): void {
-        const templates = allTransactionTemplates.value[templateType];
-        const templateMap = allTransactionTemplatesMap.value[templateType];
-
-        if (isArray(templates)) {
-            for (const [template, index] of itemAndIndex(templates)) {
-                if (template.id === currentTemplate.id) {
-                    templates.splice(index, 1, currentTemplate);
-                    break;
-                }
+    function updateTemplateInNormalTransactionTemplateList(currentTemplate: TransactionTemplate): void {
+        for (const [template, index] of itemAndIndex(allNormalTransactionTemplates.value)) {
+            if (template.id === currentTemplate.id) {
+                allNormalTransactionTemplates.value.splice(index, 1, currentTemplate);
+                break;
             }
         }
 
-        if (isObject(templateMap)) {
-            templateMap[currentTemplate.id] = currentTemplate;
+        allNormalTransactionTemplatesMap.value[currentTemplate.id] = currentTemplate;
+    }
+
+    function updateTemplateDisplayOrderInNormalTransactionTemplateList({ from, to }: { from: number, to: number }): void {
+        allNormalTransactionTemplates.value.splice(to, 0, allNormalTransactionTemplates.value.splice(from, 1)[0] as TransactionTemplate);
+    }
+
+    function updateTemplateVisibilityInNormalTransactionTemplateList({ template, hidden }: { template: TransactionTemplate, hidden: boolean }): void {
+        if (allNormalTransactionTemplatesMap.value[template.id]) {
+            allNormalTransactionTemplatesMap.value[template.id]!.hidden = hidden;
         }
     }
 
-    function updateTemplateDisplayOrderInTransactionTemplateList(templateType: number, { from, to }: { from: number, to: number }): void {
-        const templates = allTransactionTemplates.value[templateType];
-
-        if (isArray(templates)) {
-            templates.splice(to, 0, templates.splice(from, 1)[0] as TransactionTemplate);
-        }
-    }
-
-    function updateTemplateVisibilityInTransactionTemplateList(templateType: number, { template, hidden }: { template: TransactionTemplate, hidden: boolean }): void {
-        const templateMap = allTransactionTemplatesMap.value[templateType];
-
-        if (isObject(templateMap)) {
-            if (templateMap[template.id]) {
-                templateMap[template.id]!.hidden = hidden;
-            }
-        }
-    }
-
-    function removeTemplateFromTransactionTemplateList(templateType: number, currentTemplate: TransactionTemplate): void {
-        const templates = allTransactionTemplates.value[templateType];
-        const templateMap = allTransactionTemplatesMap.value[templateType];
-
-        if (isArray(templates)) {
-            for (const [template, index] of itemAndIndex(templates)) {
-                if (template.id === currentTemplate.id) {
-                    templates.splice(index, 1);
-                    break;
-                }
+    function removeTemplateFromNormalTransactionTemplateList(currentTemplate: TransactionTemplate): void {
+        for (const [template, index] of itemAndIndex(allNormalTransactionTemplates.value)) {
+            if (template.id === currentTemplate.id) {
+                allNormalTransactionTemplates.value.splice(index, 1);
+                break;
             }
         }
 
-        if (isObject(templateMap)) {
-            if (templateMap[currentTemplate.id]) {
-                delete templateMap[currentTemplate.id];
-            }
+        if (allNormalTransactionTemplatesMap.value[currentTemplate.id]) {
+            delete allNormalTransactionTemplatesMap.value[currentTemplate.id];
         }
     }
 
-    function updateTransactionTemplateListInvalidState(templateType: number, invalidState: boolean): void {
-        transactionTemplateListStatesInvalid.value[templateType] = invalidState;
+    function updateNormalTransactionTemplateListInvalidState(invalidState: boolean): void {
+        normalTransactionTemplateListStateInvalid.value = invalidState;
     }
 
-    function resetTransactionTemplates(): void {
-        allTransactionTemplates.value = {};
-        allTransactionTemplatesMap.value = {};
-        transactionTemplateListStatesInvalid.value = {};
+    function resetNormalTransactionTemplates(): void {
+        loadingPromise = null;
+        allNormalTransactionTemplates.value = [];
+        allNormalTransactionTemplatesMap.value = {};
+        normalTransactionTemplateListStateInvalid.value = true;
     }
 
-    function loadAllTemplates({ templateType, force }: { templateType: number, force?: boolean }): Promise<TransactionTemplate[]> {
-        if (!force && isDefined(transactionTemplateListStatesInvalid.value[templateType]) && !transactionTemplateListStatesInvalid.value[templateType]) {
+    function loadAllNormalTemplates({ force }: { force?: boolean }): Promise<TransactionTemplate[]> {
+        if (loadingPromise) {
+            return loadingPromise;
+        }
+
+        if (!force && !normalTransactionTemplateListStateInvalid.value) {
             return new Promise((resolve) => {
-                resolve(allTransactionTemplates.value[templateType] || []);
+                resolve(allNormalTransactionTemplates.value || []);
             });
         }
 
-        return new Promise((resolve, reject) => {
-            services.getAllTransactionTemplates({ templateType }).then(response => {
+        const currentPromise = loadingPromise = new Promise((resolve, reject) => {
+            services.getAllTransactionTemplates({
+                templateType: TemplateType.Normal.type
+            }).then(response => {
+                if (!loadingPromise || loadingPromise !== currentPromise) {
+                    logger.error('loadingPromise is invalid after retrieving normal template list');
+                    reject({ message: 'An error occurred' });
+                    return;
+                }
+
                 const data = response.data;
 
                 if (!data || !data.success || !data.result) {
+                    loadingPromise = null;
                     reject({ message: 'Unable to retrieve template list' });
                     return;
                 }
 
-                if (!isDefined(transactionTemplateListStatesInvalid.value[templateType]) || transactionTemplateListStatesInvalid.value[templateType]) {
-                    updateTransactionTemplateListInvalidState(templateType, false);
+                if (normalTransactionTemplateListStateInvalid.value) {
+                    updateNormalTransactionTemplateListInvalidState(false);
                 }
 
                 const templates = TransactionTemplate.ofMultiTemplates(data.result);
 
-                if (force && data.result && isEquals(allTransactionTemplates.value[templateType], templates)) {
+                if (force && data.result && isEquals(allNormalTransactionTemplates.value, templates)) {
+                    loadingPromise = null;
                     reject({ message: 'Template list is up to date', isUpToDate: true });
                     return;
                 }
 
-                loadTransactionTemplateList(templateType, templates);
+                loadNormalTransactionTemplateList(templates);
+                loadingPromise = null;
 
                 resolve(templates);
             }).catch(error => {
+                if (loadingPromise === currentPromise) {
+                    loadingPromise = null;
+                }
+
                 if (force) {
                     logger.error('failed to force load template list', error);
                 } else {
@@ -192,6 +151,63 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     reject(error);
                 }
             });
+        });
+
+        return loadingPromise;
+    }
+
+    function loadAllScheduledTransactions({ status }: { status: ScheduledTransactionStatus }): Promise<TransactionTemplate[]> {
+        return new Promise((resolve, reject) => {
+            services.getAllTransactionTemplates({
+                templateType: TemplateType.Schedule.type,
+                scheduledStatus: status
+            }).then(response => {
+                const data = response.data;
+
+                if (!data || !data.success || !data.result) {
+                    reject({ message: 'Unable to retrieve template list' });
+                    return;
+                }
+
+                const templates = TransactionTemplate.ofMultiTemplates(data.result);
+
+                resolve(templates);
+            }).catch(error => {
+                logger.error('failed to load scheduled transaction list', error);
+
+                if (error.response && error.response.data && error.response.data.errorMessage) {
+                    reject({ error: error.response.data });
+                } else if (!error.processed) {
+                    reject({ message: 'Unable to retrieve template list' });
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function loadScheduledTransactionsInMonth({ year, month }: { year: number, month: number }): Promise<ScheduledTransactionOccurrenceResponse[]> {
+        return services.getScheduledTransactionsInMonth({
+            year: year,
+            month: month
+        }).then(response => {
+            const data = response.data;
+
+            if (!data || !data.success || !data.result) {
+                return Promise.reject({ message: 'Unable to retrieve scheduled transaction calendar' });
+            }
+
+            return data.result;
+        }).catch(error => {
+            logger.error('failed to load scheduled transaction calendar', error);
+
+            if (error.response && error.response.data && error.response.data.errorMessage) {
+                return Promise.reject({ error: error.response.data });
+            } else if (!error.processed) {
+                return Promise.reject({ message: 'Unable to retrieve scheduled transaction calendar' });
+            }
+
+            return Promise.reject(error);
         });
     }
 
@@ -255,10 +271,12 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
 
                 const template = TransactionTemplate.ofTemplate(data.result);
 
-                if (!isEdit) {
-                    addTemplateToTransactionTemplateList(template.templateType, template);
-                } else {
-                    updateTemplateInTransactionTemplateList(template.templateType, template);
+                if (template.templateType === TemplateType.Normal.type) {
+                    if (!isEdit) {
+                        addTemplateToNormalTransactionTemplateList(template);
+                    } else {
+                        updateTemplateInNormalTransactionTemplateList(template);
+                    }
                 }
 
                 resolve(template);
@@ -280,42 +298,37 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
         });
     }
 
-    function changeTemplateDisplayOrder({ templateType, templateId, from, to }: { templateType: number, templateId: string, from: number, to: number }): Promise<void> {
+    function changeNormalTemplateDisplayOrder({ templateId, from, to }: { templateId: string, from: number, to: number }): Promise<void> {
         return new Promise((resolve, reject) => {
             let currentTemplate: TransactionTemplate | null = null;
 
-            if (!isArray(allTransactionTemplates.value[templateType])) {
-                reject({ message: 'Unable to move template' });
-                return;
-            }
-
-            for (const template of allTransactionTemplates.value[templateType]) {
+            for (const template of allNormalTransactionTemplates.value) {
                 if (template.id === templateId) {
                     currentTemplate = template;
                     break;
                 }
             }
 
-            if (!currentTemplate || !allTransactionTemplates.value[templateType][to]) {
+            if (!currentTemplate || !allNormalTransactionTemplates.value[to]) {
                 reject({ message: 'Unable to move template' });
                 return;
             }
 
-            if (isDefined(transactionTemplateListStatesInvalid.value[templateType]) && !transactionTemplateListStatesInvalid.value[templateType]) {
-                updateTransactionTemplateListInvalidState(templateType, true);
+            if (!normalTransactionTemplateListStateInvalid.value) {
+                updateNormalTransactionTemplateListInvalidState(true);
             }
 
-            updateTemplateDisplayOrderInTransactionTemplateList(templateType, { from, to });
+            updateTemplateDisplayOrderInNormalTransactionTemplateList({ from, to });
 
             resolve();
         });
     }
 
-    function updateTemplateDisplayOrders({ templateType }: { templateType: number }): Promise<boolean> {
-        const newDisplayOrders: TransactionTemplateNewDisplayOrderRequest[] = [];
+    function updateNormalTemplateDisplayOrders({ newDisplayOrders: specifiedDisplayOrders }: { newDisplayOrders?: TransactionTemplateNewDisplayOrderRequest[] } = {}): Promise<boolean> {
+        const newDisplayOrders: TransactionTemplateNewDisplayOrderRequest[] = specifiedDisplayOrders || [];
 
-        if (isArray(allTransactionTemplates.value[templateType])) {
-            for (const [template, index] of itemAndIndex(allTransactionTemplates.value[templateType])) {
+        if (!isDefined(specifiedDisplayOrders)) {
+            for (const [template, index] of itemAndIndex(allNormalTransactionTemplates.value)) {
                 newDisplayOrders.push({
                     id: template.id,
                     displayOrder: index + 1
@@ -334,9 +347,16 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     return;
                 }
 
-                loadAllTemplates({ templateType: templateType, force: false }).finally(() => {
-                    if (!isDefined(transactionTemplateListStatesInvalid.value[templateType]) || transactionTemplateListStatesInvalid.value[templateType]) {
-                        updateTransactionTemplateListInvalidState(templateType, false);
+                if (isDefined(specifiedDisplayOrders)) {
+                    resolve(data.result);
+                    return;
+                }
+
+                loadAllNormalTemplates({
+                    force: false
+                }).finally(() => {
+                    if (normalTransactionTemplateListStateInvalid.value) {
+                        updateNormalTransactionTemplateListInvalidState(false);
                     }
 
                     resolve(data.result);
@@ -373,10 +393,12 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     return;
                 }
 
-                updateTemplateVisibilityInTransactionTemplateList(template.templateType, {
-                    template: template,
-                    hidden: hidden
-                });
+                if (template.templateType === TemplateType.Normal.type) {
+                    updateTemplateVisibilityInNormalTransactionTemplateList({
+                        template: template,
+                        hidden: hidden
+                    });
+                }
 
                 resolve(data.result);
             }).catch(error => {
@@ -409,12 +431,21 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
                     return;
                 }
 
+                if (template.templateType !== TemplateType.Normal.type) {
+                    if (beforeResolve) {
+                        beforeResolve(() => resolve(data.result));
+                    } else {
+                        resolve(data.result);
+                    }
+                    return;
+                }
+
                 if (beforeResolve) {
                     beforeResolve(() => {
-                        removeTemplateFromTransactionTemplateList(template.templateType, template);
+                        removeTemplateFromNormalTransactionTemplateList(template);
                     });
                 } else {
-                    removeTemplateFromTransactionTemplateList(template.templateType, template);
+                    removeTemplateFromNormalTransactionTemplateList(template);
                 }
 
                 resolve(data.result);
@@ -434,21 +465,23 @@ export const useTransactionTemplatesStore = defineStore('transactionTemplates', 
 
     return {
         // states
-        allTransactionTemplates,
-        allTransactionTemplatesMap,
-        transactionTemplateListStatesInvalid,
+        allNormalTransactionTemplates,
+        allNormalTransactionTemplatesMap,
+        normalTransactionTemplateListStateInvalid,
         // computed states
-        allVisibleTemplates,
-        allAvailableTemplatesCount,
-        allVisibleTemplatesCount,
+        allVisibleNormalTemplates,
+        allAvailableNormalTemplatesCount,
+        allVisibleNormalTemplatesCount,
         // functions
-        updateTransactionTemplateListInvalidState,
-        resetTransactionTemplates,
-        loadAllTemplates,
+        updateNormalTransactionTemplateListInvalidState,
+        resetNormalTransactionTemplates,
+        loadAllNormalTemplates,
+        loadAllScheduledTransactions,
+        loadScheduledTransactionsInMonth,
         getTemplate,
         saveTemplateContent,
-        changeTemplateDisplayOrder,
-        updateTemplateDisplayOrders,
+        changeNormalTemplateDisplayOrder,
+        updateNormalTemplateDisplayOrders,
         hideTemplate,
         deleteTemplate
     };

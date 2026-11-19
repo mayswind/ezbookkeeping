@@ -479,6 +479,14 @@ export function isYear0BasedMonthValid(year: number, month0base: number): boolea
     return year > 0 && month0base >= 0 && month0base <= 11;
 }
 
+export function isYear1BasedMonthValid(year: number, month1base: number): boolean {
+    if (!isNumber(year) || !isNumber(month1base)) {
+        return false;
+    }
+
+    return year > 0 && month1base >= 1 && month1base <= 12;
+}
+
 export function getYear0BasedMonthObjectFromUnixTime(unixTime: number): Year0BasedMonth {
     const datetime = moment.unix(unixTime);
 
@@ -509,6 +517,30 @@ export function getYear0BasedMonthObjectFromString(yearMonth: TextualYearMonth |
     return {
         year: year,
         month0base: month0base
+    };
+}
+
+export function getYear1BasedMonthObjectFromString(yearMonth: TextualYearMonth | ''): Year1BasedMonth | null {
+    if (!isString(yearMonth)) {
+        return null;
+    }
+
+    const items = yearMonth.split('-');
+
+    if (items.length !== 2) {
+        return null;
+    }
+
+    const year = parseInt(items[0] as string);
+    const month1base = parseInt(items[1] as string);
+
+    if (!isYear1BasedMonthValid(year, month1base)) {
+        return null;
+    }
+
+    return {
+        year: year,
+        month1base: month1base
     };
 }
 

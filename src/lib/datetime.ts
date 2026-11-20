@@ -468,7 +468,7 @@ class MomentDateTime implements DateTime {
 }
 
 export function getAllowedYearRange(): [number, number] {
-    return [2000, moment().year() + 1];
+    return [2000, moment().year() + 5];
 }
 
 export function isYear0BasedMonthValid(year: number, month0base: number): boolean {

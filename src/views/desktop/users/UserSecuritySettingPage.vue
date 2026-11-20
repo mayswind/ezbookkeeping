@@ -241,7 +241,7 @@ import {
     mdiTelevision,
     mdiConsole,
     mdiCreationOutline,
-    mdiDevices
+    mdiMonitor
 } from '@mdi/js';
 
 class DesktopPageLinkedThirdPartyLogin {
@@ -297,7 +297,7 @@ class DesktopPageSessionInfo extends SessionInfo {
         } else if (deviceType === SessionDeviceType.MCP) {
             return mdiCreationOutline;
         } else {
-            return mdiDevices;
+            return mdiMonitor;
         }
     }
 }

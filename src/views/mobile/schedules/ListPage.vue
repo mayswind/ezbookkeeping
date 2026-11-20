@@ -554,6 +554,19 @@ init(true);
 
                 .scheduled-calendar-event {
                     font-size: var(--ebk-transaction-calendar-amount-font-size);
+                    padding-inline: 1px;
+
+                    &.scheduled-calendar-event-income {
+                        background: rgba(var(--ebk-amount-color-income), 0.12);
+                    }
+
+                    &.scheduled-calendar-event-expense {
+                        background: rgba(var(--ebk-amount-color-expense), 0.12);
+                    }
+                }
+
+                .scheduled-calendar-skeleton {
+                    height: calc(var(--ebk-transaction-calendar-amount-font-size) * 1.4 + 4px);
                 }
             }
         }

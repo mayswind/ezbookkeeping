@@ -7,50 +7,98 @@
     --ebk-amount-color-white: 250, 240, 237;
 }
 
-:root.expense-amount-color-green .text-expense {
-    color: rgb(var(--ebk-amount-color-green)) !important;
+:root.expense-amount-color-green {
+    --ebk-amount-color-expense: var(--ebk-amount-color-green);
+
+    .text-expense {
+        color: rgb(var(--ebk-amount-color-green)) !important;
+    }
 }
 
-:root.income-amount-color-green .text-income {
-    color: rgb(var(--ebk-amount-color-green)) !important;
+:root.income-amount-color-green {
+    --ebk-amount-color-income: var(--ebk-amount-color-green);
+
+    .text-income {
+        color: rgb(var(--ebk-amount-color-green)) !important;
+    }
 }
 
-:root.expense-amount-color-red .text-expense {
-    color: rgb(var(--ebk-amount-color-red)) !important;
+:root.expense-amount-color-red {
+    --ebk-amount-color-expense: var(--ebk-amount-color-red);
+
+    .text-expense {
+        color: rgb(var(--ebk-amount-color-red)) !important;
+    }
 }
 
-:root.income-amount-color-red .text-income {
-    color: rgb(var(--ebk-amount-color-red)) !important;
+:root.income-amount-color-red {
+    --ebk-amount-color-income: var(--ebk-amount-color-red);
+
+    .text-income {
+        color: rgb(var(--ebk-amount-color-red)) !important;
+    }
 }
 
-:root.expense-amount-color-yellow .text-expense {
-    color: rgb(var(--ebk-amount-color-yellow)) !important;
+:root.expense-amount-color-yellow {
+    --ebk-amount-color-expense: var(--ebk-amount-color-yellow);
+
+    .text-expense {
+        color: rgb(var(--ebk-amount-color-yellow)) !important;
+    }
 }
 
-:root.income-amount-color-yellow .text-income {
-    color: rgb(var(--ebk-amount-color-yellow)) !important;
+:root.income-amount-color-yellow {
+    --ebk-amount-color-income: var(--ebk-amount-color-yellow);
+
+    .text-income {
+        color: rgb(var(--ebk-amount-color-yellow)) !important;
+    }
 }
 
-:root.expense-amount-color-blue .text-expense {
-    color: rgb(var(--ebk-amount-color-blue)) !important;
+:root.expense-amount-color-blue {
+    --ebk-amount-color-expense: var(--ebk-amount-color-blue);
+
+    .text-expense {
+        color: rgb(var(--ebk-amount-color-blue)) !important;
+    }
 }
 
-:root.income-amount-color-blue .text-income {
-    color: rgb(var(--ebk-amount-color-blue)) !important;
+:root.income-amount-color-blue {
+    --ebk-amount-color-income: var(--ebk-amount-color-blue);
+
+    .text-income {
+        color: rgb(var(--ebk-amount-color-blue)) !important;
+    }
 }
 
-:root.expense-amount-color-blackorwhite .text-expense {
-    color: rgb(var(--ebk-amount-color-black)) !important;
+:root.expense-amount-color-blackorwhite {
+    --ebk-amount-color-expense: var(--ebk-amount-color-black);
+
+    .text-expense {
+        color: rgb(var(--ebk-amount-color-black)) !important;
+    }
 }
 
-:root.dark.expense-amount-color-blackorwhite .text-expense {
-    color: rgb(var(--ebk-amount-color-white)) !important;
+:root.dark.expense-amount-color-blackorwhite {
+    --ebk-amount-color-expense: var(--ebk-amount-color-white);
+
+    .text-expense {
+        color: rgb(var(--ebk-amount-color-white)) !important;
+    }
 }
 
-:root.income-amount-color-blackorwhite .text-income {
-    color: rgb(var(--ebk-amount-color-black)) !important;
+:root.income-amount-color-blackorwhite {
+    --ebk-amount-color-income: var(--ebk-amount-color-black);
+
+    .text-income {
+        color: rgb(var(--ebk-amount-color-black)) !important;
+    }
 }
 
-:root.dark.income-amount-color-blackorwhite .text-income {
-    color: rgb(var(--ebk-amount-color-white)) !important;
+:root.dark.income-amount-color-blackorwhite {
+    --ebk-amount-color-income: var(--ebk-amount-color-white);
+
+    .text-income {
+        color: rgb(var(--ebk-amount-color-white)) !important;
+    }
 }

@@ -13,6 +13,7 @@
                 <div class="scheduled-calendar-skeleton" aria-hidden="true" v-if="loading && dataInDate.isCurrentMonth && dataInDate.date >= today"></div>
                 <template v-else-if="!loading">
                     <button class="scheduled-calendar-event" type="button" :key="template.id"
+                            :class="{ 'scheduled-calendar-event-income': template.type === TransactionType.Income, 'scheduled-calendar-event-expense': template.type === TransactionType.Expense }"
                             v-for="template in dataInDate.templates"
                             @click="emit('edit', template)">{{ template.name }}</button>
                 </template>
@@ -28,6 +29,7 @@ import { useI18n } from '@/locales/helpers.ts';
 import { useUserStore } from '@/stores/user.ts';
 
 import type { DateTime, TextualYearMonth, TextualYearMonthDay, WeekDayValue } from '@/core/datetime.ts';
+import { TransactionType } from '@/core/transaction.ts';
 
 import type { TransactionTemplate, ScheduledTransactionOccurrenceResponse } from '@/models/transaction_template.ts';
 
@@ -204,7 +206,6 @@ const templatesByDates = computed<ScheduledTransactionCalendarDay[]>(() => {
         margin-top: 3px;
         padding: 2px 5px;
         border: 0;
-        border-inline-start: 2px solid rgb(var(--ebk-primary-color));
         border-radius: 4px;
         background: rgba(var(--ebk-primary-color), 0.12);
     }

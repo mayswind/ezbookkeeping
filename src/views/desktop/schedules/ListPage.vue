@@ -514,6 +514,17 @@ reload();
 
                 .scheduled-calendar-event {
                     font-size: 0.8125rem;
+                    border-inline-start: 2px solid rgb(var(--ebk-primary-color));
+
+                    &.scheduled-calendar-event-income {
+                        border-inline-start-color: rgb(var(--v-theme-income));
+                        background: rgba(var(--v-theme-income), 0.12);
+                    }
+
+                    &.scheduled-calendar-event-expense {
+                        border-inline-start-color: rgb(var(--v-theme-expense));
+                        background: rgba(var(--v-theme-expense), 0.12);
+                    }
                 }
             }
         }

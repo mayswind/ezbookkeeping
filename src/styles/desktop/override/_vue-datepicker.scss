@@ -19,6 +19,10 @@
         padding-block: 0;
     }
 
+    .dp--calendar > [role='grid'] {
+        overflow: hidden;
+    }
+
     .dp--calendar .dp--calendar-item {
         flex: 1;
         min-width: 0;

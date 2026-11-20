@@ -20,7 +20,7 @@
                             <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
                         </v-btn>
                         <v-spacer/>
-                        <v-btn-group class="mx-2" color="default" density="comfortable" variant="outlined" divided
+                        <v-btn-group class="ms-2" color="default" density="comfortable" variant="outlined" divided
                                      v-if="supportCalendar">
                             <v-btn class="button-icon-with-direction" :icon="mdiArrowLeft"
                                    :aria-label="tt('Previous Period')"
@@ -43,7 +43,7 @@
                                    @click="shiftMonth(1)"/>
                         </v-btn-group>
 
-                        <v-btn-toggle class="toggle-buttons mx-2" style="min-height: 36px"
+                        <v-btn-toggle class="toggle-buttons ms-3" style="min-height: 36px"
                                       density="compact" color="default" variant="outlined"
                                       mandatory="force"
                                       :disabled="loading || updating || displayOrderModified"
@@ -54,7 +54,7 @@
                             <v-btn :value="true" :disabled="!supportCalendar">{{ tt('Calendar View') }}</v-btn>
                         </v-btn-toggle>
 
-                        <v-btn-toggle class="toggle-buttons ms-2" style="min-height: 36px"
+                        <v-btn-toggle class="toggle-buttons ms-3" style="min-height: 36px"
                                       density="compact" color="default" variant="outlined"
                                       mandatory="force"
                                       :disabled="loading || updating || displayOrderModified"

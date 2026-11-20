@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import moment from 'moment-timezone';
 
-import { getShiftedDateRange } from '@/lib/datetime.ts';
+import { getAllBillingCyclesStartAndEndUnixTimes, getShiftedDateRange } from '@/lib/datetime.ts';
 
 function toUnixTime(dateTime: string, timezone: string): number {
 	return moment.tz(dateTime, 'YYYY-MM-DD HH:mm:ss', timezone).unix();
@@ -1046,5 +1046,55 @@ describe('getShiftedDateRange', () => {
 				maxTime: toUnixTime('2024-10-07 23:59:59', timezone)
 			});
 		});
+	});
+});
+
+describe('getAllBillingCyclesStartAndEndUnixTimes', () => {
+	const timezone = 'Europe/Berlin';
+
+	function getCycles(startTime: string, endTime: string, statementDate: number): string[][] {
+		return getAllBillingCyclesStartAndEndUnixTimes(toUnixTime(startTime, timezone), toUnixTime(endTime, timezone), statementDate)
+			.map(cycle => [
+				`${cycle.year}-${cycle.month0base + 1}`,
+				moment.unix(cycle.minUnixTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
+				moment.unix(cycle.maxUnixTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss')
+			]);
+	}
+
+	beforeEach(() => {
+		moment.tz.setDefault(timezone);
+	});
+
+	afterEach(() => {
+		moment.tz.setDefault();
+	});
+
+	it('should end the February cycle on the statement date 28 in a non-leap year', () => {
+		expect(getCycles('2025-01-10 00:00:00', '2025-02-27 23:59:59', 28)).toEqual([
+			['2025-1', '2024-12-29 00:00:00', '2025-01-28 23:59:59'],
+			['2025-2', '2025-01-29 00:00:00', '2025-02-28 23:59:59']
+		]);
+	});
+
+	it('should end the February cycle on the statement date 28 in a leap year', () => {
+		expect(getCycles('2024-01-10 00:00:00', '2024-03-10 23:59:59', 28)).toEqual([
+			['2024-1', '2023-12-29 00:00:00', '2024-01-28 23:59:59'],
+			['2024-2', '2024-01-29 00:00:00', '2024-02-28 23:59:59'],
+			['2024-3', '2024-02-29 00:00:00', '2024-03-28 23:59:59']
+		]);
+	});
+
+	it('should return contiguous cycles across February 28 of a non-leap year', () => {
+		const cycles = getAllBillingCyclesStartAndEndUnixTimes(toUnixTime('2026-01-01 00:00:00', timezone), toUnixTime('2026-12-31 23:59:59', timezone), 28);
+
+		expect(cycles.length).toBe(13);
+
+		for (let i = 0; i < cycles.length; i++) {
+			expect(moment.unix(cycles[i]!.maxUnixTime).tz(timezone).format('DD HH:mm:ss')).toBe('28 23:59:59');
+
+			if (i > 0) {
+				expect(cycles[i]!.minUnixTime).toBe(cycles[i - 1]!.maxUnixTime + 1);
+			}
+		}
 	});
 });

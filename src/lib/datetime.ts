@@ -1176,17 +1176,20 @@ export function getAllBillingCyclesStartAndEndUnixTimes(startUnixTime: number, e
     while (unixTime <= endUnixTime) {
         const currentDateTime = parseDateTimeFromUnixTime(unixTime);
         let currentBillingCycleMinDateTime: DateTime;
+        let currentBillingCycleMaxDateTime: DateTime;
 
         if (currentDateTime.getGregorianCalendarDay() > statementDate) {
             const currentMonthMinDateTime = getMonthFirstDateTimeBySpecifiedUnixTime(unixTime);
+            const nextMonthMinDateTime = currentMonthMinDateTime.add(1, 'months');
             currentBillingCycleMinDateTime = currentMonthMinDateTime.add(statementDate, 'days');
+            currentBillingCycleMaxDateTime = nextMonthMinDateTime.add(statementDate, 'days').subtract(1, 'seconds');
         } else {
             const currentMonthMinDateTime = getMonthFirstDateTimeBySpecifiedUnixTime(unixTime);
             const previousMonthMinDateTime = currentMonthMinDateTime.add(-1, 'months');
             currentBillingCycleMinDateTime = previousMonthMinDateTime.add(statementDate, 'days');
+            currentBillingCycleMaxDateTime = currentMonthMinDateTime.add(statementDate, 'days').subtract(1, 'seconds');
         }
 
-        const currentBillingCycleMaxDateTime = currentBillingCycleMinDateTime.add(1, 'months').subtract(1, 'seconds');
         const yearMonth: Year0BasedMonth = {
             year: currentBillingCycleMaxDateTime.getGregorianCalendarYear(),
             month0base: currentBillingCycleMaxDateTime.getGregorianCalendarMonth() - 1

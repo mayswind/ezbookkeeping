@@ -547,6 +547,7 @@ init(true);
 
             .scheduled-calendar-day {
                 min-height: 74px;
+                padding: 4px;
 
                 .scheduled-calendar-alternate-date {
                     font-size: var(--ebk-transaction-calendar-alternate-date-font-size);

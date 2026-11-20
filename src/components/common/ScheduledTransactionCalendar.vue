@@ -6,9 +6,10 @@
                  :key="index" v-for="(dataInDate, index) in templatesByDates">
                 <div class="scheduled-calendar-date"
                      :class="{ 'scheduled-calendar-today': dataInDate.date === today, 'scheduled-calendar-other-month': !dataInDate.isCurrentMonth }"
-                     :aria-label="formatGregorianTextualYearMonthDayToLongDate(dataInDate.date)">{{ dataInDate.label }}</div>
-                <div class="scheduled-calendar-alternate-date" :class="{ 'scheduled-calendar-other-month': !dataInDate.isCurrentMonth }"
-                     v-if="dataInDate.alternateDate">{{ dataInDate.alternateDate }}</div>
+                     :aria-label="formatGregorianTextualYearMonthDayToLongDate(dataInDate.date)">
+                    <div>{{ dataInDate.label }}</div>
+                    <div class="scheduled-calendar-alternate-date" v-if="dataInDate.alternateDate">{{ dataInDate.alternateDate }}</div>
+                </div>
                 <div class="scheduled-calendar-skeleton" aria-hidden="true" v-if="loading && dataInDate.isCurrentMonth && dataInDate.date >= today"></div>
                 <template v-else-if="!loading">
                     <button class="scheduled-calendar-event" type="button" :key="template.id"
@@ -163,7 +164,9 @@ const templatesByDates = computed<ScheduledTransactionCalendarDay[]>(() => {
     }
 
     .scheduled-calendar-date {
+        box-sizing: border-box;
         display: inline-block;
+        max-width: 100%;
         padding: 4px 7px;
         border-radius: 4px;
 
@@ -179,17 +182,11 @@ const templatesByDates = computed<ScheduledTransactionCalendarDay[]>(() => {
     }
 
     .scheduled-calendar-alternate-date {
-        margin-top: 2px;
-        margin-bottom: 6px;
-        padding-inline: 5px;
+        font-weight: 400;
         opacity: 0.6;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-
-        &.scheduled-calendar-other-month {
-            opacity: 0.3;
-        }
     }
 
     .scheduled-calendar-event {

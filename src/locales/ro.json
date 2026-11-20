@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "În fiecare {days} din lună",
             "everyMultiDaysOfYear": "În fiecare {days} din an",
             "everyNDays": "La fiecare {n} zile",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "Ai înregistrat {count} conturi",
             "addNewTag": "Adaugă eticheta nouă „{tag}”",
             "clickToSelectedFile": "Fă clic pentru a selecta fișierul de import ({extensions})",

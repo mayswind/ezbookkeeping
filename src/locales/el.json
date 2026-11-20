@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Κάθε {days} του μήνα",
             "everyMultiDaysOfYear": "Κάθε {days} του έτους",
             "everyNDays": "Κάθε {n} ημέρες",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "Έχετε καταχωρίσει {count} λογαριασμούς",
             "addNewTag": "Προσθήκη νέας ετικέτας \"{tag}\"",
             "clickToSelectedFile": "Κάντε κλικ για επιλογή αρχείου εισαγωγής ({extensions})",

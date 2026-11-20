@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Ayın her {days} günü",
             "everyMultiDaysOfYear": "Yılın her {days} günü",
             "everyNDays": "Her {n} günde bir",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "{count} adet hesap kaydettiniz",
             "addNewTag": "Yeni etiket ekle: \"{tag}\"",
             "clickToSelectedFile": "İçe aktarılacak dosyayı seçmek için tıklayın ({extensions})",

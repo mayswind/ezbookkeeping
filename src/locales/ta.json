@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "மாதத்தில் ஒவ்வொரு {days}",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "நீங்கள் {count} கணக்குகளை பதிவு செய்துள்ளீர்கள்",
             "addNewTag": "புதிய குறிச்சொல் சேர்க்க \"{tag}\"",
             "clickToSelectedFile": "இறக்குமதி கோப்பைத் தேர்ந்தெடுக்க கிளிக் செய்யவும் ({extensions})",

@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Todo dia {days}",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "Você registrou {count} contas",
             "addNewTag": "Adicionar nova etiqueta \"{tag}\"",
             "clickToSelectedFile": "Clique para selecionar o arquivo de importação ({extensions})",

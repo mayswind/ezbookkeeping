@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "ทุกๆ {days} ของเดือน",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "คุณได้บันทึกบัญชี {count} บัญชี",
             "addNewTag": "เพิ่มแท็กใหม่ \"{tag}\"",
             "clickToSelectedFile": "คลิกเพื่อเลือกไฟล์นำเข้า ({extensions})",

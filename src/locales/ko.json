@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "매월 {days}일",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "{count}개의 계정을 기록했습니다",
             "addNewTag": "새 태그 \"{tag}\"를 추가했습니다.",
             "clickToSelectedFile": "클릭해서 내보내기할 파일을 선택하세요 ({extensions})",

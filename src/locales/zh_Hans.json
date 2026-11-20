@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "每月{days}",
             "everyMultiDaysOfYear": "每年{days}",
             "everyNDays": "每 {n} 天",
-            "nextExecutionTime": "下次执行：{time}",
+            "nextPostingTime": "下次入账：{time}",
             "youHaveAccounts": "您已经记录了 {count} 个账户",
             "addNewTag": "添加新标签 \"{tag}\"",
             "clickToSelectedFile": "点击选择导入文件 ({extensions})",

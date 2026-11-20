@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Каждое {days} число месяца",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "У вас добавлено {count} счетов",
             "addNewTag": "Добавить новый тег \"{tag}\"",
             "clickToSelectedFile": "Нажмите, чтобы выбрать файл для импорта ({extensions})",

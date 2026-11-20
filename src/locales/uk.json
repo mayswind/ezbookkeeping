@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Кожного {days} числа місяця",
             "everyMultiDaysOfYear": "Кожні {days} року",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "Зареєстровано рахунків: {count}",
             "addNewTag": "Додати новий тег \"{tag}\"",
             "clickToSelectedFile": "Натисніть, щоб вибрати файл для імпорту ({extensions})",

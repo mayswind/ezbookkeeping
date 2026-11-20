@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Elke {days} van de maand",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "Je hebt {count} rekeningen geregistreerd",
             "addNewTag": "Nieuwe tag toevoegen \"{tag}\"",
             "clickToSelectedFile": "Klik om importbestand te selecteren ({extensions})",

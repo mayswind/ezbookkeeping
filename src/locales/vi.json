@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Mỗi ngày {days} trong tháng",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "Bạn đã ghi nhận {count} tài khoản",
             "addNewTag": "Add new tag \"{tag}\"",
             "clickToSelectedFile": "Nhấp để chọn tệp nhập khẩu ({extensions})",

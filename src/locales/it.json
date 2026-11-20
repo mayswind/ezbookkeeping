@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "Ogni {days} del mese",
             "everyMultiDaysOfYear": "Ogni {days} dell'anno",
             "everyNDays": "Ogni {n} giorni",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "Hai registrato {count} profili",
             "addNewTag": "Aggiungi nuovo tag \"{tag}\"",
             "clickToSelectedFile": "Carica un file ({extensions})",

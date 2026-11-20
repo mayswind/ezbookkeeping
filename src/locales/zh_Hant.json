@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "每月{days}",
             "everyMultiDaysOfYear": "每年{days}",
             "everyNDays": "每 {n} 天",
-            "nextExecutionTime": "下次執行：{time}",
+            "nextPostingTime": "下次入帳：{time}",
             "youHaveAccounts": "您已經記錄了 {count} 個帳戶",
             "addNewTag": "新增標籤 \"{tag}\"",
             "clickToSelectedFile": "點擊選擇匯入檔案 ({extensions})",

@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "ಪ್ರತಿ {days} ತಿಂಗಳಲ್ಲಿ",
             "everyMultiDaysOfYear": "Every {days} of year",
             "everyNDays": "Every {n} days",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "ನೀವು {count} ಖಾತೆಗಳನ್ನು ದಾಖಲಿಸಿದ್ದೀರಿ",
             "addNewTag": "ಹೊಸ ಟ್ಯಾಗ್ ಸೇರಿಸಿ \"{tag}\"",
             "clickToSelectedFile": "ಆಮದು ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ ({extensions})",

@@ -150,7 +150,7 @@
             "everyMultiDaysOfMonth": "毎月{days}日",
             "everyMultiDaysOfYear": "毎年{days}",
             "everyNDays": "{n}日ごと",
-            "nextExecutionTime": "Next execution: {time}",
+            "nextPostingTime": "Next posting: {time}",
             "youHaveAccounts": "{count}件の口座を記録しました",
             "addNewTag": "新しいタグ「{tag}」を追加",
             "clickToSelectedFile": "クリックしてインポートファイルを選択します（{extensions}）",

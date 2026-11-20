@@ -178,7 +178,7 @@ export function useScheduledTransactionListPageBase() {
     }
 
     function getDisplayNextScheduledTime(template: TransactionTemplate): string {
-        return template.nextScheduledTime ? tt('format.misc.nextExecutionTime', {
+        return template.nextScheduledTime ? tt('format.misc.nextPostingTime', {
             time: formatDateTimeToLongDate(parseDateTimeFromUnixTime(template.nextScheduledTime))
         }) : '';
     }

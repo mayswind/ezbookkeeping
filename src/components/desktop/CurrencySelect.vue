@@ -4,6 +4,7 @@
         item-value="currencyCode"
         auto-select-first
         persistent-placeholder
+        :class="{ 'currency-select-auto-size': autoSize }"
         :density="density"
         :variant="variant"
         :disabled="disabled"
@@ -56,7 +57,9 @@ const props = defineProps<{
     label?: string;
     placeholder?: string;
     withNotSet?: boolean;
+    allowedCurrencies?: string[];
     modelValue: string;
+    autoSize?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -65,7 +68,21 @@ const emit = defineEmits<{
 
 const { tt, getAllCurrencies } = useI18n();
 
-const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => getAllCurrencies(props.withNotSet));
+const allCurrencies = computed<LocalizedCurrencyInfo[]>(() => {
+    const currencies = getAllCurrencies();
+
+    if (props.allowedCurrencies && props.allowedCurrencies.length > 0) {
+        const allowedCurrencies: Record<string, boolean> = {};
+
+        for (const currency of props.allowedCurrencies) {
+            allowedCurrencies[currency] = true;
+        }
+
+        return currencies.filter(currency => !!allowedCurrencies[currency.currencyCode]);
+    }
+
+    return currencies;
+});
 
 const currentCurrencyValue = computed<string | null>({
     get: () => props.modelValue,
@@ -93,3 +110,14 @@ function filterCurrency(value: string, query: string, item?: { value: unknown, r
         || NormalizedText.normalizeForSearch(item.raw.currencyCode).indexOf(normalizedFilterContent) >= 0;
 }
 </script>
+
+<style scoped>
+.currency-select-auto-size.v-autocomplete {
+    flex: 0 1 auto;
+    width: max-content;
+}
+
+.currency-select-auto-size.v-autocomplete :deep(.v-autocomplete__selection) {
+    max-width: calc(100% - 2px);
+}
+</style>

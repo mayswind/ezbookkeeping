@@ -2,185 +2,160 @@
     <v-row class="match-height">
         <v-col cols="12">
             <v-card>
-                <v-layout class="page-with-navigation-drawer">
-                    <v-navigation-drawer ref="navbar" :permanent="alwaysShowNav" v-model="showNav">
-                        <div class="mx-4 my-3">
-                            <btn-vertical-group :disabled="loading" :buttons="[
-                                { name: tt('Expense'), value: CategoryType.Expense },
-                                { name: tt('Income'), value: CategoryType.Income },
-                                { name: tt('Transfer'), value: CategoryType.Transfer }
-                            ]" v-model="activeCategoryType" @update:model-value="switchAllPrimaryCategories" />
-                        </div>
-                        <v-divider />
-                        <v-tabs show-arrows class="my-3" direction="vertical"
-                                :disabled="loading" v-model="primaryCategoryId">
-                            <v-tab class="tab-text-truncate" value="0" @click="switchAllPrimaryCategories">
-                                <span class="text-truncate">{{ tt('Primary Categories') }}</span>
-                            </v-tab>
-                            <template :key="category.id" v-for="category in primaryCategories">
-                                <v-tab class="tab-text-truncate" :value="category.id" v-if="!category.hidden"
-                                       @click="switchPrimaryCategory(category)">
-                                    <span class="text-truncate">{{ category.name }}</span>
-                                </v-tab>
+                <template #title>
+                    <div class="title-and-toolbar d-flex align-center">
+                        <span>{{ tt('Transaction Categories') }}</span>
+                        <v-btn class="ms-3" color="default" variant="outlined"
+                               :disabled="loading || updating" @click="add">{{ tt('Add') }}</v-btn>
+                        <v-btn class="ms-3" color="primary" variant="tonal"
+                               :disabled="loading || updating" @click="saveSortResult"
+                               v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
+                        <v-btn density="compact" color="default" variant="text" class="ms-2"
+                               :aria-label="tt('Refresh')" :icon="true" :loading="loading || updating" @click="reload(true)">
+                            <template #loader>
+                                <v-progress-circular indeterminate size="20"/>
                             </template>
-                            <template v-if="loading && (!primaryCategories || primaryCategories.length < 1)">
-                                <v-skeleton-loader class="skeleton-no-margin mx-4 mt-h1 py-3" type="text"
-                                                   :key="itemIdx" :loading="true" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"></v-skeleton-loader>
-                            </template>
-                        </v-tabs>
-                    </v-navigation-drawer>
-                    <v-main>
-                        <v-window class="d-flex flex-grow-1 disable-tab-transition w-100-window-container" v-model="activeTab">
-                            <v-window-item value="categoryPage">
-                                <v-card variant="flat" :min-height="cardMinHeight">
-                                    <template #title>
-                                        <div class="title-and-toolbar d-flex align-center">
-                                            <v-btn class="me-3 d-lg-none" density="compact" color="default" variant="plain"
-                                                   :aria-label="tt('Open Menu')" :ripple="false" :icon="true" @click="showNav = !showNav">
-                                                <v-icon :icon="mdiMenu" size="24" />
-                                            </v-btn>
-                                            <span>{{ tt('Transaction Categories') }}</span>
-                                            <v-btn class="ms-3" color="default" variant="outlined"
-                                                   :disabled="loading || updating" @click="add">{{ tt('Add') }}</v-btn>
-                                            <v-btn class="ms-3" color="primary" variant="tonal"
-                                                   :disabled="loading || updating" @click="saveSortResult"
-                                                   v-if="displayOrderModified">{{ tt('Save Display Order') }}</v-btn>
-                                            <v-btn density="compact" color="default" variant="text" class="ms-2"
-                                                   :aria-label="tt('Refresh')" :icon="true" :loading="loading || updating" @click="reload(true)">
-                                                <template #loader>
-                                                    <v-progress-circular indeterminate size="20"/>
-                                                </template>
-                                                <v-icon :icon="mdiRefresh" size="24" />
-                                                <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
-                                            </v-btn>
-                                            <v-spacer/>
-                                            <v-btn density="comfortable" color="default" variant="text" class="ms-2"
-                                                   :aria-label="tt('More')" :disabled="loading || updating" :icon="true">
-                                                <v-icon :icon="mdiDotsVertical" />
-                                                <v-menu activator="parent">
-                                                    <v-list>
-                                                        <v-list-item :prepend-icon="mdiEyeOutline"
-                                                                     :title="tt('Show Hidden Transaction Categories')"
-                                                                     v-if="!showHidden" @click="showHidden = true"></v-list-item>
-                                                        <v-list-item :prepend-icon="mdiEyeOffOutline"
-                                                                     :title="tt('Hide Hidden Transaction Categories')"
-                                                                     v-if="showHidden" @click="showHidden = false"></v-list-item>
-                                                    </v-list>
-                                                </v-menu>
-                                            </v-btn>
+                            <v-icon :icon="mdiRefresh" size="24" />
+                            <v-tooltip activator="parent">{{ tt('Refresh') }}</v-tooltip>
+                        </v-btn>
+                        <v-spacer/>
+                        <v-select class="ms-2 flex-0-1" density="compact" variant="outlined"
+                                  item-title="name" item-value="value"
+                                  :disabled="loading"
+                                  :items="availableRootCategories"
+                                  v-model="primaryCategoryId">
+                        </v-select>
+                        <v-btn-toggle class="toggle-buttons ms-3" style="min-height: 36px"
+                                      density="compact" color="default" variant="outlined"
+                                      mandatory="force"
+                                      :disabled="loading"
+                                      v-model="activeCategoryType"
+                                      @update:model-value="switchAllPrimaryCategories">
+                            <v-btn :value="CategoryType.Expense">{{ tt('Expense') }}</v-btn>
+                            <v-btn :value="CategoryType.Income">{{ tt('Income') }}</v-btn>
+                            <v-btn :value="CategoryType.Transfer">{{ tt('Transfer') }}</v-btn>
+                        </v-btn-toggle>
+                        <v-btn density="comfortable" color="default" variant="text" class="ms-2"
+                               :aria-label="tt('More')" :disabled="loading || updating" :icon="true">
+                            <v-icon :icon="mdiDotsVertical" />
+                            <v-menu activator="parent">
+                                <v-list>
+                                    <v-list-item :prepend-icon="mdiEyeOutline"
+                                                 :title="tt('Show Hidden Transaction Categories')"
+                                                 v-if="!showHidden" @click="showHidden = true"></v-list-item>
+                                    <v-list-item :prepend-icon="mdiEyeOffOutline"
+                                                 :title="tt('Hide Hidden Transaction Categories')"
+                                                 v-if="showHidden" @click="showHidden = false"></v-list-item>
+                                </v-list>
+                            </v-menu>
+                        </v-btn>
+                    </div>
+                </template>
+
+                <v-table class="transaction-category-table table-striped" :hover="!loading">
+                    <thead>
+                    <tr>
+                        <th>
+                            <div class="d-flex align-center">
+                                <span>{{ tt('Category Name') }}</span>
+                                <v-spacer/>
+                                <span>{{ tt('Operation') }}</span>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody v-if="loading && noAvailableCategory">
+                    <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]">
+                        <td class="px-0">
+                            <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                    <tbody v-if="!loading && noAvailableCategory">
+                    <tr>
+                        <td>
+                            <div class="d-flex align-center">
+                                <span>{{ tt('No available category') }}</span>
+                                <v-btn class="ms-3" color="default" variant="outlined"
+                                       @click="showPresetDialog = true"
+                                       v-if="hasSubCategories && noCategory">
+                                    {{ tt('Add Default Categories') }}
+                                </v-btn>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                    <draggable-list tag="tbody"
+                                    item-key="id"
+                                    handle=".drag-handle"
+                                    ghost-class="dragging-item"
+                                    :disabled="noAvailableCategory"
+                                    v-model="categories"
+                                    @change="onMove">
+                        <template #item="{ element }">
+                            <tr class="transaction-category-table-row" v-if="showHidden || !element.hidden"
+                                @mouseenter="hoveredCategoryId = element.id" @mouseleave="hoveredCategoryId = ''">
+                                <td>
+                                    <div class="d-flex align-center">
+                                        <div class="d-flex align-center" :class="{ 'cursor-pointer': isCategorySupportSwitch(element) }"
+                                             @click="switchPrimaryCategory(element)">
+                                            <ItemIcon :icon-type="getCategoryIconType(element.iconType)"
+                                                      :icon-id="element.icon" :color="element.color"
+                                                      :hidden-status="element.hidden" />
+                                            <div class="d-flex flex-column py-2">
+                                                <span class="ms-2">{{ element.name }}</span>
+                                                <span class="transaction-category-comment ms-2">{{ element.comment }}</span>
+                                            </div>
                                         </div>
-                                    </template>
 
-                                    <v-table class="transaction-category-table table-striped"
-                                             density="default" :hover="!loading">
-                                        <thead>
-                                        <tr>
-                                            <th>
-                                                <div class="d-flex align-center">
-                                                    <span>{{ tt('Category Name') }}</span>
-                                                    <v-spacer/>
-                                                    <span>{{ tt('Operation') }}</span>
-                                                </div>
-                                            </th>
-                                        </tr>
-                                        </thead>
+                                        <v-spacer/>
 
-                                        <tbody v-if="loading && noAvailableCategory">
-                                        <tr :key="itemIdx" v-for="itemIdx in [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]">
-                                            <td class="px-0">
-                                                <v-skeleton-loader type="text" :loading="true"></v-skeleton-loader>
-                                            </td>
-                                        </tr>
-                                        </tbody>
+                                        <template v-if="hoveredCategoryId === element.id && !loading">
+                                            <v-btn class="px-2 ms-2" color="default"
+                                                   density="comfortable" variant="text"
+                                                   :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
+                                                   :loading="categoryHiding[element.id]"
+                                                   :disabled="loading || updating"
+                                                   @click="hide(element, !element.hidden)">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20" width="2"/>
+                                                </template>
+                                                {{ element.hidden ? tt('Show') : tt('Hide') }}
+                                            </v-btn>
+                                            <v-btn class="px-2" color="default"
+                                                   density="comfortable" variant="text"
+                                                   :prepend-icon="mdiPencilOutline"
+                                                   :disabled="loading || updating"
+                                                   @click="edit(element)">
+                                                {{ tt('Edit') }}
+                                            </v-btn>
+                                            <v-btn class="px-2" color="default"
+                                                   density="comfortable" variant="text"
+                                                   :prepend-icon="mdiDeleteOutline"
+                                                   :loading="categoryRemoving[element.id]"
+                                                   :disabled="loading || updating"
+                                                   @click="remove(element)">
+                                                <template #loader>
+                                                    <v-progress-circular indeterminate size="20" width="2"/>
+                                                </template>
+                                                {{ tt('Delete') }}
+                                            </v-btn>
+                                        </template>
 
-                                        <tbody v-if="!loading && noAvailableCategory">
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-center">
-                                                    <span>{{ tt('No available category') }}</span>
-                                                    <v-btn class="ms-3" color="default" variant="outlined"
-                                                           @click="showPresetDialog = true"
-                                                           v-if="hasSubCategories && noCategory">
-                                                        {{ tt('Add Default Categories') }}
-                                                    </v-btn>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-
-                                        <draggable-list tag="tbody"
-                                                        item-key="id"
-                                                        handle=".drag-handle"
-                                                        ghost-class="dragging-item"
-                                                        :disabled="noAvailableCategory"
-                                                        v-model="categories"
-                                                        @change="onMove">
-                                            <template #item="{ element }">
-                                                <tr class="transaction-category-table-row" v-if="showHidden || !element.hidden"
-                                                    @mouseenter="hoveredCategoryId = element.id" @mouseleave="hoveredCategoryId = ''">
-                                                    <td>
-                                                        <div class="d-flex align-center">
-                                                            <div class="d-flex align-center" :class="{ 'cursor-pointer': isCategorySupportSwitch(element) }"
-                                                                 @click="switchPrimaryCategory(element)">
-                                                                <ItemIcon :icon-type="getCategoryIconType(element.iconType)"
-                                                                          :icon-id="element.icon" :color="element.color"
-                                                                          :hidden-status="element.hidden" />
-                                                                <div class="d-flex flex-column py-2">
-                                                                    <span class="ms-2">{{ element.name }}</span>
-                                                                    <span class="transaction-category-comment ms-2">{{ element.comment }}</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <v-spacer/>
-
-                                                            <template v-if="hoveredCategoryId === element.id && !loading">
-                                                                <v-btn class="px-2 ms-2" color="default"
-                                                                       density="comfortable" variant="text"
-                                                                       :prepend-icon="element.hidden ? mdiEyeOutline : mdiEyeOffOutline"
-                                                                       :loading="categoryHiding[element.id]"
-                                                                       :disabled="loading || updating"
-                                                                       @click="hide(element, !element.hidden)">
-                                                                    <template #loader>
-                                                                        <v-progress-circular indeterminate size="20" width="2"/>
-                                                                    </template>
-                                                                    {{ element.hidden ? tt('Show') : tt('Hide') }}
-                                                                </v-btn>
-                                                                <v-btn class="px-2" color="default"
-                                                                       density="comfortable" variant="text"
-                                                                       :prepend-icon="mdiPencilOutline"
-                                                                       :disabled="loading || updating"
-                                                                       @click="edit(element)">
-                                                                    {{ tt('Edit') }}
-                                                                </v-btn>
-                                                                <v-btn class="px-2" color="default"
-                                                                       density="comfortable" variant="text"
-                                                                       :prepend-icon="mdiDeleteOutline"
-                                                                       :loading="categoryRemoving[element.id]"
-                                                                       :disabled="loading || updating"
-                                                                       @click="remove(element)">
-                                                                    <template #loader>
-                                                                        <v-progress-circular indeterminate size="20" width="2"/>
-                                                                    </template>
-                                                                    {{ tt('Delete') }}
-                                                                </v-btn>
-                                                            </template>
-
-                                                            <span class="ms-2">
-                                                                <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
-                                                                        :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
-                                                                <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1 && hoveredCategoryId === element.id">{{ tt('Drag to Reorder') }}</v-tooltip>
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </draggable-list>
-                                    </v-table>
-                                </v-card>
-                            </v-window-item>
-                        </v-window>
-                    </v-main>
-                </v-layout>
+                                        <span class="ms-2">
+                                            <v-icon :class="!loading && !updating && availableCategoryCount > 1 ? 'drag-handle' : 'disabled'"
+                                                    :aria-label="tt('Drag to Reorder')" :icon="mdiDrag"/>
+                                            <v-tooltip activator="parent" v-if="!loading && !updating && availableCategoryCount > 1 && hoveredCategoryId === element.id">{{ tt('Drag to Reorder') }}</v-tooltip>
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </draggable-list>
+                </v-table>
             </v-card>
         </v-col>
     </v-row>
@@ -193,14 +168,11 @@
 </template>
 
 <script setup lang="ts">
-import { VNavigationDrawer } from 'vuetify/components/VNavigationDrawer';
-
 import ConfirmDialog from '@/components/desktop/ConfirmDialog.vue';
 import EditDialog from './list/dialogs/EditDialog.vue';
 import PresetDialog from './list/dialogs/PresetDialog.vue';
 
-import { ref, computed, useTemplateRef, watch, nextTick } from 'vue';
-import { useDisplay } from 'vuetify';
+import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPageBase.ts';
@@ -208,6 +180,7 @@ import { useCategoryListPageBase } from '@/views/base/categories/CategoryListPag
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useDesktopPageStore } from '@/stores/desktopPage.ts';
 
+import type { NameValue } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import type { TransactionCategory } from '@/models/transaction_category.ts';
 
@@ -216,11 +189,9 @@ import {
     isNoAvailableCategory,
     getAvailableCategoryCount
 } from '@/lib/category.ts';
-import { getNavSideBarOuterHeight } from '@/lib/ui/desktop.ts';
 
 import {
     mdiRefresh,
-    mdiMenu,
     mdiPencilOutline,
     mdiEyeOffOutline,
     mdiEyeOutline,
@@ -232,29 +203,39 @@ import {
 type ConfirmDialogType = InstanceType<typeof ConfirmDialog>;
 type EditDialogType = InstanceType<typeof EditDialog>;
 
-const { lgAndUp } = useDisplay();
 const { tt } = useI18n();
 const { loading, primaryCategoryId, currentPrimaryCategory } = useCategoryListPageBase();
 
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const desktopPageStore = useDesktopPageStore();
 
-const navbar = useTemplateRef<VNavigationDrawer>('navbar');
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const editDialog = useTemplateRef<EditDialogType>('editDialog');
 
 const activeCategoryType = ref<CategoryType>(CategoryType.Expense);
-const activeTab = ref<string>('categoryPage');
 const updating = ref<boolean>(false);
 const hoveredCategoryId = ref<string>('');
 const categoryHiding = ref<Record<string, boolean>>({});
 const categoryRemoving = ref<Record<string, boolean>>({});
 const displayOrderModified = ref<boolean>(false);
-const cardMinHeight = ref<number>(680);
-const alwaysShowNav = ref<boolean>(lgAndUp.value);
-const showNav = ref<boolean>(lgAndUp.value);
 const showHidden = ref<boolean>(false);
 const showPresetDialog = ref<boolean>(false);
+
+const availableRootCategories = computed<NameValue[]>(() => {
+    const categories: NameValue[] = [];
+
+    categories.push({
+        name: tt('Primary Categories'),
+        value: '0'
+    });
+
+    categories.push(...primaryCategories.value.filter(category => !category.hidden).map(category => ({
+        name: category.name,
+        value: category.id
+    })));
+
+    return categories;
+});
 
 const primaryCategories = computed<TransactionCategory[]>(() => {
     if (!transactionCategoriesStore.allTransactionCategories || !transactionCategoriesStore.allTransactionCategories[activeCategoryType.value]) {
@@ -288,15 +269,6 @@ const noAvailableCategory = computed<boolean>(() => isNoAvailableCategory(catego
 const noCategory = computed<boolean>(() => categories.value.length < 1);
 const availableCategoryCount = computed<number>(() => getAvailableCategoryCount(categories.value, showHidden.value));
 
-function updateCardMinHeight(): void {
-    nextTick(() => {
-        if (navbar.value && navbar.value.$el && navbar.value.$el.nextElementSibling) {
-            const navbarHeight = getNavSideBarOuterHeight(navbar.value.$el.nextElementSibling);
-            cardMinHeight.value = Math.max(navbarHeight, 680);
-        }
-    });
-}
-
 function isCategorySupportSwitch(category: TransactionCategory): boolean {
     if (!category || category.hidden) {
         return false;
@@ -307,7 +279,6 @@ function isCategorySupportSwitch(category: TransactionCategory): boolean {
 
 function switchAllPrimaryCategories(): void {
     primaryCategoryId.value = '0';
-    updateCardMinHeight();
 }
 
 function switchPrimaryCategory(category: TransactionCategory): void {
@@ -318,8 +289,6 @@ function switchPrimaryCategory(category: TransactionCategory): void {
     if (!category.parentId || category.parentId === '' || category.parentId === '0') {
         primaryCategoryId.value = category.id;
     }
-
-    updateCardMinHeight();
 }
 
 function reload(force: boolean): void {
@@ -334,8 +303,6 @@ function reload(force: boolean): void {
         if (force) {
             desktopPageStore.addToast('Category list has been updated');
         }
-
-        updateCardMinHeight();
     }).catch(error => {
         loading.value = false;
 
@@ -359,8 +326,6 @@ function add(): void {
         if (result && result.message) {
             desktopPageStore.addToast(result.message);
         }
-
-        updateCardMinHeight();
     }).catch(error => {
         if (error) {
             desktopPageStore.addErrorToast(error);
@@ -380,8 +345,6 @@ function edit(category: TransactionCategory): void {
         if (transactionCategoriesStore.transactionCategoryListStateInvalid) {
             reload(true);
         }
-
-        updateCardMinHeight();
     }).catch(error => {
         if (error) {
             desktopPageStore.addErrorToast(error);
@@ -399,8 +362,6 @@ function hide(category: TransactionCategory, hidden: boolean): void {
     }).then(() => {
         updating.value = false;
         categoryHiding.value[category.id] = false;
-
-        updateCardMinHeight();
     }).catch(error => {
         updating.value = false;
         categoryHiding.value[category.id] = false;
@@ -421,8 +382,6 @@ function remove(category: TransactionCategory): void {
         }).then(() => {
             updating.value = false;
             categoryRemoving.value[category.id] = false;
-
-            updateCardMinHeight();
         }).catch(error => {
             updating.value = false;
             categoryRemoving.value[category.id] = false;
@@ -485,14 +444,6 @@ function onPresetCategorySaved(e: { message: string }): void {
         reload(false);
     }
 }
-
-watch(lgAndUp, (newValue) => {
-    alwaysShowNav.value = newValue;
-
-    if (!showNav.value) {
-        showNav.value = newValue;
-    }
-});
 
 reload(false);
 </script>

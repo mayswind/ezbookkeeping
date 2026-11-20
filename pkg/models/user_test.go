@@ -118,6 +118,36 @@ func TestUserCanEditTransactionByTransactionTime_ScopeIsThisYearOrLater(t *testi
 	assert.Equal(t, false, user.CanEditTransactionByTransactionTime(utils.GetMinTransactionTimeFromUnixTime(lastYearLastDatetime.Unix()), timezone, nil, nil))
 }
 
+func TestUserCanEditTransactionByTransactionTime_ScopeStartsOnClientDate(t *testing.T) {
+	// At any time of day, at least one of these two zones is on a different date than the server
+	timezones := []*time.Location{
+		time.FixedZone("UTC+14", 14*60*60),
+		time.FixedZone("UTC-12", -12*60*60),
+	}
+
+	for _, timezone := range timezones {
+		clientNow := time.Now().In(timezone)
+		clientToday := time.Date(clientNow.Year(), clientNow.Month(), clientNow.Day(), 0, 0, 0, 0, timezone)
+		daysSinceMonday := (int(clientNow.Weekday()) + 6) % 7
+
+		scopeStartTimes := map[TransactionEditScope]time.Time{
+			TRANSACTION_EDIT_SCOPE_THIS_WEEK_OR_LATER:  clientToday.AddDate(0, 0, -daysSinceMonday),
+			TRANSACTION_EDIT_SCOPE_THIS_MONTH_OR_LATER: time.Date(clientNow.Year(), clientNow.Month(), 1, 0, 0, 0, 0, timezone),
+			TRANSACTION_EDIT_SCOPE_THIS_YEAR_OR_LATER:  time.Date(clientNow.Year(), 1, 1, 0, 0, 0, 0, timezone),
+		}
+
+		for scope, scopeStartTime := range scopeStartTimes {
+			user := &User{
+				TransactionEditScope: scope,
+				FirstDayOfWeek:       core.WEEKDAY_MONDAY,
+			}
+
+			assert.Equal(t, true, user.CanEditTransactionByTransactionTime(utils.GetMinTransactionTimeFromUnixTime(scopeStartTime.Add(1*time.Second).Unix()), timezone, nil, nil), "scope %d, %s", scope, scopeStartTime.Add(1*time.Second))
+			assert.Equal(t, false, user.CanEditTransactionByTransactionTime(utils.GetMinTransactionTimeFromUnixTime(scopeStartTime.Add(-1*time.Second).Unix()), timezone, nil, nil), "scope %d, %s", scope, scopeStartTime.Add(-1*time.Second))
+		}
+	}
+}
+
 func TestUserCanEditTransactionByTransactionTime_ScopeIsLastReconciledTimeOrLater(t *testing.T) {
 	user := &User{
 		TransactionEditScope:  TRANSACTION_EDIT_SCOPE_LAST_RECONCILED_TIME_OR_LATER,

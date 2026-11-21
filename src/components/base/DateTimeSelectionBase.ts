@@ -4,6 +4,7 @@ import { useI18n } from '@/locales/helpers.ts';
 
 import { type NameValue } from '@/core/base.ts';
 import { NumeralSystem } from '@/core/numeral.ts';
+import { type DateTime, type DateFormatOrder, KnownDateTimeFormat } from '@/core/datetime.ts';
 
 import {
     getLocalDatetimeFromUnixTime,
@@ -11,7 +12,8 @@ import {
     getSameDateTimeWithBrowserTimezone,
     getSameDateTimeWithTimezoneOffset,
     parseDateTimeFromUnixTimeWithBrowserTimezone,
-    parseDateTimeFromUnixTimeWithTimezoneOffset
+    parseDateTimeFromUnixTimeWithTimezoneOffset,
+    parseDateTimeFromKnownDateTimeFormat
 } from '@/lib/datetime.ts';
 
 export interface TimePickerValue {
@@ -23,6 +25,12 @@ export function useDateTimeSelectionBase() {
     const {
         getAllMeridiemIndicators,
         getCurrentNumeralSystemType,
+        getLocalizedLongDateFormat,
+        getLocalizedLongTimeFormat,
+        getLongDateFormatOrder,
+        getShortDateFormatOrder,
+        parseDateTimeFromLongDateTime,
+        parseDateTimeFromShortDateTime,
         isLongTime24HourFormat,
         isLongTimeMeridiemIndicatorFirst,
         isLongTimeHourTwoDigits,
@@ -38,6 +46,9 @@ export function useDateTimeSelectionBase() {
 
     const numeralSystem = computed<NumeralSystem>(() => getCurrentNumeralSystemType());
     const meridiemItems = computed<NameValue[]>(() => getAllMeridiemIndicators());
+    const longDateFormatOrder = computed<DateFormatOrder>(() => getLongDateFormatOrder());
+    const shortDateFormatOrder = computed<DateFormatOrder>(() => getShortDateFormatOrder());
+    const typedFormatHint = computed<string>(() => `${getLocalizedLongDateFormat()} ${getLocalizedLongTimeFormat()}`);
 
     function getLocalDatetimeFromSameDateTimeOfUnixTime(unixTime: number, utcOffset: number): Date {
         return getLocalDatetimeFromUnixTime(getSameDateTimeWithBrowserTimezone(parseDateTimeFromUnixTimeWithTimezoneOffset(unixTime, utcOffset)).getUnixTime());
@@ -96,6 +107,27 @@ export function useDateTimeSelectionBase() {
         return ret;
     }
 
+    function parseTypedDateTime(text: string): DateTime | undefined {
+        const trimmedText = text.trim();
+
+        if (!trimmedText) {
+            return undefined;
+        }
+
+        const normalizedText = numeralSystem.value.replaceLocalizedDigitsToWesternArabicDigits(trimmedText);
+        const formats = KnownDateTimeFormat.detect(normalizedText, longDateFormatOrder.value, shortDateFormatOrder.value);
+
+        if (formats && (formats.length === 1 || (formats.length > 1 && formats[0]!.type === longDateFormatOrder.value && formats[0]!.type === shortDateFormatOrder.value))) {
+            const dt = parseDateTimeFromKnownDateTimeFormat(normalizedText, formats[0] as KnownDateTimeFormat);
+
+            if (dt) {
+                return dt;
+            }
+        }
+
+        return parseDateTimeFromLongDateTime(normalizedText) || parseDateTimeFromShortDateTime(normalizedText);
+    }
+
     return {
         // states
         is24Hour,
@@ -105,11 +137,13 @@ export function useDateTimeSelectionBase() {
         isMeridiemIndicatorFirst,
         // computed
         meridiemItems,
+        typedFormatHint,
         // functions
         getLocalDatetimeFromSameDateTimeOfUnixTime,
         getUnixTimeFromSameDateTimeOfLocalDatetime,
         getDisplayTimeValue,
         generateAllHours,
-        generateAllMinutesOrSeconds
+        generateAllMinutesOrSeconds,
+        parseTypedDateTime
     };
 }

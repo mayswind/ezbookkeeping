@@ -75,7 +75,7 @@
         <template #header.operation>
             <div>
                 <span>{{ tt('Operation') }}</span>
-                <v-icon :icon="mdiMenuDown" size="20" />
+                <v-icon class="menu-toggle-icon" size="20" :icon="mdiMenuDown" />
                 <v-menu activator="parent" location="bottom">
                     <v-list>
                         <v-list-item :prepend-icon="mdiTextBoxEditOutline"

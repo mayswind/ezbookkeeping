@@ -141,6 +141,14 @@
     color: inherit !important;
 }
 
+.menu-toggle-icon {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[aria-expanded='true'] > .menu-toggle-icon {
+    transform: rotate(180deg);
+}
+
 .chart-pointer {
     display: inline-block;
     width: 0.625rem;

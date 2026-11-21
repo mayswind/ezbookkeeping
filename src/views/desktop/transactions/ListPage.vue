@@ -221,7 +221,7 @@
                                             <div class="d-flex align-center cursor-pointer"
                                                  :class="{ 'readonly': loading, 'text-primary': query.dateType !== DateRange.ThisMonth.type }" v-bind="props">
                                                 <span>{{ tt('Time') }}</span>
-                                                <v-icon :icon="mdiMenuDown" />
+                                                <v-icon class="menu-toggle-icon" :icon="mdiMenuDown" />
                                             </div>
                                         </template>
                                         <v-list :selected="[query.dateType]">
@@ -257,7 +257,7 @@
                                             <div class="d-flex align-center"
                                                 :class="{ 'readonly': loading, 'cursor-pointer': query.type !== 1, 'text-primary': query.categoryIds }" v-bind="props">
                                                 <span>{{ queryCategoryName }}</span>
-                                                <v-icon :icon="mdiMenuDown" v-show="query.type !== 1" />
+                                                <v-icon class="menu-toggle-icon" :icon="mdiMenuDown" v-show="query.type !== 1" />
                                             </div>
                                         </template>
                                         <v-list :selected="[queryAllSelectedFilterCategoryIds]">
@@ -356,7 +356,7 @@
                                             <div class="d-flex align-center cursor-pointer"
                                                  :class="{ 'readonly': loading, 'text-primary': query.amountFilter }" v-bind="props">
                                                 <span>{{ tt('Amount') }}</span>
-                                                <v-icon :icon="mdiMenuDown" />
+                                                <v-icon class="menu-toggle-icon" :icon="mdiMenuDown" />
                                             </div>
                                         </template>
                                         <v-list :selected="[query.amountFilter.split(':')[0]]">
@@ -408,7 +408,7 @@
                                             <div class="d-flex align-center cursor-pointer"
                                                  :class="{ 'readonly': loading, 'text-primary': query.accountIds }" v-bind="props">
                                                 <span>{{ queryAccountName }}</span>
-                                                <v-icon :icon="mdiMenuDown" />
+                                                <v-icon class="menu-toggle-icon" :icon="mdiMenuDown" />
                                             </div>
                                         </template>
                                         <v-list :selected="[queryAllSelectedFilterAccountIds]">
@@ -463,7 +463,7 @@
                                             <div class="d-flex align-center cursor-pointer"
                                                  :class="{ 'readonly': loading, 'text-primary': query.tagFilter }" v-bind="props">
                                                 <span>{{ queryTagName }}</span>
-                                                <v-icon :icon="mdiMenuDown" />
+                                                <v-icon class="menu-toggle-icon" :icon="mdiMenuDown" />
                                             </div>
                                         </template>
                                         <v-list :selected="[queryAllSelectedFilterTagIds]">

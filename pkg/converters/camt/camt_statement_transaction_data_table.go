@@ -62,7 +62,7 @@ func (t *camtStatementTransactionDataTable) TransactionRowCount() int {
 		for j := 0; j < len(statement.Entries); j++ {
 			entry := statement.Entries[j]
 
-			if entry.EntryDetails != nil {
+			if entry.EntryDetails != nil && len(entry.EntryDetails.TransactionDetails) > 0 {
 				totalDataRowCount += len(entry.EntryDetails.TransactionDetails)
 			} else {
 				totalDataRowCount++
@@ -114,7 +114,7 @@ func (t *camtStatementTransactionDataRowIterator) HasNext() bool {
 	} else if t.currentEntryIndex < len(currentStatement.Entries) {
 		currencyEntry := currentStatement.Entries[t.currentEntryIndex]
 
-		if currencyEntry.EntryDetails != nil {
+		if currencyEntry.EntryDetails != nil && len(currencyEntry.EntryDetails.TransactionDetails) > 0 {
 			if t.currentTransactionDetailsIndex+1 < len(currencyEntry.EntryDetails.TransactionDetails) {
 				return true
 			}
@@ -168,7 +168,7 @@ func (t *camtStatementTransactionDataRowIterator) Next(ctx core.Context, user *m
 		statement := allStatements[i]
 
 		for j := t.currentEntryIndex; j < len(statement.Entries); j++ {
-			if statement.Entries[j].EntryDetails != nil {
+			if statement.Entries[j].EntryDetails != nil && len(statement.Entries[j].EntryDetails.TransactionDetails) > 0 {
 				if t.currentTransactionDetailsIndex+1 < len(statement.Entries[j].EntryDetails.TransactionDetails) {
 					t.currentTransactionDetailsIndex++
 					foundNextRow = true
@@ -209,7 +209,7 @@ func (t *camtStatementTransactionDataRowIterator) Next(ctx core.Context, user *m
 	entry := currentStatement.Entries[t.currentEntryIndex]
 	var transactionDetails *camtTransactionDetails
 
-	if entry.EntryDetails != nil {
+	if entry.EntryDetails != nil && len(entry.EntryDetails.TransactionDetails) > 0 {
 		if t.currentTransactionDetailsIndex >= len(entry.EntryDetails.TransactionDetails) {
 			return nil, nil
 		} else {

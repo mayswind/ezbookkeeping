@@ -541,6 +541,38 @@ func TestCamt053TransactionDataFileParseImportedData_ParseTransactionValidAmount
 	assert.Equal(t, 1, len(allNewTransactions))
 	assert.Equal(t, "CNY", allNewTransactions[0].OriginalSourceAccountCurrency)
 	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
+
+	allNewTransactions, _, _, _, _, _, err = importer.ParseImportedData(context, user, []byte(
+		`<?xml version="1.0" encoding="UTF-8"?>
+		<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
+			<BkToCstmrStmt>
+				<Stmt>
+					<Acct>
+						<Id>
+							<IBAN>123</IBAN>
+						</Id>
+						<Ccy>CNY</Ccy>
+					</Acct>
+					<Ntry>
+						<BookgDt>
+							<DtTm>2024-09-01T12:34:56+08:00</DtTm>
+						</BookgDt>
+						<CdtDbtInd>CRDT</CdtDbtInd>
+						<Amt Ccy="USD">123.45</Amt>
+						<NtryDtls>
+							<Btch>
+								<NbOfTxs>2</NbOfTxs>
+							</Btch>
+						</NtryDtls>
+					</Ntry>
+				</Stmt>
+			</BkToCstmrStmt>
+		</Document>`), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(allNewTransactions))
+	assert.Equal(t, "USD", allNewTransactions[0].OriginalSourceAccountCurrency)
+	assert.Equal(t, int64(12345), allNewTransactions[0].Amount)
 }
 
 func TestCamt053TransactionDataFileParseImportedData_ParseTransactionInvalidAmountAndCurrency(t *testing.T) {

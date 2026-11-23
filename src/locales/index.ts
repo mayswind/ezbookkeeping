@@ -50,6 +50,13 @@ export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
         textDirection: TextDirection.LTR,
         loadContent: () => import('./hi.json').then(module => module.default)
     },
+    'id': {
+        name: 'Indonesian',
+        displayName: 'Bahasa Indonesia',
+        alternativeLanguageTag: 'id-ID',
+        textDirection: TextDirection.LTR,
+        loadContent: () => import('./id.json').then(module => module.default)
+    },
     'it': {
         name: 'Italian',
         displayName: 'Italiano',

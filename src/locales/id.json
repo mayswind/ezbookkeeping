@@ -50,13 +50,13 @@
     "format": {
         "longDate": {
             "YearMonthDay": "YYYY MMMM DD",
-            "MonthDayYear": "MMMM D, YYYY",
-            "DayMonthYear": "D MMMM YYYY"
+            "MonthDayYear": "MMMM DD YYYY",
+            "DayMonthYear": "DD MMMM YYYY"
         },
         "shortDate": {
-            "YearMonthDay": "YYYY-M-D",
-            "MonthDayYear": "M/D/YYYY",
-            "DayMonthYear": "D/M/YYYY"
+            "YearMonthDay": "YYYY-MM-DD",
+            "MonthDayYear": "MM/DD/YYYY",
+            "DayMonthYear": "DD/MM/YYYY"
         },
         "longYear": {
             "YearMonthDay": "YYYY",
@@ -74,34 +74,34 @@
             "DayMonthYear": "MMMM YYYY"
         },
         "shortYearMonth": {
-            "YearMonthDay": "YYYY-M",
+            "YearMonthDay": "YYYY-MM",
             "MonthDayYear": "MMM YYYY",
             "DayMonthYear": "MMM YYYY"
         },
         "longMonthDay": {
             "YearMonthDay": "MMMM DD",
-            "MonthDayYear": "MMMM D",
-            "DayMonthYear": "D MMMM"
+            "MonthDayYear": "MMMM DD",
+            "DayMonthYear": "DD MMMM"
         },
         "shortMonthDay": {
-            "YearMonthDay": "M-D",
-            "MonthDayYear": "M/D",
-            "DayMonthYear": "D/M"
+            "YearMonthDay": "MM-DD",
+            "MonthDayYear": "MM/DD",
+            "DayMonthYear": "DD/MM"
         },
         "shortDay": {
-            "YearMonthDay": "D",
-            "MonthDayYear": "D",
-            "DayMonthYear": "D"
+            "YearMonthDay": "DD",
+            "MonthDayYear": "DD",
+            "DayMonthYear": "DD"
         },
         "longTime": {
-            "HourMinuteSecond": "HH:mm:ss",
-            "MeridiemIndicatorHourMinuteSecond": "A hh:mm:ss",
-            "HourMinuteSecondMeridiemIndicator": "hh:mm:ss A"
+            "HourMinuteSecond": "HH.mm.ss",
+            "MeridiemIndicatorHourMinuteSecond": "A hh.mm.ss",
+            "HourMinuteSecondMeridiemIndicator": "hh.mm.ss A"
         },
         "shortTime": {
-            "HourMinute": "HH:mm",
-            "MeridiemIndicatorHourMinute": "A hh:mm",
-            "HourMinuteMeridiemIndicator": "hh:mm A"
+            "HourMinute": "HH.mm",
+            "MeridiemIndicatorHourMinute": "A hh.mm",
+            "HourMinuteMeridiemIndicator": "hh.mm A"
         },
         "yearQuarter": {
             "content": "{quarter} {year}"
@@ -371,7 +371,7 @@
     "timezone": {
         "International Date Line West": "Batas Tanggal Internasional Barat",
         "Coordinated Universal Time-11": "Waktu Universal Terkoordinasi-11",
-        "Aleutian Islands": "Kepulauan Aleut",
+        "Aleutian Islands": "Kepulauan Aleutian",
         "Hawaii": "Hawaii",
         "Marquesas Islands": "Kepulauan Marquesas",
         "Alaska": "Alaska",
@@ -384,13 +384,13 @@
         "Mountain Time (US & Canada)": "Waktu Pegunungan (AS & Kanada)",
         "Yukon": "Yukon",
         "Central America": "Amerika Tengah",
-        "Central Time (US & Canada)": "Waktu Tengah (AS & Kanada)",
+        "Central Time (US & Canada)": "Waktu Bagian Tengah (AS & Kanada)",
         "Easter Island": "Pulau Paskah",
-        "Guadalajara, Mexico City, Monterrey": "Guadalajara, Kota Meksiko, Monterrey",
+        "Guadalajara, Mexico City, Monterrey": "Guadalajara, Mexico City, Monterrey",
         "Saskatchewan": "Saskatchewan",
         "Bogota, Lima, Quito, Rio Branco": "Bogota, Lima, Quito, Rio Branco",
         "Chetumal": "Chetumal",
-        "Eastern Time (US & Canada)": "Waktu Timur (AS & Kanada)",
+        "Eastern Time (US & Canada)": "Waktu Bagian Timur (AS & Kanada)",
         "Haiti": "Haiti",
         "Havana": "Havana",
         "Indiana (East)": "Indiana (Timur)",
@@ -413,15 +413,15 @@
         "Coordinated Universal Time-02": "Waktu Universal Terkoordinasi-02",
         "Greenland": "Greenland",
         "Azores": "Azores",
-        "Cabo Verde Is": "Kepulauan Tanjung Verde",
+        "Cabo Verde Is": "Cabo Verde Is.",
         "Coordinated Universal Time": "Waktu Universal Terkoordinasi",
-        "Dublin, Edinburgh, Lisbon, London": "Dublin, Edinburgh, Lisabon, London",
+        "Dublin, Edinburgh, Lisbon, London": "Dublin, Edinburgh, Lisbon, London",
         "Monrovia, Reykjavik": "Monrovia, Reykjavik",
         "Sao Tome": "Sao Tome",
         "Casablanca": "Casablanca",
         "Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna": "Amsterdam, Berlin, Bern, Roma, Stockholm, Wina",
-        "Belgrade, Bratislava, Budapest, Ljubljana, Prague": "Belgrade, Bratislava, Budapest, Ljubljana, Praha",
-        "Brussels, Copenhagen, Madrid, Paris": "Brussel, Kopenhagen, Madrid, Paris",
+        "Belgrade, Bratislava, Budapest, Ljubljana, Prague": "Beograd, Bratislava, Budapest, Ljubljana, Praha",
+        "Brussels, Copenhagen, Madrid, Paris": "Brussels, Kopenhagen, Madrid, Paris",
         "Sarajevo, Skopje, Warsaw, Zagreb": "Sarajevo, Skopje, Warsawa, Zagreb",
         "West Central Africa": "Afrika Tengah Barat",
         "Athens, Bucharest": "Athena, Bukares",
@@ -430,7 +430,7 @@
         "Chisinau": "Chisinau",
         "Gaza, Hebron": "Gaza, Hebron",
         "Harare, Pretoria": "Harare, Pretoria",
-        "Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius": "Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius",
+        "Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius": "Helsinki, Kiev, Riga, Sofia, Tallinn, Vilnius",
         "Jerusalem": "Yerusalem",
         "Juba": "Juba",
         "Kaliningrad": "Kaliningrad",
@@ -443,11 +443,11 @@
         "Istanbul": "Istanbul",
         "Kuwait, Riyadh": "Kuwait, Riyadh",
         "Minsk": "Minsk",
-        "Moscow, St Petersburg": "Moskwa, St. Petersburg",
+        "Moscow, St Petersburg": "Moskow, St. Petersburg",
         "Nairobi": "Nairobi",
         "Volgograd": "Volgograd",
         "Tehran": "Teheran",
-        "Abu Dhabi, Muscat": "Abu Dhabi, Muskat",
+        "Abu Dhabi, Muscat": "Abu Dhabi, Muscat",
         "Astrakhan, Ulyanovsk": "Astrakhan, Ulyanovsk",
         "Baku": "Baku",
         "Izhevsk, Samara": "Izhevsk, Samara",
@@ -473,7 +473,7 @@
         "Krasnoyarsk": "Krasnoyarsk",
         "Novosibirsk": "Novosibirsk",
         "Tomsk": "Tomsk",
-        "Beijing, Chongqing, Hong Kong SAR, Urumqi": "Beijing, Chongqing, Hong Kong SAR, Urumqi",
+        "Beijing, Chongqing, Hong Kong SAR, Urumqi": "Beijing, Chongqing, Hong Kong, Urumqi",
         "Irkutsk": "Irkutsk",
         "Kuala Lumpur, Singapore": "Kuala Lumpur, Singapura",
         "Perth": "Perth",
@@ -498,16 +498,16 @@
         "Magadan": "Magadan",
         "Norfolk Island": "Pulau Norfolk",
         "Sakhalin": "Sakhalin",
-        "Solomon Is, New Caledonia": "Kepulauan Solomon, Kaledonia Baru",
+        "Solomon Is, New Caledonia": "P. Solomon, Kaledonia Baru",
         "Anadyr, Petropavlovsk-Kamchatsky": "Anadyr, Petropavlovsk-Kamchatsky",
         "Auckland, Wellington": "Auckland, Wellington",
         "Coordinated Universal Time+12": "Waktu Universal Terkoordinasi+12",
-        "Fiji": "Fiji",
+        "Fiji": "Kepulauan Fiji",
         "Chatham Islands": "Kepulauan Chatham",
         "Coordinated Universal Time+13": "Waktu Universal Terkoordinasi+13",
         "Nukualofa": "Nuku'alofa",
         "Samoa": "Samoa",
-        "Kiritimati Island": "Pulau Kiritimati"
+        "Kiritimati Island": "Kiritimati Island"
     },
     "currency": {
         "name": {

@@ -330,6 +330,18 @@ func TestExcelMSCFBFileBasicDataRowGetData(t *testing.T) {
 	assert.Equal(t, "C3", row3.GetData(2))
 }
 
+func TestExcelMSCFBFileBasicDataRowGetData_BuiltinDateFormat(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/builtin_date_format_excel_file.xls")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelMSCFBFileBasicDataTable(testdata, false)
+	assert.Nil(t, err)
+	iterator := datatable.DataRowIterator()
+
+	row1 := iterator.Next()
+	assert.Equal(t, "2026-01-15T12:34:56Z", row1.GetData(0))
+}
+
 func TestExcelMSCFBFileBasicDataRowGetData_HasTitleLine(t *testing.T) {
 	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xls")
 	assert.Nil(t, err)

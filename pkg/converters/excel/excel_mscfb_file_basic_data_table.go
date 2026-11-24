@@ -3,12 +3,34 @@ package excel
 import (
 	"bytes"
 	"fmt"
+	"reflect"
+	"time"
+	"unsafe"
 
 	"github.com/extrame/xls"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
 )
+
+// The layouts of built-in formats are Go time layouts instead of Excel layouts, because the formatter of extrame/xls passes them through as is,
+// but it formats the month, hour, minute and second of Excel layouts incorrectly.
+
+// builtinDateTimeFormatLayout is the same output as extrame/xls produces for the date cells stored in the RK records
+const builtinDateTimeFormatLayout = time.RFC3339
+
+// builtinTimeFormatLayout is the layout for the time cells
+const builtinTimeFormatLayout = "15:04:05"
+
+// isBuiltinDateTimeFormatId returns whether the built-in number format id is a date or datetime format (the same ids as extrame/xls treats as dates)
+func isBuiltinDateTimeFormatId(formatId uint16) bool {
+	return 14 <= formatId && formatId <= 17 || formatId == 22 || 27 <= formatId && formatId <= 36 || 50 <= formatId && formatId <= 58
+}
+
+// isBuiltinTimeFormatId returns whether the built-in number format id is a time format
+func isBuiltinTimeFormatId(formatId uint16) bool {
+	return 18 <= formatId && formatId <= 21 || 45 <= formatId && formatId <= 47
+}
 
 // ExcelMSCFBFileBasicDataTable defines the structure of excel (microsoft compound file binary) file data table
 type ExcelMSCFBFileBasicDataTable struct {
@@ -187,6 +209,8 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 		return nil, err
 	}
 
+	fillBuiltinNumberFormats(workbook)
+
 	var firstRowItems []string
 	var sheets []*xls.WorkSheet
 
@@ -257,6 +281,8 @@ func CreateNewExcelMSCFBFileBasicDataTables(data []byte, hasTitleLine bool) ([]d
 		return nil, err
 	}
 
+	fillBuiltinNumberFormats(workbook)
+
 	var dataTables []datatable.BasicDataTable
 
 	for i := 0; i < workbook.NumSheets(); i++ {
@@ -301,4 +327,46 @@ func CreateNewExcelMSCFBFileBasicDataTables(data []byte, hasTitleLine bool) ([]d
 	}
 
 	return dataTables, nil
+}
+
+// fillBuiltinNumberFormats adds the formats which are used by cells but not stored in the workbook
+// extrame/xls only reads the custom formats from the file, so a numeric cell with a built-in format id (e.g. 14) causes a nil pointer dereference
+func fillBuiltinNumberFormats(workbook *xls.WorkBook) {
+	for _, xf := range workbook.Xfs {
+		var formatId *uint16
+
+		switch x := xf.(type) {
+		case *xls.Xf5:
+			formatId = &x.Format
+		case *xls.Xf8:
+			formatId = &x.Format
+		default:
+			continue
+		}
+
+		if *formatId == 0 || *formatId >= 164 || workbook.Formats[*formatId] != nil {
+			continue
+		}
+
+		var layout string
+
+		if isBuiltinDateTimeFormatId(*formatId) {
+			layout = builtinDateTimeFormatLayout
+		} else if isBuiltinTimeFormatId(*formatId) {
+			layout = builtinTimeFormatLayout
+		} else {
+			// the other built-in formats are numbers or text, so they are shown as general
+			*formatId = 0
+			continue
+		}
+
+		format := &xls.Format{}
+		format.Head.Index = *formatId
+
+		// the layout field is not exported
+		layoutField := reflect.ValueOf(format).Elem().FieldByName("str")
+		reflect.NewAt(layoutField.Type(), unsafe.Pointer(layoutField.UnsafeAddr())).Elem().SetString(layout)
+
+		workbook.Formats[*formatId] = format
+	}
 }

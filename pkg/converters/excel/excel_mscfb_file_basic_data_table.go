@@ -92,6 +92,20 @@ func (r *ExcelMSCFBFileBasicDataTableRow) ColumnCount() int {
 // GetData returns the data in the specified column index
 func (r *ExcelMSCFBFileBasicDataTableRow) GetData(columnIndex int) string {
 	row := r.sheet.Row(r.rowIndex)
+	return safeRowCol(row, columnIndex)
+}
+
+// safeRowCol wraps xls.Row.Col, guarding against a panic inside extrame/xls
+// when a numeric cell references a format that has no FORMAT record in the
+// workbook (built-in formats can have none). In that case the cell content
+// cannot be decoded, so an empty string is returned instead of crashing.
+func safeRowCol(row *xls.Row, columnIndex int) (content string) {
+	defer func() {
+		if r := recover(); r != nil {
+			content = ""
+		}
+	}()
+
 	return row.Col(columnIndex)
 }
 
@@ -213,7 +227,7 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 				// But row.FirstCol() returns "colMic" in the "Row" struct, that is an unsigned integer that specifies the zero-based index of the first column.
 				// Reference: https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/4aab09eb-49ed-4d01-a3b1-1d726247d3c2
 				for j := 0; j < row.LastCol(); j++ {
-					headerItem := row.Col(j)
+					headerItem := safeRowCol(row, j)
 
 					if headerItem == "" {
 						break
@@ -223,7 +237,7 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 				}
 			} else {
 				for j := 0; j < min(row.LastCol(), len(firstRowItems)); j++ {
-					headerItem := row.Col(j)
+					headerItem := safeRowCol(row, j)
 
 					if headerItem != firstRowItems[j] {
 						return nil, errs.ErrFieldsInMultiTableAreDifferent
@@ -283,7 +297,7 @@ func CreateNewExcelMSCFBFileBasicDataTables(data []byte, hasTitleLine bool) ([]d
 			// But row.FirstCol() returns "colMic" in the "Row" struct, that is an unsigned integer that specifies the zero-based index of the first column.
 			// Reference: https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/4aab09eb-49ed-4d01-a3b1-1d726247d3c2
 			for j := 0; j < row.LastCol(); j++ {
-				headerItem := row.Col(j)
+				headerItem := safeRowCol(row, j)
 
 				if headerItem == "" {
 					break

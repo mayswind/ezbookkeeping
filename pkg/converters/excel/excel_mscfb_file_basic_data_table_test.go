@@ -455,6 +455,33 @@ func TestExcelMSCFBFileBasicDataRowGetData_MultipleSheets_HasTitleLine(t *testin
 	assert.Equal(t, "5-C3", sheet5Row2.GetData(2))
 }
 
+func TestExcelMSCFBFileBasicDataRowGetData_BuiltinDateFormat(t *testing.T) {
+	// A NUMBER cell formatted with a built-in date format that has no FORMAT
+	// record in the workbook used to panic inside extrame/xls (nil dereference
+	// on wb.Formats[fNo]). The cell cannot be decoded so it reads as empty,
+	// while the rest of the workbook keeps parsing.
+	testdata, err := os.ReadFile("../../../testdata/builtin_date_format_excel_file.xls")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelMSCFBFileBasicDataTable(testdata, false)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, datatable.DataRowCount())
+
+	iterator := datatable.DataRowIterator()
+	row := iterator.Next()
+	assert.NotNil(t, row)
+	assert.Equal(t, "", row.GetData(0))
+}
+
+func TestExcelMSCFBFileBasicDataRowGetData_BuiltinDateFormat_HasTitleLine(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/builtin_date_format_excel_file.xls")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelMSCFBFileBasicDataTable(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, datatable.DataRowCount())
+}
+
 func TestCreateNewExcelMSCFBFileBasicDataTable_MultipleSheetsWithDifferentHeaders(t *testing.T) {
 	testdata, err := os.ReadFile("../../../testdata/multiple_sheets_with_different_header_row_excel_file.xls")
 	assert.Nil(t, err)

@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/extrame/xls"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -679,6 +680,42 @@ func TestCreateNewExcelMSCFBFileBasicDataTables_DataRowIterator_DifferentHeaders
 	assert.False(t, iterator1.HasNext())
 }
 
+func TestExcelMSCFBFileBasicDataRowGetData_BuiltinDateFormat(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/builtin_date_format_excel_file.xls")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelMSCFBFileBasicDataTable(testdata, false)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, datatable.DataRowCount())
+
+	iterator := datatable.DataRowIterator()
+	assert.True(t, iterator.HasNext())
+
+	row1 := iterator.Next()
+	assert.NotNil(t, row1)
+	assert.Equal(t, "2026-01-15T12:34:56Z", row1.GetData(0))
+	assert.False(t, iterator.HasNext())
+}
+
+func TestCreateNewExcelMSCFBFileBasicDataTable_BuiltinDateFormatHeaderLine(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/builtin_date_format_excel_file.xls")
+	assert.Nil(t, err)
+
+	datatable, err := CreateNewExcelMSCFBFileBasicDataTable(testdata, true)
+	assert.Nil(t, err)
+	assert.EqualValues(t, []string{"2026-01-15T12:34:56Z"}, datatable.HeaderColumnNames())
+}
+
+func TestCreateNewExcelMSCFBFileBasicDataTables_BuiltinDateFormatHeaderLine(t *testing.T) {
+	testdata, err := os.ReadFile("../../../testdata/builtin_date_format_excel_file.xls")
+	assert.Nil(t, err)
+
+	tables, err := CreateNewExcelMSCFBFileBasicDataTables(testdata, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(tables))
+	assert.EqualValues(t, []string{"2026-01-15T12:34:56Z"}, tables[0].HeaderColumnNames())
+}
+
 func TestExcelMSCFBFileBasicDataRowIteratorCurrentRowId(t *testing.T) {
 	testdata, err := os.ReadFile("../../../testdata/simple_excel_file.xls")
 	assert.Nil(t, err)
@@ -798,4 +835,23 @@ func TestExcelMSCFBFileBasicDataRowIteratorCurrentRowId_EmptyContent(t *testing.
 
 	assert.Nil(t, iterator.Next())
 	assert.Equal(t, "", iterator.CurrentRowId())
+}
+
+func TestFormatExcelMSCFBNumberCell(t *testing.T) {
+	workbook := &xls.WorkBook{}
+	workbook.Xfs = append(workbook.Xfs,
+		&xls.Xf8{Format: 14},  // built-in date format (mm-dd-yy)
+		&xls.Xf8{Format: 22},  // built-in datetime format (m/d/yy h:mm)
+		&xls.Xf5{Format: 15},  // BIFF5 built-in date format (d-mmm-yy)
+		&xls.Xf8{Format: 2},   // built-in numeric format (0.00)
+		&xls.Xf8{Format: 164}, // unregistered custom format
+	)
+
+	assert.Equal(t, "2026-01-15T12:34:56Z", formatExcelMSCFBNumberCell(workbook, 0, 46037.52425925926))
+	assert.Equal(t, "2026-01-15T12:34:56Z", formatExcelMSCFBNumberCell(workbook, 1, 46037.52425925926))
+	assert.Equal(t, "2026-01-15T00:00:00Z", formatExcelMSCFBNumberCell(workbook, 2, 46037))
+	assert.Equal(t, "123.45", formatExcelMSCFBNumberCell(workbook, 3, 123.45))
+	assert.Equal(t, "123.45", formatExcelMSCFBNumberCell(workbook, 4, 123.45))
+	assert.Equal(t, "123.45", formatExcelMSCFBNumberCell(workbook, 99, 123.45))
+	assert.Equal(t, "123.45", formatExcelMSCFBNumberCell(nil, 0, 123.45))
 }

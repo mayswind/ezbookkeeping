@@ -3,8 +3,13 @@ package excel
 import (
 	"bytes"
 	"fmt"
+	"math"
+	"reflect"
+	"strconv"
+	"time"
 
 	"github.com/extrame/xls"
+	"github.com/xuri/excelize/v2"
 
 	"github.com/mayswind/ezbookkeeping/pkg/converters/datatable"
 	"github.com/mayswind/ezbookkeeping/pkg/errs"
@@ -12,6 +17,7 @@ import (
 
 // ExcelMSCFBFileBasicDataTable defines the structure of excel (microsoft compound file binary) file data table
 type ExcelMSCFBFileBasicDataTable struct {
+	workbook              *xls.WorkBook
 	sheets                []*xls.WorkSheet
 	headerLineColumnNames []string
 	hasTitleLine          bool
@@ -19,6 +25,7 @@ type ExcelMSCFBFileBasicDataTable struct {
 
 // ExcelMSCFBFileBasicDataTableRow defines the structure of excel (microsoft compound file binary) file data table row
 type ExcelMSCFBFileBasicDataTableRow struct {
+	workbook *xls.WorkBook
 	sheet    *xls.WorkSheet
 	rowIndex int
 }
@@ -92,7 +99,7 @@ func (r *ExcelMSCFBFileBasicDataTableRow) ColumnCount() int {
 // GetData returns the data in the specified column index
 func (r *ExcelMSCFBFileBasicDataTableRow) GetData(columnIndex int) string {
 	row := r.sheet.Row(r.rowIndex)
-	return row.Col(columnIndex)
+	return getExcelMSCFBFileCellData(r.workbook, row, columnIndex)
 }
 
 // HasNext returns whether the iterator does not reach the end
@@ -173,6 +180,7 @@ func (t *ExcelMSCFBFileBasicDataTableRowIterator) Next() datatable.BasicDataTabl
 	}
 
 	return &ExcelMSCFBFileBasicDataTableRow{
+		workbook: t.dataTable.workbook,
 		sheet:    currentSheet,
 		rowIndex: int(t.currentRowIndexInSheet),
 	}
@@ -213,7 +221,7 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 				// But row.FirstCol() returns "colMic" in the "Row" struct, that is an unsigned integer that specifies the zero-based index of the first column.
 				// Reference: https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/4aab09eb-49ed-4d01-a3b1-1d726247d3c2
 				for j := 0; j < row.LastCol(); j++ {
-					headerItem := row.Col(j)
+					headerItem := getExcelMSCFBFileCellData(workbook, row, j)
 
 					if headerItem == "" {
 						break
@@ -223,7 +231,7 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 				}
 			} else {
 				for j := 0; j < min(row.LastCol(), len(firstRowItems)); j++ {
-					headerItem := row.Col(j)
+					headerItem := getExcelMSCFBFileCellData(workbook, row, j)
 
 					if headerItem != firstRowItems[j] {
 						return nil, errs.ErrFieldsInMultiTableAreDifferent
@@ -242,6 +250,7 @@ func CreateNewExcelMSCFBFileBasicDataTable(data []byte, hasTitleLine bool) (data
 	}
 
 	return &ExcelMSCFBFileBasicDataTable{
+		workbook:              workbook,
 		sheets:                sheets,
 		headerLineColumnNames: headerLineColumnNames,
 		hasTitleLine:          hasTitleLine,
@@ -283,7 +292,7 @@ func CreateNewExcelMSCFBFileBasicDataTables(data []byte, hasTitleLine bool) ([]d
 			// But row.FirstCol() returns "colMic" in the "Row" struct, that is an unsigned integer that specifies the zero-based index of the first column.
 			// Reference: https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/4aab09eb-49ed-4d01-a3b1-1d726247d3c2
 			for j := 0; j < row.LastCol(); j++ {
-				headerItem := row.Col(j)
+				headerItem := getExcelMSCFBFileCellData(workbook, row, j)
 
 				if headerItem == "" {
 					break
@@ -294,6 +303,7 @@ func CreateNewExcelMSCFBFileBasicDataTables(data []byte, hasTitleLine bool) ([]d
 		}
 
 		dataTables = append(dataTables, &ExcelMSCFBFileBasicDataTable{
+			workbook:              workbook,
 			sheets:                []*xls.WorkSheet{sheet},
 			headerLineColumnNames: headerLineColumnNames,
 			hasTitleLine:          hasTitleLine,
@@ -301,4 +311,122 @@ func CreateNewExcelMSCFBFileBasicDataTables(data []byte, hasTitleLine bool) ([]d
 	}
 
 	return dataTables, nil
+}
+
+func getExcelMSCFBFileCellData(workbook *xls.WorkBook, row *xls.Row, columnIndex int) string {
+	if row == nil || columnIndex < 0 || columnIndex > math.MaxUint16 {
+		return ""
+	}
+
+	var cellData string
+	var panicked bool
+
+	func() {
+		defer func() {
+			if recover() != nil {
+				panicked = true
+			}
+		}()
+		cellData = row.Col(columnIndex)
+	}()
+
+	if !panicked {
+		return cellData
+	}
+
+	// extrame/xls (*NumberCol).String dereferences wb.Formats[fNo] without checking for nil
+	// when a cell uses a built-in format ID that has no explicit FORMAT record.
+	return getExcelMSCFBFileCellFallbackData(workbook, row, columnIndex)
+}
+
+func getExcelMSCFBFileCellFallbackData(workbook *xls.WorkBook, row *xls.Row, columnIndex int) string {
+	rowValue := reflect.ValueOf(row)
+	if !rowValue.IsValid() || rowValue.Kind() != reflect.Ptr || rowValue.IsNil() {
+		return ""
+	}
+
+	colsField := rowValue.Elem().FieldByName("cols")
+	if !colsField.IsValid() || colsField.Kind() != reflect.Map {
+		return ""
+	}
+
+	colValue := colsField.MapIndex(reflect.ValueOf(uint16(columnIndex)))
+	if !colValue.IsValid() || colValue.IsNil() {
+		return ""
+	}
+
+	if colValue.Kind() == reflect.Interface {
+		colValue = colValue.Elem()
+	}
+
+	if colValue.Kind() != reflect.Ptr || colValue.IsNil() {
+		return ""
+	}
+
+	colStruct := colValue.Elem()
+	if colStruct.Type() != reflect.TypeOf(xls.NumberCol{}) {
+		return ""
+	}
+
+	xfIndexField := colStruct.FieldByName("Index")
+	floatField := colStruct.FieldByName("Float")
+	if !xfIndexField.IsValid() || !xfIndexField.CanUint() || !floatField.IsValid() || !floatField.CanFloat() {
+		return ""
+	}
+
+	return formatExcelMSCFBNumberCell(workbook, uint16(xfIndexField.Uint()), floatField.Float())
+}
+
+func formatExcelMSCFBNumberCell(workbook *xls.WorkBook, xfIndex uint16, floatVal float64) string {
+	if workbook != nil && int(xfIndex) < len(workbook.Xfs) {
+		formatIndex, ok := getExcelMSCBFXfFormatIndex(workbook.Xfs[xfIndex])
+		if ok && isBuiltInExcelDateFormat(formatIndex) {
+			isDate1904 := isExcelMSCFBWorkbookDate1904(workbook)
+			if dateTime, err := excelize.ExcelDateToTime(floatVal, isDate1904); err == nil {
+				return dateTime.Format(time.RFC3339)
+			}
+		}
+	}
+
+	return strconv.FormatFloat(floatVal, 'f', -1, 64)
+}
+
+func getExcelMSCBFXfFormatIndex(xf interface{}) (uint16, bool) {
+	switch v := xf.(type) {
+	case *xls.Xf8:
+		if v != nil {
+			return v.Format, true
+		}
+	case *xls.Xf5:
+		if v != nil {
+			return v.Format, true
+		}
+	}
+
+	return 0, false
+}
+
+func isBuiltInExcelDateFormat(formatIndex uint16) bool {
+	return (14 <= formatIndex && formatIndex <= 17) ||
+		formatIndex == 22 ||
+		(27 <= formatIndex && formatIndex <= 36) ||
+		(50 <= formatIndex && formatIndex <= 58)
+}
+
+func isExcelMSCFBWorkbookDate1904(workbook *xls.WorkBook) bool {
+	if workbook == nil {
+		return false
+	}
+
+	wbValue := reflect.ValueOf(workbook)
+	if wbValue.Kind() != reflect.Ptr || wbValue.IsNil() {
+		return false
+	}
+
+	dateModeField := wbValue.Elem().FieldByName("dateMode")
+	if !dateModeField.IsValid() || !dateModeField.CanUint() {
+		return false
+	}
+
+	return dateModeField.Uint() == 1
 }

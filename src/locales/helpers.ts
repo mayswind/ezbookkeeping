@@ -3124,6 +3124,8 @@ function parse(row, index) {
         getCurrentDigitGroupingType,
         getCurrentFiscalYearFormatType,
         getCurrencyName,
+        getLocalizedLongDateFormat,
+        getLocalizedLongTimeFormat,
         getLongDateFormatOrder,
         getShortDateFormatOrder,
         isLongDateMonthAfterYear,

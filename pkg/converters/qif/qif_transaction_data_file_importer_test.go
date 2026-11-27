@@ -485,6 +485,34 @@ func TestQIFTransactionDataFileParseImportedData_ParseSubCategory(t *testing.T) 
 	assert.Equal(t, "Sub Category", allNewSubExpenseCategories[0].Name)
 }
 
+func TestQIFTransactionDataFileParseImportedData_ParseCategoryWithClass(t *testing.T) {
+	importer := QifYearMonthDayTransactionDataImporter
+	context := core.NewNullContext()
+
+	user := &models.User{
+		Uid:             1234567890,
+		DefaultCurrency: "CNY",
+	}
+
+	allNewTransactions, _, _, _, _, _, err := importer.ParseImportedData(context, user, []byte(
+		"!Type:Bank\n"+
+			"D2024-09-01\n"+
+			"T-123.45\n"+
+			"LTest Category:Sub Category/Business\n"+
+			"^\n"+
+			"D2024-09-02\n"+
+			"T-0.05\n"+
+			"L[Test Account2]/Business\n"+
+			"^\n"), time.UTC, converter.DefaultImporterOptions, nil, nil, nil, nil, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(allNewTransactions))
+
+	assert.Equal(t, "Sub Category", allNewTransactions[0].OriginalCategoryName)
+	assert.Equal(t, models.TRANSACTION_DB_TYPE_TRANSFER_OUT, allNewTransactions[1].Type)
+	assert.Equal(t, "Test Account2", allNewTransactions[1].OriginalDestinationAccountName)
+}
+
 func TestQIFTransactionDataFileParseImportedData_ParseDescription(t *testing.T) {
 	importer := QifYearMonthDayTransactionDataImporter
 	context := core.NewNullContext()

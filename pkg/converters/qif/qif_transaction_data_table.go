@@ -157,21 +157,27 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 		data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = ""
 	}
 
-	if len(qifTransaction.Category) > 0 && qifTransaction.Category[0] == '[' && qifTransaction.Category[len(qifTransaction.Category)-1] == ']' {
+	category := qifTransaction.Category
+
+	if i := strings.Index(category, "/"); i >= 0 { // category/class
+		category = category[:i]
+	}
+
+	if len(category) > 0 && category[0] == '[' && category[len(category)-1] == ']' {
 		if qifTransaction.Payee == qifOpeningBalancePayeeText { // balance modification
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = qifTransactionTypeNameMapping[models.TRANSACTION_TYPE_MODIFY_BALANCE]
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
-			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.Category[1 : len(qifTransaction.Category)-1]
+			data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = category[1 : len(category)-1]
 		} else { // transfer
 			data[datatable.TRANSACTION_DATA_TABLE_TRANSACTION_TYPE] = qifTransactionTypeNameMapping[models.TRANSACTION_TYPE_TRANSFER]
 
 			if amount >= 0 { // transfer from [account name]
 				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(amount)
 				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME]
-				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = qifTransaction.Category[1 : len(qifTransaction.Category)-1]
+				data[datatable.TRANSACTION_DATA_TABLE_ACCOUNT_NAME] = category[1 : len(category)-1]
 			} else { // transfer to [account name]
 				data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
-				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = qifTransaction.Category[1 : len(qifTransaction.Category)-1]
+				data[datatable.TRANSACTION_DATA_TABLE_RELATED_ACCOUNT_NAME] = category[1 : len(category)-1]
 			}
 		}
 	} else { // income/expense
@@ -183,13 +189,13 @@ func (t *qifTransactionDataRowIterator) parseTransaction(ctx core.Context, user 
 			data[datatable.TRANSACTION_DATA_TABLE_AMOUNT] = utils.FormatAmount(-amount)
 		}
 
-		if strings.Index(qifTransaction.Category, ":") > 0 { // category:subcategory
-			categories := strings.Split(qifTransaction.Category, ":")
+		if strings.Index(category, ":") > 0 { // category:subcategory
+			categories := strings.Split(category, ":")
 			data[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = categories[0]
 			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = categories[len(categories)-1]
 		} else {
 			data[datatable.TRANSACTION_DATA_TABLE_CATEGORY] = ""
-			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = qifTransaction.Category
+			data[datatable.TRANSACTION_DATA_TABLE_SUB_CATEGORY] = category
 		}
 	}
 
